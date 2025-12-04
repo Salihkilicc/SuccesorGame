@@ -1,83 +1,153 @@
-import React, {useMemo, useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React from 'react';
+import {ScrollView, View, Text, StyleSheet, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import MarketScreen from './Assets/Market/MarketScreen';
-import MyCompanyScreen from './Assets/MyCompany/MyCompanyScreen';
-import {useStatsStore, useUserStore, useEventStore} from '../store';
-import {getRandomEvent} from '../utils/randomEvent';
+import {useStatsStore, useEventStore} from '../store';
+import {theme} from '../theme';
 import type {AssetsStackParamList} from '../navigation';
 
-const TABS = [
-  {key: 'Market', label: 'Market'},
-  {key: 'MyCompany', label: 'My Company'},
-] as const;
+const formatMoney = (value: number) => {
+  const absolute = Math.abs(value);
+  if (absolute >= 1_000_000) {
+    const formatted = (value / 1_000_000).toFixed(1);
+    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
+  }
+  if (absolute >= 1_000) {
+    const formatted = (value / 1_000).toFixed(1);
+    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
+  }
+  return `$${value.toLocaleString()}`;
+};
 
-type AssetsTab = (typeof TABS)[number]['key'];
+type StatPillProps = {
+  label: string;
+  value: string;
+};
+
+const StatPill = ({label, value}: StatPillProps) => (
+  <View style={styles.pill}>
+    <Text style={styles.pillLabel}>{label}</Text>
+    <Text style={styles.pillValue}>{value}</Text>
+  </View>
+);
 
 const AssetsScreen = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
-  const {netWorth, money, riskApetite, strategicSense} = useStatsStore();
-  const {hasPremium} = useUserStore();
+  const navigation = useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
+  const {netWorth, money, monthlyIncome, monthlyExpenses, riskApetite, strategicSense} =
+    useStatsStore();
   const {lastMarketEvent} = useEventStore();
-  const [activeTab, setActiveTab] = useState<AssetsTab>('Market');
-  const nextMove = useMemo(
-    () =>
-      getRandomEvent([
-        'Rebalance your portfolio.',
-        'Check startup deal flow.',
-        'Park cash in a safe asset.',
-      ]),
-    [],
-  );
+
+  const nextMove = (() => {
+    if (riskApetite > 65) {
+      return 'Consider adding a small position in higher risk assets.';
+    }
+    if (riskApetite < 40) {
+      return 'Keep it safe: focus on blue-chip and lower volatility.';
+    }
+    return 'Balance your portfolio between growth and stability.';
+  })();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Assets</Text>
-      <Text style={styles.body}>
-        Overview of your holdings and net worth. Switch tabs to peek at the
-        market or your own company.
-      </Text>
-      <Pressable
-        onPress={() => navigation.navigate('Casino')}
-        style={({pressed}) => [
-          styles.casinoButton,
-          pressed && styles.casinoButtonPressed,
-        ]}>
-        <Text style={styles.casinoButtonText}>Go to Casino</Text>
-      </Pressable>
-      <Text style={styles.stat}>Net worth: ${netWorth.toLocaleString()}</Text>
-      <Text style={styles.stat}>Cash: ${money.toLocaleString()}</Text>
-      <Text style={styles.stat}>Risk appetite: {riskApetite}</Text>
-      <Text style={styles.stat}>Strategic sense: {strategicSense}</Text>
-      <Text style={styles.event}>Last market event: {lastMarketEvent}</Text>
-      <Text style={styles.event}>Next move idea: {nextMove}</Text>
-      <Text style={styles.event}>Premium: {hasPremium ? 'Yes' : 'No'}</Text>
+    <View style={styles.safeArea}>
+      <ScrollView
+        style={{flex: 1}}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Assets</Text>
+          <View style={styles.riskRow}>
+            <StatPill label="Risk Appetite" value={`${Math.round(riskApetite)}%`} />
+            <StatPill label="Strategic Sense" value={`${Math.round(strategicSense)}%`} />
+          </View>
+        </View>
 
-      <View style={styles.segmentContainer}>
-        {TABS.map(tab => {
-          const isActive = tab.key === activeTab;
-          return (
-            <Pressable
-              key={tab.key}
-              style={[styles.segmentButton, isActive && styles.segmentButtonOn]}
-              onPress={() => setActiveTab(tab.key)}>
-              <Text
-                style={[
-                  styles.segmentLabel,
-                  isActive && styles.segmentLabelOn,
-                ]}>
-                {tab.label}
+        <View style={styles.cardGroup}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Last Market Event</Text>
+            <Text style={styles.cardBody}>
+              {lastMarketEvent ?? 'No significant market event yet.'}
+            </Text>
+          </View>
+          <View style={styles.cardSoft}>
+            <Text style={styles.cardTitle}>Next Move Idea</Text>
+            <Text style={styles.cardBody}>{nextMove}</Text>
+          </View>
+        </View>
+
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryCol}>
+              <Text style={styles.summaryLabel}>Net Worth</Text>
+              <Text style={styles.summaryValue}>{formatMoney(netWorth)}</Text>
+
+              <View style={{marginTop: theme.spacing.md}}>
+                <Text style={styles.summaryLabel}>Cash</Text>
+                <Text style={styles.summaryValue}>{formatMoney(money)}</Text>
+              </View>
+            </View>
+
+            <View style={styles.summaryCol}>
+              <Pressable
+                onPress={() => {
+                  console.log('Navigate to Investments screen (to be implemented)');
+                }}
+                style={({pressed}) => [styles.investmentsButton, pressed && styles.investmentsButtonPressed]}>
+                <View>
+                  <Text style={styles.summaryLabel}>Investments</Text>
+                  {/* TODO: Replace placeholder with real investments total when available */}
+                  <Text style={styles.summaryValue}>{formatMoney(0)}</Text>
+                </View>
+                <Text style={styles.investmentsCta}>›</Text>
+              </Pressable>
+
+              <View style={styles.incomeRow}>
+                <View>
+                  <Text style={styles.summaryLabel}>Income</Text>
+                  <Text style={styles.summaryValue}>
+                    {monthlyIncome ? formatMoney(monthlyIncome) : '$0'}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={styles.summaryLabel}>Expenses</Text>
+                  <Text style={styles.summaryValue}>
+                    {monthlyExpenses ? formatMoney(monthlyExpenses) : '$0'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={{gap: theme.spacing.md}}>
+          <View style={styles.actionCard}>
+            <View style={{gap: theme.spacing.xs}}>
+              <Text style={styles.actionTitle}>Market</Text>
+              <Text style={styles.actionBody}>
+                Scan the latest sectors and move quickly on opportunities.
               </Text>
+            </View>
+            <Pressable
+              onPress={() => navigation.navigate('Market')}
+              style={({pressed}) => [styles.actionButton, pressed && styles.actionButtonPressed]}>
+              <Text style={styles.actionButtonText}>Go to Market</Text>
             </Pressable>
-          );
-        })}
-      </View>
+          </View>
 
-      <View style={styles.content}>
-        {activeTab === 'Market' ? <MarketScreen /> : <MyCompanyScreen />}
-      </View>
+          <View style={styles.actionCard}>
+            <View style={{gap: theme.spacing.xs}}>
+              <Text style={styles.actionTitle}>My Company</Text>
+              <Text style={styles.actionBody}>
+                Review valuation, ownership, and make strategic moves.
+              </Text>
+            </View>
+            <Pressable
+              onPress={() => navigation.navigate('MyCompany')}
+              style={({pressed}) => [styles.actionButton, pressed && styles.actionButtonPressed]}>
+              <Text style={styles.actionButtonText}>Go to My Company</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -85,68 +155,159 @@ const AssetsScreen = () => {
 export default AssetsScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#f6f7fb',
-    padding: 16,
-    gap: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginTop: 24,
-    color: '#111827',
-  },
-  body: {
-    fontSize: 16,
-    color: '#4b5563',
-    textAlign: 'center',
-  },
-  casinoButton: {
-    backgroundColor: '#111827',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    alignSelf: 'stretch',
-  },
-  casinoButtonPressed: {
-    backgroundColor: '#0b1220',
-    transform: [{scale: 0.98}],
-  },
-  casinoButtonText: {
-    color: '#f9fafb',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  segmentContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    backgroundColor: '#e5e7eb',
-    borderRadius: 10,
-    padding: 4,
-    gap: 4,
-  },
-  segmentButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  segmentButtonOn: {
-    backgroundColor: '#111827',
-  },
-  segmentLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4b5563',
-  },
-  segmentLabelOn: {
-    color: '#f9fafb',
+    backgroundColor: theme.colors.background,
   },
   content: {
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    paddingBottom: theme.spacing.xl * 2,
+  },
+  header: {
+    gap: theme.spacing.sm,
+  },
+  title: {
+    fontSize: theme.typography.title,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+  },
+  riskRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    flexWrap: 'wrap',
+  },
+  pill: {
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  pillLabel: {
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
+    letterSpacing: 0.4,
+  },
+  pillValue: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
+    fontWeight: '700',
+  },
+  cardGroup: {
+    gap: theme.spacing.sm,
+  },
+  card: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
+  },
+  cardSoft: {
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
+  },
+  cardTitle: {
+    color: theme.colors.textPrimary,
+    fontWeight: '700',
+    fontSize: theme.typography.body,
+  },
+  cardBody: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
+    lineHeight: 18,
+  },
+  summaryCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.lg,
+  },
+  summaryCol: {
     flex: 1,
-    alignSelf: 'stretch',
+    gap: theme.spacing.sm,
+  },
+  summaryLabel: {
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+  },
+  summaryValue: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
+  },
+  investmentsButton: {
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  investmentsButtonPressed: {
+    backgroundColor: theme.colors.card,
+    transform: [{scale: 0.98}],
+  },
+  investmentsCta: {
+    color: theme.colors.accent,
+    fontWeight: '800',
+    fontSize: theme.typography.subtitle,
+  },
+  incomeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+  },
+  actionCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm,
+  },
+  actionTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
+  },
+  actionBody: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.body,
+    lineHeight: 18,
+  },
+  actionButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.accentSoft,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.accent,
+  },
+  actionButtonPressed: {
+    transform: [{scale: 0.98}],
+  },
+  actionButtonText: {
+    color: theme.colors.accent,
+    fontWeight: '800',
+    fontSize: theme.typography.caption + 1,
   },
 });
