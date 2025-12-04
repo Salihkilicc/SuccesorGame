@@ -1,4 +1,4 @@
-import {useEventStore, useStatsStore} from '../store';
+import {useEventStore, useStatsStore, useUserStore} from '../store';
 import {
   lifeEvents,
   loveEvents,
@@ -8,6 +8,7 @@ import {
   type GameEvent,
 } from './eventTemplates';
 import {buildAIEvent} from './aiEventBuilder';
+import {checkAllAchievementsAfterStateChange} from '../achievements/checker';
 
 export type EventType = GameEvent['category'];
 
@@ -18,6 +19,9 @@ const pools: Record<EventType, GameEvent[]> = {
   company: companyEvents,
   casino: casinoEvents,
 };
+
+const clamp = (value: number, min = 0, max = 100) =>
+  Math.min(max, Math.max(min, value));
 
 const getRandomEvent = (pool: GameEvent[], category: EventType): GameEvent => {
   if (!pool.length) {
@@ -51,12 +55,20 @@ export const applyEventEffects = (event: GameEvent) => {
   if (typeof effects.charisma === 'number') {
     setField('charisma', stats.charisma + effects.charisma);
   }
+  if (typeof effects.reputation === 'number') {
+    const next = clamp(stats.reputation + effects.reputation);
+    setField('reputation', next);
+  }
+  if (typeof effects.love === 'number') {
+    const next = clamp(stats.love + effects.love);
+    setField('love', next);
+  }
   if (typeof effects.companyValue === 'number') {
     setField('companyValue', stats.companyValue + effects.companyValue);
   }
   if (typeof effects.casinoReputation === 'number') {
-    const next = Math.min(100, Math.max(0, stats.casinoReputation + effects.casinoReputation));
-    setField('casinoReputation', next);
+    const casinoValue = clamp(stats.casinoReputation + effects.casinoReputation);
+    setField('casinoReputation', casinoValue);
   }
 
   const handledKeys = [
@@ -64,6 +76,8 @@ export const applyEventEffects = (event: GameEvent) => {
     'health',
     'stress',
     'charisma',
+    'reputation',
+    'love',
     'companyValue',
     'casinoReputation',
   ];
@@ -75,14 +89,18 @@ export const applyEventEffects = (event: GameEvent) => {
   if (Object.keys(effects).length) {
     console.log('[EventEngine] Effects applied', effects);
   }
+  checkAllAchievementsAfterStateChange();
 };
 
 export const triggerEvent = async (type: EventType): Promise<GameEvent> => {
   const shouldAI = Math.random() < 0.3;
   const pool = pools[type] ?? [];
+  const {hasPremium} = useUserStore.getState();
   const eventObj = shouldAI
-    ? await buildAIEvent(type, useStatsStore.getState())
+    ? await buildAIEvent(type, useStatsStore.getState(), hasPremium)
     : getRandomEvent(pool, type);
+
+  applyEventEffects(eventObj);
 
   const {
     setLastLifeEvent,
@@ -114,11 +132,12 @@ export const triggerEvent = async (type: EventType): Promise<GameEvent> => {
       break;
   }
 
-  applyEventEffects(eventObj);
   return eventObj;
 };
 
-export const simulateNewDay = () => {
-  console.log('[EventEngine] New day simulated (placeholder)');
-  // TODO: Update markets, company valuation, and other daily systems here.
+export const simulateNewMonth = () => {
+  console.log('[EventEngine] New month simulated (placeholder)');
+  // TODO: Update markets, company valuation, and other monthly systems here.
 };
+
+export const simulateNewDay = simulateNewMonth;

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-} from 'react-native';
+import {ScrollView, View, Text, Pressable, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
@@ -18,7 +11,8 @@ import LoveActionButton from '../../components/Love/LoveActionButton';
 import MatchPopup from '../../components/Match/MatchPopup';
 import {useMatchSystem} from '../../components/Match/useMatchSystem';
 import {triggerEvent} from '../../event/eventEngine';
-import {useGameStore} from '../../store';
+import {theme} from '../../theme';
+import AppScreen from '../../components/layout/AppScreen';
 
 type LoveNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>,
@@ -26,10 +20,10 @@ type LoveNavigationProp = CompositeNavigationProp<
 >;
 
 const ACTIONS = [
-  {label: 'Message', emoji: '💬'},
-  {label: 'Gift', emoji: '🎁'},
-  {label: 'Date', emoji: '🍷'},
-  {label: 'Intimacy', emoji: '❤️'},
+  {label: 'Message', emoji: '💬', description: 'Soft interaction'},
+  {label: 'Gift', emoji: '🎁', description: 'Small surprise'},
+  {label: 'Date', emoji: '🍷', description: 'Plan a special moment'},
+  {label: 'Intimacy', emoji: '❤️', description: 'More intense vibe'},
 ] as const;
 
 const LoveScreen = () => {
@@ -37,7 +31,6 @@ const LoveScreen = () => {
   const {charisma, luck} = useStatsStore();
   const {partner} = useUserStore();
   const {lastLoveEvent, usedLoveActionToday, setField} = useEventStore();
-  const {currentDay} = useGameStore();
   const {
     visible,
     matchCandidate,
@@ -46,6 +39,17 @@ const LoveScreen = () => {
     acceptMatch,
     rejectMatch,
   } = useMatchSystem();
+
+  const handleGoHome = () => {
+    const rootNav = navigation.getParent()?.getParent();
+    if (rootNav) {
+      rootNav.navigate('Home' as never);
+      return;
+    }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
 
   const handleFindMatch = () => {
     console.log('[Love] Find match placeholder');
@@ -60,91 +64,80 @@ const LoveScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <View style={{flex: 1}}>
-            <Text style={styles.title}>Love</Text>
-            <Text style={styles.day}>Day {currentDay}</Text>
-          </View>
-          <Text style={styles.subtitle}>
-            Nurture connections, track mood, and plan your next move.
-          </Text>
-        </View>
-
+    <AppScreen
+      title="LOVE"
+      subtitle="Relationship & Emotions"
+      leftNode={
+        <Pressable
+          onPress={handleGoHome}
+          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          <Text style={styles.backIcon}>←</Text>
+        </Pressable>
+      }>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.statRow}>
           <Text style={styles.stat}>Charisma: {charisma}</Text>
           <Text style={styles.stat}>Luck: {luck}</Text>
         </View>
 
-        {partner ? (
-          <PartnerCard partner={partner} usedToday={usedLoveActionToday} />
-        ) : (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyTitle}>Henüz bir partnerin yok.</Text>
-            <Text style={styles.emptyBody}>
-              Life ekranında eşleşme bulabilirsin. Hazırlıklarını tamamla ve
-              ilk adımı at.
-            </Text>
-            <Pressable
-              onPress={() => openMatch()}
-              style={({pressed}) => [
-                styles.matchButton,
-                pressed && styles.matchButtonPressed,
-              ]}>
-              <Text style={styles.matchButtonText}>Find Partner</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleFindMatch}
-              style={({pressed}) => [
-                styles.matchButton,
-                pressed && styles.matchButtonPressed,
-              ]}>
-              <Text style={styles.matchButtonText}>
-                Find Match (placeholder)
+          {partner ? (
+            <PartnerCard partner={partner} usedToday={usedLoveActionToday} />
+          ) : (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyEmoji}>💔</Text>
+              <Text style={styles.emptyTitle}>Henüz bir partnerin yok.</Text>
+              <Text style={styles.emptyBody}>
+                Life ekranında tanışacağın kişiler kaderini değiştirebilir.
               </Text>
-            </Pressable>
-          </View>
-        )}
+              <Pressable
+                onPress={() => openMatch()}
+                style={({pressed}) => [
+                  styles.ctaButton,
+                  pressed && styles.ctaButtonPressed,
+                ]}>
+                <Text style={styles.ctaButtonText}>Find Match</Text>
+              </Pressable>
+            </View>
+          )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Daily Actions</Text>
-          <View style={styles.actionsGrid}>
-            {ACTIONS.map(action => (
-              <LoveActionButton
-                key={action.label}
-                label={action.label}
-                emoji={action.emoji}
-                onPress={() => handleActionPress(action.label)}
-                disabled={usedLoveActionToday}
-              />
-            ))}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Daily Actions</Text>
+            <View style={styles.actionsGrid}>
+              {ACTIONS.map(action => (
+                <LoveActionButton
+                  key={action.label}
+                  title={action.label}
+                  emoji={action.emoji}
+                  description={action.description}
+                  onPress={() => handleActionPress(action.label)}
+                  disabled={usedLoveActionToday}
+                />
+              ))}
+            </View>
+            <Text style={styles.helperText}>
+              {usedLoveActionToday
+                ? 'Bugünkü etkileşimini kullandın.'
+                : 'Bugün 1 aksiyon hakkın var.'}
+            </Text>
           </View>
-          <Text style={styles.helperText}>
-            {usedLoveActionToday
-              ? 'Bugünkü etkileşimini kullandın.'
-              : 'Bugün 1 aksiyon hakkın var.'}
-          </Text>
-        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Last Love Event</Text>
-          <Pressable
-            onPress={() => {
-              void triggerEvent('love');
-            }}
-            style={({pressed}) => [
-              styles.secondaryButton,
-              pressed && styles.secondaryButtonPressed,
-            ]}>
-            <Text style={styles.secondaryButtonText}>Trigger Love Event</Text>
-          </Pressable>
-          <View style={styles.placeholderCard}>
+          <View style={styles.eventCard}>
+            <Text style={styles.eventIcon}>💌</Text>
             <Text style={styles.placeholderText}>
-              {lastLoveEvent ?? 'Bugün henüz özel bir olay yaşamadın.'}
+              {lastLoveEvent ?? 'Bugün henüz özel bir aşk olayı yaşanmadı.'}
             </Text>
+            <Pressable
+              onPress={() => {
+                void triggerEvent('love');
+              }}
+              style={({pressed}) => [
+                styles.secondaryButton,
+                pressed && styles.secondaryButtonPressed,
+              ]}>
+              <Text style={styles.secondaryButtonText}>Trigger Love Event (Test)</Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -155,136 +148,146 @@ const LoveScreen = () => {
         onReject={rejectMatch}
         onClose={closeMatch}
       />
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
 export default LoveScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f6f7fb',
-  },
   container: {
-    padding: 16,
-    gap: 16,
-  },
-  header: {
-    gap: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#4b5563',
-  },
-  day: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 2,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
+    gap: theme.spacing.md,
   },
   statRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: theme.spacing.lg,
   },
   stat: {
-    fontSize: 14,
-    color: '#111827',
-    backgroundColor: '#e5e7eb',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
+    fontSize: theme.typography.body,
+    color: theme.colors.textPrimary,
+    backgroundColor: theme.colors.cardSoft,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.sm,
   },
   emptyCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    gap: 10,
-    shadowColor: '#0f172a',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  emptyBody: {
-    fontSize: 14,
-    color: '#4b5563',
-    lineHeight: 20,
-  },
-  matchButton: {
-    backgroundColor: '#111827',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
     alignItems: 'center',
   },
-  matchButtonPressed: {
-    backgroundColor: '#0b1220',
+  emptyEmoji: {
+    fontSize: 32,
+  },
+  emptyTitle: {
+    fontSize: theme.typography.subtitle + 2,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+  },
+  emptyBody: {
+    fontSize: theme.typography.body,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  ctaButton: {
+    backgroundColor: theme.colors.accent,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: 999,
+    alignItems: 'center',
+    alignSelf: 'stretch',
+  },
+  ctaButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
     transform: [{scale: 0.98}],
   },
-  matchButtonText: {
-    color: '#f9fafb',
-    fontWeight: '700',
-    fontSize: 15,
+  ctaButtonText: {
+    color: theme.colors.textPrimary,
+    fontWeight: '800',
+    fontSize: theme.typography.body,
   },
   section: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    shadowColor: '#0f172a',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   helperText: {
-    fontSize: 13,
-    color: '#4b5563',
+    fontSize: theme.typography.caption,
+    color: theme.colors.textMuted,
   },
-  placeholderCard: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 10,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+  eventCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm,
+  },
+  eventIcon: {
+    fontSize: 18,
   },
   placeholderText: {
-    fontSize: 14,
-    color: '#4b5563',
+    fontSize: theme.typography.body,
+    color: theme.colors.textSecondary,
     lineHeight: 20,
   },
   secondaryButton: {
-    backgroundColor: '#111827',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: theme.colors.accentSoft,
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: 999,
     alignItems: 'center',
+    alignSelf: 'flex-start',
   },
   secondaryButtonPressed: {
-    backgroundColor: '#0b1220',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   secondaryButtonText: {
-    color: '#f9fafb',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: theme.typography.body,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
+  },
+  backButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{scale: 0.97}],
+  },
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '700',
   },
 });

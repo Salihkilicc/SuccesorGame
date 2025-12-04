@@ -4,12 +4,13 @@ import RAndDModal from './Actions/RAndDModal';
 import LoanModal from './Actions/LoanModal';
 import IssueSharesModal from './Actions/IssueSharesModal';
 import AcquireStartupModal from './Actions/AcquireStartupModal';
+import {theme} from '../../theme';
 
 const ACTIONS = [
-  {label: '🔬 R&D Investment', key: 'rnd'},
-  {label: '💳 Take Loan', key: 'loan'},
-  {label: '📈 Issue Shares', key: 'issue'},
-  {label: '🧩 Acquire Startup', key: 'acquire'},
+  {label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation'},
+  {label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital'},
+  {label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash'},
+  {label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio'},
 ] as const;
 
 const CompanyActions = () => {
@@ -51,7 +52,9 @@ const CompanyActions = () => {
               styles.button,
               pressed && styles.buttonPressed,
             ]}>
+            <Text style={styles.icon}>{action.icon}</Text>
             <Text style={styles.buttonText}>{action.label}</Text>
+            <Text style={styles.description}>{action.description}</Text>
           </Pressable>
         ))}
       </View>
@@ -74,12 +77,12 @@ export default CompanyActions;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 14,
-    padding: 16,
-    gap: 12,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: theme.colors.border,
   },
   headerRow: {
     flexDirection: 'row',
@@ -87,34 +90,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#EEF2FF',
-    letterSpacing: 0.3,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: theme.spacing.md,
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: '#1B2340',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 10,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
   },
   buttonPressed: {
-    backgroundColor: '#202A4A',
+    backgroundColor: theme.colors.cardSoft,
     transform: [{scale: 0.98}],
   },
+  icon: {
+    fontSize: 22,
+  },
   buttonText: {
-    color: '#E6ECF7',
+    color: theme.colors.textPrimary,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
+    textAlign: 'center',
+  },
+  description: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
     textAlign: 'center',
   },
 });

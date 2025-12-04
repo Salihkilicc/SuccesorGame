@@ -1,21 +1,19 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  StyleSheet,
-  Pressable,
-  Text,
-} from 'react-native';
-import StatBar from '../../../components/common/StatBar';
+import {ScrollView, View, StyleSheet, Pressable, Text} from 'react-native';
 import CompanyHeader from '../../../components/MyCompany/CompanyHeader';
 import CompanyActions from '../../../components/MyCompany/CompanyActions';
 import CompanyPortfolio from '../../../components/MyCompany/CompanyPortfolio';
 import FinancialSummary from '../../../components/MyCompany/FinancialSummary';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useStatsStore, useEventStore} from '../../../store';
 import {triggerEvent} from '../../../event/eventEngine';
+import {theme} from '../../../theme';
+import AppScreen from '../../../components/layout/AppScreen';
+import type {AssetsStackParamList} from '../../../navigation';
 
 const MyCompanyScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
   const {
     companyValue,
     companySharePrice,
@@ -25,17 +23,22 @@ const MyCompanyScreen = () => {
   } = useStatsStore();
   const {lastCompanyEvent} = useEventStore();
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatBar />
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>MY COMPANY</Text>
-          <Text style={styles.subtitle}>Rich Industries — Main Holding Company</Text>
-        </View>
+  const BackButton = () => (
+    <Pressable
+      onPress={() => {
+        if (navigation.canGoBack()) navigation.goBack();
+      }}
+      style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+      <Text style={styles.backIcon}>←</Text>
+    </Pressable>
+  );
 
+  return (
+    <AppScreen
+      title="MY COMPANY"
+      subtitle="Rich Industries — Main Holding Company"
+      leftNode={<BackButton />}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <CompanyHeader
           valuation={companyValue}
           sharePrice={companySharePrice}
@@ -65,69 +68,72 @@ const MyCompanyScreen = () => {
           </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
 export default MyCompanyScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#05060A',
-  },
   container: {
-    padding: 16,
-    gap: 16,
-    paddingBottom: 32,
-  },
-  header: {
-    gap: 6,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#E8EDF5',
-    letterSpacing: 1,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#A3AEC2',
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#EEF2FF',
-    letterSpacing: 0.3,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   eventCard: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 14,
-    padding: 16,
-    gap: 12,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: theme.colors.border,
   },
   eventText: {
-    fontSize: 13,
-    color: '#A3AEC2',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textSecondary,
     lineHeight: 18,
   },
   secondaryButton: {
-    backgroundColor: '#1B2340',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: theme.colors.accentSoft,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.sm,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.border,
   },
   secondaryButtonPressed: {
-    backgroundColor: '#202A4A',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   secondaryButtonText: {
-    color: '#E6ECF7',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
+  },
+  backButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{scale: 0.97}],
+  },
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '700',
   },
 });

@@ -1,22 +1,16 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-} from 'react-native';
+import {ScrollView, View, Text, Pressable, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {CompositeNavigationProp} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import StatBar from '../../components/common/StatBar';
 import MatchPopup from '../../components/Match/MatchPopup';
 import {useMatchSystem} from '../../components/Match/useMatchSystem';
 import {triggerEvent} from '../../event/eventEngine';
 import type {LifeStackParamList, RootTabParamList} from '../../navigation';
-import {useEventStore, useGameStore} from '../../store';
+import {useEventStore, useUserStore} from '../../store';
+import {theme} from '../../theme';
+import AppScreen from '../../components/layout/AppScreen';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -85,7 +79,7 @@ const ACTIONS: Array<{
 const LifeScreen = () => {
   const navigation = useNavigation<LifeNavigationProp>();
   const {lastLifeEvent} = useEventStore();
-  const {currentDay, advanceDay} = useGameStore();
+  const {name, avatarUrl} = useUserStore();
   const {
     visible,
     matchCandidate,
@@ -94,6 +88,17 @@ const LifeScreen = () => {
     acceptMatch,
     rejectMatch,
   } = useMatchSystem();
+
+  const handleGoHome = () => {
+    const rootNav = navigation.getParent()?.getParent();
+    if (rootNav) {
+      rootNav.navigate('Home' as never);
+      return;
+    }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
 
   const handleAction = (type: LifeActionType) => {
     switch (type) {
@@ -122,78 +127,84 @@ const LifeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatBar />
-      <View style={styles.body}>
-      <View style={styles.header}>
-        <View style={{flex: 1}}>
-          <Text style={styles.title}>LIFE</Text>
-          <Text style={styles.subtitle}>Day {currentDay} — Downtown District</Text>
-        </View>
+    <AppScreen
+      title="LIFE"
+      subtitle="Downtown District"
+      leftNode={
         <Pressable
-          onPress={advanceDay}
-          style={({pressed}) => [
-            styles.nextDayButton,
-            pressed && styles.nextDayButtonPressed,
-          ]}>
-          <Text style={styles.nextDayText}>Next Day</Text>
+          onPress={handleGoHome}
+          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          <Text style={styles.backIcon}>←</Text>
         </Pressable>
-      </View>
-
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Lifestyle Actions</Text>
-            <View style={styles.actionsGrid}>
-              {ACTIONS.map(action => (
-                <LifeActionButton
-                  key={action.key}
-                  emoji={action.emoji}
-                  label={action.label}
-                  description={action.description}
-                  onPress={() => handleAction(action.key)}
-                />
-              ))}
-            </View>
+      }
+      rightNode={
+        <View style={styles.headerActions}>
+          <Pressable
+            onPress={() => navigation.navigate('Profile')}
+            style={({pressed}) => [
+              styles.profileButton,
+              pressed && styles.profileButtonPressed,
+            ]}>
+            {avatarUrl ? (
+              <Text style={styles.profileInitial}>🙂</Text>
+            ) : (
+              <Text style={styles.profileInitial}>{name?.[0]?.toUpperCase() ?? 'Y'}</Text>
+            )}
+          </Pressable>
+        </View>
+      }>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Lifestyle Actions</Text>
+          <View style={styles.actionsGrid}>
+            {ACTIONS.map(action => (
+              <LifeActionButton
+                key={action.key}
+                emoji={action.emoji}
+                label={action.label}
+                description={action.description}
+                onPress={() => handleAction(action.key)}
+              />
+            ))}
           </View>
+        </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Today&apos;s Life Event</Text>
-            <View style={styles.card}>
-              <Text style={styles.cardText}>
-                {lastLifeEvent ?? 'Bugün henüz özel bir sosyal olay yaşanmadı.'}
-              </Text>
-              <Pressable
-                onPress={() => {
-                  void triggerEvent('life');
-                }}
-                style={({pressed}) => [
-                  styles.secondaryButton,
-                  pressed && styles.secondaryButtonPressed,
-                ]}>
-                <Text style={styles.secondaryButtonText}>Random Life Event</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Encounters & Matches</Text>
-            <Text style={styles.placeholderText}>
-              Burada Tinder-style eşleşme pop-up&apos;ları tetiklenecek.
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Today&apos;s Life Event</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardText}>
+              {lastLifeEvent ?? 'Bugün henüz özel bir sosyal olay yaşanmadı.'}
             </Text>
             <Pressable
-              onPress={openMatch}
+              onPress={() => {
+                void triggerEvent('life');
+              }}
               style={({pressed}) => [
                 styles.secondaryButton,
                 pressed && styles.secondaryButtonPressed,
               ]}>
-              <Text style={styles.secondaryButtonText}>Test Match Popup</Text>
+              <Text style={styles.secondaryButtonText}>Random Life Event</Text>
             </Pressable>
           </View>
-        </ScrollView>
-      </View>
+        </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Encounters & Matches</Text>
+          <Text style={styles.placeholderText}>
+            Burada Tinder-style eşleşme pop-up&apos;ları tetiklenecek.
+          </Text>
+          <Pressable
+            onPress={openMatch}
+            style={({pressed}) => [
+              styles.secondaryButton,
+              pressed && styles.secondaryButtonPressed,
+            ]}>
+            <Text style={styles.secondaryButtonText}>Test Match Popup</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
       <MatchPopup
         visible={visible}
         candidate={matchCandidate}
@@ -201,7 +212,7 @@ const LifeScreen = () => {
         onReject={rejectMatch}
         onClose={closeMatch}
       />
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
@@ -228,137 +239,139 @@ const LifeActionButton = ({
 export default LifeScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#05060A',
-  },
-  body: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  header: {
-    marginBottom: 16,
-    gap: 6,
+  headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: theme.spacing.sm,
   },
-  title: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#E8EDF5',
-    letterSpacing: 1,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#A3AEC2',
-  },
-  nextDayButton: {
-    backgroundColor: '#1B2340',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  backButton: {
+    width: 36,
+    height: 36,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
   },
-  nextDayButtonPressed: {
-    backgroundColor: '#202A4A',
-    transform: [{scale: 0.98}],
+  backButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{scale: 0.97}],
   },
-  nextDayText: {
-    color: '#E6ECF7',
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
     fontWeight: '700',
-    fontSize: 12,
+  },
+  profileButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    backgroundColor: theme.colors.cardSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    marginRight: theme.spacing.sm,
+  },
+  profileButtonPressed: {
+    backgroundColor: theme.colors.card,
+    transform: [{scale: 0.97}],
+  },
+  profileInitial: {
+    color: theme.colors.textPrimary,
+    fontWeight: '800',
   },
   scrollContent: {
     paddingBottom: 40,
-    gap: 16,
+    gap: theme.spacing.md,
   },
   section: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
-    gap: 12,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#EEF2FF',
-    letterSpacing: 0.3,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: theme.spacing.md,
   },
   actionButton: {
     width: '48%',
-    backgroundColor: '#0F1424',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1C2335',
+    borderColor: theme.colors.border,
   },
   actionButtonPressed: {
-    backgroundColor: '#131A2D',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   actionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   actionEmoji: {
     fontSize: 18,
   },
   actionLabel: {
-    fontSize: 15,
+    fontSize: theme.typography.subtitle,
     fontWeight: '700',
-    color: '#E6ECF7',
+    color: theme.colors.textPrimary,
   },
   actionDescription: {
-    fontSize: 12,
-    color: '#9AA7BC',
+    fontSize: theme.typography.caption,
+    color: theme.colors.textSecondary,
     lineHeight: 16,
   },
   card: {
-    backgroundColor: '#0F1424',
-    borderRadius: 12,
-    padding: 14,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.sm,
+    padding: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1C2335',
-    gap: 12,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.md,
   },
   cardText: {
-    fontSize: 14,
-    color: '#D8DEEC',
+    fontSize: theme.typography.body,
+    color: theme.colors.textSecondary,
     lineHeight: 20,
   },
   placeholderText: {
-    fontSize: 13,
-    color: '#9AA7BC',
+    fontSize: theme.typography.caption,
+    color: theme.colors.textMuted,
     lineHeight: 18,
   },
   secondaryButton: {
-    backgroundColor: '#1B2340',
-    borderRadius: 10,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.accentSoft,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.border,
   },
   secondaryButtonPressed: {
-    backgroundColor: '#202A4A',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   secondaryButtonText: {
-    color: '#E6ECF7',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
   },
 });

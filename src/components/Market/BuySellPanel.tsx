@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import {useStatsStore} from '../../store';
+import {theme} from '../../theme';
 
 type BuySellPanelProps = {
   symbol: string;
@@ -82,80 +83,79 @@ export default BuySellPanel;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    shadowColor: '#0f172a',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
   },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: theme.spacing.md,
   },
   qtyButton: {
     width: 44,
     height: 44,
-    borderRadius: 10,
-    backgroundColor: '#e5e7eb',
+    borderRadius: 999,
+    backgroundColor: theme.colors.cardSoft,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   qtyButtonPressed: {
-    backgroundColor: '#d1d5db',
+    backgroundColor: theme.colors.card,
   },
   qtyButtonText: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#111827',
+    color: theme.colors.textPrimary,
   },
   qtyValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textPrimary,
     minWidth: 32,
     textAlign: 'center',
   },
   helper: {
-    fontSize: 13,
-    color: '#4b5563',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textSecondary,
   },
   actions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   button: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.md,
     alignItems: 'center',
   },
   buttonPressed: {
     transform: [{scale: 0.98}],
   },
   sellButton: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: theme.colors.danger,
   },
   buyButton: {
-    backgroundColor: '#16a34a',
+    backgroundColor: theme.colors.success,
   },
   sellText: {
-    fontSize: 15,
+    fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#b91c1c',
+    color: theme.colors.textPrimary,
   },
   buyText: {
-    fontSize: 15,
+    fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: theme.colors.textPrimary,
   },
 });

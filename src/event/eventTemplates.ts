@@ -29,7 +29,7 @@ export const lifeEvents: GameEvent[] = [
     id: 'life_002',
     category: 'life',
     text: 'Lüks bir restoran çıkışında paparazziler seni görüntüledi.',
-    effects: {charisma: 1},
+    effects: {reputation: 1},
     tags: ['media'],
     aiGenerated: false,
   },
@@ -41,6 +41,14 @@ export const lifeEvents: GameEvent[] = [
     tags: ['calm'],
     aiGenerated: false,
   },
+  {
+    id: 'life_004',
+    category: 'life',
+    text: 'Kapalı bir VIP spor salonunda tek başına antrenman yaptın.',
+    effects: {health: 2, stress: -1},
+    tags: ['wellness'],
+    aiGenerated: false,
+  },
 ];
 
 export const loveEvents: GameEvent[] = [
@@ -48,7 +56,7 @@ export const loveEvents: GameEvent[] = [
     id: 'love_001',
     category: 'love',
     text: 'Partnerin sürpriz bir mesajla gününü güzelleştirdi.',
-    effects: {stress: -1, charisma: 1},
+    effects: {stress: -1, love: 2},
     tags: ['warm'],
     aiGenerated: false,
   },
@@ -66,6 +74,14 @@ export const loveEvents: GameEvent[] = [
     text: 'Aranızda samimi bir sohbet geçti ve bağınız güçlendi.',
     effects: {stress: -1},
     tags: ['bond'],
+    aiGenerated: false,
+  },
+  {
+    id: 'love_004',
+    category: 'love',
+    text: 'Kısa bir yürüyüş sırasında birbirinizi neşelendirdiniz.',
+    effects: {love: 1, stress: -1},
+    tags: ['calm'],
     aiGenerated: false,
   },
 ];
@@ -95,6 +111,14 @@ export const marketEvents: GameEvent[] = [
     tags: ['insight'],
     aiGenerated: false,
   },
+  {
+    id: 'market_004',
+    category: 'market',
+    text: 'Riskli pozisyonunu küçültüp portföyünü rahatlattın.',
+    effects: {money: -400, stress: -1},
+    tags: ['rebalance'],
+    aiGenerated: false,
+  },
 ];
 
 export const companyEvents: GameEvent[] = [
@@ -122,6 +146,14 @@ export const companyEvents: GameEvent[] = [
     tags: ['media'],
     aiGenerated: false,
   },
+  {
+    id: 'company_004',
+    category: 'company',
+    text: 'Bir müşteri başarı hikayesi sosyal medyada viral oldu.',
+    effects: {companyValue: 80_000, reputation: 2},
+    tags: ['customer'],
+    aiGenerated: false,
+  },
 ];
 
 export const casinoEvents: GameEvent[] = [
@@ -147,6 +179,14 @@ export const casinoEvents: GameEvent[] = [
     text: 'Gözlem yaparken yeni bir bahis taktiği öğrendin.',
     effects: {charisma: 1},
     tags: ['skill'],
+    aiGenerated: false,
+  },
+  {
+    id: 'casino_004',
+    category: 'casino',
+    text: "VIP lounge'da sana özel bir içki ikram edildi.",
+    effects: {casinoReputation: 3, stress: -1},
+    tags: ['vip'],
     aiGenerated: false,
   },
 ];

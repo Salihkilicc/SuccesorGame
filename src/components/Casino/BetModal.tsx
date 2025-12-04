@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {Modal, View, Text, StyleSheet, Pressable} from 'react-native';
 import {useStatsStore} from '../../store';
 import type {RoomId} from './RoomSelector';
+import {theme} from '../../theme';
 
 type BetModalProps = {
   visible: boolean;
@@ -99,6 +100,7 @@ const BetModal = ({visible, roomId, onClose, onBetResult}: BetModalProps) => {
             ]}>
             <Text style={styles.closeText}>Close</Text>
           </Pressable>
+          <Text style={styles.helper}>Feeling lucky? Play smart, keep your rep high.</Text>
         </View>
       </View>
     </Modal>
@@ -110,66 +112,73 @@ export default BetModal;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(5, 6, 10, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
+    padding: theme.spacing.lg,
   },
   card: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
     width: '90%',
     maxWidth: 440,
-    gap: 14,
+    gap: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: theme.colors.border,
   },
   title: {
-    fontSize: 20,
+    fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
-    color: '#E8EDF5',
+    color: theme.colors.textPrimary,
     letterSpacing: 0.5,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 13,
-    color: '#A3AEC2',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
   },
   betRow: {
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   betButton: {
-    backgroundColor: '#1B2340',
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.accentSoft,
+    borderRadius: 999,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.accent,
   },
   betButtonPressed: {
-    backgroundColor: '#202A4A',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   betButtonText: {
-    color: '#E6ECF7',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
   },
   closeButton: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: 999,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1F2937',
+    borderColor: theme.colors.border,
   },
   closeButtonPressed: {
-    backgroundColor: '#0B1220',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   closeText: {
-    color: '#E6ECF7',
+    color: theme.colors.textSecondary,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
+  },
+  helper: {
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    fontSize: theme.typography.caption,
   },
 });

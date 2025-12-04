@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import MatchCandidateCard from './MatchCandidateCard';
+import {theme} from '../../theme';
 import type {MatchCandidate} from './useMatchSystem';
 
 type MatchPopupProps = {
@@ -62,51 +63,55 @@ export default MatchPopup;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(17, 24, 39, 0.35)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
   },
   card: {
     width: Math.min(420, width - 32),
-    backgroundColor: '#f9fafb',
-    borderRadius: 20,
-    padding: 16,
-    gap: 14,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   header: {
-    fontSize: 18,
+    fontSize: theme.typography.subtitle + 2,
     fontWeight: '800',
-    color: '#111827',
+    color: theme.colors.textPrimary,
     textAlign: 'center',
   },
   actions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   button: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.sm,
     alignItems: 'center',
   },
   buttonPressed: {
     transform: [{scale: 0.98}],
   },
   skipButton: {
-    backgroundColor: '#e5e7eb',
+    backgroundColor: theme.colors.cardSoft,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   matchButton: {
-    backgroundColor: '#16a34a',
+    backgroundColor: theme.colors.success,
   },
   buttonText: {
-    fontSize: 15,
+    fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textPrimary,
   },
   matchButtonText: {
-    fontSize: 15,
+    fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: theme.colors.textPrimary,
   },
 });

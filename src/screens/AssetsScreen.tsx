@@ -54,7 +54,24 @@ const AssetsScreen = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.title}>Assets</Text>
+          <View style={styles.headerRow}>
+            <Pressable
+              onPress={() => {
+                const rootNav = navigation.getParent()?.getParent();
+                if (rootNav) {
+                  rootNav.navigate('Home' as never);
+                  return;
+                }
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                }
+              }}
+              style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+              <Text style={styles.backIcon}>←</Text>
+            </Pressable>
+            <Text style={styles.title}>Assets</Text>
+            <View style={{width: 32}} />
+          </View>
           <View style={styles.riskRow}>
             <StatPill label="Risk Appetite" value={`${Math.round(riskApetite)}%`} />
             <StatPill label="Strategic Sense" value={`${Math.round(strategicSense)}%`} />
@@ -160,12 +177,37 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    padding: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl * 2 + theme.spacing.sm,
     gap: theme.spacing.md,
     paddingBottom: theme.spacing.xl * 2,
   },
   header: {
     gap: theme.spacing.sm,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
+  },
+  backButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{scale: 0.97}],
+  },
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '700',
   },
   title: {
     fontSize: theme.typography.title,

@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View, StyleProp, ViewStyle} from 'react-native';
-import {useStatsStore} from 'src/store/useStatsStore';
+import {useStatsStore} from '../../store/useStatsStore';
+import {theme} from '../../theme';
 
 type StatBarProps = {
   style?: StyleProp<ViewStyle>;
@@ -44,10 +45,10 @@ const StatBar = ({style}: StatBarProps) => {
 
   return (
     <View style={[styles.container, style]}>
-      <StatItem icon="💰" label="Para" value={formatMoney(money)} accent="#f2c94c" />
-      <StatItem icon="❤️" label="Sağlık" value={`${health}%`} accent="#34d399" />
-      <StatItem icon="😖" label="Stres" value={`${stress}%`} accent="#f87171" />
-      <StatItem icon="⭐" label="Karizma" value={`${charisma}%`} accent="#60a5fa" />
+      <StatItem icon="💰" label="Para" value={formatMoney(money)} accent={theme.colors.accent} />
+      <StatItem icon="❤️" label="Sağlık" value={`${health}%`} accent={theme.colors.success} />
+      <StatItem icon="😖" label="Stres" value={`${stress}%`} accent={theme.colors.danger} />
+      <StatItem icon="⭐" label="Karizma" value={`${charisma}%`} accent={theme.colors.accent} />
     </View>
   );
 };
@@ -59,11 +60,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#05060A',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#11131a',
+    borderBottomColor: theme.colors.border,
   },
   item: {
     flex: 1,
@@ -79,14 +80,14 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   label: {
-    color: '#9ca3af',
+    color: theme.colors.textMuted,
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   value: {
-    color: '#e5e7eb',
-    fontSize: 16,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
     fontWeight: '700',
   },
 });

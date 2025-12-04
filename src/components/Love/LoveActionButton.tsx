@@ -1,15 +1,18 @@
 import React from 'react';
 import {Pressable, Text, StyleSheet} from 'react-native';
+import {theme} from '../../theme';
 
 type LoveActionButtonProps = {
-  label: string;
+  title: string;
+  description?: string;
   emoji: string;
   onPress: () => void;
   disabled?: boolean;
 };
 
 const LoveActionButton = ({
-  label,
+  title,
+  description,
   emoji,
   onPress,
   disabled = false,
@@ -23,7 +26,8 @@ const LoveActionButton = ({
       pressed && !disabled && styles.buttonPressed,
     ]}>
     <Text style={styles.emoji}>{emoji}</Text>
-    <Text style={styles.label}>{label}</Text>
+    <Text style={styles.label}>{title}</Text>
+    {description ? <Text style={styles.description}>{description}</Text> : null}
   </Pressable>
 );
 
@@ -32,25 +36,31 @@ export default LoveActionButton;
 const styles = StyleSheet.create({
   button: {
     flexBasis: '48%',
-    backgroundColor: '#ec4899',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
-    gap: 6,
+    gap: theme.spacing.xs,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.accentSoft,
   },
   buttonPressed: {
-    backgroundColor: '#db2777',
+    backgroundColor: theme.colors.cardSoft,
     transform: [{scale: 0.98}],
   },
   buttonDisabled: {
-    backgroundColor: '#fbcfe8',
+    opacity: 0.5,
   },
   emoji: {
-    fontSize: 20,
+    fontSize: 22,
   },
   label: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#ffffff',
+    color: theme.colors.textPrimary,
+  },
+  description: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
   },
 });

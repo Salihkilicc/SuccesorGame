@@ -1,4 +1,6 @@
 import {create} from 'zustand';
+import {persist} from 'zustand/middleware';
+import {zustandStorage} from '../storage/persist';
 
 export type EventState = {
   todayEvent?: string;
@@ -25,11 +27,12 @@ type EventStore = EventState & {
   setLastCompanyEvent: (value: string | null) => void;
   incrementCompanyEventCount: () => void;
   setLastCasinoEvent: (value: string | null) => void;
+  resetCycleFlags: () => void;
   resetDailyFlags: () => void;
   reset: () => void;
 };
 
-const initialState: EventState = {
+export const initialEventState: EventState = {
   todayEvent: 'You woke up energized and ready to plan.',
   lastLifeEvent: 'Started a new morning routine.',
   lastLoveEvent: 'Sent a thoughtful message.',
@@ -45,34 +48,64 @@ const initialState: EventState = {
   usedLoveActionToday: false,
 };
 
-export const useEventStore = create<EventStore>(set => ({
-  ...initialState,
-  update: partial => set(state => ({...state, ...partial})),
-  setField: (key, value) => set(state => ({...state, [key]: value})),
-  setLastLifeEvent: value => set(state => ({...state, lastLifeEvent: value})),
-  setLastLoveEvent: value => set(state => ({...state, lastLoveEvent: value})),
-  setLastMarketEvent: value =>
-    set(state => ({...state, lastMarketEvent: value})),
-  setLastCompanyEvent: value =>
-    set(state => ({...state, lastCompanyEvent: value})),
-  incrementCompanyEventCount: () =>
-    set(state => ({...state, companyEventCount: (state.companyEventCount ?? 0) + 1})),
-  setLastCasinoEvent: value =>
-    set(state => ({...state, lastCasinoEvent: value})),
-  resetDailyFlags: () =>
-    set(state => ({
-      ...state,
-      lastLifeEvent: null,
-      lastLoveEvent: null,
-      lastMarketEvent: null,
-      lastCompanyEvent: null,
-      lastCasinoEvent: null,
-      usedLoveActionToday: false,
-      todayLifeEvents: [],
-      todayLoveEvents: [],
-      todayMarketEvents: [],
-      todayCompanyEvents: [],
-      todayCasinoEvents: [],
-    })),
-  reset: () => set(initialState),
-}));
+export const useEventStore = create<EventStore>()(
+  persist(
+    set => ({
+      ...initialEventState,
+      update: partial => set(state => ({...state, ...partial})),
+      setField: (key, value) => set(state => ({...state, [key]: value})),
+      setLastLifeEvent: value => set(state => ({...state, lastLifeEvent: value})),
+      setLastLoveEvent: value => set(state => ({...state, lastLoveEvent: value})),
+      setLastMarketEvent: value =>
+        set(state => ({...state, lastMarketEvent: value})),
+      setLastCompanyEvent: value =>
+        set(state => ({...state, lastCompanyEvent: value})),
+      incrementCompanyEventCount: () =>
+        set(state => ({...state, companyEventCount: (state.companyEventCount ?? 0) + 1})),
+      setLastCasinoEvent: value =>
+        set(state => ({...state, lastCasinoEvent: value})),
+      resetCycleFlags: () =>
+        set(state => ({
+          ...state,
+          lastLifeEvent: null,
+          lastLoveEvent: null,
+          lastMarketEvent: null,
+          lastCompanyEvent: null,
+          lastCasinoEvent: null,
+          usedLoveActionToday: false,
+          todayLifeEvents: [],
+          todayLoveEvents: [],
+          todayMarketEvents: [],
+          todayCompanyEvents: [],
+          todayCasinoEvents: [],
+        })),
+      resetDailyFlags: () =>
+        set(state => ({
+          ...state,
+          lastLifeEvent: null,
+          lastLoveEvent: null,
+          lastMarketEvent: null,
+          lastCompanyEvent: null,
+          lastCasinoEvent: null,
+          usedLoveActionToday: false,
+          todayLifeEvents: [],
+          todayLoveEvents: [],
+          todayMarketEvents: [],
+          todayCompanyEvents: [],
+          todayCasinoEvents: [],
+        })),
+      reset: () => set(initialEventState),
+    }),
+    {
+      name: 'succesor_events_v1',
+      storage: zustandStorage,
+      partialize: state => ({
+        lastLifeEvent: state.lastLifeEvent,
+        lastLoveEvent: state.lastLoveEvent,
+        lastMarketEvent: state.lastMarketEvent,
+        lastCompanyEvent: state.lastCompanyEvent,
+        lastCasinoEvent: state.lastCasinoEvent,
+      }),
+    },
+  ),
+);

@@ -1,18 +1,22 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {AssetsStackParamList} from '../../../navigation';
 import StockDetailHeader from '../../../components/Market/StockDetailHeader';
 import StockInfoSection from '../../../components/Market/StockInfoSection';
 import BuySellPanel from '../../../components/Market/BuySellPanel';
+import {theme} from '../../../theme';
+import AppScreen from '../../../components/layout/AppScreen';
 
 type Props = NativeStackScreenProps<AssetsStackParamList, 'StockDetail'>;
 
 const StockDetailScreen = ({route}: Props) => {
   const {symbol, price, change, category} = route.params;
+  const categoryLabel = category ?? 'Tech';
+  const riskLabel = 'Medium';
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AppScreen title={symbol} subtitle={`${categoryLabel} • Risk ${riskLabel}`}>
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}>
@@ -25,19 +29,15 @@ const StockDetailScreen = ({route}: Props) => {
         <StockInfoSection />
         <BuySellPanel symbol={symbol} price={price} />
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
 export default StockDetailScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f6f7fb',
-  },
   container: {
-    padding: 16,
-    gap: 16,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
   },
 });

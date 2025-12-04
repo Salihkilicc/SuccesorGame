@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {useUserStore} from '../../store';
+import {theme} from '../../theme';
 
 export type CompanyHeaderProps = {
   companyName?: string;
@@ -28,6 +29,14 @@ const formatLargeMoney = (value: number) => {
   return `$${value.toLocaleString()}`;
 };
 
+const formatShortMoney = (value: number) => {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toLocaleString();
+};
+
 const CompanyHeader = ({
   companyName = 'Rich Industries',
   valuation,
@@ -42,29 +51,19 @@ const CompanyHeader = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
+      <View style={styles.topRow}>
         <View style={{flex: 1}}>
           <Text style={styles.title}>{companyName}</Text>
           <Text style={styles.subtitle}>CEO: {name}</Text>
+          <Text style={styles.subtitle}>Ownership: {ownership}%</Text>
         </View>
-        <Text style={styles.badge}>HQ</Text>
-      </View>
-
-      <View style={styles.metrics}>
-        <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Valuation</Text>
-          <Text style={styles.metricValue}>{formatLargeMoney(valuation)}</Text>
-        </View>
-        <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Share Price</Text>
-          <Text style={styles.metricValue}>${sharePrice.toFixed(2)}</Text>
+        <View style={styles.rightCol}>
+          <Text style={styles.metricLabel}>Company Value</Text>
+          <Text style={styles.metricValue}>${formatShortMoney(valuation)}</Text>
+          <Text style={styles.meta}>Share Price: ${sharePrice.toFixed(2)}</Text>
           <Text style={[styles.change, changeColor]}>{formattedChange}</Text>
+          <Text style={[styles.meta, styles.debt]}>Debt: ${formatShortMoney(debt)}</Text>
         </View>
-      </View>
-
-      <View style={styles.footerRow}>
-        <Text style={styles.footerText}>Ownership: {ownership}%</Text>
-        <Text style={styles.footerText}>Debt: {formatLargeMoney(debt)}</Text>
       </View>
     </View>
   );
@@ -74,80 +73,57 @@ export default CompanyHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    borderColor: theme.colors.border,
   },
   title: {
-    color: '#E8EDF5',
-    fontSize: 22,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle + 8,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   subtitle: {
-    color: '#A3AEC2',
-    fontSize: 13,
-    marginTop: 4,
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
+    marginTop: theme.spacing.xs,
   },
-  badge: {
-    backgroundColor: '#1B2340',
-    color: '#E6ECF7',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-    fontWeight: '800',
-    fontSize: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
-  },
-  metrics: {
+  topRow: {
     flexDirection: 'row',
-    gap: 12,
   },
-  metric: {
-    flex: 1,
-    backgroundColor: '#0F1424',
-    padding: 12,
-    borderRadius: 12,
-    gap: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1C2335',
+  rightCol: {
+    alignItems: 'flex-end',
+    gap: theme.spacing.xs,
   },
   metricLabel: {
-    color: '#9AA7BC',
-    fontSize: 11,
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   metricValue: {
-    color: '#E6ECF7',
-    fontSize: 18,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
   },
   change: {
-    fontSize: 13,
+    fontSize: theme.typography.caption + 1,
     fontWeight: '700',
   },
   changeUp: {
-    color: '#34D399',
+    color: theme.colors.success,
   },
   changeDown: {
-    color: '#F87171',
+    color: theme.colors.danger,
   },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  meta: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
   },
-  footerText: {
-    color: '#A3AEC2',
-    fontSize: 12,
+  debt: {
+    color: theme.colors.danger,
   },
 });

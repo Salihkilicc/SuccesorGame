@@ -4,4 +4,5 @@ export type {
   LifeStackParamList,
   LoveStackParamList,
   AssetsStackParamList,
+  RootStackParamList,
 } from './RootNavigator';

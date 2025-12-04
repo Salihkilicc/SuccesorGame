@@ -1,6 +1,7 @@
 import React from 'react';
 import {Modal, View, Text, StyleSheet, Pressable} from 'react-native';
 import {useStatsStore} from '../../../store';
+import {checkAllAchievementsAfterStateChange} from '../../../achievements/checker';
 
 export type IssueSharesModalProps = {
   visible: boolean;
@@ -24,6 +25,7 @@ const IssueSharesModal = ({visible, onClose}: IssueSharesModalProps) => {
     console.log(
       `Issued ${percent}% new shares, ownership now ${newOwnership}% (placeholder)`,
     );
+    checkAllAchievementsAfterStateChange();
     onClose();
   };
 

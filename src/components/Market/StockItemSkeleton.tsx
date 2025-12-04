@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {theme} from '../../theme';
 
 type StockItemSkeletonProps = {
   symbol: string;
@@ -43,58 +44,56 @@ export default StockItemSkeleton;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 12,
-    padding: 14,
-    gap: 8,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    gap: theme.spacing.sm,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: theme.colors.border,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   symbol: {
-    fontSize: 16,
+    fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: '#E6ECF7',
+    color: theme.colors.textPrimary,
     letterSpacing: 0.3,
   },
   name: {
-    fontSize: 12,
-    color: '#9AA7BC',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textSecondary,
     marginTop: 2,
   },
   riskTag: {
-    backgroundColor: '#2B0F17',
-    color: '#F87171',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    fontSize: 11,
+    backgroundColor: theme.colors.danger,
+    color: theme.colors.textPrimary,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: 999,
+    fontSize: theme.typography.caption,
     fontWeight: '800',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#5C1E2E',
   },
   price: {
-    fontSize: 15,
-    color: '#D8DEEC',
-    fontWeight: '600',
+    fontSize: theme.typography.subtitle,
+    color: theme.colors.textPrimary,
+    fontWeight: '700',
   },
   change: {
-    fontSize: 13,
+    fontSize: theme.typography.caption + 1,
     fontWeight: '700',
   },
   changeUp: {
-    color: '#34D399',
+    color: theme.colors.success,
   },
   changeDown: {
-    color: '#F87171',
+    color: theme.colors.danger,
   },
   meta: {
-    fontSize: 12,
-    color: '#A3AEC2',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textMuted,
   },
 });

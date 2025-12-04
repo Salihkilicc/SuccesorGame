@@ -1,106 +1,185 @@
 import React from 'react';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
+import PremiumBadge from '../common/PremiumBadge';
+import {theme} from '../../theme';
 
 export type RoomId = 'standard' | 'high' | 'vip' | 'ultra';
 
 type RoomSelectorProps = {
   onRoomSelect: (roomId: RoomId) => void;
   hasPremium: boolean;
+  netWorth: number;
+  charisma: number;
+  onRequestPremium?: () => void;
 };
+
+const MIN_HIGH_NET_WORTH = 100_000;
+const MIN_ULTRA_NET_WORTH = 1_000_000;
 
 const ROOMS: Array<{
   id: RoomId;
   label: string;
   minBet: string;
   emoji: string;
-  premium?: boolean;
+  requiresPremium?: boolean;
+  minNetWorth?: number;
+  minCharisma?: number;
+  flavor?: string;
 }> = [
-  {id: 'standard', label: 'Standard Room', minBet: '$1K', emoji: '🎰'},
-  {id: 'high', label: 'High Roller', minBet: '$10K', emoji: '🔥'},
-  {id: 'vip', label: 'VIP Room', minBet: '$50K — premium required', emoji: '💎', premium: true},
-  {id: 'ultra', label: 'Ultra VIP', minBet: '$250K — premium required', emoji: '🃏', premium: true},
+  {id: 'standard', label: 'Standard Room', minBet: '$1K', emoji: '🎰', flavor: 'Casual bets & chill vibe.'},
+  {
+    id: 'high',
+    label: 'High Roller',
+    minBet: '$10K',
+    emoji: '🔥',
+    minNetWorth: MIN_HIGH_NET_WORTH,
+    minCharisma: 60,
+    flavor: 'Serious money, serious faces.',
+  },
+  {
+    id: 'vip',
+    label: 'VIP Room',
+    minBet: '$50K — premium required',
+    emoji: '💎',
+    requiresPremium: true,
+    flavor: 'Private tables & signature drinks.',
+  },
+  {
+    id: 'ultra',
+    label: 'Ultra VIP',
+    minBet: '$250K — premium + $1M NW',
+    emoji: '🃏',
+    requiresPremium: true,
+    minNetWorth: MIN_ULTRA_NET_WORTH,
+    flavor: 'Only legends play here.',
+  },
 ];
 
-const RoomSelector = ({onRoomSelect, hasPremium}: RoomSelectorProps) => (
-  <View style={styles.container}>
-    {ROOMS.map(room => {
-      const locked = room.premium && !hasPremium;
-      return (
-        <Pressable
-          key={room.id}
-          onPress={() => (!locked ? onRoomSelect(room.id) : null)}
-          style={({pressed}) => [
-            styles.card,
-            locked && styles.cardLocked,
-            pressed && !locked && styles.cardPressed,
-          ]}>
-          <View style={styles.row}>
-            <Text style={styles.emoji}>{room.emoji}</Text>
-            <View style={{flex: 1}}>
-              <Text style={styles.label}>{room.label}</Text>
-              <Text style={styles.meta}>Min bet: {room.minBet}</Text>
+const RoomSelector = ({onRoomSelect, hasPremium, netWorth, charisma, onRequestPremium}: RoomSelectorProps) => {
+  return (
+    <View style={styles.container}>
+      {ROOMS.map(room => {
+        const lockedByPremium = room.requiresPremium && !hasPremium;
+        const lockedByNetWorth =
+          typeof room.minNetWorth === 'number' ? netWorth < room.minNetWorth : false;
+        const lockedByCharisma =
+          typeof room.minCharisma === 'number' ? charisma < room.minCharisma : false;
+        const lockedHighRoller =
+          room.id === 'high' ? lockedByNetWorth && lockedByCharisma : false;
+        const locked =
+          lockedByPremium || (room.id === 'high' ? lockedHighRoller : lockedByNetWorth || lockedByCharisma);
+
+        const handlePress = () => {
+          if (lockedByPremium && onRequestPremium) {
+            onRequestPremium();
+            return;
+          }
+          if (locked) {
+            console.log(`[Casino] Locked room: ${room.id}`);
+            return;
+          }
+          onRoomSelect(room.id);
+        };
+
+        return (
+          <Pressable
+            key={room.id}
+            onPress={handlePress}
+            style={({pressed}) => [
+              styles.card,
+              locked && styles.cardLocked,
+              pressed && !locked && styles.cardPressed,
+            ]}>
+            <View style={styles.cardTop}>
+              <Text style={styles.emoji}>{room.emoji}</Text>
+              {room.requiresPremium ? (
+                <PremiumBadge
+                  size="small"
+                  style={locked ? styles.premiumBadgeLocked : undefined}
+                />
+              ) : null}
+              {locked ? <Text style={styles.lockBadge}>LOCKED</Text> : null}
             </View>
-            {room.premium ? (
-              <Text style={[styles.badge, locked && styles.badgeLocked]}>PREMIUM</Text>
+            <Text style={styles.label}>{room.label}</Text>
+            <Text style={styles.meta}>Min Bet: {room.minBet}</Text>
+            <Text style={styles.flavor}>{room.flavor}</Text>
+            {locked ? (
+              <Text style={styles.lockReason}>
+                {lockedByPremium
+                  ? 'Premium gerekli.'
+                  : room.id === 'high'
+                  ? `Net worth ${MIN_HIGH_NET_WORTH.toLocaleString()}$+ veya charisma 60+ gerekli.`
+                  : `Net worth ${room.minNetWorth?.toLocaleString()}$+ gerekli.`}
+              </Text>
             ) : null}
-          </View>
-        </Pressable>
-      );
-    })}
-  </View>
-);
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+};
 
 export default RoomSelector;
 
 const styles = StyleSheet.create({
   container: {
-    gap: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.md,
   },
   card: {
-    backgroundColor: '#0F1424',
-    borderRadius: 12,
-    padding: 12,
+    width: '48%',
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1C2335',
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
   },
   cardLocked: {
-    opacity: 0.4,
+    opacity: 0.5,
   },
   cardPressed: {
-    backgroundColor: '#131A2D',
+    backgroundColor: theme.colors.card,
+    transform: [{scale: 0.99}],
   },
-  row: {
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'space-between',
   },
   emoji: {
-    fontSize: 24,
+    fontSize: 28,
   },
   label: {
-    color: '#E6ECF7',
-    fontSize: 15,
-    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
   },
   meta: {
-    color: '#9AA7BC',
-    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
     marginTop: 2,
   },
-  badge: {
-    backgroundColor: '#1B2340',
-    color: '#E6ECF7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    fontSize: 11,
-    fontWeight: '800',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+  flavor: {
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
   },
-  badgeLocked: {
-    backgroundColor: '#2B1B1B',
-    color: '#F87171',
-    borderColor: '#5C2626',
+  lockReason: {
+    color: theme.colors.warning,
+    fontSize: theme.typography.caption,
+    marginTop: theme.spacing.xs,
+  },
+  premiumBadgeLocked: {
+    opacity: 0.8,
+  },
+  lockBadge: {
+    backgroundColor: theme.colors.textMuted,
+    color: theme.colors.textPrimary,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: 999,
+    fontSize: theme.typography.caption,
+    overflow: 'hidden',
   },
 });

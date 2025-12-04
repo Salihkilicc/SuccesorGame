@@ -1,21 +1,14 @@
 import React, {useMemo, useState} from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  FlatList,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Pressable, FlatList} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import StatBar from '../../../components/common/StatBar';
 import MarketOverview from '../../../components/Market/MarketOverview';
 import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
 import type {AssetsStackParamList} from '../../../navigation';
 import {useEventStore} from '../../../store';
 import {triggerEvent} from '../../../event/eventEngine';
+import {theme} from '../../../theme';
+import AppScreen from '../../../components/layout/AppScreen';
 
 type Category =
   | 'Tech'
@@ -93,8 +86,6 @@ const MarketScreen = () => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <Text style={styles.title}>MARKET</Text>
-      <Text style={styles.subtitle}>Simulated Nasdaq & Crypto</Text>
       <MarketOverview trend="Bullish" volatility="Medium" />
       <View style={styles.tabBar}>
         <ScrollView
@@ -122,7 +113,10 @@ const MarketScreen = () => {
 
   const renderFooter = () => (
     <View style={styles.eventCard}>
-      <Text style={styles.sectionTitle}>Today&apos;s Market Event</Text>
+      <View style={{flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs}}>
+        <Text style={styles.eventIcon}>📈</Text>
+        <Text style={styles.sectionTitle}>Today&apos;s Market Event</Text>
+      </View>
       <Text style={styles.eventText}>
         {lastMarketEvent ?? 'Bugün henüz özel bir market olayı yaşanmadı.'}
       </Text>
@@ -139,9 +133,18 @@ const MarketScreen = () => {
     </View>
   );
 
+  const BackButton = () => (
+    <Pressable
+      onPress={() => {
+        if (navigation.canGoBack()) navigation.goBack();
+      }}
+      style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+      <Text style={styles.backIcon}>←</Text>
+    </Pressable>
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatBar />
+    <AppScreen title="MARKET" subtitle="Simulated Nasdaq & Crypto" leftNode={<BackButton />}>
       <FlatList
         data={data}
         keyExtractor={item => item.symbol}
@@ -171,102 +174,108 @@ const MarketScreen = () => {
         )}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
 export default MarketScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#05060A',
-  },
   listContent: {
-    padding: 16,
-    gap: 12,
-    paddingBottom: 32,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    paddingBottom: theme.spacing.xl + theme.spacing.md,
   },
   headerContainer: {
-    gap: 12,
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#E8EDF5',
-    letterSpacing: 1,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#A3AEC2',
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   tabBar: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    backgroundColor: 'transparent',
   },
   tabBarContent: {
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    gap: 8,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    gap: theme.spacing.sm,
   },
   tab: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: '#0C0F1A',
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: 999,
+    backgroundColor: 'transparent',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: theme.colors.border,
   },
   tabActive: {
-    backgroundColor: '#1B2340',
-    borderColor: '#263157',
+    backgroundColor: theme.colors.accentSoft,
+    borderColor: theme.colors.accent,
   },
   tabLabel: {
-    color: '#9AA7BC',
+    color: theme.colors.textSecondary,
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: theme.typography.caption + 1,
   },
   tabLabelActive: {
-    color: '#E6ECF7',
+    color: theme.colors.accent,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#EEF2FF',
-    letterSpacing: 0.3,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   eventCard: {
-    marginTop: 12,
-    backgroundColor: '#0C0F1A',
-    borderRadius: 12,
-    padding: 16,
+    marginTop: theme.spacing.md,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
-    gap: 12,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.md,
+  },
+  eventIcon: {
+    fontSize: 16,
   },
   eventText: {
-    fontSize: 13,
-    color: '#A3AEC2',
+    fontSize: theme.typography.caption + 1,
+    color: theme.colors.textSecondary,
     lineHeight: 18,
   },
   secondaryButton: {
-    backgroundColor: '#1B2340',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: theme.colors.accentSoft,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.sm,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
+    borderColor: theme.colors.border,
   },
   secondaryButtonPressed: {
-    backgroundColor: '#202A4A',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   secondaryButtonText: {
-    color: '#E6ECF7',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: theme.typography.body,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
+  },
+  backButtonPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{scale: 0.97}],
+  },
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '700',
   },
 });

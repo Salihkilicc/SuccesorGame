@@ -1,6 +1,8 @@
 import React from 'react';
 import {Modal, View, Text, StyleSheet, Pressable} from 'react-native';
 import {useStatsStore} from '../../../store';
+import {checkAllAchievementsAfterStateChange} from '../../../achievements/checker';
+import {theme} from '../../../theme';
 
 export type RAndDModalProps = {
   visible: boolean;
@@ -22,6 +24,7 @@ const RAndDModal = ({visible, onClose, onResult}: RAndDModalProps) => {
     const success = Math.random() < 0.5;
     console.log(success ? 'R&D success (placeholder)' : 'R&D failed (placeholder)');
     onResult?.(success);
+    checkAllAchievementsAfterStateChange();
     // TODO: triggerEvent('company') on success later
     onClose();
   };
@@ -64,59 +67,65 @@ export default RAndDModal;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(17, 24, 39, 0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
+    padding: theme.spacing.lg,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
     width: '90%',
     maxWidth: 420,
-    gap: 12,
+    gap: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   title: {
-    fontSize: 18,
+    fontSize: theme.typography.subtitle + 2,
     fontWeight: '800',
-    color: '#111827',
+    color: theme.colors.textPrimary,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#4b5563',
+    fontSize: theme.typography.body,
+    color: theme.colors.textSecondary,
   },
   options: {
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   option: {
-    backgroundColor: '#111827',
-    borderRadius: 10,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.accentSoft,
+    borderRadius: 999,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.accent,
   },
   optionPressed: {
-    backgroundColor: '#0b1220',
+    backgroundColor: theme.colors.card,
     transform: [{scale: 0.98}],
   },
   optionText: {
-    color: '#f9fafb',
+    color: theme.colors.accent,
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: theme.typography.body,
   },
   closeButton: {
-    backgroundColor: '#e5e7eb',
-    borderRadius: 10,
-    paddingVertical: 12,
+    backgroundColor: theme.colors.card,
+    borderRadius: 999,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   closeButtonPressed: {
-    backgroundColor: '#d1d5db',
+    backgroundColor: theme.colors.cardSoft,
     transform: [{scale: 0.98}],
   },
   closeText: {
-    fontSize: 15,
+    fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textSecondary,
   },
 });

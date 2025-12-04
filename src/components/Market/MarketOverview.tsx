@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {theme} from '../../theme';
 
 type MarketOverviewProps = {
   trend?: 'Bullish' | 'Bearish' | 'Neutral';
@@ -12,17 +13,34 @@ const MarketOverview = ({
 }: MarketOverviewProps) => (
   <View style={styles.container}>
     <View style={styles.headerRow}>
+      <Text style={styles.icon}>📊</Text>
       <Text style={styles.title}>Market Overview</Text>
-      <Text style={styles.tag}>Live</Text>
     </View>
     <View style={styles.row}>
-      <Text style={styles.label}>Market Trend</Text>
-      <Text style={styles.value}>{trend}</Text>
+      <Text style={styles.label}>Trend</Text>
+      <Text
+        style={[
+          styles.value,
+          trend === 'Bullish' ? styles.positive : trend === 'Bearish' ? styles.negative : null,
+        ]}>
+        {trend}
+      </Text>
     </View>
     <View style={styles.row}>
       <Text style={styles.label}>Volatility</Text>
-      <Text style={styles.value}>{volatility}</Text>
+      <Text
+        style={[
+          styles.value,
+          volatility === 'High'
+            ? styles.negative
+            : volatility === 'Medium'
+            ? styles.warning
+            : null,
+        ]}>
+        {volatility}
+      </Text>
     </View>
+    <Text style={styles.helper}>All data is fictional & simulated.</Text>
   </View>
 );
 
@@ -30,33 +48,25 @@ export default MarketOverview;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0C0F1A',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
-    gap: 10,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
+  },
+  icon: {
+    fontSize: 16,
   },
   title: {
-    color: '#E6ECF7',
-    fontSize: 16,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
     fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  tag: {
-    backgroundColor: '#1B2340',
-    color: '#A3AEC2',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    fontSize: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#263157',
   },
   row: {
     flexDirection: 'row',
@@ -64,12 +74,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#9AA7BC',
-    fontSize: 13,
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: '#E6ECF7',
-    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
     fontWeight: '700',
+  },
+  positive: {color: theme.colors.success},
+  negative: {color: theme.colors.danger},
+  warning: {color: theme.colors.warning},
+  helper: {
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
   },
 });
