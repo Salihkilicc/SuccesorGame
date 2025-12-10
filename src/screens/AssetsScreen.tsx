@@ -37,6 +37,10 @@ const AssetsScreen = () => {
     useStatsStore();
   const {lastMarketEvent} = useEventStore();
 
+  const propertiesValue = 2_450_000;
+  const vehiclesValue = 1_120_000;
+  const belongingsValue = 380_000;
+
   const nextMove = (() => {
     if (riskApetite > 65) {
       return 'Consider adding a small position in higher risk assets.';
@@ -135,34 +139,72 @@ const AssetsScreen = () => {
           </View>
         </View>
 
-        <View style={{gap: theme.spacing.md}}>
-          <View style={styles.actionCard}>
+        <Pressable
+          onPress={() => console.log('Open premium shopping hub (placeholder)')}
+          style={({pressed}) => [styles.shoppingButton, pressed && styles.shoppingButtonPressed]}>
+          <Text style={styles.shoppingTitle}>Go Shopping</Text>
+          <Text style={styles.shoppingSubtitle}>
+            Explore properties, vehicles, art, jewelry, and more.
+          </Text>
+          <Text style={styles.shoppingCta}>Shop Now ↗</Text>
+        </Pressable>
+
+        <View style={styles.categoryGrid}>
+          <Pressable
+            onPress={() => console.log('Open properties (placeholder)')}
+            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            <Text style={styles.categoryLabel}>Properties</Text>
+            <Text style={styles.categoryValue}>{formatMoney(propertiesValue)}</Text>
+            <Text style={styles.categoryMeta}>Homes, penthouses, estates</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => console.log('Open vehicles (placeholder)')}
+            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            <Text style={styles.categoryLabel}>Vehicles</Text>
+            <Text style={styles.categoryValue}>{formatMoney(vehiclesValue)}</Text>
+            <Text style={styles.categoryMeta}>Cars, jets, yachts</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => console.log('Open belongings (placeholder)')}
+            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            <Text style={styles.categoryLabel}>Belongings</Text>
+            <Text style={styles.categoryValue}>{formatMoney(belongingsValue)}</Text>
+            <Text style={styles.categoryMeta}>Art, jewelry, antiques</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.actionRow}>
+          <Pressable
+            onPress={() => navigation.navigate('Market')}
+            style={({pressed}) => [
+              styles.actionTile,
+              styles.marketTile,
+              pressed && styles.actionTilePressed,
+            ]}>
             <View style={{gap: theme.spacing.xs}}>
               <Text style={styles.actionTitle}>Market</Text>
               <Text style={styles.actionBody}>
                 Scan the latest sectors and move quickly on opportunities.
               </Text>
             </View>
-            <Pressable
-              onPress={() => navigation.navigate('Market')}
-              style={({pressed}) => [styles.actionButton, pressed && styles.actionButtonPressed]}>
-              <Text style={styles.actionButtonText}>Go to Market</Text>
-            </Pressable>
-          </View>
+            <Text style={styles.tileCta}>›</Text>
+          </Pressable>
 
-          <View style={styles.actionCard}>
+          <Pressable
+            onPress={() => navigation.navigate('MyCompany')}
+            style={({pressed}) => [
+              styles.actionTile,
+              styles.companyTile,
+              pressed && styles.actionTilePressed,
+            ]}>
             <View style={{gap: theme.spacing.xs}}>
               <Text style={styles.actionTitle}>My Company</Text>
               <Text style={styles.actionBody}>
                 Review valuation, ownership, and make strategic moves.
               </Text>
             </View>
-            <Pressable
-              onPress={() => navigation.navigate('MyCompany')}
-              style={({pressed}) => [styles.actionButton, pressed && styles.actionButtonPressed]}>
-              <Text style={styles.actionButtonText}>Go to My Company</Text>
-            </Pressable>
-          </View>
+            <Text style={styles.tileCta}>›</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -317,13 +359,88 @@ const styles = StyleSheet.create({
     gap: theme.spacing.lg,
     marginTop: theme.spacing.md,
   },
-  actionCard: {
+  actionRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  shoppingButton: {
     backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
+  },
+  shoppingButtonPressed: {
+    transform: [{scale: 0.99}],
+  },
+  shoppingTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
+  },
+  shoppingSubtitle: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.body,
+    lineHeight: 18,
+  },
+  shoppingCta: {
+    color: theme.colors.accent,
+    fontWeight: '800',
+    fontSize: theme.typography.caption + 1,
+    marginTop: theme.spacing.xs,
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  categoryCard: {
+    flex: 1,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.xs,
+    minHeight: 110,
+  },
+  categoryCardPressed: {
+    transform: [{scale: 0.98}],
+    backgroundColor: theme.colors.card,
+  },
+  categoryLabel: {
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.caption,
+    letterSpacing: 0.4,
+  },
+  categoryValue: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.subtitle,
+    fontWeight: '800',
+  },
+  categoryMeta: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption + 1,
+    lineHeight: 18,
+  },
+  actionTile: {
+    flex: 1,
+    backgroundColor: theme.colors.cardSoft,
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
+    justifyContent: 'space-between',
+    minHeight: 140,
+  },
+  marketTile: {
+    backgroundColor: theme.colors.success,
+    borderColor: theme.colors.success,
+  },
+  companyTile: {
+    backgroundColor: theme.colors.accent,
+    borderColor: theme.colors.accent,
   },
   actionTitle: {
     color: theme.colors.textPrimary,
@@ -335,21 +452,19 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     lineHeight: 18,
   },
-  actionButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: theme.colors.accentSoft,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.accent,
+  actionBody: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.body,
+    lineHeight: 18,
   },
-  actionButtonPressed: {
+  actionTilePressed: {
     transform: [{scale: 0.98}],
+    opacity: 0.94,
   },
-  actionButtonText: {
-    color: theme.colors.accent,
+  tileCta: {
+    color: theme.colors.textPrimary,
     fontWeight: '800',
-    fontSize: theme.typography.caption + 1,
+    fontSize: theme.typography.subtitle,
+    alignSelf: 'flex-end',
   },
 });
