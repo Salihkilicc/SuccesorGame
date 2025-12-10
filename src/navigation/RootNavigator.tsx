@@ -13,6 +13,10 @@ import {
   LoveScreen,
   MarketScreen,
   MyCompanyScreen,
+  SlotsGameScreen,
+  RouletteGameScreen,
+  PokerGameScreen,
+  BlackjackGameScreen,
   StockDetailScreen,
   CasinoScreen,
   PremiumScreen,
@@ -37,7 +41,6 @@ export type AssetsStackParamList = {
   AssetsHome: undefined;
   Market: undefined;
   MyCompany: undefined;
-  Casino: undefined;
   Premium: undefined;
   StockDetail: {
     symbol: string;
@@ -45,6 +48,16 @@ export type AssetsStackParamList = {
     change: number;
     category?: string;
   };
+};
+
+export type CasinoStackParamList = {
+  Casino: undefined;
+  SlotsGame: {
+    variant: 'street_fighter' | 'poseidon' | 'high_roller';
+  };
+  RouletteGame: undefined;
+  PokerGame: undefined;
+  BlackjackGame: undefined;
 };
 
 export type RootTabParamList = {
@@ -59,12 +72,14 @@ export type RootStackParamList = {
   MyCompany: undefined;
   Premium: undefined;
   Achievements: undefined;
+  Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const LifeStack = createNativeStackNavigator<LifeStackParamList>();
 const LoveStack = createNativeStackNavigator<LoveStackParamList>();
 const AssetsStack = createNativeStackNavigator<AssetsStackParamList>();
+const CasinoStack = createNativeStackNavigator<CasinoStackParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
@@ -100,11 +115,6 @@ const AssetsStackNavigator = () => (
       options={{title: formatScreenTitle('My Company')}}
     />
     <AssetsStack.Screen
-      name="Casino"
-      component={CasinoScreen}
-      options={{title: formatScreenTitle('Casino')}}
-    />
-    <AssetsStack.Screen
       name="StockDetail"
       component={StockDetailScreen}
       options={{title: formatScreenTitle('Stock Detail')}}
@@ -115,6 +125,36 @@ const AssetsStackNavigator = () => (
       options={{title: formatScreenTitle('Premium')}}
     />
   </AssetsStack.Navigator>
+);
+
+const CasinoStackNavigator = () => (
+  <CasinoStack.Navigator screenOptions={{headerShown: false}}>
+    <CasinoStack.Screen
+      name="Casino"
+      component={CasinoScreen}
+      options={{title: formatScreenTitle('Casino')}}
+    />
+    <CasinoStack.Screen
+      name="SlotsGame"
+      component={SlotsGameScreen}
+      options={{title: formatScreenTitle('Slots Game')}}
+    />
+    <CasinoStack.Screen
+      name="RouletteGame"
+      component={RouletteGameScreen}
+      options={{title: formatScreenTitle('Roulette Game')}}
+    />
+    <CasinoStack.Screen
+      name="PokerGame"
+      component={PokerGameScreen}
+      options={{title: formatScreenTitle('Poker Game')}}
+    />
+    <CasinoStack.Screen
+      name="BlackjackGame"
+      component={BlackjackGameScreen}
+      options={{title: formatScreenTitle('Blackjack Game')}}
+    />
+  </CasinoStack.Navigator>
 );
 
 const MainTabs = () => (
@@ -158,6 +198,7 @@ const RootNavigator = () => (
         <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
         <RootStack.Screen name="Premium" component={PremiumScreen} />
         <RootStack.Screen name="Achievements" component={AchievementsScreen} />
+        <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
         {/* Future settings/legal/notifications routes can be added here */}
       </RootStack.Navigator>
       <BottomStatsBar

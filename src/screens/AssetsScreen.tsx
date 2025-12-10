@@ -139,16 +139,6 @@ const AssetsScreen = () => {
           </View>
         </View>
 
-        <Pressable
-          onPress={() => console.log('Open premium shopping hub (placeholder)')}
-          style={({pressed}) => [styles.shoppingButton, pressed && styles.shoppingButtonPressed]}>
-          <Text style={styles.shoppingTitle}>Go Shopping</Text>
-          <Text style={styles.shoppingSubtitle}>
-            Explore properties, vehicles, art, jewelry, and more.
-          </Text>
-          <Text style={styles.shoppingCta}>Shop Now ↗</Text>
-        </Pressable>
-
         <View style={styles.categoryGrid}>
           <Pressable
             onPress={() => console.log('Open properties (placeholder)')}
@@ -363,33 +353,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.md,
   },
-  shoppingButton: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.xs,
-  },
-  shoppingButtonPressed: {
-    transform: [{scale: 0.99}],
-  },
-  shoppingTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '800',
-  },
-  shoppingSubtitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-    lineHeight: 18,
-  },
-  shoppingCta: {
-    color: theme.colors.accent,
-    fontWeight: '800',
-    fontSize: theme.typography.caption + 1,
-    marginTop: theme.spacing.xs,
-  },
   categoryGrid: {
     flexDirection: 'row',
     gap: theme.spacing.md,
@@ -446,11 +409,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-  },
-  actionBody: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-    lineHeight: 18,
   },
   actionBody: {
     color: theme.colors.textSecondary,

@@ -7,14 +7,17 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import MatchPopup from '../../components/Match/MatchPopup';
 import {useMatchSystem} from '../../components/Match/useMatchSystem';
 import {triggerEvent} from '../../event/eventEngine';
-import type {LifeStackParamList, RootTabParamList} from '../../navigation';
-import {useEventStore, useUserStore} from '../../store';
+import type {LifeStackParamList, RootStackParamList, RootTabParamList} from '../../navigation';
+import {useEventStore} from '../../store';
 import {theme} from '../../theme';
 import AppScreen from '../../components/layout/AppScreen';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
-  BottomTabNavigationProp<RootTabParamList, 'Life'>
+  CompositeNavigationProp<
+    BottomTabNavigationProp<RootTabParamList, 'Life'>,
+    NativeStackNavigationProp<RootStackParamList>
+  >
 >;
 
 type LifeActionType =
@@ -23,7 +26,11 @@ type LifeActionType =
   | 'gym'
   | 'shopping'
   | 'travel'
-  | 'casino';
+  | 'casino'
+  | 'blackMarket'
+  | 'add'
+  | 'hookup'
+  | 'network';
 
 type LifeActionButtonProps = {
   emoji: string;
@@ -74,12 +81,35 @@ const ACTIONS: Array<{
     description: 'High risk, high thrill',
     emoji: '🎰',
   },
+  {
+    key: 'blackMarket',
+    label: 'Black Market',
+    description: 'Shadow deals for rare items',
+    emoji: '🕶',
+  },
+  {
+    key: 'add',
+    label: 'Add',
+    description: 'Queue your next move',
+    emoji: '➕',
+  },
+  {
+    key: 'hookup',
+    label: 'Hookup',
+    description: 'Casual chemistry',
+    emoji: '🔥',
+  },
+  {
+    key: 'network',
+    label: 'Network',
+    description: 'Meet investors and mentors',
+    emoji: '🤝',
+  },
 ];
 
 const LifeScreen = () => {
   const navigation = useNavigation<LifeNavigationProp>();
   const {lastLifeEvent} = useEventStore();
-  const {name, avatarUrl} = useUserStore();
   const {
     visible,
     matchCandidate,
@@ -119,7 +149,19 @@ const LifeScreen = () => {
         break;
       case 'casino':
         console.log('[Life] Navigating to Casino');
-        navigation.navigate('Assets', {screen: 'Casino'});
+        navigation.navigate('Casino');
+        break;
+      case 'blackMarket':
+        console.log('[Life] Action triggered: Black Market');
+        break;
+      case 'add':
+        console.log('[Life] Action triggered: Add (placeholder)');
+        break;
+      case 'hookup':
+        console.log('[Life] Action triggered: Hookup (placeholder)');
+        break;
+      case 'network':
+        console.log('[Life] Action triggered: Network (placeholder)');
         break;
       default:
         break;
@@ -136,22 +178,6 @@ const LifeScreen = () => {
           style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
           <Text style={styles.backIcon}>←</Text>
         </Pressable>
-      }
-      rightNode={
-        <View style={styles.headerActions}>
-          <Pressable
-            onPress={() => navigation.navigate('Profile')}
-            style={({pressed}) => [
-              styles.profileButton,
-              pressed && styles.profileButtonPressed,
-            ]}>
-            {avatarUrl ? (
-              <Text style={styles.profileInitial}>🙂</Text>
-            ) : (
-              <Text style={styles.profileInitial}>{name?.[0]?.toUpperCase() ?? 'Y'}</Text>
-            )}
-          </Pressable>
-        </View>
       }>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -239,11 +265,6 @@ const LifeActionButton = ({
 export default LifeScreen;
 
 const styles = StyleSheet.create({
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
   backButton: {
     width: 36,
     height: 36,
@@ -262,25 +283,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: theme.typography.subtitle,
     fontWeight: '700',
-  },
-  profileButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 999,
-    backgroundColor: theme.colors.cardSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    marginRight: theme.spacing.sm,
-  },
-  profileButtonPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{scale: 0.97}],
-  },
-  profileInitial: {
-    color: theme.colors.textPrimary,
-    fontWeight: '800',
   },
   scrollContent: {
     paddingBottom: 40,

@@ -5,4 +5,5 @@ export type {
   LoveStackParamList,
   AssetsStackParamList,
   RootStackParamList,
+  CasinoStackParamList,
 } from './RootNavigator';
