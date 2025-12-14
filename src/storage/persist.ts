@@ -1,30 +1,17 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createMMKV, type MMKV } from 'react-native-mmkv';
 import type { StateStorage } from 'zustand/middleware';
 
+export const storage = createMMKV();
+
 export const zustandStorage: StateStorage = {
-  getItem: async (name: string) => {
-    try {
-      const value = await AsyncStorage.getItem(name);
-      return value ?? null;
-    } catch (error) {
-      console.error('AsyncStorage getItem error:', error);
-      return null;
-    }
+  getItem: (name: string) => {
+    const value = storage.getString(name);
+    return value ?? null;
   },
-  setItem: async (name: string, value: string) => {
-    try {
-      // Ensure value is a string
-      const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-      await AsyncStorage.setItem(name, stringValue);
-    } catch (error) {
-      console.error('AsyncStorage setItem error:', error);
-    }
+  setItem: (name: string, value: string) => {
+    storage.set(name, value);
   },
-  removeItem: async (name: string) => {
-    try {
-      await AsyncStorage.removeItem(name);
-    } catch (error) {
-      console.error('AsyncStorage removeItem error:', error);
-    }
+  removeItem: (name: string) => {
+    storage.remove(name);
   },
 };
