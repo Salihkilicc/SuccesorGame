@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -8,14 +8,14 @@ import {
   Modal,
   TouchableOpacity,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {useUserStore, useGameStore, useStatsStore, useEventStore} from '../../store';
-import {theme} from '../../theme';
-import type {RootStackParamList, RootTabParamList} from '../../navigation';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {CompositeNavigationProp} from '@react-navigation/native';
-import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { useUserStore, useGameStore, useStatsStore, useEventStore } from '../../store';
+import { theme } from '../../theme';
+import type { RootStackParamList, RootTabParamList } from '../../navigation';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -26,16 +26,16 @@ const formatMoney = (value: number) => {
   const absolute = Math.abs(value);
   if (absolute >= 1_000_000) {
     const formatted = (value / 1_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
+    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted} M`;
   }
   if (absolute >= 1_000) {
     const formatted = (value / 1_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
+    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted} K`;
   }
-  return `$${value.toLocaleString()}`;
+  return `$${value.toLocaleString()} `;
 };
 
-const NewsItem = ({text}: {text: string}) => (
+const NewsItem = ({ text }: { text: string }) => (
   <View style={styles.newsItem}>
     <Text style={styles.newsBullet}>•</Text>
     <Text style={styles.newsText}>{text}</Text>
@@ -44,11 +44,16 @@ const NewsItem = ({text}: {text: string}) => (
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeNavProp>();
-  const {name, bio, gender, hasPremium, partner} = useUserStore();
-  const {age, currentMonth, advanceMonth} = useGameStore();
+  const { name, bio, gender, hasPremium, partner } = useUserStore();
+  const { age, currentMonth, advanceMonth } = useGameStore();
   // TODO: Wire monthlyIncome/monthlyExpenses to real store values when available.
-  const {money, netWorth, monthlyIncome, monthlyExpenses} = useStatsStore();
-  const {lastLifeEvent} = useEventStore();
+  const { money, netWorth, monthlyIncome, monthlyExpenses, setField } = useStatsStore();
+
+  useEffect(() => {
+    // Force set money to 450k as requested
+    setField('money', 450_000);
+  }, []);
+  const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [language, setLanguage] = useState<'EN' | 'TR'>('EN');
@@ -63,20 +68,20 @@ const HomeScreen = () => {
   }, [gender]);
 
   const partnerBrief = partner
-    ? `${partner.name} — ${partner.love >= 70 ? 'Relationship stable' : 'Some drama ahead'}`
+    ? `${partner.name} — ${partner.love >= 70 ? 'Relationship stable' : 'Some drama ahead'} `
     : 'Currently single.';
 
   const assetsBrief =
     netWorth > 25000
       ? 'Your assets are growing steadily.'
       : netWorth > 10000
-      ? 'Volatile month so far.'
-      : 'Time to build momentum.';
+        ? 'Volatile month so far.'
+        : 'Time to build momentum.';
 
   const lifeBrief = lastLifeEvent ?? 'Nothing remarkable happened recently.';
 
   const handleNavigateTabs = (screen: keyof RootTabParamList) => {
-    navigation.navigate('MainTabs', {screen});
+    navigation.navigate('MainTabs', { screen } as any);
   };
 
   const handleNavigateStack = (screen: keyof RootStackParamList) => {
@@ -90,7 +95,7 @@ const HomeScreen = () => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
-          <View style={{flex: 1, gap: theme.spacing.xs}}>
+          <View style={{ flex: 1, gap: theme.spacing.xs }}>
             <View style={styles.nameRow}>
               <Text style={styles.name}>{displayName}</Text>
               <Text style={styles.gender}>{genderSymbol}</Text>
@@ -105,7 +110,7 @@ const HomeScreen = () => {
               </View>
               <Pressable
                 onPress={advanceMonth}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                   styles.nextMonthButton,
                   pressed && styles.nextMonthButtonPressed,
                 ]}>
@@ -116,7 +121,7 @@ const HomeScreen = () => {
 
           <Pressable
             onPress={() => setDrawerOpen(true)}
-            style={({pressed}) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
+            style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
             <Text style={styles.hamburgerText}>☰</Text>
           </Pressable>
         </View>
@@ -130,7 +135,7 @@ const HomeScreen = () => {
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Cash</Text>
-              <Text style={styles.value}>{formatMoney(money)}</Text>
+              <Text style={styles.value}>${money.toLocaleString()}</Text>
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Income (Monthly)</Text>
@@ -148,7 +153,7 @@ const HomeScreen = () => {
             <View style={styles.cardActions}>
               <Pressable
                 onPress={() => handleNavigateStack('MyCompany')}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                   styles.primaryCardButton,
                   pressed && styles.primaryCardButtonPressed,
                 ]}>
@@ -156,7 +161,7 @@ const HomeScreen = () => {
               </Pressable>
               <Pressable
                 onPress={() => setShowNews(true)}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                   styles.secondaryCardButton,
                   pressed && styles.secondaryCardButtonPressed,
                 ]}>
@@ -187,19 +192,19 @@ const HomeScreen = () => {
         <View style={styles.entryRow}>
           <Pressable
             onPress={() => handleNavigateTabs('Life')}
-            style={({pressed}) => [styles.entryLife, pressed && styles.entryPressed]}>
+            style={({ pressed }) => [styles.entryLife, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleDark}>LIFE</Text>
             <Text style={styles.entrySubtitleDark}>Lifestyle & Events</Text>
           </Pressable>
           <Pressable
             onPress={() => handleNavigateTabs('Assets')}
-            style={({pressed}) => [styles.entryAssets, pressed && styles.entryPressed]}>
+            style={({ pressed }) => [styles.entryAssets, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleLight}>ASSETS</Text>
             <Text style={styles.entrySubtitleLight}>Market & Company</Text>
           </Pressable>
           <Pressable
             onPress={() => handleNavigateTabs('Love')}
-            style={({pressed}) => [styles.entryLove, pressed && styles.entryPressed]}>
+            style={({ pressed }) => [styles.entryLove, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleLight}>LOVE</Text>
             <Text style={styles.entrySubtitleLight}>Relationships & Drama</Text>
           </Pressable>
@@ -276,8 +281,8 @@ type DrawerItemProps = {
   rightNode?: React.ReactNode;
 };
 
-const DrawerItem = ({label, onPress, rightNode}: DrawerItemProps) => (
-  <Pressable onPress={onPress} style={({pressed}) => [styles.drawerItem, pressed && styles.drawerItemPressed]}>
+const DrawerItem = ({ label, onPress, rightNode }: DrawerItemProps) => (
+  <Pressable onPress={onPress} style={({ pressed }) => [styles.drawerItem, pressed && styles.drawerItemPressed]}>
     <Text style={styles.drawerItemText}>{label}</Text>
     {rightNode ? rightNode : null}
   </Pressable>
@@ -370,7 +375,7 @@ const styles = StyleSheet.create({
   },
   nextMonthButtonPressed: {
     opacity: 0.85,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   nextMonthText: {
     color: theme.colors.accent,
@@ -440,7 +445,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   primaryCardButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   primaryCardButtonText: {
     color: theme.colors.accent,
@@ -458,7 +463,7 @@ const styles = StyleSheet.create({
   },
   secondaryCardButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   secondaryCardButtonText: {
     color: theme.colors.textPrimary,
@@ -541,7 +546,7 @@ const styles = StyleSheet.create({
   },
   entryPressed: {
     opacity: 0.9,
-    transform: [{scale: 0.99}],
+    transform: [{ scale: 0.99 }],
   },
   drawerOverlay: {
     ...StyleSheet.absoluteFillObject,

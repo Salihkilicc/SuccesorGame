@@ -1,28 +1,41 @@
-import React, {useMemo, useState} from 'react';
-import {Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import AppScreen from '../../components/layout/AppScreen';
-import {theme} from '../../theme';
-import {useStatsStore} from '../../store';
-import type {CasinoStackParamList} from '../../navigation';
+import React, { useMemo, useState } from 'react';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../../theme';
+import { useStatsStore } from '../../store';
+import type { CasinoStackParamList } from '../../navigation';
+import CasinoBetModal from './components/CasinoBetModal';
 
-type LocationId = 'greece' | 'las_vegas' | 'monaco' | 'montenegro' | 'macau' | 'singapore';
+type LocationId =
+  | 'greece'
+  | 'las_vegas'
+  | 'monaco'
+  | 'montenegro'
+  | 'macau'
+  | 'singapore';
 
 type CasinoLocation = {
   id: LocationId;
   name: string;
   requirement: number;
-  tagline: string;
 };
 
 const CASINO_LOCATIONS: CasinoLocation[] = [
-  {id: 'greece', name: 'Greece', requirement: 0, tagline: 'Open to every guest'},
-  {id: 'las_vegas', name: 'Las Vegas', requirement: 20, tagline: 'Strip neon and quick action'},
-  {id: 'monaco', name: 'Monaco', requirement: 40, tagline: 'Velvet ropes and old money'},
-  {id: 'montenegro', name: 'Montenegro', requirement: 30, tagline: 'Adriatic rooms, tailored service'},
-  {id: 'macau', name: 'Macau', requirement: 50, tagline: 'VIP junkets and baccarat whales'},
-  {id: 'singapore', name: 'Singapore', requirement: 60, tagline: 'Skyline luxury and crisp floors'},
+  { id: 'greece', name: 'Greece', requirement: 0 },
+  { id: 'las_vegas', name: 'Las Vegas', requirement: 20 },
+  { id: 'monaco', name: 'Monaco', requirement: 40 },
+  { id: 'montenegro', name: 'Montenegro', requirement: 30 },
+  { id: 'macau', name: 'Macau', requirement: 50 },
+  { id: 'singapore', name: 'Singapore', requirement: 60 },
 ];
 
 const SLOT_VARIANTS: Array<{
@@ -30,17 +43,45 @@ const SLOT_VARIANTS: Array<{
   title: string;
   icon: string;
   note: string;
+  isHighRoller?: boolean;
 }> = [
-  {id: 'street_fighter', title: 'Street Fighter Slots', icon: '🎮', note: 'Volatility: Medium'},
-  {id: 'poseidon', title: "Poseidon's Fortune", icon: '🌊', note: 'Volatility: Medium-High'},
-  {id: 'high_roller', title: 'High Roller Deluxe', icon: '💎', note: 'Volatility: High'},
-];
+    {
+      id: 'street_fighter',
+      title: 'Street Fighter Slots',
+      icon: '🎮',
+      note: 'Volatility: Medium',
+    },
+    {
+      id: 'poseidon',
+      title: "Poseidon's Fortune",
+      icon: '🌊',
+      note: 'Volatility: Medium-High',
+    },
+  ];
+
+const HIGH_ROLLER_SLOT = {
+  id: 'high_roller',
+  title: 'High Roller Deluxe',
+  icon: '💎',
+  note: 'Volatility: High',
+} as const;
+
+type PendingGame = {
+  type: 'SlotsGame' | 'RouletteGame' | 'PokerGame' | 'BlackjackGame';
+  title: string;
+  params?: any;
+};
 
 const CasinoScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<CasinoStackParamList>>();
-  const {casinoReputation, money} = useStatsStore();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<CasinoStackParamList>>();
+  const { casinoReputation, money } = useStatsStore();
   const [selectedLocation, setSelectedLocation] = useState<LocationId>('greece');
   const [locationModalVisible, setLocationModalVisible] = useState(false);
+
+  // Phase 2: Bet Modal State
+  const [betModalVisible, setBetModalVisible] = useState(false);
+  const [pendingGame, setPendingGame] = useState<PendingGame | null>(null);
 
   const reputationValue = useMemo(
     () => Math.max(0, Math.min(100, Math.round(casinoReputation ?? 0))),
@@ -48,178 +89,240 @@ const CasinoScreen = () => {
   );
 
   const location = useMemo(
-    () => CASINO_LOCATIONS.find(item => item.id === selectedLocation) ?? CASINO_LOCATIONS[0],
+    () =>
+      CASINO_LOCATIONS.find(item => item.id === selectedLocation) ??
+      CASINO_LOCATIONS[0],
     [selectedLocation],
   );
 
   const handleSelectLocation = (target: CasinoLocation) => {
-    if (reputationValue < target.requirement) {
-      Alert.alert(
-        'Not enough reputation',
-        `Requires Casino Rep ${target.requirement}+ to enter.`,
-      );
+    if (target.id !== 'greece') {
       return;
     }
     setSelectedLocation(target.id);
     setLocationModalVisible(false);
   };
 
-  const renderSlotCard = (variant: (typeof SLOT_VARIANTS)[number]) => (
+  const handleBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
+
+  // --- Game Launch Logic ---
+  const handleGamePress = (
+    type: PendingGame['type'],
+    title: string,
+    params?: any
+  ) => {
+    setPendingGame({ type, title, params });
+    setBetModalVisible(true);
+  };
+
+  const handlePlayGame = (betAmount: number) => {
+    setBetModalVisible(false);
+    if (pendingGame) {
+      navigation.navigate(pendingGame.type as any, {
+        ...pendingGame.params,
+        betAmount, // Pass the chosen bet amount
+      });
+    }
+    setPendingGame(null);
+  };
+
+  const renderSlotCard = (item: typeof SLOT_VARIANTS[number]) => (
     <Pressable
-      key={variant.id}
-      onPress={() => navigation.navigate('SlotsGame', {variant: variant.id})}
-      style={({pressed}) => [styles.slotCard, pressed && styles.cardPressed]}>
-      <Text style={styles.slotIcon}>{variant.icon}</Text>
-      <Text style={styles.slotTitle}>{variant.title}</Text>
-      <Text style={styles.slotNote}>{variant.note}</Text>
+      key={item.id}
+      onPress={() => handleGamePress('SlotsGame', item.title, { variant: item.id })}
+      style={({ pressed }) => [styles.slotCard, pressed && styles.cardPressed]}>
+      <Text style={styles.slotIcon}>{item.icon}</Text>
+      <Text style={styles.slotTitle}>{item.title}</Text>
+      <Text style={styles.slotNote}>{item.note}</Text>
       <Text style={styles.slotCta}>Play ›</Text>
     </Pressable>
   );
 
   return (
-    <AppScreen title="Casino" subtitle="Premium Hub">
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* 1. Ultra-Slim Header */}
+      <View style={styles.header}>
+        <Pressable
+          onPress={handleBack}
+          style={({ pressed }) => [
+            styles.headerLeft,
+            pressed && { opacity: 0.7 },
+          ]}>
+          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.headerTitle}>Casino</Text>
+        </Pressable>
+        <View style={styles.headerRight}>
+          <Text style={styles.balanceText}>
+            ${money.toLocaleString()}
+          </Text>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.pageHeader}>
-          <View style={{gap: theme.spacing.xs}}>
-            <Text style={styles.pageTitle}>Casino</Text>
-            <Text style={styles.pageSubtitle}>
-              Pick your location, check your reputation, and dive into the tables.
-            </Text>
-          </View>
-          <View style={styles.bankrollPill}>
-            <Text style={styles.pillLabel}>Bankroll</Text>
-            <Text style={styles.pillValue}>${money.toLocaleString()}</Text>
-          </View>
-        </View>
-
+        {/* 2. Location & Reputation Row */}
         <View style={styles.topRow}>
-          <Pressable
-            onPress={() => setLocationModalVisible(true)}
-            style={({pressed}) => [styles.locationCard, pressed && styles.cardPressed]}>
-            <Text style={styles.locationLabel}>Selected Casino</Text>
-            <Text style={styles.locationName}>{location.name}</Text>
-            <Text style={styles.locationTagline}>{location.tagline}</Text>
-            <Text style={styles.changeHint}>Tap to change location</Text>
-          </Pressable>
+          {/* A) Location Button */}
+          <View style={styles.locationContainer}>
+            <Pressable
+              onPress={() => setLocationModalVisible(true)}
+              style={({ pressed }) => [
+                styles.locationButton,
+                pressed && styles.cardPressed,
+              ]}>
+              <Text style={styles.locationLabel}>Selected Casino:</Text>
+              <Text style={styles.locationValue}>{location.name.toUpperCase()}</Text>
+            </Pressable>
+            <Text style={styles.locationHint}>Tap for other casinos</Text>
+          </View>
 
-          <View style={styles.repCard}>
-            <Text style={styles.repLabel}>Casino Rep</Text>
-            <Text style={styles.repValue}>{reputationValue} / 100</Text>
+          {/* B) Reputation Bar */}
+          <View style={styles.repContainer}>
+            <View style={styles.repHeader}>
+              <Text style={styles.repLabel}>Casino Rep</Text>
+              <Text style={styles.repValueText}>{reputationValue} / 100</Text>
+            </View>
             <View style={styles.repTrack}>
-              <View style={[styles.repFill, {width: `${reputationValue}%`}]} />
+              <View
+                style={[
+                  styles.repFill,
+                  { width: `${reputationValue}%` },
+                ]}
+              />
             </View>
           </View>
         </View>
 
+        {/* 4. Game List */}
+
+        {/* 1. Slots */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Slots</Text>
           <View style={styles.slotGrid}>{SLOT_VARIANTS.map(renderSlotCard)}</View>
         </View>
 
+        {/* 2. High Roller Deluxe */}
+        <View style={styles.section}>
+          <Pressable
+            onPress={() => handleGamePress('SlotsGame', HIGH_ROLLER_SLOT.title, { variant: HIGH_ROLLER_SLOT.id })}
+            style={({ pressed }) => [
+              styles.highRollerCard,
+              pressed && styles.cardPressed,
+            ]}>
+            <View style={styles.highRollerLeft}>
+              <Text style={styles.highRollerIcon}>{HIGH_ROLLER_SLOT.icon}</Text>
+              <View>
+                <Text style={styles.highRollerTitle}>{HIGH_ROLLER_SLOT.title}</Text>
+                <Text style={styles.highRollerNote}>{HIGH_ROLLER_SLOT.note}</Text>
+              </View>
+            </View>
+            <Text style={styles.playCta}>Play ›</Text>
+          </Pressable>
+        </View>
+
+        {/* 3. Roulette */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Roulette</Text>
           <Pressable
-            onPress={() => navigation.navigate('RouletteGame')}
-            style={({pressed}) => [styles.rouletteCard, pressed && styles.cardPressed]}>
-            <View style={{gap: theme.spacing.xs}}>
-              <Text style={styles.rouletteLabel}>European Roulette Table</Text>
-              <Text style={styles.rouletteNote}>Single zero, tailored limits.</Text>
+            onPress={() => handleGamePress('RouletteGame', 'European Roulette')}
+            style={({ pressed }) => [styles.gameRow, pressed && styles.cardPressed]}>
+            <View style={{ gap: 4 }}>
+              <Text style={styles.gameTitle}>European Roulette</Text>
+              <Text style={styles.gameNote}>Single zero, tailored limits</Text>
             </View>
             <Pressable
-              onPress={() => navigation.navigate('RouletteGame')}
-              style={({pressed}) => [styles.playPill, pressed && styles.playPillPressed]}>
-              <Text style={styles.playPillText}>Play</Text>
+              onPress={() => handleGamePress('RouletteGame', 'European Roulette')}
+              style={styles.playButton}>
+              <Text style={styles.playButtonText}>Play</Text>
             </Pressable>
           </Pressable>
         </View>
 
+        {/* 4. Texas Shuffle (Poker) */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Texas Shuffle</Text>
           <Pressable
-            onPress={() => navigation.navigate('PokerGame')}
-            style={({pressed}) => [styles.tableCard, pressed && styles.cardPressed]}>
-            <View style={{gap: theme.spacing.xs}}>
-              <Text style={styles.tableTitle}>Texas Hold'em (2 Players)</Text>
-              <Text style={styles.tableNote}>Heads-up energy with fast blinds.</Text>
+            onPress={() => handleGamePress('PokerGame', "Texas Hold'em")}
+            style={({ pressed }) => [styles.gameRow, pressed && styles.cardPressed]}>
+            <View style={{ gap: 4 }}>
+              <Text style={styles.gameTitle}>Texas Hold'em</Text>
+              <Text style={styles.gameNote}>Heads-up energy</Text>
             </View>
             <Pressable
-              onPress={() => navigation.navigate('PokerGame')}
-              style={({pressed}) => [styles.playPill, pressed && styles.playPillPressed]}>
-              <Text style={styles.playPillText}>Play</Text>
+              onPress={() => handleGamePress('PokerGame', "Texas Hold'em")}
+              style={styles.playButton}>
+              <Text style={styles.playButtonText}>Play</Text>
             </Pressable>
           </Pressable>
         </View>
 
+        {/* 5. Blackjack */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Blackjack</Text>
           <Pressable
-            onPress={() => navigation.navigate('BlackjackGame')}
-            style={({pressed}) => [styles.tableCard, pressed && styles.cardPressed]}>
-            <View style={{gap: theme.spacing.xs}}>
-              <Text style={styles.tableTitle}>Blackjack 21</Text>
-              <Text style={styles.tableNote}>Smooth dealing, quick payouts.</Text>
+            onPress={() => handleGamePress('BlackjackGame', 'Blackjack 21')}
+            style={({ pressed }) => [styles.gameRow, pressed && styles.cardPressed]}>
+            <View style={{ gap: 4 }}>
+              <Text style={styles.gameTitle}>Blackjack 21</Text>
+              <Text style={styles.gameNote}>Smooth dealing, quick payouts</Text>
             </View>
             <Pressable
-              onPress={() => navigation.navigate('BlackjackGame')}
-              style={({pressed}) => [styles.playPill, pressed && styles.playPillPressed]}>
-              <Text style={styles.playPillText}>Play</Text>
+              onPress={() => handleGamePress('BlackjackGame', 'Blackjack 21')}
+              style={styles.playButton}>
+              <Text style={styles.playButtonText}>Play</Text>
             </Pressable>
           </Pressable>
         </View>
       </ScrollView>
 
+      {/* 3. Location Selection Modal */}
       <Modal
         visible={locationModalVisible}
         transparent
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setLocationModalVisible(false)}>
         <Pressable
           style={styles.modalOverlay}
           onPress={() => setLocationModalVisible(false)}>
-          <Pressable style={styles.modalCard} onPress={e => e.stopPropagation()}>
-            <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalTitle}>Select Casino Location</Text>
-                <Text style={styles.modalSubtitle}>Each floor has its own mood.</Text>
-              </View>
-              <Pressable
-                onPress={() => setLocationModalVisible(false)}
-                style={({pressed}) => [styles.closeButton, pressed && styles.cardPressed]}>
-                <Text style={styles.closeIcon}>✕</Text>
-              </Pressable>
-            </View>
-
+          <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+            <Text style={styles.modalTitle}>Select Casino Location</Text>
             <View style={styles.modalList}>
-              {CASINO_LOCATIONS.map(item => {
-                const locked = reputationValue < item.requirement;
-                const isSelected = item.id === selectedLocation;
+              {CASINO_LOCATIONS.map(loc => {
+                const isGreece = loc.id === 'greece';
+                const isSelected = selectedLocation === loc.id;
+
                 return (
                   <Pressable
-                    key={item.id}
-                    onPress={() => handleSelectLocation(item)}
-                    style={({pressed}) => [
-                      styles.locationRow,
-                      locked && styles.locationRowLocked,
-                      isSelected && styles.locationRowSelected,
-                      pressed && styles.cardPressed,
+                    key={loc.id}
+                    disabled={!isGreece}
+                    onPress={() => {
+                      if (isGreece) {
+                        setSelectedLocation('greece');
+                        setLocationModalVisible(false);
+                      }
+                    }}
+                    style={[
+                      styles.modalOption,
+                      isSelected && styles.modalOptionSelected,
+                      !isGreece && styles.modalOptionLocked,
                     ]}>
-                    <View style={{flex: 1}}>
-                      <View style={styles.locationRowHeader}>
-                        <Text style={styles.locationRowName}>
-                          {item.name}
-                          {locked ? ' 🔒' : ''}
-                        </Text>
-                        {isSelected ? <Text style={styles.selectedBadge}>Selected</Text> : null}
-                      </View>
-                      <Text style={styles.locationRowTagline}>{item.tagline}</Text>
-                      <Text style={styles.locationRequirement}>
-                        {item.requirement > 0
-                          ? `Requires Casino Rep ${item.requirement}+`
-                          : 'Open to all players'}
-                      </Text>
-                    </View>
+                    <Text
+                      style={[
+                        styles.modalOptionText,
+                        !isGreece && styles.modalOptionTextLocked,
+                      ]}>
+                      {loc.name}
+                    </Text>
+                    {isGreece ? (
+                      isSelected ? <Text style={styles.checkIcon}>✓</Text> : null
+                    ) : (
+                      <Text style={styles.lockIcon}>🔒</Text>
+                    )}
                   </Pressable>
                 );
               })}
@@ -227,114 +330,122 @@ const CasinoScreen = () => {
           </Pressable>
         </Pressable>
       </Modal>
-    </AppScreen>
+
+      {/* 4. Bet Selection Modal */}
+      <CasinoBetModal
+        visible={betModalVisible}
+        onClose={() => setBetModalVisible(false)}
+        onPlay={handlePlayGame}
+        gameTitle={pendingGame?.title ?? 'Game'}
+        minBet={10000}
+        maxBet={100000}
+      />
+    </SafeAreaView>
   );
 };
 
 export default CasinoScreen;
 
 const styles = StyleSheet.create({
-  content: {
-    padding: theme.spacing.lg,
-    gap: theme.spacing.lg,
-    paddingBottom: theme.spacing.xl * 2.5,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-  pageHeader: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: theme.spacing.md,
-  },
-  pageTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: 0.2,
-  },
-  pageSubtitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-    lineHeight: 19,
-    maxWidth: '90%',
-  },
-  bankrollPill: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
     backgroundColor: theme.colors.card,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    alignItems: 'flex-start',
-    gap: theme.spacing.xs / 2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
-  pillLabel: {
-    color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
-  pillValue: {
+  backIcon: {
+    color: theme.colors.textPrimary,
+    fontSize: 22,
+    fontWeight: '300',
+  },
+  headerTitle: {
     color: theme.colors.textPrimary,
     fontSize: theme.typography.subtitle,
+    fontWeight: '700',
+  },
+  headerRight: {},
+  balanceText: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
     fontWeight: '800',
+    fontVariant: ['tabular-nums'],
+  },
+  content: {
+    padding: theme.spacing.lg,
+    gap: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl * 2,
   },
   topRow: {
     flexDirection: 'row',
     gap: theme.spacing.md,
+    alignItems: 'flex-start',
   },
-  locationCard: {
+  locationContainer: {
     flex: 1,
+    gap: theme.spacing.xs,
+  },
+  locationButton: {
     backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    gap: theme.spacing.xs,
+    justifyContent: 'center',
   },
   locationLabel: {
     color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-    letterSpacing: 0.5,
+    fontSize: 10,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
   },
-  locationName: {
+  locationValue: {
     color: theme.colors.textPrimary,
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: '800',
+    letterSpacing: 0.5,
   },
-  locationTagline: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-    lineHeight: 18,
+  locationHint: {
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 11,
+    alignSelf: 'center',
   },
-  changeHint: {
-    color: theme.colors.accent,
-    fontSize: theme.typography.caption,
-    marginTop: theme.spacing.xs,
-    fontWeight: '700',
-  },
-  repCard: {
-    width: 150,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
+  repContainer: {
+    flex: 1,
     padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
+    // Matching height visually to location button for alignment if needed, but flex takes care of width
     justifyContent: 'center',
+    gap: theme.spacing.sm,
+  },
+  repHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   repLabel: {
     color: theme.colors.textMuted,
     fontSize: theme.typography.caption,
-    letterSpacing: 0.5,
   },
-  repValue: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '800',
+  repValueText: {
+    color: theme.colors.accent,
+    fontSize: theme.typography.caption,
+    fontWeight: '700',
   },
   repTrack: {
-    height: 8,
+    height: 6,
     backgroundColor: theme.colors.cardSoft,
     borderRadius: 999,
     overflow: 'hidden',
@@ -344,188 +455,176 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.accent,
   },
   section: {
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   sectionTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '800',
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.body,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   slotGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: theme.spacing.md,
   },
   slotCard: {
     flex: 1,
-    minWidth: '46%',
-    backgroundColor: theme.colors.cardSoft,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    gap: theme.spacing.xs,
+    alignItems: 'flex-start',
+    gap: 6,
+  },
+  cardPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
   },
   slotIcon: {
-    fontSize: 26,
+    fontSize: 24,
+    marginBottom: 4,
   },
   slotTitle: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.body + 2,
-    fontWeight: '800',
+    fontSize: theme.typography.body,
+    fontWeight: '700',
   },
   slotNote: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
+    color: theme.colors.textMuted,
+    fontSize: 11,
   },
   slotCta: {
     color: theme.colors.accent,
-    fontSize: theme.typography.body,
+    fontSize: 12,
     fontWeight: '700',
-    marginTop: theme.spacing.xs,
+    marginTop: 4,
   },
-  rouletteCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  highRollerCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  rouletteLabel: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body + 1,
-    fontWeight: '700',
-  },
-  rouletteNote: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  tableCard: {
+    // Note: RN doesn't support linear-gradient string in bg without lib. Fallback to cardSoft or similar.
+    // Making it distinct:
     backgroundColor: theme.colors.cardSoft,
+    borderWidth: 1,
+    borderColor: theme.colors.accentSoft,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  },
+  highRollerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  highRollerIcon: {
+    fontSize: 28,
+  },
+  highRollerTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  highRollerNote: {
+    color: theme.colors.accent,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  playCta: {
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  gameRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  tableTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body + 1,
-    fontWeight: '700',
-  },
-  tableNote: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  playPill: {
-    backgroundColor: theme.colors.accent,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: 999,
+    backgroundColor: theme.colors.card,
+    padding: theme.spacing.lg,
+    borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
-  playPillPressed: {
-    opacity: 0.85,
-    transform: [{scale: 0.98}],
-  },
-  playPillText: {
+  gameTitle: {
     color: theme.colors.textPrimary,
-    fontWeight: '800',
-    fontSize: theme.typography.body,
+    fontSize: 15,
+    fontWeight: '700',
   },
-  cardPressed: {
-    transform: [{scale: 0.98}],
-    opacity: 0.96,
+  gameNote: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
   },
+  playButton: {
+    backgroundColor: theme.colors.accentSoft,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  playButtonText: {
+    color: theme.colors.accent,
+    fontWeight: '700',
+    fontSize: 12,
+  },
+
+  // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'flex-end',
-  },
-  modalCard: {
-    backgroundColor: theme.colors.card,
-    borderTopLeftRadius: theme.radius.lg,
-    borderTopRightRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  modalHeader: {
-    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: theme.spacing.xl,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: '#1E2230',
+    borderRadius: 24,
+    padding: 24,
+    gap: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   modalTitle: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '800',
-  },
-  modalSubtitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.cardSoft,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  closeIcon: {
-    fontSize: 16,
-    color: theme.colors.textPrimary,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalList: {
-    gap: theme.spacing.sm,
+    gap: 8,
   },
-  locationRow: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.xs,
-  },
-  locationRowLocked: {
-    opacity: 0.5,
-  },
-  locationRowSelected: {
-    borderColor: theme.colors.accent,
-  },
-  locationRowHeader: {
+  modalOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 16,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
   },
-  locationRowName: {
+  modalOptionSelected: {
+    backgroundColor: theme.colors.accentSoft,
+    borderColor: theme.colors.accent,
+    borderWidth: 1,
+  },
+  modalOptionLocked: {
+    opacity: 0.5,
+  },
+  modalOptionText: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.body + 1,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '600',
   },
-  selectedBadge: {
-    color: theme.colors.accent,
-    fontWeight: '800',
-    fontSize: theme.typography.caption,
-  },
-  locationRowTagline: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
-  },
-  locationRequirement: {
+  modalOptionTextLocked: {
     color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
+  },
+  checkIcon: {
+    color: theme.colors.accent,
+    fontWeight: 'bold',
+  },
+  lockIcon: {
+    fontSize: 14,
   },
 });
+

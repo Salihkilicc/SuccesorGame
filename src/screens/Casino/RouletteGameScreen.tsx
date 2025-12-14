@@ -1,11 +1,11 @@
-import React, {useRef, useState} from 'react';
-import {Alert, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, { useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AppScreen from '../../components/layout/AppScreen';
-import {theme} from '../../theme';
-import {useStatsStore} from '../../store';
-import type {CasinoStackParamList} from '../../navigation';
+import { theme } from '../../theme';
+import { useStatsStore } from '../../store';
+import type { CasinoStackParamList } from '../../navigation';
 
 type BetType = 'RED' | 'BLACK' | 'EVEN' | 'ODD' | 'LOW' | 'HIGH';
 
@@ -22,15 +22,24 @@ const redNumbers = [
 const isRed = (value: number) => redNumbers.includes(value);
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
+import type { RouteProp } from '@react-navigation/native';
+import GameResultPopup from './components/GameResultPopup';
+
+type RouletteRouteProp = RouteProp<CasinoStackParamList, 'RouletteGame'>;
+
 const RouletteGameScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<CasinoStackParamList, 'RouletteGame'>>();
-  const {money, setField, casinoReputation, setCasinoReputation} = useStatsStore();
+  const route = useRoute<RouletteRouteProp>();
+  const initialBet = route.params?.betAmount;
+
+  const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
   const [selectedBet, setSelectedBet] = useState<BetType | null>(null);
-  const [chip, setChip] = useState<number>(CHIP_VALUES[0]);
+  const [chip, setChip] = useState<number>(initialBet ?? CHIP_VALUES[0]);
   const [lastResult, setLastResult] = useState<ResultEntry | null>(null);
   const [history, setHistory] = useState<ResultEntry[]>([]);
   const [status, setStatus] = useState('Pick a bet and spin the wheel.');
+  const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss', amount: number } | null>(null);
   const lossStreak = useRef(0);
 
   const reputationUp = (delta: number) => {
@@ -67,6 +76,7 @@ const RouletteGameScreen = () => {
   };
 
   const handleSpin = () => {
+    setResultPopup(null); // Clear previous result
     if (!selectedBet) {
       Alert.alert('Pick a bet', 'Select RED, BLACK, EVEN, ODD, LOW, or HIGH first.');
       return;
@@ -81,6 +91,9 @@ const RouletteGameScreen = () => {
       result === 0 ? 'green' : isRed(result) ? 'red' : 'black';
     const win = evaluateWin(result, selectedBet);
     const winnings = win ? chip * 2 : 0;
+    // Deduct chip, add winnings.
+    // If win: -chip + (chip*2) = +chip.
+    // If lose: -chip + 0 = -chip.
     const nextMoney = money - chip + winnings;
     setField('money', nextMoney);
 
@@ -88,13 +101,15 @@ const RouletteGameScreen = () => {
       lossStreak.current = 0;
       reputationUp(1);
       setStatus(`You win ${winnings.toLocaleString()}!`);
+      setResultPopup({ type: 'win', amount: chip });
     } else {
       lossStreak.current += 1;
       reputationDownSmall();
       setStatus('Missed this spin.');
+      setResultPopup({ type: 'loss', amount: chip });
     }
 
-    const entry = {value: result, color};
+    const entry = { value: result, color };
     setLastResult(entry);
     setHistory(prev => [entry, ...prev].slice(0, 3));
   };
@@ -103,8 +118,11 @@ const RouletteGameScreen = () => {
     const active = selectedBet === type;
     return (
       <Pressable
-        onPress={() => setSelectedBet(type)}
-        style={({pressed}) => [
+        onPress={() => {
+          setSelectedBet(type);
+          setResultPopup(null);
+        }}
+        style={({ pressed }) => [
           styles.betButton,
           active && styles.betButtonActive,
           pressed && styles.betButtonPressed,
@@ -134,13 +152,16 @@ const RouletteGameScreen = () => {
       leftNode={
         <Pressable
           onPress={() => navigation.goBack()}
-          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
           <Text style={styles.backIcon}>←</Text>
         </Pressable>
       }>
+
+      <GameResultPopup result={resultPopup} onHide={() => setResultPopup(null)} />
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topRow}>
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.title}>Bankroll ${money.toLocaleString()}</Text>
             <Text style={styles.subtitle}>{status}</Text>
           </View>
@@ -168,8 +189,11 @@ const RouletteGameScreen = () => {
             return (
               <Pressable
                 key={value}
-                onPress={() => setChip(value)}
-                style={({pressed}) => [
+                onPress={() => {
+                  setChip(value);
+                  setResultPopup(null);
+                }}
+                style={({ pressed }) => [
                   styles.chip,
                   active && styles.chipActive,
                   pressed && styles.chipPressed,
@@ -182,7 +206,7 @@ const RouletteGameScreen = () => {
 
         <Pressable
           onPress={handleSpin}
-          style={({pressed}) => [styles.spinButton, pressed && styles.spinButtonPressed]}>
+          style={({ pressed }) => [styles.spinButton, pressed && styles.spinButtonPressed]}>
           <Text style={styles.spinText}>SPIN</Text>
           {lastResult ? (
             <Text style={styles.spinSub}>
@@ -190,8 +214,8 @@ const RouletteGameScreen = () => {
               {lastResult.color === 'green'
                 ? 'Green'
                 : lastResult.color === 'red'
-                ? 'Red'
-                : 'Black'}
+                  ? 'Red'
+                  : 'Black'}
               )
             </Text>
           ) : (
@@ -266,7 +290,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   betButtonPressed: {
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   betButtonText: {
     color: theme.colors.textPrimary,
@@ -290,7 +314,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   chipPressed: {
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   chipText: {
     color: theme.colors.textPrimary,
@@ -304,7 +328,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   spinButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
   spinText: {
@@ -347,7 +371,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.cardSoft,
   },
   backButtonPressed: {
-    transform: [{scale: 0.96}],
+    transform: [{ scale: 0.96 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,

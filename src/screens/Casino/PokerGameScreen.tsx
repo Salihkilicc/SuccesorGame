@@ -1,11 +1,11 @@
-import React, {useRef, useState} from 'react';
-import {Alert, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, { useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AppScreen from '../../components/layout/AppScreen';
-import {theme} from '../../theme';
-import {useStatsStore} from '../../store';
-import type {CasinoStackParamList} from '../../navigation';
+import { theme } from '../../theme';
+import { useStatsStore } from '../../store';
+import type { CasinoStackParamList } from '../../navigation';
 
 type Card = {
   rank: string;
@@ -27,7 +27,7 @@ const createDeck = (): Card[] => {
   const deck: Card[] = [];
   SUITS.forEach(suit => {
     RANKS.forEach(rank => {
-      deck.push({rank, suit, value: rankValue(rank)});
+      deck.push({ rank, suit, value: rankValue(rank) });
     });
   });
   for (let i = deck.length - 1; i > 0; i -= 1) {
@@ -40,14 +40,27 @@ const createDeck = (): Card[] => {
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 const BASE_BET = 5000;
 
+import type { RouteProp } from '@react-navigation/native';
+import GameResultPopup from './components/GameResultPopup';
+
+type PokerRouteProp = RouteProp<CasinoStackParamList, 'PokerGame'>;
+
 const PokerGameScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<CasinoStackParamList, 'PokerGame'>>();
-  const {money, setField, casinoReputation, setCasinoReputation} = useStatsStore();
+  const route = useRoute<PokerRouteProp>();
+  const initialBet = route.params?.betAmount ?? 10_000;
+
+  const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [board, setBoard] = useState<Card[]>([]);
-  const [status, setStatus] = useState('2-player Hold’em lite. Tap play to deal a hand.');
+  const [revealedBoard, setRevealedBoard] = useState<number>(0); // 0, 3, 4, 5
+  // Dealer cards hidden from UI entirely, handled in background
+  const [status, setStatus] = useState('2-player Hold’em. Progressive betting.');
+  const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss', amount: number } | null>(null);
+  const [gamePhase, setGamePhase] = useState<'idle' | 'flop' | 'turn' | 'river' | 'showdown'>('idle');
+  const [currentBet, setCurrentBet] = useState(initialBet);
   const lossStreak = useRef(0);
 
   const reputationUp = (delta: number) => {
@@ -71,67 +84,168 @@ const PokerGameScreen = () => {
     return total;
   };
 
-  const playHand = () => {
-    if (money < BASE_BET) {
-      Alert.alert('Not enough cash', 'You need at least 5K to take a seat.');
-      return;
-    }
-    const deck = createDeck();
-    const nextPlayer = [deck.pop()!, deck.pop()!];
-    const nextDealer = [deck.pop()!, deck.pop()!];
-    const nextBoard = [deck.pop()!, deck.pop()!, deck.pop()!, deck.pop()!, deck.pop()!];
+  const handleRegame = () => {
+    // Acts as Fold / Resign
+    lossStreak.current += 1;
+    reputationDownSmall();
+    const lostAmount = currentBet;
 
-    setPlayerHand(nextPlayer);
-    setDealerHand(nextDealer);
-    setBoard(nextBoard);
+    // Show Lost Screen
+    setResultPopup({ type: 'loss', amount: lostAmount });
+    setStatus(`Folded. You lost $${lostAmount.toLocaleString()}.`);
 
-    const playerScore = scoreHand(nextPlayer, nextBoard);
-    const dealerScore = scoreHand(nextDealer, nextBoard);
-
-    let outcome: 'win' | 'lose' | 'push' = 'push';
-    if (playerScore > dealerScore) {
-      outcome = 'win';
-    } else if (dealerScore > playerScore) {
-      outcome = 'lose';
-    }
-
-    let winnings = 0;
-    if (outcome === 'win') {
-      winnings = BASE_BET * 2;
-      reputationUp(1);
-      lossStreak.current = 0;
-      setStatus(`You win with ${playerScore} vs ${dealerScore}.`);
-    } else if (outcome === 'lose') {
-      lossStreak.current += 1;
-      reputationDownSmall();
-      setStatus(`Dealer wins ${dealerScore} vs ${playerScore}.`);
-    } else {
-      winnings = BASE_BET;
-      setStatus('Push. Bets returned.');
-    }
-
-    const nextMoney = money - BASE_BET + winnings;
-    setField('money', nextMoney);
+    // Reset for new hand
+    setGamePhase('idle');
+    setRevealedBoard(0);
+    setPlayerHand([]);
+    setDealerHand([]);
+    setBoard([]);
+    // Don't reset currentBet yet? No, next deal handles it.
+    // Ensure playHand will reset it.
+    setCurrentBet(initialBet);
   };
 
-  const renderCard = (card: Card, idx: number) => (
-    <View key={`${card.rank}${card.suit}-${idx}`} style={styles.card}>
-      <Text style={styles.cardRank}>{card.rank}</Text>
-      <Text style={styles.cardSuit}>{card.suit}</Text>
+  const playHand = () => {
+    if (gamePhase === 'idle') {
+      // Phase 1: Deal (Bet 1x)
+      setResultPopup(null);
+      if (money < initialBet) {
+        Alert.alert('Not enough cash', 'You need ' + initialBet + ' to start.');
+        return;
+      }
+
+      // Deduct initial bet
+      setField('money', money - initialBet);
+      setCurrentBet(initialBet);
+
+      const deck = createDeck();
+      const nextPlayer = [deck.pop()!, deck.pop()!];
+      const nextDealer = [deck.pop()!, deck.pop()!];
+      const nextBoard = [deck.pop()!, deck.pop()!, deck.pop()!, deck.pop()!, deck.pop()!];
+
+      setPlayerHand(nextPlayer);
+      setDealerHand(nextDealer);
+      setBoard(nextBoard);
+      setRevealedBoard(3); // Show flop immediately? Or wait for next click?
+      // "everytime a card opening the bet must be double"
+      // User likely means: Deal Hole Cards -> Bet 1x.
+      // Click Continue -> Show Flop -> Bet becomes 2x.
+      // Let's reveal FLOP immediately logic or progressive?
+      // "first 3 can be visible"
+      setRevealedBoard(3);
+      setGamePhase('flop');
+      setStatus('Flop dealt. Continue to double bet.');
+    } else if (gamePhase === 'flop') {
+      // Phase 2: Turn (Bet 2x)
+      if (money < initialBet) {
+        Alert.alert('Not enough cash', 'You need more funds to continue.');
+        return;
+      }
+      setField('money', money - initialBet); // Add 1x to pot
+      setCurrentBet(currentBet + initialBet);
+
+      setRevealedBoard(4);
+      setGamePhase('turn');
+      setStatus('Turn revealed. Continue to triple bet.');
+    } else if (gamePhase === 'turn') {
+      // Phase 3: River (Bet 3x)
+      if (money < initialBet) {
+        Alert.alert('Not enough cash', 'You need more funds to continue.');
+        return;
+      }
+      setField('money', money - initialBet); // Add 1x to pot
+      setCurrentBet(currentBet + initialBet);
+
+      setRevealedBoard(5);
+      setGamePhase('river');
+      setStatus('River revealed. Showdown!');
+      // Auto showdown or specific click? "continue" logic suggests next step.
+      // Let's do instant showdown or one more click? 
+      // User says "when you press regame... new game begins".
+      // Let's transition to showdown immediately after paying for River?
+      // Or 1 more click for suspense? Let's do 1 more click.
+    } else if (gamePhase === 'river') {
+      // Showdown
+      setGamePhase('showdown');
+
+      const playerScore = scoreHand(playerHand, board);
+      const dealerScore = scoreHand(dealerHand, board);
+
+      let outcome: 'win' | 'lose' | 'push' = 'push';
+      if (playerScore > dealerScore) {
+        outcome = 'win';
+      } else if (dealerScore > playerScore) {
+        outcome = 'lose';
+      }
+
+      let winnings = 0;
+      if (outcome === 'win') {
+        winnings = currentBet * 2; // Return stake + equal profit
+        reputationUp(1);
+        lossStreak.current = 0;
+        setStatus(`You win! Score: ${playerScore} vs ${dealerScore}`);
+        setResultPopup({ type: 'win', amount: winnings - currentBet }); // Net profit
+      } else if (outcome === 'lose') {
+        lossStreak.current += 1;
+        reputationDownSmall();
+        setStatus(`Dealer wins. Score: ${dealerScore} vs ${playerScore}`);
+        setResultPopup({ type: 'loss', amount: currentBet });
+      } else {
+        winnings = currentBet;
+        setStatus('Push. Bets returned.');
+      }
+
+      const nextMoney = money + winnings; // money was already deducted incrementally
+      setField('money', nextMoney);
+    } else {
+      // Reset for new hand (from Showdown)
+      setResultPopup(null);
+      setGamePhase('idle');
+      setRevealedBoard(0);
+      setPlayerHand([]);
+      setDealerHand([]);
+      setBoard([]);
+      setCurrentBet(initialBet);
+      setStatus('Ready for next hand.');
+    }
+  };
+
+  const renderCard = (card: Card, idx: number, hidden: boolean = false) => (
+    <View key={`${card.rank}${card.suit}-${idx}`} style={[styles.card, hidden && styles.cardHidden]}>
+      {hidden ? (
+        <Text style={styles.cardBack}>🂠</Text>
+      ) : (
+        <>
+          <Text style={styles.cardRank}>{card.rank}</Text>
+          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#ef4444' : '#e2e8f0' }]}>
+            {card.suit}
+          </Text>
+        </>
+      )}
     </View>
   );
 
   return (
     <AppScreen
       title="Texas Shuffle"
-      subtitle="Heads-up Hold’em"
+      subtitle="Progressive Hold’em"
       leftNode={
         <Pressable
           onPress={() => navigation.goBack()}
-          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
           <Text style={styles.backIcon}>←</Text>
         </Pressable>
+      }
+      rightNode={
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.exitButton, pressed && styles.exitButtonPressed]}>
+          <Text style={styles.exitText}>EXIT</Text>
+        </Pressable>
       }>
+
+      <GameResultPopup result={resultPopup} onHide={() => setResultPopup(null)} />
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topRow}>
           <View>
@@ -139,31 +253,44 @@ const PokerGameScreen = () => {
             <Text style={styles.subtitle}>{status}</Text>
           </View>
           <View style={styles.betBox}>
-            <Text style={styles.betLabel}>Bet / Hand</Text>
-            <Text style={styles.betValue}>${BASE_BET.toLocaleString()}</Text>
+            <Text style={styles.betLabel}>Total Bet</Text>
+            <Text style={styles.betValue}>${currentBet.toLocaleString()}</Text>
+          </View>
+        </View>
+
+        {/* Dealer UI Removed as requested */}
+
+        <View style={styles.boardCard}>
+          <Text style={styles.sectionLabel}>Board</Text>
+          <View style={styles.cardRow}>
+            {board.slice(0, revealedBoard).map((card, idx) => renderCard(card, idx))}
+            {board.slice(revealedBoard).map((card, idx) => renderCard(card, idx + revealedBoard, true))}
           </View>
         </View>
 
         <View style={styles.tableCard}>
-          <Text style={styles.sectionLabel}>Dealer</Text>
-          <View style={styles.cardRow}>{dealerHand.map(renderCard)}</View>
-        </View>
-
-        <View style={styles.boardCard}>
-          <Text style={styles.sectionLabel}>Board</Text>
-          <View style={styles.cardRow}>{board.map(renderCard)}</View>
-        </View>
-
-        <View style={styles.tableCard}>
           <Text style={styles.sectionLabel}>You</Text>
-          <View style={styles.cardRow}>{playerHand.map(renderCard)}</View>
+          <View style={styles.cardRow}>{playerHand.map((card, idx) => renderCard(card, idx))}</View>
         </View>
 
-        <Pressable
-          onPress={playHand}
-          style={({pressed}) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
-          <Text style={styles.primaryText}>PLAY HAND</Text>
-        </Pressable>
+        <View style={styles.buttonRow}>
+          {gamePhase !== 'idle' && gamePhase !== 'showdown' && (
+            <Pressable
+              onPress={handleRegame}
+              style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+              <Text style={styles.secondaryText}>REGAME (FOLD)</Text>
+            </Pressable>
+          )}
+
+          <Pressable
+            onPress={playHand}
+            style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed, { flex: 1 }]}>
+            <Text style={styles.primaryText}>
+              {gamePhase === 'idle' ? 'DEAL HAND' : gamePhase === 'showdown' ? 'NEW HAND' : 'CONTINUE'}
+            </Text>
+          </Pressable>
+        </View>
+
       </ScrollView>
     </AppScreen>
   );
@@ -246,6 +373,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: theme.spacing.xs,
   },
+  cardHidden: {
+    backgroundColor: '#2A2D3A',
+  },
+  cardBack: {
+    fontSize: 40,
+    color: theme.colors.textMuted,
+  },
   cardRank: {
     color: theme.colors.textPrimary,
     fontSize: theme.typography.subtitle,
@@ -262,7 +396,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
   primaryText: {
@@ -281,10 +415,49 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.cardSoft,
   },
   backButtonPressed: {
-    transform: [{scale: 0.96}],
+    transform: [{ scale: 0.96 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,
     fontSize: 18,
+  },
+  exitButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  exitButtonPressed: {
+    opacity: 0.7,
+  },
+  exitText: {
+    color: theme.colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  secondaryButton: {
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: theme.radius.lg,
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  secondaryButtonPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+  secondaryText: {
+    color: theme.colors.textSecondary,
+    fontWeight: '800',
+    fontSize: theme.typography.body,
   },
 });

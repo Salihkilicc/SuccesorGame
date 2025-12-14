@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
-import {zustandStorage} from '../storage/persist';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { zustandStorage } from '../storage/persist';
 
 export type StatKey =
   | 'charisma'
@@ -60,7 +60,7 @@ export const initialStatsState: StatsState = {
   health: 75,
   stress: 20,
   love: 65,
-  money: 5000,
+  money: 450_000,
   netWorth: 15000,
   monthlyIncome: 0,
   monthlyExpenses: 0,
@@ -78,11 +78,11 @@ export const initialStatsState: StatsState = {
   companyExpensesMonthly: 620_000,
   companyCapital: 4_800_000,
   shareholders: [
-    {id: 'player', name: 'Player', type: 'player', percentage: 65},
-    {id: 'family', name: 'Family', type: 'family', percentage: 15},
-    {id: 'investor-a', name: 'Investor A', type: 'investor', percentage: 7},
-    {id: 'investor-b', name: 'Investor B', type: 'investor', percentage: 3},
-    {id: 'investor-c', name: 'Investor C', type: 'investor', percentage: 10},
+    { id: 'player', name: 'Player', type: 'player', percentage: 65 },
+    { id: 'family', name: 'Family', type: 'family', percentage: 15 },
+    { id: 'investor-a', name: 'Investor A', type: 'investor', percentage: 7 },
+    { id: 'investor-b', name: 'Investor B', type: 'investor', percentage: 3 },
+    { id: 'investor-c', name: 'Investor C', type: 'investor', percentage: 10 },
   ],
 };
 
@@ -90,31 +90,31 @@ export const useStatsStore = create<StatsStore>()(
   persist(
     (set, get) => ({
       ...initialStatsState,
-      update: partial => set(state => ({...state, ...partial})),
-      setField: (key, value) => set(state => ({...state, [key]: value})),
-      setCompanyValue: value => set(state => ({...state, companyValue: value})),
+      update: partial => set(state => ({ ...state, ...partial })),
+      setField: (key, value) => set(state => ({ ...state, [key]: value })),
+      setCompanyValue: value => set(state => ({ ...state, companyValue: value })),
       setCompanySharePrice: value =>
-        set(state => ({...state, companySharePrice: value})),
+        set(state => ({ ...state, companySharePrice: value })),
       setCompanyDailyChange: value =>
-        set(state => ({...state, companyDailyChange: value})),
-      setCompanyDebt: value => set(state => ({...state, companyDebt: value})),
+        set(state => ({ ...state, companyDailyChange: value })),
+      setCompanyDebt: value => set(state => ({ ...state, companyDebt: value })),
       setCompanyDebtTotal: value =>
-        set(state => ({...state, companyDebtTotal: value})),
+        set(state => ({ ...state, companyDebtTotal: value })),
       setCompanyOwnership: value =>
-        set(state => ({...state, companyOwnership: value})),
+        set(state => ({ ...state, companyOwnership: value })),
       setCompanyRevenueMonthly: value =>
-        set(state => ({...state, companyRevenueMonthly: value})),
+        set(state => ({ ...state, companyRevenueMonthly: value })),
       setCompanyExpensesMonthly: value =>
-        set(state => ({...state, companyExpensesMonthly: value})),
-      setCompanyCapital: value => set(state => ({...state, companyCapital: value})),
+        set(state => ({ ...state, companyExpensesMonthly: value })),
+      setCompanyCapital: value => set(state => ({ ...state, companyCapital: value })),
       setCasinoReputation: value =>
-        set(state => ({...state, casinoReputation: value})),
-      setShareholders: list => set(state => ({...state, shareholders: list})),
-      reset: () => set(() => ({...initialStatsState})),
+        set(state => ({ ...state, casinoReputation: value })),
+      setShareholders: list => set(state => ({ ...state, shareholders: list })),
+      reset: () => set(() => ({ ...initialStatsState })),
     }),
     {
       name: 'succesor_stats_v1',
-      storage: zustandStorage,
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         money: state.money,
         netWorth: state.netWorth,

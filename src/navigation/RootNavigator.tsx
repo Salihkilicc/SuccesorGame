@@ -1,12 +1,12 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { Text, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
   NavigatorScreenParams,
   createNavigationContainerRef,
 } from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   AssetsScreen,
   LifeScreen,
@@ -24,7 +24,7 @@ import {
   AchievementsScreen,
   HomeScreen,
 } from '../screens';
-import {formatScreenTitle} from '../utils';
+import { formatScreenTitle } from '../utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
 
 export type LifeStackParamList = {
@@ -51,13 +51,20 @@ export type AssetsStackParamList = {
 };
 
 export type CasinoStackParamList = {
-  Casino: undefined;
+  CasinoLobby: undefined;
   SlotsGame: {
     variant: 'street_fighter' | 'poseidon' | 'high_roller';
+    betAmount?: number;
   };
-  RouletteGame: undefined;
-  PokerGame: undefined;
-  BlackjackGame: undefined;
+  RouletteGame: {
+    betAmount?: number;
+  };
+  PokerGame: {
+    betAmount?: number;
+  };
+  BlackjackGame: {
+    betAmount?: number;
+  };
 };
 
 export type RootTabParamList = {
@@ -84,7 +91,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const LifeStackNavigator = () => (
-  <LifeStack.Navigator screenOptions={{headerShown: false}}>
+  <LifeStack.Navigator screenOptions={{ headerShown: false }}>
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
     <LifeStack.Screen name="Profile" component={ProfileScreen} />
     <LifeStack.Screen name="Achievements" component={AchievementsScreen} />
@@ -92,67 +99,67 @@ const LifeStackNavigator = () => (
 );
 
 const LoveStackNavigator = () => (
-  <LoveStack.Navigator screenOptions={{headerShown: false}}>
+  <LoveStack.Navigator screenOptions={{ headerShown: false }}>
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
   </LoveStack.Navigator>
 );
 
 const AssetsStackNavigator = () => (
-  <AssetsStack.Navigator screenOptions={{headerShown: false}}>
+  <AssetsStack.Navigator screenOptions={{ headerShown: false }}>
     <AssetsStack.Screen
       name="AssetsHome"
       component={AssetsScreen}
-      options={{title: formatScreenTitle('Assets')}}
+      options={{ title: formatScreenTitle('Assets') }}
     />
     <AssetsStack.Screen
       name="Market"
       component={MarketScreen}
-      options={{title: formatScreenTitle('Market')}}
+      options={{ title: formatScreenTitle('Market') }}
     />
     <AssetsStack.Screen
       name="MyCompany"
       component={MyCompanyScreen}
-      options={{title: formatScreenTitle('My Company')}}
+      options={{ title: formatScreenTitle('My Company') }}
     />
     <AssetsStack.Screen
       name="StockDetail"
       component={StockDetailScreen}
-      options={{title: formatScreenTitle('Stock Detail')}}
+      options={{ title: formatScreenTitle('Stock Detail') }}
     />
     <AssetsStack.Screen
       name="Premium"
       component={PremiumScreen}
-      options={{title: formatScreenTitle('Premium')}}
+      options={{ title: formatScreenTitle('Premium') }}
     />
   </AssetsStack.Navigator>
 );
 
 const CasinoStackNavigator = () => (
-  <CasinoStack.Navigator screenOptions={{headerShown: false}}>
+  <CasinoStack.Navigator screenOptions={{ headerShown: false }}>
     <CasinoStack.Screen
-      name="Casino"
+      name="CasinoLobby"
       component={CasinoScreen}
-      options={{title: formatScreenTitle('Casino')}}
+      options={{ title: formatScreenTitle('Casino') }}
     />
     <CasinoStack.Screen
       name="SlotsGame"
       component={SlotsGameScreen}
-      options={{title: formatScreenTitle('Slots Game')}}
+      options={{ title: formatScreenTitle('Slots Game') }}
     />
     <CasinoStack.Screen
       name="RouletteGame"
       component={RouletteGameScreen}
-      options={{title: formatScreenTitle('Roulette Game')}}
+      options={{ title: formatScreenTitle('Roulette Game') }}
     />
     <CasinoStack.Screen
       name="PokerGame"
       component={PokerGameScreen}
-      options={{title: formatScreenTitle('Poker Game')}}
+      options={{ title: formatScreenTitle('Poker Game') }}
     />
     <CasinoStack.Screen
       name="BlackjackGame"
       component={BlackjackGameScreen}
-      options={{title: formatScreenTitle('Blackjack Game')}}
+      options={{ title: formatScreenTitle('Blackjack Game') }}
     />
   </CasinoStack.Navigator>
 );
@@ -161,27 +168,27 @@ const MainTabs = () => (
   <Tab.Navigator
     screenOptions={{
       headerShown: false,
-      tabBarStyle: {display: 'none'},
+      tabBarStyle: { display: 'none' },
     }}>
     <Tab.Screen
       name="Life"
       component={LifeStackNavigator}
       options={{
-        tabBarIcon: ({color}) => <Text style={{fontSize: 18, color}}>🎭</Text>,
+        tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🎭</Text>,
       }}
     />
     <Tab.Screen
       name="Love"
       component={LoveStackNavigator}
       options={{
-        tabBarIcon: ({color}) => <Text style={{fontSize: 18, color}}>❤️</Text>,
+        tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>❤️</Text>,
       }}
     />
     <Tab.Screen
       name="Assets"
       component={AssetsStackNavigator}
       options={{
-        tabBarIcon: ({color}) => <Text style={{fontSize: 18, color}}>💼</Text>,
+        tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>💼</Text>,
       }}
     />
   </Tab.Navigator>
@@ -189,9 +196,9 @@ const MainTabs = () => (
 
 const RootNavigator = () => (
   <NavigationContainer ref={rootNavigationRef}>
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <RootStack.Navigator
-        screenOptions={{headerShown: false}}
+        screenOptions={{ headerShown: false }}
         initialRouteName="Home">
         <RootStack.Screen name="Home" component={HomeScreen} />
         <RootStack.Screen name="MainTabs" component={MainTabs} />

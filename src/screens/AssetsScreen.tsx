@@ -1,10 +1,10 @@
 import React from 'react';
-import {ScrollView, View, Text, StyleSheet, Pressable} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useStatsStore, useEventStore} from '../store';
-import {theme} from '../theme';
-import type {AssetsStackParamList} from '../navigation';
+import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useStatsStore, useEventStore } from '../store';
+import { theme } from '../theme';
+import type { AssetsStackParamList } from '../navigation';
 
 const formatMoney = (value: number) => {
   const absolute = Math.abs(value);
@@ -24,7 +24,7 @@ type StatPillProps = {
   value: string;
 };
 
-const StatPill = ({label, value}: StatPillProps) => (
+const StatPill = ({ label, value }: StatPillProps) => (
   <View style={styles.pill}>
     <Text style={styles.pillLabel}>{label}</Text>
     <Text style={styles.pillValue}>{value}</Text>
@@ -33,9 +33,9 @@ const StatPill = ({label, value}: StatPillProps) => (
 
 const AssetsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
-  const {netWorth, money, monthlyIncome, monthlyExpenses, riskApetite, strategicSense} =
+  const { netWorth, money, monthlyIncome, monthlyExpenses, riskApetite, strategicSense } =
     useStatsStore();
-  const {lastMarketEvent} = useEventStore();
+  const { lastMarketEvent } = useEventStore();
 
   const propertiesValue = 2_450_000;
   const vehiclesValue = 1_120_000;
@@ -54,7 +54,7 @@ const AssetsScreen = () => {
   return (
     <View style={styles.safeArea}>
       <ScrollView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -70,11 +70,11 @@ const AssetsScreen = () => {
                   navigation.goBack();
                 }
               }}
-              style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+              style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
               <Text style={styles.backIcon}>←</Text>
             </Pressable>
             <Text style={styles.title}>Assets</Text>
-            <View style={{width: 32}} />
+            <View style={{ width: 32 }} />
           </View>
           <View style={styles.riskRow}>
             <StatPill label="Risk Appetite" value={`${Math.round(riskApetite)}%`} />
@@ -101,9 +101,9 @@ const AssetsScreen = () => {
               <Text style={styles.summaryLabel}>Net Worth</Text>
               <Text style={styles.summaryValue}>{formatMoney(netWorth)}</Text>
 
-              <View style={{marginTop: theme.spacing.md}}>
+              <View style={{ marginTop: theme.spacing.md }}>
                 <Text style={styles.summaryLabel}>Cash</Text>
-                <Text style={styles.summaryValue}>{formatMoney(money)}</Text>
+                <Text style={styles.summaryValue}>${money.toLocaleString()}</Text>
               </View>
             </View>
 
@@ -112,7 +112,7 @@ const AssetsScreen = () => {
                 onPress={() => {
                   console.log('Navigate to Investments screen (to be implemented)');
                 }}
-                style={({pressed}) => [styles.investmentsButton, pressed && styles.investmentsButtonPressed]}>
+                style={({ pressed }) => [styles.investmentsButton, pressed && styles.investmentsButtonPressed]}>
                 <View>
                   <Text style={styles.summaryLabel}>Investments</Text>
                   {/* TODO: Replace placeholder with real investments total when available */}
@@ -142,21 +142,21 @@ const AssetsScreen = () => {
         <View style={styles.categoryGrid}>
           <Pressable
             onPress={() => console.log('Open properties (placeholder)')}
-            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Properties</Text>
             <Text style={styles.categoryValue}>{formatMoney(propertiesValue)}</Text>
             <Text style={styles.categoryMeta}>Homes, penthouses, estates</Text>
           </Pressable>
           <Pressable
             onPress={() => console.log('Open vehicles (placeholder)')}
-            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Vehicles</Text>
             <Text style={styles.categoryValue}>{formatMoney(vehiclesValue)}</Text>
             <Text style={styles.categoryMeta}>Cars, jets, yachts</Text>
           </Pressable>
           <Pressable
             onPress={() => console.log('Open belongings (placeholder)')}
-            style={({pressed}) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+            style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Belongings</Text>
             <Text style={styles.categoryValue}>{formatMoney(belongingsValue)}</Text>
             <Text style={styles.categoryMeta}>Art, jewelry, antiques</Text>
@@ -166,12 +166,12 @@ const AssetsScreen = () => {
         <View style={styles.actionRow}>
           <Pressable
             onPress={() => navigation.navigate('Market')}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.actionTile,
               styles.marketTile,
               pressed && styles.actionTilePressed,
             ]}>
-            <View style={{gap: theme.spacing.xs}}>
+            <View style={{ gap: theme.spacing.xs }}>
               <Text style={styles.actionTitle}>Market</Text>
               <Text style={styles.actionBody}>
                 Scan the latest sectors and move quickly on opportunities.
@@ -182,12 +182,12 @@ const AssetsScreen = () => {
 
           <Pressable
             onPress={() => navigation.navigate('MyCompany')}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.actionTile,
               styles.companyTile,
               pressed && styles.actionTilePressed,
             ]}>
-            <View style={{gap: theme.spacing.xs}}>
+            <View style={{ gap: theme.spacing.xs }}>
               <Text style={styles.actionTitle}>My Company</Text>
               <Text style={styles.actionBody}>
                 Review valuation, ownership, and make strategic moves.
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   backButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   },
   investmentsButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   investmentsCta: {
     color: theme.colors.accent,
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     minHeight: 110,
   },
   categoryCardPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     backgroundColor: theme.colors.card,
   },
   categoryLabel: {
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   actionTilePressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     opacity: 0.94,
   },
   tileCta: {

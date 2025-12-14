@@ -1,11 +1,13 @@
-import React, {useMemo, useRef, useState} from 'react';
-import {Alert, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, { useMemo, useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
 import AppScreen from '../../components/layout/AppScreen';
-import {theme} from '../../theme';
-import {useStatsStore} from '../../store';
-import type {CasinoStackParamList} from '../../navigation';
+import { theme } from '../../theme';
+import { useStatsStore } from '../../store';
+import type { CasinoStackParamList } from '../../navigation';
+import GameResultPopup from './components/GameResultPopup';
 
 type Card = {
   rank: string;
@@ -28,7 +30,7 @@ const createDeck = (): Card[] => {
   const deck: Card[] = [];
   SUITS.forEach(suit => {
     RANKS.forEach(rank => {
-      deck.push({rank, suit, value: rankValue(rank)});
+      deck.push({ rank, suit, value: rankValue(rank) });
     });
   });
   for (let i = deck.length - 1; i > 0; i -= 1) {
@@ -40,16 +42,23 @@ const createDeck = (): Card[] => {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
+type BlackjackRouteProp = RouteProp<CasinoStackParamList, 'BlackjackGame'>;
+
+
 const BlackjackGameScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<CasinoStackParamList, 'BlackjackGame'>>();
-  const {money, setField, casinoReputation, setCasinoReputation} = useStatsStore();
+  const route = useRoute<BlackjackRouteProp>();
+  const initialBet = route.params?.betAmount ?? 5000;
+
+  const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
   const [playerCards, setPlayerCards] = useState<Card[]>([]);
   const [dealerCards, setDealerCards] = useState<Card[]>([]);
   const [deck, setDeck] = useState<Card[]>([]);
-  const [bet, setBet] = useState(5000);
+  const [bet, setBet] = useState(initialBet);
   const [roundState, setRoundState] = useState<RoundState>('idle');
   const [status, setStatus] = useState('Place your bet and deal.');
+  const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss' | 'push', amount: number } | null>(null);
   const lossStreak = useRef(0);
 
   const handTotal = (cards: Card[]) => {
@@ -60,7 +69,7 @@ const BlackjackGameScreen = () => {
       aces -= 1;
     }
     const isBlackjack = cards.length === 2 && total === 21;
-    return {total, isBlackjack};
+    return { total, isBlackjack };
   };
 
   const reputationUp = (delta: number) => {
@@ -75,6 +84,7 @@ const BlackjackGameScreen = () => {
   };
 
   const deal = () => {
+    setResultPopup(null); // Clear previous result
     if (roundState === 'player') {
       return;
     }
@@ -98,31 +108,36 @@ const BlackjackGameScreen = () => {
         player.isBlackjack && dealer.isBlackjack
           ? 'push'
           : player.isBlackjack
-          ? 'blackjack'
-          : 'lose';
+            ? 'blackjack'
+            : 'lose';
       resolveRound(outcome);
     }
   };
 
   const resolveRound = (outcome: 'win' | 'lose' | 'push' | 'blackjack') => {
     let winnings = 0;
+
     if (outcome === 'win') {
       winnings = bet * 2;
       reputationUp(1);
       lossStreak.current = 0;
       setStatus(`You win ${winnings.toLocaleString()}!`);
+      setResultPopup({ type: 'win', amount: bet });
     } else if (outcome === 'blackjack') {
       winnings = Math.round(bet * 2.5);
       reputationUp(2);
       lossStreak.current = 0;
       setStatus('Blackjack! Premium payout.');
+      setResultPopup({ type: 'win', amount: Math.round(bet * 1.5) });
     } else if (outcome === 'push') {
       winnings = bet;
       setStatus('Push. Bet returned.');
+      setResultPopup({ type: 'push', amount: bet });
     } else {
       lossStreak.current += 1;
       reputationDownSmall();
       setStatus('Bust or dealer wins.');
+      setResultPopup({ type: 'loss', amount: bet });
     }
 
     const nextMoney = money - bet + winnings;
@@ -138,7 +153,7 @@ const BlackjackGameScreen = () => {
     const nextHand = [...playerCards, card];
     setPlayerCards(nextHand);
     setDeck(nextDeck);
-    const {total} = handTotal(nextHand);
+    const { total } = handTotal(nextHand);
     if (total > 21) {
       resolveRound('lose');
     }
@@ -148,6 +163,7 @@ const BlackjackGameScreen = () => {
     if (roundState !== 'player') return;
     let nextDeck = [...deck];
     let nextDealer = [...dealerCards];
+    // Dealer hits on soft 17? Simplified: Hit until >= 17
     while (handTotal(nextDealer).total < 17) {
       const draw = nextDeck.pop();
       if (!draw) break;
@@ -174,14 +190,17 @@ const BlackjackGameScreen = () => {
   };
 
   const adjustBet = (delta: number) => {
-    const next = clamp(bet + delta, 1000, 20000);
+    setResultPopup(null);
+    const next = clamp(bet + delta, 1000, 100_000);
     setBet(next);
   };
 
   const renderCard = (card: Card, idx: number) => (
     <View key={`${card.rank}${card.suit}-${idx}`} style={styles.card}>
       <Text style={styles.cardRank}>{card.rank}</Text>
-      <Text style={styles.cardSuit}>{card.suit}</Text>
+      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#ef4444' : '#e2e8f0' }]}>
+        {card.suit}
+      </Text>
     </View>
   );
 
@@ -196,10 +215,13 @@ const BlackjackGameScreen = () => {
       leftNode={
         <Pressable
           onPress={() => navigation.goBack()}
-          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
           <Text style={styles.backIcon}>←</Text>
         </Pressable>
       }>
+
+      <GameResultPopup result={resultPopup} onHide={() => setResultPopup(null)} />
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topRow}>
           <View>
@@ -238,17 +260,32 @@ const BlackjackGameScreen = () => {
         <View style={styles.betControls}>
           <Pressable
             onPress={() => adjustBet(-1000)}
-            style={({pressed}) => [styles.betButton, pressed && styles.betButtonPressed]}>
+            disabled={roundState === 'player'}
+            style={({ pressed }) => [
+              styles.betButton,
+              pressed && styles.betButtonPressed,
+              roundState === 'player' && styles.disabledButton
+            ]}>
             <Text style={styles.betButtonText}>-</Text>
           </Pressable>
           <Pressable
             onPress={() => adjustBet(1000)}
-            style={({pressed}) => [styles.betButton, pressed && styles.betButtonPressed]}>
+            disabled={roundState === 'player'}
+            style={({ pressed }) => [
+              styles.betButton,
+              pressed && styles.betButtonPressed,
+              roundState === 'player' && styles.disabledButton
+            ]}>
             <Text style={styles.betButtonText}>+</Text>
           </Pressable>
           <Pressable
             onPress={deal}
-            style={({pressed}) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
+            disabled={roundState === 'player'}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed && styles.primaryButtonPressed,
+              roundState === 'player' && styles.disabledButton
+            ]}>
             <Text style={styles.primaryText}>DEAL</Text>
           </Pressable>
         </View>
@@ -257,7 +294,7 @@ const BlackjackGameScreen = () => {
           <Pressable
             onPress={handleHit}
             disabled={roundState !== 'player'}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.secondaryButton,
               pressed && styles.secondaryButtonPressed,
               roundState !== 'player' && styles.disabledButton,
@@ -267,7 +304,7 @@ const BlackjackGameScreen = () => {
           <Pressable
             onPress={handleStand}
             disabled={roundState !== 'player'}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.secondaryButton,
               pressed && styles.secondaryButtonPressed,
               roundState !== 'player' && styles.disabledButton,
@@ -380,7 +417,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.cardSoft,
   },
   betButtonPressed: {
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   betButtonText: {
     color: theme.colors.textPrimary,
@@ -396,7 +433,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
   },
   primaryButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
   primaryText: {
@@ -419,7 +456,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   secondaryButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   secondaryText: {
     color: theme.colors.textPrimary,
@@ -439,7 +476,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.cardSoft,
   },
   backButtonPressed: {
-    transform: [{scale: 0.96}],
+    transform: [{ scale: 0.96 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,
