@@ -2,12 +2,16 @@ import React from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useStatsStore, useEventStore } from '../store';
+import { useStatsStore, useEventStore, useUserStore } from '../store';
 import { theme } from '../theme';
 import type { AssetsStackParamList } from '../navigation';
 
 const formatMoney = (value: number) => {
   const absolute = Math.abs(value);
+  if (absolute >= 1_000_000_000) {
+    const formatted = (value / 1_000_000_000).toFixed(1);
+    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}B`;
+  }
   if (absolute >= 1_000_000) {
     const formatted = (value / 1_000_000).toFixed(1);
     return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
@@ -36,10 +40,19 @@ const AssetsScreen = () => {
   const { netWorth, money, monthlyIncome, monthlyExpenses, riskApetite, strategicSense } =
     useStatsStore();
   const { lastMarketEvent } = useEventStore();
+  const { inventory } = useUserStore();
 
-  const propertiesValue = 2_450_000;
-  const vehiclesValue = 1_120_000;
-  const belongingsValue = 380_000;
+  const propertiesValue = inventory
+    .filter(i => i.type === 'penthouse' || i.type === 'mansion' || i.type === 'villa' || i.type === 'estate' || i.type === 'yali' || i.type === 'castle' || i.type === 'chalet' || i.type === 'island' || i.type === 'marina' || i.type === 'land' || i.type === 'apartment' || i.type === 'townhouse' || i.type === 'lodge' || i.type === 'camp' || i.type === 'riad' || i.type === 'resort' || i.type === 'house' || i.type === 'suite' || i.type === 'vineyard')
+    .reduce((acc, item) => acc + item.price, 0);
+
+  const vehiclesValue = inventory
+    .filter(i => i.type === 'car' || i.type === 'plane' || i.type === 'helicopter' || i.type === 'jet' || i.type === 'yacht' || i.type === 'submarine' || i.type === 'boat' || i.type === 'cruise_ship' || i.type === 'ship')
+    .reduce((acc, item) => acc + item.price, 0);
+
+  const belongingsValue = inventory
+    .filter(i => i.type === 'ring' || i.type === 'watch' || i.type === 'necklace' || i.type === 'gem' || i.type === 'brooch' || i.type === 'bracelet' || i.type === 'tiara' || i.type === 'earrings' || i.type === 'watch_jewelry' || i.type === 'artifact')
+    .reduce((acc, item) => acc + item.price, 0);
 
   const nextMove = (() => {
     if (riskApetite > 65) {
@@ -99,7 +112,7 @@ const AssetsScreen = () => {
           <View style={styles.summaryRow}>
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Net Worth</Text>
-              <Text style={styles.summaryValue}>{formatMoney(netWorth)}</Text>
+              <Text style={styles.summaryValue}>{formatMoney(netWorth + propertiesValue + vehiclesValue + belongingsValue)}</Text>
 
               <View style={{ marginTop: theme.spacing.md }}>
                 <Text style={styles.summaryLabel}>Cash</Text>
@@ -109,14 +122,11 @@ const AssetsScreen = () => {
 
             <View style={styles.summaryCol}>
               <Pressable
-                onPress={() => {
-                  console.log('Navigate to Investments screen (to be implemented)');
-                }}
+                onPress={() => navigation.navigate('Shopping')}
                 style={({ pressed }) => [styles.investmentsButton, pressed && styles.investmentsButtonPressed]}>
                 <View>
-                  <Text style={styles.summaryLabel}>Investments</Text>
-                  {/* TODO: Replace placeholder with real investments total when available */}
-                  <Text style={styles.summaryValue}>{formatMoney(0)}</Text>
+                  <Text style={styles.summaryLabel}>Shopping</Text>
+                  <Text style={styles.summaryValue}>Go to Mall</Text>
                 </View>
                 <Text style={styles.investmentsCta}>›</Text>
               </Pressable>
@@ -141,21 +151,21 @@ const AssetsScreen = () => {
 
         <View style={styles.categoryGrid}>
           <Pressable
-            onPress={() => console.log('Open properties (placeholder)')}
+            onPress={() => navigation.navigate('Shopping')}
             style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Properties</Text>
             <Text style={styles.categoryValue}>{formatMoney(propertiesValue)}</Text>
-            <Text style={styles.categoryMeta}>Homes, penthouses, estates</Text>
+            <Text style={styles.categoryMeta}>Homes, estates, islands</Text>
           </Pressable>
           <Pressable
-            onPress={() => console.log('Open vehicles (placeholder)')}
+            onPress={() => navigation.navigate('Shopping')}
             style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Vehicles</Text>
             <Text style={styles.categoryValue}>{formatMoney(vehiclesValue)}</Text>
             <Text style={styles.categoryMeta}>Cars, jets, yachts</Text>
           </Pressable>
           <Pressable
-            onPress={() => console.log('Open belongings (placeholder)')}
+            onPress={() => navigation.navigate('Shopping')}
             style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
             <Text style={styles.categoryLabel}>Belongings</Text>
             <Text style={styles.categoryValue}>{formatMoney(belongingsValue)}</Text>
@@ -201,8 +211,7 @@ const AssetsScreen = () => {
   );
 };
 
-export default AssetsScreen;
-
+// ... styles ...
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -426,3 +435,5 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
 });
+
+export default AssetsScreen;

@@ -23,6 +23,8 @@ import {
   ProfileScreen,
   AchievementsScreen,
   HomeScreen,
+  ShoppingScreen,
+  ShopDetailScreen,
 } from '../screens';
 import { formatScreenTitle } from '../utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
@@ -42,6 +44,10 @@ export type AssetsStackParamList = {
   Market: undefined;
   MyCompany: undefined;
   Premium: undefined;
+  Shopping: undefined;
+  ShopDetail: {
+    shopId: string;
+  };
   StockDetail: {
     symbol: string;
     price: number;
@@ -130,6 +136,16 @@ const AssetsStackNavigator = () => (
       name="Premium"
       component={PremiumScreen}
       options={{ title: formatScreenTitle('Premium') }}
+    />
+    <AssetsStack.Screen
+      name="Shopping"
+      component={ShoppingScreen}
+      options={{ title: formatScreenTitle('Shopping') }}
+    />
+    <AssetsStack.Screen
+      name="ShopDetail"
+      component={ShopDetailScreen}
+      options={{ title: formatScreenTitle('Shop Detail') }}
     />
   </AssetsStack.Navigator>
 );

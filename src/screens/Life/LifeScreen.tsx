@@ -1,16 +1,18 @@
 import React from 'react';
-import {ScrollView, View, Text, Pressable, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {CompositeNavigationProp} from '@react-navigation/native';
-import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MatchPopup from '../../components/Match/MatchPopup';
-import {useMatchSystem} from '../../components/Match/useMatchSystem';
-import {triggerEvent} from '../../event/eventEngine';
-import type {LifeStackParamList, RootStackParamList, RootTabParamList} from '../../navigation';
-import {useEventStore} from '../../store';
-import {theme} from '../../theme';
+import { useMatchSystem } from '../../components/Match/useMatchSystem';
+import { triggerEvent } from '../../event/eventEngine';
+import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../navigation';
+import { useEventStore } from '../../store';
+import { theme } from '../../theme';
 import AppScreen from '../../components/layout/AppScreen';
+import { useHookupSystem } from '../../components/Life/useHookupSystem';
+import HookupModal from '../../components/Life/HookupModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -45,71 +47,71 @@ const ACTIONS: Array<{
   description: string;
   emoji: string;
 }> = [
-  {
-    key: 'nightOut',
-    label: 'Night Out',
-    description: 'Celebrate with friends',
-    emoji: '🎉',
-  },
-  {
-    key: 'spa',
-    label: 'Spa & Relax',
-    description: 'Reset your mind and body',
-    emoji: '🧖',
-  },
-  {
-    key: 'gym',
-    label: 'Gym',
-    description: 'Train discipline and strength',
-    emoji: '🏋️',
-  },
-  {
-    key: 'shopping',
-    label: 'Shopping',
-    description: 'Upgrade your lifestyle',
-    emoji: '🛍',
-  },
-  {
-    key: 'travel',
-    label: 'Travel',
-    description: 'Change your scenery',
-    emoji: '✈️',
-  },
-  {
-    key: 'casino',
-    label: 'Casino',
-    description: 'High risk, high thrill',
-    emoji: '🎰',
-  },
-  {
-    key: 'blackMarket',
-    label: 'Black Market',
-    description: 'Shadow deals for rare items',
-    emoji: '🕶',
-  },
-  {
-    key: 'add',
-    label: 'Add',
-    description: 'Queue your next move',
-    emoji: '➕',
-  },
-  {
-    key: 'hookup',
-    label: 'Hookup',
-    description: 'Casual chemistry',
-    emoji: '🔥',
-  },
-  {
-    key: 'network',
-    label: 'Network',
-    description: 'Meet investors and mentors',
-    emoji: '🤝',
-  },
-];
+    {
+      key: 'nightOut',
+      label: 'Night Out',
+      description: 'Celebrate with friends',
+      emoji: '🎉',
+    },
+    {
+      key: 'spa',
+      label: 'Spa & Relax',
+      description: 'Reset your mind and body',
+      emoji: '🧖',
+    },
+    {
+      key: 'gym',
+      label: 'Gym',
+      description: 'Train discipline and strength',
+      emoji: '🏋️',
+    },
+    {
+      key: 'shopping',
+      label: 'Shopping',
+      description: 'Upgrade your lifestyle',
+      emoji: '🛍',
+    },
+    {
+      key: 'travel',
+      label: 'Travel',
+      description: 'Change your scenery',
+      emoji: '✈️',
+    },
+    {
+      key: 'casino',
+      label: 'Casino',
+      description: 'High risk, high thrill',
+      emoji: '🎰',
+    },
+    {
+      key: 'blackMarket',
+      label: 'Black Market',
+      description: 'Shadow deals for rare items',
+      emoji: '🕶',
+    },
+    {
+      key: 'add',
+      label: 'Add',
+      description: 'Queue your next move',
+      emoji: '➕',
+    },
+    {
+      key: 'hookup',
+      label: 'Hookup',
+      description: 'Casual chemistry',
+      emoji: '🔥',
+    },
+    {
+      key: 'network',
+      label: 'Network',
+      description: 'Meet investors and mentors',
+      emoji: '🤝',
+    },
+  ];
 
 const LifeScreen = () => {
   const navigation = useNavigation<LifeNavigationProp>();
-  const {lastLifeEvent} = useEventStore();
+  const { lastLifeEvent } = useEventStore();
   const {
     visible,
     matchCandidate,
@@ -118,6 +120,15 @@ const LifeScreen = () => {
     acceptMatch,
     rejectMatch,
   } = useMatchSystem();
+
+  const {
+    isHookupVisible,
+    hookupCandidate,
+    startHookup,
+    acceptHookup,
+    rejectHookup,
+    closeHookupModal,
+  } = useHookupSystem();
 
   const handleGoHome = () => {
     const rootNav = navigation.getParent()?.getParent();
@@ -142,7 +153,9 @@ const LifeScreen = () => {
         console.log('[Life] Action triggered: Gym');
         break;
       case 'shopping':
-        console.log('[Life] Action triggered: Shopping');
+        console.log('[Life] Navigating to Shopping');
+        // @ts-ignore - we know this path exists in the root navigator
+        navigation.navigate('Assets', { screen: 'Shopping' });
         break;
       case 'travel':
         console.log('[Life] Action triggered: Travel');
@@ -158,7 +171,8 @@ const LifeScreen = () => {
         console.log('[Life] Action triggered: Add (placeholder)');
         break;
       case 'hookup':
-        console.log('[Life] Action triggered: Hookup (placeholder)');
+        console.log('[Life] Action triggered: Hookup');
+        startHookup();
         break;
       case 'network':
         console.log('[Life] Action triggered: Network (placeholder)');
@@ -175,7 +189,7 @@ const LifeScreen = () => {
       leftNode={
         <Pressable
           onPress={handleGoHome}
-          style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
           <Text style={styles.backIcon}>←</Text>
         </Pressable>
       }>
@@ -207,7 +221,7 @@ const LifeScreen = () => {
               onPress={() => {
                 void triggerEvent('life');
               }}
-              style={({pressed}) => [
+              style={({ pressed }) => [
                 styles.secondaryButton,
                 pressed && styles.secondaryButtonPressed,
               ]}>
@@ -222,8 +236,8 @@ const LifeScreen = () => {
             Burada Tinder-style eşleşme pop-up&apos;ları tetiklenecek.
           </Text>
           <Pressable
-            onPress={openMatch}
-            style={({pressed}) => [
+            onPress={() => openMatch()}
+            style={({ pressed }) => [
               styles.secondaryButton,
               pressed && styles.secondaryButtonPressed,
             ]}>
@@ -238,6 +252,13 @@ const LifeScreen = () => {
         onReject={rejectMatch}
         onClose={closeMatch}
       />
+      <HookupModal
+        visible={isHookupVisible}
+        candidate={hookupCandidate}
+        onAccept={acceptHookup}
+        onReject={rejectHookup}
+        onClose={closeHookupModal}
+      />
     </AppScreen>
   );
 };
@@ -250,7 +271,7 @@ const LifeActionButton = ({
 }: LifeActionButtonProps) => (
   <Pressable
     onPress={onPress}
-    style={({pressed}) => [
+    style={({ pressed }) => [
       styles.actionButton,
       pressed && styles.actionButtonPressed,
     ]}>
@@ -277,7 +298,7 @@ const styles = StyleSheet.create({
   },
   backButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,
@@ -320,7 +341,7 @@ const styles = StyleSheet.create({
   },
   actionButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   actionHeader: {
     flexDirection: 'row',
@@ -369,7 +390,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   secondaryButtonText: {
     color: theme.colors.accent,

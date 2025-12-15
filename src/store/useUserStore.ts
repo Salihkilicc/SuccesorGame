@@ -32,6 +32,18 @@ export type PartnerProfile = {
   photo?: string | null;
 };
 
+// ... types
+export type InventoryItem = {
+  id: string;
+  name: string;
+  price: number;
+  type: string;
+  shopId: string;
+  brand?: string;
+  location?: string;
+  purchasedAt: number; // timestamp
+};
+
 export type UserState = {
   name: string;
   bio: string;
@@ -43,6 +55,8 @@ export type UserState = {
   family: FamilyMember[];
   friends: Friend[];
   exes: ExPartner[];
+  inventory: InventoryItem[];
+  hasEngagementRing: boolean;
 };
 
 type UserStore = UserState & {
@@ -52,6 +66,7 @@ type UserStore = UserState & {
   setBio: (bio: string) => void;
   setAvatarUrl: (url: string | null) => void;
   setHasPremium: (value: boolean) => Promise<void>;
+  addItem: (item: InventoryItem) => void;
   reset: () => void;
 };
 
@@ -87,6 +102,8 @@ export const initialUserState: UserState = {
     { id: 'fr-2', name: 'Sarah', relationship: 65 },
   ],
   exes: [],
+  inventory: [],
+  hasEngagementRing: false,
 };
 
 export const useUserStore = create<UserStore>()(
@@ -101,6 +118,15 @@ export const useUserStore = create<UserStore>()(
       setHasPremium: async value => {
         set(state => ({ ...state, hasPremium: value }));
       },
+      addItem: item =>
+        set(state => {
+          const isRing = item.type === 'ring';
+          return {
+            ...state,
+            inventory: [...state.inventory, item],
+            hasEngagementRing: state.hasEngagementRing || isRing,
+          };
+        }),
       reset: () => set(() => ({ ...initialUserState })),
     }),
     {
@@ -116,6 +142,8 @@ export const useUserStore = create<UserStore>()(
         family: state.family,
         friends: state.friends,
         exes: state.exes,
+        inventory: state.inventory,
+        hasEngagementRing: state.hasEngagementRing,
       }) as any,
     },
   ),
