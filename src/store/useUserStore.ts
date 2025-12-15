@@ -57,6 +57,14 @@ export type UserState = {
   exes: ExPartner[];
   inventory: InventoryItem[];
   hasEngagementRing: boolean;
+  gymState: {
+    gymStatus: number; // 0-100
+    membership: 'titanium' | 'elite' | null;
+    unlockedTiers: ('titanium' | 'elite')[];
+    trainerId: 'sarah' | 'marcus' | 'ken' | null;
+    martialArts: Record<string, number>; // discipline -> level (0-6)
+    combatStrength: number;
+  };
 };
 
 type UserStore = UserState & {
@@ -67,6 +75,7 @@ type UserStore = UserState & {
   setAvatarUrl: (url: string | null) => void;
   setHasPremium: (value: boolean) => Promise<void>;
   addItem: (item: InventoryItem) => void;
+  updateGymState: (partial: Partial<UserState['gymState']>) => void;
   reset: () => void;
 };
 
@@ -104,6 +113,20 @@ export const initialUserState: UserState = {
   exes: [],
   inventory: [],
   hasEngagementRing: false,
+  gymState: {
+    gymStatus: 0,
+    membership: null,
+    unlockedTiers: ['titanium'],
+    trainerId: null,
+    martialArts: {
+      boxing: 0,
+      mma: 0,
+      kungfu: 0,
+      karate: 0,
+      kravmaga: 0,
+    },
+    combatStrength: 0,
+  },
 };
 
 export const useUserStore = create<UserStore>()(
@@ -127,6 +150,11 @@ export const useUserStore = create<UserStore>()(
             hasEngagementRing: state.hasEngagementRing || isRing,
           };
         }),
+      updateGymState: partial =>
+        set(state => ({
+          ...state,
+          gymState: { ...state.gymState, ...partial },
+        })),
       reset: () => set(() => ({ ...initialUserState })),
     }),
     {
@@ -144,6 +172,7 @@ export const useUserStore = create<UserStore>()(
         exes: state.exes,
         inventory: state.inventory,
         hasEngagementRing: state.hasEngagementRing,
+        gymState: state.gymState,
       }) as any,
     },
   ),

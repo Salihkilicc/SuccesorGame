@@ -12,6 +12,8 @@ export const theme = {
     danger: '#FF4D4F',
     success: '#52C41A',
     warning: '#FAAD14',
+    primary: '#D4AF37',
+    error: '#FF4D4F',
   },
   radius: {
     xs: 6,

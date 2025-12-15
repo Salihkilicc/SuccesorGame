@@ -13,6 +13,13 @@ import { theme } from '../../theme';
 import AppScreen from '../../components/layout/AppScreen';
 import { useHookupSystem } from '../../components/Life/useHookupSystem';
 import HookupModal from '../../components/Life/HookupModal';
+import { useNightOutSystem } from '../../components/Life/NightOut/useNightOutSystem';
+import NightOutSetupModal from '../../components/Life/NightOut/NightOutSetupModal';
+import NightOutOutcomeModal from '../../components/Life/NightOut/NightOutOutcomeModal';
+import CondomDecisionModal from '../../components/Life/NightOut/CondomDecisionModal';
+import { useGymSystem } from '../../components/Life/Gym/useGymSystem';
+import GymMembershipModal from '../../components/Life/Gym/GymMembershipModal';
+import GymHubModal from '../../components/Life/Gym/GymHubModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -130,6 +137,60 @@ const LifeScreen = () => {
     closeHookupModal,
   } = useHookupSystem();
 
+  const {
+    setupModalVisible,
+    outcomeModalVisible,
+    outcomeType,
+    condomModalVisible,
+    selectedClub,
+    selectedAircraft,
+    aircrafts,
+    needsTravel,
+    totalCost,
+    setSetupModalVisible,
+    startNightOut,
+    setSelectedClub,
+    setSelectedAircraft,
+    confirmNightOut,
+    handleHookupAccept,
+    handleOutcomeClose,
+    handleCondomDecision,
+  } = useNightOutSystem();
+
+  const {
+    membershipModalVisible,
+    hubModalVisible,
+    trainerModalVisible,
+    supplementModalVisible,
+    fitnessConfigVisible,
+    martialArtsModalVisible,
+    resultModalVisible,
+
+    workoutInProgress,
+    selectedFitnessType,
+    selectedMartialArt,
+    lastResult,
+    gymState,
+
+    setMembershipModalVisible,
+    setHubModalVisible,
+    setTrainerModalVisible,
+    setSupplementModalVisible,
+    setFitnessConfigVisible,
+    setMartialArtsModalVisible,
+    setResultModalVisible,
+
+    setSelectedFitnessType,
+    setSelectedMartialArt,
+
+    openGym,
+    buyMembership,
+    hireTrainer,
+    // attemptUnlockElite,
+    startFitnessWorkout,
+    startMartialArtsTraining
+  } = useGymSystem();
+
   const handleGoHome = () => {
     const rootNav = navigation.getParent()?.getParent();
     if (rootNav) {
@@ -145,12 +206,14 @@ const LifeScreen = () => {
     switch (type) {
       case 'nightOut':
         console.log('[Life] Action triggered: Night Out');
+        startNightOut();
         break;
       case 'spa':
         console.log('[Life] Action triggered: Spa & Relax');
         break;
       case 'gym':
         console.log('[Life] Action triggered: Gym');
+        openGym();
         break;
       case 'shopping':
         console.log('[Life] Navigating to Shopping');
@@ -258,6 +321,47 @@ const LifeScreen = () => {
         onAccept={acceptHookup}
         onReject={rejectHookup}
         onClose={closeHookupModal}
+      />
+      <NightOutSetupModal
+        visible={setupModalVisible}
+        onClose={() => setSetupModalVisible(false)}
+        onConfirm={confirmNightOut}
+        selectedClub={selectedClub}
+        setSelectedClub={setSelectedClub}
+        selectedAircraft={selectedAircraft}
+        setSelectedAircraft={setSelectedAircraft}
+        aircrafts={aircrafts}
+        needsTravel={needsTravel}
+        totalCost={totalCost}
+      />
+      <NightOutOutcomeModal
+        visible={outcomeModalVisible}
+        type={outcomeType}
+        onClose={handleOutcomeClose}
+        onHookupAccept={handleHookupAccept}
+      />
+      <CondomDecisionModal
+        visible={condomModalVisible}
+        onDecision={handleCondomDecision}
+      />
+      <GymMembershipModal
+        visible={membershipModalVisible}
+        onClose={() => setMembershipModalVisible(false)}
+        onPurchase={buyMembership}
+      />
+      <GymHubModal
+        visible={hubModalVisible}
+        onClose={() => setHubModalVisible(false)}
+        gymStatus={gymState.gymStatus}
+        trainerId={gymState.trainerId}
+        onHireTrainer={hireTrainer}
+        onStartFitness={startFitnessWorkout}
+        martialArtsLevels={gymState.martialArts}
+        onStartMartialArts={startMartialArtsTraining}
+        workoutInProgress={workoutInProgress}
+        lastResult={lastResult}
+        onResultClose={() => setResultModalVisible(false)}
+        showResult={resultModalVisible}
       />
     </AppScreen>
   );
