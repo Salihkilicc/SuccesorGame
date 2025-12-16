@@ -5,7 +5,7 @@ import { zustandStorage } from '../storage/persist';
 export type FamilyMember = {
   id: string;
   name: string;
-  relation: 'Mother' | 'Father' | 'Sister' | 'Brother' | 'Sibling';
+  relation: 'Mother' | 'Father' | 'Sister' | 'Brother' | 'Sibling' | 'Son' | 'Daughter';
   relationship: number; // 0-100
   photo?: string | null;
 };

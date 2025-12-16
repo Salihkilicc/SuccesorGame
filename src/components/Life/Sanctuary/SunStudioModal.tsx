@@ -1,0 +1,186 @@
+import React from 'react';
+import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { theme } from '../../../theme';
+import { useStatsStore } from '../../../store/useStatsStore';
+
+type SunStudioModalProps = {
+    visible: boolean;
+    onClose: () => void;
+    handleServicePurchase: (
+        cost: number,
+        statUpdates: Partial<typeof useStatsStore.getState>,
+        resultTitle: string,
+        resultMessage: string,
+        displayStats: { label: string; value: string; isPositive: boolean }[]
+    ) => void;
+};
+
+const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioModalProps) => {
+    return (
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}>
+            <View style={styles.overlay}>
+                <View style={styles.container}>
+                    <Text style={styles.headerTitle}>SUN STUDIO</Text>
+                    <Text style={styles.headerSubtitle}>Achieve the perfect glow</Text>
+
+                    <View style={styles.options}>
+                        {/* SPRAY TAN */}
+                        <Pressable
+                            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+                            onPress={() => {
+                                handleServicePurchase(
+                                    100,
+                                    { charisma: useStatsStore.getState().charisma + 2 },
+                                    'SPRAY TAN',
+                                    'You look glowing and ready for summer.',
+                                    [{ label: 'Charisma', value: '+2', isPositive: true }]
+                                );
+                            }}
+                        >
+                            <Text style={styles.emoji}>🧴</Text>
+                            <Text style={styles.cardTitle}>Instant Spray Tan</Text>
+                            <Text style={styles.cardPrice}>$100</Text>
+                            <Text style={styles.cardDesc}>Safe, quick, and orange-free guaranteed.</Text>
+                            <Text style={styles.statText}>Charisma +2 (Safe)</Text>
+                        </Pressable>
+
+                        {/* UV BED */}
+                        <Pressable
+                            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+                            onPress={() => {
+                                const burned = Math.random() < 0.1;
+                                const currentStats = useStatsStore.getState();
+
+                                if (burned) {
+                                    handleServicePurchase(
+                                        250,
+                                        {
+                                            charisma: currentStats.charisma - 2,
+                                            health: currentStats.health - 1
+                                        },
+                                        'SKIN BURN!',
+                                        'The UV bed was too intense. You look red and painful.',
+                                        [
+                                            { label: 'Charisma', value: '-2', isPositive: false },
+                                            { label: 'Health', value: '-1', isPositive: false }
+                                        ]
+                                    );
+                                } else {
+                                    handleServicePurchase(
+                                        250,
+                                        { charisma: currentStats.charisma + 5 },
+                                        'DEEP BRONZE',
+                                        'Perfect, deep tan achieved. You look amazing.',
+                                        [{ label: 'Charisma', value: '+5', isPositive: true }]
+                                    );
+                                }
+                            }}
+                        >
+                            <Text style={styles.emoji}>☀️</Text>
+                            <Text style={styles.cardTitle}>UV Solarium Bed</Text>
+                            <Text style={styles.cardPrice}>$250</Text>
+                            <Text style={styles.cardDesc}>Deep bronze look with a hint of danger.</Text>
+                            <Text style={[styles.statText, styles.riskText]}>Charisma +5 (Risk: Skin Burn)</Text>
+                        </Pressable>
+                    </View>
+
+                    <Pressable onPress={onClose} style={styles.closeButton}>
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </Pressable>
+                </View>
+            </View>
+        </Modal>
+    );
+};
+
+export default SunStudioModal;
+
+const styles = StyleSheet.create({
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: theme.spacing.lg,
+    },
+    container: {
+        width: '100%',
+        backgroundColor: '#1E222A',
+        borderRadius: theme.radius.lg,
+        padding: theme.spacing.lg,
+        borderWidth: 1,
+        borderColor: '#ECC94B',
+    },
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#ECC94B',
+        textAlign: 'center',
+        marginBottom: 4,
+    },
+    headerSubtitle: {
+        fontSize: 13,
+        color: '#A0AEC0',
+        textAlign: 'center',
+        marginBottom: theme.spacing.xl,
+        fontStyle: 'italic',
+    },
+    options: {
+        gap: theme.spacing.md,
+    },
+    card: {
+        backgroundColor: '#2D3748',
+        borderRadius: theme.radius.md,
+        padding: theme.spacing.md,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#4A5568',
+    },
+    cardPressed: {
+        backgroundColor: '#353F4F',
+        transform: [{ scale: 0.98 }],
+    },
+    emoji: {
+        fontSize: 32,
+        marginBottom: 8,
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#F7FAFC',
+        marginBottom: 4,
+    },
+    cardPrice: {
+        fontSize: 16,
+        color: '#ECC94B',
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+    cardDesc: {
+        fontSize: 13,
+        color: '#CBD5E0',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+    statText: {
+        fontSize: 12,
+        color: '#68D391',
+        fontWeight: '600',
+    },
+    riskText: {
+        color: '#F6AD55',
+    },
+    closeButton: {
+        marginTop: theme.spacing.xl,
+        alignItems: 'center',
+        padding: 10,
+    },
+    closeButtonText: {
+        color: '#A0AEC0',
+        textDecorationLine: 'underline',
+    },
+});

@@ -20,6 +20,18 @@ import CondomDecisionModal from '../../components/Life/NightOut/CondomDecisionMo
 import { useGymSystem } from '../../components/Life/Gym/useGymSystem';
 import GymMembershipModal from '../../components/Life/Gym/GymMembershipModal';
 import GymHubModal from '../../components/Life/Gym/GymHubModal';
+import { useTravelSystem } from '../../components/Life/Travel/useTravelSystem';
+import TravelDestinationModal from '../../components/Life/Travel/TravelDestinationModal';
+import TravelCompanionModal from '../../components/Life/Travel/TravelCompanionModal';
+import TravelResultModal from '../../components/Life/Travel/TravelResultModal';
+
+import { useSanctuarySystem } from '../../components/Life/Sanctuary/useSanctuarySystem';
+import SanctuaryHubModal from '../../components/Life/Sanctuary/SanctuaryHubModal';
+import GroomingLoungeModal from '../../components/Life/Sanctuary/GroomingLoungeModal';
+import RoyalMassageModal from '../../components/Life/Sanctuary/RoyalMassageModal';
+import SunStudioModal from '../../components/Life/Sanctuary/SunStudioModal';
+import PlasticSurgeryModal from '../../components/Life/Sanctuary/PlasticSurgeryModal';
+import SanctuaryResultModal from '../../components/Life/Sanctuary/SanctuaryResultModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -187,9 +199,59 @@ const LifeScreen = () => {
     buyMembership,
     hireTrainer,
     // attemptUnlockElite,
+    // attemptUnlockElite,
     startFitnessWorkout,
     startMartialArtsTraining
   } = useGymSystem();
+
+  const {
+    // Visibility
+    destinationModalVisible,
+    companionModalVisible,
+    resultModalVisible: travelResultVisible,
+
+    // Actions
+    openTravel,
+    closeTravel,
+    goToCompanionSelection,
+    confirmTrip,
+
+    // State Setters
+    setSelectedCountry,
+    setSelectedVibe,
+    setSelectedActivity,
+
+    // Selection Values
+    selectedCountry,
+    selectedVibe,
+    selectedActivity,
+
+    // Computed / Context
+    hasPartner,
+    hasChildren,
+    partnerName,
+    childrenCount,
+
+    // Results
+    totalCost: travelCost,
+    enjoyment: travelEnjoyment,
+    selectedCompanion
+  } = useTravelSystem();
+
+  const {
+    isHubVisible,
+    closeSanctuary,
+    openSanctuary,
+    // Sub-modals
+    isGroomingVisible, setGroomingVisible, openGrooming,
+    isMassageVisible, setMassageVisible, openMassage,
+    isSunStudioVisible, setSunStudioVisible, openSunStudio,
+    isSurgeryVisible, setSurgeryVisible, openSurgery,
+
+    // Result
+    isResultVisible, resultData,
+    handleServicePurchase
+  } = useSanctuarySystem();
 
   const handleGoHome = () => {
     const rootNav = navigation.getParent()?.getParent();
@@ -209,7 +271,8 @@ const LifeScreen = () => {
         startNightOut();
         break;
       case 'spa':
-        console.log('[Life] Action triggered: Spa & Relax');
+        console.log('[Life] Action triggered: Spa & Relax -> Sanctuary');
+        openSanctuary();
         break;
       case 'gym':
         console.log('[Life] Action triggered: Gym');
@@ -222,6 +285,7 @@ const LifeScreen = () => {
         break;
       case 'travel':
         console.log('[Life] Action triggered: Travel');
+        openTravel();
         break;
       case 'casino':
         console.log('[Life] Navigating to Casino');
@@ -362,6 +426,75 @@ const LifeScreen = () => {
         lastResult={lastResult}
         onResultClose={() => setResultModalVisible(false)}
         showResult={resultModalVisible}
+      />
+
+      {/* Travel Modals */}
+      <TravelDestinationModal
+        visible={destinationModalVisible}
+        onClose={closeTravel}
+        onNext={goToCompanionSelection}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}
+        selectedVibe={selectedVibe}
+        setSelectedVibe={setSelectedVibe}
+        selectedActivity={selectedActivity}
+        setSelectedActivity={setSelectedActivity}
+      />
+      <TravelCompanionModal
+        visible={companionModalVisible}
+        onClose={closeTravel}
+        onConfirm={confirmTrip}
+        hasPartner={hasPartner}
+        hasChildren={hasChildren}
+        partnerName={partnerName}
+        childrenCount={childrenCount}
+      />
+      <TravelResultModal
+        visible={travelResultVisible}
+        onClose={closeTravel}
+        country={selectedCountry}
+        activity={selectedActivity}
+        companion={selectedCompanion}
+        partnerName={partnerName}
+        cost={travelCost}
+        enjoyment={travelEnjoyment}
+      />
+
+      {/* The Wellness Sanctuary Modals */}
+      <SanctuaryHubModal
+        visible={isHubVisible}
+        onClose={closeSanctuary}
+        onOpenGrooming={openGrooming}
+        onOpenMassage={openMassage}
+        onOpenSunStudio={openSunStudio}
+        onOpenSurgery={openSurgery}
+      />
+      <GroomingLoungeModal
+        visible={isGroomingVisible}
+        onClose={() => setGroomingVisible(false)}
+        handleServicePurchase={handleServicePurchase}
+      />
+      <RoyalMassageModal
+        visible={isMassageVisible}
+        onClose={() => setMassageVisible(false)}
+        handleServicePurchase={handleServicePurchase}
+      />
+      <SunStudioModal
+        visible={isSunStudioVisible}
+        onClose={() => setSunStudioVisible(false)}
+        handleServicePurchase={handleServicePurchase}
+      />
+      <PlasticSurgeryModal
+        visible={isSurgeryVisible}
+        onClose={() => setSurgeryVisible(false)}
+        handleServicePurchase={handleServicePurchase}
+      />
+
+      {/* RESULT MODAL */}
+      <SanctuaryResultModal
+        visible={isResultVisible}
+        resultData={resultData}
+        onClose={closeSanctuary}
       />
     </AppScreen>
   );
