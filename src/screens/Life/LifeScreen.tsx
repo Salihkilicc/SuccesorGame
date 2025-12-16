@@ -33,6 +33,12 @@ import SunStudioModal from '../../components/Life/Sanctuary/SunStudioModal';
 import PlasticSurgeryModal from '../../components/Life/Sanctuary/PlasticSurgeryModal';
 import SanctuaryResultModal from '../../components/Life/Sanctuary/SanctuaryResultModal';
 
+import { useBlackMarketSystem } from '../../components/Life/BlackMarket/useBlackMarketSystem';
+import BlackMarketHubModal from '../../components/Life/BlackMarket/BlackMarketHubModal';
+import BelongingsModal from '../../components/Life/BlackMarket/BelongingsModal';
+import { Alert } from 'react-native';
+import { useEffect } from 'react';
+
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
   CompositeNavigationProp<
@@ -49,7 +55,7 @@ type LifeActionType =
   | 'travel'
   | 'casino'
   | 'blackMarket'
-  | 'add'
+  | 'belongings'
   | 'hookup'
   | 'network';
 
@@ -109,10 +115,10 @@ const ACTIONS: Array<{
       emoji: '🕶',
     },
     {
-      key: 'add',
-      label: 'Add',
-      description: 'Queue your next move',
-      emoji: '➕',
+      key: 'belongings',
+      label: 'My Belongings',
+      description: 'Your secret vault',
+      emoji: '🗝️',
     },
     {
       key: 'hookup',
@@ -253,6 +259,35 @@ const LifeScreen = () => {
     handleServicePurchase
   } = useSanctuarySystem();
 
+  const {
+    isHubVisible: isBlackMarketVisible,
+    isBelongingsVisible,
+    isOfferVisible,
+    currentOffer,
+    effectMessage,
+    openBlackMarket,
+    closeBlackMarket,
+    openBelongings,
+    closeBelongings,
+    generateRandomOffer,
+    acceptOffer,
+    rejectOffer,
+    buyWeapon,
+    buySubstance,
+    clearEffect
+  } = useBlackMarketSystem();
+
+  // Effect for Substance consumption
+  useEffect(() => {
+    if (effectMessage) {
+      Alert.alert(
+        "Whoa...",
+        effectMessage,
+        [{ text: "I'm okay... I think.", onPress: clearEffect }]
+      );
+    }
+  }, [effectMessage, clearEffect]);
+
   const handleGoHome = () => {
     const rootNav = navigation.getParent()?.getParent();
     if (rootNav) {
@@ -293,9 +328,11 @@ const LifeScreen = () => {
         break;
       case 'blackMarket':
         console.log('[Life] Action triggered: Black Market');
+        openBlackMarket();
         break;
-      case 'add':
-        console.log('[Life] Action triggered: Add (placeholder)');
+      case 'belongings':
+        console.log('[Life] Action triggered: Belongings');
+        openBelongings();
         break;
       case 'hookup':
         console.log('[Life] Action triggered: Hookup');
@@ -495,6 +532,27 @@ const LifeScreen = () => {
         visible={isResultVisible}
         resultData={resultData}
         onClose={closeSanctuary}
+      />
+
+      {/* BLACK MARKET MODALS */}
+      <BlackMarketHubModal
+        visible={isBlackMarketVisible}
+        onClose={closeBlackMarket}
+        onSelectArt={() => generateRandomOffer('art')}
+        onSelectAntique={() => generateRandomOffer('antique')}
+        onSelectJewel={() => generateRandomOffer('jewel')}
+        onBuyWeapon={buyWeapon}
+        onBuySubstance={buySubstance}
+        // Offer Logic
+        offerVisible={isOfferVisible}
+        offerItem={currentOffer}
+        onAcceptOffer={acceptOffer}
+        onRejectOffer={rejectOffer}
+      />
+
+      <BelongingsModal
+        visible={isBelongingsVisible}
+        onClose={closeBelongings}
       />
     </AppScreen>
   );
