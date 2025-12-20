@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { useUserStore, useGameStore, useStatsStore, useEventStore } from '../../store';
+import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../store';
 import { theme } from '../../theme';
 import type { RootStackParamList, RootTabParamList } from '../../navigation';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -48,6 +48,9 @@ const HomeScreen = () => {
   const { age, currentMonth, advanceMonth } = useGameStore();
   // TODO: Wire monthlyIncome/monthlyExpenses to real store values when available.
   const { money, netWorth, monthlyIncome, monthlyExpenses, setField } = useStatsStore();
+  const { holdings } = useMarketStore();
+
+  const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
   useEffect(() => {
     // Force set money to 450k as requested
@@ -136,6 +139,10 @@ const HomeScreen = () => {
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Cash</Text>
               <Text style={styles.value}>${money.toLocaleString()}</Text>
+            </View>
+            <View style={styles.rowBetween}>
+              <Text style={styles.label}>Investments</Text>
+              <Text style={styles.value}>{formatMoney(investmentsValue)}</Text>
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Income (Monthly)</Text>

@@ -3,3 +3,4 @@ export * from './useStatsStore';
 export * from './useUserStore';
 export * from './useEventStore';
 export * from './useGameStore';
+export * from './useMarketStore';

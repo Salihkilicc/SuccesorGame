@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {theme} from '../../theme';
+import React, { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { theme } from '../../theme';
 import TickerBand from '../../components/Market/TickerBand';
 import FinancialNewsButton from '../../components/Market/FinancialNewsButton';
 import FinancialAdvisorsButton from '../../components/Market/FinancialAdvisorsButton';
@@ -23,7 +23,8 @@ import type {
   HoldingItem,
   StockItem,
 } from '../../components/Market/marketTypes';
-import type {AssetsStackParamList} from '../../navigation';
+import type { AssetsStackParamList } from '../../navigation';
+import { useMarketStore } from '../../store';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -41,12 +42,12 @@ const MarketScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
   const insets = useSafeAreaInsets();
+  const { holdings, buyAsset, reset } = useMarketStore();
 
   const [category, setCategory] = useState<CategoryKey>('bonds');
   const [selectedBond, setSelectedBond] = useState<BondItem | null>(null);
   const [selectedCrypto, setSelectedCrypto] = useState<CryptoAsset | null>(null);
   const [selectedStock, setSelectedStock] = useState<StockItem | null>(null);
-  const [holdings, setHoldings] = useState<HoldingItem[]>([]);
   const [portfolioVisible, setPortfolioVisible] = useState(false);
 
   const totalInvested = useMemo(
@@ -68,17 +69,15 @@ const MarketScreen = () => {
     }
     const estimatedValue = amount * (1 + bond.coupon / 100);
     const pl = amount ? ((estimatedValue - amount) / amount) * 100 : 0;
-    setHoldings(prev => [
-      ...prev,
-      {
-        id: `${bond.id}-${Date.now()}`,
-        name: bond.name,
-        type: 'bond',
-        amount,
-        estimatedValue,
-        pl: Number(pl.toFixed(1)),
-      },
-    ]);
+
+    buyAsset({
+      id: `${bond.id}-${Date.now()}`,
+      name: bond.name,
+      type: 'bond',
+      amount,
+      estimatedValue,
+      pl: Number(pl.toFixed(1)),
+    });
     console.log('Bond purchase placeholder');
     setSelectedBond(null);
   };
@@ -91,17 +90,15 @@ const MarketScreen = () => {
     const effectiveChange = adjustedChange(asset.change, asset.marketCap);
     const estimatedValue = amount * (1 + effectiveChange / 100);
     const pl = amount ? ((estimatedValue - amount) / amount) * 100 : 0;
-    setHoldings(prev => [
-      ...prev,
-      {
-        id: `${asset.id}-${Date.now()}`,
-        name: asset.name,
-        type: 'crypto',
-        amount,
-        estimatedValue,
-        pl: Number(pl.toFixed(1)),
-      },
-    ]);
+
+    buyAsset({
+      id: `${asset.id}-${Date.now()}`,
+      name: asset.name,
+      type: 'crypto',
+      amount,
+      estimatedValue,
+      pl: Number(pl.toFixed(1)),
+    });
     console.log('Crypto purchase placeholder');
     setSelectedCrypto(null);
   };
@@ -115,17 +112,15 @@ const MarketScreen = () => {
     const effectiveChange = adjustedChange(stock.dailyChange, stock.marketCap);
     const estimatedValue = amount * (1 + effectiveChange / 100);
     const pl = amount ? ((estimatedValue - amount) / amount) * 100 : 0;
-    setHoldings(prev => [
-      ...prev,
-      {
-        id: `${stock.id}-${Date.now()}`,
-        name: `${stock.company} (${stock.symbol})`,
-        type: 'stock',
-        amount,
-        estimatedValue,
-        pl: Number(pl.toFixed(1)),
-      },
-    ]);
+
+    buyAsset({
+      id: `${stock.id}-${Date.now()}`,
+      name: `${stock.company} (${stock.symbol})`,
+      type: 'stock',
+      amount,
+      estimatedValue,
+      pl: Number(pl.toFixed(1)),
+    });
     console.log('Stock purchase placeholder');
     setSelectedStock(null);
   };
@@ -133,8 +128,8 @@ const MarketScreen = () => {
   const holdingsCount = holdings.length;
 
   const liquidateAll = () => {
-    console.log('Liquidated all holdings (placeholder)');
-    setHoldings([]);
+    console.log('Liquidated all holdings');
+    reset();
   };
 
   const BackButton = () => (
@@ -142,7 +137,7 @@ const MarketScreen = () => {
       onPress={() => {
         if (navigation.canGoBack()) navigation.goBack();
       }}
-      style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+      style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
       <Text style={styles.backIcon}>←</Text>
     </Pressable>
   );
@@ -150,7 +145,7 @@ const MarketScreen = () => {
   return (
     <View style={styles.safeArea}>
       <ScrollView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         contentContainerStyle={[
           styles.content,
           {
@@ -252,7 +247,7 @@ const styles = StyleSheet.create({
   },
   backButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,

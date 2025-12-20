@@ -24,7 +24,11 @@ export type StatKey =
   | 'companyRevenueMonthly'
   | 'companyExpensesMonthly'
   | 'companyCapital'
-  | 'casinoReputation';
+  | 'casinoReputation'
+  | 'factoryCount'
+  | 'employeeCount'
+  | 'employeeMorale'
+  | 'productionCapacity';
 
 export interface Shareholder {
   id: string;
@@ -35,6 +39,7 @@ export interface Shareholder {
 
 export type StatsState = Record<StatKey, number> & {
   shareholders: Shareholder[];
+  salaryTier: 'low' | 'average' | 'above_average';
 };
 
 type StatsStore = StatsState & {
@@ -51,6 +56,8 @@ type StatsStore = StatsState & {
   setCompanyCapital: (value: number) => void;
   setCasinoReputation: (value: number) => void;
   setShareholders: (list: Shareholder[]) => void;
+  setSalaryTier: (tier: 'low' | 'average' | 'above_average') => void;
+  processCompanyMonthlyTick: () => void;
   reset: () => void;
 };
 
@@ -77,6 +84,11 @@ export const initialStatsState: StatsState = {
   companyRevenueMonthly: 1_200_000,
   companyExpensesMonthly: 620_000,
   companyCapital: 4_800_000,
+  factoryCount: 1,
+  employeeCount: 300,
+  employeeMorale: 75,
+  salaryTier: 'average',
+  productionCapacity: 1000,
   shareholders: [
     { id: 'player', name: 'Player', type: 'player', percentage: 65 },
     { id: 'family', name: 'Family', type: 'family', percentage: 15 },
@@ -110,6 +122,27 @@ export const useStatsStore = create<StatsStore>()(
       setCasinoReputation: value =>
         set(state => ({ ...state, casinoReputation: value })),
       setShareholders: list => set(state => ({ ...state, shareholders: list })),
+      setSalaryTier: tier => set(state => ({ ...state, salaryTier: tier })),
+      processCompanyMonthlyTick: () =>
+        set(state => {
+          // Feedback Loop
+          const profit = state.companyRevenueMonthly - state.companyExpensesMonthly;
+          let moraleDelta = 0;
+
+          if (profit > 0) moraleDelta += 1;
+          else moraleDelta -= 2;
+
+          if (state.salaryTier === 'low') moraleDelta -= 2;
+          if (state.salaryTier === 'above_average') moraleDelta += 2;
+
+          const nextMorale = Math.max(0, Math.min(100, state.employeeMorale + moraleDelta));
+
+          // Production Error Penalty (Morale < 40)
+          // Just logging it for now or we could reduce revenue slightly
+          // but avoiding complex temporary modifiers to keep it simple.
+
+          return { ...state, employeeMorale: nextMorale };
+        }),
       reset: () => set(() => ({ ...initialStatsState })),
     }),
     {
@@ -136,6 +169,11 @@ export const useStatsStore = create<StatsStore>()(
         companyCapital: state.companyCapital,
         shareholders: state.shareholders,
         casinoReputation: state.casinoReputation,
+        factoryCount: state.factoryCount,
+        employeeCount: state.employeeCount,
+        employeeMorale: state.employeeMorale,
+        salaryTier: state.salaryTier,
+        productionCapacity: state.productionCapacity,
       }),
     },
   ),

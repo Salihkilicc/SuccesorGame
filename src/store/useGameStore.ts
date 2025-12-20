@@ -1,10 +1,10 @@
-import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
-import {useEventStore} from './useEventStore';
-import {simulateNewMonth} from '../event/eventEngine';
-import {zustandStorage} from '../storage/persist';
-import {useStatsStore} from './useStatsStore';
-import {useUserStore} from './useUserStore';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { useEventStore } from './useEventStore';
+import { simulateNewMonth } from '../event/eventEngine';
+import { zustandStorage } from '../storage/persist';
+import { useStatsStore } from './useStatsStore';
+import { useUserStore } from './useUserStore';
 
 export type GameState = {
   currentMonth: number;
@@ -31,15 +31,15 @@ export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...initialGameState,
-      setField: (key, value) => set(state => ({...state, [key]: value})),
+      setField: (key, value) => set(state => ({ ...state, [key]: value })),
       resetMonthlyState: () => {
-        const {resetCycleFlags} = useEventStore.getState();
+        const { resetCycleFlags } = useEventStore.getState();
         resetCycleFlags();
-        set(state => ({...state, actionsUsedThisMonth: 0}));
+        set(state => ({ ...state, actionsUsedThisMonth: 0 }));
         console.log('[Game] Monthly state reset (placeholder)');
       },
       advanceMonth: () => {
-        const {currentMonth, age} = get();
+        const { currentMonth, age } = get();
         let newMonth = currentMonth + 1;
         let newAge = age;
 
@@ -57,6 +57,7 @@ export const useGameStore = create<GameStore>()(
         console.log(`[Game] Advanced to age ${newAge}, month ${newMonth}`);
         get().resetMonthlyState();
         simulateNewMonth();
+        useStatsStore.getState().processCompanyMonthlyTick();
         import('../achievements/checker').then(mod => {
           mod.checkAllAchievementsAfterStateChange();
         });
@@ -65,7 +66,7 @@ export const useGameStore = create<GameStore>()(
         useStatsStore.getState().reset();
         useUserStore.getState().reset();
         useEventStore.getState().reset();
-        set(() => ({...initialGameState}));
+        set(() => ({ ...initialGameState }));
         await zustandStorage.removeItem('succesor_stats_v1');
         await zustandStorage.removeItem('succesor_user_v1');
         await zustandStorage.removeItem('succesor_game_v1');

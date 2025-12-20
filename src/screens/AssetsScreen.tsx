@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useStatsStore, useEventStore, useUserStore } from '../store';
+import { useStatsStore, useEventStore, useUserStore, useMarketStore } from '../store';
 import { theme } from '../theme';
 import type { AssetsStackParamList } from '../navigation';
 
@@ -41,17 +41,43 @@ const AssetsScreen = () => {
     useStatsStore();
   const { lastMarketEvent } = useEventStore();
   const { inventory } = useUserStore();
+  const { holdings } = useMarketStore();
+  const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
+  /* 
+    Properties: Includes all real estate types from BelongingsModal 
+    ('ranch' was missing in previous version)
+  */
   const propertiesValue = inventory
-    .filter(i => i.type === 'penthouse' || i.type === 'mansion' || i.type === 'villa' || i.type === 'estate' || i.type === 'yali' || i.type === 'castle' || i.type === 'chalet' || i.type === 'island' || i.type === 'marina' || i.type === 'land' || i.type === 'apartment' || i.type === 'townhouse' || i.type === 'lodge' || i.type === 'camp' || i.type === 'riad' || i.type === 'resort' || i.type === 'house' || i.type === 'suite' || i.type === 'vineyard')
+    .filter(i => [
+      'penthouse', 'mansion', 'villa', 'estate', 'apartment', 'yali',
+      'house', 'land', 'ranch', 'chalet', 'vineyard', 'townhouse',
+      'lodge', 'camp', 'riad', 'resort', 'suite', 'castle', 'island', 'marina'
+    ].includes(i.type))
     .reduce((acc, item) => acc + item.price, 0);
 
+  /* 
+    Vehicles: Includes Cars, Aircrafts, and Marine 
+  */
   const vehiclesValue = inventory
-    .filter(i => i.type === 'car' || i.type === 'plane' || i.type === 'helicopter' || i.type === 'jet' || i.type === 'yacht' || i.type === 'submarine' || i.type === 'boat' || i.type === 'cruise_ship' || i.type === 'ship')
+    .filter(i => [
+      'car',
+      'plane', 'helicopter', 'jet',
+      'yacht', 'boat', 'submarine', 'ship', 'cruise_ship'
+    ].includes(i.type))
     .reduce((acc, item) => acc + item.price, 0);
 
+  /* 
+    Belongings: Includes Artifacts, Weapons, and Jewelry 
+    ('art', 'antique', 'weapon', 'jewel' were missing)
+  */
   const belongingsValue = inventory
-    .filter(i => i.type === 'ring' || i.type === 'watch' || i.type === 'necklace' || i.type === 'gem' || i.type === 'brooch' || i.type === 'bracelet' || i.type === 'tiara' || i.type === 'earrings' || i.type === 'watch_jewelry' || i.type === 'artifact')
+    .filter(i => [
+      'art', 'antique', 'artifact',
+      'weapon',
+      'ring', 'watch', 'gem', 'necklace', 'bracelet', 'tiara',
+      'earrings', 'brooch', 'watch_jewelry', 'jewel'
+    ].includes(i.type))
     .reduce((acc, item) => acc + item.price, 0);
 
   const nextMove = (() => {
@@ -112,11 +138,16 @@ const AssetsScreen = () => {
           <View style={styles.summaryRow}>
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Net Worth</Text>
-              <Text style={styles.summaryValue}>{formatMoney(netWorth + propertiesValue + vehiclesValue + belongingsValue)}</Text>
+              <Text style={styles.summaryValue}>{formatMoney(netWorth + propertiesValue + vehiclesValue + belongingsValue + investmentsValue)}</Text>
 
               <View style={{ marginTop: theme.spacing.md }}>
                 <Text style={styles.summaryLabel}>Cash</Text>
                 <Text style={styles.summaryValue}>${money.toLocaleString()}</Text>
+              </View>
+
+              <View style={{ marginTop: theme.spacing.md }}>
+                <Text style={styles.summaryLabel}>Investments</Text>
+                <Text style={styles.summaryValue}>{formatMoney(investmentsValue)}</Text>
               </View>
             </View>
 

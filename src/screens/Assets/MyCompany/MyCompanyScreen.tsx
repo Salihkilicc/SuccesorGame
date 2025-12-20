@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -7,14 +7,17 @@ import {
   Text,
   View,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {theme} from '../../../theme';
-import {useStatsStore} from '../../../store';
-import type {AssetsStackParamList} from '../../../navigation';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { theme } from '../../../theme';
+import { useStatsStore } from '../../../store';
+import type { AssetsStackParamList } from '../../../navigation';
 import RAndDModal from '../../../components/MyCompany/Actions/RAndDModal';
 import AcquireStartupModal from '../../../components/MyCompany/Actions/AcquireStartupModal';
+import FactoriesModule from '../../../components/MyCompany/Management/FactoriesModule';
+import EmployeesModule from '../../../components/MyCompany/Management/EmployeesModule';
+import ProductHub from '../../../components/MyCompany/Products/ProductHub';
 
 const formatMoney = (value: number) => {
   const absolute = Math.abs(value);
@@ -41,14 +44,14 @@ type InfoRowProps = {
   tone?: 'danger' | 'success';
 };
 
-const InfoRow = ({label, value, tone}: InfoRowProps) => (
+const InfoRow = ({ label, value, tone }: InfoRowProps) => (
   <View style={styles.infoRow}>
     <Text style={styles.infoLabel}>{label}</Text>
     <Text
       style={[
         styles.infoValue,
-        tone === 'danger' && {color: theme.colors.danger},
-        tone === 'success' && {color: theme.colors.success},
+        tone === 'danger' && { color: theme.colors.danger },
+        tone === 'success' && { color: theme.colors.success },
       ]}>
       {value}
     </Text>
@@ -62,13 +65,13 @@ type InvestmentRowProps = {
   onPress: () => void;
 };
 
-const InvestmentRow = ({icon, title, description, onPress}: InvestmentRowProps) => (
+const InvestmentRow = ({ icon, title, description, onPress }: InvestmentRowProps) => (
   <Pressable
     onPress={onPress}
-    style={({pressed}) => [styles.investmentRow, pressed && styles.rowPressed]}>
+    style={({ pressed }) => [styles.investmentRow, pressed && styles.rowPressed]}>
     <View style={styles.investmentLabel}>
       <Text style={styles.investmentIcon}>{icon}</Text>
-      <View style={{gap: theme.spacing.xs}}>
+      <View style={{ gap: theme.spacing.xs }}>
         <Text style={styles.investmentTitle}>{title}</Text>
         <Text style={styles.investmentDescription}>{description}</Text>
       </View>
@@ -84,7 +87,7 @@ type ModalCardProps = {
   children: React.ReactNode;
 };
 
-const ModalCard = ({visible, title, onClose, children}: ModalCardProps) => (
+const ModalCard = ({ visible, title, onClose, children }: ModalCardProps) => (
   <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.modalBackdrop}>
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose}>
@@ -95,7 +98,7 @@ const ModalCard = ({visible, title, onClose, children}: ModalCardProps) => (
           <Text style={styles.modalTitle}>{title}</Text>
           <Pressable
             onPress={onClose}
-            style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+            style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
             <Text style={styles.closeCircleText}>×</Text>
           </Pressable>
         </View>
@@ -111,11 +114,11 @@ type OverlayActionRowProps = {
   onPress: () => void;
 };
 
-const OverlayActionRow = ({title, description, onPress}: OverlayActionRowProps) => (
+const OverlayActionRow = ({ title, description, onPress }: OverlayActionRowProps) => (
   <Pressable
     onPress={onPress}
-    style={({pressed}) => [styles.overlayAction, pressed && styles.rowPressed]}>
-    <View style={{gap: theme.spacing.xs}}>
+    style={({ pressed }) => [styles.overlayAction, pressed && styles.rowPressed]}>
+    <View style={{ gap: theme.spacing.xs }}>
       <Text style={styles.actionTitle}>{title}</Text>
       <Text style={styles.actionDescription}>{description}</Text>
     </View>
@@ -129,11 +132,11 @@ type BigCardButtonProps = {
   onPress: () => void;
 };
 
-const BigCardButton = ({title, description, onPress}: BigCardButtonProps) => (
+const BigCardButton = ({ title, description, onPress }: BigCardButtonProps) => (
   <Pressable
     onPress={onPress}
-    style={({pressed}) => [styles.bigCard, pressed && styles.bigCardPressed]}>
-    <View style={{gap: theme.spacing.xs}}>
+    style={({ pressed }) => [styles.bigCard, pressed && styles.bigCardPressed]}>
+    <View style={{ gap: theme.spacing.xs }}>
       <Text style={styles.bigCardTitle}>{title}</Text>
       <Text style={styles.bigCardDescription}>{description}</Text>
     </View>
@@ -166,9 +169,8 @@ const MyCompanyScreen = () => {
   const [isRndVisible, setRndVisible] = useState(false);
   const [isAcquireVisible, setAcquireVisible] = useState(false);
   const [isExpertVisible, setExpertVisible] = useState(false);
-  const [employeeMorale, setEmployeeMorale] = useState(72);
-  const [factoryLevel, setFactoryLevel] = useState(1);
-  const [productionCapacity, setProductionCapacity] = useState(120);
+  const [isFactoriesVisible, setFactoriesVisible] = useState(false);
+  const [isEmployeesVisible, setEmployeesVisible] = useState(false);
 
   const playerStake = useMemo(
     () => shareholders.find(holder => holder.type === 'player')?.percentage ?? 0,
@@ -183,24 +185,12 @@ const MyCompanyScreen = () => {
     setExpertVisible(false);
   };
 
-  const adjustMorale = (delta: number) => {
-    setEmployeeMorale(current => {
-      const next = Math.max(0, Math.min(100, current + delta));
-      return next;
-    });
-    console.log('Employees morale adjusted (placeholder)');
-  };
 
-  const handleFactoryTuning = () => {
-    setFactoryLevel(level => level + 1);
-    setProductionCapacity(cap => cap + 25);
-    console.log('Factory tuning placeholder');
-  };
 
   return (
     <View style={styles.safeArea}>
       <ScrollView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         contentContainerStyle={[
           styles.content,
           {
@@ -214,7 +204,7 @@ const MyCompanyScreen = () => {
             onPress={() => {
               if (navigation.canGoBack()) navigation.goBack();
             }}
-            style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+            style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
             <Text style={styles.backIcon}>←</Text>
           </Pressable>
           <View style={styles.titleGroup}>
@@ -227,7 +217,7 @@ const MyCompanyScreen = () => {
           <Text style={styles.financialLabel}>Financials</Text>
           <Pressable
             onPress={() => setDebtModalVisible(true)}
-            style={({pressed}) => [styles.debtPill, pressed && styles.pillPressed]}>
+            style={({ pressed }) => [styles.debtPill, pressed && styles.pillPressed]}>
             <Text style={styles.debtText}>Debts</Text>
             <Text style={styles.debtValue}>{formatMoney(companyDebtTotal)}</Text>
           </Pressable>
@@ -238,7 +228,7 @@ const MyCompanyScreen = () => {
             <Text style={styles.sharesLabel}>Shares</Text>
             <Pressable
               onPress={() => setSharesVisible(true)}
-              style={({pressed}) => [styles.expand, pressed && styles.expandPressed]}>
+              style={({ pressed }) => [styles.expand, pressed && styles.expandPressed]}>
               <Text style={styles.expandText}>Expand ↗</Text>
             </Pressable>
           </View>
@@ -301,6 +291,11 @@ const MyCompanyScreen = () => {
           />
         </View>
 
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Products</Text>
+        </View>
+        <ProductHub />
+
         <View style={styles.bottomRow}>
           <BigCardButton
             title="Share Control"
@@ -319,7 +314,7 @@ const MyCompanyScreen = () => {
         visible={isDebtModalVisible}
         title="Debts"
         onClose={() => setDebtModalVisible(false)}>
-        <View style={{gap: theme.spacing.sm}}>
+        <View style={{ gap: theme.spacing.sm }}>
           <Text style={styles.modalBodyText}>Total Debt: {formatMoney(companyDebtTotal)}</Text>
           <Text style={styles.modalSubText}>Monthly payments (placeholder)</Text>
         </View>
@@ -341,7 +336,7 @@ const MyCompanyScreen = () => {
         </View>
         <Pressable
           onPress={() => setSharesVisible(false)}
-          style={({pressed}) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
+          style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
           <Text style={styles.closeButtonText}>Close</Text>
         </Pressable>
       </ModalCard>
@@ -350,8 +345,8 @@ const MyCompanyScreen = () => {
         visible={isExpertVisible}
         title="Expert Advice"
         onClose={() => setExpertVisible(false)}>
-        <View style={{gap: theme.spacing.md}}>
-          <View style={{gap: theme.spacing.xs}}>
+        <View style={{ gap: theme.spacing.md }}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.modalBodyText}>
               You can ask an expert to review your company and portfolio.
             </Text>
@@ -360,12 +355,12 @@ const MyCompanyScreen = () => {
           <View style={styles.modalButtonRow}>
             <Pressable
               onPress={() => setExpertVisible(false)}
-              style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+              style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
               <Text style={styles.secondaryButtonText}>Cancel</Text>
             </Pressable>
             <Pressable
               onPress={handleExpertPay}
-              style={({pressed}) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
+              style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
               <Text style={styles.primaryButtonText}>Pay &amp; Ask</Text>
             </Pressable>
           </View>
@@ -376,7 +371,7 @@ const MyCompanyScreen = () => {
         visible={isShareControlVisible}
         title="Share Control"
         onClose={() => setShareControlVisible(false)}>
-        <View style={{gap: theme.spacing.md}}>
+        <View style={{ gap: theme.spacing.md }}>
           <OverlayActionRow
             title="Dilution / New Shareholders"
             description="Issue new shares and bring in new investors."
@@ -396,7 +391,7 @@ const MyCompanyScreen = () => {
           />
           <Pressable
             onPress={() => setShareControlVisible(false)}
-            style={({pressed}) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
+            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
             <Text style={styles.closeButtonText}>Close</Text>
           </Pressable>
         </View>
@@ -406,56 +401,43 @@ const MyCompanyScreen = () => {
         visible={isManagementVisible}
         title="Company Management"
         onClose={() => setManagementVisible(false)}>
-        <View style={{gap: theme.spacing.md}}>
+        <View style={{ gap: theme.spacing.lg }}>
           <Pressable
-            onPress={handleFactoryTuning}
-            style={({pressed}) => [styles.managementRow, pressed && styles.rowPressed]}>
-            <View style={{gap: theme.spacing.xs}}>
-              <Text style={styles.actionTitle}>🏭 Factories &amp; Production</Text>
-              <Text style={styles.actionDescription}>
-                Adjust production capacity and efficiency.
-              </Text>
-              <Text style={styles.managementMeta}>
-                Level {factoryLevel} • Capacity {productionCapacity} units
-              </Text>
+            onPress={() => {
+              setManagementVisible(false);
+              setTimeout(() => setFactoriesVisible(true), 300);
+            }}
+            style={({ pressed }) => [styles.managementRow, pressed && styles.rowPressed]}>
+            <View style={{ gap: theme.spacing.xs }}>
+              <Text style={styles.actionTitle}>🏭 Factories & Production</Text>
+              <Text style={styles.actionDescription}>Manage infrastructure.</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
           </Pressable>
 
-          <View style={styles.employeesBlock}>
-            <View style={{gap: theme.spacing.xs}}>
-              <Text style={styles.actionTitle}>👥 Employees &amp; Morale</Text>
-              <Text style={styles.actionDescription}>
-                Adjust salaries, bonuses, and morale.
-              </Text>
-              <Text style={styles.managementMeta}>Current morale: {employeeMorale}%</Text>
+          <Pressable
+            onPress={() => {
+              setManagementVisible(false);
+              setTimeout(() => setEmployeesVisible(true), 300);
+            }}
+            style={({ pressed }) => [styles.managementRow, pressed && styles.rowPressed]}>
+            <View style={{ gap: theme.spacing.xs }}>
+              <Text style={styles.actionTitle}>👥 Employees & Morale</Text>
+              <Text style={styles.actionDescription}>Manage workforce.</Text>
             </View>
-            <View style={styles.moraleActions}>
-              <Pressable
-                onPress={() => adjustMorale(-6)}
-                style={({pressed}) => [styles.chipButton, pressed && styles.chipButtonPressed]}>
-                <Text style={styles.chipText}>Cut Costs</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => adjustMorale(0)}
-                style={({pressed}) => [styles.chipButton, pressed && styles.chipButtonPressed]}>
-                <Text style={styles.chipText}>Keep Stable</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => adjustMorale(5)}
-                style={({pressed}) => [styles.chipButton, pressed && styles.chipButtonPressed]}>
-                <Text style={styles.chipText}>Give Bonuses</Text>
-              </Pressable>
-            </View>
-          </View>
+            <Text style={styles.chevron}>›</Text>
+          </Pressable>
 
           <Pressable
             onPress={() => setManagementVisible(false)}
-            style={({pressed}) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
+            <Text style={styles.closeButtonText}>Close Management</Text>
           </Pressable>
         </View>
       </ModalCard>
+
+      <FactoriesModule visible={isFactoriesVisible} onClose={() => setFactoriesVisible(false)} />
+      <EmployeesModule visible={isEmployeesVisible} onClose={() => setEmployeesVisible(false)} />
 
       <RAndDModal visible={isRndVisible} onClose={() => setRndVisible(false)} />
       <AcquireStartupModal
@@ -494,7 +476,7 @@ const styles = StyleSheet.create({
   },
   backButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   backIcon: {
     color: theme.colors.textPrimary,
@@ -573,7 +555,7 @@ const styles = StyleSheet.create({
   },
   expandPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   expandText: {
     color: theme.colors.textSecondary,
@@ -698,7 +680,7 @@ const styles = StyleSheet.create({
   },
   bigCardPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.99}],
+    transform: [{ scale: 0.99 }],
   },
   bigCardTitle: {
     color: theme.colors.textPrimary,
@@ -753,7 +735,7 @@ const styles = StyleSheet.create({
   },
   closeCirclePressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.96}],
+    transform: [{ scale: 0.96 }],
   },
   closeCircleText: {
     color: theme.colors.textSecondary,
@@ -800,7 +782,7 @@ const styles = StyleSheet.create({
   },
   closeButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   closeButtonText: {
     color: theme.colors.textSecondary,
@@ -822,7 +804,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   secondaryButtonText: {
     color: theme.colors.textSecondary,
@@ -837,7 +819,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   primaryButtonText: {
     color: theme.colors.textPrimary,
@@ -867,7 +849,7 @@ const styles = StyleSheet.create({
   },
   rowPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.99}],
+    transform: [{ scale: 0.99 }],
   },
   managementRow: {
     backgroundColor: theme.colors.cardSoft,
@@ -907,7 +889,7 @@ const styles = StyleSheet.create({
   },
   chipButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   chipText: {
     color: theme.colors.textPrimary,
@@ -916,6 +898,6 @@ const styles = StyleSheet.create({
   },
   pillPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
 });
