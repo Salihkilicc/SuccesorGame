@@ -48,6 +48,16 @@ export interface TechLevels {
   future: number;
 }
 
+export interface SubsidiaryState {
+  id: string;
+  name: string;
+  marketCap: number;
+  baseProfit: number; // Original profit when acquired
+  currentProfit: number; // Current monthly profit (can be negative)
+  isLossMaking: boolean; // True if currently failing
+  initialPurchasePrice: number; // Price paid when acquiring the company
+}
+
 // --- State Definitions ---
 
 export type Acquisitions = string[];
@@ -57,6 +67,7 @@ export type StatsState = Record<StatKey, number> & {
   salaryTier: 'low' | 'average' | 'above_average';
   techLevels: TechLevels;
   acquisitions: Acquisitions;
+  subsidiaryStates: Record<string, SubsidiaryState>; // Track subsidiary performance
   isPublic: boolean;
 };
 
@@ -76,7 +87,7 @@ type StatsStore = StatsState & {
   setShareholders: (list: Shareholder[]) => void;
   setSalaryTier: (tier: 'low' | 'average' | 'above_average') => void;
   setTechLevel: (category: keyof TechLevels, level: number) => void;
-  addAcquisition: (id: string) => void;
+  addAcquisition: (id: string, companyData: { name: string; marketCap: number; profit: number }) => void;
   setIsPublic: (value: boolean) => void;
   performIPO: () => void;
   performStockSplit: () => void;
@@ -135,6 +146,7 @@ export const initialStatsState: StatsState = {
     future: 1,
   },
   acquisitions: [], // Ensure this is initialized
+  subsidiaryStates: {}, // Track subsidiary performance
   shareholders: [
     { id: 'player', name: 'Player', type: 'player', percentage: 51, avatar: 'P' },
     {
@@ -287,11 +299,32 @@ export const useStatsStore = create<StatsStore>()(
           return { ...nextState, ...financials };
         }),
 
-      addAcquisition: (id) =>
-        set(state => ({
-          ...state,
-          acquisitions: [...state.acquisitions, id],
-        })),
+      addAcquisition: (id, companyData) =>
+        set(state => {
+          const purchasePrice = companyData.marketCap * 1.15; // Assume 15% premium
+
+          const subsidiaryState: SubsidiaryState = {
+            id,
+            name: companyData.name,
+            marketCap: companyData.marketCap,
+            baseProfit: companyData.profit,
+            currentProfit: companyData.profit,
+            isLossMaking: false,
+            initialPurchasePrice: purchasePrice,
+          };
+
+          // Ensure acquisitions is an array (handle legacy state)
+          const currentAcquisitions = Array.isArray(state.acquisitions) ? state.acquisitions : [];
+
+          return {
+            ...state,
+            acquisitions: [...currentAcquisitions, id],
+            subsidiaryStates: {
+              ...state.subsidiaryStates,
+              [id]: subsidiaryState,
+            },
+          };
+        }),
 
       setIsPublic: (value) => set(state => {
         const nextState = { ...state, isPublic: value } as StatsStore;
@@ -413,11 +446,49 @@ export const useStatsStore = create<StatsStore>()(
             acquisitions: state.acquisitions
           });
 
-          // 2. Recalculate Financials (Reads updated Revenue from Product Store)
+          // 2. Simulate Subsidiary Performance (RNG Logic)
+          const updatedSubsidiaries: Record<string, SubsidiaryState> = {};
+          let subsidiaryNetProfit = 0;
+
+          Object.values(state.subsidiaryStates).forEach(sub => {
+            const roll = Math.random() * 100;
+            let newSub = { ...sub };
+
+            if (!sub.isLossMaking) {
+              // Healthy Company: 7% chance to fail
+              if (roll < 7) {
+                newSub.isLossMaking = true;
+                newSub.currentProfit = -sub.marketCap * 0.02; // 2% of market cap as loss
+                console.log(`⚠️ Warning: ${sub.name} is failing due to mismanagement!`);
+              }
+            } else {
+              // Failing Company: 25% chance to recover
+              if (roll < 25) {
+                newSub.isLossMaking = false;
+                newSub.currentProfit = sub.baseProfit; // Restore to original profit
+                console.log(`✅ ${sub.name} has recovered and is profitable again.`);
+              }
+            }
+
+            updatedSubsidiaries[sub.id] = newSub;
+            subsidiaryNetProfit += newSub.currentProfit;
+          });
+
+          // 3. Recalculate Financials (Reads updated Revenue from Product Store + Subsidiary Profit)
           const financials = recalculateFinancials(state as StatsStore);
 
-          // Feedback Loop
-          const profit = financials.companyRevenueMonthly - financials.companyExpensesMonthly;
+          // Add subsidiary profit to revenue (or subtract if loss)
+          const adjustedRevenue = financials.companyRevenueMonthly + Math.max(0, subsidiaryNetProfit);
+          const adjustedExpenses = financials.companyExpensesMonthly + Math.max(0, -subsidiaryNetProfit);
+
+          const updatedFinancials = {
+            ...financials,
+            companyRevenueMonthly: adjustedRevenue,
+            companyExpensesMonthly: adjustedExpenses,
+          };
+
+          // 4. Feedback Loop
+          const profit = updatedFinancials.companyRevenueMonthly - updatedFinancials.companyExpensesMonthly;
           let moraleDelta = 0;
 
           if (profit > 0) moraleDelta += 1;
@@ -429,14 +500,15 @@ export const useStatsStore = create<StatsStore>()(
           const nextMorale = Math.max(0, Math.min(100, state.employeeMorale + moraleDelta));
 
           let updates: Partial<StatsState> = {
-            ...financials,
-            employeeMorale: nextMorale
+            ...updatedFinancials,
+            employeeMorale: nextMorale,
+            subsidiaryStates: updatedSubsidiaries,
           };
 
-          // Stock price volatility if public
+          // 5. Stock price volatility if public
           if (state.isPublic) {
-            const profitMargin = financials.companyRevenueMonthly > 0
-              ? profit / financials.companyRevenueMonthly
+            const profitMargin = updatedFinancials.companyRevenueMonthly > 0
+              ? profit / updatedFinancials.companyRevenueMonthly
               : -0.1;
 
             // Base change on performance (-10% to +10%)
@@ -447,8 +519,8 @@ export const useStatsStore = create<StatsStore>()(
             priceChangePercent += newsFactor;
 
             // Apply change to Share Price & Value
-            const newPrice = financials.companySharePrice * (1 + priceChangePercent / 100);
-            const newValue = financials.companyValue * (1 + priceChangePercent / 100);
+            const newPrice = updatedFinancials.companySharePrice * (1 + priceChangePercent / 100);
+            const newValue = updatedFinancials.companyValue * (1 + priceChangePercent / 100);
 
             updates = {
               ...updates,

@@ -111,7 +111,11 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                     setStatusMessage('Deal Closed! Transferring assets...'); // ... rest same                 // Finalize after short delay
                     setTimeout(() => {
                         setField('companyCapital', companyCapital - offer);
-                        addAcquisition(company.id);
+                        addAcquisition(company.id, {
+                            name: company.name,
+                            marketCap: company.marketCap,
+                            profit: company.profit,
+                        });
                         onSuccess();
                     }, 1500);
                 }

@@ -16,6 +16,7 @@ import { useProductStore } from '../../../store/useProductStore';
 import type { AssetsStackParamList } from '../../../navigation';
 import RAndDModal from '../../../components/MyCompany/Actions/RAndDModal';
 import AcquireStartupModal from '../../../components/MyCompany/Actions/AcquireStartupModal';
+import ExistingCompaniesModal from '../../../components/MyCompany/Actions/ExistingCompaniesModal';
 import FactoriesModule from '../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../components/MyCompany/Management/EmployeesModule';
 import ProductHub from '../../../components/MyCompany/Products/ProductHub';
@@ -228,6 +229,7 @@ const MyCompanyScreen = () => {
     visible: false,
   });
   const [isAcquireVisible, setAcquireVisible] = useState(false);
+  const [isExistingCompaniesVisible, setExistingCompaniesVisible] = useState(false);
   const [isExpertVisible, setExpertVisible] = useState(false);
   const [isFactoriesVisible, setFactoriesVisible] = useState(false);
   const [isEmployeesVisible, setEmployeesVisible] = useState(false);
@@ -338,8 +340,8 @@ const MyCompanyScreen = () => {
           <InvestmentRow
             icon="🏢"
             title="Existing Companies"
-            description="View and manage your current portfolio."
-            onPress={() => console.log('Open existing companies management')}
+            description="Manage subsidiaries"
+            onPress={() => setExistingCompaniesVisible(true)}
           />
           <InvestmentRow
             icon="🧠"
@@ -521,10 +523,10 @@ const MyCompanyScreen = () => {
       <EmployeesModule visible={isEmployeesVisible} onClose={() => setEmployeesVisible(false)} />
 
       <RAndDModal visible={isRndVisible} onClose={() => setRndVisible(false)} />
-      <AcquireStartupModal
-        visible={isAcquireVisible}
-        onClose={() => setAcquireVisible(false)}
-      />
+      <AcquireStartupModal visible={isAcquireVisible} onClose={() => setAcquireVisible(false)} />
+
+      {/* Existing Companies Modal */}
+      <ExistingCompaniesModal visible={isExistingCompaniesVisible} onClose={() => setExistingCompaniesVisible(false)} />
 
       {/* Root Level Modals */}
       {activeShareholder && (
