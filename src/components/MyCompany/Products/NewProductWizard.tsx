@@ -6,73 +6,147 @@ import {
     Pressable,
     Modal,
     FlatList,
+    Alert,
 } from 'react-native';
 import { theme } from '../../../theme';
 import { useProductManagement } from './useProductManagement';
-import { useProductStore, PRODUCT_TYPES, DEFAULT_SUPPLIERS } from '../../../store/useProductStore';
+import { useProductStore, DEFAULT_SUPPLIERS } from '../../../store/useProductStore';
+import { useStatsStore, TechLevels } from '../../../store/useStatsStore';
 
 interface Props {
     visible: boolean;
     onClose: () => void;
 }
 
+// Map custom types to base types for supplier logic
+const TYPE_MAPPING: Record<string, string> = {
+    'Electronic Accessories': 'Electronics', // Maps to cheap electronics
+    'MyPhone': 'Smartphones', // Will need specific handling
+    'MyPad': 'Tablets',
+    'MyMac': 'Laptops',
+    'MyWatch': 'Wearables',
+    'MyPods': 'Audio',
+    'MyCar': 'Automotive',
+    'MyVision': 'VR',
+};
+
 // Fixed market data for each product type
 const MARKET_DATA: Record<string, { demand: number; competition: number }> = {
+    'Electronic Accessories': { demand: 85, competition: 90 }, // High Demand, High Comp
+    'MyPhone': { demand: 60, competition: 80 }, // Start mid demand, high comp
+    'MyPad': { demand: 70, competition: 70 },
+    'MyMac': { demand: 75, competition: 65 },
+    'MyWatch': { demand: 65, competition: 60 },
+    'MyPods': { demand: 80, competition: 65 },
+    'MyCar': { demand: 95, competition: 85 },
+    'MyVision': { demand: 88, competition: 50 },
     'Electronics': { demand: 75, competition: 65 },
-    'Clothing': { demand: 80, competition: 70 },
-    'Food & Beverage': { demand: 85, competition: 60 },
-    'Furniture': { demand: 60, competition: 50 },
-    'Cosmetics': { demand: 70, competition: 75 },
-    'Toys': { demand: 65, competition: 55 },
-    'Sports Equipment': { demand: 55, competition: 60 },
-    'Books & Media': { demand: 50, competition: 45 },
 };
+
+interface ProductDef {
+    id: string;
+    label: string;
+    type: string;
+    req?: { category: keyof TechLevels; level: number };
+    estCost: string;
+    capacityWeight: number;
+}
+
+const PRODUCT_DEFINITIONS: ProductDef[] = [
+    { id: 'accessories', label: 'Electronic Accessories', type: 'Electronic Accessories', estCost: '$5-$15', capacityWeight: 1 },
+    { id: 'myphone', label: 'MyPhone', type: 'MyPhone', req: { category: 'hardware', level: 1 }, estCost: '$250-$400', capacityWeight: 2 }, // Actually Lvl 1 is start, so practically unlocked
+    { id: 'mypad', label: 'MyPad', type: 'MyPad', req: { category: 'hardware', level: 2 }, estCost: '$150-$250', capacityWeight: 3 },
+    { id: 'mymac', label: 'MyMac', type: 'MyMac', req: { category: 'hardware', level: 3 }, estCost: '$400-$700', capacityWeight: 5 },
+    { id: 'mywatch', label: 'MyWatch', type: 'MyWatch', req: { category: 'hardware', level: 4 }, estCost: '$50-$100', capacityWeight: 1 },
+    { id: 'mypods', label: 'MyPods', type: 'MyPods', req: { category: 'hardware', level: 4 }, estCost: '$30-$60', capacityWeight: 1 },
+    { id: 'mycar', label: 'MyCar', type: 'MyCar', req: { category: 'future', level: 2 }, estCost: '$25k-$35k', capacityWeight: 50 },
+    { id: 'myvision', label: 'MyVision', type: 'MyVision', req: { category: 'future', level: 3 }, estCost: '$1.5k-$2.5k', capacityWeight: 5 },
+];
 
 const NewProductWizard = ({ visible, onClose }: Props) => {
     // ALL HOOKS MUST BE CALLED FIRST, UNCONDITIONALLY
     const [step, setStep] = useState(1);
-    const [selectedType, setSelectedType] = useState<string | null>(null);
+    const [selectedDef, setSelectedDef] = useState<ProductDef | null>(null);
     const [marketResearched, setMarketResearched] = useState(false);
 
     const productManagement = useProductManagement();
     const addProduct = useProductStore((state) => state.addProduct);
+    const { techLevels, companyCapital, setField } = useStatsStore();
 
     // NOW we can use the values
     const availableCapacity = productManagement.availableCapacity;
-    const currentMarketData = selectedType ? MARKET_DATA[selectedType] : null;
+    const currentMarketData = selectedDef ? MARKET_DATA[selectedDef.type] || MARKET_DATA['Electronics'] : null;
 
-    const handleSelectType = (type: string) => {
-        setSelectedType(type);
+    const handleSelectProduct = (def: ProductDef) => {
+        // Check requirement
+        if (def.req) {
+            const currentLevel = techLevels[def.req.category] || 0;
+            if (currentLevel < def.req.level) {
+                Alert.alert(
+                    'Investment Required',
+                    `Research ${def.req.category.charAt(0).toUpperCase() + def.req.category.slice(1)} Level ${def.req.level} to unlock ${def.label}.`
+                );
+                return;
+            }
+        }
+
+        setSelectedDef(def);
         setMarketResearched(false);
         setStep(2);
     };
 
     const handleMarketSearch = () => {
-        if (!selectedType) return;
+        if (!selectedDef) return;
+
+        if (companyCapital < 50_000) {
+            Alert.alert('Insufficient Funds', 'You need $50,000 for market research.');
+            return;
+        }
+
+        setField('companyCapital', companyCapital - 50_000);
         setMarketResearched(true);
     };
 
     const handleLaunch = () => {
-        if (!selectedType) return;
+        if (!selectedDef) return;
 
         const tempId = `product_${Date.now()}`;
-        const defaultSupplier = DEFAULT_SUPPLIERS[selectedType][0];
-        const marketData = MARKET_DATA[selectedType] || { demand: 50, competition: 50 };
+
+        // Resolve Supplier
+        // Use mapping or fallback to 'Electronics'
+        const baseType = TYPE_MAPPING[selectedDef.type] || 'Electronics';
+        const suppliers = DEFAULT_SUPPLIERS[baseType] || DEFAULT_SUPPLIERS['Electronics'];
+        let defaultSupplier = { ...suppliers[0] };
+
+        // Apply ChipMaster effect (10% cost reduction)
+        const { acquisitions } = useStatsStore.getState();
+        if (acquisitions.chipMaster) {
+            defaultSupplier.cost = Math.floor(defaultSupplier.cost * 0.9);
+        }
+
+        const marketData = currentMarketData || { demand: 50, competition: 50 };
+
+        // Apply MyAI Integration effect (Demand Boost)
+        let finalDemand = marketData.demand;
+        if (techLevels.software >= 3) {
+            finalDemand = Math.min(100, finalDemand + 15);
+        }
 
         const newProduct = {
             id: tempId,
-            name: `New ${selectedType}`,
-            type: selectedType,
+            name: selectedDef.label,
+            type: selectedDef.type,
             supplier: defaultSupplier,
             production: {
-                allocated: Math.min(1000, availableCapacity),
+                allocated: 0, // Start with 0 allocation
                 capacity: availableCapacity,
+                weight: selectedDef.capacityWeight || 1, // Add weight here
             },
             pricing: {
-                salePrice: defaultSupplier.cost * 2.5,
+                salePrice: defaultSupplier.cost * 2.0, // Conservative start
             },
             market: {
-                demand: marketData.demand,
+                demand: finalDemand,
                 competition: marketData.competition,
                 researched: true,
             },
@@ -84,17 +158,22 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
         handleClose();
     };
 
-    const handleCancelProduct = () => {
+    const handleBack = () => {
         setStep(1);
-        setSelectedType(null);
+        setSelectedDef(null);
         setMarketResearched(false);
     };
 
     const handleClose = () => {
         setStep(1);
-        setSelectedType(null);
+        setSelectedDef(null);
         setMarketResearched(false);
         onClose();
+    };
+
+    const isLocked = (def: ProductDef) => {
+        if (!def.req) return false;
+        return techLevels[def.req.category] < def.req.level;
     };
 
     return (
@@ -115,32 +194,69 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                     <View style={styles.body}>
                         {step === 1 && (
                             <View style={styles.stepContainer}>
-                                <Text style={styles.stepTitle}>Select Product Type</Text>
+                                <Text style={styles.stepTitle}>Select Product</Text>
                                 <FlatList
-                                    data={PRODUCT_TYPES}
-                                    keyExtractor={(item) => item}
+                                    data={PRODUCT_DEFINITIONS}
+                                    keyExtractor={(item) => item.id}
                                     numColumns={2}
                                     contentContainerStyle={styles.typeGrid}
-                                    renderItem={({ item }) => (
-                                        <Pressable
-                                            onPress={() => handleSelectType(item)}
-                                            style={({ pressed }) => [
-                                                styles.typeCard,
-                                                pressed && styles.typeCardPressed,
-                                            ]}>
-                                            <Text style={styles.typeText}>{item}</Text>
-                                        </Pressable>
-                                    )}
+                                    renderItem={({ item }) => {
+                                        const locked = isLocked(item);
+                                        const isActiveOwned = productManagement.products.some(
+                                            p => p.type === item.type && p.status === 'active'
+                                        );
+
+                                        return (
+                                            <Pressable
+                                                onPress={() => {
+                                                    if (isActiveOwned) {
+                                                        Alert.alert('Limit Reached', 'You already have an active product line of this type. Please retire the existing one to launch a new version.');
+                                                        return;
+                                                    }
+                                                    handleSelectProduct(item)
+                                                }}
+                                                disabled={locked}
+                                                style={({ pressed }) => [
+                                                    styles.typeCard,
+                                                    (locked || isActiveOwned) && styles.typeCardLocked,
+                                                    isActiveOwned && styles.typeCardOwned, // New style
+                                                    pressed && !locked && !isActiveOwned && styles.typeCardPressed,
+                                                ]}>
+                                                <View style={styles.cardHeader}>
+                                                    <Text style={[styles.typeText, (locked || isActiveOwned) && styles.typeTextLocked]}>
+                                                        {item.label}
+                                                    </Text>
+                                                    {isActiveOwned && (
+                                                        <View style={styles.activeBadge}>
+                                                            <Text style={styles.activeBadgeText}>ACTIVE</Text>
+                                                        </View>
+                                                    )}
+                                                </View>
+
+                                                {(!locked && !isActiveOwned) && (
+                                                    <View style={{ marginTop: 4, alignItems: 'center' }}>
+                                                        <Text style={styles.estCostText}>Cost: {item.estCost}</Text>
+                                                        <Text style={styles.capWeightText}>🏭 Cap: {item.capacityWeight}x</Text>
+                                                    </View>
+                                                )}
+
+                                                {locked && (
+                                                    <Text style={styles.lockInfo}>
+                                                        🔒 Req: {item.req?.category} Lv{item.req?.level}
+                                                    </Text>
+                                                )}
+                                            </Pressable>
+                                        );
+                                    }}
                                 />
                             </View>
                         )}
 
-                        {step === 2 && (
+                        {step === 2 && selectedDef && (
                             <View style={styles.stepContainer}>
-                                <Text style={styles.stepTitle}>Market Research Required</Text>
+                                <Text style={styles.stepTitle}>Market Research: {selectedDef.label}</Text>
                                 <Text style={styles.stepDescription}>
-                                    Before launching {selectedType}, you must perform market research to
-                                    understand demand and competition.
+                                    Analyze the market demand and competition for {selectedDef.label}.
                                 </Text>
                                 <View style={styles.costCard}>
                                     <Text style={styles.costLabel}>Research Cost</Text>
@@ -148,17 +264,29 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                 </View>
 
                                 {!marketResearched ? (
-                                    <Pressable
-                                        onPress={handleMarketSearch}
-                                        style={({ pressed }) => [
-                                            styles.btn,
-                                            styles.btnPrimary,
-                                            pressed && styles.btnPressed,
-                                        ]}>
-                                        <Text style={[styles.btnText, { color: '#000' }]}>
-                                            Perform Market Search
-                                        </Text>
-                                    </Pressable>
+                                    <View style={styles.buttonRow}>
+                                        <Pressable
+                                            onPress={handleBack}
+                                            style={({ pressed }) => [
+                                                styles.btn,
+                                                styles.btnSecondary,
+                                                pressed && styles.btnPressed,
+                                            ]}>
+                                            <Text style={styles.btnText}>Back</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={handleMarketSearch}
+                                            style={({ pressed }) => [
+                                                styles.btn,
+                                                styles.btnPrimary,
+                                                pressed && styles.btnPressed,
+                                                { flex: 2 }
+                                            ]}>
+                                            <Text style={[styles.btnText, { color: '#000' }]}>
+                                                Perform Analysis
+                                            </Text>
+                                        </Pressable>
+                                    </View>
                                 ) : (
                                     <>
                                         <View style={styles.marketResultsCard}>
@@ -198,14 +326,14 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
 
                                         <View style={styles.buttonRow}>
                                             <Pressable
-                                                onPress={handleCancelProduct}
+                                                onPress={handleBack}
                                                 style={({ pressed }) => [
                                                     styles.btn,
                                                     styles.btnSecondary,
                                                     pressed && styles.btnPressed,
                                                 ]}>
                                                 <Text style={styles.btnText}>
-                                                    Look for Another Product
+                                                    Back
                                                 </Text>
                                             </Pressable>
 
@@ -299,19 +427,67 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: theme.spacing.xs / 2,
         borderWidth: 1,
-        borderColor: theme.colors.border,
+        borderColor: theme.colors.accent,
         minHeight: 80,
         justifyContent: 'center',
+    },
+    typeCardLocked: {
+        backgroundColor: theme.colors.background,
+        borderColor: theme.colors.border,
+        opacity: 0.6,
     },
     typeCardPressed: {
         backgroundColor: theme.colors.card,
         transform: [{ scale: 0.96 }],
     },
     typeText: {
-        fontSize: 13,
-        fontWeight: '600',
+        fontSize: 14,
+        fontWeight: '700',
         color: theme.colors.textPrimary,
         textAlign: 'center',
+    },
+    typeTextLocked: {
+        color: theme.colors.textSecondary,
+    },
+    estCostText: {
+        fontSize: 11,
+        color: theme.colors.textSecondary,
+    },
+    capWeightText: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: theme.colors.textMuted,
+        marginTop: 2,
+    },
+    typeCardOwned: {
+        opacity: 0.6,
+        borderColor: theme.colors.success,
+        borderWidth: 1,
+    },
+    cardHeader: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    activeBadge: {
+        backgroundColor: theme.colors.success + '20',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        marginTop: 4,
+        borderWidth: 1,
+        borderColor: theme.colors.success,
+    },
+    activeBadgeText: {
+        fontSize: 9,
+        fontWeight: '800',
+        color: theme.colors.success,
+        textTransform: 'uppercase',
+    },
+    lockInfo: {
+        fontSize: 10,
+        color: theme.colors.textSecondary,
+        marginTop: 4,
+        fontStyle: 'italic',
     },
     costCard: {
         backgroundColor: theme.colors.cardSoft,
@@ -385,7 +561,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     btnPrimary: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
     },
     btnSuccess: {
         flex: 1,

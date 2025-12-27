@@ -16,6 +16,7 @@ export interface Product {
     production: {
         allocated: number;
         capacity: number;
+        weight?: number; // Capacity units per item. Default 1.
     };
     pricing: {
         salePrice: number;
@@ -91,7 +92,14 @@ interface ProductActions {
     addProduct: (product: Product) => void;
     updateProduct: (id: string, updates: Partial<Product>) => void;
     retireProduct: (id: string) => void;
+    processMonthlySales: (context: SalesContext) => void;
     reset: () => void;
+}
+
+export interface SalesContext {
+    morale: number;
+    techLevels: { hardware: number; software: number; future: number };
+    acquisitions: string[];
 }
 
 export const initialProductState: ProductState = {
@@ -114,7 +122,53 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 })),
             retireProduct: (id) =>
                 set((state) => ({
-                    products: state.products.filter((p) => p.id !== id),
+                    products: state.products.map((p) =>
+                        p.id === id ? { ...p, status: 'retired' } : p
+                    ),
+                })),
+            processMonthlySales: (context) =>
+                set((state) => ({
+                    products: state.products.map((product) => {
+                        if (product.status !== 'active') return product;
+
+                        // Logic imported from useProductManagement
+                        const { morale, techLevels, acquisitions } = context;
+                        let production = product.production.allocated;
+
+                        // Shipping issue event (20% if morale < 40)
+                        // We could store events if we want, but for now just updating revenue
+                        if (morale < 40 && Math.random() < 0.2) {
+                            production = Math.floor(production * 0.9);
+                        }
+
+                        // Tech Bonus for Price Factor
+                        const qualityBonus = product.supplier.quality / 100; // 0-1
+                        const competitionPenalty = product.market.competition / 200; // 0-0.5
+                        const optimalMultiplier = techLevels.software >= 3 ? 2.5 : 2.0;
+                        const priceRatio = product.pricing.salePrice / (product.supplier.cost * optimalMultiplier);
+
+                        const priceFactor = Math.max(0.1, qualityBonus - competitionPenalty - Math.abs(1 - priceRatio) * 0.3);
+
+                        // Base Sales
+                        let maxSales = product.market.demand * priceFactor;
+
+                        // Acquisition Bonuses
+                        if (Array.isArray(acquisitions)) {
+                            if (acquisitions.includes('streamify') && (product.type === 'MyPhone' || product.type === 'MyPods')) {
+                                maxSales *= 1.15;
+                            }
+                            if (acquisitions.includes('gameGen') && (product.type === 'MyMac' || product.type === 'MyPad')) {
+                                maxSales *= 1.15;
+                            }
+                        }
+
+                        const unitsSold = Math.floor(Math.min(production, maxSales));
+                        const revenue = unitsSold * product.pricing.salePrice;
+
+                        // Update product market data occasionally? (Competition/Demand shifts)
+                        // For now, just update revenue
+                        return { ...product, revenue };
+                    })
                 })),
             reset: () => set(() => ({ ...initialProductState })),
         }),

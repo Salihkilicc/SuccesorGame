@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from '../storage/persist';
+import { useProductStore } from './useProductStore';
 
 export type StatKey =
   | 'charisma'
@@ -28,18 +29,35 @@ export type StatKey =
   | 'factoryCount'
   | 'employeeCount'
   | 'employeeMorale'
-  | 'productionCapacity';
+  | 'productionCapacity'
+  | 'stockSplitCount';
 
 export interface Shareholder {
   id: string;
   name: string;
   type: 'player' | 'family' | 'investor';
   percentage: number;
+  relationship?: number; // 0-100, only for non-player
+  avatar?: string;
+  bio?: string;
 }
+
+export interface TechLevels {
+  hardware: number;
+  software: number;
+  future: number;
+}
+
+// --- State Definitions ---
+
+export type Acquisitions = string[];
 
 export type StatsState = Record<StatKey, number> & {
   shareholders: Shareholder[];
   salaryTier: 'low' | 'average' | 'above_average';
+  techLevels: TechLevels;
+  acquisitions: Acquisitions;
+  isPublic: boolean;
 };
 
 type StatsStore = StatsState & {
@@ -57,9 +75,29 @@ type StatsStore = StatsState & {
   setCasinoReputation: (value: number) => void;
   setShareholders: (list: Shareholder[]) => void;
   setSalaryTier: (tier: 'low' | 'average' | 'above_average') => void;
+  setTechLevel: (category: keyof TechLevels, level: number) => void;
+  addAcquisition: (id: string) => void;
+  setIsPublic: (value: boolean) => void;
+  performIPO: () => void;
+  performStockSplit: () => void;
+  updateShareholderRelationship: (id: string, delta: number) => void;
+  performDilution: (percentage: number) => void;
+  performBuyback: (percentage: number) => void;
+  payDividend: (percentage: number) => void;
   processCompanyMonthlyTick: () => void;
+  borrowCapital: (amount: number, interestRate: number) => void;
+  repayCapital: (amount: number) => void;
   reset: () => void;
 };
+
+// --- Financial Constants ---
+const SALARY_TIERS = {
+  low: 3000,
+  average: 5000,
+  above_average: 8000
+};
+const FACTORY_COST_MONTHLY = 50_000;
+const BASE_SHARES = 10_000_000;
 
 export const initialStatsState: StatsState = {
   charisma: 50,
@@ -74,28 +112,129 @@ export const initialStatsState: StatsState = {
   luck: 55,
   riskApetite: 60,
   strategicSense: 60,
-  companyDebt: 8_400_000,
-  companyDebtTotal: 8_400_000,
+  companyDebt: 0,
+  companyDebtTotal: 0,
   companyOwnership: 72,
   companyValue: 18_600_000,
   companySharePrice: 120.5,
-  companyDailyChange: 2.1,
+  companyDailyChange: 0,
   casinoReputation: 0,
-  companyRevenueMonthly: 1_200_000,
-  companyExpensesMonthly: 620_000,
-  companyCapital: 4_800_000,
+  companyRevenueMonthly: 0,
+  companyExpensesMonthly: 0,
+  companyCapital: 100_000_000_000, // 100 Billion for M&A testing
   factoryCount: 1,
-  employeeCount: 300,
+  employeeCount: 20,
   employeeMorale: 75,
   salaryTier: 'average',
   productionCapacity: 1000,
+  stockSplitCount: 0,
+  isPublic: false,
+  techLevels: {
+    hardware: 1,
+    software: 1,
+    future: 1,
+  },
+  acquisitions: [], // Ensure this is initialized
   shareholders: [
-    { id: 'player', name: 'Player', type: 'player', percentage: 65 },
-    { id: 'family', name: 'Family', type: 'family', percentage: 15 },
-    { id: 'investor-a', name: 'Investor A', type: 'investor', percentage: 7 },
-    { id: 'investor-b', name: 'Investor B', type: 'investor', percentage: 3 },
-    { id: 'investor-c', name: 'Investor C', type: 'investor', percentage: 10 },
+    { id: 'player', name: 'Player', type: 'player', percentage: 51, avatar: 'P' },
+    {
+      id: 'family',
+      name: 'Uncle Sam',
+      type: 'family',
+      percentage: 10,
+      relationship: 90,
+      avatar: 'U',
+      bio: 'Your supportive uncle who provided the initial seed funding. He trusts you completely.'
+    },
+    {
+      id: 'partner',
+      name: 'Jessica (Partner)',
+      type: 'family',
+      percentage: 5,
+      relationship: 100,
+      avatar: 'J',
+      bio: 'Your life partner and confidant. She supports your vision but worries about the risks.'
+    },
+    {
+      id: 'vp',
+      name: 'Angel Investor Mike',
+      type: 'investor',
+      percentage: 14,
+      relationship: 65,
+      avatar: 'M',
+      bio: 'An early-stage tech investor looking for the next unicorn. Impatient but wealthy.'
+    },
+    {
+      id: 'vc_small',
+      name: 'Nebula VC',
+      type: 'investor',
+      percentage: 10,
+      relationship: 45,
+      avatar: 'N',
+      bio: 'A mid-tier venture firm focused on rapid growth. They push for aggressive expansion.'
+    },
+    {
+      id: 'vc_big',
+      name: 'BlackRock VC',
+      type: 'investor',
+      percentage: 10,
+      relationship: 30,
+      avatar: 'B',
+      bio: 'A global investment giant. They care only about returns and have zero patience for failure.'
+    },
   ],
+};
+
+// --- Helper: Recalculate Financials ---
+const recalculateFinancials = (currentState: StatsStore) => {
+  const {
+    employeeCount,
+    salaryTier,
+    factoryCount,
+    companyDebtTotal,
+    companyCapital,
+    isPublic,
+    techLevels,
+    stockSplitCount
+  } = currentState;
+
+  // 1. Calculate Expenses
+  const salaryCost = employeeCount * SALARY_TIERS[salaryTier];
+  let factoryCost = factoryCount * FACTORY_COST_MONTHLY;
+
+  // ChipMaster Bonus: Reduces production costs
+  if (Array.isArray(currentState.acquisitions) && currentState.acquisitions.includes('chipMaster')) {
+    factoryCost *= 0.9;
+  }
+
+  const debtInterest = (companyDebtTotal * 0.05) / 12; // Approx 5% annual interest base
+  const totalExpenses = salaryCost + factoryCost + debtInterest;
+
+  // 2. Calculate Revenue (from Product Store)
+  const productState = useProductStore.getState();
+  const activeProducts = productState.products.filter(p => p.status === 'active');
+  const totalRevenue = activeProducts.reduce((sum, p) => sum + p.revenue, 0);
+
+  // 3. Calculate Valuation
+  // Multiplier Logic: Base 3x, Public 15x, +1 for each Tech Level
+  const techBonus = techLevels.hardware + techLevels.software + techLevels.future;
+  const multiplier = (isPublic ? 15 : 3) + techBonus;
+
+  // Annualized Revenue * Multiplier + Cash
+  const valuation = (totalRevenue * 12 * multiplier) + companyCapital;
+
+  // 4. Calculate Share Price
+  // Adjust base shares for splits
+  const currentTotalShares = BASE_SHARES * Math.pow(10, stockSplitCount);
+  const sharePrice = Math.max(0.01, valuation / currentTotalShares);
+
+  // Return partial state update
+  return {
+    companyExpensesMonthly: totalExpenses,
+    companyRevenueMonthly: totalRevenue,
+    companyValue: valuation,
+    companySharePrice: sharePrice
+  };
 };
 
 export const useStatsStore = create<StatsStore>()(
@@ -118,15 +257,167 @@ export const useStatsStore = create<StatsStore>()(
         set(state => ({ ...state, companyRevenueMonthly: value })),
       setCompanyExpensesMonthly: value =>
         set(state => ({ ...state, companyExpensesMonthly: value })),
-      setCompanyCapital: value => set(state => ({ ...state, companyCapital: value })),
+
+      // Hook into setCompanyCapital to trigger updates? 
+      // Doing it explicitly in actions is safer to avoid loops.
+      setCompanyCapital: value => set(state => {
+        const nextState = { ...state, companyCapital: value } as StatsStore;
+        // Recalculate usually happens on month tick, but cash changes affect valuation immediately
+        const financials = recalculateFinancials(nextState);
+        return { ...nextState, ...financials };
+      }),
+
       setCasinoReputation: value =>
         set(state => ({ ...state, casinoReputation: value })),
       setShareholders: list => set(state => ({ ...state, shareholders: list })),
-      setSalaryTier: tier => set(state => ({ ...state, salaryTier: tier })),
+
+      setSalaryTier: tier => set(state => {
+        const nextState = { ...state, salaryTier: tier } as StatsStore;
+        const financials = recalculateFinancials(nextState);
+        return { ...nextState, ...financials };
+      }),
+
+      setTechLevel: (category, level) =>
+        set(state => {
+          const nextState = {
+            ...state,
+            techLevels: { ...state.techLevels, [category]: level },
+          } as StatsStore;
+          const financials = recalculateFinancials(nextState);
+          return { ...nextState, ...financials };
+        }),
+
+      addAcquisition: (id) =>
+        set(state => ({
+          ...state,
+          acquisitions: [...state.acquisitions, id],
+        })),
+
+      setIsPublic: (value) => set(state => {
+        const nextState = { ...state, isPublic: value } as StatsStore;
+        const financials = recalculateFinancials(nextState);
+        return { ...nextState, ...financials };
+      }),
+
+      performIPO: () =>
+        set(state => {
+          if (state.isPublic) return state; // Already public
+
+          // 1. Valuation increases by 40% (Liquidity Premium)
+          const valuationIncrease = state.companyValue * 0.4;
+          const newValuation = state.companyValue + valuationIncrease;
+
+          // 2. Add 15% of NEW Valuation to Company Cash
+          const cashInjection = newValuation * 0.15;
+
+          const nextState = {
+            ...state,
+            isPublic: true,
+            companyValue: newValuation,
+            companyCapital: state.companyCapital + cashInjection,
+          } as StatsStore;
+
+          // Perform full recalculation to sync everything
+          const financials = recalculateFinancials(nextState);
+
+          return { ...nextState, ...financials };
+        }),
+
+      performStockSplit: () =>
+        set(state => {
+          if (state.companySharePrice <= 1000) return state; // Only split if > $1000
+
+          const nextState = {
+            ...state,
+            stockSplitCount: state.stockSplitCount + 1,
+          } as StatsStore;
+
+          const financials = recalculateFinancials(nextState);
+          return { ...nextState, ...financials };
+        }),
+
+      updateShareholderRelationship: (id, delta) =>
+        set(state => ({
+          ...state,
+          shareholders: state.shareholders.map(sh =>
+            sh.id === id && sh.type !== 'player'
+              ? { ...sh, relationship: Math.max(0, Math.min(100, (sh.relationship || 50) + delta)) }
+              : sh
+          ),
+        })),
+      performDilution: (percentage) =>
+        set(state => {
+          const capitalRaised = state.companyValue * (percentage / 100);
+          const newOwnership = state.companyOwnership * (1 - percentage / 100);
+
+          // Share Price drops by 3% (Supply increase)
+          const newSharePrice = state.companySharePrice * 0.97;
+
+          return {
+            ...state,
+            companyCapital: state.companyCapital + capitalRaised,
+            companyOwnership: newOwnership,
+            companySharePrice: newSharePrice,
+            shareholders: state.shareholders.map(s => {
+              if (s.type === 'player') return { ...s, percentage: newOwnership };
+              return s;
+            }),
+          };
+        }),
+      performBuyback: (percentage) =>
+        set(state => {
+          const cost = state.companyValue * (percentage / 100);
+          if (state.companyCapital < cost) return state;
+
+          const multiplier = 1 / (1 - (percentage / 100));
+          const preciseNewOwnership = Math.min(100, state.companyOwnership * multiplier);
+
+          // Share Price increases by 4% (Demand increase)
+          const newSharePrice = state.companySharePrice * 1.04;
+
+          return {
+            ...state,
+            companyCapital: state.companyCapital - cost,
+            companyOwnership: preciseNewOwnership,
+            companySharePrice: newSharePrice,
+            shareholders: state.shareholders.map(s => {
+              if (s.type === 'player') return { ...s, percentage: preciseNewOwnership };
+              return s;
+            }),
+          };
+        }),
+      payDividend: (percentage) =>
+        set(state => {
+          const dividendPool = state.companyCapital * (percentage / 100);
+          const playerOwnership = state.companyOwnership / 100;
+          const playerDividend = dividendPool * playerOwnership;
+
+          // Share Price increases by 2% (Happy investors)
+          const newSharePrice = state.companySharePrice * 1.02;
+
+          return {
+            ...state,
+            companyCapital: state.companyCapital - dividendPool,
+            money: state.money + playerDividend,
+            companySharePrice: newSharePrice,
+          };
+        }),
+
       processCompanyMonthlyTick: () =>
         set(state => {
+          // 1. Process Product Sales (Updates Product Store Revenue)
+          // We pass current store state as context for the sales logic
+          useProductStore.getState().processMonthlySales({
+            morale: state.employeeMorale,
+            techLevels: state.techLevels,
+            acquisitions: state.acquisitions
+          });
+
+          // 2. Recalculate Financials (Reads updated Revenue from Product Store)
+          const financials = recalculateFinancials(state as StatsStore);
+
           // Feedback Loop
-          const profit = state.companyRevenueMonthly - state.companyExpensesMonthly;
+          const profit = financials.companyRevenueMonthly - financials.companyExpensesMonthly;
           let moraleDelta = 0;
 
           if (profit > 0) moraleDelta += 1;
@@ -137,12 +428,69 @@ export const useStatsStore = create<StatsStore>()(
 
           const nextMorale = Math.max(0, Math.min(100, state.employeeMorale + moraleDelta));
 
-          // Production Error Penalty (Morale < 40)
-          // Just logging it for now or we could reduce revenue slightly
-          // but avoiding complex temporary modifiers to keep it simple.
+          let updates: Partial<StatsState> = {
+            ...financials,
+            employeeMorale: nextMorale
+          };
 
-          return { ...state, employeeMorale: nextMorale };
+          // Stock price volatility if public
+          if (state.isPublic) {
+            const profitMargin = financials.companyRevenueMonthly > 0
+              ? profit / financials.companyRevenueMonthly
+              : -0.1;
+
+            // Base change on performance (-10% to +10%)
+            let priceChangePercent = profitMargin * 10;
+
+            // Add random news factor (-5% to +5%)
+            const newsFactor = (Math.random() - 0.5) * 10;
+            priceChangePercent += newsFactor;
+
+            // Apply change to Share Price & Value
+            const newPrice = financials.companySharePrice * (1 + priceChangePercent / 100);
+            const newValue = financials.companyValue * (1 + priceChangePercent / 100);
+
+            updates = {
+              ...updates,
+              companySharePrice: newPrice,
+              companyValue: newValue,
+              companyDailyChange: priceChangePercent,
+            };
+          }
+
+          return { ...state, ...updates };
         }),
+
+      borrowCapital: (amount, interestRate) =>
+        set(state => {
+          // Interest is handled in recalculateFinancials based on TotalDebt
+          // But here we need to update Capital and Debt first
+          const nextState = {
+            ...state,
+            companyCapital: state.companyCapital + amount,
+            companyDebtTotal: state.companyDebtTotal + amount,
+            companyDebt: state.companyDebt + amount,
+          } as StatsStore;
+
+          const financials = recalculateFinancials(nextState);
+          return { ...nextState, ...financials };
+        }),
+
+      repayCapital: (amount) =>
+        set(state => {
+          if (state.companyDebtTotal <= 0) return state;
+
+          const nextState = {
+            ...state,
+            companyCapital: state.companyCapital - amount,
+            companyDebtTotal: state.companyDebtTotal - amount,
+            companyDebt: state.companyDebt - amount,
+          } as StatsStore;
+
+          const financials = recalculateFinancials(nextState);
+          return { ...nextState, ...financials };
+        }),
+
       reset: () => set(() => ({ ...initialStatsState })),
     }),
     {
@@ -174,6 +522,10 @@ export const useStatsStore = create<StatsStore>()(
         employeeMorale: state.employeeMorale,
         salaryTier: state.salaryTier,
         productionCapacity: state.productionCapacity,
+        techLevels: state.techLevels,
+        acquisitions: state.acquisitions,
+        isPublic: state.isPublic,
+        stockSplitCount: state.stockSplitCount,
       }),
     },
   ),

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Modal,
   Pressable,
@@ -12,12 +12,26 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store';
+import { useProductStore } from '../../../store/useProductStore';
 import type { AssetsStackParamList } from '../../../navigation';
 import RAndDModal from '../../../components/MyCompany/Actions/RAndDModal';
 import AcquireStartupModal from '../../../components/MyCompany/Actions/AcquireStartupModal';
 import FactoriesModule from '../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../components/MyCompany/Management/EmployeesModule';
 import ProductHub from '../../../components/MyCompany/Products/ProductHub';
+import ShareControlHub from '../../../components/MyCompany/Shares/ShareControlHub';
+import BoardMembersModal from '../../../components/MyCompany/Shares/BoardMembersModal';
+import ShareNegotiationModal from '../../../components/MyCompany/Shares/ShareNegotiationModal';
+import ShareholderProfileModal from '../../../components/MyCompany/Shares/ShareholderProfileModal';
+import GiftSelectionModal from '../../../components/MyCompany/Shares/GiftSelectionModal';
+import IPOWarningModal from '../../../components/MyCompany/Shares/IPOWarningModal';
+import DilutionModal from '../../../components/MyCompany/Shares/DilutionModal';
+import DividendModal from '../../../components/MyCompany/Shares/DividendModal';
+import BuybackModal from '../../../components/MyCompany/Shares/BuybackModal';
+import { Shareholder } from '../../../store/useStatsStore';
+import CorporateFinanceHubModal from '../../../components/MyCompany/Finance/CorporateFinanceHubModal';
+import BorrowModal from '../../../components/MyCompany/Finance/BorrowModal';
+import RepayModal from '../../../components/MyCompany/Finance/RepayModal';
 
 const formatMoney = (value: number) => {
   const absolute = Math.abs(value);
@@ -152,21 +166,67 @@ const MyCompanyScreen = () => {
   const insets = useSafeAreaInsets();
   const {
     shareholders,
+    isPublic,
+    companyValue,
     companySharePrice,
+    companyDailyChange,
     companyRevenueMonthly,
     companyExpensesMonthly,
     companyCapital,
+    companyDebt,
     companyDebtTotal,
-    companyValue,
+    companyOwnership, // Player's %
+    productionCapacity,
+    factoryCount,
+    employeeCount,
     money,
     setField,
+    setCompanyCapital,
+    borrowCapital,
+    repayCapital,
   } = useStatsStore();
 
+  // TEMPORARY: Force update capital for M&A testing
+  useEffect(() => {
+    if (companyCapital < 100_000_000_000) {
+      setCompanyCapital(100_000_000_000);
+    }
+  }, []);
+
+  const { products } = useProductStore();
+  // Root Level Interaction State
+  const [activeShareholder, setActiveShareholder] = useState<Shareholder | null>(null);
+  const [profileShareholder, setProfileShareholder] = useState<Shareholder | null>(null);
+  const [activeAction, setActiveAction] = useState<'gift' | 'negotiate' | null>(null);
+
+  const handleOpenGift = (shareholder: Shareholder) => {
+    setActiveShareholder(shareholder);
+    setActiveAction('gift');
+  };
+
+  const handleOpenNegotiate = (shareholder: Shareholder) => {
+    setActiveShareholder(shareholder);
+    setActiveAction('negotiate');
+  };
+
+  // Share Control Sub-Modal State
+  const [activeShareAction, setActiveShareAction] = useState<'ipo' | 'dilution' | 'dividend' | 'buyback' | null>(null);
+
   const [isDebtModalVisible, setDebtModalVisible] = useState(false);
-  const [isSharesVisible, setSharesVisible] = useState(false);
+  const [isBoardMembersVisible, setBoardMembersVisible] = useState(false);
   const [isShareControlVisible, setShareControlVisible] = useState(false);
   const [isManagementVisible, setManagementVisible] = useState(false);
   const [isRndVisible, setRndVisible] = useState(false);
+
+  // Finance Sub-Modal State
+  const [borrowConfig, setBorrowConfig] = useState<{ visible: boolean; type: string; rate: number }>({
+    visible: false,
+    type: '',
+    rate: 0,
+  });
+  const [repayConfig, setRepayConfig] = useState<{ visible: boolean }>({
+    visible: false,
+  });
   const [isAcquireVisible, setAcquireVisible] = useState(false);
   const [isExpertVisible, setExpertVisible] = useState(false);
   const [isFactoriesVisible, setFactoriesVisible] = useState(false);
@@ -184,8 +244,6 @@ const MyCompanyScreen = () => {
     console.log('Expert advice granted (placeholder)');
     setExpertVisible(false);
   };
-
-
 
   return (
     <View style={styles.safeArea}>
@@ -227,12 +285,12 @@ const MyCompanyScreen = () => {
           <View style={styles.sharesHeader}>
             <Text style={styles.sharesLabel}>Shares</Text>
             <Pressable
-              onPress={() => setSharesVisible(true)}
+              onPress={() => setBoardMembersVisible(true)}
               style={({ pressed }) => [styles.expand, pressed && styles.expandPressed]}>
-              <Text style={styles.expandText}>Expand ↗</Text>
+              <Text style={styles.expandText}>Board Members ↗</Text>
             </Pressable>
           </View>
-          <Text style={styles.stakeValue}>Your stake: {playerStake}%</Text>
+          <Text style={styles.stakeValue}>Your stake: {playerStake.toFixed(1)}%</Text>
           <Text style={styles.stakeHint}>
             Anchored by family and seasoned investors. Tap to see full list.
           </Text>
@@ -310,36 +368,68 @@ const MyCompanyScreen = () => {
         </View>
       </ScrollView>
 
-      <ModalCard
+      <CorporateFinanceHubModal
         visible={isDebtModalVisible}
-        title="Debts"
-        onClose={() => setDebtModalVisible(false)}>
-        <View style={{ gap: theme.spacing.sm }}>
-          <Text style={styles.modalBodyText}>Total Debt: {formatMoney(companyDebtTotal)}</Text>
-          <Text style={styles.modalSubText}>Monthly payments (placeholder)</Text>
-        </View>
-      </ModalCard>
+        onClose={() => setDebtModalVisible(false)}
+        onSelectLoan={(type, rate) => {
+          // Close Hub, Open Borrow Modal
+          setDebtModalVisible(false);
+          setBorrowConfig({ visible: true, type, rate });
+        }}
+        onSelectRepay={() => {
+          // Close Hub, Open Repay Modal
+          setDebtModalVisible(false);
+          setRepayConfig({ visible: true });
+        }}
+      />
 
-      <ModalCard
-        visible={isSharesVisible}
-        title="Shareholders"
-        onClose={() => setSharesVisible(false)}>
-        <View style={styles.shareholderList}>
-          {shareholders.map(holder => (
-            <View key={holder.id} style={styles.shareholderRow}>
-              <Text style={styles.shareholderName}>
-                {holder.type === 'player' ? 'You' : holder.name}
-              </Text>
-              <Text style={styles.shareholderValue}>{holder.percentage}%</Text>
-            </View>
-          ))}
-        </View>
-        <Pressable
-          onPress={() => setSharesVisible(false)}
-          style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </Pressable>
-      </ModalCard>
+      {/* Corporate Finance Sub-Modals */}
+      {borrowConfig.visible && (
+        <BorrowModal
+          visible={borrowConfig.visible}
+          type={borrowConfig.type}
+          rate={borrowConfig.rate}
+          maxLimit={Math.max(10_000_000, companyRevenueMonthly * 5)}
+          onClose={() => {
+            setBorrowConfig({ ...borrowConfig, visible: false });
+            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+          }}
+          onConfirm={(amount) => {
+            borrowCapital(amount, borrowConfig.rate);
+            setBorrowConfig({ ...borrowConfig, visible: false });
+            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+          }}
+        />
+      )}
+
+      {repayConfig.visible && (
+        <RepayModal
+          visible={repayConfig.visible}
+          totalDebt={companyDebtTotal}
+          cash={companyCapital}
+          onClose={() => {
+            setRepayConfig({ ...repayConfig, visible: false });
+            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+          }}
+          onRepay={(amount) => {
+            repayCapital(amount);
+            setRepayConfig({ ...repayConfig, visible: false });
+            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+          }}
+        />
+      )}
+
+      <BoardMembersModal
+        visible={isBoardMembersVisible}
+        onClose={() => setBoardMembersVisible(false)}
+        onSelectMember={(member) => {
+          setBoardMembersVisible(false);
+          // Small delay to allow fade out
+          setTimeout(() => {
+            setProfileShareholder(member);
+          }, 300);
+        }}
+      />
 
       <ModalCard
         visible={isExpertVisible}
@@ -367,35 +457,26 @@ const MyCompanyScreen = () => {
         </View>
       </ModalCard>
 
-      <ModalCard
+      <ShareControlHub
         visible={isShareControlVisible}
-        title="Share Control"
-        onClose={() => setShareControlVisible(false)}>
-        <View style={{ gap: theme.spacing.md }}>
-          <OverlayActionRow
-            title="Dilution / New Shareholders"
-            description="Issue new shares and bring in new investors."
-            onPress={() =>
-              console.log('Dilution placeholder: will change shareholders in future')
-            }
-          />
-          <OverlayActionRow
-            title="Buyback"
-            description="Buy back your own shares to increase your stake."
-            onPress={() => console.log('Buyback placeholder')}
-          />
-          <OverlayActionRow
-            title="IPO / Go Public"
-            description="Take the company public and unlock new possibilities."
-            onPress={() => console.log('IPO placeholder')}
-          />
-          <Pressable
-            onPress={() => setShareControlVisible(false)}
-            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </Pressable>
-        </View>
-      </ModalCard>
+        onClose={() => setShareControlVisible(false)}
+        onOpenIPO={() => {
+          setShareControlVisible(false);
+          setTimeout(() => setActiveShareAction('ipo'), 300);
+        }}
+        onOpenDilution={() => {
+          setShareControlVisible(false);
+          setTimeout(() => setActiveShareAction('dilution'), 300);
+        }}
+        onOpenDividend={() => {
+          setShareControlVisible(false);
+          setTimeout(() => setActiveShareAction('dividend'), 300);
+        }}
+        onOpenBuyback={() => {
+          setShareControlVisible(false);
+          setTimeout(() => setActiveShareAction('buyback'), 300);
+        }}
+      />
 
       <ModalCard
         visible={isManagementVisible}
@@ -443,6 +524,70 @@ const MyCompanyScreen = () => {
       <AcquireStartupModal
         visible={isAcquireVisible}
         onClose={() => setAcquireVisible(false)}
+      />
+
+      {/* Root Level Modals */}
+      {activeShareholder && (
+        <>
+          <GiftSelectionModal
+            visible={activeAction === 'gift'}
+            shareholder={activeShareholder}
+            onClose={() => setActiveAction(null)}
+          />
+          <ShareNegotiationModal
+            visible={activeAction === 'negotiate'}
+            shareholder={activeShareholder}
+            onClose={() => setActiveAction(null)}
+          />
+        </>
+      )}
+
+      {profileShareholder && (
+        <ShareholderProfileModal
+          visible={!!profileShareholder}
+          shareholder={profileShareholder}
+          onClose={() => {
+            setProfileShareholder(null);
+            // Small delay to allow fade out
+            setTimeout(() => {
+              setBoardMembersVisible(true);
+            }, 300);
+          }}
+          onOpenGift={(shareholder) => {
+            setProfileShareholder(null);
+            setBoardMembersVisible(false);
+            setTimeout(() => {
+              setActiveShareholder(shareholder);
+              setActiveAction('gift');
+            }, 300);
+          }}
+          onOpenNegotiate={(shareholder) => {
+            setProfileShareholder(null);
+            setBoardMembersVisible(false);
+            setTimeout(() => {
+              setActiveShareholder(shareholder);
+              setActiveAction('negotiate');
+            }, 300);
+          }}
+        />
+      )}
+
+      {/* Share Control Sub-Modals */}
+      <IPOWarningModal
+        visible={activeShareAction === 'ipo'}
+        onClose={() => setActiveShareAction(null)}
+      />
+      <DilutionModal
+        visible={activeShareAction === 'dilution'}
+        onClose={() => setActiveShareAction(null)}
+      />
+      <DividendModal
+        visible={activeShareAction === 'dividend'}
+        onClose={() => setActiveShareAction(null)}
+      />
+      <BuybackModal
+        visible={activeShareAction === 'buyback'}
+        onClose={() => setActiveShareAction(null)}
       />
     </View>
   );

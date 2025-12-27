@@ -11,7 +11,7 @@ export const useProductManagement = () => {
     // Calculate available capacity
     const usedCapacity = products
         .filter((p) => p.status === 'active')
-        .reduce((sum, p) => sum + p.production.allocated, 0);
+        .reduce((sum, p) => sum + (p.production.allocated * (p.production.weight || 1)), 0);
     const availableCapacity = productionCapacity - usedCapacity;
 
     // Generate random suppliers with RNG logic
@@ -73,6 +73,7 @@ export const useProductManagement = () => {
         revenue: number;
         events: string[];
     } => {
+        const { acquisitions } = useStatsStore.getState();
         const events: string[] = [];
         let production = product.production.allocated;
 
@@ -94,7 +95,16 @@ export const useProductManagement = () => {
 
         // Calculate sales
         const priceFactor = calculatePriceFactor(product);
-        const maxSales = product.market.demand * priceFactor;
+        let maxSales = product.market.demand * priceFactor;
+
+        // Apply Acquisition Bonuses
+        if (acquisitions.streamify && (product.type === 'MyPhone' || product.type === 'MyPods')) {
+            maxSales *= 1.15; // 15% boost
+        }
+        if (acquisitions.gameGen && (product.type === 'MyMac' || product.type === 'MyPad')) {
+            maxSales *= 1.15; // 15% boost
+        }
+
         const unitsSold = Math.min(production, maxSales);
         const revenue = unitsSold * product.pricing.salePrice;
 
@@ -103,9 +113,16 @@ export const useProductManagement = () => {
 
     // Helper: Calculate price factor based on quality and competition
     const calculatePriceFactor = (product: Product): number => {
+        const { techLevels } = useStatsStore.getState();
+
         const qualityBonus = product.supplier.quality / 100; // 0-1
         const competitionPenalty = product.market.competition / 200; // 0-0.5
-        const priceRatio = product.pricing.salePrice / (product.supplier.cost * 2); // Optimal is 2x cost
+
+        // Base Price Ratio (Optimal is 2x cost)
+        // If Software Lvl 3 (MyAI), optimal price is higher (e.g. 2.5x)
+        const optimalMultiplier = techLevels.software >= 3 ? 2.5 : 2.0;
+
+        const priceRatio = product.pricing.salePrice / (product.supplier.cost * optimalMultiplier);
 
         return Math.max(0.1, qualityBonus - competitionPenalty - Math.abs(1 - priceRatio) * 0.3);
     };
