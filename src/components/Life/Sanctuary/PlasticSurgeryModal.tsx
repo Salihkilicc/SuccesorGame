@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store/useStatsStore';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
 
 type PlasticSurgeryModalProps = {
     visible: boolean;
@@ -87,123 +89,65 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
     };
 
     return (
-        <Modal
+        <GameModal
             visible={visible}
-            transparent
-            animationType="slide"
-            onRequestClose={onClose}>
-            <View style={styles.overlay}>
+            onClose={onClose}
+            title="PLASTIC SURGERY"
+            subtitle="Redefine Yourself. At a Cost."
+        >
+            {/* SELECTION STAGE */}
+            {stage === 'selection' && (
+                <>
+                    <ScrollView contentContainerStyle={styles.listContent}>
+                        {PROCEDURES.map((proc) => (
+                            <Pressable
+                                key={proc.name}
+                                style={({ pressed }) => [styles.procItem, pressed && styles.procItemPressed]}
+                                onPress={() => handleSelect(proc)}
+                            >
+                                <Text style={styles.procName}>{proc.name}</Text>
+                                <Text style={styles.procCost}>${proc.cost.toLocaleString()}</Text>
+                            </Pressable>
+                        ))}
+                    </ScrollView>
+                    <GameButton title="Cancel" variant="secondary" onPress={onClose} />
+                </>
+            )}
 
-                {/* SELECTION STAGE */}
-                {stage === 'selection' && (
-                    <View style={styles.container}>
-                        <Text style={styles.headerTitle}>PLASTIC SURGERY</Text>
-                        <Text style={styles.headerSubtitle}>Redefine Yourself. At a Cost.</Text>
-
-                        <ScrollView contentContainerStyle={styles.listContent}>
-                            {PROCEDURES.map((proc) => (
-                                <Pressable
-                                    key={proc.name}
-                                    style={({ pressed }) => [styles.procItem, pressed && styles.procItemPressed]}
-                                    onPress={() => handleSelect(proc)}
-                                >
-                                    <Text style={styles.procName}>{proc.name}</Text>
-                                    <Text style={styles.procCost}>${proc.cost.toLocaleString()}</Text>
-                                </Pressable>
-                            ))}
-                        </ScrollView>
-
-                        <Pressable onPress={onClose} style={styles.closeButton}>
-                            <Text style={styles.closeButtonText}>Cancel</Text>
-                        </Pressable>
+            {/* WARNING STAGE */}
+            {stage === 'warning' && (
+                <View style={styles.warningContent}>
+                    <Text style={styles.warningTitle}>⚠️ SCALPEL WARNING ⚠️</Text>
+                    <Text style={styles.warningText}>
+                        Surgery carries significant risks. Results are NOT guaranteed.{'\n\n'}
+                        If complications arise, you may suffer permanent loss of Charisma and Health.{'\n\n'}
+                        Do you wish to proceed with the <Text style={{ fontWeight: 'bold' }}>{selectedProcedure?.name}</Text> for <Text style={{ color: '#C5A065' }}>${selectedProcedure?.cost.toLocaleString()}</Text>?
+                    </Text>
+                    <View style={styles.buttonGroup}>
+                        <GameButton title="YES, I ACCEPT THE RISK" variant="danger" onPress={handleConfirm} style={{ flex: 1 }} />
+                        <GameButton title="No, take me back" variant="secondary" onPress={() => setStage('selection')} style={{ flex: 1 }} />
                     </View>
-                )}
+                </View>
+            )}
 
-                {/* WARNING STAGE */}
-                {stage === 'warning' && (
-                    <View style={styles.warningContainer}>
-                        <Text style={styles.warningTitle}>⚠️ SCALPEL WARNING ⚠️</Text>
-                        <Text style={styles.warningText}>
-                            Surgery carries significant risks. Results are NOT guaranteed.{'\n\n'}
-                            If complications arise, you may suffer permanent loss of Charisma and Health.{'\n\n'}
-                            Do you wish to proceed with the <Text style={{ fontWeight: 'bold' }}>{selectedProcedure?.name}</Text> for <Text style={{ color: '#C5A065' }}>${selectedProcedure?.cost.toLocaleString()}</Text>?
-                        </Text>
-
-                        <Pressable style={styles.confirmButton} onPress={handleConfirm}>
-                            <Text style={styles.confirmButtonText}>YES, I ACCEPT THE RISK</Text>
-                        </Pressable>
-
-                        <Pressable onPress={() => setStage('selection')} style={styles.cancelLink}>
-                            <Text style={styles.cancelLinkText}>No, take me back</Text>
-                        </Pressable>
-                    </View>
-                )}
-
-                {/* PROCESSING STAGE */}
-                {stage === 'processing' && (
-                    <View style={styles.processingContainer}>
-                        <ActivityIndicator size="large" color="#C5A065" />
-                        <Text style={styles.processingText}>Performing Surgery...</Text>
-                        <Text style={styles.processingSubText}>Anesthesia administered.</Text>
-                    </View>
-                )}
-
-            </View>
-        </Modal>
+            {/* PROCESSING STAGE */}
+            {stage === 'processing' && (
+                <View style={styles.processingContent}>
+                    <ActivityIndicator size="large" color="#C5A065" />
+                    <Text style={styles.processingText}>Performing Surgery...</Text>
+                    <Text style={styles.processingSubText}>Anesthesia administered.</Text>
+                </View>
+            )}
+        </GameModal>
     );
 };
 
 export default PlasticSurgeryModal;
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: theme.spacing.lg,
-    },
-
-    // SHARED CONTAINER STYLES
-    container: {
-        width: '100%',
-        backgroundColor: '#1A1D24',
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
-        borderWidth: 1,
-        borderColor: '#4A5568',
-    },
-    warningContainer: {
-        width: '100%',
-        backgroundColor: '#000',
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.xl,
-        borderWidth: 2,
-        borderColor: '#E53E3E', // Red border for warning
-        alignItems: 'center',
-    },
-    processingContainer: {
-        alignItems: 'center',
-        gap: 20,
-    },
-
-    // TEXT STYLES
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#E2E8F0',
-        textAlign: 'center',
-        marginBottom: 4,
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        color: '#A0AEC0',
-        textAlign: 'center',
-        marginBottom: theme.spacing.lg,
-        fontStyle: 'italic',
-    },
     listContent: {
         gap: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
     },
     procItem: {
         flexDirection: 'row',
@@ -226,16 +170,11 @@ const styles = StyleSheet.create({
         color: '#C5A065',
         fontWeight: '700',
     },
-    closeButton: {
-        marginTop: theme.spacing.lg,
-        alignItems: 'center',
-        padding: 10,
-    },
-    closeButtonText: {
-        color: '#A0AEC0',
-    },
-
     // WARNING STYLES
+    warningContent: {
+        alignItems: 'center',
+        paddingVertical: 20,
+    },
     warningTitle: {
         color: '#E53E3E',
         fontSize: 20,
@@ -248,28 +187,17 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         marginBottom: 30,
     },
-    confirmButton: {
-        backgroundColor: '#E53E3E',
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 8,
+    buttonGroup: {
+        flexDirection: 'row',
+        gap: 10,
         width: '100%',
-        alignItems: 'center',
     },
-    confirmButtonText: {
-        color: '#FFF',
-        fontWeight: '900',
-        fontSize: 16,
-    },
-    cancelLink: {
-        marginTop: 20,
-    },
-    cancelLinkText: {
-        color: '#718096',
-        textDecorationLine: 'underline',
-    },
-
     // PROCESSING STYLES
+    processingContent: {
+        alignItems: 'center',
+        paddingVertical: 40,
+        gap: 16,
+    },
     processingText: {
         color: '#C5A065',
         fontSize: 18,

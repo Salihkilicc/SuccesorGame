@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, Animated } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../theme';
 import { ActivityType, CompanionType } from './useTravelSystem';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
 
 interface TravelResultModalProps {
     visible: boolean;
@@ -52,63 +54,45 @@ const TravelResultModal = ({
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.headerEmoji}>✈️🌍</Text>
-                    <Text style={styles.title}>Bon Voyage!</Text>
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            title="Bon Voyage!"
+            subtitle="Trip Summary"
+        >
+            <Text style={styles.headerEmoji}>✈️🌍</Text>
 
-                    <Text style={styles.description}>
-                        You traveled to <Text style={styles.highlight}>{country}</Text> for a{' '}
-                        <Text style={styles.highlight}>{activity}</Text> with{' '}
-                        <Text style={styles.highlight}>{getCompanionText()}</Text>.
-                    </Text>
+            <Text style={styles.description}>
+                You traveled to <Text style={styles.highlight}>{country}</Text> for a{' '}
+                <Text style={styles.highlight}>{activity}</Text> with{' '}
+                <Text style={styles.highlight}>{getCompanionText()}</Text>.
+            </Text>
 
-                    <View style={styles.costContainer}>
-                        <Text style={styles.costLabel}>Total Cost</Text>
-                        <Text style={styles.costValue}>-${cost.toLocaleString()}</Text>
-                    </View>
-
-                    <View style={styles.resultContainer}>
-                        <Text style={styles.resultLabel}>Your Enjoyment</Text>
-                        <ProgressBar value={enjoyment} />
-                    </View>
-
-                    <Pressable onPress={onClose} style={styles.okButton}>
-                        <Text style={styles.okButtonText}>OK</Text>
-                    </Pressable>
-                </View>
+            <View style={styles.costContainer}>
+                <Text style={styles.costLabel}>Total Cost</Text>
+                <Text style={styles.costValue}>-${cost.toLocaleString()}</Text>
             </View>
-        </Modal>
+
+            <View style={styles.resultContainer}>
+                <Text style={styles.resultLabel}>Your Enjoyment</Text>
+                <ProgressBar value={enjoyment} />
+            </View>
+
+            <GameButton
+                title="OK"
+                onPress={onClose}
+                variant="primary"
+                style={{ marginTop: 20 }}
+            />
+        </GameModal>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: theme.spacing.lg,
-    },
-    container: {
-        width: '100%',
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.xl,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-        alignItems: 'center',
-    },
     headerEmoji: {
         fontSize: 48,
         marginBottom: theme.spacing.md,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-        marginBottom: theme.spacing.md,
+        textAlign: 'center',
     },
     description: {
         fontSize: theme.typography.body,
@@ -167,19 +151,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: theme.colors.textSecondary,
         fontWeight: '700',
-    },
-    okButton: {
-        backgroundColor: theme.colors.primary,
-        paddingVertical: theme.spacing.md,
-        paddingHorizontal: 40,
-        borderRadius: theme.radius.md,
-        width: '100%',
-        alignItems: 'center',
-    },
-    okButtonText: {
-        color: '#fff',
-        fontWeight: '700',
-        fontSize: 16,
     },
 });
 

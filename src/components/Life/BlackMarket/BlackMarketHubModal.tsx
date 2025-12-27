@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Animated } from 'react-native';
+import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../theme';
 import { BLACK_MARKET_WEAPONS, BLACK_MARKET_SUBSTANCES } from '../../../data/BlackMarketData';
 import OfferModal from './OfferModal';
+import BlackMarketMenuView from './components/BlackMarketMenuView';
+import BlackMarketListView from './components/BlackMarketListView';
 
 type BlackMarketHubModalProps = {
     visible: boolean;
@@ -44,84 +46,6 @@ const BlackMarketHubModal = ({
         onClose();
     };
 
-    const renderMenu = () => (
-        <View style={styles.menuContainer}>
-            <Text style={styles.headerTitle}>THE UNDERGROUND</Text>
-            <Text style={styles.headerSubtitle}>Money talks. Silence pays.</Text>
-
-            <View style={styles.buttonsContainer}>
-                <MenuButton
-                    icon="🎨"
-                    title="Art Thief"
-                    subtitle="Stolen Masterpieces"
-                    onPress={onSelectArt}
-                />
-                <MenuButton
-                    icon="🏺"
-                    title="Antique Dealer"
-                    subtitle="History for Sale"
-                    onPress={onSelectAntique}
-                />
-                <MenuButton
-                    icon="💎"
-                    title="Jewel Dealer"
-                    subtitle="Royal Gems"
-                    onPress={onSelectJewel}
-                />
-                <MenuButton
-                    icon="🔫"
-                    title="Arms Dealer"
-                    subtitle="Lethal Hardware"
-                    onPress={() => setView('WEAPONS')}
-                    danger
-                />
-                <MenuButton
-                    icon="💊"
-                    title="Street Dealer"
-                    subtitle="Quick Fix"
-                    onPress={() => setView('SUBSTANCES')}
-                    danger
-                />
-            </View>
-        </View>
-    );
-
-    const renderList = (
-        title: string,
-        data: typeof BLACK_MARKET_WEAPONS | typeof BLACK_MARKET_SUBSTANCES,
-        onBuy: (id: string) => void
-    ) => (
-        <View style={styles.listContainer}>
-            <View style={styles.listHeader}>
-                <Pressable onPress={() => setView('MENU')} style={styles.backButton}>
-                    <Text style={styles.backText}>← Back</Text>
-                </Pressable>
-                <Text style={styles.listTitle}>{title}</Text>
-                <View style={{ width: 50 }} />
-            </View>
-
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {data.map(item => (
-                    <Pressable
-                        key={item.id}
-                        style={({ pressed }) => [styles.listItem, pressed && styles.pressed]}
-                        onPress={() => onBuy(item.id)}
-                    >
-                        <View style={styles.itemRow}>
-                            <View style={styles.itemInfo}>
-                                <Text style={styles.itemName}>{item.name}</Text>
-                                {'description' in item && (
-                                    <Text style={styles.itemDesc}>{item.description}</Text>
-                                )}
-                            </View>
-                            <Text style={styles.itemPrice}>${item.price.toLocaleString()}</Text>
-                        </View>
-                    </Pressable>
-                ))}
-            </ScrollView>
-        </View>
-    );
-
     return (
         <Modal
             visible={visible}
@@ -135,9 +59,31 @@ const BlackMarketHubModal = ({
                 </Pressable>
 
                 <View style={styles.content}>
-                    {view === 'MENU' && renderMenu()}
-                    {view === 'WEAPONS' && renderList("ARSENAL", BLACK_MARKET_WEAPONS, onBuyWeapon)}
-                    {view === 'SUBSTANCES' && renderList("STREET STASH", BLACK_MARKET_SUBSTANCES, onBuySubstance)}
+                    {view === 'MENU' && (
+                        <BlackMarketMenuView
+                            onSelectArt={onSelectArt}
+                            onSelectAntique={onSelectAntique}
+                            onSelectJewel={onSelectJewel}
+                            onSelectWeapons={() => setView('WEAPONS')}
+                            onSelectSubstances={() => setView('SUBSTANCES')}
+                        />
+                    )}
+                    {view === 'WEAPONS' && (
+                        <BlackMarketListView
+                            title="ARSENAL"
+                            data={BLACK_MARKET_WEAPONS}
+                            onBuy={onBuyWeapon}
+                            onBack={() => setView('MENU')}
+                        />
+                    )}
+                    {view === 'SUBSTANCES' && (
+                        <BlackMarketListView
+                            title="STREET STASH"
+                            data={BLACK_MARKET_SUBSTANCES}
+                            onBuy={onBuySubstance}
+                            onBack={() => setView('MENU')}
+                        />
+                    )}
                 </View>
 
                 {/* Embedded Offer Modal (Overlay) */}
@@ -151,24 +97,6 @@ const BlackMarketHubModal = ({
         </Modal>
     );
 };
-
-const MenuButton = ({ icon, title, subtitle, onPress, danger }: any) => (
-    <Pressable
-        style={({ pressed }) => [
-            styles.menuButton,
-            danger && styles.dangerButton,
-            pressed && styles.pressed
-        ]}
-        onPress={onPress}
-    >
-        <Text style={styles.menuIcon}>{icon}</Text>
-        <View>
-            <Text style={[styles.menuTitle, danger && styles.dangerText]}>{title}</Text>
-            <Text style={styles.menuSubtitle}>{subtitle}</Text>
-        </View>
-        <Text style={styles.arrow}>›</Text>
-    </Pressable>
-);
 
 const styles = StyleSheet.create({
     container: {
@@ -191,128 +119,6 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         paddingTop: 80,
-    },
-    menuContainer: {
-        padding: 20,
-        alignItems: 'center',
-    },
-    headerTitle: {
-        color: '#fff',
-        fontSize: 28,
-        fontWeight: '900',
-        letterSpacing: 4,
-        marginBottom: 8,
-    },
-    headerSubtitle: {
-        color: '#444',
-        fontSize: 14,
-        marginBottom: 50,
-        fontStyle: 'italic',
-    },
-    buttonsContainer: {
-        width: '100%',
-        gap: 16,
-    },
-    menuButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#111',
-        padding: 20,
-        borderRadius: 4,
-        borderLeftWidth: 3,
-        borderLeftColor: '#444',
-    },
-    dangerButton: {
-        borderLeftColor: '#900',
-        backgroundColor: '#1a0505',
-    },
-    pressed: {
-        transform: [{ scale: 0.98 }],
-        opacity: 0.8,
-    },
-    menuIcon: {
-        fontSize: 24,
-        marginRight: 20,
-    },
-    menuTitle: {
-        color: '#ddd',
-        fontSize: 18,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-    },
-    dangerText: {
-        color: '#ff4444',
-    },
-    menuSubtitle: {
-        color: '#555',
-        fontSize: 12,
-    },
-    arrow: {
-        color: '#333',
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginLeft: 'auto',
-    },
-    // List Styles
-    listContainer: {
-        flex: 1,
-    },
-    listHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#222',
-        marginBottom: 10,
-    },
-    backButton: {
-        padding: 10,
-    },
-    backText: {
-        color: '#888',
-    },
-    listTitle: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        letterSpacing: 2,
-    },
-    scrollContent: {
-        padding: 20,
-        gap: 12,
-    },
-    listItem: {
-        backgroundColor: '#111',
-        padding: 16,
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: '#222',
-    },
-    itemRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    itemInfo: {
-        flex: 1,
-        marginRight: 10,
-    },
-    itemName: {
-        color: '#eee',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    itemDesc: {
-        color: '#555',
-        fontSize: 12,
-        marginTop: 4,
-    },
-    itemPrice: {
-        color: '#ff4444',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
 });
 

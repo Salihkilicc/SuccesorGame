@@ -1,7 +1,9 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../theme';
 import { ACTIVITIES, ActivityType, COUNTRIES, TripVibe } from './useTravelSystem';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
 
 interface TravelDestinationModalProps {
     visible: boolean;
@@ -27,137 +29,113 @@ const TravelDestinationModal = ({
     setSelectedActivity,
 }: TravelDestinationModalProps) => {
     return (
-        <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Plan Your Trip ✈️</Text>
-                    <Text style={styles.subtitle}>Select your destination & vibe.</Text>
-
-                    <ScrollView style={styles.content}>
-                        {/* Country Selector */}
-                        <Text style={styles.label}>Destination</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-                            {COUNTRIES.map((country) => (
-                                <Pressable
-                                    key={country}
-                                    onPress={() => setSelectedCountry(country)}
-                                    style={[
-                                        styles.chip,
-                                        selectedCountry === country && styles.chipSelected,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.chipText,
-                                            selectedCountry === country && styles.chipTextSelected,
-                                        ]}
-                                    >
-                                        {country}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </ScrollView>
-
-                        {/* Vibe Selector */}
-                        <Text style={styles.label}>Vibe</Text>
-                        <View style={styles.vibeContainer}>
-                            {(['Standard', 'Ultra-Rich'] as TripVibe[]).map((vibe) => (
-                                <Pressable
-                                    key={vibe}
-                                    onPress={() => {
-                                        setSelectedVibe(vibe);
-                                        // Reset activity to first in new vibe list
-                                        setSelectedActivity(ACTIVITIES[vibe][0]);
-                                    }}
-                                    style={[
-                                        styles.vibeButton,
-                                        selectedVibe === vibe && styles.vibeButtonSelected,
-                                        vibe === 'Ultra-Rich' && styles.vibeButtonRich,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.vibeText,
-                                            selectedVibe === vibe && styles.vibeTextSelected,
-                                        ]}
-                                    >
-                                        {vibe === 'Ultra-Rich' ? '💎 Ultra-Rich' : '🌴 Standard'}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </View>
-
-                        {/* Activity Selector */}
-                        <Text style={styles.label}>Activity</Text>
-                        <View style={styles.activityGrid}>
-                            {ACTIVITIES[selectedVibe].map((activity) => (
-                                <Pressable
-                                    key={activity}
-                                    onPress={() => setSelectedActivity(activity)}
-                                    style={[
-                                        styles.activityCard,
-                                        selectedActivity === activity && styles.activityCardSelected,
-                                        selectedVibe === 'Ultra-Rich' && selectedActivity === activity && styles.activityCardRich,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.activityText,
-                                            selectedActivity === activity && styles.activityTextSelected,
-                                        ]}
-                                    >
-                                        {activity}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </View>
-                    </ScrollView>
-
-                    <View style={styles.footer}>
-                        <Pressable onPress={onClose} style={styles.cancelButton}>
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            title="Plan Your Trip ✈️"
+            subtitle="Select your destination & vibe."
+        >
+            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Country Selector */}
+                <Text style={styles.label}>Destination</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+                    {COUNTRIES.map((country) => (
+                        <Pressable
+                            key={country}
+                            onPress={() => setSelectedCountry(country)}
+                            style={[
+                                styles.chip,
+                                selectedCountry === country && styles.chipSelected,
+                            ]}
+                        >
+                            <Text
+                                style={[
+                                    styles.chipText,
+                                    selectedCountry === country && styles.chipTextSelected,
+                                ]}
+                            >
+                                {country}
+                            </Text>
                         </Pressable>
-                        <Pressable onPress={onNext} style={styles.nextButton}>
-                            <Text style={styles.nextButtonText}>Next Step →</Text>
+                    ))}
+                </ScrollView>
+
+                {/* Vibe Selector */}
+                <Text style={styles.label}>Vibe</Text>
+                <View style={styles.vibeContainer}>
+                    {(['Standard', 'Ultra-Rich'] as TripVibe[]).map((vibe) => (
+                        <Pressable
+                            key={vibe}
+                            onPress={() => {
+                                setSelectedVibe(vibe);
+                                // Reset activity to first in new vibe list
+                                setSelectedActivity(ACTIVITIES[vibe][0]);
+                            }}
+                            style={[
+                                styles.vibeButton,
+                                selectedVibe === vibe && styles.vibeButtonSelected,
+                                vibe === 'Ultra-Rich' && styles.vibeButtonRich,
+                            ]}
+                        >
+                            <Text
+                                style={[
+                                    styles.vibeText,
+                                    selectedVibe === vibe && styles.vibeTextSelected,
+                                ]}
+                            >
+                                {vibe === 'Ultra-Rich' ? '💎 Ultra-Rich' : '🌴 Standard'}
+                            </Text>
                         </Pressable>
-                    </View>
+                    ))}
                 </View>
+
+                {/* Activity Selector */}
+                <Text style={styles.label}>Activity</Text>
+                <View style={styles.activityGrid}>
+                    {ACTIVITIES[selectedVibe].map((activity) => (
+                        <Pressable
+                            key={activity}
+                            onPress={() => setSelectedActivity(activity)}
+                            style={[
+                                styles.activityCard,
+                                selectedActivity === activity && styles.activityCardSelected,
+                                selectedVibe === 'Ultra-Rich' && selectedActivity === activity && styles.activityCardRich,
+                            ]}
+                        >
+                            <Text
+                                style={[
+                                    styles.activityText,
+                                    selectedActivity === activity && styles.activityTextSelected,
+                                ]}
+                            >
+                                {activity}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
+            </ScrollView>
+
+            <View style={styles.footer}>
+                <GameButton
+                    title="Cancel"
+                    onPress={onClose}
+                    variant="ghost"
+                    style={{ flex: 1, marginRight: 8 }}
+                />
+                <GameButton
+                    title="Next Step →"
+                    onPress={onNext}
+                    variant="primary"
+                    style={{ flex: 2 }}
+                />
             </View>
-        </Modal>
+        </GameModal>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: theme.spacing.md,
-    },
-    container: {
-        width: '100%',
-        maxHeight: '90%',
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-        textAlign: 'center',
-        marginBottom: theme.spacing.xs,
-    },
-    subtitle: {
-        fontSize: theme.typography.body,
-        color: theme.colors.textSecondary,
-        textAlign: 'center',
-        marginBottom: theme.spacing.lg,
-    },
     content: {
+        maxHeight: 400, // Limit height to ensure modal fits
         marginBottom: theme.spacing.md,
     },
     label: {
@@ -221,6 +199,7 @@ const styles = StyleSheet.create({
     },
     activityGrid: {
         gap: theme.spacing.sm,
+        marginBottom: 20,
     },
     activityCard: {
         width: '100%',
@@ -252,24 +231,7 @@ const styles = StyleSheet.create({
         paddingTop: theme.spacing.md,
         borderTopWidth: 1,
         borderTopColor: theme.colors.border,
-    },
-    cancelButton: {
-        padding: theme.spacing.md,
-    },
-    cancelButtonText: {
-        color: theme.colors.textMuted,
-        fontSize: theme.typography.body,
-    },
-    nextButton: {
-        backgroundColor: theme.colors.primary,
-        paddingVertical: theme.spacing.md,
-        paddingHorizontal: theme.spacing.xl,
-        borderRadius: theme.radius.md,
-    },
-    nextButtonText: {
-        color: '#fff',
-        fontWeight: '700',
-        fontSize: theme.typography.body,
+        marginTop: 10,
     },
 });
 

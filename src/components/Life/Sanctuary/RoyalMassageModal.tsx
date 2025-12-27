@@ -1,6 +1,8 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../theme';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
 
 import { useStatsStore } from '../../../store/useStatsStore';
 
@@ -25,94 +27,62 @@ const MASSAGE_OPTIONS = [
 
 const RoyalMassageModal = ({ visible, onClose, handleServicePurchase }: RoyalMassageModalProps) => {
     return (
-        <Modal
+        <GameModal
             visible={visible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}>
-            <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.headerTitle}>ROYAL MASSAGE</Text>
-                    <Text style={styles.headerSubtitle}>Rejuvenate your body and soul</Text>
+            onClose={onClose}
+            title="ROYAL MASSAGE"
+            subtitle="Rejuvenate your body and soul">
 
-                    <ScrollView contentContainerStyle={styles.scrollContent}>
-                        {MASSAGE_OPTIONS.map((option) => (
-                            <Pressable
-                                key={option.name}
-                                style={({ pressed }) => [styles.optionCard, pressed && styles.optionCardPressed]}
-                                onPress={() => {
-                                    const currentStats = useStatsStore.getState();
-                                    handleServicePurchase(
-                                        option.cost,
-                                        {
-                                            stress: Math.max(0, currentStats.stress - option.stress),
-                                            health: Math.min(100, currentStats.health + option.health)
-                                        },
-                                        option.name,
-                                        `You enjoyed a ${option.name}.`,
-                                        [
-                                            { label: 'Stress', value: `-${option.stress}`, isPositive: true },
-                                            ...(option.health > 0 ? [{ label: 'Health', value: `+${option.health}`, isPositive: true }] : [])
-                                        ]
-                                    );
-                                }}
-                            >
-                                <View style={styles.optionHeader}>
-                                    <Text style={styles.optionName}>{option.name}</Text>
-                                    <Text style={styles.optionCost}>${option.cost}</Text>
-                                </View>
-                                <Text style={styles.optionDesc}>{option.desc}</Text>
-                                <View style={styles.statsRow}>
-                                    <Text style={styles.statText}>Stress -{option.stress}</Text>
-                                    {option.health > 0 && (
-                                        <Text style={[styles.statText, styles.healthText]}>Health +{option.health}</Text>
-                                    )}
-                                </View>
-                            </Pressable>
-                        ))}
-                    </ScrollView>
-
-                    <Pressable onPress={onClose} style={styles.closeButton}>
-                        <Text style={styles.closeButtonText}>Close</Text>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                {MASSAGE_OPTIONS.map((option) => (
+                    <Pressable
+                        key={option.name}
+                        style={({ pressed }) => [styles.optionCard, pressed && styles.optionCardPressed]}
+                        onPress={() => {
+                            const currentStats = useStatsStore.getState();
+                            handleServicePurchase(
+                                option.cost,
+                                {
+                                    stress: Math.max(0, currentStats.stress - option.stress),
+                                    health: Math.min(100, currentStats.health + option.health)
+                                },
+                                option.name,
+                                `You enjoyed a ${option.name}.`,
+                                [
+                                    { label: 'Stress', value: `-${option.stress}`, isPositive: true },
+                                    ...(option.health > 0 ? [{ label: 'Health', value: `+${option.health}`, isPositive: true }] : [])
+                                ]
+                            );
+                        }}
+                    >
+                        <View style={styles.optionHeader}>
+                            <Text style={styles.optionName}>{option.name}</Text>
+                            <Text style={styles.optionCost}>${option.cost}</Text>
+                        </View>
+                        <Text style={styles.optionDesc}>{option.desc}</Text>
+                        <View style={styles.statsRow}>
+                            <Text style={styles.statText}>Stress -{option.stress}</Text>
+                            {option.health > 0 && (
+                                <Text style={[styles.statText, styles.healthText]}>Health +{option.health}</Text>
+                            )}
+                        </View>
                     </Pressable>
-                </View>
-            </View>
-        </Modal>
+                ))}
+            </ScrollView>
+
+            <GameButton
+                title="Close"
+                variant="ghost"
+                onPress={onClose}
+                style={{ marginTop: 24 }}
+            />
+        </GameModal>
     );
 };
 
 export default RoyalMassageModal;
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: theme.spacing.lg,
-    },
-    container: {
-        width: '100%',
-        backgroundColor: '#1E222A',
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
-        borderWidth: 1,
-        borderColor: '#C5A065',
-    },
-    headerTitle: {
-        fontSize: 22,
-        fontWeight: '800',
-        color: '#E2E8F0',
-        textAlign: 'center',
-        marginBottom: 4,
-    },
-    headerSubtitle: {
-        fontSize: 13,
-        color: '#A0AEC0',
-        textAlign: 'center',
-        marginBottom: theme.spacing.lg,
-        fontStyle: 'italic',
-    },
     scrollContent: {
         gap: theme.spacing.md,
     },
@@ -159,14 +129,5 @@ const styles = StyleSheet.create({
     },
     healthText: {
         color: '#63B3ED', // Blue
-    },
-    closeButton: {
-        marginTop: theme.spacing.lg,
-        alignItems: 'center',
-        padding: 10,
-    },
-    closeButtonText: {
-        color: '#A0AEC0',
-        textDecorationLine: 'underline',
     },
 });

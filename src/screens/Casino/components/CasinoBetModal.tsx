@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import {
-    Modal,
-    StyleSheet,
-    Text,
-    View,
-    Pressable,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../theme';
+import GameModal from '../../../components/common/GameModal';
+import GameButton from '../../../components/common/GameButton';
 
 type Props = {
     visible: boolean;
@@ -44,113 +40,62 @@ const CasinoBetModal = ({
     }, [visible, minBet]);
 
     return (
-        <Modal
+        <GameModal
             visible={visible}
-            transparent
-            animationType="slide"
-            onRequestClose={onClose}>
-            <View style={styles.overlay}>
-                <View style={styles.card}>
-                    <Text style={styles.gameTitle}>{gameTitle}</Text>
+            onClose={onClose}
+            title={gameTitle}
+            subtitle="Place your bet"
+        >
+            <View style={styles.infoRow}>
+                <Text style={styles.limitText}>Min: ${minBet.toLocaleString()}</Text>
+                <Text style={styles.limitText}>Max: ${maxBet.toLocaleString()}</Text>
+            </View>
 
-                    <View style={styles.infoRow}>
-                        <Text style={styles.limitText}>Min: ${minBet.toLocaleString()}</Text>
-                        <Text style={styles.limitText}>Max: ${maxBet.toLocaleString()}</Text>
-                    </View>
+            <View style={styles.betDisplay}>
+                <Text style={styles.betLabel}>Current Bet</Text>
+                <Text style={styles.betValue}>${betAmount.toLocaleString()}</Text>
+            </View>
 
-                    <View style={styles.betDisplay}>
-                        <Text style={styles.betLabel}>Current Bet</Text>
-                        <Text style={styles.betValue}>${betAmount.toLocaleString()}</Text>
-                    </View>
-
-                    {/* Bet Adjustment Buttons */}
-                    <View style={styles.controlsContainer}>
-                        <View style={styles.buttonRow}>
-                            <Pressable
-                                onPress={() => adjustBet(-STEP * 2)}
-                                style={({ pressed }) => [styles.adjustButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.adjustButtonText}>-$10K</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => adjustBet(-STEP)}
-                                style={({ pressed }) => [styles.adjustButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.adjustButtonText}>-$5K</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => adjustBet(STEP)}
-                                style={({ pressed }) => [styles.adjustButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.adjustButtonText}>+$5K</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => adjustBet(STEP * 2)}
-                                style={({ pressed }) => [styles.adjustButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.adjustButtonText}>+$10K</Text>
-                            </Pressable>
-                        </View>
-                        <View style={styles.buttonRow}>
-                            <Pressable
-                                onPress={() => setBetAmount(minBet)}
-                                style={({ pressed }) => [styles.presetButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.presetButtonText}>Min</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => setBetAmount(50_000)}
-                                style={({ pressed }) => [styles.presetButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.presetButtonText}>$50K</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => setBetAmount(maxBet)}
-                                style={({ pressed }) => [styles.presetButton, pressed && styles.btnPressed]}>
-                                <Text style={styles.presetButtonText}>Max</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-
-                    <Pressable
-                        onPress={() => onPlay(betAmount)}
-                        style={({ pressed }) => [styles.playBtn, pressed && styles.btnPressed]}>
-                        <Text style={styles.playBtnText}>PLAY</Text>
-                    </Pressable>
-
-                    <Pressable onPress={onClose} style={styles.closeHitBox}>
-                        <Text style={styles.closeText}>Cancel</Text>
-                    </Pressable>
+            {/* Bet Adjustment Buttons */}
+            <View style={styles.controlsContainer}>
+                <View style={styles.buttonRow}>
+                    <GameButton title="-$10K" onPress={() => adjustBet(-STEP * 2)} variant="secondary" style={styles.adjustButton} textStyle={styles.adjustBtnText} />
+                    <GameButton title="-$5K" onPress={() => adjustBet(-STEP)} variant="secondary" style={styles.adjustButton} textStyle={styles.adjustBtnText} />
+                    <GameButton title="+$5K" onPress={() => adjustBet(STEP)} variant="secondary" style={styles.adjustButton} textStyle={styles.adjustBtnText} />
+                    <GameButton title="+$10K" onPress={() => adjustBet(STEP * 2)} variant="secondary" style={styles.adjustButton} textStyle={styles.adjustBtnText} />
+                </View>
+                <View style={styles.buttonRow}>
+                    <GameButton title="Min" onPress={() => setBetAmount(minBet)} variant="ghost" style={styles.presetButton} />
+                    <GameButton title="$50K" onPress={() => setBetAmount(50_000)} variant="ghost" style={styles.presetButton} />
+                    <GameButton title="Max" onPress={() => setBetAmount(maxBet)} variant="ghost" style={styles.presetButton} />
                 </View>
             </View>
-        </Modal>
+
+            <GameButton
+                title="PLAY"
+                onPress={() => onPlay(betAmount)}
+                variant="primary"
+                style={{ marginTop: 24 }}
+            />
+
+            <GameButton
+                title="Cancel"
+                onPress={onClose}
+                variant="ghost"
+                style={{ marginTop: 8 }}
+            />
+        </GameModal>
     );
 };
 
 export default CasinoBetModal;
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
-        justifyContent: 'center',
-        padding: theme.spacing.lg,
-    },
-    card: {
-        backgroundColor: theme.colors.card,
-        borderRadius: 24,
-        padding: 32,
-        alignItems: 'center',
-        gap: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-    },
-    gameTitle: {
-        color: theme.colors.textPrimary,
-        fontSize: 24,
-        fontWeight: '800',
-        letterSpacing: 1,
-        textTransform: 'uppercase',
-    },
     infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        paddingHorizontal: 8,
+        marginBottom: 16,
     },
     limitText: {
         color: theme.colors.textMuted,
@@ -159,7 +104,7 @@ const styles = StyleSheet.create({
     },
     betDisplay: {
         alignItems: 'center',
-        gap: 4,
+        marginBottom: 24,
     },
     betLabel: {
         color: theme.colors.textSecondary,
@@ -183,58 +128,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     adjustButton: {
-        backgroundColor: theme.colors.cardSoft,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
         minWidth: 70,
-        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 4,
     },
-    adjustButtonText: {
-        color: theme.colors.textPrimary,
-        fontSize: 14,
-        fontWeight: '700',
+    adjustBtnText: {
+        fontSize: 12,
     },
     presetButton: {
-        backgroundColor: theme.colors.accentSoft,
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: theme.colors.accent,
         flex: 1,
-        alignItems: 'center',
     },
-    presetButtonText: {
-        color: theme.colors.accent,
-        fontSize: 14,
-        fontWeight: '700',
-    },
-    playBtn: {
-        backgroundColor: theme.colors.accent,
-        width: '100%',
-        paddingVertical: 18,
-        borderRadius: 16,
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    btnPressed: {
-        opacity: 0.9,
-        transform: [{ scale: 0.98 }],
-    },
-    playBtnText: {
-        color: '#FFF',
-        fontSize: 18,
-        fontWeight: '900',
-        letterSpacing: 1,
-    },
-    closeHitBox: {
-        padding: 12,
-    },
-    closeText: {
-        color: theme.colors.textMuted,
-        fontSize: 14,
-    }
 });

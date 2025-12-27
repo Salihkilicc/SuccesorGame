@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 
 // --- TYPES ---
 export type GymTier = 'titanium' | 'elite';
+export type GymMembershipType = GymTier; // Alias for compatibility
 export type TrainerId = 'sarah' | 'marcus' | 'ken';
 export type SupplementType = 'none' | 'protein' | 'creatine' | 'preworkout' | 'steroids';
 export type MartialArtDiscipline = 'boxing' | 'mma' | 'kungfu' | 'karate' | 'kravmaga';

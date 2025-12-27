@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../theme';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
 
 import { useStatsStore } from '../../../store/useStatsStore';
 
@@ -31,10 +33,7 @@ const GroomingLoungeModal = ({ visible, onClose, handleServicePurchase }: Groomi
     const onApply = () => {
         handleServicePurchase(
             COST,
-            { charisma: useStatsStore.getState().charisma + 1 }, // This delta logic needs care. The handler should probably take deltas or we compute final here.
-            // Wait, in useSanctuarySystem I updated it to MERGE updates.
-            // So passing `{ charisma: current + 1 }` is correct if I access current state here.
-            // Accessing store inside component is fine.
+            { charisma: useStatsStore.getState().charisma + 1 },
             'FRESH CUT',
             `You look sharp with your ${selectedHair} and ${selectedBeard}.`,
             [{ label: 'Charisma', value: '+1', isPositive: true }]
@@ -42,56 +41,53 @@ const GroomingLoungeModal = ({ visible, onClose, handleServicePurchase }: Groomi
     };
 
     return (
-        <Modal
+        <GameModal
             visible={visible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}>
-            <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.headerTitle}>GROOMING LOUNGE</Text>
-                    <Text style={styles.priceTag}>Cost: ${COST}</Text>
+            onClose={onClose}
+            title="GROOMING LOUNGE">
 
-                    <ScrollView contentContainerStyle={styles.scrollContent}>
+            <Text style={styles.priceTag}>Cost: ${COST}</Text>
 
-                        <SectionTitle title="Hairstyle" />
-                        <SelectorGrid
-                            items={HAIRSTYLES}
-                            selected={selectedHair}
-                            onSelect={setHair}
-                        />
+            <ScrollView contentContainerStyle={styles.scrollContent}>
 
-                        <SectionTitle title="Beard Style" />
-                        <SelectorGrid
-                            items={BEARDSTYLES}
-                            selected={selectedBeard}
-                            onSelect={setBeard}
-                        />
+                <SectionTitle title="Hairstyle" />
+                <SelectorGrid
+                    items={HAIRSTYLES}
+                    selected={selectedHair}
+                    onSelect={setHair}
+                />
 
-                        <SectionTitle title="Hair Color" />
-                        <SelectorGrid
-                            items={HAIRCOLORS}
-                            selected={selectedColor}
-                            onSelect={setColor}
-                        />
+                <SectionTitle title="Beard Style" />
+                <SelectorGrid
+                    items={BEARDSTYLES}
+                    selected={selectedBeard}
+                    onSelect={setBeard}
+                />
 
-                    </ScrollView>
+                <SectionTitle title="Hair Color" />
+                <SelectorGrid
+                    items={HAIRCOLORS}
+                    selected={selectedColor}
+                    onSelect={setColor}
+                />
 
-                    <View style={styles.footer}>
-                        <Pressable
-                            style={styles.cancelButton}
-                            onPress={onClose}>
-                            <Text style={styles.cancelText}>Cancel</Text>
-                        </Pressable>
-                        <Pressable
-                            style={styles.applyButton}
-                            onPress={onApply}>
-                            <Text style={styles.applyText}>Apply New Look</Text>
-                        </Pressable>
-                    </View>
-                </View>
+            </ScrollView>
+
+            <View style={styles.footer}>
+                <GameButton
+                    title="Cancel"
+                    variant="secondary"
+                    onPress={onClose}
+                    style={{ flex: 1 }}
+                />
+                <GameButton
+                    title="Apply New Look"
+                    variant="primary"
+                    onPress={onApply}
+                    style={{ flex: 1 }}
+                />
             </View>
-        </Modal>
+        </GameModal>
     );
 };
 
@@ -122,30 +118,6 @@ const SelectorGrid = ({ items, selected, onSelect }: { items: string[], selected
 export default GroomingLoungeModal;
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: theme.spacing.md,
-    },
-    container: {
-        width: '100%',
-        maxHeight: '85%',
-        backgroundColor: '#1E222A',
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
-        borderWidth: 1,
-        borderColor: '#4A5568',
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#E2E8F0',
-        textAlign: 'center',
-        letterSpacing: 1,
-        marginBottom: theme.spacing.xs,
-    },
     priceTag: {
         textAlign: 'center',
         color: '#C5A065',
@@ -195,27 +167,5 @@ const styles = StyleSheet.create({
         paddingTop: theme.spacing.md,
         borderTopWidth: 1,
         borderTopColor: '#2D3748',
-    },
-    cancelButton: {
-        flex: 1,
-        padding: 14,
-        borderRadius: theme.radius.md,
-        backgroundColor: '#2D3748',
-        alignItems: 'center',
-    },
-    cancelText: {
-        color: '#A0AEC0',
-        fontWeight: '600',
-    },
-    applyButton: {
-        flex: 1,
-        padding: 14,
-        borderRadius: theme.radius.md,
-        backgroundColor: '#C5A065', // Gold
-        alignItems: 'center',
-    },
-    applyText: {
-        color: '#1A202C',
-        fontWeight: '700',
     },
 });
