@@ -7,13 +7,15 @@ import {
   Pressable,
   Modal,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../store';
 import { theme } from '../../theme';
-import type { RootStackParamList, RootTabParamList } from '../../navigation';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
+import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../Assets/MyCompany/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
@@ -61,6 +63,43 @@ const HomeScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [language, setLanguage] = useState<'EN' | 'TR'>('EN');
   const [showNews, setShowNews] = useState(false);
+
+  // --- Quarterly Report State ---
+  const [reportVisible, setReportVisible] = useState(false);
+  const [lastReportData, setLastReportData] = useState<ReportFinancialData | null>(null);
+
+  const handleAdvanceTime = async () => {
+    try {
+      console.log('>>> HomeScreen: Advancing 3 Months (Quarter)...');
+
+      // 1. Advance by 3 months (Quarterly gameplay)
+      const result = await advanceMonth(3);
+      console.log('>>> Advance Result:', result);
+
+      if (result && result.data) {
+        console.log('>>> Quarter finished! Generating Report...');
+        // Map Data
+        const mappedData: ReportFinancialData = {
+          productionCount: result.data.reportTotalProduction || 0,
+          salesCount: result.data.reportTotalSales || 0,
+          revenue: result.data.reportTotalRevenue || 0,
+          totalExpenses: result.data.reportTotalExpenses || 0,
+          netProfit: result.data.reportNetProfit || 0,
+          endingCash: result.data.playerCash || 0,
+          endingCapital: result.data.companyCapital || 0,
+        };
+        setLastReportData(mappedData);
+        setReportVisible(true);
+
+        if (result.status === 'bankrupt') {
+          Alert.alert("GAME OVER", `Company Bankrupt: ${result.reason}`);
+        }
+      }
+    } catch (e) {
+      console.error("Home Advance Error", e);
+      Alert.alert("Error", "Could not advance time.");
+    }
+  };
 
   const displayName = name || 'New Player';
   const displayBio = bio || 'New to the rich life.';
@@ -112,21 +151,21 @@ const HomeScreen = () => {
                 <Text style={styles.monthBadge}>Month {currentMonth}</Text>
               </View>
               <Pressable
-                onPress={advanceMonth}
+                onPress={handleAdvanceTime}
                 style={({ pressed }) => [
                   styles.nextMonthButton,
                   pressed && styles.nextMonthButtonPressed,
                 ]}>
-                <Text style={styles.nextMonthText}>Next Month</Text>
+                <Text style={styles.nextMonthText}>Next Quarter &gt;&gt;</Text>
               </Pressable>
             </View>
-          </View>
 
-          <Pressable
-            onPress={() => setDrawerOpen(true)}
-            style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
-            <Text style={styles.hamburgerText}>☰</Text>
-          </Pressable>
+            <Pressable
+              onPress={() => setDrawerOpen(true)}
+              style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
+              <Text style={styles.hamburgerText}>☰</Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -218,48 +257,48 @@ const HomeScreen = () => {
         </View>
       </ScrollView>
 
-      {drawerOpen ? (
-        <View style={styles.drawerOverlay}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
-          <View style={styles.drawer}>
-            <View style={styles.drawerHeader}>
-              <Text style={styles.drawerTitle}>Settings</Text>
-              <Pressable onPress={() => setDrawerOpen(false)}>
-                <Text style={styles.drawerClose}>✕</Text>
-              </Pressable>
+      {
+        drawerOpen ? (
+          <View style={styles.drawerOverlay}>
+            <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
+            <View style={styles.drawer}>
+              <View style={styles.drawerHeader}>
+                <Text style={styles.drawerTitle}>Settings</Text>
+                <Pressable onPress={() => setDrawerOpen(false)}>
+                  <Text style={styles.drawerClose}>✕</Text>
+                </Pressable>
+              </View>
+              <DrawerItem label="Privacy Policy" onPress={() => console.log('Privacy Policy')} />
+              <DrawerItem label="Terms & Conditions" onPress={() => console.log('Terms')} />
+              <DrawerItem
+                label="Notifications"
+                onPress={() => setNotificationsEnabled(prev => !prev)}
+                rightNode={
+                  <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
+                }
+              />
+              <DrawerItem
+                label="Language"
+                onPress={() => setLanguage(prev => (prev === 'EN' ? 'TR' : 'EN'))}
+                rightNode={<Text style={styles.drawerMeta}>{language}</Text>}
+              />
+              <DrawerItem
+                label="Be Premium"
+                onPress={() => {
+                  setDrawerOpen(false);
+                  handleNavigateStack('Premium');
+                }}
+              />
             </View>
-            <DrawerItem label="Privacy Policy" onPress={() => console.log('Privacy Policy')} />
-            <DrawerItem label="Terms & Conditions" onPress={() => console.log('Terms')} />
-            <DrawerItem
-              label="Notifications"
-              onPress={() => setNotificationsEnabled(prev => !prev)}
-              rightNode={
-                <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
-              }
-            />
-            <DrawerItem
-              label="Language"
-              onPress={() => setLanguage(prev => (prev === 'EN' ? 'TR' : 'EN'))}
-              rightNode={<Text style={styles.drawerMeta}>{language}</Text>}
-            />
-            <DrawerItem
-              label="Achievements"
-              onPress={() => {
-                setDrawerOpen(false);
-                handleNavigateStack('Achievements');
-              }}
-            />
-            <DrawerItem
-              label="Be Premium"
-              onPress={() => {
-                setDrawerOpen(false);
-                handleNavigateStack('Premium');
-              }}
-            />
           </View>
-        </View>
-      ) : null}
+        ) : null
+      }
 
+      <QuarterlyReportModal
+        visible={reportVisible}
+        onClose={() => setReportVisible(false)}
+        reportData={lastReportData}
+      />
       <Modal transparent visible={showNews} animationType="fade" onRequestClose={() => setShowNews(false)}>
         <View style={styles.newsOverlay}>
           <View style={styles.newsModal}>
@@ -278,7 +317,7 @@ const HomeScreen = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 

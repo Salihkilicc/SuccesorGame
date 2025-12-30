@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
-import {zustandStorage} from '../storage/persist';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandStorage } from '../storage/persist';
 
 type AchievementState = {
   unlockedIds: string[];
@@ -33,11 +33,11 @@ export const useAchievementStore = create<AchievementStore>()(
         console.log(`Unlocked achievement: ${id}`);
       },
       isUnlocked: id => get().unlockedIds.includes(id),
-      resetAchievements: () => set(() => ({...initialState})),
+      resetAchievements: () => set(() => ({ ...initialState })),
     }),
     {
       name: 'succesor_achievements_v1',
-      storage: zustandStorage,
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         unlockedIds: state.unlockedIds,
         lastUnlockedId: state.lastUnlockedId,

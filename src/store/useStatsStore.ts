@@ -30,6 +30,7 @@ export type StatKey =
   | 'employeeCount'
   | 'employeeMorale'
   | 'productionCapacity'
+  | 'productionLevel'
   | 'stockSplitCount';
 
 export interface Shareholder {
@@ -133,11 +134,12 @@ export const initialStatsState: StatsState = {
   companyRevenueMonthly: 0,
   companyExpensesMonthly: 0,
   companyCapital: 100_000_000_000, // 100 Billion for M&A testing
-  factoryCount: 1,
-  employeeCount: 20,
+  factoryCount: 5,
+  employeeCount: 100,
   employeeMorale: 75,
   salaryTier: 'average',
   productionCapacity: 1000,
+  productionLevel: 2000,
   stockSplitCount: 0,
   isPublic: false,
   techLevels: {
@@ -594,6 +596,7 @@ export const useStatsStore = create<StatsStore>()(
         employeeMorale: state.employeeMorale,
         salaryTier: state.salaryTier,
         productionCapacity: state.productionCapacity,
+        productionLevel: state.productionLevel,
         techLevels: state.techLevels,
         acquisitions: state.acquisitions,
         isPublic: state.isPublic,

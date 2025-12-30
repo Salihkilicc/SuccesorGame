@@ -274,11 +274,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-  badgeTextOwned: {
-    color: theme.colors.success,
-    fontSize: 10,
-    fontWeight: '800',
-  },
+
   headerLeft: {
     gap: 12,
   },

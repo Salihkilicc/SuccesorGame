@@ -1,14 +1,10 @@
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    Modal,
-    ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { theme } from '../../../theme';
 import { Product } from '../../../store/useProductStore';
+import GameModal from '../../common/GameModal';
+import SectionCard from '../../common/SectionCard';
+import GameButton from '../../common/GameButton';
 
 interface ProductReport {
     product: Product;
@@ -35,259 +31,133 @@ const MonthlyReportModal = ({
     onDone,
 }: Props) => {
     const netProfit = totalRevenue - totalExpenses;
-    const hasEvents = reports.some((r) => r.events.length > 0);
 
     return (
-        <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.content}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>📊 Monthly Performance Report</Text>
-                        <Text style={styles.subtitle}>Product Sales Summary</Text>
+        <GameModal
+            visible={visible}
+            onClose={() => { }} // Block manual close, must use Done button
+            title="📊 Monthly Report"
+            subtitle="Performance Summary"
+        >
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
+
+                {/* Financial Summary */}
+                <View style={styles.summaryCard}>
+                    <View style={styles.row}>
+                        <Text style={styles.label}>Total Revenue</Text>
+                        <Text style={[styles.value, { color: theme.colors.success }]}>
+                            +${(totalRevenue / 1000).toFixed(1)}k
+                        </Text>
                     </View>
-
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={styles.scrollContent}>
-                        {/* Product Reports */}
-                        {reports.map((report) => (
-                            <View key={report.product.id} style={styles.productReport}>
-                                <View style={styles.productHeader}>
-                                    <Text style={styles.productName}>{report.product.name}</Text>
-                                    <Pressable
-                                        onPress={() => onConfigureProduct(report.product.id)}
-                                        style={({ pressed }) => [
-                                            styles.configBtn,
-                                            pressed && styles.configBtnPressed,
-                                        ]}>
-                                        <Text style={styles.configBtnText}>Configure</Text>
-                                    </Pressable>
-                                </View>
-
-                                <View style={styles.productStats}>
-                                    <View style={styles.stat}>
-                                        <Text style={styles.statLabel}>Units Sold</Text>
-                                        <Text style={styles.statValue}>
-                                            {report.unitsSold.toLocaleString()}
-                                        </Text>
-                                    </View>
-                                    <View style={styles.stat}>
-                                        <Text style={styles.statLabel}>Revenue</Text>
-                                        <Text style={[styles.statValue, { color: theme.colors.success }]}>
-                                            ${(report.revenue / 1000).toFixed(1)}k
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                {/* Events */}
-                                {report.events.length > 0 && (
-                                    <View style={styles.eventsContainer}>
-                                        {report.events.map((event, idx) => (
-                                            <Text key={idx} style={styles.eventText}>
-                                                {event}
-                                            </Text>
-                                        ))}
-                                    </View>
-                                )}
-                            </View>
-                        ))}
-
-                        {/* Summary */}
-                        <View style={styles.summaryCard}>
-                            <Text style={styles.summaryTitle}>Financial Summary</Text>
-                            <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Total Revenue</Text>
-                                <Text style={[styles.summaryValue, { color: theme.colors.success }]}>
-                                    +${(totalRevenue / 1000).toFixed(1)}k
-                                </Text>
-                            </View>
-                            <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Total Expenses</Text>
-                                <Text style={[styles.summaryValue, { color: theme.colors.danger }]}>
-                                    -${(totalExpenses / 1000).toFixed(1)}k
-                                </Text>
-                            </View>
-                            <View style={[styles.summaryRow, styles.summaryTotal]}>
-                                <Text style={styles.summaryTotalLabel}>Net Profit</Text>
-                                <Text
-                                    style={[
-                                        styles.summaryTotalValue,
-                                        { color: netProfit >= 0 ? theme.colors.success : theme.colors.danger },
-                                    ]}>
-                                    {netProfit >= 0 ? '+' : ''}${(netProfit / 1000).toFixed(1)}k
-                                </Text>
-                            </View>
-                        </View>
-
-                        {/* Actions */}
-                        <Pressable
-                            onPress={onDone}
-                            style={({ pressed }) => [
-                                styles.doneBtn,
-                                pressed && styles.doneBtnPressed,
-                            ]}>
-                            <Text style={styles.doneBtnText}>Done / Next Month</Text>
-                        </Pressable>
-                    </ScrollView>
+                    <View style={styles.row}>
+                        <Text style={styles.label}>Total Expenses</Text>
+                        <Text style={[styles.value, { color: theme.colors.danger }]}>
+                            -${(totalExpenses / 1000).toFixed(1)}k
+                        </Text>
+                    </View>
+                    <View style={[styles.row, styles.totalRow]}>
+                        <Text style={styles.totalLabel}>Net Profit</Text>
+                        <Text style={[styles.totalValue, { color: netProfit >= 0 ? theme.colors.success : theme.colors.danger }]}>
+                            {netProfit >= 0 ? '+' : ''}${(netProfit / 1000).toFixed(1)}k
+                        </Text>
+                    </View>
                 </View>
-            </View>
-        </Modal>
+
+                {/* Product List */}
+                <View style={{ gap: 8 }}>
+                    <Text style={styles.sectionTitle}>PRODUCT BREAKDOWN</Text>
+                    {reports.map((report) => (
+                        <View key={report.product.id} style={{ gap: 4 }}>
+                            <SectionCard
+                                title={report.product.name}
+                                subtitle={`Sold: ${report.unitsSold.toLocaleString()} units`}
+                                rightText={`$${(report.revenue / 1000).toFixed(1)}k`}
+                                onPress={() => onConfigureProduct(report.product.id)}
+                                style={styles.productCard}
+                            />
+                            {/* Render events below if any */}
+                            {report.events.length > 0 && (
+                                <View style={styles.eventsList}>
+                                    {report.events.map((e, idx) => (
+                                        <Text key={idx} style={styles.eventText}>• {e}</Text>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                    ))}
+                </View>
+
+                <GameButton
+                    title="Done / Next Month"
+                    onPress={onDone}
+                    variant="primary"
+                    style={{ marginTop: 8 }}
+                />
+
+            </ScrollView>
+        </GameModal>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        padding: theme.spacing.lg,
-    },
-    content: {
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        maxHeight: '90%',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    header: {
-        padding: theme.spacing.lg,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    subtitle: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-        marginTop: 4,
-    },
-    scrollContent: {
-        padding: theme.spacing.lg,
-        gap: theme.spacing.md,
-    },
-    productReport: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        gap: theme.spacing.sm,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    productHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    productName: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
-    },
-    configBtn: {
-        backgroundColor: theme.colors.card,
-        paddingHorizontal: theme.spacing.sm,
-        paddingVertical: 4,
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    configBtnPressed: {
-        opacity: 0.7,
-    },
-    configBtnText: {
-        fontSize: 11,
-        fontWeight: '700',
-        color: theme.colors.textSecondary,
-    },
-    productStats: {
-        flexDirection: 'row',
-        gap: theme.spacing.md,
-    },
-    stat: {
-        flex: 1,
-    },
-    statLabel: {
-        fontSize: 10,
-        textTransform: 'uppercase',
-        color: theme.colors.textMuted,
-        letterSpacing: 0.5,
-        marginBottom: 2,
-    },
-    statValue: {
-        fontSize: 14,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    eventsContainer: {
-        gap: 4,
-        marginTop: 4,
-    },
-    eventText: {
-        fontSize: 12,
-        color: theme.colors.danger,
-        lineHeight: 16,
-    },
     summaryCard: {
         backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        gap: theme.spacing.sm,
-        borderWidth: 2,
+        borderRadius: 12,
+        padding: 16,
+        gap: 8,
+        borderWidth: 1,
         borderColor: theme.colors.border,
     },
-    summaryTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
-        marginBottom: 4,
-    },
-    summaryRow: {
+    row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    summaryLabel: {
-        fontSize: 13,
+    label: {
+        fontSize: 14,
         color: theme.colors.textSecondary,
     },
-    summaryValue: {
+    value: {
         fontSize: 14,
         fontWeight: '700',
     },
-    summaryTotal: {
+    totalRow: {
         marginTop: 8,
         paddingTop: 8,
         borderTopWidth: 1,
         borderTopColor: theme.colors.border,
     },
-    summaryTotalLabel: {
-        fontSize: 14,
-        fontWeight: '700',
+    totalLabel: {
+        fontSize: 16,
+        fontWeight: '800',
         color: theme.colors.textPrimary,
     },
-    summaryTotalValue: {
-        fontSize: 18,
+    totalValue: {
+        fontSize: 20,
         fontWeight: '800',
     },
-    doneBtn: {
-        backgroundColor: theme.colors.success,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-        marginTop: theme.spacing.sm,
-    },
-    doneBtnPressed: {
-        opacity: 0.8,
-        transform: [{ scale: 0.98 }],
-    },
-    doneBtnText: {
-        fontSize: 15,
+    sectionTitle: {
+        fontSize: 11,
         fontWeight: '700',
-        color: '#000',
+        textTransform: 'uppercase',
+        color: theme.colors.textMuted,
+        letterSpacing: 0.5,
+        marginLeft: 4,
+    },
+    productCard: {
+        // SectionCard handles most, we just add specific spacing or color overrides if needed
+    },
+    eventsList: {
+        marginTop: 8,
+        paddingTop: 8,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.1)',
+        gap: 2,
+    },
+    eventText: {
+        fontSize: 11,
+        color: theme.colors.danger,
+        fontStyle: 'italic',
     },
 });
 

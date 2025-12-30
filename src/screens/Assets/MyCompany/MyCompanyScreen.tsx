@@ -1,19 +1,24 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../theme';
-import { useStatsStore } from '../../../store';
+import { useStatsStore, useGameStore } from '../../../store';
 import { useProductStore } from '../../../store/useProductStore';
 import type { AssetsStackParamList } from '../../../navigation';
+import { formatCurrency } from './NativeEconomy';
+
+
+
+// --- COMPONENTS ---
 import RAndDModal from '../../../components/MyCompany/Actions/RAndDModal';
 import AcquireStartupModal from '../../../components/MyCompany/Actions/AcquireStartupModal';
 import ExistingCompaniesModal from '../../../components/MyCompany/Actions/ExistingCompaniesModal';
@@ -33,193 +38,139 @@ import { Shareholder } from '../../../store/useStatsStore';
 import CorporateFinanceHubModal from '../../../components/MyCompany/Finance/CorporateFinanceHubModal';
 import BorrowModal from '../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../components/MyCompany/Finance/RepayModal';
+import GameModal from '../../../components/common/GameModal';
+import SectionCard from '../../../components/common/SectionCard';
+import GameButton from '../../../components/common/GameButton';
+import ManagementCard from '../../../components/MyCompany/ManagementCard';
 
-const formatMoney = (value: number) => {
-  const absolute = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
-
-  if (absolute >= 1_000_000_000) {
-    const formatted = (absolute / 1_000_000_000).toFixed(1);
-    return `${sign}$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}B`;
-  }
-  if (absolute >= 1_000_000) {
-    const formatted = (absolute / 1_000_000).toFixed(1);
-    return `${sign}$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
-  }
-  if (absolute >= 1_000) {
-    const formatted = (absolute / 1_000).toFixed(1);
-    return `${sign}$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
-  }
-  return `${sign}$${absolute.toLocaleString()}`;
-};
-
-type InfoRowProps = {
-  label: string;
-  value: string;
-  tone?: 'danger' | 'success';
-};
-
-const InfoRow = ({ label, value, tone }: InfoRowProps) => (
-  <View style={styles.infoRow}>
-    <Text style={styles.infoLabel}>{label}</Text>
-    <Text
-      style={[
-        styles.infoValue,
-        tone === 'danger' && { color: theme.colors.danger },
-        tone === 'success' && { color: theme.colors.success },
-      ]}>
-      {value}
-    </Text>
-  </View>
-);
-
-type InvestmentRowProps = {
+type DepartmentCardProps = {
   icon: string;
   title: string;
-  description: string;
+  subtitle: string;
   onPress: () => void;
 };
 
-const InvestmentRow = ({ icon, title, description, onPress }: InvestmentRowProps) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress }: DepartmentCardProps) => (
   <Pressable
     onPress={onPress}
-    style={({ pressed }) => [styles.investmentRow, pressed && styles.rowPressed]}>
-    <View style={styles.investmentLabel}>
-      <Text style={styles.investmentIcon}>{icon}</Text>
-      <View style={{ gap: theme.spacing.xs }}>
-        <Text style={styles.investmentTitle}>{title}</Text>
-        <Text style={styles.investmentDescription}>{description}</Text>
-      </View>
-    </View>
-    <Text style={styles.chevron}>›</Text>
+    style={({ pressed }) => [styles.departmentCard, pressed && styles.departmentCardPressed]}
+  >
+    <Text style={styles.departmentIcon}>{icon}</Text>
+    <Text style={styles.departmentTitle}>{title}</Text>
+    <Text style={styles.departmentSubtitle}>{subtitle}</Text>
   </Pressable>
 );
-
-type ModalCardProps = {
-  visible: boolean;
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-};
-
-const ModalCard = ({ visible, title, onClose, children }: ModalCardProps) => (
-  <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-    <View style={styles.modalBackdrop}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onClose}>
-        <View />
-      </Pressable>
-      <View style={styles.modalCard}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{title}</Text>
-          <Pressable
-            onPress={onClose}
-            style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
-            <Text style={styles.closeCircleText}>×</Text>
-          </Pressable>
-        </View>
-        {children}
-      </View>
-    </View>
-  </Modal>
-);
-
-type OverlayActionRowProps = {
-  title: string;
-  description: string;
-  onPress: () => void;
-};
-
-const OverlayActionRow = ({ title, description, onPress }: OverlayActionRowProps) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => [styles.overlayAction, pressed && styles.rowPressed]}>
-    <View style={{ gap: theme.spacing.xs }}>
-      <Text style={styles.actionTitle}>{title}</Text>
-      <Text style={styles.actionDescription}>{description}</Text>
-    </View>
-    <Text style={styles.chevron}>›</Text>
-  </Pressable>
-);
-
-type BigCardButtonProps = {
-  title: string;
-  description: string;
-  onPress: () => void;
-};
-
-const BigCardButton = ({ title, description, onPress }: BigCardButtonProps) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => [styles.bigCard, pressed && styles.bigCardPressed]}>
-    <View style={{ gap: theme.spacing.xs }}>
-      <Text style={styles.bigCardTitle}>{title}</Text>
-      <Text style={styles.bigCardDescription}>{description}</Text>
-    </View>
-    <Text style={styles.bigCardArrow}>↗</Text>
-  </Pressable>
-);
-
-const EXPERT_COST = 50_000;
 
 const MyCompanyScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
   const insets = useSafeAreaInsets();
+
+  // Store Data
   const {
-    shareholders,
-    isPublic,
-    companyValue,
     companySharePrice,
     companyDailyChange,
-    companyRevenueMonthly,
-    companyExpensesMonthly,
-    companyCapital,
-    companyDebt,
     companyDebtTotal,
-    companyOwnership, // Player's %
-    productionCapacity,
-    factoryCount,
+    companyOwnership,
     employeeCount,
-    money,
-    setField,
-    setCompanyCapital,
     borrowCapital,
     repayCapital,
+    companyValue,
+    companyCapital,
+    money: playerCash,
+    netWorth: playerNetWorth,
+    monthlyIncome: playerIncome,
+
+    monthlyExpenses: playerExpenses,
+    setField,
+    factoryCount,
   } = useStatsStore();
 
-  // TEMPORARY: Force update capital for M&A testing
-  useEffect(() => {
-    if (companyCapital < 100_000_000_000) {
-      setCompanyCapital(100_000_000_000);
-    }
-  }, []);
+  const handlePurchaseFactory = (delta: number) => {
+    if (delta === 0) return;
 
+    const cost = Math.abs(delta) * 50_000_000;
+    const newCount = factoryCount + delta;
+
+    if (delta > 0) {
+      // Buying factories
+      if (companyCapital < cost) {
+        Alert.alert('Insufficient Capital', 'You cannot afford this expansion.');
+        return;
+      }
+      setField('companyCapital', companyCapital - cost);
+      setField('factoryCount', newCount);
+      Alert.alert('Success', `Purchased ${delta} Factories!`);
+    } else {
+      // Selling factories
+      const refund = cost * 0.5; // 50% refund
+      setField('companyCapital', companyCapital + refund);
+      setField('factoryCount', newCount);
+      Alert.alert('Success', `Sold ${Math.abs(delta)} Factories for ${refund.toLocaleString()}!`);
+    }
+  };
+
+  const handleHireEmployees = (delta: number) => {
+    if (delta === 0) return;
+
+    const cost = Math.abs(delta) * 5_000;
+    const newCount = employeeCount + delta;
+    const currentLimit = factoryCount * 500;
+
+    if (delta > 0) {
+      // Hiring employees
+      if (companyCapital < cost) {
+        Alert.alert('Insufficient Capital', 'You cannot afford these hiring fees.');
+        return;
+      }
+      if (newCount > currentLimit) {
+        Alert.alert('Capacity Reached', `Each factory supports 500 employees. Build more factories first.`);
+        return;
+      }
+      setField('companyCapital', companyCapital - cost);
+      setField('employeeCount', newCount);
+      Alert.alert('Success', `Hired ${delta} Employees!`);
+    } else {
+      // Firing employees (no refund, just severance cost)
+      setField('companyCapital', companyCapital - cost); // Severance pay
+      setField('employeeCount', newCount);
+      Alert.alert('Notice', `Fired ${Math.abs(delta)} Employees (Severance: $${cost.toLocaleString()})`);
+    }
+  };
+
+  const { resetGame } = useGameStore();
   const { products } = useProductStore();
-  // Root Level Interaction State
+
+  // --- REMOVED QUARTERLY REPORT LOGIC AND STATE ---
+
+  const handleRestartGame = async () => {
+    try {
+      await resetGame();
+    } catch (e) {
+      console.error("Failed to restart game", e);
+    }
+  };
+
+  // State Management
   const [activeShareholder, setActiveShareholder] = useState<Shareholder | null>(null);
   const [profileShareholder, setProfileShareholder] = useState<Shareholder | null>(null);
   const [activeAction, setActiveAction] = useState<'gift' | 'negotiate' | null>(null);
-
-  const handleOpenGift = (shareholder: Shareholder) => {
-    setActiveShareholder(shareholder);
-    setActiveAction('gift');
-  };
-
-  const handleOpenNegotiate = (shareholder: Shareholder) => {
-    setActiveShareholder(shareholder);
-    setActiveAction('negotiate');
-  };
-
-  // Share Control Sub-Modal State
   const [activeShareAction, setActiveShareAction] = useState<'ipo' | 'dilution' | 'dividend' | 'buyback' | null>(null);
 
-  const [isDebtModalVisible, setDebtModalVisible] = useState(false);
-  const [isBoardMembersVisible, setBoardMembersVisible] = useState(false);
+  // Modal Visibilities
+  const [isFinanceHubVisible, setFinanceHubVisible] = useState(false);
+  const [isProductHubVisible, setProductHubVisible] = useState(false);
+  const [isManagementHubVisible, setManagementHubVisible] = useState(false);
   const [isShareControlVisible, setShareControlVisible] = useState(false);
-  const [isManagementVisible, setManagementVisible] = useState(false);
+  const [isBoardMembersVisible, setBoardMembersVisible] = useState(false);
   const [isRndVisible, setRndVisible] = useState(false);
+  const [isAcquireVisible, setAcquireVisible] = useState(false);
+  const [isExistingCompaniesVisible, setExistingCompaniesVisible] = useState(false);
 
-  // Finance Sub-Modal State
+  // Sub Modals
+  const [isFactoriesVisible, setFactoriesVisible] = useState(false);
+  const [isEmployeesVisible, setEmployeesVisible] = useState(false);
+
   const [borrowConfig, setBorrowConfig] = useState<{ visible: boolean; type: string; rate: number }>({
     visible: false,
     type: '',
@@ -228,24 +179,8 @@ const MyCompanyScreen = () => {
   const [repayConfig, setRepayConfig] = useState<{ visible: boolean }>({
     visible: false,
   });
-  const [isAcquireVisible, setAcquireVisible] = useState(false);
-  const [isExistingCompaniesVisible, setExistingCompaniesVisible] = useState(false);
-  const [isExpertVisible, setExpertVisible] = useState(false);
-  const [isFactoriesVisible, setFactoriesVisible] = useState(false);
-  const [isEmployeesVisible, setEmployeesVisible] = useState(false);
 
-  const playerStake = useMemo(
-    () => shareholders.find(holder => holder.type === 'player')?.percentage ?? 0,
-    [shareholders],
-  );
-
-  const profit = companyRevenueMonthly - companyExpensesMonthly;
-
-  const handleExpertPay = () => {
-    setField('money', Math.max(0, money - EXPERT_COST));
-    console.log('Expert advice granted (placeholder)');
-    setExpertVisible(false);
-  };
+  const activeProductsCount = products.filter(p => p.status === 'active').length;
 
   return (
     <View style={styles.safeArea}>
@@ -259,6 +194,8 @@ const MyCompanyScreen = () => {
           },
         ]}
         showsVerticalScrollIndicator={false}>
+
+        {/* Header */}
         <View style={styles.headerRow}>
           <Pressable
             onPress={() => {
@@ -268,196 +205,249 @@ const MyCompanyScreen = () => {
             <Text style={styles.backIcon}>←</Text>
           </Pressable>
           <View style={styles.titleGroup}>
-            <Text style={styles.title}>My Company</Text>
-            <Text style={styles.subtitle}>Financial overview of your main company</Text>
+            <Text style={styles.title}>Command Center</Text>
+            <Text style={styles.subtitle}>Manage your company operations</Text>
           </View>
         </View>
 
-        <View style={styles.financialBar}>
-          <Text style={styles.financialLabel}>Financials</Text>
-          <Pressable
-            onPress={() => setDebtModalVisible(true)}
-            style={({ pressed }) => [styles.debtPill, pressed && styles.pillPressed]}>
-            <Text style={styles.debtText}>Debts</Text>
-            <Text style={styles.debtValue}>{formatMoney(companyDebtTotal)}</Text>
-          </Pressable>
-        </View>
+        {/* Unified Company Header Card */}
+        <View style={styles.headerCard}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.companyTitle}>My Company</Text>
 
-        <View style={styles.sharesCard}>
-          <View style={styles.sharesHeader}>
-            <Text style={styles.sharesLabel}>Shares</Text>
-            <Pressable
-              onPress={() => setBoardMembersVisible(true)}
-              style={({ pressed }) => [styles.expand, pressed && styles.expandPressed]}>
-              <Text style={styles.expandText}>Board Members ↗</Text>
-            </Pressable>
           </View>
-          <Text style={styles.stakeValue}>Your stake: {playerStake.toFixed(1)}%</Text>
-          <Text style={styles.stakeHint}>
-            Anchored by family and seasoned investors. Tap to see full list.
-          </Text>
-        </View>
 
-        <View style={styles.detailsCard}>
-          <View style={styles.detailsHeader}>
-            <Text style={styles.detailsTitle}>Financial Details</Text>
-            <Text style={styles.detailsCaption}>Valuation {formatMoney(companyValue)}</Text>
+          <View style={styles.shareRow}>
+            <Text style={styles.sharePrice}>${companySharePrice.toFixed(2)}</Text>
+            <Text style={[
+              styles.shareChange,
+              (companyDailyChange || 0) >= 0 ? styles.changePositive : styles.changeNegative
+            ]}>
+              {(companyDailyChange || 0) >= 0 ? '+' : ''}{(companyDailyChange || 0).toFixed(2)}%
+            </Text>
           </View>
-          <View style={styles.detailsRow}>
-            <View style={styles.detailsCol}>
-              <InfoRow label="Share Price" value={`$${companySharePrice.toFixed(2)}`} />
-              <InfoRow label="Monthly Revenue" value={formatMoney(companyRevenueMonthly)} />
-              <InfoRow label="Capital" value={formatMoney(companyCapital)} />
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>Valuation</Text>
+              <Text style={styles.statValue}>{formatCurrency(companyValue || 0)}</Text>
             </View>
-            <View style={styles.detailsCol}>
-              <InfoRow label="Total Debt" value={formatMoney(companyDebtTotal)} tone="danger" />
-              <InfoRow label="Monthly Expenses" value={formatMoney(companyExpensesMonthly)} />
-              <InfoRow
-                label="Profit (Monthly)"
-                value={formatMoney(profit)}
-                tone={profit >= 0 ? 'success' : 'danger'}
-              />
+            <View style={styles.statSeparator} />
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>Capital</Text>
+              <Text style={styles.statValue}>{formatCurrency(companyCapital || 0)}</Text>
+            </View>
+            <View style={styles.statSeparator} />
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>CEO Cash</Text>
+              <Text style={[styles.statValue, styles.textSuccess]}>
+                {formatCurrency(playerCash || 0)}
+              </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Investments</Text>
+        {/* Player Personal Finance Card */}
+        <View style={styles.headerCard}>
+          <Text style={[styles.companyTitle, { fontSize: 18, marginBottom: 8 }]}>Personal Finances</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>Net Worth</Text>
+              <Text style={styles.statValue}>{formatCurrency(playerNetWorth || 0)}</Text>
+            </View>
+            <View style={styles.statSeparator} />
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>Income</Text>
+              <Text style={[styles.statValue, styles.textSuccess]}>+{formatCurrency(playerIncome || 0)}</Text>
+            </View>
+            <View style={styles.statSeparator} />
+            <View style={styles.statCol}>
+              <Text style={styles.statLabel}>Expenses</Text>
+              <Text style={[styles.statValue, styles.textDanger]}>-{formatCurrency(playerExpenses || 0)}</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.investmentsCard}>
-          <InvestmentRow
-            icon="🔬"
-            title="R&D Investment"
-            description="Invest in future growth."
-            onPress={() => setRndVisible(true)}
+
+        {/* Operations Management Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>OPERATIONS MANAGEMENT</Text>
+        </View>
+
+        <View style={{ gap: 12 }}>
+          <ManagementCard
+            title="Factories"
+            icon="🏭"
+            currentValue={factoryCount}
+            maxValue={Math.floor((companyCapital || 0) / 50_000_000)}
+            costPerUnit={50_000_000}
+            onSave={handlePurchaseFactory}
           />
-          <InvestmentRow
-            icon="🧩"
-            title="Acquire Company"
-            description="Buy new companies to expand your empire."
-            onPress={() => setAcquireVisible(true)}
-          />
-          <InvestmentRow
-            icon="🏢"
-            title="Existing Companies"
-            description="Manage subsidiaries"
-            onPress={() => setExistingCompaniesVisible(true)}
-          />
-          <InvestmentRow
-            icon="🧠"
-            title="Expert Advice"
-            description="Get premium insights for a fee."
-            onPress={() => setExpertVisible(true)}
+          <ManagementCard
+            title="Employees"
+            icon="👥"
+            currentValue={employeeCount}
+            maxValue={Math.min(
+              Math.floor((companyCapital || 0) / 5_000),
+              (factoryCount * 500) - employeeCount
+            )}
+            costPerUnit={5_000}
+            onSave={handleHireEmployees}
           />
         </View>
 
+        {/* Departments Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Products</Text>
+          <Text style={styles.sectionTitle}>DEPARTMENTS</Text>
         </View>
-        <ProductHub />
 
-        <View style={styles.bottomRow}>
-          <BigCardButton
-            title="Share Control"
-            description="Dilution, buyback, IPO"
+        <View style={styles.departmentsGrid}>
+          <DepartmentCard
+            icon="🏦"
+            title="Finance"
+            subtitle={`Debt: ${formatCurrency(companyDebtTotal)}`}
+            onPress={() => setFinanceHubVisible(true)}
+          />
+          <DepartmentCard
+            icon="🏭"
+            title="Products"
+            subtitle={`${activeProductsCount} Active`}
+            onPress={() => setProductHubVisible(true)}
+          />
+          <DepartmentCard
+            icon="👥"
+            title="HR & Management"
+            subtitle={`${employeeCount} Employees`}
+            onPress={() => setManagementHubVisible(true)}
+          />
+          <DepartmentCard
+            icon="📈"
+            title="Stock Market"
+            subtitle={`${companyOwnership.toFixed(1)}% Owned`}
             onPress={() => setShareControlVisible(true)}
           />
-          <BigCardButton
-            title="Company Management"
-            description="Factories, employees, morale"
-            onPress={() => setManagementVisible(true)}
+        </View>
+
+        {/* Quick Actions */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>QUICK ACTIONS</Text>
+        </View>
+
+        <View style={{ gap: 8 }}>
+          <SectionCard
+            title="🔬 R&D Investment"
+            subtitle="Invest in future growth"
+            onPress={() => setRndVisible(true)}
+          />
+          <SectionCard
+            title="🧩 Acquire Company"
+            subtitle="Expand your empire"
+            onPress={() => setAcquireVisible(true)}
+          />
+          <SectionCard
+            title="👔 Board Members"
+            subtitle="View shareholders"
+            onPress={() => setBoardMembersVisible(true)}
+          />
+          <SectionCard
+            title="🏢 Existing Companies"
+            subtitle="Manage subsidiaries"
+            onPress={() => setExistingCompaniesVisible(true)}
           />
         </View>
+
       </ScrollView>
 
+      {/* --- MODAL AREA (Outside ScrollView) --- */}
+
+      {/* Finance Modals */}
       <CorporateFinanceHubModal
-        visible={isDebtModalVisible}
-        onClose={() => setDebtModalVisible(false)}
+        visible={isFinanceHubVisible}
+        onClose={() => setFinanceHubVisible(false)}
         onSelectLoan={(type, rate) => {
-          // Close Hub, Open Borrow Modal
-          setDebtModalVisible(false);
+          setFinanceHubVisible(false);
           setBorrowConfig({ visible: true, type, rate });
         }}
         onSelectRepay={() => {
-          // Close Hub, Open Repay Modal
-          setDebtModalVisible(false);
+          setFinanceHubVisible(false);
           setRepayConfig({ visible: true });
         }}
       />
-
-      {/* Corporate Finance Sub-Modals */}
       {borrowConfig.visible && (
         <BorrowModal
           visible={borrowConfig.visible}
           type={borrowConfig.type}
           rate={borrowConfig.rate}
-          maxLimit={Math.max(10_000_000, companyRevenueMonthly * 5)}
+          maxLimit={Math.max(10_000_000, (companyCapital || 0) * 0.5)}
           onClose={() => {
             setBorrowConfig({ ...borrowConfig, visible: false });
-            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+            setTimeout(() => setFinanceHubVisible(true), 300);
           }}
           onConfirm={(amount) => {
             borrowCapital(amount, borrowConfig.rate);
             setBorrowConfig({ ...borrowConfig, visible: false });
-            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+            setTimeout(() => setFinanceHubVisible(true), 300);
           }}
         />
       )}
-
       {repayConfig.visible && (
         <RepayModal
           visible={repayConfig.visible}
           totalDebt={companyDebtTotal}
-          cash={companyCapital}
+          cash={companyCapital || 0}
           onClose={() => {
             setRepayConfig({ ...repayConfig, visible: false });
-            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+            setTimeout(() => setFinanceHubVisible(true), 300);
           }}
           onRepay={(amount) => {
             repayCapital(amount);
             setRepayConfig({ ...repayConfig, visible: false });
-            setTimeout(() => setDebtModalVisible(true), 300); // Re-open Hub
+            setTimeout(() => setFinanceHubVisible(true), 300);
           }}
         />
       )}
 
-      <BoardMembersModal
-        visible={isBoardMembersVisible}
-        onClose={() => setBoardMembersVisible(false)}
-        onSelectMember={(member) => {
-          setBoardMembersVisible(false);
-          // Small delay to allow fade out
-          setTimeout(() => {
-            setProfileShareholder(member);
-          }, 300);
-        }}
-      />
+      {/* Other Modals */}
+      <GameModal
+        visible={isProductHubVisible}
+        onClose={() => setProductHubVisible(false)}
+      >
+        <ProductHub onClose={() => setProductHubVisible(false)} />
+      </GameModal>
 
-      <ModalCard
-        visible={isExpertVisible}
-        title="Expert Advice"
-        onClose={() => setExpertVisible(false)}>
-        <View style={{ gap: theme.spacing.md }}>
-          <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.modalBodyText}>
-              You can ask an expert to review your company and portfolio.
-            </Text>
-            <Text style={styles.modalSubText}>Cost: {formatMoney(EXPERT_COST)} (placeholder).</Text>
-          </View>
-          <View style={styles.modalButtonRow}>
-            <Pressable
-              onPress={() => setExpertVisible(false)}
-              style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
-              <Text style={styles.secondaryButtonText}>Cancel</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleExpertPay}
-              style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
-              <Text style={styles.primaryButtonText}>Pay &amp; Ask</Text>
-            </Pressable>
+      {isManagementHubVisible && (
+        <View style={styles.modalBackdrop}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setManagementHubVisible(false)} />
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>HR & Management</Text>
+            <View style={{ gap: 12 }}>
+              <GameButton
+                title="🏭 Factories & Production"
+                variant="secondary"
+                onPress={() => {
+                  setManagementHubVisible(false);
+                  setTimeout(() => setFactoriesVisible(true), 300);
+                }}
+              />
+              <GameButton
+                title="👥 Employees & Morale"
+                variant="secondary"
+                onPress={() => {
+                  setManagementHubVisible(false);
+                  setTimeout(() => setEmployeesVisible(true), 300);
+                }}
+              />
+              <GameButton
+                title="Close"
+                variant="ghost"
+                onPress={() => setManagementHubVisible(false)}
+              />
+            </View>
           </View>
         </View>
-      </ModalCard>
+      )}
+
+      <FactoriesModule visible={isFactoriesVisible} onClose={() => setFactoriesVisible(false)} />
+      <EmployeesModule visible={isEmployeesVisible} onClose={() => setEmployeesVisible(false)} />
 
       <ShareControlHub
         visible={isShareControlVisible}
@@ -480,55 +470,22 @@ const MyCompanyScreen = () => {
         }}
       />
 
-      <ModalCard
-        visible={isManagementVisible}
-        title="Company Management"
-        onClose={() => setManagementVisible(false)}>
-        <View style={{ gap: theme.spacing.lg }}>
-          <Pressable
-            onPress={() => {
-              setManagementVisible(false);
-              setTimeout(() => setFactoriesVisible(true), 300);
-            }}
-            style={({ pressed }) => [styles.managementRow, pressed && styles.rowPressed]}>
-            <View style={{ gap: theme.spacing.xs }}>
-              <Text style={styles.actionTitle}>🏭 Factories & Production</Text>
-              <Text style={styles.actionDescription}>Manage infrastructure.</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => {
-              setManagementVisible(false);
-              setTimeout(() => setEmployeesVisible(true), 300);
-            }}
-            style={({ pressed }) => [styles.managementRow, pressed && styles.rowPressed]}>
-            <View style={{ gap: theme.spacing.xs }}>
-              <Text style={styles.actionTitle}>👥 Employees & Morale</Text>
-              <Text style={styles.actionDescription}>Manage workforce.</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => setManagementVisible(false)}
-            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-            <Text style={styles.closeButtonText}>Close Management</Text>
-          </Pressable>
-        </View>
-      </ModalCard>
-
-      <FactoriesModule visible={isFactoriesVisible} onClose={() => setFactoriesVisible(false)} />
-      <EmployeesModule visible={isEmployeesVisible} onClose={() => setEmployeesVisible(false)} />
+      <BoardMembersModal
+        visible={isBoardMembersVisible}
+        onClose={() => setBoardMembersVisible(false)}
+        onSelectMember={(member) => {
+          setBoardMembersVisible(false);
+          setTimeout(() => {
+            setProfileShareholder(member);
+          }, 300);
+        }}
+      />
 
       <RAndDModal visible={isRndVisible} onClose={() => setRndVisible(false)} />
       <AcquireStartupModal visible={isAcquireVisible} onClose={() => setAcquireVisible(false)} />
-
-      {/* Existing Companies Modal */}
       <ExistingCompaniesModal visible={isExistingCompaniesVisible} onClose={() => setExistingCompaniesVisible(false)} />
 
-      {/* Root Level Modals */}
+      {/* Shareholder Actions */}
       {activeShareholder && (
         <>
           <GiftSelectionModal
@@ -550,7 +507,6 @@ const MyCompanyScreen = () => {
           shareholder={profileShareholder}
           onClose={() => {
             setProfileShareholder(null);
-            // Small delay to allow fade out
             setTimeout(() => {
               setBoardMembersVisible(true);
             }, 300);
@@ -574,7 +530,6 @@ const MyCompanyScreen = () => {
         />
       )}
 
-      {/* Share Control Sub-Modals */}
       <IPOWarningModal
         visible={activeShareAction === 'ipo'}
         onClose={() => setActiveShareAction(null)}
@@ -591,6 +546,9 @@ const MyCompanyScreen = () => {
         visible={activeShareAction === 'buyback'}
         onClose={() => setActiveShareAction(null)}
       />
+
+
+
     </View>
   );
 };
@@ -604,7 +562,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: theme.spacing.lg,
-    gap: theme.spacing.md,
+    gap: theme.spacing.lg,
   },
   headerRow: {
     flexDirection: 'row',
@@ -643,408 +601,144 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.typography.body,
   },
-  financialBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: theme.spacing.sm,
-  },
-  financialLabel: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
-  },
-  debtPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
+  headerCard: {
     backgroundColor: theme.colors.cardSoft,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  debtText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
-    fontSize: theme.typography.body,
-  },
-  debtValue: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  sharesCard: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.xs,
-  },
-  sharesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sharesLabel: {
-    color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-    letterSpacing: 0.4,
-  },
-  expand: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
-  },
-  expandPressed: {
-    backgroundColor: theme.colors.cardSoft,
-    transform: [{ scale: 0.98 }],
-  },
-  expandText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    fontWeight: '700',
-  },
-  stakeValue: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '800',
-  },
-  stakeHint: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
-  },
-  detailsCard: {
-    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
+    gap: 8,
   },
-  detailsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  detailsTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
+  companyTitle: {
+    fontSize: 24,
     fontWeight: '800',
+    color: theme.colors.textPrimary,
   },
-  detailsCaption: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  detailsRow: {
+  shareRow: {
     flexDirection: 'row',
-    gap: theme.spacing.lg,
+    alignItems: 'baseline',
+    gap: 8,
+    marginBottom: 8,
   },
-  detailsCol: {
+  sharePrice: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  shareChange: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  changePositive: {
+    color: theme.colors.success,
+  },
+  changeNegative: {
+    color: theme.colors.danger,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  statCol: {
     flex: 1,
-    gap: theme.spacing.sm,
+    gap: 4,
   },
-  infoRow: {
-    gap: theme.spacing.xs / 2,
+  statSeparator: {
+    width: 1,
+    backgroundColor: theme.colors.border,
+    marginHorizontal: 12,
   },
-  infoLabel: {
-    color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-    letterSpacing: 0.4,
+  statLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
     textTransform: 'uppercase',
   },
-  infoValue: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
+  statValue: {
+    fontSize: 14,
     fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  textSuccess: {
+    color: theme.colors.success,
+  },
+  textDanger: {
+    color: theme.colors.danger,
   },
   sectionHeader: {
     marginTop: theme.spacing.sm,
   },
   sectionTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: 14,
+    color: theme.colors.textMuted,
+    fontSize: 11,
     fontWeight: '800',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginLeft: 4,
   },
-  investmentsCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
-    gap: theme.spacing.xs,
-  },
-  investmentRow: {
+  departmentsGrid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: theme.spacing.sm,
-    gap: theme.spacing.sm,
-  },
-  investmentLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    flex: 1,
-  },
-  investmentIcon: {
-    fontSize: 20,
-  },
-  investmentTitle: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
-    fontSize: theme.typography.body,
-  },
-  investmentDescription: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
-  },
-  chevron: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.subtitle,
-  },
-  bottomRow: {
-    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: theme.spacing.md,
-    marginTop: theme.spacing.sm,
   },
-  bigCard: {
-    flex: 1,
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    paddingVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.md,
-    justifyContent: 'space-between',
-    minHeight: 120,
-  },
-  bigCardPressed: {
+  departmentCard: {
+    flexBasis: '48%',
     backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.99 }],
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm,
+    minHeight: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  bigCardTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
+  departmentCardPressed: {
+    backgroundColor: theme.colors.cardSoft,
+    transform: [{ scale: 0.98 }],
+  },
+  departmentIcon: {
+    fontSize: 32,
+  },
+  departmentTitle: {
+    fontSize: 15,
     fontWeight: '800',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
   },
-  bigCardDescription: {
+  departmentSubtitle: {
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-  },
-  bigCardArrow: {
-    color: theme.colors.textSecondary,
-    alignSelf: 'flex-end',
-    fontSize: theme.typography.subtitle,
+    textAlign: 'center',
   },
   modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing.lg,
+    zIndex: 999,
   },
   modalCard: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
-    width: '95%',
-    maxWidth: 520,
+    width: '90%',
+    maxWidth: 400,
     gap: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: theme.colors.border,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   modalTitle: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle + 2,
+    fontSize: 18,
     fontWeight: '800',
-  },
-  closeCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.colors.cardSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  closeCirclePressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.96 }],
-  },
-  closeCircleText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
-  },
-  modalBodyText: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
-    lineHeight: 20,
-  },
-  modalSubText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
-  },
-  shareholderList: {
-    gap: theme.spacing.sm,
-  },
-  shareholderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-    paddingBottom: theme.spacing.sm,
-  },
-  shareholderName: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
-    fontWeight: '700',
-  },
-  shareholderValue: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-  },
-  closeButton: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.sm,
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  closeButtonPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.98 }],
-  },
-  closeButtonText: {
-    color: theme.colors.textSecondary,
-    fontWeight: '700',
-    fontSize: theme.typography.body,
-  },
-  modalButtonRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  secondaryButtonPressed: {
-    backgroundColor: theme.colors.cardSoft,
-    transform: [{ scale: 0.98 }],
-  },
-  secondaryButtonText: {
-    color: theme.colors.textSecondary,
-    fontWeight: '700',
-    fontSize: theme.typography.body,
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: theme.colors.accent,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  primaryButtonPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  primaryButtonText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '800',
-    fontSize: theme.typography.body,
-  },
-  overlayAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
-  },
-  actionTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
-    fontWeight: '800',
-  },
-  actionDescription: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-    lineHeight: 18,
-  },
-  rowPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.99 }],
-  },
-  managementRow: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: theme.spacing.sm,
-  },
-  managementMeta: {
-    color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-  },
-  employeesBlock: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
-  },
-  moraleActions: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  chipButton: {
-    flex: 1,
-    backgroundColor: theme.colors.card,
-    borderRadius: 999,
-    paddingVertical: theme.spacing.sm,
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  chipButtonPressed: {
-    backgroundColor: theme.colors.cardSoft,
-    transform: [{ scale: 0.98 }],
-  },
-  chipText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
-    fontSize: theme.typography.caption + 1,
-  },
-  pillPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.98 }],
   },
 });

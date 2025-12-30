@@ -1,6 +1,6 @@
-import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
-import {zustandStorage} from '../storage/persist';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandStorage } from '../storage/persist';
 
 export type EventState = {
   todayEvent?: string;
@@ -52,18 +52,18 @@ export const useEventStore = create<EventStore>()(
   persist(
     set => ({
       ...initialEventState,
-      update: partial => set(state => ({...state, ...partial})),
-      setField: (key, value) => set(state => ({...state, [key]: value})),
-      setLastLifeEvent: value => set(state => ({...state, lastLifeEvent: value})),
-      setLastLoveEvent: value => set(state => ({...state, lastLoveEvent: value})),
+      update: partial => set(state => ({ ...state, ...partial })),
+      setField: (key, value) => set(state => ({ ...state, [key]: value })),
+      setLastLifeEvent: value => set(state => ({ ...state, lastLifeEvent: value })),
+      setLastLoveEvent: value => set(state => ({ ...state, lastLoveEvent: value })),
       setLastMarketEvent: value =>
-        set(state => ({...state, lastMarketEvent: value})),
+        set(state => ({ ...state, lastMarketEvent: value })),
       setLastCompanyEvent: value =>
-        set(state => ({...state, lastCompanyEvent: value})),
+        set(state => ({ ...state, lastCompanyEvent: value })),
       incrementCompanyEventCount: () =>
-        set(state => ({...state, companyEventCount: (state.companyEventCount ?? 0) + 1})),
+        set(state => ({ ...state, companyEventCount: (state.companyEventCount ?? 0) + 1 })),
       setLastCasinoEvent: value =>
-        set(state => ({...state, lastCasinoEvent: value})),
+        set(state => ({ ...state, lastCasinoEvent: value })),
       resetCycleFlags: () =>
         set(state => ({
           ...state,
@@ -98,7 +98,7 @@ export const useEventStore = create<EventStore>()(
     }),
     {
       name: 'succesor_events_v1',
-      storage: zustandStorage,
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         lastLifeEvent: state.lastLifeEvent,
         lastLoveEvent: state.lastLoveEvent,

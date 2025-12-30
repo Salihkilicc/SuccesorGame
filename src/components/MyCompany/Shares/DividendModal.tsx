@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    Modal,
-    Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store/useStatsStore';
+import GameModal from '../../common/GameModal';
+import SectionCard from '../../common/SectionCard';
+import GameButton from '../../common/GameButton';
 
 interface Props {
     visible: boolean;
@@ -23,6 +19,9 @@ const DividendModal = ({ visible, onClose }: Props) => {
     const dividendPool = companyCapital * (dividendPercentage / 100);
     const playerDividend = dividendPool * (companyOwnership / 100);
     const remainingCapital = companyCapital - dividendPool;
+
+    // Logic for warning
+    const isRisky = remainingCapital < companyCapital * 0.3;
 
     const handleConfirm = () => {
         if (dividendPercentage <= 0) {
@@ -60,129 +59,94 @@ const DividendModal = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
-            <View style={styles.overlay} pointerEvents="box-none">
-                <View style={styles.content}>
-                    <Text style={styles.title}>💸 Pay Dividend</Text>
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            title="💸 Pay Dividend"
+            subtitle="Distribute profits to shareholders"
+        >
+            <View style={{ gap: 16 }}>
 
-                    <Text style={styles.description}>
-                        Distribute company profits to shareholders. Your share will be transferred to your personal wallet.
+                {/* Capital Card */}
+                <View style={styles.capitalCard}>
+                    <Text style={styles.capitalLabel}>Available Capital</Text>
+                    <Text style={styles.capitalValue}>
+                        ${(companyCapital / 1_000_000).toFixed(2)}M
                     </Text>
+                </View>
 
-                    <View style={styles.capitalCard}>
-                        <Text style={styles.capitalLabel}>Available Capital</Text>
-                        <Text style={styles.capitalValue}>
-                            ${(companyCapital / 1_000_000).toFixed(2)}M
+                {/* Slider Section */}
+                <View style={styles.sliderCard}>
+                    <View style={styles.sliderHeader}>
+                        <Text style={styles.sliderLabel}>Dividend Amount</Text>
+                        <Text style={styles.sliderValue}>{dividendPercentage.toFixed(1)}%</Text>
+                    </View>
+                    <Slider
+                        style={styles.slider}
+                        minimumValue={1}
+                        maximumValue={50}
+                        step={1}
+                        value={dividendPercentage}
+                        onValueChange={setDividendPercentage}
+                        minimumTrackTintColor={theme.colors.success}
+                        maximumTrackTintColor={theme.colors.cardSoft}
+                        thumbTintColor={theme.colors.success}
+                    />
+                </View>
+
+                {/* Info */}
+                <View style={{ gap: 4 }}>
+                    <SectionCard
+                        title="Total Dividend Pool"
+                        rightText={`$${(dividendPool / 1_000_000).toFixed(2)}M`}
+                    />
+                    <SectionCard
+                        title={`Your Share (${companyOwnership.toFixed(1)}%)`}
+                        rightText={`+$${(playerDividend / 1_000_000).toFixed(2)}M`}
+                        style={{ borderColor: theme.colors.success }}
+                        selected
+                    />
+                    <SectionCard
+                        title="Remaining Capital"
+                        rightText={`$${(remainingCapital / 1_000_000).toFixed(2)}M`}
+                        danger={isRisky}
+                    />
+                </View>
+
+                {dividendPercentage > 30 && (
+                    <View style={styles.warningBox}>
+                        <Text style={styles.warningText}>
+                            ⚠️ High dividend may impact company operations
                         </Text>
                     </View>
+                )}
 
-                    <View style={styles.sliderCard}>
-                        <View style={styles.sliderHeader}>
-                            <Text style={styles.sliderLabel}>Dividend Amount</Text>
-                            <Text style={styles.sliderValue}>{dividendPercentage.toFixed(1)}%</Text>
-                        </View>
-                        <Slider
-                            style={styles.slider}
-                            minimumValue={1}
-                            maximumValue={50}
-                            step={1}
-                            value={dividendPercentage}
-                            onValueChange={setDividendPercentage}
-                            minimumTrackTintColor={theme.colors.success}
-                            maximumTrackTintColor={theme.colors.cardSoft}
-                            thumbTintColor={theme.colors.success}
-                        />
-                    </View>
-
-                    <View style={styles.calculationCard}>
-                        <View style={styles.calcRow}>
-                            <Text style={styles.calcLabel}>Total Dividend Pool</Text>
-                            <Text style={styles.calcValue}>
-                                ${(dividendPool / 1_000_000).toFixed(2)}M
-                            </Text>
-                        </View>
-                        <View style={styles.calcRow}>
-                            <Text style={styles.calcLabel}>Your Share ({companyOwnership.toFixed(1)}%)</Text>
-                            <Text style={[styles.calcValue, { color: theme.colors.success }]}>
-                                +${(playerDividend / 1_000_000).toFixed(2)}M
-                            </Text>
-                        </View>
-                        <View style={styles.calcRow}>
-                            <Text style={styles.calcLabel}>Remaining Capital</Text>
-                            <Text style={[
-                                styles.calcValue,
-                                { color: remainingCapital < companyCapital * 0.3 ? theme.colors.danger : theme.colors.textPrimary }
-                            ]}>
-                                ${(remainingCapital / 1_000_000).toFixed(2)}M
-                            </Text>
-                        </View>
-                    </View>
-
-                    {dividendPercentage > 30 && (
-                        <View style={styles.warningBox}>
-                            <Text style={styles.warningText}>
-                                ⚠️ High dividend may impact company operations
-                            </Text>
-                        </View>
-                    )}
-
-                    <View style={styles.buttonRow}>
-                        <Pressable
-                            onPress={onClose}
-                            style={({ pressed }) => [
-                                styles.btn,
-                                styles.btnCancel,
-                                pressed && styles.btnPressed,
-                            ]}>
-                            <Text style={styles.btnText}>Cancel</Text>
-                        </Pressable>
-                        <Pressable
-                            onPress={handleConfirm}
-                            style={({ pressed }) => [
-                                styles.btn,
-                                styles.btnConfirm,
-                                pressed && styles.btnPressed,
-                            ]}>
-                            <Text style={[styles.btnText, { color: '#000' }]}>Pay Dividend</Text>
-                        </Pressable>
-                    </View>
+                {/* Actions */}
+                <View style={{ gap: 8 }}>
+                    <GameButton
+                        title="Pay Dividend"
+                        onPress={handleConfirm}
+                        variant="primary"
+                    />
+                    <GameButton
+                        title="Cancel"
+                        onPress={onClose}
+                        variant="ghost"
+                    />
                 </View>
+
             </View>
-        </Modal>
+        </GameModal>
     );
 };
 
+export default DividendModal;
+
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        padding: theme.spacing.lg,
-    },
-    content: {
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
-        gap: theme.spacing.md,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-        textAlign: 'center',
-    },
-    description: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-        textAlign: 'center',
-        lineHeight: 18,
-    },
     capitalCard: {
-        backgroundColor: theme.colors.success + '20',
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
+        backgroundColor: 'rgba(76, 175, 80, 0.15)',
+        padding: 16,
+        borderRadius: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -191,7 +155,8 @@ const styles = StyleSheet.create({
     },
     capitalLabel: {
         fontSize: 14,
-        color: theme.colors.textPrimary,
+        color: '#E2E8F0',
+        fontWeight: '600',
     },
     capitalValue: {
         fontSize: 18,
@@ -199,12 +164,12 @@ const styles = StyleSheet.create({
         color: theme.colors.success,
     },
     sliderCard: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        gap: theme.spacing.sm,
+        backgroundColor: '#2D3748',
+        padding: 16,
+        borderRadius: 12,
+        gap: 8,
         borderWidth: 1,
-        borderColor: theme.colors.border,
+        borderColor: '#4A5568',
     },
     sliderHeader: {
         flexDirection: 'row',
@@ -213,7 +178,8 @@ const styles = StyleSheet.create({
     },
     sliderLabel: {
         fontSize: 14,
-        color: theme.colors.textSecondary,
+        color: '#E2E8F0',
+        fontWeight: '600',
     },
     sliderValue: {
         fontSize: 18,
@@ -224,67 +190,17 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 40,
     },
-    calculationCard: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        gap: theme.spacing.sm,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    calcRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    calcLabel: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-    },
-    calcValue: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
-    },
     warningBox: {
-        backgroundColor: theme.colors.danger + '20',
-        padding: theme.spacing.sm,
-        borderRadius: theme.radius.md,
+        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+        padding: 8,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: theme.colors.danger,
+        borderColor: '#FF6B6B',
+        alignItems: 'center',
     },
     warningText: {
         fontSize: 12,
-        color: theme.colors.danger,
-        textAlign: 'center',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: theme.spacing.sm,
-        marginTop: theme.spacing.sm,
-    },
-    btn: {
-        flex: 1,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-    },
-    btnCancel: {
-        backgroundColor: theme.colors.cardSoft,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    btnConfirm: {
-        backgroundColor: theme.colors.success,
-    },
-    btnPressed: {
-        transform: [{ scale: 0.98 }],
-    },
-    btnText: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
+        color: '#FF6B6B',
+        fontWeight: '600',
     },
 });
-
-export default DividendModal;

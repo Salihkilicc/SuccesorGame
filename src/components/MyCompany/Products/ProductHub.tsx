@@ -4,23 +4,63 @@ import { theme } from '../../../theme';
 import { useProductManagement } from './useProductManagement';
 import ProductDetailModal from './ProductDetailModal';
 import NewProductWizard from './NewProductWizard';
+import ManagementCard from '../ManagementCard';
+import { useStatsStore } from '../../../store';
 
-const ProductHub = () => {
+interface Props {
+    onClose?: () => void;
+}
+
+const ProductHub = ({ onClose }: Props) => {
     const { products, availableCapacity } = useProductManagement();
+    const { productionLevel, employeeCount, setField } = useStatsStore();
     const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [isWizardVisible, setWizardVisible] = useState(false);
+
+    const maxProduction = employeeCount * 150; // 150 units per employee
+
+    const handleProductionChange = (delta: number) => {
+        const newLevel = productionLevel + delta;
+        setField('productionLevel', newLevel);
+    };
 
     const canAddProduct = products.length < 6;
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>🏭 Products</Text>
-                <View style={styles.capacityBadge}>
-                    <Text style={styles.capacityText}>
-                        Capacity: {availableCapacity.toLocaleString()}
-                    </Text>
+                <View style={styles.headerLeft}>
+                    <Text style={styles.title}>🏭 Products</Text>
+                    <View style={styles.capacityBadge}>
+                        <Text style={styles.capacityText}>
+                            Cap: {availableCapacity.toLocaleString()}
+                        </Text>
+                    </View>
                 </View>
+                {onClose && (
+                    <Pressable
+                        onPress={onClose}
+                        style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
+                    >
+                        <Text style={styles.closeButtonText}>✕</Text>
+                    </Pressable>
+                )}
+            </View>
+
+            {/* Production Control */}
+            <View style={styles.productionSection}>
+                <ManagementCard
+                    title="Production Target"
+                    icon="⚙️"
+                    currentValue={productionLevel}
+                    maxValue={maxProduction}
+                    minValue={0}
+                    costPerUnit={0}
+                    onSave={handleProductionChange}
+                />
+                <Text style={styles.productionHint}>
+                    💡 This target persists across quarters. Production costs are deducted during execution.
+                </Text>
             </View>
 
             <ScrollView
@@ -99,12 +139,38 @@ const ProductHub = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        minHeight: 600,
+        backgroundColor: theme.colors.background,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: theme.spacing.md,
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    closeButton: {
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.cardSoft,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    closeButtonPressed: {
+        backgroundColor: theme.colors.card,
+    },
+    closeButtonText: {
+        fontSize: 16,
+        color: theme.colors.textSecondary,
+        fontWeight: '700',
+        marginTop: -2,
     },
     title: {
         fontSize: theme.typography.title,
@@ -123,6 +189,16 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
         color: theme.colors.textSecondary,
+    },
+    productionSection: {
+        marginBottom: theme.spacing.md,
+        gap: theme.spacing.sm,
+    },
+    productionHint: {
+        fontSize: 11,
+        color: theme.colors.textMuted,
+        fontStyle: 'italic',
+        textAlign: 'center',
     },
     productList: {
         gap: theme.spacing.md,

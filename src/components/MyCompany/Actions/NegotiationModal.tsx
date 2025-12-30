@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { theme } from '../../../theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
 import { useStatsStore } from '../../../store/useStatsStore';
+import GameModal from '../../common/GameModal';
+import SectionCard from '../../common/SectionCard';
+import GameButton from '../../common/GameButton';
 
 type Props = {
     visible: boolean;
@@ -126,158 +129,111 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <Pressable style={styles.backdrop} onPress={onClose}>
-                <Pressable style={styles.container} onPress={e => e.stopPropagation()}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>Deal Room: {company.name}</Text>
-                        <Pressable onPress={onClose}><Text style={styles.closeText}>Cancel</Text></Pressable>
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            title={`Deal Room: ${company.name}`}
+            subtitle="Negotiate Acquisition"
+        >
+            <View style={{ minHeight: 350 }}>
+                {status === 'initial' && (
+                    <View style={styles.content}>
+                        <SectionCard 
+                            title="Valuation (Market Cap)"
+                            rightText={formatMoney(company.marketCap)}
+                        />
+                        <SectionCard 
+                            title="Asking Price (Inc. Premium)"
+                            rightText={formatMoney(askingPrice)}
+                            style={{ borderColor: theme.colors.accent }}
+                        />
+
+                        <View style={styles.divider} />
+
+                        <Text style={styles.inputLabel}>Your Offer ($ Billions)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="e.g. 52.5"
+                            placeholderTextColor="#666"
+                            keyboardType="numeric"
+                            value={offerAmount}
+                            onChangeText={setOfferAmount}
+                        />
+
+                        <Text style={styles.hint}>
+                            Cash Available: {formatMoney(companyCapital)}
+                        </Text>
+
+                        <GameButton 
+                            title="Submit Offer to Board"
+                            onPress={handleSubmitOffer}
+                            style={{ marginTop: 8 }}
+                        />
                     </View>
+                )}
 
-                    {status === 'initial' && (
-                        <View style={styles.content}>
-                            <View style={styles.infoRow}>
-                                <Text style={styles.label}>Valuation (Market Cap)</Text>
-                                <Text style={styles.value}>{formatMoney(company.marketCap)}</Text>
-                            </View>
-                            <View style={styles.infoRow}>
-                                <Text style={styles.label}>Asking Price (Inc. Premium)</Text>
-                                <Text style={[styles.value, { color: theme.colors.accent }]}>{formatMoney(askingPrice)}</Text>
-                            </View>
+                {status === 'board_voting' && (
+                    <View style={styles.centerContent}>
+                        <ActivityIndicator size="large" color={theme.colors.primary} />
+                        <Text style={styles.statusTitle}>Board Voting...</Text>
+                        <Text style={styles.statusDesc}>
+                            {isMajorityOwner ? "You have majority control. Rubber stamping..." : "Seeking shareholder approval..."}
+                        </Text>
+                    </View>
+                )}
 
-                            <View style={styles.divider} />
+                {status === 'negotiating' && (
+                    <View style={styles.centerContent}>
+                        <ActivityIndicator size="large" color={theme.colors.accent} />
+                        <Text style={styles.statusTitle}>Negotiating...</Text>
+                        <Text style={styles.statusDesc}>Offer sent to {company.name} board.</Text>
+                    </View>
+                )}
 
-                            <Text style={styles.inputLabel}>Your Offer ($ Billions)</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="e.g. 52.5"
-                                placeholderTextColor="#666"
-                                keyboardType="numeric"
-                                value={offerAmount}
-                                onChangeText={setOfferAmount}
-                            />
+                {status === 'rejected' && (
+                    <View style={styles.centerContent}>
+                        <Text style={styles.icon}>❌</Text>
+                        <Text style={[styles.statusTitle, { color: theme.colors.danger }]}>Offer Failed</Text>
+                        <Text style={styles.statusDesc}>{statusMessage}</Text>
+                        
+                        <GameButton 
+                            title="Adjust Offer"
+                            onPress={() => setStatus('initial')}
+                            variant="secondary"
+                            style={{ marginTop: 16, width: '100%' }}
+                        />
+                    </View>
+                )}
 
-                            <Text style={styles.hint}>
-                                Cash Available: {formatMoney(companyCapital)}
-                            </Text>
-
-                            <Pressable
-                                onPress={handleSubmitOffer}
-                                style={({ pressed }) => [styles.submitBtn, pressed && styles.submitBtnPressed]}
-                            >
-                                <Text style={styles.submitBtnText}>Submit Offer to Board</Text>
-                            </Pressable>
-                        </View>
-                    )}
-
-                    {status === 'board_voting' && (
-                        <View style={styles.centerContent}>
-                            <ActivityIndicator size="large" color={theme.colors.primary} />
-                            <Text style={styles.statusTitle}>Board Voting...</Text>
-                            <Text style={styles.statusDesc}>
-                                {isMajorityOwner ? "You have majority control. Rubber stamping..." : "Seeking shareholder approval..."}
-                            </Text>
-                        </View>
-                    )}
-
-                    {status === 'negotiating' && (
-                        <View style={styles.centerContent}>
-                            <ActivityIndicator size="large" color={theme.colors.accent} />
-                            <Text style={styles.statusTitle}>Negotiating...</Text>
-                            <Text style={styles.statusDesc}>Offer sent to {company.name} board.</Text>
-                        </View>
-                    )}
-
-                    {status === 'rejected' && (
-                        <View style={styles.centerContent}>
-                            <Text style={styles.icon}>❌</Text>
-                            <Text style={[styles.statusTitle, { color: theme.colors.danger }]}>Offer Failed</Text>
-                            <Text style={styles.statusDesc}>{statusMessage}</Text>
-                            <Pressable onPress={() => setStatus('initial')} style={styles.retryBtn}>
-                                <Text style={styles.retryText}>Adjust Offer</Text>
-                            </Pressable>
-                        </View>
-                    )}
-
-                    {status === 'accepted' && (
-                        <View style={styles.centerContent}>
-                            <Text style={styles.icon}>🤝</Text>
-                            <Text style={[styles.statusTitle, { color: theme.colors.success }]}>OFFER ACCEPTED</Text>
-                            <Text style={styles.statusDesc}>{statusMessage}</Text>
-                        </View>
-                    )}
-
-                </Pressable>
-            </Pressable>
-        </Modal>
+                {status === 'accepted' && (
+                    <View style={styles.centerContent}>
+                        <Text style={styles.icon}>🤝</Text>
+                        <Text style={[styles.statusTitle, { color: theme.colors.success }]}>OFFER ACCEPTED</Text>
+                        <Text style={styles.statusDesc}>{statusMessage}</Text>
+                    </View>
+                )}
+            </View>
+        </GameModal>
     );
 };
 
 export default NegotiationModal;
 
 const styles = StyleSheet.create({
-    backdrop: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
-        justifyContent: 'center',
-        padding: 20,
-    },
-    container: {
-        backgroundColor: theme.colors.card,
-        borderRadius: 24,
-        padding: 24,
-        minHeight: 350,
-        gap: 16,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    closeText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: theme.colors.textSecondary,
-    },
     content: {
-        gap: 16,
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: theme.colors.cardSoft,
-        padding: 16,
-        borderRadius: 12,
-    },
-    label: {
-        color: theme.colors.textSecondary,
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    value: {
-        color: theme.colors.textPrimary,
-        fontSize: 16,
-        fontWeight: '800',
+        gap: 12,
     },
     divider: {
         height: 1,
         backgroundColor: theme.colors.border,
-        marginVertical: 8,
+        marginVertical: 4,
     },
     inputLabel: {
         color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '700',
         marginLeft: 4,
+        marginBottom: 4,
     },
     input: {
         backgroundColor: theme.colors.background,
@@ -293,21 +249,6 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
         fontSize: 12,
         textAlign: 'right',
-    },
-    submitBtn: {
-        backgroundColor: theme.colors.primary,
-        padding: 16,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    submitBtnPressed: {
-        opacity: 0.9,
-    },
-    submitBtnText: {
-        color: '#FFF',
-        fontWeight: '800',
-        fontSize: 16,
     },
     centerContent: {
         flex: 1,
@@ -331,18 +272,5 @@ const styles = StyleSheet.create({
     icon: {
         fontSize: 64,
         marginBottom: 16,
-    },
-    retryBtn: {
-        backgroundColor: theme.colors.cardSoft,
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 50,
-        marginTop: 16,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    retryText: {
-        color: theme.colors.textPrimary,
-        fontWeight: '700',
     },
 });

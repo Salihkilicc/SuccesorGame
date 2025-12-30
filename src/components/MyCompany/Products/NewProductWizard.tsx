@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    Modal,
-    FlatList,
-    Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, Pressable } from 'react-native';
 import { theme } from '../../../theme';
 import { useProductManagement } from './useProductManagement';
 import { useProductStore, DEFAULT_SUPPLIERS } from '../../../store/useProductStore';
 import { useStatsStore, TechLevels } from '../../../store/useStatsStore';
+import GameModal from '../../common/GameModal';
+import GameButton from '../../common/GameButton';
+import SectionCard from '../../common/SectionCard';
 
 interface Props {
     visible: boolean;
@@ -20,8 +15,8 @@ interface Props {
 
 // Map custom types to base types for supplier logic
 const TYPE_MAPPING: Record<string, string> = {
-    'Electronic Accessories': 'Electronics', // Maps to cheap electronics
-    'MyPhone': 'Smartphones', // Will need specific handling
+    'Electronic Accessories': 'Electronics',
+    'MyPhone': 'Smartphones',
     'MyPad': 'Tablets',
     'MyMac': 'Laptops',
     'MyWatch': 'Wearables',
@@ -32,8 +27,8 @@ const TYPE_MAPPING: Record<string, string> = {
 
 // Fixed market data for each product type
 const MARKET_DATA: Record<string, { demand: number; competition: number }> = {
-    'Electronic Accessories': { demand: 85, competition: 90 }, // High Demand, High Comp
-    'MyPhone': { demand: 60, competition: 80 }, // Start mid demand, high comp
+    'Electronic Accessories': { demand: 85, competition: 90 },
+    'MyPhone': { demand: 60, competition: 80 },
     'MyPad': { demand: 70, competition: 70 },
     'MyMac': { demand: 75, competition: 65 },
     'MyWatch': { demand: 65, competition: 60 },
@@ -54,7 +49,7 @@ interface ProductDef {
 
 const PRODUCT_DEFINITIONS: ProductDef[] = [
     { id: 'accessories', label: 'Electronic Accessories', type: 'Electronic Accessories', estCost: '$5-$15', capacityWeight: 1 },
-    { id: 'myphone', label: 'MyPhone', type: 'MyPhone', req: { category: 'hardware', level: 1 }, estCost: '$250-$400', capacityWeight: 2 }, // Actually Lvl 1 is start, so practically unlocked
+    { id: 'myphone', label: 'MyPhone', type: 'MyPhone', req: { category: 'hardware', level: 1 }, estCost: '$250-$400', capacityWeight: 2 },
     { id: 'mypad', label: 'MyPad', type: 'MyPad', req: { category: 'hardware', level: 2 }, estCost: '$150-$250', capacityWeight: 3 },
     { id: 'mymac', label: 'MyMac', type: 'MyMac', req: { category: 'hardware', level: 3 }, estCost: '$400-$700', capacityWeight: 5 },
     { id: 'mywatch', label: 'MyWatch', type: 'MyWatch', req: { category: 'hardware', level: 4 }, estCost: '$50-$100', capacityWeight: 1 },
@@ -111,22 +106,19 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
         if (!selectedDef) return;
 
         const tempId = `product_${Date.now()}`;
-
-        // Resolve Supplier
-        // Use mapping or fallback to 'Electronics'
         const baseType = TYPE_MAPPING[selectedDef.type] || 'Electronics';
         const suppliers = DEFAULT_SUPPLIERS[baseType] || DEFAULT_SUPPLIERS['Electronics'];
         let defaultSupplier = { ...suppliers[0] };
 
         // Apply ChipMaster effect (10% cost reduction)
         const { acquisitions } = useStatsStore.getState();
-        if (acquisitions.chipMaster) {
+        if (Array.isArray(acquisitions) && acquisitions.includes('chipMaster')) {
             defaultSupplier.cost = Math.floor(defaultSupplier.cost * 0.9);
         }
 
         const marketData = currentMarketData || { demand: 50, competition: 50 };
 
-        // Apply MyAI Integration effect (Demand Boost)
+        // Apply MyAI Integration effect
         let finalDemand = marketData.demand;
         if (techLevels.software >= 3) {
             finalDemand = Math.min(100, finalDemand + 15);
@@ -138,12 +130,12 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
             type: selectedDef.type,
             supplier: defaultSupplier,
             production: {
-                allocated: 0, // Start with 0 allocation
+                allocated: 0,
                 capacity: availableCapacity,
-                weight: selectedDef.capacityWeight || 1, // Add weight here
+                weight: selectedDef.capacityWeight || 1,
             },
             pricing: {
-                salePrice: defaultSupplier.cost * 2.0, // Conservative start
+                salePrice: defaultSupplier.cost * 2.0,
             },
             market: {
                 demand: finalDemand,
@@ -158,17 +150,20 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
         handleClose();
     };
 
+    const handleClose = () => {
+        // Reset state
+        setTimeout(() => {
+            setStep(1);
+            setSelectedDef(null);
+            setMarketResearched(false);
+        }, 300);
+        onClose();
+    };
+
     const handleBack = () => {
         setStep(1);
         setSelectedDef(null);
         setMarketResearched(false);
-    };
-
-    const handleClose = () => {
-        setStep(1);
-        setSelectedDef(null);
-        setMarketResearched(false);
-        onClose();
     };
 
     const isLocked = (def: ProductDef) => {
@@ -177,409 +172,217 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-            <View style={styles.overlay}>
-                <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
-                <View style={styles.content}>
-                    <View style={styles.header}>
-                        <View>
-                            <Text style={styles.title}>✨ New Product Wizard</Text>
-                            <Text style={styles.subtitle}>Step {step} of 2</Text>
-                        </View>
-                        <Pressable onPress={handleClose} style={styles.closeBtn}>
-                            <Text style={styles.closeBtnText}>×</Text>
-                        </Pressable>
-                    </View>
+        <GameModal
+            visible={visible}
+            onClose={handleClose}
+            title={step === 1 ? "✨ Select Product" : `Market Research: ${selectedDef?.label}`}
+            subtitle={step === 1 ? "Step 1 of 2: Choose Line" : "Step 2 of 2: Analyze & Launch"}
+        >
+            <View style={{ gap: 16, height: '100%' }}>
+                {step === 1 && (
+                    <FlatList
+                        data={PRODUCT_DEFINITIONS}
+                        keyExtractor={(item) => item.id}
+                        numColumns={2}
+                        columnWrapperStyle={{ gap: 8 }}
+                        contentContainerStyle={{ gap: 8, paddingBottom: 20 }}
+                        renderItem={({ item }) => {
+                            const locked = isLocked(item);
+                            const isActiveOwned = productManagement.products.some(
+                                p => p.type === item.type && p.status === 'active'
+                            );
 
-                    <View style={styles.body}>
-                        {step === 1 && (
-                            <View style={styles.stepContainer}>
-                                <Text style={styles.stepTitle}>Select Product</Text>
-                                <FlatList
-                                    data={PRODUCT_DEFINITIONS}
-                                    keyExtractor={(item) => item.id}
-                                    numColumns={2}
-                                    contentContainerStyle={styles.typeGrid}
-                                    renderItem={({ item }) => {
-                                        const locked = isLocked(item);
-                                        const isActiveOwned = productManagement.products.some(
-                                            p => p.type === item.type && p.status === 'active'
-                                        );
-
-                                        return (
-                                            <Pressable
-                                                onPress={() => {
-                                                    if (isActiveOwned) {
-                                                        Alert.alert('Limit Reached', 'You already have an active product line of this type. Please retire the existing one to launch a new version.');
-                                                        return;
-                                                    }
-                                                    handleSelectProduct(item)
-                                                }}
-                                                disabled={locked}
-                                                style={({ pressed }) => [
-                                                    styles.typeCard,
-                                                    (locked || isActiveOwned) && styles.typeCardLocked,
-                                                    isActiveOwned && styles.typeCardOwned, // New style
-                                                    pressed && !locked && !isActiveOwned && styles.typeCardPressed,
-                                                ]}>
-                                                <View style={styles.cardHeader}>
-                                                    <Text style={[styles.typeText, (locked || isActiveOwned) && styles.typeTextLocked]}>
-                                                        {item.label}
-                                                    </Text>
-                                                    {isActiveOwned && (
-                                                        <View style={styles.activeBadge}>
-                                                            <Text style={styles.activeBadgeText}>ACTIVE</Text>
-                                                        </View>
-                                                    )}
-                                                </View>
-
-                                                {(!locked && !isActiveOwned) && (
-                                                    <View style={{ marginTop: 4, alignItems: 'center' }}>
-                                                        <Text style={styles.estCostText}>Cost: {item.estCost}</Text>
-                                                        <Text style={styles.capWeightText}>🏭 Cap: {item.capacityWeight}x</Text>
-                                                    </View>
-                                                )}
-
-                                                {locked && (
-                                                    <Text style={styles.lockInfo}>
-                                                        🔒 Req: {item.req?.category} Lv{item.req?.level}
-                                                    </Text>
-                                                )}
-                                            </Pressable>
-                                        );
+                            return (
+                                <Pressable
+                                    onPress={() => {
+                                        if (isActiveOwned) {
+                                            Alert.alert('Limit Reached', 'You already have an active product line of this type. Please retire the existing one to launch a new version.');
+                                            return;
+                                        }
+                                        handleSelectProduct(item)
                                     }}
+                                    disabled={locked}
+                                    style={({ pressed }) => [
+                                        styles.gridCard,
+                                        (locked || isActiveOwned) && styles.gridCardLocked,
+                                        isActiveOwned && styles.gridCardOwned,
+                                        pressed && !locked && !isActiveOwned && styles.gridCardPressed,
+                                    ]}
+                                >
+                                    <View>
+                                        <Text style={[styles.cardTitle, (locked || isActiveOwned) && styles.textLocked]}>{item.label}</Text>
+                                        {isActiveOwned && <Text style={styles.activeLabel}>ACTIVE</Text>}
+                                        {!locked && !isActiveOwned && (
+                                            <View style={{ marginTop: 4 }}>
+                                                <Text style={styles.metaText}>{item.estCost}</Text>
+                                                <Text style={styles.metaText}>Cap: {item.capacityWeight}x</Text>
+                                            </View>
+                                        )}
+                                        {locked && (
+                                            <Text style={styles.lockText}>
+                                                🔒 Req: {item.req?.category} Lv{item.req?.level}
+                                            </Text>
+                                        )}
+                                    </View>
+                                </Pressable>
+                            );
+                        }}
+                    />
+                )}
+
+                {step === 2 && selectedDef && (
+                    <View style={{ gap: 16, flex: 1 }}>
+                        <SectionCard
+                            title="Research Quote"
+                            rightText="$50,000"
+                        />
+
+                        {!marketResearched ? (
+                            <View style={{ marginTop: 'auto', gap: 8 }}>
+                                <GameButton
+                                    title="Perform Analysis"
+                                    variant="primary"
+                                    onPress={handleMarketSearch}
+                                />
+                                <GameButton
+                                    title="Back"
+                                    variant="secondary"
+                                    onPress={handleBack}
                                 />
                             </View>
-                        )}
-
-                        {step === 2 && selectedDef && (
-                            <View style={styles.stepContainer}>
-                                <Text style={styles.stepTitle}>Market Research: {selectedDef.label}</Text>
-                                <Text style={styles.stepDescription}>
-                                    Analyze the market demand and competition for {selectedDef.label}.
-                                </Text>
-                                <View style={styles.costCard}>
-                                    <Text style={styles.costLabel}>Research Cost</Text>
-                                    <Text style={styles.costValue}>$50,000</Text>
+                        ) : (
+                            <>
+                                <View style={styles.resultsCard}>
+                                    <Text style={styles.resultsTitle}>✓ Market Analysis Complete</Text>
+                                    {currentMarketData && (
+                                        <View style={{ gap: 12 }}>
+                                            <View>
+                                                <Text style={styles.statLabel}>Demand</Text>
+                                                <View style={styles.barBg}>
+                                                    <View style={[styles.barFill, { width: `${currentMarketData.demand}%`, backgroundColor: theme.colors.success }]} />
+                                                </View>
+                                                <Text style={styles.statValue}>{currentMarketData.demand}%</Text>
+                                            </View>
+                                            <View>
+                                                <Text style={styles.statLabel}>Competition</Text>
+                                                <View style={styles.barBg}>
+                                                    <View style={[styles.barFill, { width: `${currentMarketData.competition}%`, backgroundColor: theme.colors.danger }]} />
+                                                </View>
+                                                <Text style={styles.statValue}>{currentMarketData.competition}%</Text>
+                                            </View>
+                                        </View>
+                                    )}
                                 </View>
 
-                                {!marketResearched ? (
-                                    <View style={styles.buttonRow}>
-                                        <Pressable
-                                            onPress={handleBack}
-                                            style={({ pressed }) => [
-                                                styles.btn,
-                                                styles.btnSecondary,
-                                                pressed && styles.btnPressed,
-                                            ]}>
-                                            <Text style={styles.btnText}>Back</Text>
-                                        </Pressable>
-                                        <Pressable
-                                            onPress={handleMarketSearch}
-                                            style={({ pressed }) => [
-                                                styles.btn,
-                                                styles.btnPrimary,
-                                                pressed && styles.btnPressed,
-                                                { flex: 2 }
-                                            ]}>
-                                            <Text style={[styles.btnText, { color: '#000' }]}>
-                                                Perform Analysis
-                                            </Text>
-                                        </Pressable>
-                                    </View>
-                                ) : (
-                                    <>
-                                        <View style={styles.marketResultsCard}>
-                                            <Text style={styles.marketResultsTitle}>✓ Market Analysis Complete</Text>
-
-                                            {currentMarketData && (
-                                                <>
-                                                    <View style={styles.marketStat}>
-                                                        <Text style={styles.marketLabel}>Demand</Text>
-                                                        <View style={styles.marketBar}>
-                                                            <View
-                                                                style={[
-                                                                    styles.marketBarFill,
-                                                                    { width: `${currentMarketData.demand}%` },
-                                                                ]}
-                                                            />
-                                                        </View>
-                                                        <Text style={styles.marketValue}>{currentMarketData.demand}%</Text>
-                                                    </View>
-
-                                                    <View style={styles.marketStat}>
-                                                        <Text style={styles.marketLabel}>Competition</Text>
-                                                        <View style={styles.marketBar}>
-                                                            <View
-                                                                style={[
-                                                                    styles.marketBarFill,
-                                                                    styles.marketBarDanger,
-                                                                    { width: `${currentMarketData.competition}%` },
-                                                                ]}
-                                                            />
-                                                        </View>
-                                                        <Text style={styles.marketValue}>{currentMarketData.competition}%</Text>
-                                                    </View>
-                                                </>
-                                            )}
-                                        </View>
-
-                                        <View style={styles.buttonRow}>
-                                            <Pressable
-                                                onPress={handleBack}
-                                                style={({ pressed }) => [
-                                                    styles.btn,
-                                                    styles.btnSecondary,
-                                                    pressed && styles.btnPressed,
-                                                ]}>
-                                                <Text style={styles.btnText}>
-                                                    Back
-                                                </Text>
-                                            </Pressable>
-
-                                            <Pressable
-                                                onPress={handleLaunch}
-                                                style={({ pressed }) => [
-                                                    styles.btn,
-                                                    styles.btnSuccess,
-                                                    pressed && styles.btnPressed,
-                                                ]}>
-                                                <Text style={[styles.btnText, { color: '#000' }]}>
-                                                    Launch Product
-                                                </Text>
-                                            </Pressable>
-                                        </View>
-                                    </>
-                                )}
-                            </View>
+                                <View style={{ marginTop: 'auto', gap: 8 }}>
+                                    <GameButton
+                                        title="🚀 Launch Product"
+                                        variant="primary" // Could be 'success' color if available, but primary is fine
+                                        onPress={handleLaunch}
+                                        style={{ backgroundColor: '#4CAF50', borderColor: '#4CAF50' }} // Custom override for success green
+                                    />
+                                    <GameButton
+                                        title="Back"
+                                        variant="secondary"
+                                        onPress={handleBack}
+                                    />
+                                </View>
+                            </>
                         )}
                     </View>
-                </View>
+                )}
             </View>
-        </Modal>
+        </GameModal>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        justifyContent: 'center',
-        padding: theme.spacing.lg,
-    },
-    content: {
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        maxHeight: '80%',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        padding: theme.spacing.lg,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    subtitle: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-        marginTop: 2,
-    },
-    closeBtn: {
-        padding: 4,
-    },
-    closeBtnText: {
-        fontSize: 28,
-        color: theme.colors.textSecondary,
-        lineHeight: 28,
-    },
-    body: {
-        padding: theme.spacing.lg,
-    },
-    stepContainer: {
-        gap: theme.spacing.md,
-    },
-    stepTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
-    },
-    stepDescription: {
-        fontSize: 14,
-        color: theme.colors.textSecondary,
-        lineHeight: 20,
-    },
-    typeGrid: {
-        gap: theme.spacing.sm,
-    },
-    typeCard: {
+    gridCard: {
         flex: 1,
         backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-        margin: theme.spacing.xs / 2,
+        borderRadius: 12,
+        padding: 12,
         borderWidth: 1,
-        borderColor: theme.colors.accent,
-        minHeight: 80,
-        justifyContent: 'center',
-    },
-    typeCardLocked: {
-        backgroundColor: theme.colors.background,
         borderColor: theme.colors.border,
+        minHeight: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    gridCardLocked: {
+        backgroundColor: theme.colors.background,
         opacity: 0.6,
     },
-    typeCardPressed: {
-        backgroundColor: theme.colors.card,
-        transform: [{ scale: 0.96 }],
+    gridCardOwned: {
+        borderColor: theme.colors.success,
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
     },
-    typeText: {
+    gridCardPressed: {
+        backgroundColor: theme.colors.card,
+        transform: [{ scale: 0.98 }],
+    },
+    cardTitle: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '800',
         color: theme.colors.textPrimary,
         textAlign: 'center',
     },
-    typeTextLocked: {
+    textLocked: {
         color: theme.colors.textSecondary,
     },
-    estCostText: {
+    activeLabel: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: theme.colors.success,
+        textAlign: 'center',
+        marginTop: 4,
+    },
+    metaText: {
         fontSize: 11,
         color: theme.colors.textSecondary,
+        textAlign: 'center',
     },
-    capWeightText: {
+    lockText: {
         fontSize: 10,
-        fontWeight: '700',
         color: theme.colors.textMuted,
-        marginTop: 2,
-    },
-    typeCardOwned: {
-        opacity: 0.6,
-        borderColor: theme.colors.success,
-        borderWidth: 1,
-    },
-    cardHeader: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    activeBadge: {
-        backgroundColor: theme.colors.success + '20',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
-        marginTop: 4,
-        borderWidth: 1,
-        borderColor: theme.colors.success,
-    },
-    activeBadgeText: {
-        fontSize: 9,
-        fontWeight: '800',
-        color: theme.colors.success,
-        textTransform: 'uppercase',
-    },
-    lockInfo: {
-        fontSize: 10,
-        color: theme.colors.textSecondary,
-        marginTop: 4,
+        textAlign: 'center',
         fontStyle: 'italic',
+        marginTop: 4,
     },
-    costCard: {
+    resultsCard: {
         backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-        gap: 4,
+        padding: 16,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: theme.colors.border,
+        borderColor: theme.colors.success,
     },
-    costLabel: {
-        fontSize: 12,
-        color: theme.colors.textSecondary,
-    },
-    costValue: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    marketResultsCard: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        gap: theme.spacing.md,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    marketResultsTitle: {
+    resultsTitle: {
         fontSize: 14,
         fontWeight: '700',
         color: theme.colors.success,
         textAlign: 'center',
+        marginBottom: 12,
+    },
+    statLabel: {
+        fontSize: 12,
+        color: theme.colors.textSecondary,
         marginBottom: 4,
     },
-    marketStat: {
-        gap: 4,
-    },
-    marketLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: theme.colors.textSecondary,
-    },
-    marketBar: {
+    barBg: {
         height: 8,
         backgroundColor: theme.colors.card,
         borderRadius: 4,
         overflow: 'hidden',
     },
-    marketBarFill: {
+    barFill: {
         height: '100%',
-        backgroundColor: theme.colors.success,
+        borderRadius: 4,
     },
-    marketBarDanger: {
-        backgroundColor: theme.colors.danger,
-    },
-    marketValue: {
-        fontSize: 11,
+    statValue: {
+        fontSize: 12,
         fontWeight: '700',
         color: theme.colors.textPrimary,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: theme.spacing.sm,
-    },
-    btn: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    btnPrimary: {
-        backgroundColor: theme.colors.accent,
-    },
-    btnSuccess: {
-        flex: 1,
-        backgroundColor: '#4CAF50',
-    },
-    btnSecondary: {
-        flex: 1,
-        backgroundColor: theme.colors.cardSoft,
-        borderColor: theme.colors.border,
-    },
-    btnPressed: {
-        opacity: 0.7,
-        transform: [{ scale: 0.98 }],
-    },
-    btnText: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
+        textAlign: 'right',
+        marginTop: 2,
     },
 });
 
