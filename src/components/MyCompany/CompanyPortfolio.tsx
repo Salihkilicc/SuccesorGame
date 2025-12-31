@@ -28,6 +28,10 @@ const CompanyPortfolio = () => {
       <ShareControlHub
         visible={showShareControl}
         onClose={() => setShowShareControl(false)}
+        onOpenIPO={() => console.log('IPO')}
+        onOpenDilution={() => console.log('Dilution')}
+        onOpenDividend={() => console.log('Dividend')}
+        onOpenBuyback={() => console.log('Buyback')}
       />
     </>
   );

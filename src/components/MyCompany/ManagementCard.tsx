@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
+// Removed Slider import
 import { theme } from '../../theme';
 import GameButton from '../common/GameButton';
+import { PercentageSelector } from '../atoms/PercentageSelector';
 
 type ManagementCardProps = {
     title: string;
@@ -70,31 +71,13 @@ const ManagementCard = ({
             </View>
 
             <View style={styles.sliderContainer}>
-                <View style={styles.rowBetween}>
-                    <Text style={styles.label}>Target Level</Text>
-                    <Text style={[
-                        styles.value,
-                        isIncrease && styles.valueIncrease,
-                        isDecrease && styles.valueDecrease
-                    ]}>
-                        {targetValue.toLocaleString()} {delta !== 0 && `(${delta > 0 ? '+' : ''}${delta})`}
-                    </Text>
-                </View>
-                <Slider
-                    style={{ width: '100%', height: 40 }}
-                    minimumValue={minValue}
-                    maximumValue={maxValue}
-                    step={1}
+                <PercentageSelector
+                    label="Target Level"
                     value={targetValue}
-                    onValueChange={setTargetValue}
-                    minimumTrackTintColor={isDecrease ? theme.colors.success : theme.colors.accent}
-                    maximumTrackTintColor={theme.colors.cardSoft}
-                    thumbTintColor={isDecrease ? theme.colors.success : theme.colors.accent}
+                    min={minValue}
+                    max={maxValue}
+                    onChange={setTargetValue}
                 />
-                <View style={styles.rowBetween}>
-                    <Text style={styles.limitLabel}>Min: {minValue.toLocaleString()}</Text>
-                    <Text style={styles.limitLabel}>Max: {maxValue.toLocaleString()}</Text>
-                </View>
             </View>
 
             <View style={styles.footer}>

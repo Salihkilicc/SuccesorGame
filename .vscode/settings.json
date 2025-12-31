@@ -1,3 +1,11 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "files.exclude": {
+        "**/node_modules/**": true
+    },
+    "java.project.sourcePaths": [],
+    "java.import.gradle.enabled": false,
+    "java.jdt.ls.java.home": "",
+    "redhat.telemetry.enabled": false
 }

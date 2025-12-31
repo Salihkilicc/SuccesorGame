@@ -98,10 +98,10 @@ export const useProductManagement = () => {
         let maxSales = product.market.demand * priceFactor;
 
         // Apply Acquisition Bonuses
-        if (acquisitions.streamify && (product.type === 'MyPhone' || product.type === 'MyPods')) {
+        if (acquisitions.includes('streamify') && (product.type === 'MyPhone' || product.type === 'MyPods')) {
             maxSales *= 1.15; // 15% boost
         }
-        if (acquisitions.gameGen && (product.type === 'MyMac' || product.type === 'MyPad')) {
+        if (acquisitions.includes('gameGen') && (product.type === 'MyMac' || product.type === 'MyPad')) {
             maxSales *= 1.15; // 15% boost
         }
 

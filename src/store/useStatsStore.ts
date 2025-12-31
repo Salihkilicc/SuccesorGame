@@ -461,14 +461,12 @@ export const useStatsStore = create<StatsStore>()(
               if (roll < 7) {
                 newSub.isLossMaking = true;
                 newSub.currentProfit = -sub.marketCap * 0.02; // 2% of market cap as loss
-                console.log(`⚠️ Warning: ${sub.name} is failing due to mismanagement!`);
               }
             } else {
               // Failing Company: 25% chance to recover
               if (roll < 25) {
                 newSub.isLossMaking = false;
                 newSub.currentProfit = sub.baseProfit; // Restore to original profit
-                console.log(`✅ ${sub.name} has recovered and is profitable again.`);
               }
             }
 

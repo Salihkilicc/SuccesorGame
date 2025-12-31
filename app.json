@@ -1,4 +1,7 @@
 {
   "name": "Succesor",
-  "displayName": "Succesor"
+  "displayName": "Succesor",
+  "ios": {
+    "bundleIdentifier": "com.salih115.succesor"
+  }
 }

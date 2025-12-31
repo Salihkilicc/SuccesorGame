@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import Slider from '@react-native-community/slider';
+// Removed Slider import
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store/useStatsStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
+import { PercentageSelector } from '../../atoms/PercentageSelector';
 
 interface Props {
     visible: boolean;
@@ -67,23 +68,14 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                 {/* Visual Description handled by subtitle mostly, but can add more if needed */}
 
                 {/* Slider Section */}
-                <View style={styles.sliderCard}>
-                    <View style={styles.sliderHeader}>
-                        <Text style={styles.sliderLabel}>Buyback Amount</Text>
-                        <Text style={styles.sliderValue}>{buybackPercentage.toFixed(1)}%</Text>
-                    </View>
-                    <Slider
-                        style={styles.slider}
-                        minimumValue={0.5}
-                        maximumValue={10}
-                        step={0.5}
-                        value={buybackPercentage}
-                        onValueChange={setBuybackPercentage}
-                        minimumTrackTintColor={theme.colors.success}
-                        maximumTrackTintColor={theme.colors.cardSoft}
-                        thumbTintColor={theme.colors.success}
-                    />
-                </View>
+                <PercentageSelector
+                    label="Buyback Amount"
+                    value={buybackPercentage}
+                    min={0.5}
+                    max={10}
+                    onChange={setBuybackPercentage}
+                    unit="%"
+                />
 
                 {/* Calculation Info */}
                 <View style={{ gap: 4 }}>

@@ -47,7 +47,7 @@ const ProductDetailModal = ({ productId, visible, onClose }: Props) => {
     const handleMarketSearch = () => {
         const success = performMarketSearch(productId);
         if (!success) {
-            console.log('Insufficient funds for market search!');
+            // Insufficient funds handling
         }
     };
 

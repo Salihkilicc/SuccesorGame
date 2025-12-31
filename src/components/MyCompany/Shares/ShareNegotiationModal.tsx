@@ -8,9 +8,9 @@ import {
     TextInput,
     Alert,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
 import { theme } from '../../../theme';
 import { useStatsStore, Shareholder } from '../../../store/useStatsStore';
+import { PercentageSelector } from '../../atoms/PercentageSelector'; // Yeni Bileşen
 
 interface Props {
     visible: boolean;
@@ -40,12 +40,14 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
     const npcOfferPrice = companySharePrice * 1.2;
 
     const relationship = shareholder.relationship || 50;
+    
+    // 1 Lot = %0.1 Hisse
     const maxQuantity = transactionType === 'buy'
-        ? Math.floor(shareholder.percentage * 10) // Approx mapping: 0.1% per lot
-        : 10; // Cap sell to 10 lots for gameplay balance
+        ? Math.floor(shareholder.percentage * 10) // Hissedarın elindeki max lot
+        : 10; // Oyuncunun satabileceği max lot (Oyun dengesi için 10 ile sınırlı)
 
     useEffect(() => {
-        // Reset when valid
+        // Modal açıldığında state sıfırla
         if (visible) {
             setResult('pending');
             setOfferPrice(companySharePrice.toString());
@@ -58,13 +60,13 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
         const totalValue = finalPrice * quantity;
 
         if (transactionType === 'buy') {
-            // PLAYER WANTS TO BUY
+            // OYUNCU ALIYOR
             if (money < totalValue) {
-                Alert.alert('Insufficient Funds', "You can't afford this transaction.");
+                Alert.alert('Yetersiz Bakiye', "Bu işlem için yeterli nakitin yok.");
                 return;
             }
 
-            // Logic: Does NPC accept?
+            // NPC Kabul Ediyor mu?
             const priceRatio = finalPrice / companySharePrice;
             let success = false;
 
@@ -80,19 +82,19 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
             }
 
         } else {
-            // PLAYER SELLS (Accepts NPC Offer)
+            // OYUNCU SATIYOR (NPC Teklifini kabul et)
             commitTransaction('sell', finalPrice, totalValue);
         }
     };
 
     const handleRejectOffer = () => {
-        // Player rejects NPC offer
+        // Oyuncu teklifi reddetti
         setResult('fail');
-        updateShareholderRelationship(shareholder.id, -5); // Insulted
+        updateShareholderRelationship(shareholder.id, -5); // NPC alındı
     };
 
     const commitTransaction = (type: TransactionType, price: number, total: number) => {
-        const pctChange = quantity * 0.1;
+        const pctChange = quantity * 0.1; // Lot başına %0.1
 
         if (type === 'buy') {
             setField('money', money - total);
@@ -122,7 +124,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
 
         setShareholders(newShareholders);
 
-        // Update player ownership stat
+        // Player ownership güncelle
         const player = newShareholders.find(s => s.id === 'player');
         if (player) setField('companyOwnership', player.percentage);
 
@@ -143,101 +145,94 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                     <View style={[styles.content, styles.resultContent, result === 'success' ? styles.successBorder : styles.failBorder]}>
                         <Text style={styles.resultEmoji}>{result === 'success' ? '✅' : '❌'}</Text>
                         <Text style={styles.resultTitle}>
-                            {result === 'success' ? 'Deal Sealed!' : 'Offer Rejected!'}
+                            {result === 'success' ? 'Anlaşma Sağlandı!' : 'Teklif Reddedildi!'}
                         </Text>
                         <Text style={styles.resultMessage}>
                             {result === 'success'
-                                ? "Ownership has been updated."
+                                ? "Hisse devri tamamlandı."
                                 : transactionType === 'buy'
-                                    ? "They refused your price."
-                                    : "They felt insulted by your rejection."}
+                                    ? "Verdiğin fiyatı beğenmediler."
+                                    : "Reddetmen onları biraz kırdı."}
                         </Text>
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
-                            <Text style={styles.closeBtnText}>Close</Text>
+                            <Text style={styles.closeBtnText}>Kapat</Text>
                         </Pressable>
                     </View>
                 ) : (
                     <View style={styles.content}>
-                        <Text style={styles.title}>Negotiate Shares</Text>
+                        <Text style={styles.title}>Hisse Pazarlığı</Text>
 
                         {/* Tabs */}
                         <View style={styles.tabs}>
                             <Pressable
                                 onPress={() => setTransactionType('buy')}
                                 style={[styles.tab, transactionType === 'buy' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>BUY SHARES</Text>
+                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>AL</Text>
                             </Pressable>
                             <Pressable
                                 onPress={() => setTransactionType('sell')}
                                 style={[styles.tab, transactionType === 'sell' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>SELL SHARES</Text>
+                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>SAT</Text>
                             </Pressable>
                         </View>
 
-                        {/* Quantity */}
+                        {/* YENİ Quantity Seçici (Slider Yerine) */}
                         <View style={styles.section}>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Quantity (Lots)</Text>
-                                <Text style={styles.valueHighlight}>{quantity}</Text>
-                            </View>
-                            <Slider
-                                style={{ width: '100%', height: 40 }}
-                                minimumValue={1}
-                                maximumValue={Math.max(1, maxQuantity)} // Ensure at least 1
-                                step={1}
+                            <PercentageSelector
+                                label="Miktar (Lot)"
                                 value={quantity}
-                                onValueChange={setQuantity}
-                                minimumTrackTintColor={theme.colors.accent}
-                                maximumTrackTintColor={theme.colors.cardSoft}
-                                thumbTintColor={theme.colors.accent}
+                                min={1}
+                                max={Math.max(1, maxQuantity)}
+                                onChange={setQuantity}
+                                unit="lot"
                             />
-                            <Text style={styles.hint}>{(quantity * 0.1).toFixed(1)}% Ownership</Text>
+                            <Text style={styles.hint}>Toplam Etki: %{(quantity * 0.1).toFixed(1)} Hisse</Text>
                         </View>
 
-                        {/* Conditional UI based on Buy/Sell */}
+                        {/* Fiyat Kartları */}
                         {transactionType === 'buy' ? (
                             <View style={styles.section}>
-                                <Text style={styles.label}>Your Offer Price (per share)</Text>
+                                <Text style={styles.label}>Teklifin (Hisse Başı)</Text>
                                 <TextInput
                                     style={styles.input}
                                     value={offerPrice}
                                     onChangeText={setOfferPrice}
                                     keyboardType="numeric"
-                                    placeholder="Price"
+                                    placeholder="Fiyat"
                                     placeholderTextColor={theme.colors.textMuted}
                                 />
                                 <View style={styles.marketRef}>
-                                    <Text style={styles.hint}>Market Price: ${companySharePrice.toFixed(0)}</Text>
+                                    <Text style={styles.hint}>Piyasa: ${companySharePrice.toFixed(0)}</Text>
                                 </View>
                             </View>
                         ) : (
                             <View style={styles.npcOfferCard}>
-                                <Text style={styles.npcOfferLabel}>THEIR OFFER (Premium +20%)</Text>
-                                <Text style={styles.npcOfferValue}>${npcOfferPrice.toFixed(0)} <Text style={styles.perShare}>/share</Text></Text>
+                                <Text style={styles.npcOfferLabel}>ONLARIN TEKLİFİ (Piyasa +%20)</Text>
+                                <Text style={styles.npcOfferValue}>${npcOfferPrice.toFixed(0)} <Text style={styles.perShare}>/adet</Text></Text>
                                 <Text style={styles.npcOfferContext}>
-                                    "I offer ${npcOfferPrice.toFixed(0)} for your shares. Take it or leave it."
+                                    "Senin lotların için adet başı ${npcOfferPrice.toFixed(0)} veriyorum. İşine gelirse."
                                 </Text>
                             </View>
                         )}
 
-                        {/* Total */}
+                        {/* Toplam Tutar */}
                         <View style={styles.totalRow}>
-                            <Text style={styles.totalLabel}>Total Value</Text>
+                            <Text style={styles.totalLabel}>Toplam Tutar</Text>
                             <Text style={styles.totalAmount}>${currentTotal.toLocaleString()}</Text>
                         </View>
 
-                        {/* Actions */}
+                        {/* Butonlar */}
                         <View style={styles.actions}>
                             {transactionType === 'sell' && (
                                 <Pressable style={styles.rejectBtn} onPress={handleRejectOffer}>
-                                    <Text style={styles.rejectText}>Reject</Text>
+                                    <Text style={styles.rejectText}>Reddet</Text>
                                 </Pressable>
                             )}
                             <Pressable
                                 style={[styles.mainBtn, transactionType === 'sell' ? styles.acceptBtn : styles.submitBtn]}
                                 onPress={handleAction}>
                                 <Text style={styles.mainBtnText}>
-                                    {transactionType === 'buy' ? 'Submit Offer' : 'Accept Offer'}
+                                    {transactionType === 'buy' ? 'Teklifi Sun' : 'Kabul Et & Sat'}
                                 </Text>
                             </Pressable>
                         </View>
@@ -254,7 +249,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.95)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
-        zIndex: 9999, // Root Level
+        zIndex: 9999,
         elevation: 10,
     },
     content: {
@@ -299,24 +294,16 @@ const styles = StyleSheet.create({
     section: {
         marginBottom: theme.spacing.lg,
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
     label: {
         color: theme.colors.textSecondary,
         fontSize: 14,
-    },
-    valueHighlight: {
-        color: theme.colors.accent,
-        fontWeight: '800',
-        fontSize: 16,
+        marginBottom: 4,
     },
     hint: {
         color: theme.colors.textMuted,
         fontSize: 12,
         marginTop: 4,
+        textAlign: 'right',
     },
     input: {
         backgroundColor: theme.colors.cardSoft,
@@ -327,7 +314,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        marginTop: 8,
     },
     marketRef: {
         alignItems: 'flex-end',
@@ -415,7 +401,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: '800',
     },
-    // Result
     resultContent: {
         alignItems: 'center',
         paddingVertical: 40,

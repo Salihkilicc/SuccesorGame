@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
-import Slider from '@react-native-community/slider';
 import { theme } from '../../../theme';
+import { PercentageSelector } from '../../atoms/PercentageSelector';
 
 type Props = {
     visible: boolean;
@@ -34,22 +34,14 @@ const BorrowModal = ({ visible, type, rate, maxLimit, onClose, onConfirm }: Prop
                     <Text style={styles.subModalSubtitle}>{type} • {rate}% APR</Text>
 
                     <View style={styles.sliderContainer}>
-                        <Text style={styles.amountText}>{formatCurrency(amount)}</Text>
-                        <Slider
-                            style={{ width: '100%', height: 40 }}
-                            minimumValue={1_000_000}
-                            maximumValue={safeMax}
-                            step={100_000}
+                        <PercentageSelector
+                            label="Loan Amount"
                             value={amount}
-                            onValueChange={setAmount}
-                            minimumTrackTintColor={theme.colors.success}
-                            maximumTrackTintColor="#555"
-                            thumbTintColor="#FFF"
+                            min={1_000_000}
+                            max={safeMax}
+                            onChange={setAmount}
+                            unit="$"
                         />
-                        <View style={styles.limitRow}>
-                            <Text style={styles.limitText}>Min: $1M</Text>
-                            <Text style={styles.limitText}>Max: {formatCurrency(safeMax)}</Text>
-                        </View>
                     </View>
 
                     <View style={styles.calculationBox}>

@@ -1,7 +1,7 @@
-import { createMMKV, type MMKV } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 import type { StateStorage } from 'zustand/middleware';
 
-export const storage = createMMKV();
+export const storage = new MMKV();
 
 export const zustandStorage: StateStorage = {
   getItem: (name: string) => {
