@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-// Removed Slider import
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { theme } from '../../../theme';
-import { useStatsStore } from '../../../store/useStatsStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
+// 👇 YOL GÜNCELLENDİ
+import { useBuybackLogic } from './logic/useBuybackLogic';
 
 interface Props {
     visible: boolean;
@@ -14,47 +14,15 @@ interface Props {
 }
 
 const BuybackModal = ({ visible, onClose }: Props) => {
-    const { companyValue, companyOwnership, companyCapital, performBuyback } = useStatsStore();
-    const [buybackPercentage, setBuybackPercentage] = useState(1);
-
-    const cost = companyValue * (buybackPercentage / 100);
-    const multiplier = 1 / (1 - (buybackPercentage / 100));
-    // Check constraint: logic preserved
-    const newOwnership = Math.min(100, companyOwnership * multiplier);
-
-    // Check affordability
-    const isAffordable = companyCapital >= cost;
-
-    const handleConfirm = () => {
-        if (buybackPercentage <= 0) {
-            Alert.alert('Invalid Amount', 'Please select a percentage.');
-            return;
-        }
-        if (!isAffordable) {
-            Alert.alert('Insufficient Capital', `Company needs $${(cost / 1_000_000).toFixed(1)}M to buy back shares.`);
-            return;
-        }
-
-        Alert.alert(
-            'Confirm Buyback',
-            `Spend $${(cost / 1_000_000).toFixed(1)}M to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\nThis will increase your ownership to ${newOwnership.toFixed(1)}%.`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Confirm',
-                    style: 'destructive',
-                    onPress: () => {
-                        performBuyback(buybackPercentage);
-                        onClose();
-                        Alert.alert(
-                            'Buyback Complete',
-                            `Company shares retired. Your ownership increased to ${newOwnership.toFixed(1)}%.`
-                        );
-                    },
-                },
-            ]
-        );
-    };
+    const { 
+        buybackPercentage, 
+        setBuybackPercentage, 
+        cost, 
+        newOwnership, 
+        companyCapital, 
+        isAffordable, 
+        handleConfirm 
+    } = useBuybackLogic(onClose);
 
     return (
         <GameModal
@@ -64,10 +32,6 @@ const BuybackModal = ({ visible, onClose }: Props) => {
             subtitle="Retire shares to increase ownership"
         >
             <View style={{ gap: 16 }}>
-
-                {/* Visual Description handled by subtitle mostly, but can add more if needed */}
-
-                {/* Slider Section */}
                 <PercentageSelector
                     label="Buyback Amount"
                     value={buybackPercentage}
@@ -77,7 +41,6 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                     unit="%"
                 />
 
-                {/* Calculation Info */}
                 <View style={{ gap: 4 }}>
                     <SectionCard
                         title="Cost (Capital)"
@@ -96,7 +59,6 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                     />
                 </View>
 
-                {/* Actions */}
                 <View style={{ gap: 8 }}>
                     <GameButton
                         title="Confirm Buyback"
@@ -110,7 +72,6 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         variant="ghost"
                     />
                 </View>
-
             </View>
         </GameModal>
     );
@@ -118,32 +79,4 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 
 export default BuybackModal;
 
-const styles = StyleSheet.create({
-    sliderCard: {
-        backgroundColor: '#2D3748', // Matching SectionCard bg
-        padding: 16,
-        borderRadius: 12,
-        gap: 8,
-        borderWidth: 1,
-        borderColor: '#4A5568',
-    },
-    sliderHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    sliderLabel: {
-        fontSize: 14,
-        color: '#E2E8F0',
-        fontWeight: '600',
-    },
-    sliderValue: {
-        fontSize: 18,
-        fontWeight: '800',
-        color: theme.colors.success,
-    },
-    slider: {
-        width: '100%',
-        height: 40,
-    },
-});
+const styles = StyleSheet.create({}); // Stil gerekirse buraya eklenir, şu an inline stiller yeterli.

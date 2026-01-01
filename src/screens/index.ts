@@ -1,6 +1,6 @@
 export { default as LifeScreen } from './Life/LifeScreen';
 export { default as LoveScreen } from './Love/LoveScreen';
-export { default as AssetsScreen } from './AssetsScreen';
+export { default as AssetsScreen } from './Assets/AssetsScreen';
 export { default as HomeScreen } from './Home/HomeScreen';
 export { default as MarketScreen } from './Market/MarketScreen';
 export { default as StockDetailScreen } from './Assets/Market/StockDetailScreen';

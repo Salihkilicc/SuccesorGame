@@ -31,11 +31,9 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
     const [dividendPercentage, setDividendPercentage] = useState(10);
 
     // Store Data
-    const money = useStatsStore((state: any) => state.money || 0);
-
-    // Business Logic Constants
-    const DIVIDEND_POOL_RATIO = 0.5; // 50% of cash available
-    const PLAYER_SHARE_PCT = 100;    // 100% ownership
+    const companyCapital = useStatsStore((state: any) => state.companyCapital || 0);
+    const companyOwnership = useStatsStore((state: any) => state.companyOwnership || 0);
+    const payDividend = useStatsStore((state: any) => state.payDividend);
 
     // BUG FIX: State Reset Logic
     useEffect(() => {
@@ -49,21 +47,17 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
     }, [visible]);
 
     // Financial Calculations
-    // 1. Pool is 50% of total money
-    const dividendPool = money * DIVIDEND_POOL_RATIO;
+    // Distribution is % of Company Capital
+    const distributionAmount = (companyCapital * dividendPercentage) / 100;
 
-    // 2. Distribution is % of that Pool (NOT % of total money directly)
-    // Formula: (Pool * Slider%) / 100
-    const distributionAmount = (dividendPool * dividendPercentage) / 100;
+    // Effect on Company
+    const remainingCapital = companyCapital - distributionAmount;
 
-    // 3. Effect on Company
-    const remainingCapital = money - distributionAmount;
+    // Effect on Player
+    const playerDividend = (distributionAmount * companyOwnership) / 100;
 
-    // 4. Effect on Player
-    const playerDividend = (distributionAmount * PLAYER_SHARE_PCT) / 100;
-
-    // Risk Check: Warn if remaining capital < 20% of CURRENT total money
-    const isRisky = remainingCapital < (money * 0.2);
+    // Risk Check: Warn if remaining capital < 20% of CURRENT capital
+    const isRisky = remainingCapital < (companyCapital * 0.2);
 
     // Actions
     const handleConfirm = () => {
@@ -72,8 +66,8 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
             return;
         }
 
-        // TODO: Integrate actual store action
-        // useStatsStore.getState().distributeDividend(distributionAmount);
+        // Call the store action
+        payDividend(dividendPercentage);
 
         console.log('[DividendLogic] Confirmed:', {
             amount: distributionAmount,
@@ -82,7 +76,7 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
 
         Alert.alert(
             "Success",
-            `$${(playerDividend / 1000).toFixed(1)}k Dividend Paid!`,
+            `$${(playerDividend / 1_000_000).toFixed(2)}M Dividend Paid!`,
             [
                 {
                     text: "OK",
@@ -99,11 +93,11 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
     return {
         dividendPercentage,
         setDividendPercentage,
-        availableCash: money,
+        availableCash: companyCapital,
         distributionAmount,
         playerDividend,
         remainingCapital,
-        playerSharePercentage: PLAYER_SHARE_PCT,
+        playerSharePercentage: companyOwnership,
         isRisky,
         handleConfirm
     };

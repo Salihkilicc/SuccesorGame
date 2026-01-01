@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../theme';
 
-// Ortak Bileşenler
+// Common Components
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SectionCard from '../../common/SectionCard';
 
-// YENİ SİSTEM (Slider Yerine)
+// Hook & Atoms
 import { PercentageSelector } from '../../atoms/PercentageSelector';
-
-// Store
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
 
 interface Props {
     visible: boolean;
@@ -19,46 +17,17 @@ interface Props {
 }
 
 const DilutionModal = ({ visible, onClose }: Props) => {
-    // State: Ne kadar hisse basılacak? (Varsayılan %5)
-    const [dilutionPercentage, setDilutionPercentage] = useState(5);
 
-    const { 
-        companyValue, 
-        companyOwnership, 
-        companySharePrice, 
-        performDilution 
-    } = useStatsStore();
-
-    // --- Hesaplamalar ---
-    
-    // 1. Yeni basılan hisselerden gelecek nakit para
-    const capitalRaised = companyValue * (dilutionPercentage / 100);
-    
-    // 2. Sulandırma sonrası senin hissenin düşeceği yeni oran
-    // Formül: Mevcut Hissen * (1 - Sulandırma Oranı)
-    const newOwnership = companyOwnership * (1 - (dilutionPercentage / 100));
-    
-    // 3. Tahmini yeni hisse fiyatı (Arz artınca fiyat psikolojik olarak %3 düşer)
-    const estimatedNewSharePrice = companySharePrice * 0.97; 
-
-    const handleConfirm = () => {
-        Alert.alert(
-            "Onaylıyor musun?",
-            `Hisseleri %${dilutionPercentage} oranında sulandırıp piyasaya süreceksin. Senin payın %${newOwnership.toFixed(1)} seviyesine düşecek.`,
-            [
-                { text: "İptal", style: "cancel" },
-                { 
-                    text: "Onayla ve Sat", 
-                    style: "destructive",
-                    onPress: () => {
-                        performDilution(dilutionPercentage);
-                        Alert.alert("Başarılı", `$${(capitalRaised / 1_000_000).toFixed(1)}M Nakit toplandı!`);
-                        onClose();
-                    }
-                }
-            ]
-        );
-    };
+    // Use the Hook
+    const {
+        dilutionPercentage,
+        setDilutionPercentage,
+        capitalRaised,
+        newOwnership,
+        estimatedNewSharePrice,
+        currentOwnership,
+        handleConfirm
+    } = useDilutionLogic(visible, onClose);
 
     return (
         <GameModal
@@ -67,9 +36,9 @@ const DilutionModal = ({ visible, onClose }: Props) => {
             title="Sermaye Artırımı (Dilution)"
         >
             <View style={styles.container}>
-                
+
                 <Text style={styles.description}>
-                    Yeni hisse basarak yatırımcılardan nakit toplayabilirsin. 
+                    Yeni hisse basarak yatırımcılardan nakit toplayabilirsin.
                     Ancak bu işlem, şirketteki sahiplik oranını düşürür.
                 </Text>
 
@@ -90,12 +59,12 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         rightText={`+$${(capitalRaised / 1_000_000).toFixed(2)}M`}
                         style={{ borderColor: theme.colors.success }}
                     />
-                    
+
                     <SectionCard
                         title="Yeni Hisseniz"
                         rightText={`%${newOwnership.toFixed(2)}`}
                         // Eğer hissen %50'nin altına düşüyorsa kırmızı uyarı ver
-                        danger={newOwnership < 50} 
+                        danger={newOwnership < 50}
                     />
 
                     <SectionCard
@@ -105,7 +74,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                 </View>
 
                 {/* Kritik Uyarı */}
-                {newOwnership < 51 && companyOwnership >= 51 && (
+                {newOwnership < 51 && currentOwnership >= 51 && (
                     <View style={styles.warningBox}>
                         <Text style={styles.warningText}>
                             ⚠️ DİKKAT: Bu işlemden sonra çoğunluk hissesini kaybedeceksiniz!
@@ -115,17 +84,17 @@ const DilutionModal = ({ visible, onClose }: Props) => {
 
                 {/* Aksiyonlar */}
                 <View style={styles.actionRow}>
-                    <GameButton 
-                        title="İşlemi Gerçekleştir" 
-                        onPress={handleConfirm} 
-                        variant="primary" 
-                        style={{ flex: 1 }} 
+                    <GameButton
+                        title="İşlemi Gerçekleştir"
+                        onPress={handleConfirm}
+                        variant="primary"
+                        style={{ flex: 1 }}
                     />
-                    <GameButton 
-                        title="İptal" 
-                        onPress={onClose} 
-                        variant="ghost" 
-                        style={{ flex: 1 }} 
+                    <GameButton
+                        title="İptal"
+                        onPress={onClose}
+                        variant="ghost"
+                        style={{ flex: 1 }}
                     />
                 </View>
 

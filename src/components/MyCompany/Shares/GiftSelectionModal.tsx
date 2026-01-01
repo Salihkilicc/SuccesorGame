@@ -1,15 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    Modal,
-    Animated,
-    Alert,
-} from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, Modal, Animated } from 'react-native';
 import { theme } from '../../../theme';
-import { useStatsStore, Shareholder } from '../../../store/useStatsStore';
+import { Shareholder } from '../../../store/useStatsStore';
+// 👇 YOL GÜNCELLENDİ
+import { useGiftLogic } from './logic/useGiftLogic';
 
 interface Props {
     visible: boolean;
@@ -17,16 +11,8 @@ interface Props {
     onClose: () => void;
 }
 
-const GIFTS = [
-    { id: 'watch', name: 'Luxury Watch', cost: 15_000, impact: 5, icon: '⌚' },
-    { id: 'golf', name: 'Golf Membership', cost: 40_000, impact: 10, icon: '⛳' },
-    { id: 'wine', name: 'Vintage Wine', cost: 80_000, impact: 15, icon: '🍷' },
-    { id: 'car', name: 'Sports Car', cost: 150_000, impact: 25, icon: '🏎️' },
-];
-
 const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
-    const { money, setField, updateShareholderRelationship } = useStatsStore();
-    const [result, setResult] = useState<{ sent: boolean; giftName: string; impact: number } | null>(null);
+    const { money, GIFTS, result, sendGift, resetResult } = useGiftLogic(shareholder);
     const appreciationAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -41,31 +27,8 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
         }
     }, [result]);
 
-    const handleSendGift = (gift: typeof GIFTS[0]) => {
-        if (money < gift.cost) {
-            Alert.alert('Insufficient Funds', "You can't afford this gift.");
-            return;
-        }
-
-        Alert.alert(
-            'Confirm Gift',
-            `Send ${gift.name} ($${gift.cost.toLocaleString()})?`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Send',
-                    onPress: () => {
-                        setField('money', money - gift.cost);
-                        updateShareholderRelationship(shareholder.id, gift.impact);
-                        setResult({ sent: true, giftName: gift.name, impact: gift.impact });
-                    },
-                },
-            ]
-        );
-    };
-
     const handleClose = () => {
-        setResult(null);
+        resetResult();
         onClose();
     };
 
@@ -74,7 +37,6 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
     return (
         <Modal visible={visible} animationType="fade" onRequestClose={handleClose}>
             <View style={styles.overlay} pointerEvents="box-none">
-                {/* Result Overlay */}
                 {result ? (
                     <View style={styles.resultContent}>
                         <Text style={styles.resultTitle}>🎁 Gift Sent!</Text>
@@ -122,7 +84,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                                 <Pressable
                                     key={gift.id}
                                     style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-                                    onPress={() => handleSendGift(gift)}>
+                                    onPress={() => sendGift(gift)}>
                                     <Text style={styles.icon}>{gift.icon}</Text>
                                     <Text style={styles.name}>{gift.name}</Text>
                                     <Text style={styles.cost}>${gift.cost.toLocaleString()}</Text>
@@ -149,7 +111,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.9)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
-        zIndex: 9999, // Root Level
+        zIndex: 9999,
         elevation: 10,
     },
     content: {
@@ -242,7 +204,6 @@ const styles = StyleSheet.create({
         color: theme.colors.textSecondary,
         fontWeight: '600',
     },
-    // Result Styles
     resultContent: {
         backgroundColor: theme.colors.card,
         borderRadius: theme.radius.lg,

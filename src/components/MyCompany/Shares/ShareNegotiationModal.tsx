@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -6,11 +6,11 @@ import {
     Pressable,
     Modal,
     TextInput,
-    Alert,
 } from 'react-native';
 import { theme } from '../../../theme';
-import { useStatsStore, Shareholder } from '../../../store/useStatsStore';
-import { PercentageSelector } from '../../atoms/PercentageSelector'; // Yeni Bileşen
+import { Shareholder } from '../../../store/useStatsStore';
+import { PercentageSelector } from '../../atoms/PercentageSelector';
+import { useNegotiationLogic } from '../../../features/shareholders/hooks/useNegotiationLogic';
 
 interface Props {
     visible: boolean;
@@ -18,125 +18,26 @@ interface Props {
     onClose: () => void;
 }
 
-type TransactionType = 'buy' | 'sell';
-type NegotiationResult = 'pending' | 'success' | 'fail';
-
 const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
+
+    // Connect Logic Hook
     const {
-        companySharePrice,
-        money,
-        shareholders,
-        setField,
-        setShareholders,
-        updateShareholderRelationship,
-    } = useStatsStore();
+        transactionType,
+        setTransactionType,
+        quantity,
+        setQuantity,
+        offerPrice,
+        setOfferPrice,
+        result,
+        maxQuantity,
+        currentTotal,
+        npcOfferPrice,
+        handleAction,
+        handleRejectOffer,
+        handleClose
+    } = useNegotiationLogic(visible, shareholder, onClose);
 
-    const [transactionType, setTransactionType] = useState<TransactionType>('buy');
-    const [quantity, setQuantity] = useState(1);
-    const [offerPrice, setOfferPrice] = useState(companySharePrice.toString());
-    const [result, setResult] = useState<NegotiationResult>('pending');
-
-    // Sell Mode: NPC offers Premium (Market + 20%)
-    const npcOfferPrice = companySharePrice * 1.2;
-
-    const relationship = shareholder.relationship || 50;
-    
-    // 1 Lot = %0.1 Hisse
-    const maxQuantity = transactionType === 'buy'
-        ? Math.floor(shareholder.percentage * 10) // Hissedarın elindeki max lot
-        : 10; // Oyuncunun satabileceği max lot (Oyun dengesi için 10 ile sınırlı)
-
-    useEffect(() => {
-        // Modal açıldığında state sıfırla
-        if (visible) {
-            setResult('pending');
-            setOfferPrice(companySharePrice.toString());
-            setQuantity(1);
-        }
-    }, [visible, companySharePrice]);
-
-    const handleAction = () => {
-        const finalPrice = transactionType === 'buy' ? parseFloat(offerPrice) : npcOfferPrice;
-        const totalValue = finalPrice * quantity;
-
-        if (transactionType === 'buy') {
-            // OYUNCU ALIYOR
-            if (money < totalValue) {
-                Alert.alert('Yetersiz Bakiye', "Bu işlem için yeterli nakitin yok.");
-                return;
-            }
-
-            // NPC Kabul Ediyor mu?
-            const priceRatio = finalPrice / companySharePrice;
-            let success = false;
-
-            if (relationship > 80) success = priceRatio >= 0.9;
-            else if (relationship < 30) success = priceRatio > 1.2;
-            else success = priceRatio >= 1.0 || (Math.random() > 0.5 && priceRatio > 0.95);
-
-            if (success) {
-                commitTransaction('buy', finalPrice, totalValue);
-            } else {
-                setResult('fail');
-                updateShareholderRelationship(shareholder.id, -2);
-            }
-
-        } else {
-            // OYUNCU SATIYOR (NPC Teklifini kabul et)
-            commitTransaction('sell', finalPrice, totalValue);
-        }
-    };
-
-    const handleRejectOffer = () => {
-        // Oyuncu teklifi reddetti
-        setResult('fail');
-        updateShareholderRelationship(shareholder.id, -5); // NPC alındı
-    };
-
-    const commitTransaction = (type: TransactionType, price: number, total: number) => {
-        const pctChange = quantity * 0.1; // Lot başına %0.1
-
-        if (type === 'buy') {
-            setField('money', money - total);
-        } else {
-            setField('money', money + total);
-        }
-
-        const newShareholders = shareholders.map(sh => {
-            if (sh.id === shareholder.id) {
-                return {
-                    ...sh,
-                    percentage: type === 'buy'
-                        ? Math.max(0, sh.percentage - pctChange)
-                        : sh.percentage + pctChange
-                };
-            }
-            if (sh.id === 'player') {
-                return {
-                    ...sh,
-                    percentage: type === 'buy'
-                        ? sh.percentage + pctChange
-                        : Math.max(0, sh.percentage - pctChange)
-                };
-            }
-            return sh;
-        });
-
-        setShareholders(newShareholders);
-
-        // Player ownership güncelle
-        const player = newShareholders.find(s => s.id === 'player');
-        if (player) setField('companyOwnership', player.percentage);
-
-        updateShareholderRelationship(shareholder.id, 2);
-        setResult('success');
-    };
-
-    const handleClose = () => {
-        onClose();
-    };
-
-    const currentTotal = (transactionType === 'buy' ? parseFloat(offerPrice) : npcOfferPrice) * quantity || 0;
+    const { companySharePrice } = require('../../../store/useStatsStore').useStatsStore(); // Required for display hint
 
     return (
         <Modal visible={visible} animationType="fade" onRequestClose={handleClose}>

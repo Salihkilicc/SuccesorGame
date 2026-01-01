@@ -12,6 +12,6 @@ export const zustandStorage: StateStorage = {
     storage.set(name, value);
   },
   removeItem: (name: string) => {
-    storage.remove(name);
+    storage.delete(name);
   },
 };

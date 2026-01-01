@@ -1,30 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
+import { useBorrowLogic } from '../../../features/finance/hooks/useBorrowLogic';
 
 type Props = {
     visible: boolean;
     type: string;
     rate: number;
-    maxLimit: number;
+    maxLimit: number; // Keep for display or constraint if needed, but hook handles logic
     onClose: () => void;
-    onConfirm: (amount: number) => void;
+    onConfirm?: (amount: number) => void; // Optional now as hook handles it, but keep for compat if needed (though we will ignore it in favor of hook)
 };
 
-const BorrowModal = ({ visible, type, rate, maxLimit, onClose, onConfirm }: Props) => {
-    const [amount, setAmount] = useState(1_000_000); // Start at 1M
+const BorrowModal = ({ visible, type, rate, maxLimit, onClose }: Props) => {
 
-    // Ensure min range is at least 1M or maxLimit if lower
-    const safeMax = Math.max(1_000_000, maxLimit);
+    // Use the Hook
+    const {
+        amount,
+        setAmount,
+        maxBorrowable,
+        monthlyInterestCost,
+        handleConfirm
+    } = useBorrowLogic(visible, onClose, rate);
 
-    const monthlyCost = (amount * (rate / 100)) / 12;
-
-    const formatCurrency = (val: number) => {
-        if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`;
-        if (val >= 1_000) return `$${(val / 1_000).toFixed(0)}K`;
-        return `$${val}`;
-    };
+    // Ensure min range is at least 1M
+    const safeMax = Math.max(1_000_000, maxBorrowable);
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -38,7 +39,7 @@ const BorrowModal = ({ visible, type, rate, maxLimit, onClose, onConfirm }: Prop
                             label="Loan Amount"
                             value={amount}
                             min={1_000_000}
-                            max={safeMax}
+                            max={safeMax} // Use calculated max from hook (based on valuation)
                             onChange={setAmount}
                             unit="$"
                         />
@@ -46,14 +47,21 @@ const BorrowModal = ({ visible, type, rate, maxLimit, onClose, onConfirm }: Prop
 
                     <View style={styles.calculationBox}>
                         <Text style={styles.calcLabel}>New Monthly Expense</Text>
-                        <Text style={styles.calcValue}>+${Math.round(monthlyCost).toLocaleString()}/mo</Text>
+                        <Text style={styles.calcValue}>+${Math.round(monthlyInterestCost).toLocaleString()}/mo</Text>
                     </View>
+
+                    {/* Warning if trying to borrow close to limit */}
+                    {amount > maxBorrowable * 0.9 && (
+                        <Text style={styles.warningText}>
+                            ⚠️ Approaching maximum credit limit
+                        </Text>
+                    )}
 
                     <View style={styles.modalActions}>
                         <Pressable onPress={onClose} style={styles.cancelAction}>
                             <Text style={styles.cancelText}>Cancel</Text>
                         </Pressable>
-                        <Pressable onPress={() => onConfirm(amount)} style={styles.confirmAction}>
+                        <Pressable onPress={handleConfirm} style={styles.confirmAction}>
                             <Text style={styles.confirmText}>Confirm Loan</Text>
                         </Pressable>
                     </View>
@@ -100,21 +108,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         alignItems: 'center',
     },
-    amountText: {
-        fontSize: 32,
-        fontWeight: '900',
-        color: theme.colors.success,
-    },
-    limitRow: {
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'space-between',
-        paddingHorizontal: 8,
-    },
-    limitText: {
-        color: '#666',
-        fontSize: 12,
-    },
     calculationBox: {
         backgroundColor: '#232730',
         padding: 16,
@@ -135,6 +128,13 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '700',
         color: '#FFF',
+    },
+    warningText: {
+        color: '#ffdd57',
+        fontSize: 12,
+        textAlign: 'center',
+        marginBottom: 16,
+        fontWeight: '600'
     },
     modalActions: {
         flexDirection: 'row',

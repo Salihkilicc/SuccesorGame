@@ -1,3 +1,5 @@
+// dosya: src/features/MyCompany/NativeEconomy.ts (veya mevcut yeri)
+
 import { NativeModules } from 'react-native';
 
 const { EconomyBridge } = NativeModules;
@@ -10,8 +12,7 @@ export interface FinancialData {
     companyCapital: number;
     companyValuation: number;
     isBankrupt: boolean;
-
-    // Quarterly Report Data
+    // Rapor verileri...
     reportTotalProduction?: number;
     reportTotalSales?: number;
     reportTotalRevenue?: number;
@@ -33,14 +34,16 @@ interface EconomyBridgeType {
 
 export const NativeEconomy = EconomyBridge as EconomyBridgeType;
 
-export const formatCurrency = (value: number): string => {
-    if (value >= 1_000_000_000) {
-        return `$${(value / 1_000_000_000).toFixed(1)}B`;
-    } else if (value >= 1_000_000) {
-        return `$${(value / 1_000_000).toFixed(1)}M`;
-    } else if (value >= 1_000) {
-        return `$${(value / 1_000).toFixed(1)}K`;
+// ✅ BU FONKSİYONU MERKEZİLEŞTİRDİK
+export const formatCurrency = (value: number | undefined | null): string => {
+    const val = value || 0;
+    if (val >= 1_000_000_000) {
+        return `$${(val / 1_000_000_000).toFixed(1)}B`;
+    } else if (val >= 1_000_000) {
+        return `$${(val / 1_000_000).toFixed(1)}M`;
+    } else if (val >= 1_000) {
+        return `$${(val / 1_000).toFixed(1)}K`;
     } else {
-        return `$${value.toFixed(0)}`;
+        return `$${val.toFixed(0)}`;
     }
 };
