@@ -1,4 +1,4 @@
-// src/features/MyCompany/MyCompanyScreen.tsx
+// src/screens/MyCompany/MyCompanyScreen.tsx
 
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Text, Pressable } from 'react-native';
@@ -10,13 +10,13 @@ import { useProductStore } from '../../../store/useProductStore';
 import { formatCurrency } from './NativeEconomy';
 import { useCompanyLogic } from './useCompanyLogic';
 
-// --- YENİ TEMİZ IMPORTLAR ---
+// --- UI Components ---
 import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from './components/CompanyUI';
 import { CompanyModals } from './components/CompanyModals';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
 
-// Helper Component (Burada bıraktık çünkü çok spesifik)
+// Helper Component
 const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
   <Pressable onPress={onPress} style={({ pressed }) => [styles.deptCard, pressed && { opacity: 0.8 }]}>
     <Text style={{ fontSize: 32 }}>{icon}</Text>
@@ -26,7 +26,8 @@ const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
 );
 
 const MyCompanyScreen = () => {
-  const navigation = useNavigation();
+  // Navigation'a <any> veriyoruz ki TypeScript hata vermesin
+  const navigation = useNavigation<any>(); 
   const insets = useSafeAreaInsets();
 
   // Logic Hook
@@ -34,7 +35,7 @@ const MyCompanyScreen = () => {
   const { products } = useProductStore();
 
   // Store Data
-  const stats = useStatsStore(); // Hepsini tek objede aldım, aşağıda stats.xxx diye kullanacağız, daha temiz.
+  const stats = useStatsStore(); 
 
   // --- UI STATES ---
   const [modals, setModals] = useState<any>({});
@@ -43,7 +44,7 @@ const MyCompanyScreen = () => {
   const [borrowConfig, setBorrowConfig] = useState({ visible: false, type: '', rate: 0 });
   const [repayConfig, setRepayConfig] = useState({ visible: false });
 
-  // Share Actions (Bunu burda tutuyoruz çünkü modal zinciri var)
+  // Share Actions
   const [activeShareAction, setActiveShareAction] = useState<string | null>(null);
   const [selectedShareholder, setSelectedShareholder] = useState<any>(null);
 
@@ -100,10 +101,34 @@ const MyCompanyScreen = () => {
         {/* DEPARTMENTS */}
         <SectionHeader title="DEPARTMENTS" />
         <View style={styles.grid}>
-          <DepartmentCard icon="🏦" title="Finance" subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`} onPress={() => toggleModal('finance', true)} />
-          <DepartmentCard icon="🏭" title="Products" subtitle={`${activeProductsCount} Active`} onPress={() => toggleModal('product', true)} />
-          <DepartmentCard icon="👥" title="HR & Management" subtitle={`${stats.employeeCount} Employees`} onPress={() => toggleModal('management', true)} />
-          <DepartmentCard icon="📈" title="Stock Market" subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`} onPress={() => toggleModal('shareControl', true)} />
+          <DepartmentCard 
+            icon="🏦" 
+            title="Finance" 
+            subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`} 
+            onPress={() => toggleModal('finance', true)} 
+          />
+          
+          {/* 👇 DÜZELTME BURADA YAPILDI: ARTIK NAVİGASYONA GİDİYOR 👇 */}
+          <DepartmentCard 
+            icon="🏭" 
+            title="Products" 
+            subtitle={`${activeProductsCount} Active`} 
+            onPress={() => navigation.navigate('Products')} 
+          />
+          {/* 👆 -------------------------------------------------- 👆 */}
+
+          <DepartmentCard 
+            icon="👥" 
+            title="HR & Management" 
+            subtitle={`${stats.employeeCount} Employees`} 
+            onPress={() => toggleModal('management', true)} 
+          />
+          <DepartmentCard 
+            icon="📈" 
+            title="Stock Market" 
+            subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`} 
+            onPress={() => toggleModal('shareControl', true)} 
+          />
         </View>
 
         {/* QUICK ACTIONS */}
@@ -117,7 +142,7 @@ const MyCompanyScreen = () => {
 
       </ScrollView>
 
-      {/* --- MODAL MANAGER (Tüm modallar burada) --- */}
+      {/* --- MODAL MANAGER --- */}
       <CompanyModals
         modals={modals}
         toggleModal={toggleModal}
@@ -138,10 +163,6 @@ const MyCompanyScreen = () => {
           }
         }}
       />
-
-      {/* Shareholder ve diğer küçük modallar burada kalabilir veya onları da Modal dosyasına atabilirsin.
-          Şimdilik karmaşıklığın %90'ını çözdük. */}
-
     </View>
   );
 };

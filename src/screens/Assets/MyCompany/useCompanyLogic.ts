@@ -1,12 +1,5 @@
-// dosya: src/features/MyCompany/useCompanyLogic.ts
-
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../store'; // Store yolunu projene göre ayarla
-
-// Sabit değerleri buraya alarak "Magic Number"lardan kurtulduk
-const COST_FACTORY = 50_000_000;
-const COST_EMPLOYEE = 5_000;
-const EMPLOYEES_PER_FACTORY = 500;
+import { useStatsStore } from '../../../store'; 
 
 export const useCompanyLogic = () => {
   const {
@@ -16,27 +9,57 @@ export const useCompanyLogic = () => {
     setField,
   } = useStatsStore();
 
+  // --- HEDEFLENEN SINIRLAR ---
+  const MAX_FACTORIES = 500; // Hedef: 500 Fabrika
+  // Hedef: 160.000 İşçi => 160.000 / 500 = 320 İşçi/Fabrika
+  const WORKERS_PER_FACTORY_CAPACITY = 320; 
+  
+  // Fabrika kurulunca otomatik gelen işçi (Opsiyonel, dengede kalsın diye 120 bıraktık)
+  const WORKERS_INCLUDED_WITH_FACTORY = 120; 
+
+  const COST_FACTORY = 500_000; 
+  const COST_EMPLOYEE = 5_000;
+
+  // Anlık Maksimum İşçi Kapasitesi (Border)
+  const currentMaxEmployees = factoryCount * WORKERS_PER_FACTORY_CAPACITY;
+
   const handlePurchaseFactory = (delta: number) => {
     if (delta === 0) return;
 
+    const newFactoryCount = factoryCount + delta;
+
+    // 1. Fabrika Limiti Kontrolü (Max 500)
+    if (delta > 0 && newFactoryCount > MAX_FACTORIES) {
+      Alert.alert('Sınır Aşıldı', `Maksimum ${MAX_FACTORIES} fabrikaya ulaşabilirsiniz.`);
+      return;
+    }
+
     const cost = Math.abs(delta) * COST_FACTORY;
-    const newCount = factoryCount + delta;
 
     if (delta > 0) {
-      // Satın Alma
+      // SATIN ALMA
       if (companyCapital < cost) {
-        Alert.alert('Yetersiz Sermaye', 'Bu genişlemeyi karşılayamazsınız.');
+        Alert.alert('Yetersiz Sermaye', `Bu işlem için $${cost.toLocaleString()} gerekiyor.`);
         return;
       }
+
       setField('companyCapital', companyCapital - cost);
-      setField('factoryCount', newCount);
-      Alert.alert('Başarılı', `${delta} Fabrika Satın Alındı!`);
+      setField('factoryCount', newFactoryCount);
+      
+      // Fabrika ile gelen hediye işçiler
+      const newEmployeeCount = employeeCount + (delta * WORKERS_INCLUDED_WITH_FACTORY);
+      // İşçi sayısının max kapasiteyi geçmemesini garantile (Emniyet sübabı)
+      const safeEmployeeCount = Math.min(newEmployeeCount, newFactoryCount * WORKERS_PER_FACTORY_CAPACITY);
+      
+      setField('employeeCount', safeEmployeeCount);
+
+      Alert.alert('Başarılı', `${delta} Fabrika kuruldu. Kapasite arttı!`);
     } else {
-      // Satış
-      const refund = cost * 0.5; // %50 iade
+      // SATIŞ
+      const refund = cost * 0.5;
       setField('companyCapital', companyCapital + refund);
-      setField('factoryCount', newCount);
-      Alert.alert('Başarılı', `${Math.abs(delta)} Fabrika ${refund.toLocaleString()} karşılığında satıldı!`);
+      setField('factoryCount', newFactoryCount);
+      Alert.alert('Başarılı', `${Math.abs(delta)} Fabrika satıldı.`);
     }
   };
 
@@ -45,42 +68,38 @@ export const useCompanyLogic = () => {
 
     const cost = Math.abs(delta) * COST_EMPLOYEE;
     const newCount = employeeCount + delta;
-    const currentLimit = factoryCount * EMPLOYEES_PER_FACTORY;
 
     if (delta > 0) {
-      // İşe Alma
+      // İŞE ALMA
       if (companyCapital < cost) {
-        Alert.alert('Yetersiz Sermaye', 'İşe alım ücretlerini karşılayamazsınız.');
+        Alert.alert('Yetersiz Sermaye', 'Bakiye yetersiz.');
         return;
       }
-      if (newCount > currentLimit) {
-        Alert.alert('Kapasite Dolu', `Her fabrika ${EMPLOYEES_PER_FACTORY} çalışan destekler. Önce fabrika kurun.`);
+      
+      // Kapasite Kontrolü (Fabrika * 320)
+      if (newCount > currentMaxEmployees) {
+        Alert.alert('Kapasite Dolu', `Mevcut fabrikalarınız en fazla ${currentMaxEmployees.toLocaleString()} çalışan alabilir.`);
         return;
       }
+
       setField('companyCapital', companyCapital - cost);
       setField('employeeCount', newCount);
       Alert.alert('Başarılı', `${delta} Çalışan İşe Alındı!`);
     } else {
-      // İşten Çıkarma (Kıdem tazminatı ödenir, iade yok)
+      // İŞTEN ÇIKARMA
       setField('companyCapital', companyCapital - cost);
-      setField('employeeCount', newCount);
-      Alert.alert('Bildirim', `${Math.abs(delta)} Çalışan İşten Çıkarıldı (Tazminat: $${cost.toLocaleString()})`);
+      setField('employeeCount', Math.max(0, newCount));
+      Alert.alert('Bildirim', `${Math.abs(delta)} Çalışan çıkarıldı.`);
     }
   };
 
   return {
     handlePurchaseFactory,
     handleHireEmployees,
-    costs: {
-        factory: COST_FACTORY,
-        employee: COST_EMPLOYEE
-    },
+    costs: { factory: COST_FACTORY, employee: COST_EMPLOYEE },
     limits: {
-        maxFactories: Math.floor((companyCapital || 0) / COST_FACTORY),
-        maxEmployees: Math.min(
-            Math.floor((companyCapital || 0) / COST_EMPLOYEE),
-            (factoryCount * EMPLOYEES_PER_FACTORY) - employeeCount
-        )
+        maxFactories: MAX_FACTORIES, // 500
+        maxEmployees: currentMaxEmployees // Max 160.000'e kadar çıkar
     }
   };
 };

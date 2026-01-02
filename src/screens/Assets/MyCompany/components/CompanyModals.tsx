@@ -9,7 +9,7 @@ import CorporateFinanceHubModal from '../../../../components/MyCompany/Finance/C
 import BorrowModal from '../../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../../components/MyCompany/Finance/RepayModal';
 import GameModal from '../../../../components/common/GameModal';
-import ProductHub from '../../../../components/MyCompany/Products/ProductHub';
+import ProductsScreen from '../../../Products/ProductsScreen';
 import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../../components/MyCompany/Management/EmployeesModule';
 import ShareControlHub from '../../../../components/MyCompany/Shares/ShareControlHub';
@@ -87,7 +87,7 @@ export const CompanyModals = ({
 
       {/* --- ÜRÜN & YÖNETİM --- */}
       <GameModal visible={!!modals.product} onClose={() => toggleModal('product', false)}>
-        <ProductHub onClose={() => toggleModal('product', false)} />
+        <ProductsScreen />
       </GameModal>
 
       {!!modals.management && (

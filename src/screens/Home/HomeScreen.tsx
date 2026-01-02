@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
   View,
@@ -8,11 +8,13 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../store';
+import { useProductStore } from '../../store/useProductStore';
 import { theme } from '../../theme';
 import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../Assets/MyCompany/QuarterlyReportModal';
@@ -49,8 +51,9 @@ const HomeScreen = () => {
   const { name, bio, gender, hasPremium, partner } = useUserStore();
   const { age, currentMonth, advanceMonth } = useGameStore();
   // TODO: Wire monthlyIncome/monthlyExpenses to real store values when available.
-  const { money, netWorth, monthlyIncome, monthlyExpenses, setField } = useStatsStore();
+  const { money, netWorth, monthlyIncome, monthlyExpenses, setField, factoryCount, employeeCount } = useStatsStore();
   const { holdings } = useMarketStore();
+  const { reset: resetProducts } = useProductStore();
 
   const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
@@ -67,6 +70,43 @@ const HomeScreen = () => {
   // --- Quarterly Report State ---
   const [reportVisible, setReportVisible] = useState(false);
   const [lastReportData, setLastReportData] = useState<ReportFinancialData | null>(null);
+
+  // --- Game Over State ---
+  const [isGameOver, setIsGameOver] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isGameOver) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 2000, // 2 saniye fade-in
+        useNativeDriver: true,
+      }).start();
+    } else {
+      fadeAnim.setValue(0);
+    }
+  }, [isGameOver]);
+
+  const handleRestart = () => {
+    // 1. Reset Animation & State
+    setIsGameOver(false);
+    fadeAnim.setValue(0);
+
+    // 2. New Game+ Logic
+    const retainedFactories = Math.floor((factoryCount || 0) * 0.10);
+    const retainedEmployees = Math.floor((employeeCount || 0) * 0.10);
+
+    // Reset Products Logic
+    resetProducts();
+
+    // Set New Stats
+    setField('companyCapital', 100_000_000_000); // 100 Billion
+    setField('money', 1_000_000_000); // 1 Billion
+    setField('factoryCount', retainedFactories);
+    setField('employeeCount', retainedEmployees);
+
+    Alert.alert("New Game+", `You have been reborn!\n\n+ $100B Capital\n+ $1B Cash\n+ ${retainedFactories} Factories Retained\n+ ${retainedEmployees} Employees Retained`);
+  };
 
   const handleAdvanceTime = async () => {
     try {
@@ -92,7 +132,8 @@ const HomeScreen = () => {
         setReportVisible(true);
 
         if (result.status === 'bankrupt') {
-          Alert.alert("GAME OVER", `Company Bankrupt: ${result.reason}`);
+          // Alert yerine Game Over ekranını tetikle
+          setIsGameOver(true);
         }
       }
     } catch (e) {
@@ -317,6 +358,19 @@ const HomeScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* --- GAME OVER OVERLAY --- */}
+      {isGameOver && (
+        <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
+          <Text style={styles.gameOverText}>GAME OVER</Text>
+          <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
+
+          <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+            <Text style={styles.restartButtonText}>NEW GAME</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
     </SafeAreaView >
   );
 };
@@ -689,5 +743,39 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
     lineHeight: 20,
+  },
+  gameOverOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    zIndex: 999,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  gameOverText: {
+    fontSize: 48,
+    fontWeight: '900',
+    color: theme.colors.danger,
+    textAlign: 'center',
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  gameOverSubText: {
+    fontSize: 16,
+    color: '#ddd',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  restartButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    elevation: 5,
+  },
+  restartButtonText: {
+    color: '#000',
+    fontWeight: '800',
+    fontSize: 16,
   },
 });

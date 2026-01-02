@@ -25,6 +25,7 @@ import {
   HomeScreen,
   ShoppingScreen,
   ShopDetailScreen,
+  ProductsScreen,
 } from '../screens';
 import { formatScreenTitle } from '../utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
@@ -48,6 +49,7 @@ export type AssetsStackParamList = {
   ShopDetail: {
     shopId: string;
   };
+  // Products buradan kaldırıldı, aşağıda RootStack'e eklendi.
   StockDetail: {
     symbol: string;
     price: number;
@@ -86,6 +88,7 @@ export type RootStackParamList = {
   Premium: undefined;
   Achievements: undefined;
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
+  Products: undefined; // ✅ BURAYA EKLENDİ (Global Erişim İçin)
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -127,6 +130,7 @@ const AssetsStackNavigator = () => (
       component={MyCompanyScreen}
       options={{ title: formatScreenTitle('My Company') }}
     />
+    {/* Products buradan kaldırıldı */}
     <AssetsStack.Screen
       name="StockDetail"
       component={StockDetailScreen}
@@ -219,10 +223,13 @@ const RootNavigator = () => (
         <RootStack.Screen name="Home" component={HomeScreen} />
         <RootStack.Screen name="MainTabs" component={MainTabs} />
         <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
+        
+        {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
+        <RootStack.Screen name="Products" component={ProductsScreen} />
+        
         <RootStack.Screen name="Premium" component={PremiumScreen} />
         <RootStack.Screen name="Achievements" component={AchievementsScreen} />
         <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
-        {/* Future settings/legal/notifications routes can be added here */}
       </RootStack.Navigator>
       <BottomStatsBar
         onHomePress={() => {

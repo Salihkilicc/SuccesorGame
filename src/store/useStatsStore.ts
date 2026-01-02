@@ -31,6 +31,7 @@ export type StatKey =
   | 'employeeMorale'
   | 'productionCapacity'
   | 'productionLevel'
+  | 'researchPoints'
   | 'stockSplitCount';
 
 export interface Shareholder {
@@ -85,6 +86,7 @@ type StatsStore = StatsState & {
   setCompanyExpensesMonthly: (value: number) => void;
   setCompanyCapital: (value: number) => void;
   setCasinoReputation: (value: number) => void;
+  setResearchPoints: (value: number) => void;
   setShareholders: (list: Shareholder[]) => void;
   setSalaryTier: (tier: 'low' | 'average' | 'above_average') => void;
   setTechLevel: (category: keyof TechLevels, level: number) => void;
@@ -140,6 +142,7 @@ export const initialStatsState: StatsState = {
   salaryTier: 'average',
   productionCapacity: 1000,
   productionLevel: 2000,
+  researchPoints: 0,
   stockSplitCount: 0,
   isPublic: false,
   techLevels: {
@@ -227,7 +230,7 @@ const recalculateFinancials = (currentState: StatsStore) => {
   // 2. Calculate Revenue (from Product Store)
   const productState = useProductStore.getState();
   const activeProducts = productState.products.filter(p => p.status === 'active');
-  const totalRevenue = activeProducts.reduce((sum, p) => sum + p.revenue, 0);
+  const totalRevenue = activeProducts.reduce((sum, p) => sum + (p.revenue || 0), 0);
 
   // 3. Calculate Valuation
   // Multiplier Logic: Base 3x, Public 15x, +1 for each Tech Level
@@ -283,6 +286,7 @@ export const useStatsStore = create<StatsStore>()(
 
       setCasinoReputation: value =>
         set(state => ({ ...state, casinoReputation: value })),
+      setResearchPoints: value => set(state => ({ ...state, researchPoints: value })),
       setShareholders: list => set(state => ({ ...state, shareholders: list })),
 
       setSalaryTier: tier => set(state => {
