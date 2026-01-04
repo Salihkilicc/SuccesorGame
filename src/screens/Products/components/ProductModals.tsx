@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../../theme'; // Tema yolunu kontrol et
+import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import { theme } from '../../../theme';
 import { Product } from '../../../features/products/data/productsData';
+import { useLaboratoryStore } from '../../../store/useLaboratoryStore';
+import { useProductStore } from '../../../store/useProductStore';
+import {
+    calculateUpgradeRPCost,
+    getEffectiveProductionCost,
+    getEffectiveSellingPrice,
+    getNextPriceIncrease,
+    MAX_UPGRADE_LEVEL,
+    COST_OPTIMIZATION,
+    FEATURE_ENHANCEMENT,
+} from '../../../features/products/logic/productUpgrades';
 
 // --- LAUNCH MODAL ---
 export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLaunch, analysisData }: any) => {
@@ -73,17 +84,74 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
     );
 };
 
-// --- DETAIL MODAL ---
-export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onRetire, getTip }: any) => {
+// --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
+// --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
+export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity }: any) => {
+    // 1. Get live product from store to ensure reactivity
+    const product = useProductStore((state) =>
+        state.products.find((p) => p.id === initialProduct?.id)
+    );
+
+    // If product doesn't exist (e.g. retired/deleted), return null or close
     if (!product) return null;
 
-    const [production, setProduction] = useState(product.productionLevel || 50);
-    const [price, setPrice] = useState(product.sellingPrice || 0);
+    const { totalRP } = useLaboratoryStore();
+    const { upgradeProductCost, upgradeProductPrice, randomizeProductName } = useProductStore();
+
+    const [production, setProduction] = useState(product.productionLevel ?? 50);
     const [marketing, setMarketing] = useState(product.marketingBudget || 0);
+    const [marketingPerUnit, setMarketingPerUnit] = useState(product.marketingSpendPerUnit || 0);
+    // Use product name directly to reflect randomization immediately
+    const displayName = product.name;
+
+    const costLevel = product.costLevel || 0;
+    const priceLevel = product.priceLevel || 0;
+
+    // Use values directly from product (Store now updates these fields)
+    const effectiveCost = product.unitCost ?? product.baseProductionCost;
+    const effectivePrice = product.sellingPrice || product.suggestedPrice;
+
+    const costUpgradeRP = calculateUpgradeRPCost(COST_OPTIMIZATION.BASE_RP_COST, costLevel);
+    const priceUpgradeRP = calculateUpgradeRPCost(FEATURE_ENHANCEMENT.BASE_RP_COST, priceLevel);
+
+    const canUpgradeCost = (costLevel < MAX_UPGRADE_LEVEL && totalRP >= costUpgradeRP);
+    const canUpgradePrice = (priceLevel < MAX_UPGRADE_LEVEL && totalRP >= priceUpgradeRP);
+
+    // Force re-render on RP change? useLaboratoryStore hook handles it.
+    // The issue was `product` prop being stale. Now `product` is from store hook.
+
+    const nextPriceIncrease = getNextPriceIncrease(priceLevel);
 
     const handleSave = () => {
-        onUpdate(product.id, { productionLevel: production, sellingPrice: price, marketingBudget: marketing });
+        onUpdate(product.id, {
+            productionLevel: production,
+            marketingBudget: marketing,
+            marketingSpendPerUnit: marketingPerUnit
+        });
         onClose();
+    };
+
+    const handleCostUpgrade = () => {
+        const result = upgradeProductCost(product.id, totalRP, (amount) => {
+            useLaboratoryStore.getState().spendRP(amount);
+        });
+        if (!result.success) {
+            Alert.alert('Error', result.message);
+        }
+        // Success: Store updates -> Hook triggers -> Re-render with new values
+    };
+
+    const handlePriceUpgrade = () => {
+        const result = upgradeProductPrice(product.id, totalRP, (amount) => {
+            useLaboratoryStore.getState().spendRP(amount);
+        });
+        if (!result.success) {
+            Alert.alert('Error', result.message);
+        }
+    };
+
+    const handleRandomizeName = () => {
+        randomizeProductName(product.id);
     };
 
     // Helper to format large numbers
@@ -91,8 +159,8 @@ export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onReti
         return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(num);
     };
 
-    // Calculate Real Production Units (Base 1.5M * Percentage)
-    const BASE_CAPACITY = 1500000;
+    // Calculate Real Production Units (Dynamic Base)
+    const BASE_CAPACITY = totalCapacity || 1500000;
     const estimatedUnits = Math.round(BASE_CAPACITY * (production / 100));
 
     return (
@@ -100,8 +168,16 @@ export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onReti
             <View style={styles.overlay}>
                 <View style={[styles.content, { height: '85%' }]}>
                     <View style={styles.headerRow}>
-                        <Text style={styles.modalTitle}>{product.icon} {product.name}</Text>
-                        <Pressable onPress={onClose}><Text style={styles.closeIcon}>✕</Text></Pressable>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={styles.modalTitle}>{product.icon} {displayName}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            {/* RP Badge */}
+                            <View style={styles.rpBadge}>
+                                <Text style={styles.rpBadgeText}>{totalRP.toLocaleString()} RP</Text>
+                            </View>
+                            <Pressable onPress={onClose}><Text style={styles.closeIcon}>✕</Text></Pressable>
+                        </View>
                     </View>
 
                     <ScrollView showsVerticalScrollIndicator={false}>
@@ -111,7 +187,56 @@ export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onReti
                             <Text style={styles.insightText}>{getTip(product)}</Text>
                         </View>
 
-                        {/* Production Slider Sim */}
+                        {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
+                        <View style={styles.rdSection}>
+                            <Text style={styles.sectionTitle}>🔬 R&D Upgrades</Text>
+
+                            {/* Production Cost Optimization - COMPACT */}
+                            <View style={styles.upgradeCardCompact}>
+                                <View style={styles.upgradeContentCompact}>
+                                    <Text style={styles.upgradeLabel}>Unit Cost</Text>
+                                    <Text style={styles.heroValue}>${effectiveCost}</Text>
+                                </View>
+                                <Pressable
+                                    style={[
+                                        styles.upgradeBtnCompact,
+                                        !canUpgradeCost && styles.upgradeBtnDisabled
+                                    ]}
+                                    onPress={handleCostUpgrade}
+                                    disabled={!canUpgradeCost}
+                                >
+                                    <Text style={styles.upgradeBtnTextCompact}>
+                                        {costLevel >= MAX_UPGRADE_LEVEL
+                                            ? 'MAXED OUT'
+                                            : `${formatNumber(costUpgradeRP)} RP → -$2`}
+                                    </Text>
+                                </Pressable>
+                            </View>
+
+                            {/* Feature Enhancement - COMPACT */}
+                            <View style={styles.upgradeCardCompact}>
+                                <View style={styles.upgradeContentCompact}>
+                                    <Text style={styles.upgradeLabel}>Selling Price</Text>
+                                    <Text style={styles.heroValue}>${effectivePrice}</Text>
+                                </View>
+                                <Pressable
+                                    style={[
+                                        styles.upgradeBtnCompact,
+                                        !canUpgradePrice && styles.upgradeBtnDisabled
+                                    ]}
+                                    onPress={handlePriceUpgrade}
+                                    disabled={!canUpgradePrice}
+                                >
+                                    <Text style={styles.upgradeBtnTextCompact}>
+                                        {priceLevel >= MAX_UPGRADE_LEVEL
+                                            ? 'MAXED OUT'
+                                            : `${formatNumber(priceUpgradeRP)} RP → +$${nextPriceIncrease}`}
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
+
+                        {/* Production Capacity Control */}
                         <View style={styles.controlGroup}>
                             <Text style={styles.controlTitle}>Production Capacity</Text>
                             <View style={styles.sliderRow}>
@@ -119,37 +244,45 @@ export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onReti
                                 <Text style={styles.controlValue}>{production}%</Text>
                                 <Pressable onPress={() => setProduction(Math.min(100, production + 10))} style={styles.adjBtn}><Text style={styles.adjText}>+</Text></Pressable>
                             </View>
-
-                            {/* NEW: Real Numbers Display */}
                             <View style={styles.realStatsRow}>
                                 <Text style={styles.realStatsText}>Output: {formatNumber(estimatedUnits)} Units</Text>
                                 <Text style={styles.hint}>Market Demand: {product.marketDemand}%</Text>
                             </View>
                         </View>
 
-                        {/* Price Sim */}
+                        {/* Marketing Spend (Per Unit) - NEW */}
                         <View style={styles.controlGroup}>
-                            <Text style={styles.controlTitle}>Selling Price</Text>
-                            <View style={styles.sliderRow}>
-                                <Pressable onPress={() => setPrice(Math.max(0, price - 5))} style={styles.adjBtn}><Text style={styles.adjText}>-</Text></Pressable>
-                                <Text style={styles.controlValue}>${price}</Text>
-                                <Pressable onPress={() => setPrice(price + 5)} style={styles.adjBtn}><Text style={styles.adjText}>+</Text></Pressable>
+                            <Text style={styles.controlTitle}>Marketing Spend (Per Unit)</Text>
+                            <Text style={styles.hint}>Higher spend increases sales conversion</Text>
+                            <View style={styles.progressBarContainer}>
+                                <View style={styles.progressBarBg}>
+                                    <View style={[styles.progressBarFill, { width: `${Math.min(100, (marketingPerUnit / 100) * 100)}%` }]} />
+                                </View>
+                                <Text style={styles.progressValue}>${marketingPerUnit}</Text>
                             </View>
-                            <Text style={styles.hint}>Suggested: ${product.suggestedPrice}</Text>
+                            <View style={styles.sliderRow}>
+                                <Pressable onPress={() => setMarketingPerUnit(Math.max(0, marketingPerUnit - 10))} style={styles.adjBtn}><Text style={styles.adjText}>-$10</Text></Pressable>
+                                <Pressable onPress={() => setMarketingPerUnit(Math.max(0, marketingPerUnit - 5))} style={styles.adjBtn}><Text style={styles.adjText}>-$5</Text></Pressable>
+
+                                <Pressable onPress={() => setMarketingPerUnit(Math.min(100, marketingPerUnit + 5))} style={styles.adjBtn}><Text style={styles.adjText}>+$5</Text></Pressable>
+                                <Pressable onPress={() => setMarketingPerUnit(Math.min(100, marketingPerUnit + 10))} style={styles.adjBtn}><Text style={styles.adjText}>+$10</Text></Pressable>
+                            </View>
                         </View>
 
-                        {/* Marketing Sim */}
+                        {/* Inventory Status - NEW */}
                         <View style={styles.controlGroup}>
-                            <Text style={styles.controlTitle}>Marketing Budget</Text>
-                            <View style={styles.sliderRow}>
-                                <Pressable onPress={() => setMarketing(Math.max(0, marketing - 1000))} style={styles.adjBtn}><Text style={styles.adjText}>-</Text></Pressable>
-                                <Text style={styles.controlValue}>${marketing}</Text>
-                                <Pressable onPress={() => setMarketing(marketing + 1000)} style={styles.adjBtn}><Text style={styles.adjText}>+</Text></Pressable>
-                            </View>
+                            <Text style={styles.controlTitle}>📦 Inventory Status</Text>
+                            <Text style={styles.heroValue}>{formatNumber(product.inventory || 0)} Units</Text>
+                            <Text style={styles.hint}>Est. Storage Cost: ${formatNumber((product.inventory || 0) * 5)} / quarter</Text>
                         </View>
 
                         <Pressable style={styles.btnPrimary} onPress={handleSave}>
                             <Text style={styles.btnText}>Save Changes</Text>
+                        </Pressable>
+
+                        {/* Change Product Name Button */}
+                        <Pressable style={styles.btnOutline} onPress={handleRandomizeName}>
+                            <Text style={styles.btnOutlineText}>🎲 Change Product Name</Text>
                         </Pressable>
 
                         <Pressable style={styles.btnDanger} onPress={() => onRetire(product.id)}>
@@ -165,7 +298,7 @@ export const ProductDetailModal = ({ visible, product, onClose, onUpdate, onReti
 const styles = StyleSheet.create({
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 16 },
     content: { backgroundColor: '#1A202C', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#2D3748' },
-    modalTitle: { fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 16, textAlign: 'center' },
+    modalTitle: { fontSize: 22, fontWeight: '800', color: '#fff', textAlign: 'center' },
     header: { flexDirection: 'row', gap: 16, marginBottom: 20 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
     icon: { fontSize: 42 },
@@ -186,13 +319,118 @@ const styles = StyleSheet.create({
     btnPrimary: { backgroundColor: theme.colors.accent, padding: 14, borderRadius: 10, alignItems: 'center' },
     btnSuccess: { backgroundColor: theme.colors.success, padding: 14, borderRadius: 10, alignItems: 'center' },
     btnDanger: { backgroundColor: theme.colors.danger, padding: 14, borderRadius: 10, alignItems: 'center', marginTop: 20 },
+    btnOutline: {
+        backgroundColor: 'transparent',
+        padding: 14,
+        borderRadius: 10,
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#4A5568',
+        marginTop: 12
+    },
     btnGhost: { padding: 14, alignItems: 'center' },
     btnText: { color: '#000', fontWeight: '700', fontSize: 16 },
+    btnOutlineText: { color: '#A0AEC0', fontWeight: '700', fontSize: 16 },
     ghostText: { color: '#A0AEC0', fontWeight: '600' },
     closeIcon: { fontSize: 24, color: '#A0AEC0' },
+    rpBadge: {
+        backgroundColor: theme.colors.accent,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+    },
+    rpBadgeText: {
+        color: '#000',
+        fontSize: 14,
+        fontWeight: '800',
+    },
+    progressBarContainer: {
+        marginVertical: 12,
+    },
+    progressBarBg: {
+        height: 8,
+        backgroundColor: '#2D3748',
+        borderRadius: 4,
+        overflow: 'hidden',
+        marginBottom: 8,
+    },
+    progressBarFill: {
+        height: '100%',
+        backgroundColor: theme.colors.accent,
+        borderRadius: 4,
+    },
+    progressValue: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    diceBtn: { padding: 4 },
+    diceIcon: { fontSize: 20 },
     insightBox: { backgroundColor: theme.colors.cardSoft, padding: 12, borderRadius: 8, marginBottom: 20, borderLeftWidth: 4, borderLeftColor: theme.colors.accent },
     insightTitle: { color: theme.colors.accent, fontWeight: '700', marginBottom: 4 },
     insightText: { color: '#E2E8F0', fontSize: 13 },
+    rdSection: { marginBottom: 20 },
+    sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 12 },
+
+    // COMPACT UPGRADE CARD STYLES
+    upgradeCardCompact: {
+        backgroundColor: '#2D3748',
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#4A5568',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    upgradeContentCompact: {
+        flex: 1,
+        alignItems: 'center'
+    },
+    upgradeLabel: {
+        fontSize: 11,
+        color: '#A0AEC0',
+        fontWeight: '600',
+        marginBottom: 4,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
+    },
+    heroValue: {
+        fontSize: 36,
+        fontWeight: '900',
+        color: '#fff',
+        letterSpacing: -1
+    },
+    upgradeBtnCompact: {
+        backgroundColor: theme.colors.accent,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 8,
+        minWidth: 140
+    },
+    upgradeBtnTextCompact: {
+        color: '#000',
+        fontWeight: '700',
+        fontSize: 13,
+        textAlign: 'center'
+    },
+
+    // OLD STYLES (keeping for compatibility)
+    upgradeCard: { backgroundColor: '#2D3748', padding: 16, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: '#4A5568' },
+    upgradeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+    upgradeTitle: { fontSize: 16, fontWeight: '700', color: '#fff' },
+    upgradeLevel: { fontSize: 12, color: theme.colors.accent, fontWeight: '600' },
+    upgradeStats: { marginBottom: 12 },
+    statItem: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+    statLabel: { color: '#A0AEC0', fontSize: 13 },
+    statValue: { color: '#fff', fontSize: 14, fontWeight: '700' },
+    rpCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '700' },
+    upgradeBtn: { backgroundColor: theme.colors.accent, padding: 12, borderRadius: 8, alignItems: 'center' },
+    upgradeBtnDisabled: { backgroundColor: '#4A5568', opacity: 0.5 },
+    upgradeBtnText: { color: '#000', fontWeight: '700', fontSize: 14 },
+
     controlGroup: { marginBottom: 20 },
     controlTitle: { color: '#fff', fontWeight: '600', marginBottom: 8 },
     controlValue: { color: '#fff', fontSize: 18, fontWeight: '800' },

@@ -16,3 +16,4 @@ export { default as AchievementsScreen } from './Achievements/AchievementsScreen
 export { default as ShoppingScreen } from './Shopping/ShoppingScreen';
 export { default as ShopDetailScreen } from './Shopping/ShopDetailScreen';
 export { default as ProductsScreen } from './Products/ProductsScreen';
+export { default as TechTreeScreen } from './Products/TechTreeScreen';

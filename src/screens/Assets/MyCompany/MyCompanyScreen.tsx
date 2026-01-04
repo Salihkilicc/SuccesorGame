@@ -27,7 +27,7 @@ const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
 
 const MyCompanyScreen = () => {
   // Navigation'a <any> veriyoruz ki TypeScript hata vermesin
-  const navigation = useNavigation<any>(); 
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
   // Logic Hook
@@ -35,7 +35,7 @@ const MyCompanyScreen = () => {
   const { products } = useProductStore();
 
   // Store Data
-  const stats = useStatsStore(); 
+  const stats = useStatsStore();
 
   // --- UI STATES ---
   const [modals, setModals] = useState<any>({});
@@ -95,46 +95,46 @@ const MyCompanyScreen = () => {
         <SectionHeader title="OPERATIONS MANAGEMENT" />
         <View style={{ gap: 12 }}>
           <ManagementCard title="Factories" icon="🏭" currentValue={stats.factoryCount} maxValue={limits.maxFactories} costPerUnit={costs.factory} onSave={handlePurchaseFactory} />
-          <ManagementCard title="Employees" icon="👥" currentValue={stats.employeeCount} maxValue={limits.maxEmployees} costPerUnit={costs.employee} onSave={handleHireEmployees} />
+          <ManagementCard title="Employees" icon="👥" currentValue={stats.employeeCount} minValue={limits.minEmployees} maxValue={limits.maxEmployees} costPerUnit={costs.employee} onSave={handleHireEmployees} />
         </View>
 
         {/* DEPARTMENTS */}
         <SectionHeader title="DEPARTMENTS" />
         <View style={styles.grid}>
-          <DepartmentCard 
-            icon="🏦" 
-            title="Finance" 
-            subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`} 
-            onPress={() => toggleModal('finance', true)} 
+          <DepartmentCard
+            icon="🏦"
+            title="Finance"
+            subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
+            onPress={() => toggleModal('finance', true)}
           />
-          
+
           {/* 👇 DÜZELTME BURADA YAPILDI: ARTIK NAVİGASYONA GİDİYOR 👇 */}
-          <DepartmentCard 
-            icon="🏭" 
-            title="Products" 
-            subtitle={`${activeProductsCount} Active`} 
-            onPress={() => navigation.navigate('Products')} 
+          <DepartmentCard
+            icon="🏭"
+            title="Products"
+            subtitle={`${activeProductsCount} Active`}
+            onPress={() => navigation.navigate('Products')}
           />
           {/* 👆 -------------------------------------------------- 👆 */}
 
-          <DepartmentCard 
-            icon="👥" 
-            title="HR & Management" 
-            subtitle={`${stats.employeeCount} Employees`} 
-            onPress={() => toggleModal('management', true)} 
+          <DepartmentCard
+            icon="👥"
+            title="HR & Management"
+            subtitle={`${stats.employeeCount} Employees`}
+            onPress={() => toggleModal('management', true)}
           />
-          <DepartmentCard 
-            icon="📈" 
-            title="Stock Market" 
-            subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`} 
-            onPress={() => toggleModal('shareControl', true)} 
+          <DepartmentCard
+            icon="📈"
+            title="Stock Market"
+            subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
+            onPress={() => toggleModal('shareControl', true)}
           />
         </View>
 
         {/* QUICK ACTIONS */}
         <SectionHeader title="QUICK ACTIONS" />
         <View style={{ gap: 8 }}>
-          <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => toggleModal('rnd', true)} />
+          <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => navigation.navigate('Research')} />
           <SectionCard title="🧩 Acquire Company" subtitle="Expand your empire" onPress={() => toggleModal('acquire', true)} />
           <SectionCard title="👔 Board Members" subtitle="View shareholders" onPress={() => toggleModal('boardMembers', true)} />
           <SectionCard title="🏢 Existing Companies" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />

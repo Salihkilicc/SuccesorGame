@@ -6,7 +6,7 @@ import { useProductStore } from '../../../store/useProductStore';
 
 // --- KRİTİK AYAR ---
 // 75.000.000 Üretim / 160.000 İşçi = 468.75
-const UNITS_PER_EMPLOYEE = 468.75; 
+const UNITS_PER_EMPLOYEE = 468.75;
 
 export const useProductsLogic = () => {
     const { researchPoints = 1000, employeeCount } = useStatsStore();
@@ -33,7 +33,7 @@ export const useProductsLogic = () => {
     };
 
     const openDetailModal = (product: Product) => {
-        const currentProduct = products.find(p => p.id === product.id) || product;
+        const currentProduct = products.find((p: Product) => p.id === product.id) || product;
         setSelectedProduct(currentProduct);
     };
 
@@ -50,7 +50,7 @@ export const useProductsLogic = () => {
     const launchProduct = () => {
         if (!selectedProduct) return;
 
-        const currentProduct = products.find(p => p.id === selectedProduct.id);
+        const currentProduct = products.find((p: Product) => p.id === selectedProduct.id);
         if (currentProduct?.status === 'active') {
             Alert.alert('Already Active', 'This product is already on the market.');
             return;
@@ -108,8 +108,8 @@ export const useProductsLogic = () => {
 
     return {
         products,
-        activeProducts: products.filter(p => p.status === 'active'),
-        lockedProducts: products.filter(p => p.status === 'locked'),
+        activeProducts: products.filter((p: Product) => p.status === 'active'),
+        lockedProducts: products.filter((p: Product) => p.status === 'locked'),
         selectedProduct,
         analysisData,
         maxCapacityUnits, // UI'da görünecek max değer (Full işçide 75M)

@@ -127,6 +127,7 @@ const HomeScreen = () => {
           netProfit: result.data.reportNetProfit || 0,
           endingCash: result.data.playerCash || 0,
           endingCapital: result.data.companyCapital || 0,
+          inventory: result.data.reportTotalInventory || 0,
         };
         setLastReportData(mappedData);
         setReportVisible(true);

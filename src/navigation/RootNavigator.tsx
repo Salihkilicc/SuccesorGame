@@ -26,7 +26,9 @@ import {
   ShoppingScreen,
   ShopDetailScreen,
   ProductsScreen,
+  TechTreeScreen,
 } from '../screens';
+import ResearchScreen from '../screens/Assets/MyCompany/ResearchScreen';
 import { formatScreenTitle } from '../utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
 
@@ -49,6 +51,7 @@ export type AssetsStackParamList = {
   ShopDetail: {
     shopId: string;
   };
+  // Research moved to RootStack
   // Products buradan kaldırıldı, aşağıda RootStack'e eklendi.
   StockDetail: {
     symbol: string;
@@ -89,6 +92,8 @@ export type RootStackParamList = {
   Achievements: undefined;
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
   Products: undefined; // ✅ BURAYA EKLENDİ (Global Erişim İçin)
+  Research: undefined; // ✅ MOVED GLOBAL
+  TechTree: undefined; // ✅ Added for Innovation Tech Tree
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -146,6 +151,7 @@ const AssetsStackNavigator = () => (
       component={ShoppingScreen}
       options={{ title: formatScreenTitle('Shopping') }}
     />
+    {/* ✅ NEW RESEARCH SCREEN removed from here, moved to Root */}
     <AssetsStack.Screen
       name="ShopDetail"
       component={ShopDetailScreen}
@@ -223,10 +229,17 @@ const RootNavigator = () => (
         <RootStack.Screen name="Home" component={HomeScreen} />
         <RootStack.Screen name="MainTabs" component={MainTabs} />
         <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
-        
+
         {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
         <RootStack.Screen name="Products" component={ProductsScreen} />
-        
+        {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
+        <RootStack.Screen name="Research" component={ResearchScreen} />
+        <RootStack.Screen
+          name="TechTree"
+          component={TechTreeScreen}
+          options={{ title: 'Innovation Tech Tree' }}
+        />
+
         <RootStack.Screen name="Premium" component={PremiumScreen} />
         <RootStack.Screen name="Achievements" component={AchievementsScreen} />
         <RootStack.Screen name="Casino" component={CasinoStackNavigator} />

@@ -7,12 +7,13 @@ import { ProductLaunchModal, ProductDetailModal } from './components/ProductModa
 
 const ProductsScreen = () => {
   const navigation = useNavigation();
-  const { 
-    activeProducts, 
-    lockedProducts, 
-    selectedProduct, 
+  const {
+    activeProducts,
+    lockedProducts,
+    selectedProduct,
     analysisData,
-    actions 
+    maxCapacityUnits, // Destructured here
+    actions
   } = useProductsLogic();
 
   return (
@@ -23,7 +24,7 @@ const ProductsScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        
+
         {/* ACTIVE PRODUCTS */}
         <Text style={styles.sectionTitle}>Active Products ({activeProducts.length})</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeList}>
@@ -41,21 +42,7 @@ const ProductsScreen = () => {
           {activeProducts.length === 0 && <Text style={styles.emptyText}>No active products yet.</Text>}
         </ScrollView>
 
-        {/* LOCKED PRODUCTS */}
-        <Text style={styles.sectionTitle}>New Opportunities</Text>
-        <View style={styles.lockedList}>
-          {lockedProducts.map(prod => (
-            <Pressable key={prod.id} style={styles.lockedCard} onPress={() => actions.openLaunchModal(prod)}>
-              <View style={styles.iconBox}><Text style={styles.lockedIcon}>{prod.icon}</Text></View>
-              <View style={styles.infoBox}>
-                <Text style={styles.lockedName}>{prod.name}</Text>
-                <Text style={styles.lockedCost}>🔒 {prod.rndCost} R&D</Text>
-              </View>
-              <Text style={styles.arrow}>›</Text>
-            </Pressable>
-          ))}
-        </View>
-
+        {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}
       </ScrollView>
 
       {/* MODALS */}
@@ -74,6 +61,7 @@ const ProductsScreen = () => {
         <ProductDetailModal
           visible={!!selectedProduct}
           product={selectedProduct}
+          totalCapacity={maxCapacityUnits} // Passed dynamically
           onClose={actions.closeModal}
           onUpdate={actions.updateProductSettings}
           onRetire={actions.retireProduct}

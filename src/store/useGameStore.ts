@@ -5,6 +5,8 @@ import { simulateNewMonth } from '../event/eventEngine';
 import { zustandStorage } from '../storage/persist';
 import { useStatsStore } from './useStatsStore';
 import { useUserStore } from './useUserStore';
+import { useLaboratoryStore } from './useLaboratoryStore';
+import { useProductStore } from './useProductStore';
 import { simulateEconomy } from '../logic/EconomyEngine'; // <--- YENİ MOTOR
 
 // UI Tarafının beklediği sonuç tipi
@@ -17,6 +19,7 @@ export type EconomyResult = {
     reportTotalRevenue: number;
     reportTotalExpenses: number;
     reportNetProfit: number;
+    reportTotalInventory: number; // NEW: Track total stock
     playerCash: number;
     companyCapital: number;
     playerNetWorth: number;
@@ -62,31 +65,150 @@ export const useGameStore = create<GameStore>()(
         // Input güvenliği (Varsayılan 3 ay)
         const months = typeof monthsInput === 'number' ? monthsInput : 3;
 
-        // 1. Mevcut İstatistikleri Çek
+        // 1. Mevcut İstatistikleri ve Ürünleri Çek
         const stats = useStatsStore.getState();
+        const { products } = useProductStore.getState();
+        const { researcherCount } = useLaboratoryStore.getState();
 
         // CRITICAL FIX: Default salary if not set
         const baseSalary = stats.monthlyIncome || 5000;
         const baseExpenses = stats.monthlyExpenses || 2000;
 
-        // 2. Saf TypeScript Motorunu Çalıştır (Swift Yok!)
-        const simulationResult = simulateEconomy({
-          companyCapital: stats.companyCapital || 0,
-          productStock: 0, // Basitlik için her ay stok sıfırlanıyor varsayıyoruz
-          productionCostPerUnit: 50,
-          salesPricePerUnit: 80,
-          monthlyFixedExpenses: 5000,
-          companyDebt: stats.companyDebtTotal || 0,
-          interestRate: 0.05,
-          playerCash: stats.money || 0,
-          playerSalary: baseSalary, // FIXED: Use default if 0
-          playerExpenses: baseExpenses,
-          factoryCount: stats.factoryCount || 5,
-          employeeCount: stats.employeeCount || 100,
-          productionLevel: stats.productionLevel || 2000
-        }, months);
+        // 2. DYNAMIC PRODUCT FINANCIALS (Per Quarter)
+        // Calculate quarters passed (assuming 3 months = 1 quarter)
+        const quarters = Math.floor(months / 3);
 
-        const { newState, report } = simulationResult;
+        // Initialize totals
+        let totalRevenue = 0;
+        let totalCOGS = 0;
+        let totalProduction = 0;
+        let totalSales = 0;
+        let totalMarketingCost = 0;
+        let totalStorageCost = 0;
+        let totalBeginningStock = 0;
+        let totalEndingStock = 0;
+
+        // Loop through each active product and calculate financials
+        const updatedProducts: any[] = [];
+        products.forEach((product: any) => {
+          if (product.status === 'active') {
+            // Get actual cost and price (with R&D upgrades applied)
+            const unitCost = product.unitCost ?? product.baseProductionCost;
+            const sellingPrice = product.sellingPrice || product.suggestedPrice;
+            const previousInventory = product.inventory || 0;
+            totalBeginningStock += previousInventory;
+
+            // 1. Calculate Real Production Volume
+            const baseCapacityPerFactory = 1000000; // 1 Million units per factory
+            const factoryCount = stats.factoryCount || 5;
+            const maxProduction = product.maxProduction || (factoryCount * baseCapacityPerFactory);
+
+            const utilizationRate = (product.productionLevel ?? 50) / 100; // Use ?? for 0%
+            const quarterlyProduction = Math.floor(maxProduction * utilizationRate * quarters);
+
+            // 2. INVENTORY FIRST SALES LOGIC
+            // Total Supply = Existing Inventory + Quarterly Production
+            const availableGoods = previousInventory + quarterlyProduction;
+
+            // 3. Calculate Potential Sales
+            const demandRate = (product.marketDemand || 50) / 100; // Base Demand
+            const marketingSpend = product.marketingSpendPerUnit || 0;
+
+            // Organic Sales (15% baseline even with $0 spend)
+            const organicFactor = 0.15;
+
+            // DYNAMIC MARKETING EFFICIENCY (The 30% Rule)
+            // Saturation Point = Price * 0.30 (Minimum $1 to avoid division by zero)
+            const saturationPoint = Math.max(1, sellingPrice * 0.30);
+
+            // Efficiency based on Saturation Point
+            const efficiency = Math.min(1, marketingSpend / saturationPoint);
+
+            // Final Sales Rate (0.15 to 1.0 range)
+            const finalSalesRate = organicFactor + (0.85 * efficiency);
+
+            // Potential Sales based on AVAILABLE GOODS (Inventory + Production)
+            const potentialSales = Math.floor(availableGoods * demandRate * finalSalesRate);
+
+            // Actual Sales: Cannot sell more than available
+            const quarterlySales = Math.min(availableGoods, potentialSales);
+
+            // 4. Update Inventory (New Inventory = Total - Sales)
+            const newInventory = availableGoods - quarterlySales;
+            totalEndingStock += newInventory;
+
+            // DEBUG LOGGING
+            console.log(`[Product: ${product.name}] Stock: ${previousInventory}, Prod: ${quarterlyProduction}, Total: ${availableGoods}, Sales: ${quarterlySales}, NewStock: ${newInventory}`);
+
+            // 5. Costs & Revenue
+            // Storage costs: $5 per unit in NEW inventory
+            const storageCost = newInventory * 5 * quarters;
+
+            // Marketing Costs (per unit sold)
+            const marketingCost = quarterlySales * marketingSpend;
+
+            // Revenue & COGS
+            const productRevenue = sellingPrice * quarterlySales;
+            const productCOGS = unitCost * quarterlyProduction; // COGS applies to PRODUCTION only
+
+            totalRevenue += productRevenue;
+            totalCOGS += productCOGS;
+            totalProduction += quarterlyProduction;
+            totalSales += quarterlySales;
+            totalMarketingCost += marketingCost;
+            totalStorageCost += storageCost;
+
+            // Update product with new inventory
+            updatedProducts.push({
+              ...product,
+              inventory: newInventory
+            });
+          } else {
+            updatedProducts.push(product);
+          }
+        });
+
+        // Update products in store with new inventory levels
+        updatedProducts.forEach((updatedProduct) => {
+          if (updatedProduct.inventory !== undefined) {
+            useProductStore.getState().updateProduct(updatedProduct.id, { inventory: updatedProduct.inventory });
+          }
+        });
+
+        // 3. FACTORY OVERHEAD (Corporate Fixed Costs)
+        const OVERHEAD_PER_FACTORY = 30000000; // $30M per factory per quarter
+        const factoryOverhead = (stats.factoryCount || 5) * OVERHEAD_PER_FACTORY * quarters;
+
+        // 3. R&D LABORATORY COSTS (Updated to $500k per researcher)
+        const RESEARCHER_SALARY_PER_QUARTER = 500000;
+        const rndSalaryCost = researcherCount * RESEARCHER_SALARY_PER_QUARTER * quarters;
+
+        // Process RP generation for each quarter
+        let rndRPGenerated = 0;
+        if (quarters > 0) {
+          for (let i = 0; i < quarters; i++) {
+            const { rpAwarded } = useLaboratoryStore.getState().processQuarter(() => { });
+            rndRPGenerated += rpAwarded;
+          }
+          console.log(`[Game] R&D Results: Generated ${rndRPGenerated} RP, Cost $${rndSalaryCost}`);
+        }
+
+        // 4. OTHER EXPENSES
+        const monthlyFixedExpenses = 5000;
+        const totalFixedExpenses = monthlyFixedExpenses * months;
+        const interestExpense = (stats.companyDebtTotal || 0) * 0.05 * (months / 12);
+
+        // 5. CALCULATE NET PROFIT/LOSS
+        const totalExpenses = totalCOGS + totalMarketingCost + totalStorageCost + factoryOverhead + rndSalaryCost + totalFixedExpenses + interestExpense;
+        const netProfit = totalRevenue - totalExpenses;
+
+        // 6. UPDATE CAPITAL
+        const newCompanyCapital = (stats.companyCapital || 0) + netProfit;
+
+        // 7. PLAYER FINANCIALS (Simplified)
+        const playerIncome = baseSalary * months;
+        const playerExpenses = baseExpenses * months;
+        const newPlayerCash = (stats.money || 0) + playerIncome - playerExpenses;
 
         // 3. Tarihi İlerlet
         const { currentMonth, age } = get();
@@ -112,20 +234,31 @@ export const useGameStore = create<GameStore>()(
         // 5. Store'ları Güncelle (Yeni verileri kaydet)
         // CRITICAL FIX: Use update() instead of setState() to preserve other fields
         useStatsStore.getState().update({
-          companyCapital: newState.companyCapital,
-          money: newState.playerCash,
+          companyCapital: newCompanyCapital,
+          money: newPlayerCash,
           monthlyIncome: baseSalary, // Keep the salary consistent
           monthlyExpenses: baseExpenses,
           // Basit valuation mantığı: Sermaye * 1.5 (İleride geliştirebilirsin)
-          companyValue: newState.companyCapital * 1.5,
+          companyValue: newCompanyCapital * 1.5,
           // Calculate net worth: cash + company ownership value
-          netWorth: newState.playerCash + (newState.companyCapital * 1.5 * (stats.companyOwnership / 100))
+          netWorth: newPlayerCash + (newCompanyCapital * 1.5 * (stats.companyOwnership / 100))
         });
 
         console.log('[Game] Store updated with new values:', {
-          cash: newState.playerCash,
-          capital: newState.companyCapital,
-          income: baseSalary
+          cash: newPlayerCash,
+          capital: newCompanyCapital,
+          income: baseSalary,
+          revenue: totalRevenue,
+          expenses: {
+            total: totalExpenses,
+            cogs: totalCOGS,
+            marketing: totalMarketingCost,
+            storage: totalStorageCost,
+            factoryOverhead: factoryOverhead,
+            rnd: rndSalaryCost,
+            fixed: totalFixedExpenses
+          },
+          netProfit: netProfit
         });
 
         // 6. Yan Etkileri Tetikle (Eventler vs.)
@@ -137,25 +270,26 @@ export const useGameStore = create<GameStore>()(
 
         // 7. Sonucu UI'ın beklediği formatta döndür
         const result: EconomyResult = {
-          status: report.isBankrupt ? 'bankrupt' : 'active',
-          reason: report.bankruptcyReason,
+          status: newCompanyCapital < 0 ? 'bankrupt' : 'active',
+          reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,
           data: {
-            // Rapor verileri
-            reportTotalProduction: report.productionCount,
-            reportTotalSales: report.salesCount,
-            reportTotalRevenue: report.revenue,
-            reportTotalExpenses: report.totalExpenses,
-            reportNetProfit: report.netProfit,
+            // Rapor verileri (Dynamic calculations)
+            reportTotalProduction: totalProduction,
+            reportTotalSales: totalSales,
+            reportTotalRevenue: totalRevenue,
+            reportTotalExpenses: totalExpenses,
+            reportNetProfit: netProfit,
+            reportTotalInventory: totalEndingStock, // NEW: Stock tracking
 
             // Güncel Bakiye Verileri
-            playerCash: newState.playerCash,
-            companyCapital: newState.companyCapital,
+            playerCash: newPlayerCash,
+            companyCapital: newCompanyCapital,
 
             // Diğerleri (Stats store'dan veya hesaplamadan)
-            playerNetWorth: newState.playerCash + (newState.companyCapital * 1.5 * (stats.companyOwnership / 100)),
+            playerNetWorth: newPlayerCash + (newCompanyCapital * 1.5 * (stats.companyOwnership / 100)),
             playerIncome: baseSalary, // FIXED: Return the actual salary used
             playerExpenses: baseExpenses,
-            companyValuation: newState.companyCapital * 1.5
+            companyValuation: newCompanyCapital * 1.5
           }
         };
 

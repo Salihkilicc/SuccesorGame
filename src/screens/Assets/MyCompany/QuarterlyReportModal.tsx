@@ -10,6 +10,7 @@ export interface FinancialData {
   netProfit?: number;
   endingCash?: number;
   endingCapital?: number;
+  inventory?: number; // Added
 }
 
 // Para Formatlayıcı
@@ -41,6 +42,7 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
   const profit = data.netProfit || 0;
   const cash = data.endingCash || 0;
   const capital = data.endingCapital || 0;
+  const stock = data.inventory || 0;
 
   const isProfit = profit >= 0;
 
@@ -53,7 +55,7 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
     >
       <View style={styles.overlay}>
         <View style={styles.card}>
-          
+
           <View style={styles.header}>
             <Text style={styles.title}>QUARTERLY REPORT</Text>
             <Text style={styles.subtitle}>Financial Performance</Text>
@@ -64,6 +66,7 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
             <View style={styles.gridItem}>
               <Text style={styles.label}>Production</Text>
               <Text style={styles.value}>{production} units</Text>
+              <Text style={styles.stockLabel}>(Stock: {stock} units)</Text>
             </View>
 
             {/* Sales */}
@@ -99,8 +102,8 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
           </View>
 
           <View style={styles.footerInfo}>
-             <Text style={styles.footerText}>User Cash: {formatCurrency(cash)}</Text>
-             <Text style={styles.footerText}>Capital: {formatCurrency(capital)}</Text>
+            <Text style={styles.footerText}>User Cash: {formatCurrency(cash)}</Text>
+            <Text style={styles.footerText}>Capital: {formatCurrency(capital)}</Text>
           </View>
 
           <Pressable style={styles.button} onPress={onClose}>
@@ -149,4 +152,5 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 11, color: '#666' },
   button: { width: '100%', backgroundColor: '#FFF', paddingVertical: 14, borderRadius: 10, alignItems: 'center' },
   buttonText: { color: '#000', fontSize: 15, fontWeight: '700' },
+  stockLabel: { color: '#666', fontSize: 10, marginTop: 4 },
 });

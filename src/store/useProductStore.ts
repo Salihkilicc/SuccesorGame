@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../storage/persist';
 import { Product } from '../data/types';
+import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../features/products/data/unlockableProductsData';
 
 export interface SalesContext {
     morale: number;
@@ -11,6 +12,7 @@ export interface SalesContext {
 
 interface ProductState {
     products: Product[];
+    unlockableProducts: UnlockableProduct[];
 }
 
 interface ProductActions {
@@ -19,11 +21,17 @@ interface ProductActions {
     updateProduct: (id: string, updates: Partial<Product>) => void;
     retireProduct: (id: string) => void;
     processMonthlySales: (context: SalesContext) => void;
+    // R&D Upgrade Actions
+    upgradeProductCost: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
+    upgradeProductPrice: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
+    randomizeProductName: (productId: string) => void;
+    unlockProduct: (productId: string, currentRP: number, currentCash: number, deductRP: (amount: number) => void, deductCash: (amount: number) => void) => { success: boolean; message: string; stockBoost?: number };
     reset: () => void;
 }
 
 export const initialProductState: ProductState = {
     products: [],
+    unlockableProducts: UNLOCKABLE_PRODUCTS,
 };
 
 export const useProductStore = create<ProductState & ProductActions>()(
@@ -108,6 +116,157 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         return { ...product, revenue };
                     })
                 })),
+
+            // R&D Upgrade Actions
+            upgradeProductCost: (productId, currentRP, deductRP) => {
+                const { calculateUpgradeRPCost, MAX_UPGRADE_LEVEL, COST_OPTIMIZATION } = require('../features/products/logic/productUpgrades');
+
+                let result = { success: false, message: '' };
+
+                set((state) => {
+                    const product = state.products.find(p => p.id === productId);
+                    if (!product) {
+                        result = { success: false, message: 'Product not found' };
+                        return state;
+                    }
+
+                    const currentLevel = product.costLevel || 0;
+                    if (currentLevel >= MAX_UPGRADE_LEVEL) {
+                        result = { success: false, message: 'Already at maximum level' };
+                        return state;
+                    }
+
+                    const rpCost = calculateUpgradeRPCost(COST_OPTIMIZATION.BASE_RP_COST, currentLevel);
+                    if (currentRP < rpCost) {
+                        result = { success: false, message: `Insufficient RP. Need ${rpCost.toLocaleString()} RP` };
+                        return state;
+                    }
+
+                    // Deduct RP and upgrade
+                    deductRP(rpCost);
+                    result = { success: true, message: `Production optimized! Cost reduced by $2` };
+
+                    return {
+                        products: state.products.map(p => {
+                            if (p.id !== productId) return p;
+                            const currentCost = p.unitCost ?? p.baseProductionCost;
+                            return { ...p, costLevel: currentLevel + 1, unitCost: Math.max(1, currentCost - 2) };
+                        })
+                    };
+                });
+
+                return result;
+            },
+
+            upgradeProductPrice: (productId, currentRP, deductRP) => {
+                const { calculateUpgradeRPCost, MAX_UPGRADE_LEVEL, FEATURE_ENHANCEMENT, getNextPriceIncrease } = require('../features/products/logic/productUpgrades');
+
+                let result = { success: false, message: '' };
+
+                set((state) => {
+                    const product = state.products.find(p => p.id === productId);
+                    if (!product) {
+                        result = { success: false, message: 'Product not found' };
+                        return state;
+                    }
+
+                    const currentLevel = product.priceLevel || 0;
+                    if (currentLevel >= MAX_UPGRADE_LEVEL) {
+                        result = { success: false, message: 'Already at maximum level' };
+                        return state;
+                    }
+
+                    const rpCost = calculateUpgradeRPCost(FEATURE_ENHANCEMENT.BASE_RP_COST, currentLevel);
+                    if (currentRP < rpCost) {
+                        result = { success: false, message: `Insufficient RP. Need ${rpCost.toLocaleString()} RP` };
+                        return state;
+                    }
+
+                    const priceIncrease = getNextPriceIncrease(currentLevel);
+
+                    // Deduct RP and upgrade
+                    deductRP(rpCost);
+                    result = { success: true, message: `Features enhanced! Price increased by $${priceIncrease}` };
+
+                    return {
+                        products: state.products.map(p => {
+                            if (p.id !== productId) return p;
+                            const currentPrice = p.sellingPrice || p.suggestedPrice;
+                            const increaseAmount = currentLevel + 2;
+                            return { ...p, priceLevel: currentLevel + 1, sellingPrice: currentPrice + increaseAmount };
+                        })
+                    };
+                });
+
+                return result;
+            },
+
+            randomizeProductName: (productId) => {
+                const { getRandomProductName } = require('../features/products/data/productsData');
+
+                set((state) => ({
+                    products: state.products.map(p => {
+                        if (p.id === productId) {
+                            const newName = getRandomProductName(p.category);
+                            return { ...p, name: newName };
+                        }
+                        return p;
+                    })
+                }));
+            },
+
+            unlockProduct: (productId, currentRP, currentCash, deductRP, deductCash) => {
+                let foundProduct: UnlockableProduct | undefined;
+
+                set((state) => {
+                    foundProduct = state.unlockableProducts.find((p: UnlockableProduct) => p.id === productId);
+                    return state; // No change yet, just finding
+                });
+
+                const product = foundProduct;
+
+                if (!product) {
+                    return { success: false, message: 'Ürün bulunamadı.' };
+                }
+
+                if (product.isUnlocked) {
+                    return { success: false, message: 'Bu ürün zaten açılmış.' };
+                }
+
+                // Check RP requirement
+                if (currentRP < product.unlockRPCost) {
+                    return {
+                        success: false,
+                        message: `Yetersiz Ar-Ge Puanı. Gereken: ${product.unlockRPCost.toLocaleString()} RP`
+                    };
+                }
+
+                // Check Cash requirement
+                if (currentCash < product.unlockCashCost) {
+                    return {
+                        success: false,
+                        message: `Yetersiz Sermaye. Gereken: $${product.unlockCashCost.toLocaleString()}`
+                    };
+                }
+
+                // Deduct costs
+                deductRP(product.unlockRPCost);
+                deductCash(product.unlockCashCost);
+
+                // Unlock product
+                set((state) => ({
+                    unlockableProducts: state.unlockableProducts.map((p) =>
+                        p.id === productId ? { ...p, isUnlocked: true } : p
+                    ),
+                }));
+
+                return {
+                    success: true,
+                    message: `${product.name} başarıyla açıldı!`,
+                    stockBoost: product.stockBoost
+                };
+            },
+
             reset: () => set(() => ({ ...initialProductState })),
         }),
         {
