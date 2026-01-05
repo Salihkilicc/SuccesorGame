@@ -4,15 +4,8 @@ import { theme } from '../../../theme';
 import { Product } from '../../../features/products/data/productsData';
 import { useLaboratoryStore } from '../../../store/useLaboratoryStore';
 import { useProductStore } from '../../../store/useProductStore';
-import {
-    calculateUpgradeRPCost,
-    getEffectiveProductionCost,
-    getEffectiveSellingPrice,
-    getNextPriceIncrease,
-    MAX_UPGRADE_LEVEL,
-    COST_OPTIMIZATION,
-    FEATURE_ENHANCEMENT,
-} from '../../../features/products/logic/productUpgrades';
+// Removed obsolete imports
+// import { ... } from '../../../features/products/logic/productUpgrades';
 
 // --- LAUNCH MODAL ---
 export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLaunch, analysisData }: any) => {
@@ -96,31 +89,31 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     if (!product) return null;
 
     const { totalRP } = useLaboratoryStore();
-    const { upgradeProductCost, upgradeProductPrice, randomizeProductName } = useProductStore();
+    const { optimizeProductionLine, upgradeProductQuality, randomizeProductName } = useProductStore();
 
     const [production, setProduction] = useState(product.productionLevel ?? 50);
     const [marketing, setMarketing] = useState(product.marketingBudget || 0);
     const [marketingPerUnit, setMarketingPerUnit] = useState(product.marketingSpendPerUnit || 0);
-    // Use product name directly to reflect randomization immediately
     const displayName = product.name;
 
-    const costLevel = product.costLevel || 0;
-    const priceLevel = product.priceLevel || 0;
+    const processLevel = product.processLevel || 1;
+    const qualityLevel = product.qualityLevel || 1;
+    const complexity = product.complexity || 50;
 
-    // Use values directly from product (Store now updates these fields)
-    const effectiveCost = product.unitCost ?? product.baseProductionCost;
-    const effectivePrice = product.sellingPrice || product.suggestedPrice;
+    // Cost Calculator Check
+    const getUpgradeCost = (level: number) => Math.floor(complexity * 100 * Math.pow(1.5, level));
 
-    const costUpgradeRP = calculateUpgradeRPCost(COST_OPTIMIZATION.BASE_RP_COST, costLevel);
-    const priceUpgradeRP = calculateUpgradeRPCost(FEATURE_ENHANCEMENT.BASE_RP_COST, priceLevel);
+    const processUpgradeRP = getUpgradeCost(processLevel);
+    const qualityUpgradeRP = getUpgradeCost(qualityLevel);
 
-    const canUpgradeCost = (costLevel < MAX_UPGRADE_LEVEL && totalRP >= costUpgradeRP);
-    const canUpgradePrice = (priceLevel < MAX_UPGRADE_LEVEL && totalRP >= priceUpgradeRP);
+    const canUpgradeProcess = totalRP >= processUpgradeRP;
+    const canUpgradeQuality = totalRP >= qualityUpgradeRP;
 
-    // Force re-render on RP change? useLaboratoryStore hook handles it.
-    // The issue was `product` prop being stale. Now `product` is from store hook.
+    // Cost Optimization Limit Check (40% of base)
+    const currentUnitCost = product.unitCost ?? product.baseProductionCost;
+    const minUnitCost = Math.floor(product.baseProductionCost * 0.40);
+    const isMaxEfficiency = currentUnitCost <= minUnitCost;
 
-    const nextPriceIncrease = getNextPriceIncrease(priceLevel);
 
     const handleSave = () => {
         onUpdate(product.id, {
@@ -131,18 +124,17 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
         onClose();
     };
 
-    const handleCostUpgrade = () => {
-        const result = upgradeProductCost(product.id, totalRP, (amount) => {
+    const handleProcessUpgrade = () => {
+        const result = optimizeProductionLine(product.id, totalRP, (amount) => {
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
             Alert.alert('Error', result.message);
         }
-        // Success: Store updates -> Hook triggers -> Re-render with new values
     };
 
-    const handlePriceUpgrade = () => {
-        const result = upgradeProductPrice(product.id, totalRP, (amount) => {
+    const handleQualityUpgrade = () => {
+        const result = upgradeProductQuality(product.id, totalRP, (amount) => {
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
@@ -188,49 +180,56 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         </View>
 
                         {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
+                        {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
                         <View style={styles.rdSection}>
                             <Text style={styles.sectionTitle}>🔬 R&D Upgrades</Text>
 
-                            {/* Production Cost Optimization - COMPACT */}
+                            {/* Optimize Process (Cost) */}
                             <View style={styles.upgradeCardCompact}>
                                 <View style={styles.upgradeContentCompact}>
-                                    <Text style={styles.upgradeLabel}>Unit Cost</Text>
-                                    <Text style={styles.heroValue}>${effectiveCost}</Text>
+                                    <Text style={styles.upgradeLabel}>Optimize Process</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+                                        <Text style={styles.heroValue}>${currentUnitCost}</Text>
+                                        <Text style={{ color: theme.colors.accent, fontWeight: 'bold' }}>(-2%)</Text>
+                                    </View>
+                                    <Text style={styles.hint}>Lvl {processLevel} ➜ {processLevel + 1}</Text>
                                 </View>
                                 <Pressable
                                     style={[
                                         styles.upgradeBtnCompact,
-                                        !canUpgradeCost && styles.upgradeBtnDisabled
+                                        (!canUpgradeProcess || isMaxEfficiency) && styles.upgradeBtnDisabled
                                     ]}
-                                    onPress={handleCostUpgrade}
-                                    disabled={!canUpgradeCost}
+                                    onPress={handleProcessUpgrade}
+                                    disabled={!canUpgradeProcess || isMaxEfficiency}
                                 >
                                     <Text style={styles.upgradeBtnTextCompact}>
-                                        {costLevel >= MAX_UPGRADE_LEVEL
-                                            ? 'MAXED OUT'
-                                            : `${formatNumber(costUpgradeRP)} RP → -$2`}
+                                        {isMaxEfficiency
+                                            ? 'MAX EFFICIENCY'
+                                            : `${formatNumber(processUpgradeRP)} RP`}
                                     </Text>
                                 </Pressable>
                             </View>
 
-                            {/* Feature Enhancement - COMPACT */}
+                            {/* Improve Quality (Price) */}
                             <View style={styles.upgradeCardCompact}>
                                 <View style={styles.upgradeContentCompact}>
-                                    <Text style={styles.upgradeLabel}>Selling Price</Text>
-                                    <Text style={styles.heroValue}>${effectivePrice}</Text>
+                                    <Text style={styles.upgradeLabel}>Improve Quality</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+                                        <Text style={styles.heroValue}>${product.sellingPrice || product.suggestedPrice}</Text>
+                                        <Text style={{ color: theme.colors.success, fontWeight: 'bold' }}>(+3%)</Text>
+                                    </View>
+                                    <Text style={styles.hint}>Lvl {qualityLevel} ➜ {qualityLevel + 1}</Text>
                                 </View>
                                 <Pressable
                                     style={[
                                         styles.upgradeBtnCompact,
-                                        !canUpgradePrice && styles.upgradeBtnDisabled
+                                        !canUpgradeQuality && styles.upgradeBtnDisabled
                                     ]}
-                                    onPress={handlePriceUpgrade}
-                                    disabled={!canUpgradePrice}
+                                    onPress={handleQualityUpgrade}
+                                    disabled={!canUpgradeQuality}
                                 >
                                     <Text style={styles.upgradeBtnTextCompact}>
-                                        {priceLevel >= MAX_UPGRADE_LEVEL
-                                            ? 'MAXED OUT'
-                                            : `${formatNumber(priceUpgradeRP)} RP → +$${nextPriceIncrease}`}
+                                        {`${formatNumber(qualityUpgradeRP)} RP`}
                                     </Text>
                                 </Pressable>
                             </View>

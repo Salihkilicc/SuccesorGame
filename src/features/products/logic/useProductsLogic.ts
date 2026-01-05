@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useStatsStore } from '../../../store/useStatsStore';
 import { Product, INITIAL_PRODUCTS } from '../data/productsData';
 import { useProductStore } from '../../../store/useProductStore';
+import { useLaboratoryStore } from '../../../store/useLaboratoryStore';
 
 // --- KRİTİK AYAR ---
 // 75.000.000 Üretim / 160.000 İşçi = 468.75
@@ -10,7 +11,8 @@ const UNITS_PER_EMPLOYEE = 468.75;
 
 export const useProductsLogic = () => {
     const { researchPoints = 1000, employeeCount } = useStatsStore();
-    const { products, setProducts, updateProduct } = useProductStore();
+    const { products, setProducts, updateProduct, upgradeProductQuality, optimizeProductionLine } = useProductStore();
+    const { totalRP, spendRP } = useLaboratoryStore();
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [analysisData, setAnalysisData] = useState<Product | null>(null);
@@ -106,6 +108,33 @@ export const useProductsLogic = () => {
         return "Operations stable.";
     };
 
+    // NEW HELPERS
+    const calculateUpgradeCost = (product: Product, type: 'quality' | 'process') => {
+        const level = type === 'quality' ? (product.qualityLevel || 1) : (product.processLevel || 1);
+        const complexity = product.complexity || 50;
+        return Math.floor(complexity * 100 * Math.pow(1.5, level));
+    };
+
+    const handleUpgradeQuality = (product: Product) => {
+        const result = upgradeProductQuality(product.id, totalRP, (amount) => spendRP(amount));
+        if (result.success) {
+            // Optional: Success feedback handled by UI update
+        } else {
+            Alert.alert('Upgrade Failed', result.message);
+        }
+        return result;
+    };
+
+    const handleOptimizeProcess = (product: Product) => {
+        const result = optimizeProductionLine(product.id, totalRP, (amount) => spendRP(amount));
+        if (result.success) {
+            // Optional
+        } else {
+            Alert.alert('Optimization Failed', result.message);
+        }
+        return result;
+    };
+
     return {
         products,
         activeProducts: products.filter((p: Product) => p.status === 'active'),
@@ -113,6 +142,7 @@ export const useProductsLogic = () => {
         selectedProduct,
         analysisData,
         maxCapacityUnits, // UI'da görünecek max değer (Full işçide 75M)
+        totalRP, // Expose for UI
         actions: {
             openLaunchModal,
             openDetailModal,
@@ -121,7 +151,10 @@ export const useProductsLogic = () => {
             launchProduct,
             updateProductSettings,
             retireProduct,
-            getInsightTip
+            getInsightTip,
+            calculateUpgradeCost,
+            handleUpgradeQuality,
+            handleOptimizeProcess
         }
     };
 };

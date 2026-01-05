@@ -12,6 +12,7 @@ type ManagementCardProps = {
     maxValue: number;
     minValue?: number;
     costPerUnit: number;
+    headerRight?: React.ReactNode;
     onSave: (delta: number) => void;
 };
 
@@ -22,6 +23,7 @@ const ManagementCard = ({
     maxValue,
     minValue = 0,
     costPerUnit,
+    headerRight,
     onSave,
 }: ManagementCardProps) => {
     const [targetValue, setTargetValue] = useState(currentValue);
@@ -63,7 +65,8 @@ const ManagementCard = ({
                     <Text style={styles.title}>{title}</Text>
                     <Text style={styles.subtitle}>Current: {currentValue.toLocaleString()}</Text>
                 </View>
-                {costPerUnit > 0 && (
+                {headerRight}
+                {!headerRight && costPerUnit > 0 && (
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>{formatCost(costPerUnit)} / unit</Text>
                     </View>

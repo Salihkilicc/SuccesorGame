@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useStatsStore } from '../../store/useStatsStore';
+import { useGameStore } from '../../store/useGameStore';
 
 export const FACTORY_COST = 50_000;
 export const FACTORY_CAPACITY = 1000;
@@ -35,6 +36,17 @@ export const useCompanyManagement = () => {
         setField,
         setSalaryTier
     } = useStatsStore();
+
+    const {
+        employeeMorale: gameMorale,
+        salaryPolicy,
+        eventsHostedThisQuarter,
+        lastQuarterProfit,
+        bonusDistributedThisQuarter,
+        organizeEvent: gameOrganizeEvent,
+        distributeBonus: gameDistributeBonus,
+        setSalaryPolicy: gameSetSalaryPolicy
+    } = useGameStore();
 
     const updateFactories = useCallback((delta: number) => {
         const nextCount = Math.max(0, factoryCount + delta);
@@ -86,96 +98,39 @@ export const useCompanyManagement = () => {
         update({ employeeCount: nextCount });
     }, [employeeCount, factoryCount, update]);
 
-    const organizeEvent = useCallback((eventId: string) => {
-        const event = COMPANY_EVENTS.find(e => e.id === eventId);
-        if (!event) return;
-
-        const totalCost = event.cost * employeeCount;
-
-        // Check capital or player money? Usually company pays expenses from capital or revenue.
-        // Assuming company capital functionality exists or we reduce from "Money" if early game.
-        // "AssetsPage" usually implies personal wealth vs company wealth. 
-        // Let's assume paid from Money for generic interaction or define Company Capital properly.
-        // The store has `companyCapital`. Let's use that.
-
-        if (companyCapital >= totalCost) {
-            const nextMorale = Math.min(100, employeeMorale + event.morale);
-            update({
-                companyCapital: companyCapital - totalCost,
-                employeeMorale: nextMorale
-            });
-            return true; // Success
-        }
-        return false; // Not enough money
-    }, [employeeCount, employeeMorale, companyCapital, update]);
+    const organizeEvent = useCallback((cost: number, boost: number) => {
+        gameOrganizeEvent(cost, boost);
+        return true;
+    }, [gameOrganizeEvent]);
 
     const distributeBonus = useCallback((percentage: number) => {
-        // Percentage of Net Profit (Revenue - Expenses)
-        const netProfit = companyRevenueMonthly - companyExpensesMonthly;
-        if (netProfit <= 0) return; // Cannot distribute bonus if no profit
-
-        const bonusAmount = netProfit * (percentage / 100);
-
-        // Boost morale scaling with percentage
-        let moraleBoost = 5;
-        if (percentage === 5) moraleBoost = 15;
-        if (percentage === 10) moraleBoost = 30;
-
-        update({
-            companyCapital: Math.max(0, companyCapital - bonusAmount), // Pay from capital/revenue
-            employeeMorale: Math.min(100, employeeMorale + moraleBoost)
-        });
-
-    }, [companyRevenueMonthly, companyExpensesMonthly, companyCapital, employeeMorale, update]);
+        // Mapping percentage to simply calling declaration?
+        // Store logic is fixed to 5% atm.
+        gameDistributeBonus();
+    }, [gameDistributeBonus]);
 
     const changeSalaryTier = useCallback((tier: 'low' | 'average' | 'above_average') => {
-        if (tier === salaryTier) return;
+        // Map old tiers to new policy
+        let policy: 'low' | 'avg' | 'high' = 'avg';
+        if (tier === 'low') policy = 'low';
+        if (tier === 'above_average') policy = 'high';
 
-        setSalaryTier(tier);
-        // Instant Morale impact or monthly? 
-        // User request: "Low: -2 monthly", "Above: +2 monthly".
-        // Immediate switch could also have effect but let's stick to monthly loop for the effect.
-
-        // However, "Expenses" change immediately.
-        // Simple model: Base HR cost = Employees * $3000 (example)
-        // or just percentage modifier on total expenses?
-        // Let's modify expenses.
-        // Average = Base. Low = Base * 0.8. High = Base * 1.2.
-
-        // Re-calculate expenses is complex without base. 
-        // Existing `companyExpensesMonthly` is hardcoded/manual.
-        // Let's apply a delta based on employee count * theoretical avg wage ($4000).
-
-        const AVG_WAGE = 4000;
-        const totalWages = employeeCount * AVG_WAGE;
-
-        let multiplier = 1;
-        if (tier === 'low') multiplier = 0.8;
-        if (tier === 'above_average') multiplier = 1.2;
-
-        // This is tricky because `companyExpensesMonthly` includes Factory upkeeps etc.
-        // We might need to split expenses logic if we want perfect math.
-        // For now, let's just apply a "perception" update or small delta if strict math isn't stored.
-        // BUT logic requires: "Low: Expenses low", "High: Expenses +20%".
-
-        // Let's assume current expenses are "Average".
-        // If we switch Average -> High: Expenses += 20% of WAGE bill.
-        // If High -> Low: Expenses -= difference.
-
-        // To keep it robust/simple state-wise without recalculating from scratch:
-        // We will run a `recalculateExpenses()` helper if possible, or just accept the flow.
-
-    }, [salaryTier, setSalaryTier, employeeCount]);
+        gameSetSalaryPolicy(policy);
+    }, [gameSetSalaryPolicy]);
 
     return {
         factoryCount,
         employeeCount,
-        employeeMorale,
-        salaryTier,
+        employeeMorale: gameMorale,
+        salaryTier: salaryPolicy === 'high' ? 'above_average' : (salaryPolicy === 'low' ? 'low' : 'average'),
+        eventsHostedThisQuarter,
         updateFactories,
         updateEmployees,
         organizeEvent,
         distributeBonus,
-        changeSalaryTier
+        changeSalaryTier,
+        companyCapital,
+        lastQuarterProfit,
+        bonusDistributedThisQuarter
     };
 };

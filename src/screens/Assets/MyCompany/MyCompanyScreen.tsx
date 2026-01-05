@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store';
 import { useProductStore } from '../../../store/useProductStore';
+import { useGameStore } from '../../../store/useGameStore';
 import { formatCurrency } from './NativeEconomy';
 import { useCompanyLogic } from './useCompanyLogic';
 
@@ -33,6 +34,7 @@ const MyCompanyScreen = () => {
   // Logic Hook
   const { handlePurchaseFactory, handleHireEmployees, costs, limits } = useCompanyLogic();
   const { products } = useProductStore();
+  const { employeeMorale } = useGameStore();
 
   // Store Data
   const stats = useStatsStore();
@@ -95,7 +97,38 @@ const MyCompanyScreen = () => {
         <SectionHeader title="OPERATIONS MANAGEMENT" />
         <View style={{ gap: 12 }}>
           <ManagementCard title="Factories" icon="🏭" currentValue={stats.factoryCount} maxValue={limits.maxFactories} costPerUnit={costs.factory} onSave={handlePurchaseFactory} />
-          <ManagementCard title="Employees" icon="👥" currentValue={stats.employeeCount} minValue={limits.minEmployees} maxValue={limits.maxEmployees} costPerUnit={costs.employee} onSave={handleHireEmployees} />
+
+          <ManagementCard
+            title="Employees"
+            icon="👥"
+            currentValue={stats.employeeCount}
+            minValue={limits.minEmployees}
+            maxValue={limits.maxEmployees}
+            costPerUnit={costs.employee}
+            onSave={handleHireEmployees}
+            headerRight={
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+                {/* Morale Bar */}
+                <View style={{ width: 80, height: 8, backgroundColor: theme.colors.cardSoft, borderRadius: 4, overflow: 'hidden' }}>
+                  <View style={{
+                    width: `${employeeMorale}%`,
+                    height: '100%',
+                    backgroundColor:
+                      employeeMorale < 30 ? theme.colors.danger :
+                        employeeMorale < 50 ? '#F59E0B' : // Orange
+                          employeeMorale < 70 ? '#10B981' : // Light Green
+                            theme.colors.success // Dark Green
+                  }} />
+                </View>
+                <Pressable
+                  onPress={() => toggleModal('employees', true)}
+                  style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: theme.colors.cardSoft, borderRadius: 8 }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.textPrimary }}>+ Boost</Text>
+                </Pressable>
+              </View>
+            }
+          />
         </View>
 
         {/* DEPARTMENTS */}

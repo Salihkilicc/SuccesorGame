@@ -27,7 +27,7 @@ const ProductsScreen = () => {
 
         {/* ACTIVE PRODUCTS */}
         <Text style={styles.sectionTitle}>Active Products ({activeProducts.length})</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeList}>
+        <View style={styles.activeList}>
           {activeProducts.map(prod => (
             <Pressable key={prod.id} style={styles.activeCard} onPress={() => actions.openDetailModal(prod)}>
               <View style={styles.activeHeader}>
@@ -39,8 +39,20 @@ const ProductsScreen = () => {
               <Text style={styles.activePrice}>${prod.sellingPrice}</Text>
             </Pressable>
           ))}
-          {activeProducts.length === 0 && <Text style={styles.emptyText}>No active products yet.</Text>}
-        </ScrollView>
+          {/* Discover New Tech Card */}
+          <Pressable
+            style={[styles.activeCard, { borderStyle: 'dashed', backgroundColor: 'transparent', borderWidth: 2, alignItems: 'center', justifyContent: 'center', gap: 8 }]}
+            onPress={() => navigation.navigate('TechTree' as never)}
+          >
+            <Text style={{ fontSize: 30 }}>⚛️</Text>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ color: theme.colors.accent, fontWeight: '700', fontSize: 13, textAlign: 'center' }}>Discover New Tech</Text>
+              <Text style={{ color: theme.colors.textMuted, fontSize: 10, marginTop: 4 }}>Go to R&D Lab</Text>
+            </View>
+          </Pressable>
+
+          {activeProducts.length === 0 && <Text style={styles.emptyText}>No active products yet. Start by discovering tech!</Text>}
+        </View>
 
         {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}
       </ScrollView>
@@ -80,9 +92,26 @@ const styles = StyleSheet.create({
   backText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
   title: { fontSize: 24, fontWeight: '800', color: '#fff' },
   content: { paddingBottom: 40 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginLeft: 20, marginBottom: 12, marginTop: 20 },
-  activeList: { paddingHorizontal: 20, gap: 12 },
-  activeCard: { width: 140, height: 160, backgroundColor: theme.colors.card, borderRadius: 16, padding: 12, justifyContent: 'space-between', borderWidth: 1, borderColor: theme.colors.border },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginLeft: 20, marginBottom: 16, marginTop: 20 },
+  activeList: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12
+  },
+  activeCard: {
+    width: '48%', // Approx 2 columns accounting for gap. Or calculation. 
+    // gap: 12 -> 20 padding left + 20 right = 40. Gap 12. 
+    // Width = (100% - 12) / 2 = ~48% is safe.
+    minWidth: 150,
+    height: 160,
+    backgroundColor: theme.colors.card,
+    borderRadius: 16,
+    padding: 12,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: theme.colors.border
+  },
   activeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   activeIcon: { fontSize: 32 },
   statusBadge: { backgroundColor: 'rgba(76, 175, 80, 0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },

@@ -9,6 +9,24 @@ import { useLaboratoryStore } from './useLaboratoryStore';
 import { useProductStore } from './useProductStore';
 import { simulateEconomy } from '../logic/EconomyEngine'; // <--- YENİ MOTOR
 
+const LOW_MORALE_REASONS = [
+  "Factory strikes halted production for 3 days.",
+  "Quality control sabotage detected in Batch #404.",
+  "Employees staged a 'slow-down' protest.",
+  "High absenteeism caused shipping delays.",
+  "Key engineers resigned, causing workflow chaos.",
+  "Leaked internal memos damaged brand reputation.",
+  "Unmotivated support staff ignored customer orders.",
+  "Warehouse theft resulted in missing inventory.",
+  "Production errors increased due to lack of focus.",
+  "Disgruntled staff disrupted the supply chain.",
+  "Critical machinery was left unmaintained.",
+  "Union representatives blocked delivery trucks.",
+  "Data entry errors caused massive order cancellations.",
+  "Safety protocols were ignored, causing a shutdown.",
+  "Staff walkout during peak hours slashed output."
+];
+
 // UI Tarafının beklediği sonuç tipi
 export type EconomyResult = {
   status: 'active' | 'bankrupt';
@@ -20,6 +38,11 @@ export type EconomyResult = {
     reportTotalExpenses: number;
     reportNetProfit: number;
     reportTotalInventory: number; // NEW: Track total stock
+    reportCurrentRP: number;
+    operationalSetback: boolean;
+    setbackMessage: string;
+    lostRevenue: number;
+    lostUnits: number;
     playerCash: number;
     companyCapital: number;
     playerNetWorth: number;
@@ -34,6 +57,12 @@ export type GameState = {
   age: number;
   actionsUsedThisMonth: number;
   maxActionsPerMonth: number;
+  // Employee Management
+  employeeMorale: number; // 0-100
+  salaryPolicy: 'low' | 'avg' | 'high';
+  eventsHostedThisQuarter: number;
+  lastQuarterProfit: number;
+  bonusDistributedThisQuarter: boolean;
 };
 
 type GameStore = GameState & {
@@ -41,6 +70,10 @@ type GameStore = GameState & {
   resetMonthlyState: () => void;
   advanceMonth: (months?: number) => Promise<EconomyResult>;
   resetGame: () => Promise<void>;
+  // Employee Actions
+  distributeBonus: () => void;
+  organizeEvent: (cost: number, boost: number) => void;
+  setSalaryPolicy: (policy: 'low' | 'avg' | 'high') => void;
 };
 
 export const initialGameState: GameState = {
@@ -48,6 +81,11 @@ export const initialGameState: GameState = {
   age: 18,
   actionsUsedThisMonth: 0,
   maxActionsPerMonth: 999,
+  employeeMorale: 75,
+  salaryPolicy: 'avg',
+  eventsHostedThisQuarter: 0,
+  lastQuarterProfit: 0,
+  bonusDistributedThisQuarter: false,
 };
 
 export const useGameStore = create<GameStore>()(
@@ -87,6 +125,21 @@ export const useGameStore = create<GameStore>()(
         let totalStorageCost = 0;
         let totalBeginningStock = 0;
         let totalEndingStock = 0;
+        let totalLostUnits = 0;
+        let totalLostRevenue = 0;
+        let operationalSetback = false;
+        let setbackMessage = '';
+
+        // MORALE CHECK
+        // Get morale directly, if < 50 calc penalty
+        const currentMorale = get().employeeMorale;
+        let penaltyRatio = 0;
+        if (currentMorale < 50) {
+          penaltyRatio = ((50 - currentMorale) / 50) * 0.35;
+          operationalSetback = true;
+          // Select random reason
+          setbackMessage = LOW_MORALE_REASONS[Math.floor(Math.random() * LOW_MORALE_REASONS.length)];
+        }
 
         // Loop through each active product and calculate financials
         const updatedProducts: any[] = [];
@@ -101,7 +154,12 @@ export const useGameStore = create<GameStore>()(
             // 1. Calculate Real Production Volume
             const baseCapacityPerFactory = 1000000; // 1 Million units per factory
             const factoryCount = stats.factoryCount || 5;
-            const maxProduction = product.maxProduction || (factoryCount * baseCapacityPerFactory);
+            // COMPLEXITY-BASED PRODUCTION FORMULA
+            // More complex products require more time/resources to build
+            const BASE_OUTPUT = 500;
+            const complexity = product.complexity || 50; // Default to 50 if not set
+            const rawProduction = (stats.employeeCount * BASE_OUTPUT) / complexity;
+            const maxProduction = Math.floor(rawProduction);
 
             const utilizationRate = (product.productionLevel ?? 50) / 100; // Use ?? for 0%
             const quarterlyProduction = Math.floor(maxProduction * utilizationRate * quarters);
@@ -130,8 +188,17 @@ export const useGameStore = create<GameStore>()(
             // Potential Sales based on AVAILABLE GOODS (Inventory + Production)
             const potentialSales = Math.floor(availableGoods * demandRate * finalSalesRate);
 
+            // Apply Morale Penalty
+            let actualPotentialSales = potentialSales;
+            if (penaltyRatio > 0) {
+              const lost = Math.floor(potentialSales * penaltyRatio);
+              totalLostUnits += lost;
+              totalLostRevenue += (lost * sellingPrice);
+              actualPotentialSales = potentialSales - lost;
+            }
+
             // Actual Sales: Cannot sell more than available
-            const quarterlySales = Math.min(availableGoods, potentialSales);
+            const quarterlySales = Math.min(availableGoods, actualPotentialSales);
 
             // 4. Update Inventory (New Inventory = Total - Sales)
             const newInventory = availableGoods - quarterlySales;
@@ -268,7 +335,32 @@ export const useGameStore = create<GameStore>()(
           mod.checkAllAchievementsAfterStateChange();
         });
 
-        // 7. Sonucu UI'ın beklediği formatta döndür
+        // 7. QUARTERLY MORALE LOGIC
+        if (months >= 3) {
+          const state = get();
+          let newMorale = state.employeeMorale;
+
+          // Natural Decay (-5)
+          newMorale -= 5;
+
+          // Salary Policy Impact
+          if (state.salaryPolicy === 'high') newMorale += 15;
+          if (state.salaryPolicy === 'low') newMorale -= 15;
+
+          // Clamp (0-100)
+          newMorale = Math.max(0, Math.min(100, newMorale));
+
+          set(state => ({
+            ...state,
+            employeeMorale: newMorale,
+            eventsHostedThisQuarter: 0,
+            lastQuarterProfit: netProfit,
+            bonusDistributedThisQuarter: false,
+          }));
+          console.log(`[Quarterly Review] Morale Updated: ${newMorale} (Policy: ${state.salaryPolicy})`);
+        }
+
+        // 8. Sonucu UI'ın beklediği formatta döndür
         const result: EconomyResult = {
           status: newCompanyCapital < 0 ? 'bankrupt' : 'active',
           reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,
@@ -280,6 +372,11 @@ export const useGameStore = create<GameStore>()(
             reportTotalExpenses: totalExpenses,
             reportNetProfit: netProfit,
             reportTotalInventory: totalEndingStock, // NEW: Stock tracking
+            reportCurrentRP: useLaboratoryStore.getState().totalRP,
+            operationalSetback,
+            setbackMessage,
+            lostRevenue: totalLostRevenue,
+            lostUnits: totalLostUnits,
 
             // Güncel Bakiye Verileri
             playerCash: newPlayerCash,
@@ -297,10 +394,51 @@ export const useGameStore = create<GameStore>()(
 
         return result;
       },
+      distributeBonus: () => {
+        const { lastQuarterProfit, employeeMorale, bonusDistributedThisQuarter } = get();
+        if (bonusDistributedThisQuarter) return;
+
+        const { companyCapital, update } = useStatsStore.getState();
+
+        const bonusAmount = lastQuarterProfit * 0.05;
+
+        // Checks
+        if (lastQuarterProfit <= 0) return;
+        if (companyCapital < bonusAmount) return;
+
+        // Apply
+        update({ companyCapital: companyCapital - bonusAmount });
+        set({ employeeMorale: Math.min(100, employeeMorale + 15), bonusDistributedThisQuarter: true });
+        console.log(`Bonus distributed: $${bonusAmount}`);
+      },
+
+      organizeEvent: (cost: number, boost: number) => {
+        const currentState = get();
+        if (currentState.eventsHostedThisQuarter >= 2) return;
+
+        const { companyCapital, update } = useStatsStore.getState();
+
+        if (companyCapital >= cost) {
+          const newMorale = Math.min(100, currentState.employeeMorale + boost);
+          update({ companyCapital: companyCapital - cost });
+          set(state => ({
+            ...state,
+            employeeMorale: newMorale,
+            eventsHostedThisQuarter: currentState.eventsHostedThisQuarter + 1
+          }));
+        }
+      },
+
+      setSalaryPolicy: (policy) => {
+        set(state => ({ ...state, salaryPolicy: policy }));
+      },
+
       resetGame: async () => {
         useStatsStore.getState().reset();
         useUserStore.getState().reset();
         useEventStore.getState().reset();
+        useProductStore.getState().reset(); // Reset Products
+
         set(() => ({ ...initialGameState }));
 
         // NativeEconomy.restartGame() KALDIRILDI çünkü artık yok.
@@ -309,6 +447,9 @@ export const useGameStore = create<GameStore>()(
         await zustandStorage.removeItem('succesor_user_v1');
         await zustandStorage.removeItem('succesor_game_v1');
         await zustandStorage.removeItem('succesor_game_v2');
+        await zustandStorage.removeItem('succesor_products_v3'); // Remove Product Persist
+        await zustandStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
+
         console.log('[Game] Full game reset complete');
       },
     }),
@@ -318,6 +459,11 @@ export const useGameStore = create<GameStore>()(
       partialize: state => ({
         currentMonth: state.currentMonth,
         age: state.age,
+        employeeMorale: state.employeeMorale,
+        salaryPolicy: state.salaryPolicy,
+        eventsHostedThisQuarter: state.eventsHostedThisQuarter,
+        lastQuarterProfit: state.lastQuarterProfit,
+        bonusDistributedThisQuarter: state.bonusDistributedThisQuarter,
       }),
     },
   ),

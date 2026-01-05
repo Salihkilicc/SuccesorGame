@@ -128,6 +128,11 @@ const HomeScreen = () => {
           endingCash: result.data.playerCash || 0,
           endingCapital: result.data.companyCapital || 0,
           inventory: result.data.reportTotalInventory || 0,
+          reportCurrentRP: result.data.reportCurrentRP || 0,
+          operationalSetback: result.data.operationalSetback || false,
+          setbackMessage: result.data.setbackMessage || '',
+          lostRevenue: result.data.lostRevenue || 0,
+          lostUnits: result.data.lostUnits || 0,
         };
         setLastReportData(mappedData);
         setReportVisible(true);

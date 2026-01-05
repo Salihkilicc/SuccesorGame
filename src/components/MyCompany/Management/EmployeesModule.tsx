@@ -20,11 +20,22 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
         updateEmployees,
         changeSalaryTier,
         distributeBonus,
-        organizeEvent
+        organizeEvent,
+        eventsHostedThisQuarter,
+
+        companyCapital,
+        lastQuarterProfit,
+        bonusDistributedThisQuarter,
     } = useCompanyManagement();
 
     const [eventsVisible, setEventsVisible] = useState(false);
-    const minRequired = factoryCount * 300;
+    const [successModal, setSuccessModal] = useState<{ visible: boolean; event?: typeof EVENTS[0] }>({ visible: false });
+
+    const EVENTS = [
+        { id: 'pizza', name: 'Pizza Party', cost: 50_000, morale: 5, desc: 'Herkes ekstra peynirli pizzaya bayıldı!' },
+        { id: 'retreat', name: 'Team Building Retreat', cost: 250_000, morale: 12, desc: 'Doğada yapılan aktiviteler takımı kaynaştırdı.' },
+        { id: 'gala', name: 'Grand Gala', cost: 1_000_000, morale: 25, desc: 'Şehirdeki en lüks otelde unutulmaz bir gece.' },
+    ];
 
     const renderTierBtn = (tier: 'low' | 'average' | 'above_average', label: string) => {
         const isActive = salaryTier === tier;
@@ -40,17 +51,46 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
         );
     };
 
-    const EventItem = ({ item }: { item: typeof COMPANY_EVENTS[0] }) => {
-        const total = item.cost * employeeCount;
+    const handleEvent = (item: typeof EVENTS[0]) => {
+        // Funds Check
+        if (companyCapital < item.cost) {
+            return;
+        }
+
+        organizeEvent(item.cost, item.morale);
+        setEventsVisible(false);
+        setTimeout(() => {
+            setSuccessModal({ visible: true, event: item });
+        }, 300);
+    };
+
+    const handleBonus = () => {
+        const bonusCost = lastQuarterProfit * 0.05;
+        if (bonusDistributedThisQuarter || lastQuarterProfit <= 0 || companyCapital < bonusCost) return;
+
+        distributeBonus(5); // 5% param kept for hook compatibility, though ignored by store
+
+        setSuccessModal({
+            visible: true,
+            event: {
+                id: 'bonus',
+                name: 'Bonuses Distributed! 💸',
+                desc: 'Your employees appreciate your generosity! Motivation has skyrocketed.',
+                cost: bonusCost,
+                morale: 15
+            }
+        });
+    };
+
+    const EventItem = ({ item }: { item: typeof EVENTS[0] }) => {
+        const canAfford = companyCapital >= item.cost;
         return (
             <SectionCard
                 title={item.name}
-                subtitle={`Morale +${item.morale} | $${item.cost}/head`}
-                rightText={`$${total.toLocaleString()}`}
-                onPress={() => {
-                    organizeEvent(item.id);
-                    setEventsVisible(false);
-                }}
+                subtitle={`Costs $${(item.cost / 1000).toFixed(0)}k | +${item.morale} Morale`}
+                rightText={!canAfford ? 'No Funds' : undefined}
+                disabled={!canAfford}
+                onPress={() => handleEvent(item)}
             />
         );
     };
@@ -64,62 +104,15 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
         >
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.md }}>
 
-                {/* Workforce Controls */}
-                <View>
-                    <Text style={styles.sectionTitle}>WORKFORCE SIZE ({employeeCount.toLocaleString()} Active)</Text>
 
-                    <View style={styles.controlsRow}>
-                        <View style={{ flex: 1, gap: 4 }}>
-                            <GameButton
-                                title="-100"
-                                variant="danger"
-                                onPress={() => updateEmployees(-100)}
-                                disabled={employeeCount - 100 < minRequired}
-                                style={styles.miniBtn}
-                                textStyle={{ fontSize: 12 }}
-                            />
-                            <GameButton
-                                title="-1k"
-                                variant="danger"
-                                onPress={() => updateEmployees(-1000)}
-                                disabled={employeeCount - 1000 < minRequired}
-                                style={styles.miniBtn}
-                                textStyle={{ fontSize: 12 }}
-                            />
-                        </View>
-
-                        <View style={styles.centralDisplay}>
-                            <Text style={styles.centralValue}>{employeeCount.toLocaleString()}</Text>
-                            <Text style={styles.centralMini}>Employees</Text>
-                        </View>
-
-                        <View style={{ flex: 1, gap: 4 }}>
-                            <GameButton
-                                title="+100"
-                                variant="secondary"
-                                onPress={() => updateEmployees(100)}
-                                style={styles.miniBtn}
-                                textStyle={{ fontSize: 12, color: theme.colors.success }}
-                            />
-                            <GameButton
-                                title="+1k"
-                                variant="secondary"
-                                onPress={() => updateEmployees(1000)}
-                                style={styles.miniBtn}
-                                textStyle={{ fontSize: 12, color: theme.colors.success }}
-                            />
-                        </View>
-                    </View>
-                    <Text style={styles.minWarning}>Minimum Required: {minRequired.toLocaleString()}</Text>
-                </View>
 
                 {/* Salary Tier */}
                 <View>
                     <Text style={styles.sectionTitle}>SALARY POLICY</Text>
                     <View style={styles.tierContainer}>
-                        {renderTierBtn('low', 'Low (-2)')}
+                        {renderTierBtn('low', 'Low')}
                         {renderTierBtn('average', 'Avg')}
-                        {renderTierBtn('above_average', 'High (+2)')}
+                        {renderTierBtn('above_average', 'High')}
                     </View>
                 </View>
 
@@ -129,12 +122,19 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
                     <View style={{ gap: 8 }}>
                         <SectionCard
                             title="Distribute Bonus 💰"
-                            subtitle="Costs 5% of Profit"
-                            onPress={() => distributeBonus(5)}
+                            subtitle={
+                                lastQuarterProfit <= 0 ? "No Profit to Share" :
+                                    bonusDistributedThisQuarter ? "Limit Reached (Once per Qtr)" :
+                                        `(Est. Cost: $${(lastQuarterProfit * 0.05 / 1000000).toFixed(2)}M)`
+                            }
+                            disabled={lastQuarterProfit <= 0 || bonusDistributedThisQuarter}
+                            rightText={lastQuarterProfit > 0 && !bonusDistributedThisQuarter ? "5%" : undefined}
+                            onPress={handleBonus}
                         />
                         <SectionCard
                             title="Organize Event 🎉"
-                            subtitle="Boost Morale"
+                            subtitle={eventsHostedThisQuarter >= 2 ? "Limit Reached (2/2)" : "Boost Morale"}
+                            disabled={eventsHostedThisQuarter >= 2}
                             onPress={() => setEventsVisible(true)}
                         />
                     </View>
@@ -149,12 +149,36 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
                 title="Organize Team Event"
             >
                 <FlatList
-                    data={COMPANY_EVENTS}
+                    data={EVENTS}
                     keyExtractor={i => i.id}
                     renderItem={({ item }) => <EventItem item={item} />}
                     contentContainerStyle={{ gap: 8 }}
                 />
             </GameModal>
+
+            {/* Success Overlay Modal */}
+            {successModal.visible && successModal.event && (
+                <GameModal
+                    visible={true}
+                    onClose={() => setSuccessModal({ visible: false })}
+                    title={successModal.event.name}
+                >
+                    <View style={{ alignItems: 'center', padding: 20, gap: 16 }}>
+                        <Text style={{ fontSize: 40 }}>🎉</Text>
+                        <Text style={{ color: theme.colors.textSecondary, textAlign: 'center', fontSize: 16 }}>
+                            {successModal.event.desc}
+                        </Text>
+                        <Text style={{ color: theme.colors.danger, fontSize: 18, fontWeight: '700' }}>
+                            Total Cost: -${successModal.event.cost.toLocaleString()}
+                        </Text>
+                        <GameButton
+                            title="Great!"
+                            onPress={() => setSuccessModal({ visible: false })}
+                            style={{ width: '100%', marginTop: 20 }}
+                        />
+                    </View>
+                </GameModal>
+            )}
         </GameModal>
     );
 };

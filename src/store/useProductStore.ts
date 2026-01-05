@@ -22,15 +22,83 @@ interface ProductActions {
     retireProduct: (id: string) => void;
     processMonthlySales: (context: SalesContext) => void;
     // R&D Upgrade Actions
-    upgradeProductCost: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
-    upgradeProductPrice: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
+    // R&D Upgrade Actions
+    upgradeProductQuality: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
+    optimizeProductionLine: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
     randomizeProductName: (productId: string) => void;
     unlockProduct: (productId: string, currentRP: number, currentCash: number, deductRP: (amount: number) => void, deductCash: (amount: number) => void) => { success: boolean; message: string; stockBoost?: number };
     reset: () => void;
 }
 
 export const initialProductState: ProductState = {
-    products: [],
+    products: [
+        {
+            id: 'smart_phone',
+            name: 'Smart Phone',
+            icon: '📱',
+            description: 'Essential for modern life.',
+            status: 'active',
+            category: 'Consumer', // Type cast if needed, but 'Consumer' is valid
+            // Requirements
+            rndCost: 0,
+            complexity: 50,
+            unlockCashCost: 0,
+
+            // Market Data
+            marketDemand: 80,
+            competition: 'High',
+            baseProductionCost: 250,
+            unitCost: 250,
+            suggestedPrice: 600,
+
+            // Active Config
+            sellingPrice: 600,
+            productionLevel: 50, // Started at 50%
+            marketingSpendPerUnit: 0,
+            inventory: 0,
+            revenue: 0,
+
+            // Levels
+            costLevel: 0,
+            priceLevel: 0,
+            qualityLevel: 1,
+            processLevel: 1
+        },
+        {
+            id: 'pro_laptop',
+            name: 'Pro Laptop',
+            icon: '💻',
+            description: 'High margin tool for professionals.',
+            status: 'active',
+            category: 'Consumer',
+
+            // Requirements
+            rndCost: 0,
+            complexity: 90,
+            unlockCashCost: 0,
+
+            // Market Data
+            marketDemand: 60,
+            competition: 'Medium',
+            baseProductionCost: 550,
+            unitCost: 550,
+            suggestedPrice: 1200,
+
+            // Active Config
+            sellingPrice: 1200,
+            productionLevel: 0, // Stopped initially
+            marketingSpendPerUnit: 0,
+            inventory: 0,
+            revenue: 0,
+
+
+            // Levels
+            costLevel: 0,
+            priceLevel: 0,
+            qualityLevel: 1,
+            processLevel: 1
+        }
+    ] as any[], // Cast to avoid strict type checking on partials if necessary
     unlockableProducts: UNLOCKABLE_PRODUCTS,
 };
 
@@ -118,9 +186,8 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 })),
 
             // R&D Upgrade Actions
-            upgradeProductCost: (productId, currentRP, deductRP) => {
-                const { calculateUpgradeRPCost, MAX_UPGRADE_LEVEL, COST_OPTIMIZATION } = require('../features/products/logic/productUpgrades');
-
+            // R&D Upgrade Actions - NEW SYSTEM
+            upgradeProductQuality: (productId, currentRP, deductRP) => {
                 let result = { success: false, message: '' };
 
                 set((state) => {
@@ -130,27 +197,35 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         return state;
                     }
 
-                    const currentLevel = product.costLevel || 0;
-                    if (currentLevel >= MAX_UPGRADE_LEVEL) {
-                        result = { success: false, message: 'Already at maximum level' };
-                        return state;
-                    }
+                    const currentLevel = product.qualityLevel || 1;
+                    const complexity = product.complexity || 50;
 
-                    const rpCost = calculateUpgradeRPCost(COST_OPTIMIZATION.BASE_RP_COST, currentLevel);
+                    // Formula: complexity * 100 * (1.5 ^ level)
+                    const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
+
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Insufficient RP. Need ${rpCost.toLocaleString()} RP` };
+                        result = { success: false, message: `Need ${rpCost.toLocaleString()} RP` };
                         return state;
                     }
 
-                    // Deduct RP and upgrade
+                    // Deduct RP
                     deductRP(rpCost);
-                    result = { success: true, message: `Production optimized! Cost reduced by $2` };
+
+                    // Apply Effect: +3% Price
+                    const currentPrice = product.sellingPrice || product.suggestedPrice;
+                    const newPrice = Math.floor(currentPrice * 1.03);
+
+                    result = { success: true, message: `Quality Improved! Price increased to $${newPrice}` };
 
                     return {
                         products: state.products.map(p => {
                             if (p.id !== productId) return p;
-                            const currentCost = p.unitCost ?? p.baseProductionCost;
-                            return { ...p, costLevel: currentLevel + 1, unitCost: Math.max(1, currentCost - 2) };
+                            return {
+                                ...p,
+                                qualityLevel: currentLevel + 1,
+                                sellingPrice: newPrice,
+                                suggestedPrice: newPrice // Update suggested too so demand logic holds
+                            };
                         })
                     };
                 });
@@ -158,9 +233,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 return result;
             },
 
-            upgradeProductPrice: (productId, currentRP, deductRP) => {
-                const { calculateUpgradeRPCost, MAX_UPGRADE_LEVEL, FEATURE_ENHANCEMENT, getNextPriceIncrease } = require('../features/products/logic/productUpgrades');
-
+            optimizeProductionLine: (productId, currentRP, deductRP) => {
                 let result = { success: false, message: '' };
 
                 set((state) => {
@@ -170,30 +243,44 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         return state;
                     }
 
-                    const currentLevel = product.priceLevel || 0;
-                    if (currentLevel >= MAX_UPGRADE_LEVEL) {
-                        result = { success: false, message: 'Already at maximum level' };
-                        return state;
-                    }
+                    const currentLevel = product.processLevel || 1;
+                    const complexity = product.complexity || 50;
 
-                    const rpCost = calculateUpgradeRPCost(FEATURE_ENHANCEMENT.BASE_RP_COST, currentLevel);
+                    // Formula: complexity * 100 * (1.5 ^ level)
+                    const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
+
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Insufficient RP. Need ${rpCost.toLocaleString()} RP` };
+                        result = { success: false, message: `Need ${rpCost.toLocaleString()} RP` };
                         return state;
                     }
 
-                    const priceIncrease = getNextPriceIncrease(currentLevel);
+                    // Limit Check: Cannot go below 40% of Base Cost
+                    // Use unitCost if set, else baseProductionCost
+                    const currentCost = product.unitCost ?? product.baseProductionCost;
+                    const minCost = Math.floor(product.baseProductionCost * 0.40);
 
-                    // Deduct RP and upgrade
+                    if (currentCost <= minCost) {
+                        result = { success: false, message: 'Max efficiency reached (40% limit).' };
+                        return state;
+                    }
+
+                    // Deduct RP
                     deductRP(rpCost);
-                    result = { success: true, message: `Features enhanced! Price increased by $${priceIncrease}` };
+
+                    // Apply Effect: -2% Cost
+                    let newCost = Math.floor(currentCost * 0.98);
+                    if (newCost < minCost) newCost = minCost;
+
+                    result = { success: true, message: `Process Optimized! Cost reduced to $${newCost}` };
 
                     return {
                         products: state.products.map(p => {
                             if (p.id !== productId) return p;
-                            const currentPrice = p.sellingPrice || p.suggestedPrice;
-                            const increaseAmount = currentLevel + 2;
-                            return { ...p, priceLevel: currentLevel + 1, sellingPrice: currentPrice + increaseAmount };
+                            return {
+                                ...p,
+                                processLevel: currentLevel + 1,
+                                unitCost: newCost
+                            };
                         })
                     };
                 });
@@ -258,6 +345,41 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     unlockableProducts: state.unlockableProducts.map((p) =>
                         p.id === productId ? { ...p, isUnlocked: true } : p
                     ),
+                    // AUTO-CREATE PRODUCT
+                    products: [...state.products, {
+                        id: product.id, // Tech ID as Product ID
+                        name: product.name,
+                        description: `Produced from ${product.name} technology.`,
+                        category: product.category as any,
+                        status: 'active',
+
+                        // Financials
+                        sellingPrice: product.baseSellingPrice,
+                        suggestedPrice: product.baseSellingPrice,
+                        baseProductionCost: product.baseUnitCost,
+                        unitCost: product.baseUnitCost,
+
+                        // Logic Props
+                        productionLevel: 0, // Stopped
+                        marketDemand: 100,
+                        marketingSpendPerUnit: 0,
+                        inventory: 0,
+
+                        // Levels
+                        level: 1,
+                        costLevel: 0,
+                        priceLevel: 0,
+                        qualityLevel: 1,
+                        processLevel: 1,
+
+
+                        // Misc
+                        icon: '📦',
+                        rndCost: product.unlockRPCost,
+                        complexity: product.complexity,
+                        unlockCashCost: product.unlockCashCost,
+                        competition: 'Medium',
+                    }]
                 }));
 
                 return {

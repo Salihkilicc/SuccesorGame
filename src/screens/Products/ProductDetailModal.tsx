@@ -11,7 +11,7 @@ interface ProductDetailModalProps {
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible, productId, onClose }) => {
-    const { products, updateProductSettings, retireProduct, getInsightTip } = useProductsLogic();
+    const { products, actions, totalRP } = useProductsLogic();
     const product = products.find(p => p.id === productId);
 
     const [formState, setFormState] = useState<{
@@ -38,7 +38,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
     if (!visible || !product) return null;
 
     const handleSave = () => {
-        updateProductSettings(product.id, formState);
+        actions.updateProductSettings(product.id, formState);
         Alert.alert('Saved', 'Product settings updated.');
         onClose();
     };
@@ -50,7 +50,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                 text: 'Retire',
                 style: 'destructive',
                 onPress: () => {
-                    retireProduct(product.id);
+                    actions.retireProduct(product.id);
                     onClose();
                 }
             }
@@ -58,14 +58,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
     };
 
     const handleGetInsight = () => {
-        setTip(getInsightTip(product.id));
+        setTip(actions.getInsightTip(product));
     };
 
-    // Helper for number increment
-    const adjustValue = (field: keyof typeof formState, delta: number, min = 0, max = 10000) => {
+    // Helper for number increment with dynamic max for marketing
+    const adjustValue = (field: keyof typeof formState, delta: number, min = 0, max?: number) => {
+        // Calculate dynamic max for marketing budget (40% of selling price)
+        let effectiveMax = max;
+        if (field === 'marketingBudget' && !max) {
+            effectiveMax = Math.floor(formState.sellingPrice * 0.40);
+        }
+        effectiveMax = effectiveMax || 10000; // Fallback
+
         setFormState(prev => ({
             ...prev,
-            [field]: Math.max(min, Math.min(max, (prev[field] as number) + delta))
+            [field]: Math.max(min, Math.min(effectiveMax, (prev[field] as number) + delta))
         }));
     };
 
@@ -112,16 +119,64 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                             <View style={styles.statBox}>
                                 <Text style={styles.statLabel}>Profit Margin</Text>
                                 <Text style={styles.statValue}>
-                                    {Math.round(((formState.sellingPrice - product.basePrice) / formState.sellingPrice) * 100)}%
+                                    {Math.round(((formState.sellingPrice - (product.unitCost || product.baseProductionCost)) / formState.sellingPrice) * 100)}%
                                 </Text>
                             </View>
                         </View>
 
                         <Text style={styles.sectionHeader}>Management</Text>
 
-                        {renderControl('Selling Price', 'sellingPrice', 5)}
-                        {renderControl('Marketing Budget', 'marketingBudget', 1000)}
+                        {renderControl('Selling Price', 'sellingPrice', 5, '', undefined)}
+                        {renderControl('Marketing Budget', 'marketingBudget', 100, '', undefined)}
                         {renderControl('Production Level', 'productionLevel', 5, '%', 100)}
+
+                        <Text style={styles.sectionHeader}>R&D Upgrades</Text>
+                        <View style={styles.upgradeRow}>
+                            {/* Quality Upgrade */}
+                            <View style={styles.upgradeCard}>
+                                <Text style={styles.upgradeTitle}>Improve Quality</Text>
+                                <View style={styles.upgradeStats}>
+                                    <Text style={styles.statText}>Lvl {product.qualityLevel || 1} ➜ {(product.qualityLevel || 1) + 1}</Text>
+                                    <Text style={[styles.statEffect, { color: theme.colors.success }]}>+3% Price</Text>
+                                </View>
+                                <Pressable
+                                    style={[
+                                        styles.upgradeBtn,
+                                        totalRP < actions.calculateUpgradeCost(product, 'quality') && styles.disabledBtn
+                                    ]}
+                                    disabled={totalRP < actions.calculateUpgradeCost(product, 'quality')}
+                                    onPress={() => actions.handleUpgradeQuality(product)}
+                                >
+                                    <Text style={styles.upgradeBtnText}>
+                                        Upgrade ({actions.calculateUpgradeCost(product, 'quality').toLocaleString()} RP)
+                                    </Text>
+                                </Pressable>
+                            </View>
+
+                            {/* Process Upgrade */}
+                            <View style={styles.upgradeCard}>
+                                <Text style={styles.upgradeTitle}>Optimize Process</Text>
+                                <View style={styles.upgradeStats}>
+                                    <Text style={styles.statText}>Lvl {product.processLevel || 1} ➜ {(product.processLevel || 1) + 1}</Text>
+                                    <Text style={[styles.statEffect, { color: theme.colors.accent }]}>-2% Cost</Text>
+                                </View>
+                                <Pressable
+                                    style={[
+                                        styles.upgradeBtn,
+                                        (totalRP < actions.calculateUpgradeCost(product, 'process') || (product.unitCost || 0) <= (product.baseProductionCost * 0.4)) && styles.disabledBtn
+                                    ]}
+                                    disabled={totalRP < actions.calculateUpgradeCost(product, 'process') || (product.unitCost || 0) <= (product.baseProductionCost * 0.4)}
+                                    onPress={() => actions.handleOptimizeProcess(product)}
+                                >
+                                    <Text style={styles.upgradeBtnText}>
+                                        {(product.unitCost || 0) <= (product.baseProductionCost * 0.4)
+                                            ? 'Max Efficiency'
+                                            : `Optimize (${actions.calculateUpgradeCost(product, 'process').toLocaleString()} RP)`
+                                        }
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
 
                         <View style={styles.controlRow}>
                             <Text style={styles.label}>Supplier</Text>
@@ -270,5 +325,27 @@ const styles = StyleSheet.create({
     },
     insightBtnText: { color: theme.colors.accent },
     tipBox: { backgroundColor: theme.colors.accent + '20', padding: 15, borderRadius: 8 },
-    tipText: { color: theme.colors.textPrimary, fontSize: 14 }
+    tipText: { color: theme.colors.textPrimary, fontSize: 14 },
+    upgradeRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
+    upgradeCard: {
+        flex: 1,
+        backgroundColor: theme.colors.cardSoft,
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: theme.colors.border
+    },
+    upgradeTitle: { fontSize: 12, fontWeight: 'bold', color: theme.colors.textSecondary, marginBottom: 5 },
+    upgradeStats: { marginBottom: 10 },
+    statText: { fontSize: 12, color: theme.colors.textPrimary },
+    statEffect: { fontSize: 13, fontWeight: 'bold', marginTop: 2 },
+    upgradeBtn: {
+        backgroundColor: theme.colors.primary,
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+        borderRadius: 6,
+        alignItems: 'center'
+    },
+    disabledBtn: { backgroundColor: '#444', opacity: 0.7 },
+    upgradeBtnText: { fontSize: 10, fontWeight: 'bold', color: '#000' }
 });

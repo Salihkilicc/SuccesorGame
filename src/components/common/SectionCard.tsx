@@ -10,18 +10,20 @@ type SectionCardProps = {
     style?: any;
     danger?: boolean;
     selected?: boolean;
+    disabled?: boolean;
 };
 
-const SectionCard = ({ title, subtitle, rightText, onPress, style, danger, selected }: SectionCardProps) => {
+const SectionCard = ({ title, subtitle, rightText, onPress, style, danger, selected, disabled }: SectionCardProps) => {
     return (
         <Pressable
-            onPress={onPress}
-            disabled={!onPress}
+            onPress={disabled ? undefined : onPress}
+            disabled={disabled || !onPress}
             style={({ pressed }) => [
                 styles.card,
                 danger && styles.dangerCard,
                 selected && styles.selectedCard,
-                pressed && onPress && styles.pressed,
+                disabled && { opacity: 0.5 },
+                pressed && onPress && !disabled && styles.pressed,
                 style
             ]}>
             <View style={styles.content}>

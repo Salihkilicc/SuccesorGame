@@ -11,6 +11,11 @@ export interface FinancialData {
   endingCash?: number;
   endingCapital?: number;
   inventory?: number; // Added
+  reportCurrentRP?: number;
+  operationalSetback?: boolean;
+  setbackMessage?: string;
+  lostRevenue?: number;
+  lostUnits?: number;
 }
 
 // Para Formatlayıcı
@@ -43,6 +48,7 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
   const cash = data.endingCash || 0;
   const capital = data.endingCapital || 0;
   const stock = data.inventory || 0;
+  const currentRP = data.reportCurrentRP || 0;
 
   const isProfit = profit >= 0;
 
@@ -95,9 +101,32 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
           <View style={styles.divider} />
 
           <View style={styles.resultContainer}>
+            {/* Operational Setback Alert */}
+            {data.operationalSetback && (
+              <View style={styles.alertBox}>
+                <View style={styles.alertHeader}>
+                  <Text style={styles.alertIcon}>⚠️</Text>
+                  <Text style={styles.alertTitle}>OPERATIONAL FAILURE DETECTED</Text>
+                </View>
+                <Text style={styles.alertMessage}>"{data.setbackMessage}"</Text>
+                <Text style={styles.alertLoss}>
+                  Loss: -{data.lostUnits?.toLocaleString()} Units <Text style={{ fontWeight: '900' }}>(-{formatCurrency(data.lostRevenue)})</Text>
+                </Text>
+              </View>
+            )}
+
             <Text style={styles.resultLabel}>NET PROFIT</Text>
             <Text style={[styles.resultValue, { color: isProfit ? '#4CAF50' : '#F44336' }]}>
               {isProfit ? '+' : ''}{formatCurrency(profit)}
+            </Text>
+            {/* R&D Display */}
+            <Text style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#9C27B0', // Purple/Lila
+              marginTop: 4
+            }}>
+              🟣 Current R&D: {currentRP >= 1000 ? (currentRP >= 1000000 ? `${(currentRP / 1000000).toFixed(1)}M` : `${(currentRP / 1000).toFixed(1)}K`) : currentRP} Pts
             </Text>
           </View>
 
@@ -153,4 +182,19 @@ const styles = StyleSheet.create({
   button: { width: '100%', backgroundColor: '#FFF', paddingVertical: 14, borderRadius: 10, alignItems: 'center' },
   buttonText: { color: '#000', fontSize: 15, fontWeight: '700' },
   stockLabel: { color: '#666', fontSize: 10, marginTop: 4 },
+  alertBox: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    borderWidth: 1,
+    borderColor: '#F44336',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    width: '100%',
+    alignItems: 'center'
+  },
+  alertHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, gap: 6 },
+  alertIcon: { fontSize: 16 },
+  alertTitle: { color: '#F44336', fontWeight: '900', fontSize: 12, letterSpacing: 0.5 },
+  alertMessage: { color: '#FFCDD2', fontSize: 11, fontStyle: 'italic', marginBottom: 6, textAlign: 'center' },
+  alertLoss: { color: '#FF5252', fontSize: 13, fontWeight: '700' }
 });
