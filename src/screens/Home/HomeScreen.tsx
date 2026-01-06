@@ -57,10 +57,7 @@ const HomeScreen = () => {
 
   const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
-  useEffect(() => {
-    // Force set money to 450k as requested
-    setField('money', 450_000);
-  }, []);
+
   const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);

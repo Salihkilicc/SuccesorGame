@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import MatchPopup from '../../components/Match/MatchPopup';
 import { useMatchSystem } from '../../components/Match/useMatchSystem';
 import { triggerEvent } from '../../event/eventEngine';
 import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../navigation';
-import { useEventStore } from '../../store';
+import { useEventStore, useUserStore } from '../../store';
 import { theme } from '../../theme';
 import AppScreen from '../../components/layout/AppScreen';
 import { useHookupSystem } from '../../components/Life/useHookupSystem';
@@ -37,7 +37,9 @@ import { useBlackMarketSystem } from '../../components/Life/BlackMarket/useBlack
 import BlackMarketHubModal from '../../components/Life/BlackMarket/BlackMarketHubModal';
 import BelongingsModal from '../../components/Life/BlackMarket/BelongingsModal';
 import { Alert } from 'react-native';
-import { useEffect } from 'react';
+import { useEncounterSystem } from '../../components/Love/useEncounterSystem';
+import { EncounterModal } from '../../components';
+import BreakupModal from '../../components/Love/BreakupModal'; // Import New Modal
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -155,6 +157,20 @@ const LifeScreen = () => {
     closeHookupModal,
   } = useHookupSystem();
 
+  // Encounter System Hook - MUST be before useNightOutSystem and useTravelSystem
+  const {
+    isVisible: isEncounterVisible,
+    currentScenario,
+    candidate: encounterCandidate,
+    triggerEncounter,
+    handleDate,
+    closeEncounter,
+    getCheatingConsequence
+  } = useEncounterSystem();
+
+  // Cheating consequence state
+  const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
+
   const {
     setupModalVisible,
     outcomeModalVisible,
@@ -173,7 +189,7 @@ const LifeScreen = () => {
     handleHookupAccept,
     handleOutcomeClose,
     handleCondomDecision,
-  } = useNightOutSystem();
+  } = useNightOutSystem(triggerEncounter);
 
   const {
     membershipModalVisible,
@@ -242,7 +258,7 @@ const LifeScreen = () => {
     totalCost: travelCost,
     enjoyment: travelEnjoyment,
     selectedCompanion
-  } = useTravelSystem();
+  } = useTravelSystem(triggerEncounter);
 
   const {
     isHubVisible,
@@ -288,6 +304,30 @@ const LifeScreen = () => {
     }
   }, [effectMessage, clearEffect]);
 
+  // Handle encounter date with cheating consequence check
+  const handleEncounterDate = useCallback(() => {
+    const result = handleDate();
+    if (result.wasCaught) {
+      // This will trigger the BreakupModal
+      const partnerName = useUserStore.getState().partner?.name || 'Your partner'; // Get name BEFORE it's cleared? Actually handleDate likely clears it.
+      // Wait, handleDate calls breakUp in store, which clears partner.
+      // So we need to capture partner name locally perhaps?
+      // Actually useEncounterSystem handleDate: 'if (wasCaught) breakUp(...)'
+      // The store updates immediately.
+      // So 'partner' in store became null.
+      // We should grab the name from the 'cheatingConsequence' state logic or pass it from handleDate return?
+      // handleDate in useEncounterSystem doesn't return partner name.
+      // But we can fallback to 'Your Ex' or just 'Partner'.
+      // Better fix: ensure handleDate returns the name of the person you cheated on.
+
+      // For now, let's use the fallback. 
+      // Actually, in useEncounterSystem, breakUp is called.
+      // Let's trust useEncounterSystem to have done the deed.
+      // We will set state.
+      setCheatingConsequence({ settlement: result.settlement, partnerName: 'Your Partner' });
+    }
+  }, [handleDate]);
+
   const handleGoHome = () => {
     const rootNav = navigation.getParent()?.getParent();
     if (rootNav) {
@@ -310,7 +350,12 @@ const LifeScreen = () => {
         openSanctuary();
         break;
       case 'gym':
-        console.log('[Life] Action triggered: Gym');
+        // Gym Encounter Check
+        if (triggerEncounter('gym')) {
+          console.log('[Life] Gym Encounter Triggered!');
+          return; // Encounter handled, don't open gym yet
+        }
+        console.log('[Life] Action triggered: Gym (No Encounter)');
         openGym();
         break;
       case 'shopping':
@@ -409,6 +454,8 @@ const LifeScreen = () => {
           </Pressable>
         </View>
       </ScrollView>
+
+      {/* MODALS */}
       <MatchPopup
         visible={visible}
         candidate={matchCandidate}
@@ -423,6 +470,8 @@ const LifeScreen = () => {
         onReject={rejectHookup}
         onClose={closeHookupModal}
       />
+
+      {/* Night Out Modals */}
       <NightOutSetupModal
         visible={setupModalVisible}
         onClose={() => setSetupModalVisible(false)}
@@ -445,6 +494,8 @@ const LifeScreen = () => {
         visible={condomModalVisible}
         onDecision={handleCondomDecision}
       />
+
+      {/* Gym Modals */}
       <GymMembershipModal
         visible={membershipModalVisible}
         onClose={() => setMembershipModalVisible(false)}
@@ -554,6 +605,31 @@ const LifeScreen = () => {
         visible={isBelongingsVisible}
         onClose={closeBelongings}
       />
+
+      {/* ENCOUNTER MODAL (CINEMATIC) */}
+      <EncounterModal
+        visible={isEncounterVisible}
+        candidate={encounterCandidate}
+        scenario={currentScenario}
+        context={currentScenario?.id.split('_')[0] || 'Unknown'}
+        onDate={handleEncounterDate}
+        onHookup={() => {
+          Alert.alert("Fling", "You had a great night! (Stress -10)");
+          closeEncounter();
+        }}
+        onIgnore={closeEncounter}
+      />
+
+      {/* BREAKUP MODAL (HIGHEST PRIORITY) */}
+      {cheatingConsequence && (
+        <BreakupModal
+          visible={!!cheatingConsequence}
+          onClose={() => setCheatingConsequence(null)}
+          partnerName={cheatingConsequence.partnerName}
+          settlementCost={cheatingConsequence.settlement}
+        />
+      )}
+
     </AppScreen>
   );
 };

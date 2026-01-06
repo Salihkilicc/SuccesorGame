@@ -1,8 +1,26 @@
 // Re-export types from the feature module to maintain Clean Architecture
 // The feature "owns" its domain data.
-import { Product, ProductStatus, CompetitionLevel } from '../features/products/data/productsData';
+import { Product, ProductStatus } from '../features/products/data/productsData';
+import {
+    Ethnicity,
+    SocialClass,
+    PartnerStats,
+    PartnerProfile,
+    ExPartnerProfile,
+    MarriageProposalResult,
+    BREAKUP_REASONS,
+} from './relationshipTypes';
 
-export type { Product, ProductStatus, CompetitionLevel };
+export type { Product, ProductStatus };
 
-// If there are other global types, they should be listed below. 
-// Based on previous reads, this file ONLY contained Product types.
+// Relationship Engine Types
+export type {
+    Ethnicity,
+    SocialClass,
+    PartnerStats,
+    PartnerProfile,
+    ExPartnerProfile,
+    MarriageProposalResult,
+};
+
+export { BREAKUP_REASONS };

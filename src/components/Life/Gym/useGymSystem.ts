@@ -34,7 +34,7 @@ export type WorkoutResult = {
 };
 
 export const useGymSystem = () => {
-    const { money, health, stress, charisma, update: updateStats } = useStatsStore();
+    const { money, health, stress, charisma, spendMoney, update: updateStats } = useStatsStore();
     const { gymState, updateGymState } = useUserStore();
 
     // --- MODAL VISIBILITY ---
@@ -71,7 +71,11 @@ export const useGymSystem = () => {
             }
         }
 
-        updateStats({ money: money - cost });
+        if (!spendMoney(cost)) {
+            Alert.alert('Insufficient Funds', "You can't afford this membership.");
+            return;
+        }
+
         updateGymState({ membership: tier });
 
         // Auto-unlock elite if buying it
@@ -90,7 +94,10 @@ export const useGymSystem = () => {
             Alert.alert('Insufficient Funds', 'Cannot afford this trainer.');
             return;
         }
-        updateStats({ money: money - trainer.cost });
+        if (!spendMoney(trainer.cost)) {
+            Alert.alert('Insufficient Funds', 'Cannot afford this trainer.');
+            return;
+        }
         updateGymState({ trainerId: id });
         setTrainerModalVisible(false);
     }, [money, updateStats, updateGymState]);

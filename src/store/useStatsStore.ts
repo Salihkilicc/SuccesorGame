@@ -76,6 +76,12 @@ export type StatsState = Record<StatKey, number> & {
 type StatsStore = StatsState & {
   update: (partial: Partial<StatsState>) => void;
   setField: <K extends StatKey>(key: K, value: number) => void;
+
+  // Money Transaction Methods (Single Source of Truth)
+  spendMoney: (amount: number) => boolean; // Returns true if successful, false if insufficient funds
+  earnMoney: (amount: number) => void;
+  setMoney: (amount: number) => void; // For forced updates (e.g., load game, cheats)
+
   setCompanyValue: (value: number) => void;
   setCompanySharePrice: (value: number) => void;
   setCompanyDailyChange: (value: number) => void;
@@ -260,6 +266,30 @@ export const useStatsStore = create<StatsStore>()(
       ...initialStatsState,
       update: partial => set(state => ({ ...state, ...partial })),
       setField: (key, value) => set(state => ({ ...state, [key]: value })),
+
+      // Money Transaction Methods
+      spendMoney: (amount) => {
+        const current = get().money;
+        if (current >= amount) {
+          set({ money: current - amount });
+          console.log(`[StatsStore] Spent $${amount.toLocaleString()}. Remaining: $${(current - amount).toLocaleString()}`);
+          return true; // Transaction successful
+        }
+        console.warn(`[StatsStore] Insufficient funds. Tried to spend $${amount.toLocaleString()}, but only have $${current.toLocaleString()}`);
+        return false; // Insufficient funds
+      },
+
+      earnMoney: (amount) => {
+        const current = get().money;
+        set({ money: current + amount });
+        console.log(`[StatsStore] Earned $${amount.toLocaleString()}. New balance: $${(current + amount).toLocaleString()}`);
+      },
+
+      setMoney: (amount) => {
+        set({ money: amount });
+        console.log(`[StatsStore] Money set to $${amount.toLocaleString()}`);
+      },
+
       setCompanyValue: value => set(state => ({ ...state, companyValue: value })),
       setCompanySharePrice: value =>
         set(state => ({ ...state, companySharePrice: value })),
@@ -604,6 +634,17 @@ export const useStatsStore = create<StatsStore>()(
         isPublic: state.isPublic,
         stockSplitCount: state.stockSplitCount,
       }),
+      onRehydrateStorage: (state) => {
+        console.log('[StatsStore] Storage hydration starting...');
+        return (state, error) => {
+          if (error) {
+            console.error('[StatsStore] An error happened during hydration:', error);
+          } else {
+            console.log('[StatsStore] Hydration finished successfully!');
+            console.log('[StatsStore] Rehydrated Money:', state?.money);
+          }
+        };
+      },
     },
   ),
 );

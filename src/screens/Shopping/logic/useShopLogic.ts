@@ -25,7 +25,7 @@ export interface Shop {
 const SHOPS = SHOP_DATA as unknown as Shop[];
 
 export const useShopLogic = (shopId?: string) => {
-    const { money, update: updateStats } = useStatsStore();
+    const { money, spendMoney } = useStatsStore();
     const { addItem, inventory } = useUserStore();
 
     const shop = useMemo(() => SHOPS.find(s => s.id === shopId), [shopId]);
@@ -38,12 +38,15 @@ export const useShopLogic = (shopId?: string) => {
         if (!shop) return;
         const currentShop = shop; // Capture for closure safety
 
-        // Zaten sahip mi?
-        const isOwned = inventory.some(
-            invItem => invItem.id === item.id || (invItem.name === item.name && invItem.shopId === currentShop.id)
-        );
+        const isRing = item.type === 'ring';
 
-        if (isOwned) return;
+        // Zaten sahip mi? (Yüzükler hariç)
+        if (!isRing) {
+            const isOwned = inventory.some(
+                invItem => invItem.id === item.id || (invItem.name === item.name && invItem.shopId === currentShop.id)
+            );
+            if (isOwned) return;
+        }
 
         if (money < item.price) {
             Alert.alert('Insufficient Funds', "You don't have enough cash to buy this item.");
@@ -59,12 +62,18 @@ export const useShopLogic = (shopId?: string) => {
                     text: 'Buy',
                     style: 'default',
                     onPress: () => {
-                        // Parayı düş
-                        updateStats({ money: money - item.price });
+                        // Secure Spending (Single Source of Truth)
+                        const success = spendMoney(item.price);
+                        if (!success) {
+                            Alert.alert('Error', 'Transaction failed.');
+                            return;
+                        }
 
-                        // Envantere ekle
+                        // Envantere ekle (Yüzükler için unique ID)
+                        const inventoryId = isRing ? `${item.id}_${Date.now()}` : item.id;
+
                         addItem({
-                            id: item.id,
+                            id: inventoryId,
                             name: item.name,
                             price: item.price,
                             type: item.type,
@@ -74,7 +83,7 @@ export const useShopLogic = (shopId?: string) => {
                             purchasedAt: Date.now(),
                         });
 
-                        if (item.type === 'ring') {
+                        if (isRing) {
                             Alert.alert('Success', `You purchased ${item.name}! This can be used for proposals.`);
                         } else {
                             Alert.alert('Success', `You are now the owner of ${item.name}!`);
@@ -86,6 +95,8 @@ export const useShopLogic = (shopId?: string) => {
     };
 
     const checkIfOwned = (itemId: string) => {
+        // Rings are never considered "owned" in the context of disabling the button
+        // because we save them with unique IDs in inventory.
         return inventory.some(invItem => invItem.id === itemId);
     };
 

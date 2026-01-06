@@ -35,7 +35,7 @@ const ACTIVITY_COSTS: Record<ActivityType, number> = {
     'Wellness & Detox Sanctuary': 8000,
 };
 
-export const useTravelSystem = () => {
+export const useTravelSystem = (triggerEncounter?: (context: string, countryId?: string) => boolean) => {
     // Modal Visibility States
     const [destinationModalVisible, setDestinationModalVisible] = useState(false);
     const [companionModalVisible, setCompanionModalVisible] = useState(false);
@@ -52,7 +52,7 @@ export const useTravelSystem = () => {
     const [enjoyment, setEnjoyment] = useState(0);
 
     // Store access
-    const { money, setField: setStatsField } = useStatsStore();
+    const { money, spendMoney, setField: setStatsField } = useStatsStore();
     const { partner, family } = useUserStore();
 
     const children = family.filter(m => m.relation === 'Son' || m.relation === 'Daughter');
@@ -96,32 +96,49 @@ export const useTravelSystem = () => {
         console.log(`[Travel] Calculating cost: (${BASE_COST_PER_COUNTRY} + ${ACTIVITY_COSTS[selectedActivity]}) * multiplier = ${cost}`);
 
         if (money < cost) {
-            // Handle insufficient funds - for now maybe just alert or prevent button click in UI
-            // But typically we should show an alert. 
-            // For this simplified version, let's assume UI checks canPay or we go into debt/fail.
-            // Let's enforce it here:
-            // alert("Not enough money!"); 
-            // return;
-            // Actually, let's just allow it for now or assume UI handles validation
+            // Insufficient funds - could show alert
+            return;
         }
 
         // Deduct money
-        setStatsField('money', money - cost);
+        if (!spendMoney(cost)) {
+            console.warn('[Travel] Insufficient funds for trip');
+            return;
+        }
         setTotalCost(cost);
         setSelectedCompanion(companion);
 
         // Calculate RNG Enjoyment
-        // Standard: 60-90, Ultra-Rich: 80-100? Or just 60-100 as requested
         const minEnjoyment = 60;
         const maxEnjoyment = 100;
         const randomEnjoyment = Math.floor(Math.random() * (maxEnjoyment - minEnjoyment + 1)) + minEnjoyment;
         setEnjoyment(randomEnjoyment);
 
-        // Close companion, open result
+        // Close companion modal
         setCompanionModalVisible(false);
+
+        // CRITICAL: Only trigger encounter if traveling ALONE
+        if (companion === 'Myself' && triggerEncounter) {
+            // Map country name to encounter system country ID
+            const countryMap: Record<string, string> = {
+                'Japan': 'japan',
+                'France': 'france',
+                'USA': 'usa',
+                'Dubai': 'dubai'
+            };
+            const countryId = countryMap[selectedCountry];
+
+            const hasEncounter = triggerEncounter('travel', countryId);
+            if (hasEncounter) {
+                // Encounter modal will open, don't show result modal yet
+                return;
+            }
+        }
+
+        // No encounter or traveling with companion - show result
         setTimeout(() => setResultModalVisible(true), 300);
 
-    }, [money, selectedActivity, calculateCost, setStatsField]);
+    }, [money, selectedActivity, selectedCountry, calculateCost, setStatsField, triggerEncounter]);
 
     return {
         // Visibility

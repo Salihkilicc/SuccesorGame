@@ -21,7 +21,7 @@ export const CLUBS: NightOutClub[] = [
 
 export type NightOutOutcome = 'enjoyment' | 'hookup';
 
-export const useNightOutSystem = () => {
+export const useNightOutSystem = (triggerEncounter?: (context: string) => boolean) => {
     const [setupModalVisible, setSetupModalVisible] = useState(false);
     const [outcomeModalVisible, setOutcomeModalVisible] = useState(false);
     const [outcomeType, setOutcomeType] = useState<NightOutOutcome | null>(null);
@@ -69,8 +69,7 @@ export const useNightOutSystem = () => {
             return;
         }
 
-        // 1. Deduct Money
-        // 2. Update Stats
+        // 1. Deduct Money & Update Stats
         updateStats({
             money: money - totalCost,
             stress: Math.max(0, useStatsStore.getState().stress - 15),
@@ -78,20 +77,30 @@ export const useNightOutSystem = () => {
             charisma: Math.min(100, useStatsStore.getState().charisma + 5),
         });
 
-        // 3. Determine Outcome (RNG)
+        setSetupModalVisible(false);
+
+        // 2. Try to trigger encounter
+        if (triggerEncounter) {
+            const hasEncounter = triggerEncounter('club');
+            if (hasEncounter) {
+                // Encounter modal will open, don't show outcome modal yet
+                // The outcome modal will be shown after encounter closes
+                return;
+            }
+        }
+
+        // 3. No encounter - proceed with normal outcome
         const roll = Math.random();
-        // 2/3 (0.66) Enjoyment, 1/3 (0.33) Hookup
         const type: NightOutOutcome = roll < 0.66 ? 'enjoyment' : 'hookup';
 
         setOutcomeType(type);
-        setSetupModalVisible(false);
 
         // Small delay for transition
         setTimeout(() => {
             setOutcomeModalVisible(true);
         }, 300);
 
-    }, [money, totalCost, updateStats]);
+    }, [money, totalCost, updateStats, triggerEncounter]);
 
     const handleHookupAccept = useCallback(() => {
         setOutcomeModalVisible(false);

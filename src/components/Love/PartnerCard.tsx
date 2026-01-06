@@ -1,22 +1,21 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import type {PartnerProfile} from '../../store/useUserStore';
-import {theme} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import type { PartnerProfile } from '../../data/relationshipTypes';
+import { theme } from '../../theme';
 
 type PartnerCardProps = {
   partner: PartnerProfile;
   usedToday: boolean;
 };
 
-const moodColor = (mood?: string) => {
-  if (!mood) return theme.colors.textMuted;
-  if (mood.toLowerCase().includes('happy')) return theme.colors.success;
-  if (mood.toLowerCase().includes('angry')) return theme.colors.danger;
-  if (mood.toLowerCase().includes('upset')) return theme.colors.warning;
-  return theme.colors.textMuted;
+const getLoveColor = (love: number) => {
+  if (love >= 80) return theme.colors.success;
+  if (love >= 50) return theme.colors.accent;
+  if (love >= 30) return theme.colors.warning;
+  return theme.colors.danger;
 };
 
-const PartnerCard = ({partner, usedToday}: PartnerCardProps) => (
+const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => (
   <View style={styles.card}>
     <View style={styles.photoPlaceholder}>
       <Text style={styles.photoText}>{partner.name[0] ?? 'P'}</Text>
@@ -24,14 +23,14 @@ const PartnerCard = ({partner, usedToday}: PartnerCardProps) => (
     <View style={styles.info}>
       <View style={styles.headerRow}>
         <Text style={styles.name}>{partner.name}</Text>
-        <Text style={[styles.moodChip, {color: moodColor(partner.mood)}]}>
-          {partner.mood}
+        <Text style={[styles.statusChip, { color: partner.isMarried ? theme.colors.primary : theme.colors.accent }]}>
+          {partner.isMarried ? '💍 Married' : '❤️ Dating'}
         </Text>
       </View>
       <View style={styles.loveRow}>
-        <Text style={styles.meta}>Love: {partner.love}%</Text>
+        <Text style={styles.meta}>Love: {Math.round(partner.love)}%</Text>
         <View style={styles.loveBar}>
-          <View style={[styles.loveFill, {width: `${Math.min(100, partner.love)}%`}]} />
+          <View style={[styles.loveFill, { width: `${Math.min(100, partner.love)}%`, backgroundColor: getLoveColor(partner.love) }]} />
         </View>
       </View>
       <Text style={styles.status}>
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontWeight: '600',
   },
-  moodChip: {
+  statusChip: {
     fontSize: theme.typography.caption + 1,
     fontWeight: '700',
   },

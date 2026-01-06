@@ -6,12 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserStore, useStatsStore } from '../../store';
 import type { LoveStackParamList } from '../../navigation';
 import { theme } from '../../theme';
-import { InteractionModal } from '../../components';
+import { InteractionModal, EncounterModal } from '../../components';
+import BreakupModal from '../../components/Love/BreakupModal';
+import { useEncounterSystem } from '../../components/Love/useEncounterSystem';
 
 type LoveScreenProp = NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>;
 
 type ModalType = 'partner' | 'family' | 'friend' | 'ex' | null;
-type SubmenuType = 'gift' | 'propose' | 'text' | null;
+type SubmenuType = 'gift' | 'propose' | 'text' | 'breakup_confirm' | 'breakup_result' | null;
 
 const GIFTS = [
   { name: 'Flowers', price: 50, loveParams: 2 },
@@ -25,15 +27,51 @@ const TEXT_MESSAGES = [
   "Hey...", "Remember us?", "Happy Birthday (Late)", "wyd"
 ];
 
+const PROPOSAL_LOCATIONS = [
+  { id: 'public_park', name: 'Public Park', cost: 0, bonus: 0 },
+  { id: 'coffee_shop', name: 'Local Coffee Shop', cost: 50, bonus: 1 },
+  { id: 'beach_sunset', name: 'Sunset Beach', cost: 200, bonus: 3 },
+  { id: 'fancy_dinner', name: 'Luxury Restaurant', cost: 1000, bonus: 5 },
+  { id: 'hot_air_balloon', name: 'Hot Air Balloon', cost: 2500, bonus: 8 },
+  { id: 'disney_castle', name: 'Fairytale Castle', cost: 5000, bonus: 10 },
+  { id: 'private_yacht', name: 'Private Yacht', cost: 15000, bonus: 15 },
+  { id: 'paris_eiffel', name: 'Eiffel Tower Top', cost: 25000, bonus: 20 },
+  { id: 'maldives_villa', name: 'Maldives Overwater Villa', cost: 50000, bonus: 25 },
+  { id: 'times_square', name: 'Times Square Billboard', cost: 100000, bonus: 30 },
+  { id: 'private_island', name: 'Rented Private Island', cost: 500000, bonus: 40 },
+  { id: 'space_station', name: 'Orbit (Space Station)', cost: 5000000, bonus: 100 }
+];
+
 const LoveScreen = () => {
   const navigation = useNavigation<LoveScreenProp>();
-  const { partner, family, friends, exes, setField: setUserField } = useUserStore();
-  const { money, setField: setStatsField } = useStatsStore();
+  const {
+    partner, family, friends, exes,
+    hasEngagementRing, proposeMarriage, marryPartner, removeItem, breakUp,
+    setField: setUserField
+  } = useUserStore();
+  const { money, spendMoney, setField: setStatsField } = useStatsStore();
+
+  // Encounter System Hook
+  const {
+    isVisible: isEncounterVisible,
+    currentScenario,
+    candidate: encounterCandidate,
+    triggerEncounter,
+    handleDate,
+    closeEncounter,
+    cheatingConsequence,
+    clearConsequence
+  } = useEncounterSystem();
 
   const [modalType, setModalType] = useState<ModalType>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null); // FamilyMember, Friend, or ExPartner
   const [submenu, setSubmenu] = useState<SubmenuType>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [selectedLocationIndex, setSelectedLocationIndex] = useState(0);
+  const [proposalStep, setProposalStep] = useState(0); // 0: None, 1: Picker, 2: Prenup, 3: Result
+  const [proposalResult, setProposalResult] = useState<{ success: boolean; message: string } | null>(null);
+  // Removed local cheatingConsequence state to use hook's state
+
 
   const handleBack = () => {
     if (navigation.canGoBack()) {
@@ -79,17 +117,7 @@ const LoveScreen = () => {
         }
         break;
       case 'Break Up':
-        Alert.alert("Break Up", "Are you sure you want to end this relationship?", [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Yes, It's Over", style: 'destructive', onPress: () => {
-              // Determine if we move partner to exes? For simplicity, just nullify partner for now
-              // In a real app we'd create an ExPartner object
-              setUserField('partner', null);
-              closeModal();
-            }
-          }
-        ]);
+        setSubmenu('breakup_confirm');
         break;
       case 'Elope':
         const elopeChance = partner.love / 150; // Max ~0.66 chance at 100 love
@@ -131,20 +159,22 @@ const LoveScreen = () => {
         ]);
         break;
       case 'Propose':
+        // setSubmenu('propose'); 
+        // Reset step state
+        setProposalStep(0);
+        setProposalResult(null);
         setSubmenu('propose');
         break;
     }
   };
 
   const handleBuyGift = (item: typeof GIFTS[0]) => {
-    if (money < item.price) {
+    if (!spendMoney(item.price)) {
       setFeedback(`Not enough money! Need $${item.price}`);
       return;
     }
-    setStatsField('money', money - item.price);
     updatePartnerLove(item.loveParams);
     setFeedback(`You gave her ${item.name}! (+${item.loveParams} Love)`);
-    // Close submenu after short delay or manually? Let's keep it open so they can verify
   };
 
   // --- Family & Friend Actions ---
@@ -195,11 +225,10 @@ const LoveScreen = () => {
 
   const handleGiftToOther = (item: typeof GIFTS[0]) => {
     // Generic gift handler for Family/Friends
-    if (money < item.price) {
+    if (!spendMoney(item.price)) {
       setFeedback(`Not enough money! Need $${item.price}`);
       return;
     }
-    setStatsField('money', money - item.price);
 
     if (modalType === 'family') {
       const newFamily = family.map(f =>
@@ -223,7 +252,7 @@ const LoveScreen = () => {
 
     const updateExRelation = (delta: number) => {
       const newExes = exes.map(e =>
-        e.id === selectedItem.id ? { ...e, relationship: Math.max(0, Math.min(100, e.relationship + delta)) } : e
+        e.id === selectedItem.id ? { ...e, love: Math.max(0, Math.min(100, e.love + delta)) } : e
       );
       setUserField('exes', newExes);
     };
@@ -251,7 +280,7 @@ const LoveScreen = () => {
         ]);
         break;
       case 'Start Dating Again':
-        if (selectedItem.relationship > 80 && Math.random() > 0.6) {
+        if (selectedItem.love > 80 && Math.random() > 0.6) {
           setFeedback("She agreed to define the relationship!");
           // Logic to move ex back to partner would go here
         } else {
@@ -268,7 +297,7 @@ const LoveScreen = () => {
       setFeedback("She replied! (+Relation)");
       // Update ex relation
       const newExes = exes.map(e =>
-        e.id === selectedItem.id ? { ...e, relationship: Math.min(100, e.relationship + 5) } : e
+        e.id === selectedItem.id ? { ...e, love: Math.min(100, e.love + 5) } : e
       );
       setUserField('exes', newExes);
     } else if (rng > 0.3) {
@@ -276,7 +305,7 @@ const LoveScreen = () => {
     } else {
       setFeedback("Not delivered. You might be blocked.");
       const newExes = exes.map(e =>
-        e.id === selectedItem.id ? { ...e, relationship: Math.max(0, e.relationship - 2) } : e
+        e.id === selectedItem.id ? { ...e, love: Math.max(0, e.love - 2) } : e
       );
       setUserField('exes', newExes);
     }
@@ -284,6 +313,7 @@ const LoveScreen = () => {
 
 
   const getPartnerBadge = (love: number) => {
+    if (partner?.isMarried) return 'Married';
     if (love >= 90) return 'Soulmate';
     if (love >= 70) return 'Lover';
     if (love >= 40) return 'Dating';
@@ -293,6 +323,8 @@ const LoveScreen = () => {
   // --- Render Modals ---
 
   const renderPartnerModalContent = () => {
+    if (!partner) return null;
+
     if (submenu === 'gift') {
       return (
         <View style={{ gap: 12 }}>
@@ -310,33 +342,269 @@ const LoveScreen = () => {
       );
     }
 
-    if (submenu === 'propose') {
+    if (submenu === 'breakup_confirm' || submenu === 'breakup_result') {
+      const settlement = (partner.isMarried && !partner.hasPrenup) ? money * 0.5 : 0;
+
+      if (submenu === 'breakup_result') {
+        return (
+          <View style={{ alignItems: 'center', gap: 16, padding: 20 }}>
+            <Text style={{ fontSize: 60 }}>🥀</Text>
+            <Text style={[styles.modalSubtitle, { color: theme.colors.danger }]}>IT'S OVER</Text>
+
+            <Text style={{ color: theme.colors.textPrimary, textAlign: 'center' }}>
+              You have ended your relationship with {partner.name}.
+            </Text>
+
+            {settlement > 0 && (
+              <View style={{ backgroundColor: theme.colors.danger, padding: 10, borderRadius: 8, marginTop: 10 }}>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                  SETTLEMENT PAID: -${settlement.toLocaleString()}
+                </Text>
+              </View>
+            )}
+
+            <Pressable
+              style={[styles.actionButton, { marginTop: 20, backgroundColor: theme.colors.card }]}
+              onPress={() => {
+                // Finalize
+                breakUp('divorce'); // Store handles deduction if we didn't do it manually.
+                // Wait, store breaks up instantly.
+                // If store handles deduction, we shouldn't have deducted yet.
+                // We haven't deducted manually here. We just SHOWED what was paid.
+                // So calling breakUp('divorce') now will deduct it. Correct.
+                setSubmenu(null);
+                closeModal();
+              }}
+            >
+              <Text style={styles.actionButtonText}>Leave</Text>
+            </Pressable>
+          </View>
+        );
+      }
+
+      // Confirm Screen
       return (
-        <View style={{ gap: 12 }}>
-          <Text style={styles.modalSubtitle}>Plan Proposal</Text>
-          <Text style={{ color: theme.colors.textMuted, fontSize: 13, textAlign: 'center' }}>
-            Ready to pop the question? Pick a spot.
+        <View style={{ gap: 16, padding: 10, backgroundColor: 'rgba(255,0,0,0.05)', borderRadius: 12 }}>
+          <Text style={{ fontSize: 40, textAlign: 'center' }}>💔</Text>
+          <Text style={[styles.modalSubtitle, { textAlign: 'center', color: theme.colors.danger }]}>WARNING</Text>
+
+          <Text style={{ textAlign: 'center', color: theme.colors.textSecondary }}>
+            Are you sure you want to end this?
+            {partner.isMarried && !partner.hasPrenup && (
+              <Text style={{ fontWeight: 'bold', color: theme.colors.danger }}>
+                {"\n\n"}
+                Reviewing your assets... You have no Prenup.
+                {"\n"}
+                This will cost you 50% of your wealth.
+                {"\n"}
+                (~ ${settlement.toLocaleString()})
+              </Text>
+            )}
           </Text>
 
-          {/* Placeholder for Location Picker */}
-          <Pressable style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>📍 Location: Beach (Default)</Text>
-          </Pressable>
-
-          <Pressable style={styles.actionButton} onPress={() => console.log('Go to shop')}>
-            <Text style={styles.actionButtonText}>💍 Ring: None (Buy)</Text>
+          <Pressable
+            style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
+            onPress={() => setSubmenu('breakup_result')}
+          >
+            <Text style={[styles.actionButtonText, { color: 'white' }]}>Yes, It's Over</Text>
           </Pressable>
 
           <Pressable
-            style={[styles.actionButton, { backgroundColor: theme.colors.accent, marginTop: 12 }]}
-            onPress={() => setFeedback("You don't have a ring yet!")}>
-            <Text style={[styles.actionButtonText, { color: '#000' }]}>PROPOSE</Text>
+            style={[styles.actionButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]}
+            onPress={() => setSubmenu(null)}
+          >
+            <Text style={styles.actionButtonText}>Cancel</Text>
+          </Pressable>
+        </View>
+      );
+    }
+
+    if (submenu === 'propose') {
+      const location = PROPOSAL_LOCATIONS[selectedLocationIndex];
+      const canAfford = money >= location.cost;
+
+      // STEP 1: Location & Ring Check
+      const onStartProposal = () => {
+        if (!canAfford) {
+          setFeedback(`Not enough money! Need $${location.cost.toLocaleString()}`);
+          return;
+        }
+        if (!hasEngagementRing) {
+          setFeedback("You need an Engagement Ring first!");
+          return;
+        }
+
+        // Initial Love Check
+        if (partner && partner.love < 30) {
+          // Immediate Rejection
+          setProposalResult({
+            success: false,
+            message: `${partner.name} doesn't love you enough yet... She said no.`
+          });
+          setProposalStep(3); // Go to Result directly
+          return;
+        }
+
+        // Deduct Cost & Remove Ring
+        if (!spendMoney(location.cost)) {
+          setFeedback(`Not enough money! Need $${location.cost.toLocaleString()}`);
+          return;
+        }
+
+        // Remove ring logic
+        const ring = useUserStore.getState().inventory.find(i => i.type === 'ring');
+        if (ring) {
+          removeItem(ring.id);
+        }
+
+        // Proceed to Step 2 (Prenup)
+        setProposalStep(2);
+      };
+
+      // STEP 2: Prenup Decision
+      const onDecidePrenup = (wantsPrenup: boolean) => {
+        // Calculate Final Result
+        const result = proposeMarriage(wantsPrenup, location.bonus);
+        setProposalResult(result);
+
+        if (result.success) {
+          marryPartner(wantsPrenup); // Commit State
+        }
+
+        setProposalStep(3); // Show Result
+      };
+
+      const closeProposal = () => {
+        setSubmenu(null);
+        setProposalStep(0);
+        setProposalResult(null);
+        closeModal();
+      };
+
+      // --- WIZARD UI ---
+
+      // STEP 3: RESULT
+      if (proposalStep === 3 && proposalResult) {
+        const isSuccess = proposalResult.success;
+        return (
+          <View style={{ alignItems: 'center', gap: 16, padding: 20 }}>
+            <Text style={{ fontSize: 60 }}>{isSuccess ? '💍' : '💔'}</Text>
+
+            <Text style={[styles.modalSubtitle, { fontSize: 24, color: isSuccess ? theme.colors.success : theme.colors.danger }]}>
+              {isSuccess ? 'JUST MARRIED!' : 'REJECTED'}
+            </Text>
+
+            <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 16 }}>
+              {proposalResult.message}
+            </Text>
+
+            <Pressable style={[styles.actionButton, { backgroundColor: theme.colors.cardSoft, width: '100%' }]} onPress={closeProposal}>
+              <Text style={styles.actionButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        );
+      }
+
+      // STEP 2: PRENUP DECISION
+      if (proposalStep === 2) {
+        return (
+          <View style={{ gap: 16, padding: 10 }}>
+            <Text style={{ fontSize: 50, textAlign: 'center' }}>😲</Text>
+            <Text style={[styles.modalSubtitle, { textAlign: 'center' }]}>She Said YES! (Kind of...)</Text>
+
+            <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
+              She is emotional and waiting for the ring. This is your moment.
+              {"\n\n"}
+              <Text style={{ fontWeight: 'bold', color: theme.colors.accent }}>Do you want to ask for a Prenup?</Text>
+              {"\n"}
+              (Protects assets, but might offend her)
+            </Text>
+
+            <Pressable
+              style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
+              onPress={() => onDecidePrenup(true)}>
+              <Text style={[styles.actionButtonText, { color: '#FFF' }]}>📝 Sign Prenup (Risk)</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.actionButton, { backgroundColor: theme.colors.success }]}
+              onPress={() => onDecidePrenup(false)}>
+              <Text style={[styles.actionButtonText, { color: '#000' }]}>❤️ No Prenup (Trust)</Text>
+            </Pressable>
+          </View>
+        );
+      }
+
+      // STEP 1: PICKER (Default)
+      const cycleLocation = (direction: 'prev' | 'next') => {
+        if (direction === 'prev') {
+          setSelectedLocationIndex(prev => (prev === 0 ? PROPOSAL_LOCATIONS.length - 1 : prev - 1));
+        } else {
+          setSelectedLocationIndex(prev => (prev === PROPOSAL_LOCATIONS.length - 1 ? 0 : prev + 1));
+        }
+      };
+
+      return (
+        <View style={{ gap: 16 }}>
+          <Text style={styles.modalSubtitle}>Plan Proposal</Text>
+
+          {/* Location Picker */}
+          <View style={styles.locationPicker}>
+            <Pressable onPress={() => cycleLocation('prev')} style={styles.arrowButton}>
+              <Text style={styles.arrowText}>←</Text>
+            </Pressable>
+            <View style={styles.locationInfo}>
+              <Text style={styles.locationName}>{location.name}</Text>
+              <Text style={[styles.locationCost, !canAfford && { color: theme.colors.danger }]}>
+                ${location.cost.toLocaleString()}
+              </Text>
+              <Text style={styles.locationBonus}>
+                Success Bonus: +{location.bonus}%
+              </Text>
+            </View>
+
+            <Pressable onPress={() => cycleLocation('next')} style={styles.arrowButton}>
+              <Text style={styles.arrowText}>→</Text>
+            </Pressable>
+          </View>
+
+
+          {/* Ring Check */}
+          <View style={[styles.actionButton, { justifyContent: 'space-between', backgroundColor: hasEngagementRing ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)' }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 18 }}>💍</Text>
+              <Text style={styles.actionButtonText}>
+                {hasEngagementRing ? "Ring Ready" : "No Ring"}
+              </Text>
+            </View>
+
+            {!hasEngagementRing && (
+              <Pressable
+                style={styles.smallButton}
+                // @ts-ignore
+                onPress={() => { closeModal(); navigation.navigate('Assets', { screen: 'Shopping' }); }}
+              >
+                <Text style={styles.smallButtonText}>Go Shopping</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {/* Action Button */}
+          <Pressable
+            style={[
+              styles.actionButton,
+              { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && hasEngagementRing) ? 1 : 0.5 }
+            ]}
+            onPress={onStartProposal}>
+            <Text style={[styles.actionButtonText, { color: '#000', fontWeight: '800', letterSpacing: 1 }]}>
+              PROPOSE ❤️
+            </Text>
           </Pressable>
 
           <Pressable style={[styles.actionButton, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]} onPress={() => setSubmenu(null)}>
             <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>Back</Text>
           </Pressable>
-        </View>
+        </View >
       );
     }
 
@@ -359,10 +627,12 @@ const LoveScreen = () => {
           </Pressable>
         ))}
 
-        {/* Special Propose Button */}
-        <Pressable style={[styles.actionButton, { backgroundColor: theme.colors.cardSoft, borderWidth: 1, borderColor: theme.colors.accent }]} onPress={() => handlePartnerAction('Propose')}>
-          <Text style={[styles.actionButtonText, { color: theme.colors.accent }]}>💍 Propose</Text>
-        </Pressable>
+        {/* Special Propose Button - Only if not married */}
+        {!partner.isMarried && (
+          <Pressable style={[styles.actionButton, { backgroundColor: theme.colors.cardSoft, borderWidth: 1, borderColor: theme.colors.accent }]} onPress={() => handlePartnerAction('Propose')}>
+            <Text style={[styles.actionButtonText, { color: theme.colors.accent }]}>💍 Propose</Text>
+          </Pressable>
+        )}
       </View>
     );
   };
@@ -583,7 +853,7 @@ const LoveScreen = () => {
                     <Text style={styles.listName}>{ex.name}</Text>
                   </View>
                   <View style={styles.listBarTrack}>
-                    <View style={[styles.listBarFill, { width: `${ex.relationship}%`, backgroundColor: theme.colors.textMuted }]} />
+                    <View style={[styles.listBarFill, { width: `${ex.love}%`, backgroundColor: theme.colors.textMuted }]} />
                   </View>
                 </View>
               </Pressable>
@@ -616,6 +886,33 @@ const LoveScreen = () => {
         {modalType === 'ex' && renderExModalContent()}
 
       </InteractionModal>
+
+      {/* ENCOUNTER MODAL (CINEMATIC) */}
+      <EncounterModal
+        visible={isEncounterVisible}
+        candidate={encounterCandidate}
+        scenario={currentScenario}
+        context={currentScenario?.id.split('_')[0] || 'Unknown'}
+        onDate={handleDate}
+        onHookup={() => {
+          Alert.alert("Fling", "You had a great night! (Stress -10)");
+          // TODO: Implement hookup logic (stress reduction, etc.)
+          closeEncounter();
+        }}
+        onIgnore={closeEncounter}
+      />
+
+      {/* BREAKUP MODAL (HIGHEST PRIORITY) */}
+      {cheatingConsequence && (
+        <BreakupModal
+          visible={!!cheatingConsequence}
+          onClose={clearConsequence}
+          partnerName={cheatingConsequence.partnerName}
+          settlementCost={cheatingConsequence.settlement}
+        />
+      )}
+
+
     </SafeAreaView>
   );
 };
@@ -798,7 +1095,31 @@ const styles = StyleSheet.create({
   listNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
+  },
+
+  // Exploration Places
+  placeCard: {
+    width: 100,
+    height: 110,
+    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  placeIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   listName: {
     color: theme.colors.textPrimary,
@@ -896,5 +1217,59 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
     fontSize: 14,
+  },
+
+  // Proposal Specific
+  locationPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: theme.colors.card,
+    borderRadius: 12,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  arrowButton: {
+    padding: 12,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: 8,
+  },
+  arrowText: {
+    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  locationInfo: {
+    alignItems: 'center',
+    gap: 4,
+    flex: 1,
+  },
+  locationName: {
+    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  locationCost: {
+    color: theme.colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  locationBonus: {
+    color: theme.colors.accent,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  smallButton: {
+    backgroundColor: theme.colors.accent,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  smallButtonText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '700',
   }
 });
