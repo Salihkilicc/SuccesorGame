@@ -144,14 +144,26 @@ export const useEncounterSystem = () => {
     // --- 2. Trigger Encounter ---
     const triggerEncounter = useCallback((context: string, countryId?: string): boolean => {
         // 0. Probability Check (Internal)
-        let chance = 40; // Default 40%
-        if (context === 'gym') chance = 60;
-        if (context === 'club') chance = 50;
-        if (context === 'travel' || countryId) chance = 70;
+        let chance = 10; // Default 10% (Generic)
 
-        const isSuccess = Math.random() * 100 < chance;
+        switch (context) {
+            case 'gym':
+            case 'shopping':
+                chance = 5; // Very Rare - Don't interrupt gameplay often
+                break;
+            case 'club':
+                chance = 50; // High - Socializing is the point
+                break;
+        }
 
-        if (!isSuccess) {
+        if (context === 'travel' || countryId) {
+            chance = 60; // Very High - Vacation romance
+        }
+
+        const roll = Math.random() * 100;
+        console.log(`[Encounter] Context: ${context}, Chance: ${chance}%, Roll: ${roll.toFixed(1)}`);
+
+        if (roll > chance) {
             return false;
         }
 
