@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store/useStatsStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 
@@ -10,7 +11,7 @@ type SunStudioModalProps = {
     onClose: () => void;
     handleServicePurchase: (
         cost: number,
-        statUpdates: Partial<typeof useStatsStore.getState>,
+        statUpdates: Record<string, number>,
         resultTitle: string,
         resultMessage: string,
         displayStats: { label: string; value: string; isPositive: boolean }[]
@@ -32,7 +33,7 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                     onPress={() => {
                         handleServicePurchase(
                             100,
-                            { charisma: useStatsStore.getState().charisma + 2 },
+                            { charisma: usePlayerStore.getState().attributes.charm + 2 },
                             'SPRAY TAN',
                             'You look glowing and ready for summer.',
                             [{ label: 'Charisma', value: '+2', isPositive: true }]
@@ -51,14 +52,16 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                     style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
                     onPress={() => {
                         const burned = Math.random() < 0.1;
-                        const currentStats = useStatsStore.getState();
+                        const player = usePlayerStore.getState();
+                        const currentCharm = player.attributes.charm;
+                        const currentHealth = player.core.health;
 
                         if (burned) {
                             handleServicePurchase(
                                 250,
                                 {
-                                    charisma: currentStats.charisma - 2,
-                                    health: currentStats.health - 1
+                                    charisma: currentCharm - 2,
+                                    health: currentHealth - 1
                                 },
                                 'SKIN BURN!',
                                 'The UV bed was too intense. You look red and painful.',
@@ -70,7 +73,7 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                         } else {
                             handleServicePurchase(
                                 250,
-                                { charisma: currentStats.charisma + 5 },
+                                { charisma: currentCharm + 5 },
                                 'DEEP BRONZE',
                                 'Perfect, deep tan achieved. You look amazing.',
                                 [{ label: 'Charisma', value: '+5', isPositive: true }]

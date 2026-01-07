@@ -4,18 +4,13 @@ import { zustandStorage } from '../storage/persist';
 import { useProductStore } from './useProductStore';
 
 export type StatKey =
-  | 'charisma'
-  | 'reputation'
-  | 'health'
-  | 'stress'
-  | 'love'
   | 'money'
   | 'netWorth'
   | 'monthlyIncome'
   | 'monthlyExpenses'
-  | 'luck'
-  | 'riskApetite'
-  | 'strategicSense'
+  | 'netWorth'
+  | 'monthlyIncome'
+  | 'monthlyExpenses'
   | 'companyDebt'
   | 'companyDebtTotal'
   | 'companyOwnership'
@@ -120,18 +115,10 @@ const FACTORY_COST_MONTHLY = 50_000;
 const BASE_SHARES = 10_000_000;
 
 export const initialStatsState: StatsState = {
-  charisma: 50,
-  reputation: 50,
-  health: 75,
-  stress: 20,
-  love: 65,
   money: 450_000,
   netWorth: 15000,
   monthlyIncome: 0,
   monthlyExpenses: 0,
-  luck: 55,
-  riskApetite: 60,
-  strategicSense: 60,
   companyDebt: 0,
   companyDebtTotal: 0,
   companyOwnership: 72,
@@ -605,14 +592,8 @@ export const useStatsStore = create<StatsStore>()(
       partialize: state => ({
         money: state.money,
         netWorth: state.netWorth,
-        charisma: state.charisma,
-        health: state.health,
-        stress: state.stress,
-        luck: state.luck,
         monthlyIncome: state.monthlyIncome,
         monthlyExpenses: state.monthlyExpenses,
-        riskApetite: state.riskApetite,
-        strategicSense: state.strategicSense,
         companyValue: state.companyValue,
         companyDebt: state.companyDebt,
         companyDebtTotal: state.companyDebtTotal,

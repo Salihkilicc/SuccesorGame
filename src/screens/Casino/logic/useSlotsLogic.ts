@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useStatsStore } from '../../../store'; // Store yolunu kontrol et
+import { useStatsStore, usePlayerStore } from '../../../store'; // Store yolunu kontrol et
 import { useCasinoGame } from '../../../hooks/useCasinoGame'; // Mevcut hook'un
 import { SLOT_CONFIG, SlotVariant, SlotConfig } from './slotsData';
 
@@ -16,8 +16,10 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 export const useSlotsLogic = (variant: SlotVariant, initialBet?: number) => {
   const config = SLOT_CONFIG[variant];
-  const { casinoReputation, setCasinoReputation, luck, money } = useStatsStore();
-  
+  const { casinoReputation, setCasinoReputation, money } = useStatsStore();
+  const { hidden } = usePlayerStore();
+  const luck = hidden.luck;
+
   // Mevcut hook'u kullanıyoruz (RNG ve bakiye kontrolü için)
   const { playRound, lastResult, clearResult } = useCasinoGame();
 
@@ -27,7 +29,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [message, setMessage] = useState('Ready to spin');
   const [showResult, setShowResult] = useState(false);
-  
+
   const lossStreak = useRef(0);
 
   // Variant değişirse grid'i sıfırla
@@ -76,7 +78,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number) => {
     // 1. Mantıksal Oynama (Logic)
     const odds = 0.3 + (luck / 200);
     const { success, result } = playRound(bet, odds, 3); // 3x payout generic
-    
+
     if (!success || !result) return; // Bakiye yetersizse çık
 
     // 2. Animasyon Başlat

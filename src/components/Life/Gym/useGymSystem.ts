@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useStatsStore } from '../../../store/useStatsStore';
 import { useUserStore } from '../../../store/useUserStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 import { Alert } from 'react-native';
 
 // --- TYPES ---
@@ -34,8 +35,11 @@ export type WorkoutResult = {
 };
 
 export const useGymSystem = () => {
-    const { money, health, stress, charisma, spendMoney, update: updateStats } = useStatsStore();
+    const { money, spendMoney, update: updateStats } = useStatsStore();
     const { gymState, updateGymState } = useUserStore();
+    const { core, attributes, updateCore, updateAttribute } = usePlayerStore();
+    const { health, stress } = core;
+    const charisma = attributes.charm;
 
     // --- MODAL VISIBILITY ---
     const [membershipModalVisible, setMembershipModalVisible] = useState(false);
@@ -142,11 +146,10 @@ export const useGymSystem = () => {
         dStatus *= tierMult;
 
         // Update State
-        updateStats({
-            health: Math.min(100, Math.max(0, health + dHealth)),
-            stress: Math.max(0, stress + dStress),
-            charisma: Math.min(100, charisma + dCharisma)
-        });
+        // Update State
+        updateCore('health', health + dHealth);
+        updateCore('stress', stress + dStress);
+        updateAttribute('charm', charisma + dCharisma);
 
         updateGymState({
             gymStatus: Math.min(100, gymState.gymStatus + dStatus)
@@ -162,7 +165,7 @@ export const useGymSystem = () => {
 
         setWorkoutInProgress(false);
         setResultModalVisible(true);
-    }, [health, stress, charisma, gymState, updateStats, updateGymState]);
+    }, [health, stress, charisma, gymState, updateStats, updateGymState, updateCore, updateAttribute]);
 
     const startFitnessWorkout = useCallback((type: string, config: any) => {
         setFitnessConfigVisible(false);
@@ -194,7 +197,7 @@ export const useGymSystem = () => {
         const dStrength = 2;
         const dCharisma = promoted ? 5 : 1;
 
-        updateStats({ charisma: Math.min(100, charisma + dCharisma) });
+        updateAttribute('charm', charisma + dCharisma);
         const newMartialArts = { ...gymState.martialArts, [discipline]: newLevel };
         updateGymState({
             martialArts: newMartialArts,
@@ -213,7 +216,7 @@ export const useGymSystem = () => {
 
         setWorkoutInProgress(false);
         setResultModalVisible(true);
-    }, [gymState, charisma, updateStats, updateGymState]);
+    }, [gymState, charisma, updateStats, updateGymState, updateAttribute]);
 
     const startMartialArtsTraining = useCallback((discipline: MartialArtDiscipline) => {
         setWorkoutInProgress(true);

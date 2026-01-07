@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStatsStore } from '../../../store/useStatsStore';
 import { useEventStore } from '../../../store/useEventStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 
 export type SanctuaryResult = {
     title: string;
@@ -43,7 +44,7 @@ export const useSanctuarySystem = () => {
     // --- Universal Service Handler ---
     const handleServicePurchase = (
         cost: number,
-        statUpdates: Partial<typeof useStatsStore.getState>,
+        statUpdates: Record<string, number>,
         resultTitle: string,
         resultMessage: string,
         displayStats: { label: string; value: string; isPositive: boolean }[]
@@ -67,7 +68,15 @@ export const useSanctuarySystem = () => {
         // OR we stick to specific methods wrapping this handler. 
 
         // Better approach: Caller determines "Start Grooming" -> Calculates new stats -> Calls this.
-        updateStats({ ...statUpdates, money: newMoney });
+        updateStats({ money: newMoney });
+
+        // Handle Player Stats Updates (Health, Stress, Charisma->Charm)
+        const playerStore = usePlayerStore.getState();
+        Object.entries(statUpdates).forEach(([key, value]) => {
+            if (key === 'health') playerStore.updateCore('health', value);
+            if (key === 'stress') playerStore.updateCore('stress', value);
+            if (key === 'charisma') playerStore.updateAttribute('charm', value);
+        });
 
         // 2. Prepare Result Data
         setResultData({

@@ -1,8 +1,9 @@
-import {ACHIEVEMENTS} from './achievements';
-import {useStatsStore} from '../store/useStatsStore';
-import {useUserStore} from '../store/useUserStore';
-import {useGameStore} from '../store/useGameStore';
-import {useAchievementStore} from '../store/useAchievementStore';
+import { ACHIEVEMENTS } from './achievements';
+import { useStatsStore } from '../store/useStatsStore';
+import { useUserStore } from '../store/useUserStore';
+import { useGameStore } from '../store/useGameStore';
+import { useAchievementStore } from '../store/useAchievementStore';
+import { usePlayerStore } from '../store/usePlayerStore';
 
 const getAchievementById = (id: string) => ACHIEVEMENTS.find(a => a.id === id);
 
@@ -11,6 +12,7 @@ export function checkAllAchievementsAfterStateChange() {
   const user = useUserStore.getState();
   const game = useGameStore.getState();
   const achievementStore = useAchievementStore.getState();
+  const player = usePlayerStore.getState();
 
   const unlock = (id: string) => {
     const achievement = getAchievementById(id);
@@ -28,7 +30,11 @@ export function checkAllAchievementsAfterStateChange() {
 
   if (user.partner && user.partner.love >= 80) unlock('love_001');
 
-  if (stats.charisma >= 70 && stats.health >= 70 && stats.luck >= 70) {
+  const { charm } = player.attributes;
+  const { health } = player.core;
+  const { luck } = player.hidden;
+
+  if (charm >= 70 && health >= 70 && luck >= 70) {
     unlock('meta_002');
   }
 

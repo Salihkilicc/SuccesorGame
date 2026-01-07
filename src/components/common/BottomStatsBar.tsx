@@ -1,7 +1,7 @@
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {useStatsStore} from '../../store/useStatsStore';
-import {theme} from '../../theme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { usePlayerStore } from '../../store/usePlayerStore';
+import { theme } from '../../theme';
 
 type StatPillProps = {
   label: string;
@@ -13,7 +13,7 @@ type BottomStatsBarProps = {
   onHomePress?: () => void;
 };
 
-const StatPill = ({label, value, color}: StatPillProps) => {
+const StatPill = ({ label, value, color }: StatPillProps) => {
   const clamped = Math.max(0, Math.min(100, Math.round(value)));
   return (
     <View style={styles.pill}>
@@ -22,21 +22,23 @@ const StatPill = ({label, value, color}: StatPillProps) => {
         <Text style={styles.pillValue}>{clamped}%</Text>
       </View>
       <View style={styles.track}>
-        <View style={[styles.fill, {width: `${clamped}%`, backgroundColor: color}]} />
+        <View style={[styles.fill, { width: `${clamped}%`, backgroundColor: color }]} />
       </View>
     </View>
   );
 };
 
-const BottomStatsBar = ({onHomePress}: BottomStatsBarProps) => {
-  const {health, stress, charisma} = useStatsStore();
+const BottomStatsBar = ({ onHomePress }: BottomStatsBarProps) => {
+  const { core, attributes } = usePlayerStore();
+  const { health, stress } = core;
+  const charisma = attributes.charm;
 
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         <Pressable
           onPress={onHomePress}
-          style={({pressed}) => [styles.homeButton, pressed && styles.homeButtonPressed]}>
+          style={({ pressed }) => [styles.homeButton, pressed && styles.homeButtonPressed]}>
           <Text style={styles.homeIcon}>🏠</Text>
         </Pressable>
         <StatPill label="Health" value={health} color={theme.colors.success} />
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
   },
   homeButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.97}],
+    transform: [{ scale: 0.97 }],
   },
   homeIcon: {
     fontSize: 20,

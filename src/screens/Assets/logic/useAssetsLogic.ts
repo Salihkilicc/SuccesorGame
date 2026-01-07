@@ -1,7 +1,10 @@
-import { useStatsStore, useEventStore, useUserStore, useMarketStore } from '../../../store';
+import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore } from '../../../store';
 
 export const useAssetsLogic = () => {
-    const { netWorth, money, monthlyIncome, monthlyExpenses, riskApetite, strategicSense } = useStatsStore();
+    const { netWorth, money, monthlyIncome, monthlyExpenses } = useStatsStore();
+    const { personality, attributes } = usePlayerStore();
+    const riskApetite = personality.riskAppetite;
+    const strategicSense = attributes.intellect;
     const { lastMarketEvent } = useEventStore();
     const { inventory } = useUserStore();
     const { holdings } = useMarketStore();

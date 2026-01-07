@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { useStatsStore } from '../../store';
+import { useStatsStore, usePlayerStore } from '../../store';
 import type { RoomId } from './RoomSelector';
 import { theme } from '../../theme';
 import GameModal from '../common/GameModal';
@@ -21,7 +21,11 @@ const MIN_BETS: Record<RoomId, number> = {
 };
 
 const BetModal = ({ visible, roomId, onClose, onBetResult }: BetModalProps) => {
-  const { money, luck, riskApetite, setField } = useStatsStore();
+  const { money, setField } = useStatsStore();
+  const { hidden, personality } = usePlayerStore();
+  const luck = hidden.luck;
+  const riskApetite = personality.riskAppetite;
+
   const minBet = useMemo(() => (roomId ? MIN_BETS[roomId] : 0), [roomId]);
 
   const handleBet = (multiplier: number) => {

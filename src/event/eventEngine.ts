@@ -1,4 +1,4 @@
-import {useEventStore, useStatsStore, useUserStore} from '../store';
+import { useEventStore, useStatsStore, useUserStore, usePlayerStore } from '../store';
 import {
   lifeEvents,
   loveEvents,
@@ -7,8 +7,8 @@ import {
   casinoEvents,
   type GameEvent,
 } from './eventTemplates';
-import {buildAIEvent} from './aiEventBuilder';
-import {checkAllAchievementsAfterStateChange} from '../achievements/checker';
+import { buildAIEvent } from './aiEventBuilder';
+import { checkAllAchievementsAfterStateChange } from '../achievements/checker';
 
 export type EventType = GameEvent['category'];
 
@@ -39,29 +39,44 @@ const getRandomEvent = (pool: GameEvent[], category: EventType): GameEvent => {
 };
 
 export const applyEventEffects = (event: GameEvent) => {
-  const {effects = {}} = event;
+  const { effects = {} } = event;
   const stats = useStatsStore.getState();
-  const {setField} = useStatsStore.getState();
+  const { setField } = useStatsStore.getState();
+
+  /* PLAYER STATS REFACTOR */
+  const playerStore = usePlayerStore.getState();
 
   if (typeof effects.money === 'number') {
     setField('money', stats.money + effects.money);
   }
   if (typeof effects.health === 'number') {
-    setField('health', stats.health + effects.health);
+    const current = playerStore.core.health;
+    playerStore.updateCore('health', current + effects.health);
   }
   if (typeof effects.stress === 'number') {
-    setField('stress', stats.stress + effects.stress);
+    const current = playerStore.core.stress;
+    playerStore.updateCore('stress', current + effects.stress);
   }
   if (typeof effects.charisma === 'number') {
-    setField('charisma', stats.charisma + effects.charisma);
+    const current = playerStore.attributes.charm;
+    playerStore.updateAttribute('charm', current + effects.charisma);
   }
   if (typeof effects.reputation === 'number') {
-    const next = clamp(stats.reputation + effects.reputation);
-    setField('reputation', next);
+    const current = playerStore.reputation.business;
+    playerStore.updateReputation('business', current + effects.reputation);
   }
   if (typeof effects.love === 'number') {
-    const next = clamp(stats.love + effects.love);
-    setField('love', next);
+    // Only update if we have a partner
+    const userStore = useUserStore.getState();
+    const partner = userStore.partner;
+    if (partner) {
+      const current = partner.love;
+      const next = clamp(current + effects.love);
+      // We need to manually update the partner object inside userStore
+      useUserStore.setState({
+        partner: { ...partner, love: next }
+      });
+    }
   }
   if (typeof effects.companyValue === 'number') {
     setField('companyValue', stats.companyValue + effects.companyValue);
@@ -95,7 +110,7 @@ export const applyEventEffects = (event: GameEvent) => {
 export const triggerEvent = async (type: EventType): Promise<GameEvent> => {
   const shouldAI = Math.random() < 0.3;
   const pool = pools[type] ?? [];
-  const {hasPremium} = useUserStore.getState();
+  const { hasPremium } = useUserStore.getState();
   const eventObj = shouldAI
     ? await buildAIEvent(type, useStatsStore.getState(), hasPremium)
     : getRandomEvent(pool, type);

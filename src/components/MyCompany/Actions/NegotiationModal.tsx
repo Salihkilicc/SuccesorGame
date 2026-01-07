@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'rea
 import { theme } from '../../../theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
 import { useStatsStore } from '../../../store/useStatsStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
@@ -18,7 +19,9 @@ type Props = {
 const formatMoney = (val: number) => `$${(val / 1e9).toFixed(2)}B`;
 
 const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
-    const { companyCapital, shareholders, reputation, addAcquisition, setField } = useStatsStore();
+    const { companyCapital, shareholders, addAcquisition, setField } = useStatsStore();
+    const { reputation: playerRep } = usePlayerStore();
+    const reputation = playerRep.business;
 
     // States
     const [offerAmount, setOfferAmount] = useState('');
@@ -138,11 +141,11 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
             <View style={{ minHeight: 350 }}>
                 {status === 'initial' && (
                     <View style={styles.content}>
-                        <SectionCard 
+                        <SectionCard
                             title="Valuation (Market Cap)"
                             rightText={formatMoney(company.marketCap)}
                         />
-                        <SectionCard 
+                        <SectionCard
                             title="Asking Price (Inc. Premium)"
                             rightText={formatMoney(askingPrice)}
                             style={{ borderColor: theme.colors.accent }}
@@ -164,7 +167,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                             Cash Available: {formatMoney(companyCapital)}
                         </Text>
 
-                        <GameButton 
+                        <GameButton
                             title="Submit Offer to Board"
                             onPress={handleSubmitOffer}
                             style={{ marginTop: 8 }}
@@ -195,8 +198,8 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                         <Text style={styles.icon}>❌</Text>
                         <Text style={[styles.statusTitle, { color: theme.colors.danger }]}>Offer Failed</Text>
                         <Text style={styles.statusDesc}>{statusMessage}</Text>
-                        
-                        <GameButton 
+
+                        <GameButton
                             title="Adjust Offer"
                             onPress={() => setStatus('initial')}
                             variant="secondary"

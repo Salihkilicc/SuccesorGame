@@ -4,13 +4,24 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { theme } from '../../theme';
 import { useShopLogic, ShopItem } from './logic/useShopLogic'; // Yeni Hook
 import { ShopHeader, ShopItemCard } from './components/ShopUI'; // Yeni UI
+import { useEncounterSystem } from '../../components/Love/useEncounterSystem';
+import { EncounterModal } from '../../components';
 
 const ShopDetailScreen = () => {
     const route = useRoute<any>();
     const navigation = useNavigation();
     const { shopId } = route.params;
 
-    const { shop, money, handleBuy, checkIfOwned, formatMoney } = useShopLogic(shopId);
+    const {
+        isVisible: isEncounterVisible,
+        currentScenario,
+        candidate,
+        triggerEncounter,
+        handleDate,
+        closeEncounter
+    } = useEncounterSystem();
+
+    const { shop, money, handleBuy, checkIfOwned, formatMoney, getDiscountedPrice, discountPercent } = useShopLogic(shopId, triggerEncounter);
 
     if (!shop) {
         return (
@@ -37,15 +48,30 @@ const ShopDetailScreen = () => {
                 keyExtractor={item => item.id}
                 renderItem={({ item }: { item: ShopItem }) => (
                     <ShopItemCard
-                        item={item}
                         isOwned={checkIfOwned(item.id)}
                         onBuy={() => handleBuy(item)}
                         formatMoney={formatMoney}
+                        // Apply discount and show it by modifying item
+                        item={{ ...item, price: getDiscountedPrice(item.price) }}
                     />
                 )}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
                 ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+            />
+
+            {/* ENCOUNTER MODAL */}
+            <EncounterModal
+                visible={isEncounterVisible}
+                candidate={candidate}
+                scenario={currentScenario}
+                context="shopping"
+                onDate={handleDate}
+                onHookup={() => {
+                    // Simple feedback for hookup in shopping context (store clerk?)
+                    closeEncounter();
+                }}
+                onIgnore={closeEncounter}
             />
         </SafeAreaView>
     );

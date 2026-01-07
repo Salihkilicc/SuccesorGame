@@ -14,7 +14,8 @@ interface ProductLaunchModalProps {
 export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible, product, onClose, onLaunchComplete }) => {
     const [step, setStep] = useState(1);
     const [analysisData, setAnalysisData] = useState<any>(null);
-    const { performMarketAnalysis, launchProduct } = useProductsLogic();
+    const { actions } = useProductsLogic();
+    const { performMarketAnalysis, launchProduct } = actions;
 
     useEffect(() => {
         if (visible) {

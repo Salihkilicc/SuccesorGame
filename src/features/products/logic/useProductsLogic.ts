@@ -44,35 +44,39 @@ export const useProductsLogic = () => {
         setAnalysisData(null);
     };
 
-    const performMarketAnalysis = () => {
-        if (!selectedProduct) return;
-        setAnalysisData(selectedProduct);
+    const performMarketAnalysis = (product?: Product) => {
+        const target = product || selectedProduct;
+        if (!target) return;
+        setAnalysisData(target);
+        return target; // Return data for caller
     };
 
-    const launchProduct = () => {
-        if (!selectedProduct) return;
+    const launchProduct = (product?: Product) => {
+        const target = product || selectedProduct;
+        if (!target) return false;
 
-        const currentProduct = products.find((p: Product) => p.id === selectedProduct.id);
+        const currentProduct = products.find((p: Product) => p.id === target.id);
         if (currentProduct?.status === 'active') {
             Alert.alert('Already Active', 'This product is already on the market.');
-            return;
+            return false;
         }
 
-        if (researchPoints < selectedProduct.rndCost) {
-            Alert.alert('Insufficient R&D', `You need ${selectedProduct.rndCost} Research Points.`);
-            return;
+        if (researchPoints < target.rndCost) {
+            Alert.alert('Insufficient R&D', `You need ${target.rndCost} Research Points.`);
+            return false;
         }
 
-        updateProduct(selectedProduct.id, {
+        updateProduct(target.id, {
             status: 'active',
-            sellingPrice: selectedProduct.suggestedPrice,
-            marketingBudget: 5000,
-            productionLevel: selectedProduct.marketDemand,
+            sellingPrice: target.suggestedPrice,
+            marketingSpendPerUnit: 10, // Default start
+            productionLevel: 50, // Default 50%
             supplierId: 'local'
         });
 
-        Alert.alert('🚀 Launch Successful', `${selectedProduct.name} is now on the market!`);
+        Alert.alert('🚀 Launch Successful', `${target.name} is now on the market!`);
         closeModal();
+        return true;
     };
 
     const updateProductSettings = (id: string, updates: Partial<Product>) => {

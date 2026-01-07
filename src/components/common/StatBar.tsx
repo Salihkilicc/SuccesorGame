@@ -1,7 +1,8 @@
 import React from 'react';
-import {StyleSheet, Text, View, StyleProp, ViewStyle} from 'react-native';
-import {useStatsStore} from '../../store/useStatsStore';
-import {theme} from '../../theme';
+import { StyleSheet, Text, View, StyleProp, ViewStyle } from 'react-native';
+import { useStatsStore } from '../../store/useStatsStore';
+import { usePlayerStore } from '../../store/usePlayerStore';
+import { theme } from '../../theme';
 
 type StatBarProps = {
   style?: StyleProp<ViewStyle>;
@@ -30,18 +31,21 @@ const formatMoney = (value: number) => {
   return value.toLocaleString();
 };
 
-const StatItem = ({icon, label, value, accent}: StatItemProps) => (
+const StatItem = ({ icon, label, value, accent }: StatItemProps) => (
   <View style={styles.item}>
     <Text style={styles.icon}>{icon}</Text>
     <View style={styles.textGroup}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, accent ? {color: accent} : null]}>{value}</Text>
+      <Text style={[styles.value, accent ? { color: accent } : null]}>{value}</Text>
     </View>
   </View>
 );
 
-const StatBar = ({style}: StatBarProps) => {
-  const {money, health, stress, charisma} = useStatsStore();
+const StatBar = ({ style }: StatBarProps) => {
+  const { money } = useStatsStore();
+  const { core, attributes } = usePlayerStore();
+  const { health, stress } = core;
+  const charisma = attributes.charm;
 
   return (
     <View style={[styles.container, style]}>

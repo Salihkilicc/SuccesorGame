@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useStatsStore } from '../../../store/useStatsStore';
 import { useUserStore, InventoryItem } from '../../../store/useUserStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 import { Alert } from 'react-native';
 
 export type NightOutClub = {
@@ -34,6 +35,7 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     // Store access
     const { money, update: updateStats } = useStatsStore();
     const { inventory } = useUserStore();
+    const { updateCore, updateAttribute, core, attributes } = usePlayerStore();
 
     // Filter Aircrafts
     const aircrafts = useMemo(() => {
@@ -72,10 +74,12 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         // 1. Deduct Money & Update Stats
         updateStats({
             money: money - totalCost,
-            stress: Math.max(0, useStatsStore.getState().stress - 15),
-            health: Math.max(0, useStatsStore.getState().health - 5),
-            charisma: Math.min(100, useStatsStore.getState().charisma + 5),
         });
+
+        // Update Player Stats
+        updateCore('stress', Math.max(0, core.stress - 15));
+        updateCore('health', Math.max(0, core.health - 5));
+        updateAttribute('charm', Math.min(100, attributes.charm + 5));
 
         setSetupModalVisible(false);
 

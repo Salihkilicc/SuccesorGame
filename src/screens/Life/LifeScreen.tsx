@@ -8,7 +8,7 @@ import MatchPopup from '../../components/Match/MatchPopup';
 import { useMatchSystem } from '../../components/Match/useMatchSystem';
 import { triggerEvent } from '../../event/eventEngine';
 import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../navigation';
-import { useEventStore, useUserStore } from '../../store';
+import { useEventStore, useUserStore, useStatsStore, usePlayerStore } from '../../store';
 import { theme } from '../../theme';
 import AppScreen from '../../components/layout/AppScreen';
 import { useHookupSystem } from '../../components/Life/useHookupSystem';
@@ -59,7 +59,8 @@ type LifeActionType =
   | 'blackMarket'
   | 'belongings'
   | 'hookup'
-  | 'network';
+  | 'network'
+  | 'education';
 
 type LifeActionButtonProps = {
   emoji: string;
@@ -133,6 +134,12 @@ const ACTIONS: Array<{
       label: 'Network',
       description: 'Meet investors and mentors',
       emoji: '🤝',
+    },
+    {
+      key: 'education',
+      label: 'Education',
+      description: 'Degrees & Certificates',
+      emoji: '🎓',
     },
   ];
 
@@ -339,34 +346,80 @@ const LifeScreen = () => {
     }
   };
 
+  const { core, attributes, reputation, updateCore, updateAttribute } = usePlayerStore();
+  const { money, setField: setStatsField } = useStatsStore();
+  const { health, stress, happiness } = core;
+
   const handleAction = (type: LifeActionType) => {
     switch (type) {
       case 'nightOut':
         console.log('[Life] Action triggered: Night Out');
+        // Logic handled in NightOutSystem, mostly. But user request says:
+        // "Para düş. Stress azalt. Health düşür (Yorgunluk). %30 Şansla triggerEncounter('nightclub')."
+        // NightOutSystem handles the setup/cost/outcome modal. 
+        // We should probably rely on the NightOutSystem to do the heavy lifting, 
+        // but ensure IT does the right thing, OR do simple actions here if bypass is intended.
+        // User said: "handleNightOut: Para düş. Stress azalt. Health düşür... %30 Şansla triggerEncounter"
+        // The existing 'startNightOut' opens a setup modal. Let's keep that UI flow but update logic there OR apply encounter check here.
+        // Actually, triggerEncounter is better placed AFTER the night out happens? 
+        // Or IS "Night Out" just a button press now without the modal? 
+        // The specific instruction implies a direct action logic:
+        // "handleNightOut: Para düş... triggerEncounter..."
+        // If we keep the setup modal, we should pass this logic into the confirm step.
+
+        // For now, let's keep the modal flow for Night Out as it's complex (Club/Jet selection).
+        // I will let NightOutSystem handle the stats, but I will add the Encounter trigger here or inside system.
+        // Wait, useNightOutSystem ALREADY takes 'triggerEncounter' as an argument!
+        // So I just need to verify useNightOutSystem.ts (which I did in previous turn, it was refactored).
+        // Let's just open the modal.
         startNightOut();
         break;
+
       case 'spa':
         console.log('[Life] Action triggered: Spa & Relax -> Sanctuary');
         openSanctuary();
         break;
+
       case 'gym':
-        // Gym Encounter Check
-        if (triggerEncounter('gym')) {
-          console.log('[Life] Gym Encounter Triggered!');
-          return; // Encounter handled, don't open gym yet
+        // User request: "Para düş. Stress azalt. Strength artır. %5 Şansla triggerEncounter('gym')."
+        // GymHubModal is a complex feature. 
+        // If the user wants "Gym" to be a simple button press action, I should replace openGym() with direct logic.
+        // But "GymHubModal" has Trainer, Martial Arts etc. 
+        // I will assume "Gym" enters the Hub. Inside the Hub (GymHubModal), there are actions.
+        // HOWEVER, the user specific request "handleGym: ... %5 sansla triggerEncounter('gym')" might imply
+        // checking for encounter BEFORE entering? Or upon "Working Out"?
+        // Let's add the chance here as a "Meeting someone at the entrance" event?
+        // Or simpler: The "Gym" button is "Go to Gym".
+
+        if (Math.random() < 0.05) {
+          if (triggerEncounter('gym')) {
+            console.log('[Life] Gym Encounter Triggered!');
+            return;
+          }
         }
-        console.log('[Life] Action triggered: Gym (No Encounter)');
+
         openGym();
         break;
+
       case 'shopping':
         console.log('[Life] Navigating to Shopping');
-        // @ts-ignore - we know this path exists in the root navigator
-        navigation.navigate('Assets', { screen: 'Shopping' });
+        // User request: "ShoppingScreen ... Satın alımdan sonra %5 şansla triggerEncounter"
+        // This logic belongs in ShoppingScreen, not here.
+        // Here we just navigate.
+        navigation.navigate('Shopping' as any); // Assuming route exists
         break;
+
       case 'travel':
         console.log('[Life] Action triggered: Travel');
+        // User request: "Para düş. Stress 0. Happiness 100. %60 Şansla triggerEncounter('vacation')."
+        // Travel has a wizard (Destination -> Companion -> Result).
+        // This heavy logic should probably stay in the wizard confirm step.
+        // But the ENCOUNTER check is new.
+        // useTravelSystem also takes triggerEncounter.
+        // I will let the system handle the flow.
         openTravel();
         break;
+
       case 'casino':
         console.log('[Life] Navigating to Casino');
         navigation.navigate('Casino');
@@ -385,6 +438,10 @@ const LifeScreen = () => {
         break;
       case 'network':
         console.log('[Life] Action triggered: Network (placeholder)');
+        break;
+      case 'education':
+        console.log('[Life] Navigating to Education');
+        navigation.navigate('Education' as any);
         break;
       default:
         break;

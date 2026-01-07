@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { theme } from '../../../theme';
 import { useStatsStore } from '../../../store/useStatsStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 
@@ -10,7 +11,7 @@ type PlasticSurgeryModalProps = {
     onClose: () => void;
     handleServicePurchase: (
         cost: number,
-        statUpdates: Partial<typeof useStatsStore.getState>,
+        statUpdates: Record<string, number>,
         resultTitle: string,
         resultMessage: string,
         displayStats: { label: string; value: string; isPositive: boolean }[]
@@ -50,7 +51,9 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
         // Random Outcome Logic
         // 75% Success Rate
         const isSuccess = Math.random() < 0.75;
-        const currentStats = useStatsStore.getState();
+        const { core, attributes } = usePlayerStore.getState();
+        const currentCharm = attributes.charm;
+        const { stress, health } = core;
 
         // Simulate operation time
         setTimeout(() => {
@@ -58,8 +61,8 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
                 handleServicePurchase(
                     selectedProcedure.cost,
                     {
-                        charisma: currentStats.charisma + 20,
-                        stress: Math.max(0, currentStats.stress - 10)
+                        charisma: currentCharm + 20,
+                        stress: Math.max(0, stress - 10)
                     },
                     'SURGERY SUCCESSFUL',
                     'You look radiant and years younger.',
@@ -72,9 +75,9 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
                 handleServicePurchase(
                     selectedProcedure.cost,
                     {
-                        charisma: Math.max(0, currentStats.charisma - 15),
-                        stress: currentStats.stress + 20,
-                        health: Math.max(0, currentStats.health - 10)
+                        charisma: Math.max(0, currentCharm - 15),
+                        stress: stress + 20,
+                        health: Math.max(0, health - 10)
                     },
                     'SURGERY BOTCHED',
                     'The results are unnatural. You need time to recover.',

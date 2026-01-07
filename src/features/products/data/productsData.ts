@@ -36,7 +36,42 @@ export interface Product {
   supplierId?: string; // 'local' | 'global'
   inventory?: number; // Stock count (unsold units)
   revenue?: number; // Calculated revenue from sales
+  // Supplier Info
+  supplier?: Supplier;
+  // Market Info
+  market?: {
+    demand: number;
+    competition: number;
+    researched: boolean;
+  };
+  // Pricing Info
+  pricing?: {
+    salePrice: number;
+  };
+  // Production Info
+  production?: {
+    allocated: number;
+    weight?: number; // production weight/cost
+  };
 }
+
+export interface Supplier {
+  name: string;
+  cost: number;
+  quality: number;
+}
+
+export const DEFAULT_SUPPLIERS: Record<string, Supplier[]> = {
+  'Electronics': [
+    { name: 'Global Components Inc.', cost: 100, quality: 75 },
+    { name: 'Budget Tech Supplies', cost: 60, quality: 45 },
+    { name: 'Premium Silicon Wafer', cost: 180, quality: 95 }
+  ],
+  'Fashion': [ // Just in case
+    { name: 'Textile Global', cost: 50, quality: 70 },
+    { name: 'Cheap Fabrics', cost: 20, quality: 30 }
+  ]
+};
 
 export const INITIAL_PRODUCTS: Product[] = [
   // Products are now created dynamically when unlocking from Tech Tree

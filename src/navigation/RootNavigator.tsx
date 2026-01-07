@@ -27,6 +27,7 @@ import {
   ShopDetailScreen,
   ProductsScreen,
   TechTreeScreen,
+  EducationScreen,
 } from '../screens';
 import ResearchScreen from '../screens/Assets/MyCompany/ResearchScreen';
 import { formatScreenTitle } from '../utils';
@@ -36,6 +37,7 @@ export type LifeStackParamList = {
   LifeHome: undefined;
   Profile: undefined;
   Achievements: undefined;
+  Education: undefined;
 };
 
 export type LoveStackParamList = {
@@ -109,6 +111,7 @@ const LifeStackNavigator = () => (
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
     <LifeStack.Screen name="Profile" component={ProfileScreen} />
     <LifeStack.Screen name="Achievements" component={AchievementsScreen} />
+    <LifeStack.Screen name="Education" component={EducationScreen} />
   </LifeStack.Navigator>
 );
 

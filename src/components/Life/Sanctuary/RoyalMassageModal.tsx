@@ -5,13 +5,14 @@ import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 
 import { useStatsStore } from '../../../store/useStatsStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 
 type RoyalMassageModalProps = {
     visible: boolean;
     onClose: () => void;
     handleServicePurchase: (
         cost: number,
-        statUpdates: Partial<typeof useStatsStore.getState>,
+        statUpdates: Record<string, number>,
         resultTitle: string,
         resultMessage: string,
         displayStats: { label: string; value: string; isPositive: boolean }[]
@@ -39,12 +40,12 @@ const RoyalMassageModal = ({ visible, onClose, handleServicePurchase }: RoyalMas
                         key={option.name}
                         style={({ pressed }) => [styles.optionCard, pressed && styles.optionCardPressed]}
                         onPress={() => {
-                            const currentStats = useStatsStore.getState();
+                            const { core } = usePlayerStore.getState();
                             handleServicePurchase(
                                 option.cost,
                                 {
-                                    stress: Math.max(0, currentStats.stress - option.stress),
-                                    health: Math.min(100, currentStats.health + option.health)
+                                    stress: Math.max(0, core.stress - option.stress),
+                                    health: Math.min(100, core.health + option.health)
                                 },
                                 option.name,
                                 `You enjoyed a ${option.name}.`,

@@ -21,7 +21,7 @@ const GymSupplementModal = ({ visible, onClose }: GymSupplementModalProps) => {
         if (item === 'steroids') {
             setShowWarning(true);
         } else {
-            Alert.alert('Supplements', `You drank your ${item}. +Energy.`);
+            Alert.alert('Supplements', `You drank your ${item}. +Strength.`);
             onClose(); // In real logic we'd link this to stats but user only specified steroids risk clearly
         }
     };

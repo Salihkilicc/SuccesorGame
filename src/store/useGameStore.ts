@@ -8,6 +8,8 @@ import { useUserStore } from './useUserStore';
 import { useLaboratoryStore } from './useLaboratoryStore';
 import { useProductStore } from './useProductStore';
 import { simulateEconomy } from '../logic/EconomyEngine'; // <--- YENİ MOTOR
+import { calculateStatDecay } from '../logic/statsLogic';
+import { usePlayerStore } from './usePlayerStore';
 
 const LOW_MORALE_REASONS = [
   "Factory strikes halted production for 3 days.",
@@ -358,6 +360,22 @@ export const useGameStore = create<GameStore>()(
             bonusDistributedThisQuarter: false,
           }));
           console.log(`[Quarterly Review] Morale Updated: ${newMorale} (Policy: ${state.salaryPolicy})`);
+
+
+          // 7b. STAT DECAY LOGIC (Paslanma Kuralı)
+          // "İşleyen demir ışıldar, işlemeyen paslanır."
+          const playerStore = usePlayerStore.getState();
+          const currentAttributes = playerStore.attributes;
+          const decay = calculateStatDecay(currentAttributes);
+
+          // Apply Decay
+          Object.entries(decay).forEach(([stat, value]) => {
+            if (value < 0) {
+              const currentVal = currentAttributes[stat as keyof typeof currentAttributes];
+              playerStore.updateAttribute(stat as any, Math.max(0, currentVal + value));
+              console.log(`[Stat Decay] ${stat} decayed by ${value}`);
+            }
+          });
         }
 
         // 8. Sonucu UI'ın beklediği formatta döndür

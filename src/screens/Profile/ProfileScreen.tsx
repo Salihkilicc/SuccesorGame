@@ -9,19 +9,21 @@ import {
   TextInput,
   Image,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useStatsStore, useUserStore, useGameStore} from '../../store';
-import {theme} from '../../theme';
-import type {LifeStackParamList} from '../../navigation';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useStatsStore, useUserStore, useGameStore, usePlayerStore } from '../../store';
+import { theme } from '../../theme';
+import type { LifeStackParamList } from '../../navigation';
 
 type Navigation = NativeStackNavigationProp<LifeStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<Navigation>();
-  const {money, netWorth, charisma, health, stress, companyValue, casinoReputation} =
-    useStatsStore();
-  const {name, bio, avatarUrl, partner, hasPremium, setName, setBio} = useUserStore();
+  const { money, netWorth, companyValue, casinoReputation } = useStatsStore();
+  const { core, attributes } = usePlayerStore();
+  const { health, stress } = core;
+  const charisma = attributes.charm;
+  const { name, bio, avatarUrl, partner, hasPremium, setName, setBio } = useUserStore();
 
   const initials = name?.[0]?.toUpperCase() ?? 'Y';
 
@@ -41,12 +43,12 @@ const ProfileScreen = () => {
           <View style={styles.profileRow}>
             <View style={styles.avatar}>
               {avatarUrl ? (
-                <Image source={{uri: avatarUrl}} style={styles.avatarImage} />
+                <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
               ) : (
                 <Text style={styles.avatarText}>{initials}</Text>
               )}
             </View>
-            <View style={{flex: 1, gap: theme.spacing.sm}}>
+            <View style={{ flex: 1, gap: theme.spacing.sm }}>
               <TextInput
                 value={name}
                 onChangeText={setName}
@@ -66,7 +68,7 @@ const ProfileScreen = () => {
           </View>
           <Pressable
             onPress={handleChangeAvatar}
-            style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+            style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
             <Text style={styles.secondaryButtonText}>Change Avatar (placeholder)</Text>
           </Pressable>
         </View>
@@ -97,22 +99,23 @@ const ProfileScreen = () => {
           <Text style={styles.sectionTitle}>Account / Meta</Text>
           <Text style={styles.statusText}>Premium: {hasPremium ? 'Active' : 'Inactive'}</Text>
           <Pressable
-            onPress={() => navigation.getParent()?.navigate('Assets', {screen: 'Premium'})}
-            style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+            onPress={() => navigation.getParent()?.navigate('Assets', { screen: 'Premium' })}
+            style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
             <Text style={styles.secondaryButtonText}>Go to Premium</Text>
           </Pressable>
           <Pressable
             onPress={() => navigation.navigate('Achievements')}
-            style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+            style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
             <Text style={styles.secondaryButtonText}>View Achievements</Text>
           </Pressable>
           <Pressable
             onPress={() => {
               console.log('[Debug] Stats', useStatsStore.getState());
+              console.log('[Debug] Player', usePlayerStore.getState());
               console.log('[Debug] User', useUserStore.getState());
               console.log('[Debug] Game', useGameStore.getState());
             }}
-            style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+            style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
             <Text style={styles.secondaryButtonText}>Log State</Text>
           </Pressable>
         </View>
@@ -126,7 +129,7 @@ type OverviewItemProps = {
   value: string;
 };
 
-const OverviewItem = ({label, value}: OverviewItemProps) => (
+const OverviewItem = ({ label, value }: OverviewItemProps) => (
   <View style={styles.metricCard}>
     <Text style={styles.metricLabel}>{label}</Text>
     <Text style={styles.metricValue}>{value}</Text>
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   secondaryButtonText: {
     color: theme.colors.accent,

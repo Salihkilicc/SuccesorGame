@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { useProductStore, Product, Supplier, DEFAULT_SUPPLIERS } from '../../../store/useProductStore';
+import { useProductStore } from '../../../store/useProductStore';
+import { Product, Supplier, DEFAULT_SUPPLIERS } from '../../../features/products/data/productsData';
 import { useStatsStore } from '../../../store/useStatsStore';
 
 const MARKET_SEARCH_COST = 50000;
@@ -11,7 +12,7 @@ export const useProductManagement = () => {
     // Calculate available capacity
     const usedCapacity = products
         .filter((p) => p.status === 'active')
-        .reduce((sum, p) => sum + (p.production.allocated * (p.production.weight || 1)), 0);
+        .reduce((sum, p) => sum + ((p.production?.allocated || 0) * (p.production?.weight || 1)), 0);
     const availableCapacity = productionCapacity - usedCapacity;
 
     // Generate random suppliers with RNG logic
@@ -75,7 +76,7 @@ export const useProductManagement = () => {
     } => {
         const { acquisitions } = useStatsStore.getState();
         const events: string[] = [];
-        let production = product.production.allocated;
+        let production = product.production?.allocated || 0;
 
         // Shipping issue event (20% if morale < 40)
         if (morale < 40 && Math.random() < 0.2) {
@@ -95,18 +96,18 @@ export const useProductManagement = () => {
 
         // Calculate sales
         const priceFactor = calculatePriceFactor(product);
-        let maxSales = product.market.demand * priceFactor;
+        let maxSales = (product.market?.demand || 0) * priceFactor;
 
         // Apply Acquisition Bonuses
-        if (acquisitions.includes('streamify') && (product.type === 'MyPhone' || product.type === 'MyPods')) {
+        if (acquisitions.includes('streamify') && (product.category === 'phone')) {
             maxSales *= 1.15; // 15% boost
         }
-        if (acquisitions.includes('gameGen') && (product.type === 'MyMac' || product.type === 'MyPad')) {
+        if (acquisitions.includes('gameGen') && (product.category === 'computer')) {
             maxSales *= 1.15; // 15% boost
         }
 
         const unitsSold = Math.min(production, maxSales);
-        const revenue = unitsSold * product.pricing.salePrice;
+        const revenue = unitsSold * (product.pricing?.salePrice || 0);
 
         return { unitsSold, revenue, events };
     }, []);
@@ -115,14 +116,17 @@ export const useProductManagement = () => {
     const calculatePriceFactor = (product: Product): number => {
         const { techLevels } = useStatsStore.getState();
 
-        const qualityBonus = product.supplier.quality / 100; // 0-1
-        const competitionPenalty = product.market.competition / 200; // 0-0.5
+        const qualityBonus = (product.supplier?.quality || 50) / 100; // 0-1
+        const competitionPenalty = (product.market?.competition || 50) / 200; // 0-0.5
 
         // Base Price Ratio (Optimal is 2x cost)
         // If Software Lvl 3 (MyAI), optimal price is higher (e.g. 2.5x)
         const optimalMultiplier = techLevels.software >= 3 ? 2.5 : 2.0;
 
-        const priceRatio = product.pricing.salePrice / (product.supplier.cost * optimalMultiplier);
+        const salePrice = product.pricing?.salePrice || product.suggestedPrice;
+        const cost = product.supplier?.cost || product.baseProductionCost;
+
+        const priceRatio = salePrice / (cost * optimalMultiplier);
 
         return Math.max(0.1, qualityBonus - competitionPenalty - Math.abs(1 - priceRatio) * 0.3);
     };

@@ -5,13 +5,14 @@ import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 
 import { useStatsStore } from '../../../store/useStatsStore';
+import { usePlayerStore } from '../../../store/usePlayerStore';
 
 type GroomingLoungeModalProps = {
     visible: boolean;
     onClose: () => void;
     handleServicePurchase: (
         cost: number,
-        statUpdates: Partial<typeof useStatsStore.getState>,
+        statUpdates: Record<string, number>,
         resultTitle: string,
         resultMessage: string,
         displayStats: { label: string; value: string; isPositive: boolean }[]
@@ -33,7 +34,7 @@ const GroomingLoungeModal = ({ visible, onClose, handleServicePurchase }: Groomi
     const onApply = () => {
         handleServicePurchase(
             COST,
-            { charisma: useStatsStore.getState().charisma + 1 },
+            { charisma: usePlayerStore.getState().attributes.charm + 1 },
             'FRESH CUT',
             `You look sharp with your ${selectedHair} and ${selectedBeard}.`,
             [{ label: 'Charisma', value: '+1', isPositive: true }]
