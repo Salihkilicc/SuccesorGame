@@ -2,22 +2,27 @@ import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { usePlayerStore } from '../../store'; // Adjust import based on your structure
+import { usePlayerStore } from '../../store/usePlayerStore'; // Doğru store yolu
 import { theme } from '../../theme';
-import { Ionicons } from '@expo/vector-icons'; // Assuming Expo, if not use standard Icon
 
-const ProgressBar = ({ label, value, max = 100, color = theme.colors.primary, icon }: { label: string, value: number, max?: number, color?: string, icon?: string }) => {
-    const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+// İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
+// Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
+
+const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon }: { label: string, value: number, max?: number, color?: string, icon?: string }) => {
+    // Değerlerin undefined gelme ihtimaline karşı koruma
+    const safeValue = value || 0;
+    const percentage = Math.min(100, Math.max(0, (safeValue / max) * 100));
+
     return (
         <View style={styles.statRow}>
             <View style={styles.statLabelContainer}>
-                {icon && <Text style={{ fontSize: 14, marginRight: 6 }}>{icon}</Text>}
+                {icon && <Text style={{ fontSize: 16, marginRight: 8 }}>{icon}</Text>}
                 <Text style={styles.statLabel}>{label}</Text>
             </View>
             <View style={styles.progressContainer}>
                 <View style={[styles.progressBar, { width: `${percentage}%`, backgroundColor: color }]} />
             </View>
-            <Text style={styles.statValue}>{value}/{max}</Text>
+            <Text style={styles.statValue}>{safeValue}/{max}</Text>
         </View>
     );
 };
@@ -31,16 +36,40 @@ const SectionHeader = ({ title, icon }: { title: string, icon: string }) => (
 
 const DNAScreen = () => {
     const navigation = useNavigation();
+
+    // Store'dan verileri çekiyoruz
     const {
         attributes,
         personality,
         reputation,
         security,
-        skills,
-        core
+        skills
     } = usePlayerStore();
 
     const handleBack = () => navigation.goBack();
+
+    // Kuşak rengine göre yazı rengini ayarlayan yardımcı fonksiyon
+    const getBeltTextColor = (belt: string) => {
+        const lowerBelt = belt?.toLowerCase() || 'white';
+        if (['white', 'yellow'].includes(lowerBelt)) return '#000';
+        return '#fff';
+    };
+
+    const getBeltBgColor = (belt: string) => {
+        const lowerBelt = belt?.toLowerCase() || 'white';
+        // Özel renk haritası
+        const colors: Record<string, string> = {
+            white: '#f5f5f5',
+            yellow: '#f1c40f',
+            orange: '#e67e22',
+            green: '#2ecc71',
+            blue: '#3498db',
+            purple: '#9b59b6',
+            brown: '#795548',
+            black: '#000000'
+        };
+        return colors[lowerBelt] || '#ccc';
+    };
 
     return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -48,60 +77,70 @@ const DNAScreen = () => {
             <View style={styles.header}>
                 <Pressable onPress={handleBack} style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}>
                     <Text style={styles.backIcon}>←</Text>
-                    <Text style={styles.headerTitle}>DNA & Stats</Text>
+                    <Text style={styles.headerTitle}>DNA & Stats Dashboard</Text>
                 </Pressable>
             </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* 🛡️ SECURITY */}
+                {/* 🛡️ SECURITY - Yeni Özellik */}
                 <View style={styles.card}>
                     <SectionHeader title="Security & Safety" icon="🛡️" />
-                    <ProgressBar label="Digital Security" value={security.digital} color={theme.colors.accent} icon="💻" />
-                    <ProgressBar label="Personal Security" value={security.personal} color={theme.colors.danger} icon="🥋" />
-                    <ProgressBar label="Police Heat" value={reputation.police} color={theme.colors.warning} icon="🚨" />
+                    <ProgressBar label="Digital Shield" value={security?.digital} color="#3498db" icon="💻" />
+                    <ProgressBar label="Bodyguard / Armor" value={security?.personal} color="#e74c3c" icon="🥋" />
+                    <ProgressBar label="Police Heat" value={reputation?.police} color="#f39c12" icon="🚨" />
                 </View>
 
-                {/* 🥋 SKILLS */}
+                {/* 🥋 SKILLS - Yeni Özellik */}
                 <View style={styles.card}>
-                    <SectionHeader title="Skills & Mastery" icon="🥋" />
-
+                    <SectionHeader title="Combat Mastery" icon="👊" />
                     <View style={styles.skillRow}>
                         <View>
                             <Text style={styles.skillName}>Martial Arts</Text>
-                            <Text style={styles.skillDetail}>Rank: {skills.martialArts.belt} Belt (Lvl {skills.martialArts.level})</Text>
+                            <Text style={styles.skillDetail}>
+                                Rank: <Text style={{ fontWeight: 'bold' }}>{skills?.martialArts?.belt || 'White'}</Text> Belt
+                                (Lvl {skills?.martialArts?.level || 1})
+                            </Text>
                         </View>
-                        <View style={[styles.beltBadge, { backgroundColor: skills.martialArts.belt.toLowerCase() === 'white' ? '#ddd' : skills.martialArts.belt.toLowerCase() }]} >
-                            <Text style={[styles.beltText, { color: skills.martialArts.belt.toLowerCase() === 'white' ? '#000' : '#fff' }]}>{skills.martialArts.belt}</Text>
+                        <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(skills?.martialArts?.belt) }]} >
+                            <Text style={[styles.beltText, { color: getBeltTextColor(skills?.martialArts?.belt) }]}>
+                                {skills?.martialArts?.belt || 'White'}
+                            </Text>
                         </View>
                     </View>
-                    <ProgressBar label="Progress" value={skills.martialArts.progress} max={100} color={theme.colors.success} />
+                    <ProgressBar
+                        label="Next Belt Progress"
+                        value={skills?.martialArts?.progress}
+                        max={100}
+                        color="#2ecc71"
+                        icon="📈"
+                    />
                 </View>
 
-                {/* 🃏 REPUTATION */}
+                {/* 🃏 REPUTATION - Detaylı İtibar Ağı */}
                 <View style={styles.card}>
-                    <SectionHeader title="Reputation" icon="🃏" />
-                    <ProgressBar label="Casino Rep" value={reputation.casino} color="#E91E63" icon="🎰" />
-                    <ProgressBar label="Street Rep" value={reputation.street} color="#F44336" icon="🗡️" />
-                    <ProgressBar label="Business Rep" value={reputation.business} color="#2196F3" icon="💼" />
-                    <ProgressBar label="Social Rep" value={reputation.social} color="#9C27B0" icon="🥂" />
+                    <SectionHeader title="Reputation Network" icon="🕸️" />
+                    <ProgressBar label="Casino (VIP)" value={reputation?.casino} color="#E91E63" icon="🎰" />
+                    <ProgressBar label="Street (Cred)" value={reputation?.street} color="#c0392b" icon="🗡️" />
+                    <ProgressBar label="Business (Trust)" value={reputation?.business} color="#2980b9" icon="💼" />
+                    <ProgressBar label="High Society" value={reputation?.social} color="#8e44ad" icon="🥂" />
                 </View>
 
-                {/* 🧬 GENETICS */}
+                {/* 🧬 GENETICS - Temel Özellikler */}
                 <View style={styles.card}>
-                    <SectionHeader title="Genetics (Attributes)" icon="🧬" />
-                    <ProgressBar label="Intellect" value={attributes.intellect} color={theme.colors.primary} icon="🧠" />
-                    <ProgressBar label="Charm" value={attributes.charm} color={theme.colors.accent} icon="👄" />
-                    <ProgressBar label="Looks" value={attributes.looks} color={theme.colors.accent} icon="✨" />
-                    <ProgressBar label="Strength" value={attributes.strength} color={theme.colors.danger} icon="💪" />
+                    <SectionHeader title="Core Genetics" icon="🧬" />
+                    <ProgressBar label="Intellect" value={attributes?.intellect} color="#9b59b6" icon="🧠" />
+                    <ProgressBar label="Charm" value={attributes?.charm} color="#e91e63" icon="👄" />
+                    <ProgressBar label="Looks" value={attributes?.looks} color="#f1c40f" icon="✨" />
+                    <ProgressBar label="Strength" value={attributes?.strength} color="#e74c3c" icon="💪" />
                 </View>
 
-                {/* 🧠 PERSONALITY */}
+                {/* 🧠 PERSONALITY - Karakter */}
                 <View style={styles.card}>
-                    <SectionHeader title="Personality" icon="🧠" />
-                    <ProgressBar label="Ambition" value={personality.ambition} color="#FFC107" icon="🔥" />
-                    <ProgressBar label="Risk Appetite" value={personality.riskAppetite} color="#FF5722" icon="🎲" />
-                    <ProgressBar label="Morality" value={personality.morality} color="#8BC34A" icon="😇" />
+                    <SectionHeader title="Personality Traits" icon="🎭" />
+                    <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
+                    <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
+                    <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
                 </View>
 
             </ScrollView>
@@ -112,29 +151,31 @@ const DNAScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.background,
+        backgroundColor: '#121212', // Dark Mode uyumlu arka plan
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 14,
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
+        borderBottomColor: '#333',
+        backgroundColor: '#1e1e1e',
     },
     backButton: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     backIcon: {
-        fontSize: 24,
-        color: theme.colors.textPrimary,
-        marginRight: 8,
+        fontSize: 22,
+        color: '#fff',
+        marginRight: 10,
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: theme.colors.textPrimary,
+        color: '#fff',
+        letterSpacing: 0.5,
     },
     content: {
         padding: 16,
@@ -142,92 +183,103 @@ const styles = StyleSheet.create({
         gap: 16
     },
     card: {
-        backgroundColor: theme.colors.card,
-        borderRadius: 12,
+        backgroundColor: '#1e1e1e',
+        borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: theme.colors.border,
+        borderColor: '#333',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 8,
     },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
-        paddingBottom: 8,
+        paddingBottom: 10,
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
+        borderBottomColor: '#333',
     },
     sectionIcon: {
-        fontSize: 20,
-        marginRight: 8,
+        fontSize: 22,
+        marginRight: 10,
     },
     sectionTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: theme.colors.textPrimary,
+        fontSize: 14,
+        fontWeight: '800', // Extra Bold
+        color: '#aaa',
         textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 1.2,
     },
     statRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 14,
     },
     statLabelContainer: {
         flexDirection: 'row',
-        width: 130, // Fixed width for alignment
+        width: 140,
         alignItems: 'center'
     },
     statLabel: {
-        color: theme.colors.textSecondary,
+        color: '#ccc',
         fontSize: 14,
+        fontWeight: '500',
     },
     progressContainer: {
         flex: 1,
-        height: 10, // Slim bar
-        backgroundColor: theme.colors.background,
-        borderRadius: 5,
-        marginRight: 10,
+        height: 8, // Daha ince ve modern bar
+        backgroundColor: '#333',
+        borderRadius: 4,
+        marginRight: 12,
         overflow: 'hidden',
     },
     progressBar: {
         height: '100%',
-        borderRadius: 5,
+        borderRadius: 4,
     },
     statValue: {
-        width: 45,
+        width: 50, // Sabit genişlik hizalama için
         textAlign: 'right',
-        color: theme.colors.textPrimary,
+        color: '#fff',
         fontSize: 12,
         fontWeight: 'bold',
+        fontVariant: ['tabular-nums'], // Sayıların hizalı durması için
     },
     skillRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 16,
+        paddingHorizontal: 4,
     },
     skillName: {
-        color: theme.colors.textPrimary,
+        color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+        marginBottom: 4,
     },
     skillDetail: {
-        color: theme.colors.textSecondary,
-        fontSize: 12,
+        color: '#888',
+        fontSize: 13,
     },
     beltBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 12,
-        minWidth: 60,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        borderRadius: 20,
+        minWidth: 80,
         alignItems: 'center',
+        justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#333'
+        borderColor: 'rgba(255,255,255,0.1)'
     },
     beltText: {
         fontSize: 12,
         fontWeight: 'bold',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     }
 });
 
