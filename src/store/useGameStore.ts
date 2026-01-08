@@ -9,6 +9,7 @@ import { useLaboratoryStore } from './useLaboratoryStore';
 import { useProductStore } from './useProductStore';
 import { simulateEconomy } from '../logic/EconomyEngine'; // <--- YENİ MOTOR
 import { calculateStatDecay } from '../logic/statsLogic';
+import { applyPartnerBuffs } from '../logic/relationshipLogic';
 import { usePlayerStore } from './usePlayerStore';
 
 const LOW_MORALE_REASONS = [
@@ -376,6 +377,75 @@ export const useGameStore = create<GameStore>()(
               console.log(`[Stat Decay] ${stat} decayed by ${value}`);
             }
           });
+
+          // 7c. PARTNER BUFFS (Gelişmiş Partner Sistemi)
+          const partner = useUserStore.getState().partner;
+          if (partner) {
+            const { changes, notification } = applyPartnerBuffs(partner);
+
+            if (notification) {
+              console.log(`[Partner Buff] ${notification}`);
+              // Show notification in report if no crisis
+              if (!operationalSetback) {
+                setbackMessage = notification;
+              }
+            }
+
+            // Apply Stats
+            if (changes.attributes) {
+              Object.entries(changes.attributes).forEach(([k, v]) =>
+                playerStore.updateAttribute(k as any, (playerStore.attributes[k as keyof typeof playerStore.attributes] || 0) + (v as number))
+              );
+            }
+            if (changes.core) {
+              Object.entries(changes.core).forEach(([k, v]) =>
+                playerStore.updateCore(k as any, (playerStore.core[k as keyof typeof playerStore.core] || 0) + (v as number))
+              );
+            }
+            if (changes.reputation) {
+              Object.entries(changes.reputation).forEach(([k, v]) =>
+                playerStore.updateReputation(k as any, (playerStore.reputation[k as keyof typeof playerStore.reputation] || 0) + (v as number))
+              );
+            }
+            if (changes.personality) {
+              playerStore.setAll({ personality: { ...playerStore.personality, ...changes.personality } });
+            }
+            if (changes.money) {
+              useStatsStore.getState().update({ money: (useStatsStore.getState().money || 0) + changes.money });
+            }
+
+            // New Integration: Security, Skills, Hidden
+            if (changes.security) {
+              Object.entries(changes.security).forEach(([k, v]) => {
+                playerStore.updateSecurity(k as any, (playerStore.security[k as keyof typeof playerStore.security] || 0) + (v as number));
+              });
+            }
+            if (changes.skills) {
+              if (changes.skills.martialArts) {
+                playerStore.updateSkill('martialArts', {
+                  progress: (playerStore.skills.martialArts.progress || 0) + (changes.skills.martialArts.progress || 0)
+                });
+              }
+            }
+            if (changes.hidden) {
+              Object.entries(changes.hidden).forEach(([k, v]) => {
+                playerStore.updateHidden(k as any, (playerStore.hidden[k as keyof typeof playerStore.hidden] || 0) + (v as number));
+              });
+            }
+
+          }
+
+          // 7d. EDUCATION ADVANCEMENT (New System)
+          const eduResult = playerStore.advanceEducationAction();
+          if (eduResult.message) {
+            console.log(`[Education] ${eduResult.message}`);
+            // Append to setbackMessage if empty, or just log for now.
+            // If we have a mechanism to show positive news, we should use it.
+            // For now, if no setback, we can show this as a "status update".
+            if (!setbackMessage && !operationalSetback) {
+              setbackMessage = eduResult.message;
+            }
+          }
         }
 
         // 8. Sonucu UI'ın beklediği formatta döndür

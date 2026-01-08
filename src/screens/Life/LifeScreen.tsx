@@ -60,7 +60,8 @@ type LifeActionType =
   | 'belongings'
   | 'hookup'
   | 'network'
-  | 'education';
+  | 'education'
+  | 'dna';
 
 type LifeActionButtonProps = {
   emoji: string;
@@ -140,6 +141,12 @@ const ACTIONS: Array<{
       label: 'Education',
       description: 'Degrees & Certificates',
       emoji: '🎓',
+    },
+    {
+      key: 'dna',
+      label: 'DNA / Stats',
+      description: 'View Genetics & Skills',
+      emoji: '🧬',
     },
   ];
 
@@ -378,6 +385,10 @@ const LifeScreen = () => {
       case 'spa':
         console.log('[Life] Action triggered: Spa & Relax -> Sanctuary');
         openSanctuary();
+        break;
+
+      case 'dna':
+        navigation.navigate('DNA');
         break;
 
       case 'gym':

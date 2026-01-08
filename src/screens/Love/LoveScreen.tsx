@@ -9,6 +9,7 @@ import { theme } from '../../theme';
 import { InteractionModal, EncounterModal } from '../../components';
 import BreakupModal from '../../components/Love/BreakupModal';
 import { useEncounterSystem } from '../../components/Love/useEncounterSystem';
+import { applyPartnerBuffs, getPartnerPerks } from '../../logic/relationshipLogic';
 
 type LoveScreenProp = NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>;
 
@@ -756,6 +757,67 @@ const LoveScreen = () => {
                 <Text style={styles.partnerStatLabel}>Love: {partner.love}%</Text>
                 <View style={styles.partnerBarTrack}>
                   <View style={[styles.partnerBarFill, { width: `${partner.love}%` }]} />
+                </View>
+
+                {/* ACTIVE PERKS DISPLAY */}
+                <View style={{ marginTop: 12 }}>
+                  <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginBottom: 6, fontWeight: '600', letterSpacing: 0.5 }}>
+                    ACTIVE PERKS
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 8 }}
+                  >
+                    {getPartnerPerks(partner).length > 0 ? (
+                      getPartnerPerks(partner).map(perk => (
+                        <View key={perk.id} style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: `${perk.color}15`, // 15 = ~8% opacity
+                          paddingVertical: 10,
+                          paddingHorizontal: 12,
+                          borderRadius: 12,
+                          borderLeftWidth: 3,
+                          borderLeftColor: perk.color,
+                          minWidth: 160,
+                          maxWidth: 240
+                        }}>
+                          <Text style={{ fontSize: 24, marginRight: 10 }}>{perk.icon}</Text>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{
+                              color: perk.color,
+                              fontSize: 13,
+                              fontWeight: 'bold',
+                              marginBottom: 2
+                            }}>
+                              {perk.title}
+                            </Text>
+                            <Text style={{
+                              color: theme.colors.textSecondary,
+                              fontSize: 11,
+                              lineHeight: 14
+                            }}>
+                              {perk.desc}
+                            </Text>
+                          </View>
+                        </View>
+                      ))
+                    ) : (
+                      <View style={{
+                        padding: 12,
+                        backgroundColor: 'rgba(255,255,255,0.03)',
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: 'rgba(255,255,255,0.05)',
+                        width: '100%'
+                      }}>
+                        <Text style={{ color: theme.colors.textMuted, fontSize: 12, fontStyle: 'italic' }}>
+                          Your partner has no active perks at the moment.
+                        </Text>
+                      </View>
+                    )}
+                  </ScrollView>
                 </View>
               </View>
             </View>

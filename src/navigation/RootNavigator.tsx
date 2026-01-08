@@ -28,6 +28,7 @@ import {
   ProductsScreen,
   TechTreeScreen,
   EducationScreen,
+  DNAScreen,
 } from '../screens';
 import ResearchScreen from '../screens/Assets/MyCompany/ResearchScreen';
 import { formatScreenTitle } from '../utils';
@@ -38,7 +39,10 @@ export type LifeStackParamList = {
   Profile: undefined;
   Achievements: undefined;
   Education: undefined;
+  DNA: undefined;
 };
+
+// ... existing code ...
 
 export type LoveStackParamList = {
   LoveHome: undefined;
@@ -53,8 +57,6 @@ export type AssetsStackParamList = {
   ShopDetail: {
     shopId: string;
   };
-  // Research moved to RootStack
-  // Products buradan kaldırıldı, aşağıda RootStack'e eklendi.
   StockDetail: {
     symbol: string;
     price: number;
@@ -93,18 +95,10 @@ export type RootStackParamList = {
   Premium: undefined;
   Achievements: undefined;
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
-  Products: undefined; // ✅ BURAYA EKLENDİ (Global Erişim İçin)
-  Research: undefined; // ✅ MOVED GLOBAL
-  TechTree: undefined; // ✅ Added for Innovation Tech Tree
+  Products: undefined;
+  Research: undefined;
+  TechTree: undefined;
 };
-
-const Tab = createBottomTabNavigator<RootTabParamList>();
-const LifeStack = createNativeStackNavigator<LifeStackParamList>();
-const LoveStack = createNativeStackNavigator<LoveStackParamList>();
-const AssetsStack = createNativeStackNavigator<AssetsStackParamList>();
-const CasinoStack = createNativeStackNavigator<CasinoStackParamList>();
-const RootStack = createNativeStackNavigator<RootStackParamList>();
-const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const LifeStackNavigator = () => (
   <LifeStack.Navigator screenOptions={{ headerShown: false }}>
@@ -112,6 +106,7 @@ const LifeStackNavigator = () => (
     <LifeStack.Screen name="Profile" component={ProfileScreen} />
     <LifeStack.Screen name="Achievements" component={AchievementsScreen} />
     <LifeStack.Screen name="Education" component={EducationScreen} />
+    <LifeStack.Screen name="DNA" component={DNAScreen} />
   </LifeStack.Navigator>
 );
 
@@ -120,6 +115,14 @@ const LoveStackNavigator = () => (
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
   </LoveStack.Navigator>
 );
+
+const Tab = createBottomTabNavigator<RootTabParamList>();
+const LifeStack = createNativeStackNavigator<LifeStackParamList>();
+const LoveStack = createNativeStackNavigator<LoveStackParamList>();
+const AssetsStack = createNativeStackNavigator<AssetsStackParamList>();
+const CasinoStack = createNativeStackNavigator<CasinoStackParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const AssetsStackNavigator = () => (
   <AssetsStack.Navigator screenOptions={{ headerShown: false }}>
@@ -160,7 +163,7 @@ const AssetsStackNavigator = () => (
       component={ShopDetailScreen}
       options={{ title: formatScreenTitle('Shop Detail') }}
     />
-  </AssetsStack.Navigator>
+  </AssetsStack.Navigator >
 );
 
 const CasinoStackNavigator = () => (
