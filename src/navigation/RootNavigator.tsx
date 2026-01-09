@@ -19,9 +19,6 @@ import {
   BlackjackGameScreen,
   StockDetailScreen,
   CasinoScreen,
-  PremiumScreen,
-  ProfileScreen,
-  AchievementsScreen,
   HomeScreen,
   ShoppingScreen,
   ShopDetailScreen,
@@ -104,8 +101,9 @@ export type RootStackParamList = {
 const LifeStackNavigator = () => (
   <LifeStack.Navigator screenOptions={{ headerShown: false }}>
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
-    <LifeStack.Screen name="Profile" component={ProfileScreen} />
-    <LifeStack.Screen name="Achievements" component={AchievementsScreen} />
+    {/* TODO: Restore these screens or create new ones */}
+    {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
+    {/* <LifeStack.Screen name="Achievements" component={AchievementsScreen} /> */}
     <LifeStack.Screen name="Education" component={EducationScreen} />
     <LifeStack.Screen name="DNA" component={DNAScreen} />
   </LifeStack.Navigator>
@@ -148,11 +146,7 @@ const AssetsStackNavigator = () => (
       component={StockDetailScreen}
       options={{ title: formatScreenTitle('Stock Detail') }}
     />
-    <AssetsStack.Screen
-      name="Premium"
-      component={PremiumScreen}
-      options={{ title: formatScreenTitle('Premium') }}
-    />
+
     <AssetsStack.Screen
       name="Shopping"
       component={ShoppingScreen}
@@ -247,8 +241,9 @@ const RootNavigator = () => (
           options={{ title: 'Innovation Tech Tree' }}
         />
 
-        <RootStack.Screen name="Premium" component={PremiumScreen} />
-        <RootStack.Screen name="Achievements" component={AchievementsScreen} />
+        {/* TODO: Restore these screens */}
+        {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
+        {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
         <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
       </RootStack.Navigator>
       <BottomStatsBar

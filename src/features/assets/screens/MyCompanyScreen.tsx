@@ -8,12 +8,12 @@ import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useGameStore } from '../../../core/store/useGameStore';
-import { formatCurrency } from './NativeEconomy';
-import { useCompanyLogic } from './useCompanyLogic';
+import { formatCurrency } from '../hooks/NativeEconomy';
+import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
 // --- UI Components ---
-import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from './components/CompanyUI';
-import { CompanyModals } from './components/CompanyModals';
+import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../components/MyCompany/CompanyUI';
+import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
 

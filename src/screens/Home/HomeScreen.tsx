@@ -17,7 +17,7 @@ import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStor
 import { useProductStore } from '../../core/store/useProductStore';
 import { theme } from '../../core/theme';
 import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
-import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../Assets/MyCompany/QuarterlyReportModal';
+import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 

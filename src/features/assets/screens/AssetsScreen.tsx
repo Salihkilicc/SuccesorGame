@@ -1,15 +1,15 @@
 import React from 'react';
 import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../core/theme';
-import { useAssetsLogic } from './logic/useAssetsLogic'; // Yeni Hook
+import { theme } from '../../../core/theme';
+import { useAssetsLogic } from '../hooks/useAssetsLogic';
 import {
     AssetsHeader,
     InfoCard,
     SummaryRow,
     CategoryCard,
     ActionTile
-} from './components/AssetsUI'; // Yeni UI
+} from '../components/AssetsUI';
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();

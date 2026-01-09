@@ -13,7 +13,7 @@ import MarketOverview from '../../../components/Market/MarketOverview';
 import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
 
 // Veriler (Yeni Dosyadan Geliyor)
-import { CATEGORIES, STOCKS, Category } from './marketData';
+import { CATEGORIES, STOCKS, Category } from '../data/marketData';
 
 const MarketScreen = () => {
   const navigation = useNavigation<any>();
