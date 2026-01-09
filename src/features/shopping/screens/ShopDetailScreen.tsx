@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, FlatList, SafeAreaView, StyleSheet, Text, Pressable } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { theme } from '../../core/theme';
-import { useShopLogic, ShopItem } from './logic/useShopLogic'; // Yeni Hook
-import { ShopHeader, ShopItemCard } from './components/ShopUI'; // Yeni UI
-import { useEncounterSystem } from '../../features/love/components/useEncounterSystem';
-import { EncounterModal } from '../../components';
+import { theme } from '../../../core/theme';
+import { useShopLogic, ShopItem } from '../hooks/useShopping'; // Yeni Hook
+import { ShopHeader, ShopItemCard } from '../components/ShopUI'; // Yeni UI
+import { useEncounterSystem } from '../../../features/love/components/useEncounterSystem';
+import { EncounterModal } from '../../../components';
 
 const ShopDetailScreen = () => {
     const route = useRoute<any>();

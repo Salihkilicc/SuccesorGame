@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, useUserStore, usePlayerStore } from '../../../core/store';
 import { calculateShoppingDiscount } from '../../../logic/statsLogic';
-import { SHOP_DATA } from '../../../data/ShoppingData'; // Yolunu kontrol et
+import { SHOP_DATA } from '../data/ShoppingData';
 
 export interface ShopItem {
     id: string;

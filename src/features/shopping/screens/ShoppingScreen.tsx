@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../core/theme';
-import { useShopLogic } from './logic/useShopLogic';
-import { ShopHeader, ShopListCard, SectionHeader } from './components/ShopUI';
+import { theme } from '../../../core/theme';
+import { useShopLogic } from '../hooks/useShopping';
+import { ShopHeader, ShopListCard, SectionHeader } from '../components/ShopUI';
 
 const ShoppingScreen = () => {
     const navigation = useNavigation<any>();
