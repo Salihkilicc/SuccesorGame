@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { useUserStore } from '../../../core/store/useUserStore';
-import { triggerEvent } from '../../../event/eventEngine'; // Assuming we might want to trigger random events later
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { useUserStore } from '../../../../core/store/useUserStore';
+import { triggerEvent } from '../../../../event/eventEngine'; // Assuming we might want to trigger random events later
 
 export type TripVibe = 'Standard' | 'Ultra-Rich';
 

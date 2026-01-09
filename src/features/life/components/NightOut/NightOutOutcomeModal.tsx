@@ -8,7 +8,7 @@ import {
     Dimensions,
     Image,
 } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 import { NightOutOutcome } from './useNightOutSystem';
 
 type NightOutOutcomeModalProps = {

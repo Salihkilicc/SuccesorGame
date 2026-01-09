@@ -7,7 +7,7 @@ import {
     Pressable,
     Alert,
 } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 
 type GymSupplementModalProps = {
     visible: boolean;

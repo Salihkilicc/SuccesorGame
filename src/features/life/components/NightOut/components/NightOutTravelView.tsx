@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { theme } from '../../../../core/theme';
-import { InventoryItem } from '../../../../core/store/useUserStore';
+import { theme } from '../../../../../core/theme';
+import { InventoryItem } from '../../../../../core/store/useUserStore';
 
 type NightOutTravelViewProps = {
     needsTravel: boolean;

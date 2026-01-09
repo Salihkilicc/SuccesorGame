@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { theme } from '../../../core/theme';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import { theme } from '../../../../core/theme';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 
 type SanctuaryResultModalProps = {
     visible: boolean;

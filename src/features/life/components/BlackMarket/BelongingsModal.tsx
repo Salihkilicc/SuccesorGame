@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
-import { theme } from '../../../core/theme';
-import { useUserStore, InventoryItem } from '../../../core/store/useUserStore';
+import { theme } from '../../../../core/theme';
+import { useUserStore, InventoryItem } from '../../../../core/store/useUserStore';
 
 type BelongingsModalProps = {
     visible: boolean;

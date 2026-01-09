@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { theme } from '../../core/theme';
+import { theme } from '../../../core/theme';
 
 type LoveActionButtonProps = {
   title: string;

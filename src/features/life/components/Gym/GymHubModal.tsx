@@ -8,7 +8,7 @@ import {
     Animated,
     SafeAreaView,
 } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 import { TrainerId, MartialArtDiscipline } from './useGymSystem';
 
 import GymHubView from './components/GymHubView';

@@ -7,9 +7,9 @@ import {
     Dimensions,
     ScrollView,
 } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 import { CLUBS, NightOutClub } from './useNightOutSystem';
-import { InventoryItem } from '../../../core/store/useUserStore';
+import { InventoryItem } from '../../../../core/store/useUserStore';
 
 import NightOutLocationView from './components/NightOutLocationView';
 import NightOutTravelView from './components/NightOutTravelView';

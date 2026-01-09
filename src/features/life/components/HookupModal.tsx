@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '../../core/theme';
+import { theme } from '../../../core/theme';
 import type { HookupCandidate } from './useHookupSystem';
-import GameModal from '../common/GameModal';
-import GameButton from '../common/GameButton';
+import GameModal from '../../../components/common/GameModal';
+import GameButton from '../../../components/common/GameButton';
 
 type HookupModalProps = {
     visible: boolean;

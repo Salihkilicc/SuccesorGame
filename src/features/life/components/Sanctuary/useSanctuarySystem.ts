@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { useEventStore } from '../../../core/store/useEventStore';
-import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { useEventStore } from '../../../../core/store/useEventStore';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 
 export type SanctuaryResult = {
     title: string;

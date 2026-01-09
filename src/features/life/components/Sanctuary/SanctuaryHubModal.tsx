@@ -1,6 +1,6 @@
 import React from 'react';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 import SanctuaryMenuGrid from './components/SanctuaryMenuGrid';
 
 type SanctuaryHubModalProps = {

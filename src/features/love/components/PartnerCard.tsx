@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import type { PartnerProfile } from '../../data/relationshipTypes';
-import { theme } from '../../core/theme';
+import type { PartnerProfile } from '../../../data/relationshipTypes';
+import { theme } from '../../../core/theme';
 
 type PartnerCardProps = {
   partner: PartnerProfile;

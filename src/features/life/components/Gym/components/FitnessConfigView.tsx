@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { theme } from '../../../../core/theme';
+import { theme } from '../../../../../core/theme';
 
 type FitnessConfigViewProps = {
     selectedFitness: string | null;

@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
-import { useUserStore, useStatsStore } from '../../core/store';
+import { useUserStore, useStatsStore } from '../../../core/store';
 import {
     PartnerProfile,
     PartnerStats,
     Ethnicity,
     SocialClass
-} from '../../data/relationshipTypes';
-import { ENCOUNTER_DATA, EncounterScenario } from './data/encounterData';
-import { NAME_DATABASE } from './data/nameData';
+} from '../../../data/relationshipTypes';
+import { ENCOUNTER_DATA, EncounterScenario } from '../data/encounterData';
+import { NAME_DATABASE } from '../data/nameData';
 
 // --- Constants ---
 const ETHNICITIES: Ethnicity[] = [

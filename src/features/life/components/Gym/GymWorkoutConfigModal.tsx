@@ -6,7 +6,7 @@ import {
     StyleSheet,
     Pressable,
 } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 
 type GymWorkoutConfigModalProps = {
     visible: boolean;

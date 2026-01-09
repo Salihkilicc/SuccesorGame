@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { theme } from '../../../../core/theme';
-import { NightOutClub } from '../useNightOutSystem';
+// 5 tane ../ koyuyoruz
+import { theme } from '../../../../../core/theme';import { NightOutClub } from '../useNightOutSystem';
 
 type NightOutLocationViewProps = {
     clubs: NightOutClub[];

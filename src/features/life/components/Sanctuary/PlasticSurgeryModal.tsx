@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
-import { theme } from '../../../core/theme';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../core/store/usePlayerStore';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import { theme } from '../../../../core/theme';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 
 type PlasticSurgeryModalProps = {
     visible: boolean;

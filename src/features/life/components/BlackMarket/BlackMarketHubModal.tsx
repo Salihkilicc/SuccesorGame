@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../core/theme';
-import { BLACK_MARKET_WEAPONS, BLACK_MARKET_SUBSTANCES } from '../../../data/BlackMarketData';
+import { theme } from '../../../../core/theme';
+import { BLACK_MARKET_WEAPONS, BLACK_MARKET_SUBSTANCES } from '../../../../data/BlackMarketData';
 import OfferModal from './OfferModal';
 import BlackMarketMenuView from './components/BlackMarketMenuView';
 import BlackMarketListView from './components/BlackMarketListView';

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../core/theme';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../core/store/usePlayerStore';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import { theme } from '../../../../core/theme';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 
 type SunStudioModalProps = {
     visible: boolean;

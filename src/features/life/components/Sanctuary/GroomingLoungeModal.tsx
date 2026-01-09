@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../../core/theme';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import { theme } from '../../../../core/theme';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 
 type GroomingLoungeModalProps = {
     visible: boolean;

@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { useUserStore, InventoryItem } from '../../../core/store/useUserStore';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { useUserStore, InventoryItem } from '../../../../core/store/useUserStore';
 import {
     BLACK_MARKET_ARTS,
     BLACK_MARKET_ANTIQUES,
     BLACK_MARKET_JEWELRY,
     BLACK_MARKET_WEAPONS,
     BLACK_MARKET_SUBSTANCES
-} from '../../../data/BlackMarketData';
+} from '../../../../data/BlackMarketData';
 
 // Types
 export type BlackMarketCategory = 'art' | 'antique' | 'jewel' | 'weapon' | 'substance';

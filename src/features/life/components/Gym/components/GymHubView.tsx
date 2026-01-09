@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { theme } from '../../../../core/theme';
+import { theme } from '../../../../../core/theme';
 import { TrainerId, TRAINERS, MartialArtDiscipline } from '../useGymSystem';
 
 const BELT_NAMES = ['White', 'Yellow', 'Orange', 'Green', 'Blue', 'Brown', 'Black'];

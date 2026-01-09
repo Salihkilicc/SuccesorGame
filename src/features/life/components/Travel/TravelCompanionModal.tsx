@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 import { CompanionType } from './useTravelSystem';
-import GameModal from '../../common/GameModal';
-import SectionCard from '../../common/SectionCard';
-import GameButton from '../../common/GameButton';
+import GameModal from '../../../../components/common/GameModal';
+import SectionCard from '../../../../components/common/SectionCard';
+import GameButton from '../../../../components/common/GameButton';
 
 interface TravelCompanionModalProps {
     visible: boolean;

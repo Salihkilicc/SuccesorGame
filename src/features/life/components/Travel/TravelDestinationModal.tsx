@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../../core/theme';
+import { theme } from '../../../../core/theme';
 import { ACTIVITIES, ActivityType, COUNTRIES, TripVibe } from './useTravelSystem';
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
+import GameModal from '../../../../components/common/GameModal';
+import GameButton from '../../../../components/common/GameButton';
 
 interface TravelDestinationModalProps {
     visible: boolean;

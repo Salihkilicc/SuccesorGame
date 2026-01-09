@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { useUserStore } from '../../../core/store/useUserStore';
-import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { useUserStore } from '../../../../core/store/useUserStore';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import { Alert } from 'react-native';
 
 // --- TYPES ---
