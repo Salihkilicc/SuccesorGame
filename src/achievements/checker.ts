@@ -1,9 +1,9 @@
 import { ACHIEVEMENTS } from './achievements';
-import { useStatsStore } from '../store/useStatsStore';
-import { useUserStore } from '../store/useUserStore';
-import { useGameStore } from '../store/useGameStore';
-import { useAchievementStore } from '../store/useAchievementStore';
-import { usePlayerStore } from '../store/usePlayerStore';
+import { useStatsStore } from '../core/store/useStatsStore';
+import { useUserStore } from '../core/store/useUserStore';
+import { useGameStore } from '../core/store/useGameStore';
+import { useAchievementStore } from '../core/store/useAchievementStore';
+import { usePlayerStore } from '../core/store/usePlayerStore';
 
 const getAchievementById = (id: string) => ACHIEVEMENTS.find(a => a.id === id);
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
-import type {HoldingItem} from './marketTypes';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
+import type { HoldingItem } from './marketTypes';
 
 type Props = {
   visible: boolean;
@@ -10,7 +10,7 @@ type Props = {
   onLiquidate: () => void;
 };
 
-const PortfolioModal = ({visible, holdings, onClose, onLiquidate}: Props) => {
+const PortfolioModal = ({ visible, holdings, onClose, onLiquidate }: Props) => {
   const totalValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
   return (
@@ -21,12 +21,12 @@ const PortfolioModal = ({visible, holdings, onClose, onLiquidate}: Props) => {
             <Text style={styles.title}>Portfolio Holdings</Text>
             <Pressable
               onPress={onClose}
-              style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+              style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
               <Text style={styles.closeText}>×</Text>
             </Pressable>
           </View>
 
-          <View style={{gap: theme.spacing.sm}}>
+          <View style={{ gap: theme.spacing.sm }}>
             {holdings.length === 0 ? (
               <Text style={styles.empty}>No holdings yet. Start investing to build this list.</Text>
             ) : (
@@ -34,15 +34,15 @@ const PortfolioModal = ({visible, holdings, onClose, onLiquidate}: Props) => {
                 const isPositive = item.pl >= 0;
                 return (
                   <View key={item.id} style={styles.row}>
-                    <View style={{gap: theme.spacing.xs / 2}}>
+                    <View style={{ gap: theme.spacing.xs / 2 }}>
                       <Text style={styles.name}>{item.name}</Text>
                       <Text style={styles.meta}>
                         {item.type.toUpperCase()} • Invested {formatMoney(item.amount)}
                       </Text>
                     </View>
-                    <View style={{alignItems: 'flex-end'}}>
+                    <View style={{ alignItems: 'flex-end' }}>
                       <Text style={styles.value}>{formatMoney(item.estimatedValue)}</Text>
-                      <Text style={[styles.meta, {color: isPositive ? theme.colors.success : theme.colors.danger}]}>
+                      <Text style={[styles.meta, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
                         P/L {isPositive ? '+' : ''}{item.pl.toFixed(1)}%
                       </Text>
                     </View>
@@ -52,14 +52,14 @@ const PortfolioModal = ({visible, holdings, onClose, onLiquidate}: Props) => {
             )}
           </View>
 
-          <View style={styles.footer}> 
+          <View style={styles.footer}>
             <Text style={styles.total}>Estimated Total: {formatMoney(totalValue)}</Text>
             <Pressable
               onPress={() => {
                 onLiquidate();
                 onClose();
               }}
-              style={({pressed}) => [styles.liquidateButton, pressed && styles.liquidateButtonPressed]}>
+              style={({ pressed }) => [styles.liquidateButton, pressed && styles.liquidateButtonPressed]}>
               <Text style={styles.liquidateText}>LIQUIDATE ALL</Text>
             </Pressable>
           </View>
@@ -71,7 +71,7 @@ const PortfolioModal = ({visible, holdings, onClose, onLiquidate}: Props) => {
 
 export default PortfolioModal;
 
-const formatMoney = (value: number) => `$${value.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+const formatMoney = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   liquidateButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
   liquidateText: {

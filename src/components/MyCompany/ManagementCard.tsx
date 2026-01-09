@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 // Removed Slider import
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 import GameButton from '../common/GameButton';
 import { PercentageSelector } from '../atoms/PercentageSelector';
 

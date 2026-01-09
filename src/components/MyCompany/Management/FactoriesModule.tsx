@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import { FACTORY_CAPACITY, FACTORY_COST, useCompanyManagement } from '../useCompanyManagement';
 
 const ControlButton = ({ label, onPress, disabled, tone = 'default' }: any) => (

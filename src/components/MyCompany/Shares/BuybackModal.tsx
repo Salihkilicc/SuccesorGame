@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
@@ -14,14 +14,14 @@ interface Props {
 }
 
 const BuybackModal = ({ visible, onClose }: Props) => {
-    const { 
-        buybackPercentage, 
-        setBuybackPercentage, 
-        cost, 
-        newOwnership, 
-        companyCapital, 
-        isAffordable, 
-        handleConfirm 
+    const {
+        buybackPercentage,
+        setBuybackPercentage,
+        cost,
+        newOwnership,
+        companyCapital,
+        isAffordable,
+        handleConfirm
     } = useBuybackLogic(onClose);
 
     return (

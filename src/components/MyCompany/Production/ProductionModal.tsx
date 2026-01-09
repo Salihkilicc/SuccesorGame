@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 // Ortak Bileşenler
 import GameModal from '../../common/GameModal';

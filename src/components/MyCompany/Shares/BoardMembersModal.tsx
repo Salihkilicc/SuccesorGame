@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { theme } from '../../../theme';
-import { useStatsStore, Shareholder } from '../../../store/useStatsStore';
+import { theme } from '../../../core/theme';
+import { useStatsStore, Shareholder } from '../../../core/store/useStatsStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 

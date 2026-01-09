@@ -1,8 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
-import { useStatsStore, TechLevels } from '../../../store';
+import { useStatsStore, TechLevels } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 export type RAndDModalProps = {
   visible: boolean;

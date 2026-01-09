@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 import { useShopLogic } from './logic/useShopLogic';
 import { ShopHeader, ShopListCard, SectionHeader } from './components/ShopUI';
 
@@ -17,10 +17,10 @@ const ShoppingScreen = () => {
             <View style={styles.section}>
                 <SectionHeader title={title} />
                 {shops.map(shop => (
-                    <ShopListCard 
-                        key={shop.id} 
-                        shop={shop} 
-                        onPress={() => navigation.navigate('ShopDetail', { shopId: shop.id })} 
+                    <ShopListCard
+                        key={shop.id}
+                        shop={shop}
+                        onPress={() => navigation.navigate('ShopDetail', { shopId: shop.id })}
                     />
                 ))}
             </View>
@@ -30,12 +30,12 @@ const ShoppingScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
-            
-            <ShopHeader 
-                title="Shopping" 
-                money={money} 
-                onBack={() => navigation.goBack()} 
-                formatMoney={formatMoney} 
+
+            <ShopHeader
+                title="Shopping"
+                money={money}
+                onBack={() => navigation.goBack()}
+                formatMoney={formatMoney}
             />
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

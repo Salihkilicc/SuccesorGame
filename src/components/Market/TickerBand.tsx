@@ -1,15 +1,15 @@
-import React, {useEffect, useRef} from 'react';
-import {Animated, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
 
 const sampleTickers = [
-  {symbol: 'NEOA', change: 1.4},
-  {symbol: 'TORQ', change: -0.8},
-  {symbol: 'MICROX', change: 0.2},
-  {symbol: 'METAA', change: 3.1},
+  { symbol: 'NEOA', change: 1.4 },
+  { symbol: 'TORQ', change: -0.8 },
+  { symbol: 'MICROX', change: 0.2 },
+  { symbol: 'METAA', change: 3.1 },
 ];
 
-const extendedTickers = Array.from({length: 6})
+const extendedTickers = Array.from({ length: 6 })
   .map((_, idx) =>
     sampleTickers.map(ticker => ({
       ...ticker,
@@ -42,13 +42,13 @@ const TickerBand = () => {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.inner, {transform: [{translateX}]}]}>
+      <Animated.View style={[styles.inner, { transform: [{ translateX }] }]}>
         {extendedTickers.map((item, index) => {
           const isPositive = item.change >= 0;
           return (
             <View key={`${item.key ?? item.symbol}-${index}`} style={styles.tickerItem}>
               <Text style={styles.symbol}>{item.symbol}</Text>
-              <Text style={[styles.change, {color: isPositive ? theme.colors.success : theme.colors.danger}]}>
+              <Text style={[styles.change, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
                 {isPositive ? '+' : ''}{item.change}%
               </Text>
               <Text style={styles.separator}>|</Text>

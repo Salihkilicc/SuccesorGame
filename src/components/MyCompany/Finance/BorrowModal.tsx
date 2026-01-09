@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useBorrowLogic } from '../../../features/finance/hooks/useBorrowLogic';
 

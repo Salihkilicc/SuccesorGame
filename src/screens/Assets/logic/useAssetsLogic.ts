@@ -1,4 +1,4 @@
-import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore } from '../../../store';
+import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore } from '../../../core/store';
 
 export const useAssetsLogic = () => {
     const { netWorth, money, monthlyIncome, monthlyExpenses } = useStatsStore();

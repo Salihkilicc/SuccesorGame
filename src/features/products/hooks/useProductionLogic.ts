@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 export const useProductionLogic = (visible: boolean, onClose: () => void) => {
     const { employeeCount, productionLevel, setField } = useStatsStore();

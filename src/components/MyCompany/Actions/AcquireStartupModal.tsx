@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
-import { useStatsStore } from '../../../store';
-import { theme } from '../../../theme';
+import { useStatsStore } from '../../../core/store';
+import { theme } from '../../../core/theme';
 import { AcquisitionTarget, Category } from '../../../data/AcquisitionData';
 import { enrichStockData } from '../../../data/enrichStockData';
 import CompanyAnalysisModal from './CompanyAnalysisModal';
 import NegotiationModal from './NegotiationModal';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
-import { SubsidiaryState } from '../../../store/useStatsStore';
+import { SubsidiaryState } from '../../../core/store/useStatsStore';
 
 // Import stock market data
 import { STOCKS } from '../../Market/StocksList';

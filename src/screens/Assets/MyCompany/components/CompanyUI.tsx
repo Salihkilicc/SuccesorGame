@@ -1,7 +1,7 @@
 // src/features/MyCompany/components/CompanyUI.tsx
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../../theme';
+import { theme } from '../../../../core/theme';
 
 // Tekrar eden dikey çizgi
 export const VerticalDivider = () => <View style={styles.separator} />;

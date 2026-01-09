@@ -1,7 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useUserStore} from '../../store';
-import {theme} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { useUserStore } from '../../core/store';
+import { theme } from '../../core/theme';
 
 export type CompanyHeaderProps = {
   companyName?: string;
@@ -45,14 +45,14 @@ const CompanyHeader = ({
   ownership,
   debt,
 }: CompanyHeaderProps) => {
-  const {name} = useUserStore();
+  const { name } = useUserStore();
   const changeColor = dailyChange >= 0 ? styles.changeUp : styles.changeDown;
   const formattedChange = `${dailyChange >= 0 ? '+' : ''}${dailyChange}%`;
 
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.title}>{companyName}</Text>
           <Text style={styles.subtitle}>CEO: {name}</Text>
           <Text style={styles.subtitle}>Ownership: {ownership}%</Text>

@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
+import React, { useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
 
 const NEWS_ITEMS = [
   'Markets rally on tech optimism.',
@@ -19,8 +19,8 @@ const FinancialNewsButton = () => {
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        style={({pressed}) => [styles.card, pressed && styles.cardPressed]}>
-        <View style={{gap: theme.spacing.xs}}>
+        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
+        <View style={{ gap: theme.spacing.xs }}>
           <Text style={styles.title}>Financial News</Text>
           <Text style={styles.subtitle}>Daily pulse of the global markets.</Text>
         </View>
@@ -34,11 +34,11 @@ const FinancialNewsButton = () => {
               <Text style={styles.modalTitle}>Financial News</Text>
               <Pressable
                 onPress={() => setVisible(false)}
-                style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+                style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
                 <Text style={styles.closeCircleText}>×</Text>
               </Pressable>
             </View>
-            <View style={{gap: theme.spacing.sm}}>
+            <View style={{ gap: theme.spacing.sm }}>
               {NEWS_ITEMS.map(item => (
                 <Text key={item} style={styles.newsItem}>
                   • {item}
@@ -47,7 +47,7 @@ const FinancialNewsButton = () => {
             </View>
             <Pressable
               onPress={() => setVisible(false)}
-              style={({pressed}) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
+              style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
               <Text style={styles.closeButtonText}>Close</Text>
             </Pressable>
           </View>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   cardPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   title: {
     color: theme.colors.textPrimary,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   closeButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   closeButtonText: {
     color: theme.colors.textSecondary,

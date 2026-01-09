@@ -13,9 +13,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../store';
-import { useProductStore } from '../../store/useProductStore';
-import { theme } from '../../theme';
+import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
+import { useProductStore } from '../../core/store/useProductStore';
+import { theme } from '../../core/theme';
 import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../Assets/MyCompany/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore, Shareholder } from '../../../store/useStatsStore';
+import { useStatsStore, Shareholder } from '../../../core/store/useStatsStore';
 
 export type TransactionType = 'buy' | 'sell';
 export type NegotiationResult = 'pending' | 'success' | 'fail';

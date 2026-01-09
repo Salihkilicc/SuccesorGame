@@ -1,7 +1,7 @@
 import React from 'react';
-import {StatusBar, View, Text, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {theme} from '../../theme';
+import { StatusBar, View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../../core/theme';
 
 type Props = {
   title: string;
@@ -11,7 +11,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const AppScreen = ({title, subtitle, leftNode, rightNode, children}: Props) => {
+const AppScreen = ({ title, subtitle, leftNode, rightNode, children }: Props) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />

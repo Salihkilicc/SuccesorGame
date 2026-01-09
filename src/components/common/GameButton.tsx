@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 
 type GameButtonProps = {
     onPress: () => void;

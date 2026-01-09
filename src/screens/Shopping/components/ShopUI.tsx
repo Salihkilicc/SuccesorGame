@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 // --- HEADER ---
 export const ShopHeader = ({ title, money, onBack, formatMoney }: any) => (

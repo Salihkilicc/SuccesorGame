@@ -1,11 +1,11 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PremiumBadge from '../../components/common/PremiumBadge';
 import PremiumGate from '../../components/common/PremiumGate';
-import {useUserStore} from '../../store';
-import type {AssetsStackParamList} from '../../navigation';
+import { useUserStore } from '../../core/store';
+import type { AssetsStackParamList } from '../../navigation';
 
 const perks = [
   'VIP & Ultra VIP casino odalarına erişim',
@@ -18,7 +18,7 @@ type Navigation = NativeStackNavigationProp<AssetsStackParamList, 'Premium'>;
 
 const PremiumScreen = () => {
   const navigation = useNavigation<Navigation>();
-  const {hasPremium, setHasPremium} = useUserStore();
+  const { hasPremium, setHasPremium } = useUserStore();
 
   const handleUnlock = async () => {
     console.log('Premium unlocked (placeholder, no real payment)');
@@ -60,7 +60,7 @@ const PremiumScreen = () => {
 
         <Pressable
           onPress={handleUnlock}
-          style={({pressed}) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
+          style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}>
           <Text style={styles.primaryLabel}>Unlock Premium (Placeholder)</Text>
         </Pressable>
 
@@ -70,7 +70,7 @@ const PremiumScreen = () => {
 
         <Pressable
           onPress={() => navigation.goBack()}
-          style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
           <Text style={styles.secondaryLabel}>Geri dön</Text>
         </Pressable>
       </ScrollView>
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#e5e7eb',
     shadowColor: '#0f172a',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonPressed: {
     backgroundColor: '#0b1220',
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   primaryLabel: {
     color: '#fef3c7',

@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {Animated, StyleSheet, Text} from 'react-native';
-import {useAchievementStore} from '../../store/useAchievementStore';
-import {ACHIEVEMENTS} from '../../achievements/achievements';
-import {theme} from '../../theme';
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, Text } from 'react-native';
+import { useAchievementStore } from '../../core/store/useAchievementStore';
+import { ACHIEVEMENTS } from '../../achievements/achievements';
+import { theme } from '../../core/theme';
 
 const AchievementToast = () => {
-  const {lastUnlockedId} = useAchievementStore();
+  const { lastUnlockedId } = useAchievementStore();
   const [visible, setVisible] = useState(false);
   const [opacity] = useState(new Animated.Value(0));
   const achievement = ACHIEVEMENTS.find(a => a.id === lastUnlockedId);
@@ -13,9 +13,9 @@ const AchievementToast = () => {
   useEffect(() => {
     if (!achievement) return;
     setVisible(true);
-    Animated.timing(opacity, {toValue: 1, duration: 200, useNativeDriver: true}).start();
+    Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }).start();
     const timer = setTimeout(() => {
-      Animated.timing(opacity, {toValue: 0, duration: 250, useNativeDriver: true}).start(() =>
+      Animated.timing(opacity, { toValue: 0, duration: 250, useNativeDriver: true }).start(() =>
         setVisible(false),
       );
     }, 2500);
@@ -25,7 +25,7 @@ const AchievementToast = () => {
   if (!visible || !achievement) return null;
 
   return (
-    <Animated.View style={[styles.toast, {opacity}]}>
+    <Animated.View style={[styles.toast, { opacity }]}>
       <Text style={styles.icon}>🏅</Text>
       <Text style={styles.text}>Achievement unlocked: {achievement.title}</Text>
     </Animated.View>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     elevation: 6,
   },
   icon: {

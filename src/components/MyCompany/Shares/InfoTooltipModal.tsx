@@ -6,7 +6,7 @@ import {
     Pressable,
     Modal,
 } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 interface Props {
     visible: boolean;

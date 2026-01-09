@@ -1,4 +1,4 @@
-import { useEventStore, useStatsStore, useUserStore, usePlayerStore } from '../store';
+import { useEventStore, useStatsStore, useUserStore, usePlayerStore } from '../core/store';
 import {
   lifeEvents,
   loveEvents,

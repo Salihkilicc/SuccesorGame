@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
-import type {CategoryKey} from './marketTypes';
+import React, { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
+import type { CategoryKey } from './marketTypes';
 
 type Props = {
   initial?: CategoryKey;
@@ -10,7 +10,7 @@ type Props = {
 
 const CATEGORIES: CategoryKey[] = ['bonds', 'crypto', 'stocks'];
 
-const CategoryTabs = ({initial = 'bonds', onChange}: Props) => {
+const CategoryTabs = ({ initial = 'bonds', onChange }: Props) => {
   const [active, setActive] = useState<CategoryKey>(initial);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const CategoryTabs = ({initial = 'bonds', onChange}: Props) => {
           <Pressable
             key={item}
             onPress={() => setActive(item)}
-            style={({pressed}) => [styles.tab, isActive && styles.tabActive, pressed && styles.tabPressed]}>
+            style={({ pressed }) => [styles.tab, isActive && styles.tabActive, pressed && styles.tabPressed]}>
             <Text style={[styles.label, isActive && styles.labelActive]}>
               {item.charAt(0).toUpperCase() + item.slice(1)}
             </Text>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   tabPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   label: {
     color: theme.colors.textSecondary,

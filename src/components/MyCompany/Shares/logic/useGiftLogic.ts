@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 // 👇 DÜZELTME: Bir "../" daha eklendi
-import { useStatsStore, Shareholder } from '../../../../store/useStatsStore';
+import { useStatsStore, Shareholder } from '../../../../core/store/useStatsStore';
 
 export const GIFTS = [
     { id: 'watch', name: 'Luxury Watch', cost: 15_000, impact: 5, icon: '⌚' },

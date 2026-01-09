@@ -1,5 +1,5 @@
 import { EDUCATION_DATA } from '../data/educationData';
-import { PlayerState } from '../store/usePlayerStore';
+import { PlayerState } from '../core/store/usePlayerStore';
 
 /**
  * Checks if a player can enroll in a specific education program.

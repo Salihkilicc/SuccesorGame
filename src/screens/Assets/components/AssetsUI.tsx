@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 export const StatPill = ({ label, value }: { label: string; value: string }) => (
     <View style={styles.pill}>

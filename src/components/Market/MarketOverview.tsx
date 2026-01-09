@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {theme} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { theme } from '../../core/theme';
 
 type MarketOverviewProps = {
   trend?: 'Bullish' | 'Bearish' | 'Neutral';
@@ -34,8 +34,8 @@ const MarketOverview = ({
           volatility === 'High'
             ? styles.negative
             : volatility === 'Medium'
-            ? styles.warning
-            : null,
+              ? styles.warning
+              : null,
         ]}>
         {volatility}
       </Text>
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
-  positive: {color: theme.colors.success},
-  negative: {color: theme.colors.danger},
-  warning: {color: theme.colors.warning},
+  positive: { color: theme.colors.success },
+  negative: { color: theme.colors.danger },
+  warning: { color: theme.colors.warning },
   helper: {
     color: theme.colors.textMuted,
     fontSize: theme.typography.caption,

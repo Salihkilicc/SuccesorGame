@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 export interface DividendLogicResult {
     // State

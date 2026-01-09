@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from '../../../theme';
-import { useLaboratoryStore } from '../../../store/useLaboratoryStore';
-import { useStatsStore } from '../../../store';
+import { theme } from '../../../core/theme';
+import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
+import { useStatsStore } from '../../../core/store';
 import {
     getFacilityByTier,
     getNextTier,

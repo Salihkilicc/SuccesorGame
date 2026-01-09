@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../../../theme';
-import { Supplier } from '../../../../store/useProductStore';
+import { theme } from '../../../../core/theme';
+import { Supplier } from '../../../../core/store/useProductStore';
 import SectionCard from '../../../common/SectionCard';
 import GameButton from '../../../common/GameButton';
 

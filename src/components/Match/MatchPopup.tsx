@@ -8,8 +8,8 @@ import {
   Dimensions,
 } from 'react-native';
 import MatchCandidateCard from './MatchCandidateCard';
-import {theme} from '../../theme';
-import type {MatchCandidate} from './useMatchSystem';
+import { theme } from '../../core/theme';
+import type { MatchCandidate } from './useMatchSystem';
 
 type MatchPopupProps = {
   visible: boolean;
@@ -19,7 +19,7 @@ type MatchPopupProps = {
   onClose: () => void;
 };
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const MatchPopup = ({
   visible,
@@ -36,7 +36,7 @@ const MatchPopup = ({
         <View style={styles.actions}>
           <Pressable
             onPress={onReject}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.button,
               styles.skipButton,
               pressed && styles.buttonPressed,
@@ -45,7 +45,7 @@ const MatchPopup = ({
           </Pressable>
           <Pressable
             onPress={onAccept}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.button,
               styles.matchButton,
               pressed && styles.buttonPressed,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   skipButton: {
     backgroundColor: theme.colors.cardSoft,

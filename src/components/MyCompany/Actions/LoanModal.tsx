@@ -1,8 +1,8 @@
 import React from 'react';
-import {Modal, View, Text, StyleSheet, Pressable} from 'react-native';
-import {useStatsStore} from '../../../store';
-import {checkAllAchievementsAfterStateChange} from '../../../achievements/checker';
-import {theme} from '../../../theme';
+import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useStatsStore } from '../../../core/store';
+import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
+import { theme } from '../../../core/theme';
 
 export type LoanModalProps = {
   visible: boolean;
@@ -11,8 +11,8 @@ export type LoanModalProps = {
 
 const OPTIONS = [5_000_000, 10_000_000, 20_000_000] as const;
 
-const LoanModal = ({visible, onClose}: LoanModalProps) => {
-  const {money, companyDebt, setField} = useStatsStore();
+const LoanModal = ({ visible, onClose }: LoanModalProps) => {
+  const { money, companyDebt, setField } = useStatsStore();
 
   const handleLoan = (amount: number) => {
     setField('money', money + amount);
@@ -33,7 +33,7 @@ const LoanModal = ({visible, onClose}: LoanModalProps) => {
               <Pressable
                 key={amount}
                 onPress={() => handleLoan(amount)}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                   styles.option,
                   pressed && styles.optionPressed,
                 ]}>
@@ -43,7 +43,7 @@ const LoanModal = ({visible, onClose}: LoanModalProps) => {
           </View>
           <Pressable
             onPress={onClose}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.closeButton,
               pressed && styles.closeButtonPressed,
             ]}>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   optionPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   optionText: {
     color: theme.colors.accent,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   closeButtonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   closeText: {
     fontSize: theme.typography.body,

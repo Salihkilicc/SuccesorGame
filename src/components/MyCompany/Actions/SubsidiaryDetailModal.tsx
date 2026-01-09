@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
-import { theme } from '../../../theme';
-import { SubsidiaryState } from '../../../store/useStatsStore';
-import { useStatsStore } from '../../../store';
+import { theme } from '../../../core/theme';
+import { SubsidiaryState } from '../../../core/store/useStatsStore';
+import { useStatsStore } from '../../../core/store';
 
 type Props = {
     visible: boolean;

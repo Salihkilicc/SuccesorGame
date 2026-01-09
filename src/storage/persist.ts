@@ -1,17 +1,19 @@
+import { StateStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';
-import type { StateStorage } from 'zustand/middleware';
 
-export const storage = new MMKV();
+// MMKV veritabanını oluşturuyoruz
+const storage = new MMKV();
 
+// Zustand'ın anlayacağı dile çeviriyoruz (Adapter)
 export const zustandStorage: StateStorage = {
-  getItem: (name: string) => {
+  setItem: (name, value) => {
+    return storage.set(name, value);
+  },
+  getItem: (name) => {
     const value = storage.getString(name);
     return value ?? null;
   },
-  setItem: (name: string, value: string) => {
-    storage.set(name, value);
-  },
-  removeItem: (name: string) => {
-    storage.delete(name);
+  removeItem: (name) => {
+    return storage.delete(name);
   },
 };

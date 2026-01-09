@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
-import {theme} from '../../theme';
-import type {CryptoAsset} from './marketTypes';
+import React, { useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { theme } from '../../core/theme';
+import type { CryptoAsset } from './marketTypes';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -24,7 +24,7 @@ type Props = {
   onBuy: (asset: CryptoAsset, amount: number) => void;
 };
 
-const CryptoDetailsModal = ({visible, asset, onClose, onBuy}: Props) => {
+const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
   const [amount, setAmount] = useState('5000');
 
   if (!asset) return null;
@@ -41,12 +41,12 @@ const CryptoDetailsModal = ({visible, asset, onClose, onBuy}: Props) => {
             <Text style={styles.title}>{asset.name}</Text>
             <Pressable
               onPress={onClose}
-              style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+              style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
               <Text style={styles.closeText}>×</Text>
             </Pressable>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.meta}>Current Cost: {formatMoney(asset.cost)}</Text>
             <Text style={styles.meta}>Market Cap: {formatCap(asset.marketCap)}</Text>
             <Text style={styles.meta}>Risk: {asset.risk}</Text>
@@ -57,7 +57,7 @@ const CryptoDetailsModal = ({visible, asset, onClose, onBuy}: Props) => {
             </Text>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.inputLabel}>Buy Amount</Text>
             <TextInput
               value={amount}
@@ -74,7 +74,7 @@ const CryptoDetailsModal = ({visible, asset, onClose, onBuy}: Props) => {
               onBuy(asset, numericAmount);
               setAmount('');
             }}
-            style={({pressed}) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
+            style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
             <Text style={styles.buyText}>Buy</Text>
           </Pressable>
         </View>
@@ -85,7 +85,7 @@ const CryptoDetailsModal = ({visible, asset, onClose, onBuy}: Props) => {
 
 export default CryptoDetailsModal;
 
-const formatMoney = (value: number) => `$${value.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
+const formatMoney = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buyButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   buyText: {
     color: theme.colors.textPrimary,

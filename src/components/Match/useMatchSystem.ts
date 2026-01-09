@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useUserStore } from '../../store';
-import { PartnerProfile, PartnerStats } from '../../data/types';
+import { useUserStore } from '../../core/store';
+import { PartnerProfile, PartnerStats } from '../../core/types';
 
 export type MatchCandidate = {
   name: string;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../../theme'; // Adjust path
+import { theme } from '../../../core/theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
 
 type Props = {

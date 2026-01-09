@@ -29,9 +29,10 @@ import {
   TechTreeScreen,
   EducationScreen,
   DNAScreen,
+  ResearchScreen,
 } from '../screens';
-import ResearchScreen from '../screens/Assets/MyCompany/ResearchScreen';
-import { formatScreenTitle } from '../utils';
+
+import { formatScreenTitle } from '../core/utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
 
 export type LifeStackParamList = {

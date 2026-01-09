@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useStatsStore} from '../../store';
+import { View, Text, StyleSheet } from 'react-native';
+import { useStatsStore } from '../../core/store';
 
 const formatLargeMoney = (value: number) => {
   const absolute = Math.abs(value);
@@ -20,14 +20,14 @@ const formatLargeMoney = (value: number) => {
 };
 
 const FinancialSummary = () => {
-  const {companyDebt, companyOwnership} = useStatsStore();
+  const { companyDebt, companyOwnership } = useStatsStore();
 
   const rows = [
-    {label: 'Daily Revenue', value: '$650K'},
-    {label: 'Daily Expenses', value: '$220K'},
-    {label: 'Daily Profit', value: '$430K'},
-    {label: 'Debt', value: formatLargeMoney(companyDebt)},
-    {label: 'Ownership', value: `${companyOwnership}%`},
+    { label: 'Daily Revenue', value: '$650K' },
+    { label: 'Daily Expenses', value: '$220K' },
+    { label: 'Daily Profit', value: '$430K' },
+    { label: 'Debt', value: formatLargeMoney(companyDebt) },
+    { label: 'Ownership', value: `${companyOwnership}%` },
   ];
 
   return (

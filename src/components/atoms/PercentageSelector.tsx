@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '../../theme'; // Tema yolunu projene göre kontrol et
+import { theme } from '../../core/theme'; // Tema yolunu projene göre kontrol et
 
 interface Props {
     label: string;

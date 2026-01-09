@@ -1,7 +1,7 @@
 import React from 'react';
-import {Modal, View, Text, StyleSheet, Pressable} from 'react-native';
-import {useStatsStore} from '../../../store';
-import {checkAllAchievementsAfterStateChange} from '../../../achievements/checker';
+import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useStatsStore } from '../../../core/store';
+import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
 
 export type IssueSharesModalProps = {
   visible: boolean;
@@ -10,8 +10,8 @@ export type IssueSharesModalProps = {
 
 const OPTIONS = [5, 10, 20] as const;
 
-const IssueSharesModal = ({visible, onClose}: IssueSharesModalProps) => {
-  const {companyOwnership, money, setField} = useStatsStore();
+const IssueSharesModal = ({ visible, onClose }: IssueSharesModalProps) => {
+  const { companyOwnership, money, setField } = useStatsStore();
 
   const handleSell = (percent: number) => {
     if (companyOwnership - percent < 50) {
@@ -42,7 +42,7 @@ const IssueSharesModal = ({visible, onClose}: IssueSharesModalProps) => {
               <Pressable
                 key={option}
                 onPress={() => handleSell(option)}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                   styles.option,
                   pressed && styles.optionPressed,
                 ]}>
@@ -55,7 +55,7 @@ const IssueSharesModal = ({visible, onClose}: IssueSharesModalProps) => {
           </Text>
           <Pressable
             onPress={onClose}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.closeButton,
               pressed && styles.closeButtonPressed,
             ]}>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   optionPressed: {
     backgroundColor: '#0b1220',
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   optionText: {
     color: '#f9fafb',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   closeButtonPressed: {
     backgroundColor: '#d1d5db',
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   closeText: {
     fontSize: 15,

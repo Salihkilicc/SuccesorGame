@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import { COMPANY_EVENTS, useCompanyManagement } from '../useCompanyManagement';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';

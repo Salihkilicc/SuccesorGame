@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
-import {useStatsStore} from '../../store';
-import {theme} from '../../theme';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useStatsStore } from '../../core/store';
+import { theme } from '../../core/theme';
 
 type BuySellPanelProps = {
   symbol: string;
   price: number;
 };
 
-const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
-  const {money, setField} = useStatsStore();
+const BuySellPanel = ({ symbol, price }: BuySellPanelProps) => {
+  const { money, setField } = useStatsStore();
   const [qty, setQty] = useState<number>(1);
 
   const adjustQty = (delta: number) => {
@@ -19,7 +19,7 @@ const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
   const handleBuy = () => {
     const cost = qty * price;
     if (money < cost) {
-      console.log('Not enough money to buy', {symbol, qty});
+      console.log('Not enough money to buy', { symbol, qty });
       return;
     }
     setField('money', money - cost);
@@ -36,7 +36,7 @@ const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
       <View style={styles.qtyRow}>
         <Pressable
           onPress={() => adjustQty(-1)}
-          style={({pressed}) => [
+          style={({ pressed }) => [
             styles.qtyButton,
             pressed && styles.qtyButtonPressed,
           ]}>
@@ -45,7 +45,7 @@ const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
         <Text style={styles.qtyValue}>{qty}</Text>
         <Pressable
           onPress={() => adjustQty(1)}
-          style={({pressed}) => [
+          style={({ pressed }) => [
             styles.qtyButton,
             pressed && styles.qtyButtonPressed,
           ]}>
@@ -58,7 +58,7 @@ const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
       <View style={styles.actions}>
         <Pressable
           onPress={handleSell}
-          style={({pressed}) => [
+          style={({ pressed }) => [
             styles.button,
             styles.sellButton,
             pressed && styles.buttonPressed,
@@ -67,7 +67,7 @@ const BuySellPanel = ({symbol, price}: BuySellPanelProps) => {
         </Pressable>
         <Pressable
           onPress={handleBuy}
-          style={({pressed}) => [
+          style={({ pressed }) => [
             styles.button,
             styles.buyButton,
             pressed && styles.buttonPressed,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   sellButton: {
     backgroundColor: theme.colors.danger,

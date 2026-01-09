@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, Animated } from 'react-native';
-import { theme } from '../../../theme';
-import { Shareholder } from '../../../store/useStatsStore';
+import { theme } from '../../../core/theme';
+import { Shareholder } from '../../../core/store/useStatsStore';
 // 👇 YOL GÜNCELLENDİ
 import { useGiftLogic } from './logic/useGiftLogic';
 

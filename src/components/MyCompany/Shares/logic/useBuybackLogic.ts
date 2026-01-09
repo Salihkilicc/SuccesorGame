@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 // 👇 DÜZELTME: Bir "../" daha eklendi (Toplam 4 tane)
-import { useStatsStore } from '../../../../store/useStatsStore';
+import { useStatsStore } from '../../../../core/store/useStatsStore';
 
 export const useBuybackLogic = (onClose: () => void) => {
     const { companyValue, companyOwnership, companyCapital, performBuyback } = useStatsStore();
     const [buybackPercentage, setBuybackPercentage] = useState(1);
 
     const cost = companyValue * (buybackPercentage / 100);
-    
+
     const multiplier = 1 / (1 - (buybackPercentage / 100));
     const newOwnership = Math.min(100, companyOwnership * multiplier);
 

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { theme } from '../../../theme'; // Adjust path if needed
-import { useStatsStore } from '../../../store'; // Adjust path if needed
+import { theme } from '../../../core/theme'; // Adjust path if needed
+import { useStatsStore } from '../../../core/store'; // Adjust path if needed
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';

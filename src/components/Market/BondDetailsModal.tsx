@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
-import {theme} from '../../theme';
-import type {BondItem} from './marketTypes';
+import React, { useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { theme } from '../../core/theme';
+import type { BondItem } from './marketTypes';
 
 type Props = {
   visible: boolean;
@@ -10,7 +10,7 @@ type Props = {
   onBuy: (bond: BondItem, amount: number) => void;
 };
 
-const BondDetailsModal = ({visible, bond, onClose, onBuy}: Props) => {
+const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
   const [amount, setAmount] = useState('100000');
 
   if (!bond) return null;
@@ -26,12 +26,12 @@ const BondDetailsModal = ({visible, bond, onClose, onBuy}: Props) => {
             <Text style={styles.title}>{bond.name}</Text>
             <Pressable
               onPress={onClose}
-              style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+              style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
               <Text style={styles.closeText}>×</Text>
             </Pressable>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.meta}>Years: {bond.years}y</Text>
             <Text style={styles.meta}>Coupon: {bond.coupon}%</Text>
             <Text style={styles.meta}>Risk: {bond.risk}</Text>
@@ -40,7 +40,7 @@ const BondDetailsModal = ({visible, bond, onClose, onBuy}: Props) => {
             </Text>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.inputLabel}>Buy Amount</Text>
             <TextInput
               value={amount}
@@ -57,7 +57,7 @@ const BondDetailsModal = ({visible, bond, onClose, onBuy}: Props) => {
               onBuy(bond, numericAmount);
               setAmount('');
             }}
-            style={({pressed}) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
+            style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
             <Text style={styles.buyText}>Buy</Text>
           </Pressable>
         </View>
@@ -68,7 +68,7 @@ const BondDetailsModal = ({visible, bond, onClose, onBuy}: Props) => {
 
 export default BondDetailsModal;
 
-const formatMoney = (value: number) => `$${Math.max(0, value).toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+const formatMoney = (value: number) => `$${Math.max(0, value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buyButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   buyText: {
     color: theme.colors.textPrimary,

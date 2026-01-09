@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {theme} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { theme } from '../../core/theme';
 
 type Props = {
   symbol: string;

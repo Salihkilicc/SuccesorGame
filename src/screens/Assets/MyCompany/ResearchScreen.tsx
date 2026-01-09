@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import LaboratoryScreen from './LaboratoryScreen';
 
 // Types

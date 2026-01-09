@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
-import {theme} from '../../theme';
-import type {StockItem} from './marketTypes';
+import React, { useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { theme } from '../../core/theme';
+import type { StockItem } from './marketTypes';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -24,7 +24,7 @@ type Props = {
   onBuy: (stock: StockItem, shares: number) => void;
 };
 
-const StockDetailsModal = ({visible, stock, onClose, onBuy}: Props) => {
+const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
   const [shares, setShares] = useState('10');
 
   if (!stock) return null;
@@ -42,24 +42,24 @@ const StockDetailsModal = ({visible, stock, onClose, onBuy}: Props) => {
             <Text style={styles.title}>{stock.company}</Text>
             <Pressable
               onPress={onClose}
-              style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+              style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
               <Text style={styles.closeText}>×</Text>
             </Pressable>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.meta}>Symbol: {stock.symbol}</Text>
             <Text style={styles.meta}>Sector: {stock.sector}</Text>
             <Text style={styles.meta}>Market Cap: {formatCap(stock.marketCap)}</Text>
             <Text style={styles.meta}>Current Price: ${stock.price.toFixed(2)}</Text>
-            <Text style={[styles.meta, {color: dailyColor}]}>
+            <Text style={[styles.meta, { color: dailyColor }]}>
               Daily Change (size-adjusted): {dailyAdjusted}%
             </Text>
-            <Text style={[styles.meta, {color: yearlyColor}]}>Yearly Change: {stock.yearlyChange}%</Text>
+            <Text style={[styles.meta, { color: yearlyColor }]}>Yearly Change: {stock.yearlyChange}%</Text>
             <Text style={styles.meta}>Risk Level: {stock.risk}</Text>
           </View>
 
-          <View style={{gap: theme.spacing.xs}}>
+          <View style={{ gap: theme.spacing.xs }}>
             <Text style={styles.inputLabel}>How Many Shares?</Text>
             <TextInput
               value={shares}
@@ -76,7 +76,7 @@ const StockDetailsModal = ({visible, stock, onClose, onBuy}: Props) => {
               onBuy(stock, numericShares);
               setShares('');
             }}
-            style={({pressed}) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
+            style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
             <Text style={styles.buyText}>Buy Shares</Text>
           </Pressable>
         </View>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buyButtonPressed: {
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   buyText: {
     color: theme.colors.textPrimary,

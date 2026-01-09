@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../../theme';
-import { useStatsStore } from '../../../store';
+import { theme } from '../../../core/theme';
+import { useStatsStore } from '../../../core/store';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 
 type Props = {

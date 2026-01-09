@@ -1,6 +1,6 @@
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
 
 type Props = {
   totalInvested: number;
@@ -9,23 +9,23 @@ type Props = {
   onOpen: () => void;
 };
 
-const PortfolioSummary = ({totalInvested, returnPct, holdingsCount, onOpen}: Props) => {
+const PortfolioSummary = ({ totalInvested, returnPct, holdingsCount, onOpen }: Props) => {
   const isPositive = returnPct >= 0;
 
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <View style={{gap: theme.spacing.xs}}>
+        <View style={{ gap: theme.spacing.xs }}>
           <Text style={styles.label}>Invested Value</Text>
           <Text style={styles.value}>{formatMoney(totalInvested)}</Text>
         </View>
-        <View style={{gap: theme.spacing.xs}}>
+        <View style={{ gap: theme.spacing.xs }}>
           <Text style={styles.label}>Return (3 Months)</Text>
-          <Text style={[styles.value, {color: isPositive ? theme.colors.success : theme.colors.danger}]}>
+          <Text style={[styles.value, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
             {isPositive ? '+' : ''}{returnPct.toFixed(1)}%
           </Text>
         </View>
-        <View style={{gap: theme.spacing.xs}}>
+        <View style={{ gap: theme.spacing.xs }}>
           <Text style={styles.label}>Total Holdings</Text>
           <Text style={styles.value}>{holdingsCount}</Text>
         </View>
@@ -33,7 +33,7 @@ const PortfolioSummary = ({totalInvested, returnPct, holdingsCount, onOpen}: Pro
 
       <Pressable
         onPress={onOpen}
-        style={({pressed}) => [styles.button, pressed && styles.buttonPressed]}>
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}>
         <Text style={styles.buttonText}>TOTAL INVESTMENTS</Text>
         <Text style={styles.buttonArrow}>↗</Text>
       </Pressable>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   buttonPressed: {
-    transform: [{scale: 0.99}],
+    transform: [{ scale: 0.99 }],
   },
   buttonText: {
     color: theme.colors.accent,

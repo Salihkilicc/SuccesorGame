@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
-import {theme} from '../../theme';
+import React, { useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../core/theme';
 
 const ADVISORS = [
-  {name: 'Elite Advisor', fee: 50_000},
-  {name: 'Senior Analyst', fee: 20_000},
-  {name: 'Junior Advisor', fee: 5_000},
+  { name: 'Elite Advisor', fee: 50_000 },
+  { name: 'Senior Analyst', fee: 20_000 },
+  { name: 'Junior Advisor', fee: 5_000 },
 ];
 
 const FinancialAdvisorsButton = () => {
@@ -20,8 +20,8 @@ const FinancialAdvisorsButton = () => {
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        style={({pressed}) => [styles.card, pressed && styles.cardPressed]}>
-        <View style={{gap: theme.spacing.xs}}>
+        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
+        <View style={{ gap: theme.spacing.xs }}>
           <Text style={styles.title}>Financial Advisors</Text>
           <Text style={styles.subtitle}>Premium insights on demand.</Text>
         </View>
@@ -35,16 +35,16 @@ const FinancialAdvisorsButton = () => {
               <Text style={styles.modalTitle}>Financial Advisors</Text>
               <Pressable
                 onPress={() => setVisible(false)}
-                style={({pressed}) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
+                style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
                 <Text style={styles.closeCircleText}>×</Text>
               </Pressable>
             </View>
-            <View style={{gap: theme.spacing.sm}}>
+            <View style={{ gap: theme.spacing.sm }}>
               {ADVISORS.map(advisor => (
                 <Pressable
                   key={advisor.name}
                   onPress={() => handleSelect(advisor)}
-                  style={({pressed}) => [styles.advisorRow, pressed && styles.advisorPressed]}>
+                  style={({ pressed }) => [styles.advisorRow, pressed && styles.advisorPressed]}>
                   <View>
                     <Text style={styles.advisorName}>{advisor.name}</Text>
                     <Text style={styles.advisorFee}>Fee: ${advisor.fee.toLocaleString()}</Text>
@@ -55,7 +55,7 @@ const FinancialAdvisorsButton = () => {
             </View>
             <Pressable
               onPress={() => setVisible(false)}
-              style={({pressed}) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
+              style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
               <Text style={styles.closeButtonText}>Close</Text>
             </Pressable>
           </View>
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   cardPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   title: {
     color: theme.colors.textPrimary,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   closeButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   closeButtonText: {
     color: theme.colors.textSecondary,

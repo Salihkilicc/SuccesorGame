@@ -1,16 +1,16 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import RAndDModal from './Actions/RAndDModal';
 import LoanModal from './Actions/LoanModal';
 import IssueSharesModal from './Actions/IssueSharesModal';
 import AcquireStartupModal from './Actions/AcquireStartupModal';
-import {theme} from '../../theme';
+import { theme } from '../../core/theme';
 
 const ACTIONS = [
-  {label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation'},
-  {label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital'},
-  {label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash'},
-  {label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio'},
+  { label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation' },
+  { label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital' },
+  { label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash' },
+  { label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio' },
 ] as const;
 
 const CompanyActions = () => {
@@ -48,7 +48,7 @@ const CompanyActions = () => {
           <Pressable
             key={action.key}
             onPress={() => handlePress(action.key)}
-            style={({pressed}) => [
+            style={({ pressed }) => [
               styles.button,
               pressed && styles.buttonPressed,
             ]}>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     backgroundColor: theme.colors.cardSoft,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   icon: {
     fontSize: 22,

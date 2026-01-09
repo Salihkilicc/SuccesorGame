@@ -7,8 +7,8 @@ import {
     Modal,
     Alert,
 } from 'react-native';
-import { theme } from '../../../theme';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { theme } from '../../../core/theme';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 interface Props {
     visible: boolean;

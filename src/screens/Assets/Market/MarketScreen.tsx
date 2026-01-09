@@ -3,9 +3,9 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useEventStore } from '../../../store';
+import { useEventStore } from '../../../core/store';
 import { triggerEvent } from '../../../event/eventEngine';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 // Bileşenler
 import AppScreen from '../../../components/layout/AppScreen';
@@ -21,34 +21,34 @@ const MarketScreen = () => {
   const data = useMemo(() => STOCKS[selectedCategory] ?? [], [selectedCategory]);
 
   return (
-    <AppScreen 
-      title="MARKET" 
-      subtitle="Simulated Nasdaq & Crypto" 
+    <AppScreen
+      title="MARKET"
+      subtitle="Simulated Nasdaq & Crypto"
       leftNode={<BackButton navigation={navigation} />}
     >
       <FlatList
         data={data}
         keyExtractor={item => item.symbol}
         contentContainerStyle={styles.listContent}
-        
+
         // Header ve Footer'ı aşağıda tanımladığımız bileşenlerden alıyoruz
         ListHeaderComponent={
-          <MarketHeader 
-            selectedCategory={selectedCategory} 
-            onSelectCategory={setSelectedCategory} 
+          <MarketHeader
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
           />
         }
         ListFooterComponent={<MarketEventFooter />}
-        ItemSeparatorComponent={() => <View style={{height: 12}} />}
-        
-        renderItem={({item}) => (
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+
+        renderItem={({ item }) => (
           <Pressable
             onPress={() => navigation.navigate('StockDetail', {
-                symbol: item.symbol,
-                price: item.price,
-                change: item.change,
-                category: selectedCategory,
-              })
+              symbol: item.symbol,
+              price: item.price,
+              change: item.change,
+              category: selectedCategory,
+            })
             }>
             <StockItemSkeleton
               symbol={item.symbol}
@@ -71,7 +71,7 @@ const MarketScreen = () => {
 const BackButton = ({ navigation }: { navigation: any }) => (
   <Pressable
     onPress={() => navigation.canGoBack() && navigation.goBack()}
-    style={({pressed}) => [styles.backButton, pressed && styles.backButtonPressed]}>
+    style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
     <Text style={styles.backIcon}>←</Text>
   </Pressable>
 );
@@ -104,7 +104,7 @@ const MarketEventFooter = () => {
   const { lastMarketEvent } = useEventStore();
   return (
     <View style={styles.eventCard}>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs }}>
         <Text style={styles.eventIcon}>📈</Text>
         <Text style={styles.sectionTitle}>Today&apos;s Market Event</Text>
       </View>
@@ -113,7 +113,7 @@ const MarketEventFooter = () => {
       </Text>
       <Pressable
         onPress={() => void triggerEvent('market')}
-        style={({pressed}) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
+        style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
         <Text style={styles.secondaryButtonText}>Trigger Market Event</Text>
       </Pressable>
     </View>
@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
   eventIcon: { fontSize: 16 },
   eventText: { fontSize: theme.typography.caption + 1, color: theme.colors.textSecondary, lineHeight: 18 },
   secondaryButton: { backgroundColor: theme.colors.accentSoft, paddingVertical: theme.spacing.md, borderRadius: theme.radius.sm, alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  secondaryButtonPressed: { backgroundColor: theme.colors.card, transform: [{scale: 0.98}] },
+  secondaryButtonPressed: { backgroundColor: theme.colors.card, transform: [{ scale: 0.98 }] },
   secondaryButtonText: { color: theme.colors.accent, fontWeight: '700', fontSize: theme.typography.body },
   backButton: { width: 36, height: 36, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.card },
-  backButtonPressed: { backgroundColor: theme.colors.cardSoft, transform: [{scale: 0.97}] },
+  backButtonPressed: { backgroundColor: theme.colors.cardSoft, transform: [{ scale: 0.97 }] },
   backIcon: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
 });

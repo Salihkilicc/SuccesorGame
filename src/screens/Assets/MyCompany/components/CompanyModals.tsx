@@ -1,7 +1,7 @@
 // src/features/MyCompany/components/CompanyModals.tsx
 import React from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
-import { theme } from '../../../../theme';
+import { theme } from '../../../../core/theme';
 import GameButton from '../../../../components/common/GameButton';
 
 // Modalların importları (Aynen taşıyoruz)
@@ -9,8 +9,7 @@ import CorporateFinanceHubModal from '../../../../components/MyCompany/Finance/C
 import BorrowModal from '../../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../../components/MyCompany/Finance/RepayModal';
 import GameModal from '../../../../components/common/GameModal';
-import ProductsScreen from '../../../Products/ProductsScreen';
-import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
+import ProductsScreen from '../../../../features/products/screens/ProductsScreen';import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../../components/MyCompany/Management/EmployeesModule';
 import ShareControlHub from '../../../../components/MyCompany/Shares/ShareControlHub';
 import BoardMembersModal from '../../../../components/MyCompany/Shares/BoardMembersModal';

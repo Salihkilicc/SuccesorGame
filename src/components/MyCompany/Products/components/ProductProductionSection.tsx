@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '../../../../theme';
+import { theme } from '../../../../core/theme';
 import GameButton from '../../../common/GameButton';
 import SectionCard from '../../../common/SectionCard';
 

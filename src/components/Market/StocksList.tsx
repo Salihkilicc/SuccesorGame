@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 import type { StockItem } from './marketTypes';
 
 type Props = {

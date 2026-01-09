@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert, Pressable } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import { useProductManagement } from './useProductManagement';
-import { useProductStore, DEFAULT_SUPPLIERS } from '../../../store/useProductStore';
-import { useStatsStore, TechLevels } from '../../../store/useStatsStore';
+import { useProductStore, DEFAULT_SUPPLIERS } from '../../../core/store/useProductStore';
+import { useStatsStore, TechLevels } from '../../../core/store/useStatsStore';
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SectionCard from '../../common/SectionCard';

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { theme } from '../../../theme'; // Adjust path
+import { theme } from '../../../core/theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
-import { useStatsStore } from '../../../store/useStatsStore';
-import { usePlayerStore } from '../../../store/usePlayerStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';

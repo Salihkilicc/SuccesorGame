@@ -1,9 +1,9 @@
 import React from 'react';
-import {SafeAreaView, FlatList, Text, StyleSheet, View} from 'react-native';
+import { SafeAreaView, FlatList, Text, StyleSheet, View } from 'react-native';
 import AchievementItem from '../../components/Achievements/AchievementItem';
 import AchievementToast from '../../components/Achievements/AchievementToast';
-import {ACHIEVEMENTS} from '../../achievements/achievements';
-import {theme} from '../../theme';
+import { ACHIEVEMENTS } from '../../achievements/achievements';
+import { theme } from '../../core/theme';
 
 const AchievementsScreen = () => {
   return (
@@ -18,8 +18,8 @@ const AchievementsScreen = () => {
             <Text style={styles.subtitle}>Long-term goals & milestones.</Text>
           </View>
         }
-        renderItem={({item}) => <AchievementItem achievement={item} />}
-        ItemSeparatorComponent={() => <View style={{height: theme.spacing.md}} />}
+        renderItem={({ item }) => <AchievementItem achievement={item} />}
+        ItemSeparatorComponent={() => <View style={{ height: theme.spacing.md }} />}
         showsVerticalScrollIndicator={false}
       />
       <AchievementToast />

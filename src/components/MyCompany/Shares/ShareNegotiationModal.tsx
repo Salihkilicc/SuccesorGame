@@ -7,8 +7,8 @@ import {
     Modal,
     TextInput,
 } from 'react-native';
-import { theme } from '../../../theme';
-import { Shareholder } from '../../../store/useStatsStore';
+import { theme } from '../../../core/theme';
+import { Shareholder } from '../../../core/store/useStatsStore';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useNegotiationLogic } from '../../../features/shareholders/hooks/useNegotiationLogic';
 
@@ -37,7 +37,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
         handleClose
     } = useNegotiationLogic(visible, shareholder, onClose);
 
-    const { companySharePrice } = require('../../../store/useStatsStore').useStatsStore(); // Required for display hint
+    const { companySharePrice } = require('../../../core/store/useStatsStore').useStatsStore(); // Required for display hint
 
     return (
         <Modal visible={visible} animationType="fade" onRequestClose={handleClose}>

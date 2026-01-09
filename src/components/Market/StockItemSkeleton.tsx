@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {theme} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { theme } from '../../core/theme';
 
 type StockItemSkeletonProps = {
   symbol: string;
@@ -25,7 +25,7 @@ const StockItemSkeleton = ({
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.symbol}>{symbol}</Text>
           {name ? <Text style={styles.name}>{name}</Text> : null}
         </View>

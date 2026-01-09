@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { usePlayerStore } from '../../store/usePlayerStore';
-import { theme } from '../../theme';
+import { usePlayerStore } from '../../core/store/usePlayerStore';
+import { theme } from '../../core/theme';
 
 type StatPillProps = {
   label: string;

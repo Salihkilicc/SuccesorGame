@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 import { useProductManagement } from './useProductManagement';
-import { Supplier } from '../../../store/useProductStore';
+import { Supplier } from '../../../core/store/useProductStore';
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 

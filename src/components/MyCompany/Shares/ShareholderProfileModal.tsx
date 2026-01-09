@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, TouchableOpacity } from 'react-native';
-import { theme } from '../../../theme';
-import { Shareholder } from '../../../store/useStatsStore';
+import { theme } from '../../../core/theme';
+import { Shareholder } from '../../../core/store/useStatsStore';
 // 👇 YOL GÜNCELLENDİ
 import { useShareholderActions } from './logic/useShareholderActions';
 
@@ -77,23 +77,23 @@ const ShareholderProfileModal = ({ visible, shareholder, onClose, onOpenGift, on
 
                     {!isPlayer && (
                         <View style={styles.actionsColumn}>
-                            <ActionButton 
-                                icon="📉" 
-                                title="Negotiate Shares" 
-                                subtitle="Buy or sell shares" 
-                                onPress={() => onOpenNegotiate(shareholder)} 
+                            <ActionButton
+                                icon="📉"
+                                title="Negotiate Shares"
+                                subtitle="Buy or sell shares"
+                                onPress={() => onOpenNegotiate(shareholder)}
                             />
-                            <ActionButton 
-                                icon="🎁" 
-                                title="Send Gift / Lobby" 
-                                subtitle="Improve relationship" 
-                                onPress={() => onOpenGift(shareholder)} 
+                            <ActionButton
+                                icon="🎁"
+                                title="Send Gift / Lobby"
+                                subtitle="Improve relationship"
+                                onPress={() => onOpenGift(shareholder)}
                             />
-                            <ActionButton 
-                                icon="💬" 
-                                title="Insult / Pressure" 
-                                subtitle="Risk relationship for gain" 
-                                onPress={() => performInsult(shareholder)} 
+                            <ActionButton
+                                icon="💬"
+                                title="Insult / Pressure"
+                                subtitle="Risk relationship for gain"
+                                onPress={() => performInsult(shareholder)}
                             />
                         </View>
                     )}

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { useProductStore } from '../../../store/useProductStore';
+import { useProductStore } from '../../../core/store/useProductStore';
 import { Product, Supplier, DEFAULT_SUPPLIERS } from '../../../features/products/data/productsData';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 const MARKET_SEARCH_COST = 50000;
 

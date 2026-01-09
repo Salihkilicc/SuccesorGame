@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore, useUserStore, usePlayerStore } from '../../../store';
+import { useStatsStore, useUserStore, usePlayerStore } from '../../../core/store';
 import { calculateShoppingDiscount } from '../../../logic/statsLogic';
 import { SHOP_DATA } from '../../../data/ShoppingData'; // Yolunu kontrol et
 

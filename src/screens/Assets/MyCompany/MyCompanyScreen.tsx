@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Text, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from '../../../theme';
-import { useStatsStore } from '../../../store';
-import { useProductStore } from '../../../store/useProductStore';
-import { useGameStore } from '../../../store/useGameStore';
+import { theme } from '../../../core/theme';
+import { useStatsStore } from '../../../core/store';
+import { useProductStore } from '../../../core/store/useProductStore';
+import { useGameStore } from '../../../core/store/useGameStore';
 import { formatCurrency } from './NativeEconomy';
 import { useCompanyLogic } from './useCompanyLogic';
 

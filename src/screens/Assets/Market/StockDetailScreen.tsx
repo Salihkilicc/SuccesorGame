@@ -1,17 +1,17 @@
 import React from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import type {AssetsStackParamList} from '../../../navigation';
+import { ScrollView, StyleSheet } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { AssetsStackParamList } from '../../../navigation';
 import StockDetailHeader from '../../../components/Market/StockDetailHeader';
 import StockInfoSection from '../../../components/Market/StockInfoSection';
 import BuySellPanel from '../../../components/Market/BuySellPanel';
-import {theme} from '../../../theme';
+import { theme } from '../../../core/theme';
 import AppScreen from '../../../components/layout/AppScreen';
 
 type Props = NativeStackScreenProps<AssetsStackParamList, 'StockDetail'>;
 
-const StockDetailScreen = ({route}: Props) => {
-  const {symbol, price, change, category} = route.params;
+const StockDetailScreen = ({ route }: Props) => {
+  const { symbol, price, change, category } = route.params;
   const categoryLabel = category ?? 'Tech';
   const riskLabel = 'Medium';
 

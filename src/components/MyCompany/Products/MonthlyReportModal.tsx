@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { theme } from '../../../theme';
-import { Product } from '../../../store/useProductStore';
+import { theme } from '../../../core/theme';
+import { Product } from '../../../core/store/useProductStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';

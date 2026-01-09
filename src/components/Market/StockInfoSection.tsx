@@ -1,15 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PremiumBadge from '../common/PremiumBadge';
-import {useUserStore} from '../../store';
-import type {AssetsStackParamList} from '../../navigation';
-import {theme} from '../../theme';
+import { useUserStore } from '../../core/store';
+import type { AssetsStackParamList } from '../../navigation';
+import { theme } from '../../core/theme';
 
 const StockInfoSection = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
-  const {hasPremium} = useUserStore();
+  const { hasPremium } = useUserStore();
 
   const goPremium = () => navigation.navigate('Premium');
 
@@ -34,7 +34,7 @@ const StockInfoSection = () => {
             <Text style={styles.lockedText}>Expert yorumları Premium ile açılır.</Text>
             <Pressable
               onPress={goPremium}
-              style={({pressed}) => [styles.goPremiumButton, pressed && styles.goPremiumButtonPressed]}>
+              style={({ pressed }) => [styles.goPremiumButton, pressed && styles.goPremiumButtonPressed]}>
               <Text style={styles.goPremiumLabel}>Go Premium</Text>
             </Pressable>
           </>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   goPremiumButtonPressed: {
     backgroundColor: theme.colors.card,
-    transform: [{scale: 0.98}],
+    transform: [{ scale: 0.98 }],
   },
   goPremiumLabel: {
     color: theme.colors.textPrimary,

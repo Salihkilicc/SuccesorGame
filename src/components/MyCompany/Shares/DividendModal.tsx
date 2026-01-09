@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '../../../theme';
+import { theme } from '../../../core/theme';
 
 // Common Components
 import GameModal from '../../common/GameModal';
@@ -21,7 +21,7 @@ interface Props {
  * * Updated to use PercentageSelector for better performance.
  */
 const DividendModal = ({ visible, onClose }: Props) => {
-    
+
     const {
         dividendPercentage,
         setDividendPercentage,

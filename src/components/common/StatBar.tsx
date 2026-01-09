@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, StyleProp, ViewStyle } from 'react-native';
-import { useStatsStore } from '../../store/useStatsStore';
-import { usePlayerStore } from '../../store/usePlayerStore';
-import { theme } from '../../theme';
+import { useStatsStore } from '../../core/store/useStatsStore';
+import { usePlayerStore } from '../../core/store/usePlayerStore';
+import { theme } from '../../core/theme';
 
 type StatBarProps = {
   style?: StyleProp<ViewStyle>;

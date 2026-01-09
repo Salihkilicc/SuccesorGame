@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useStatsStore, useUserStore, useGameStore, usePlayerStore } from '../../store';
-import { theme } from '../../theme';
+import { useStatsStore, useUserStore, useGameStore, usePlayerStore } from '../../core/store';
+import { theme } from '../../core/theme';
 import type { LifeStackParamList } from '../../navigation';
 
 type Navigation = NativeStackNavigationProp<LifeStackParamList, 'Profile'>;

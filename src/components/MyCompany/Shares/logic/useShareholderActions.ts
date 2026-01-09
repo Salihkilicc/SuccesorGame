@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 // 👇 DÜZELTME: Bir "../" daha eklendi
-import { useStatsStore, Shareholder } from '../../../../store/useStatsStore';
+import { useStatsStore, Shareholder } from '../../../../core/store/useStatsStore';
 
 export const useShareholderActions = () => {
     const { setField, updateShareholderRelationship, shareholders, setShareholders } = useStatsStore();
@@ -16,7 +16,7 @@ export const useShareholderActions = () => {
                     style: 'destructive',
                     onPress: () => {
                         const roll = Math.random();
-                        
+
                         // %5 Şansla Başarılı (Panic Sell)
                         if (roll < 0.05) {
                             const panicAmount = Math.min(shareholder.percentage, 1.0);

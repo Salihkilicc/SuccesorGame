@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useStatsStore } from '../../store/useStatsStore';
-import { useGameStore } from '../../store/useGameStore';
+import { useStatsStore } from '../../core/store/useStatsStore';
+import { useGameStore } from '../../core/store/useGameStore';
 
 export const FACTORY_COST = 50_000;
 export const FACTORY_CAPACITY = 1000;

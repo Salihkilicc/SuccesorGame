@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 import { Product, INITIAL_PRODUCTS } from '../data/productsData';
-import { useProductStore } from '../../../store/useProductStore';
-import { useLaboratoryStore } from '../../../store/useLaboratoryStore';
+import { useProductStore } from '../../../core/store/useProductStore';
+import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 
 // --- KRİTİK AYAR ---
 // 75.000.000 Üretim / 160.000 İşçi = 468.75

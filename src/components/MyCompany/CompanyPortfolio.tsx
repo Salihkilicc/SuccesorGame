@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useStatsStore } from '../../store/useStatsStore';
+import { useStatsStore } from '../../core/store/useStatsStore';
 import ShareControlHub from './Shares/ShareControlHub';
 
 const CompanyPortfolio = () => {

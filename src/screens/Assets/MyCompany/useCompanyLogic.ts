@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../store';
+import { useStatsStore } from '../../../core/store';
 
 export const useCompanyLogic = () => {
   const {

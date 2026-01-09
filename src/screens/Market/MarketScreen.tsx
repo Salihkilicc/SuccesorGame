@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 import TickerBand from '../../components/Market/TickerBand';
 import FinancialNewsButton from '../../components/Market/FinancialNewsButton';
 import FinancialAdvisorsButton from '../../components/Market/FinancialAdvisorsButton';
@@ -24,7 +24,7 @@ import type {
   StockItem,
 } from '../../components/Market/marketTypes';
 import type { AssetsStackParamList } from '../../navigation';
-import { useMarketStore } from '../../store';
+import { useMarketStore } from '../../core/store';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../theme';
+import { theme } from '../../core/theme';
 import { useAssetsLogic } from './logic/useAssetsLogic'; // Yeni Hook
 import {
     AssetsHeader,

@@ -1,4 +1,4 @@
-import { PartnerProfile } from '../data/types';
+import { PartnerProfile } from '../core/types';
 
 export interface PartnerBuffResult {
     changes: {

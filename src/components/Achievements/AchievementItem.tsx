@@ -1,15 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Achievement} from '../../achievements/achievements';
-import {theme} from '../../theme';
-import {useAchievementStore} from '../../store/useAchievementStore';
+import { View, Text, StyleSheet } from 'react-native';
+import { Achievement } from '../../achievements/achievements';
+import { theme } from '../../core/theme';
+import { useAchievementStore } from '../../core/store/useAchievementStore';
 
 type Props = {
   achievement: Achievement;
 };
 
-const AchievementItem = ({achievement}: Props) => {
-  const {unlockedIds} = useAchievementStore();
+const AchievementItem = ({ achievement }: Props) => {
+  const { unlockedIds } = useAchievementStore();
   const unlocked = unlockedIds.includes(achievement.id);
   const isHidden = achievement.hidden && !unlocked;
 
@@ -19,7 +19,7 @@ const AchievementItem = ({achievement}: Props) => {
   return (
     <View style={[styles.card, unlocked ? styles.cardUnlocked : styles.cardLocked]}>
       <View style={styles.row}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.category}>{achievement.category.toUpperCase()}</Text>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.description}>{description}</Text>
