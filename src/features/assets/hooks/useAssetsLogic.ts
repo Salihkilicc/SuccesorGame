@@ -6,8 +6,16 @@ export const useAssetsLogic = () => {
     const riskApetite = personality.riskAppetite;
     const strategicSense = attributes.intellect;
     const { lastMarketEvent } = useEventStore();
-    const { inventory } = useUserStore();
+    const { inventory, partner } = useUserStore();
     const { holdings } = useMarketStore();
+
+    // Partner Cost Calculation
+    const partnerCost = (partner && 'finances' in partner && (partner as any).finances?.monthlyCost)
+        ? (partner as any).finances.monthlyCost
+        : 0;
+
+    // Total Monthly Expenses
+    const totalMonthlyExpenses = (monthlyExpenses || 0) + partnerCost;
 
     // Helper: Para Formatla
     const formatMoney = (value: number) => {
@@ -46,12 +54,18 @@ export const useAssetsLogic = () => {
         return 'Balance your portfolio between growth and stability.';
     })();
 
+    // Expense Breakdown
+    const expenseBreakdown = [
+        { id: 'base_living', label: 'Lifestyle & Housing', amount: monthlyExpenses || 0 },
+        ...(partnerCost > 0 ? [{ id: 'partner_cost', label: 'Relationship', amount: partnerCost }] : [])
+    ];
+
     return {
         stats: {
             netWorth: totalNetWorth,
             money,
             monthlyIncome,
-            monthlyExpenses,
+            monthlyExpenses: totalMonthlyExpenses, // Override with total
             riskApetite,
             strategicSense,
             investmentsValue,
@@ -59,7 +73,8 @@ export const useAssetsLogic = () => {
             vehiclesValue,
             belongingsValue,
             lastMarketEvent,
-            nextMove
+            nextMove,
+            expenseBreakdown // Expose breakdown
         },
         formatMoney
     };

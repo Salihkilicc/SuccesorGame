@@ -13,6 +13,11 @@ export const useRelationshipBuffs = () => {
     let legalProtection = 0;
     let socialRepBonus = 0;
 
+    // New Visual Buffs
+    let intellectBoost = 0;
+    let strengthBoost = 0;
+    let socialBoost = 0;
+
     // Check if partner exists and has the new Deep Persona structure
     if (partner && 'job' in partner && 'buffType' in (partner as any).job) {
         const deepPartner = partner as any;
@@ -28,7 +33,9 @@ export const useRelationshipBuffs = () => {
 
             case 'STRENGTH_TRAINING':
             case 'BRAVERY':
+            case 'GYM_GAINS': // New Type
                 gymBoost = buffValue;
+                strengthBoost = buffValue; // Alias
                 break;
 
             case 'LEGAL_DEFENSE':
@@ -38,7 +45,13 @@ export const useRelationshipBuffs = () => {
 
             case 'REPUTATION_BOOST':
             case 'PARTY_INVITES':
+            case 'FAME_BOOST': // New Type
                 socialRepBonus = buffValue;
+                socialBoost = buffValue;
+                break;
+
+            case 'INTELLECT_GAIN': // New Type
+                intellectBoost = buffValue;
                 break;
         }
     }
@@ -46,9 +59,13 @@ export const useRelationshipBuffs = () => {
     return {
         medicalDiscount, // 0 to 1 (e.g., 0.25 = 25% discount)
         gymBoost,
+        strengthBoost,
+        intellectBoost,
+        socialBoost,
         legalProtection,
         socialRepBonus,
         hasPartner: !!partner,
         partnerName: partner?.name || null,
+        partnerJob: (partner as any)?.job?.title || null
     };
 };

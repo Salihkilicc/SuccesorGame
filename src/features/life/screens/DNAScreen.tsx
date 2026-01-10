@@ -4,11 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { theme } from '../../../core/theme';
+import { useRelationshipBuffs } from '../../love/hooks/useRelationshipBuffs';
 
 // İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
 // Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
 
-const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon }: { label: string, value: number, max?: number, color?: string, icon?: string }) => {
+const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon, buff }: { label: string, value: number, max?: number, color?: string, icon?: string, buff?: string }) => {
     // Değerlerin undefined gelme ihtimaline karşı koruma
     const safeValue = value || 0;
     const percentage = Math.min(100, Math.max(0, (safeValue / max) * 100));
@@ -18,6 +19,11 @@ const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon }: { lab
             <View style={styles.statLabelContainer}>
                 {icon && <Text style={{ fontSize: 16, marginRight: 8 }}>{icon}</Text>}
                 <Text style={styles.statLabel}>{label}</Text>
+                {buff && (
+                    <View style={styles.buffBadge}>
+                        <Text style={styles.buffText}>{buff} 💖</Text>
+                    </View>
+                )}
             </View>
             <View style={styles.progressContainer}>
                 <View style={[styles.progressBar, { width: `${percentage}%`, backgroundColor: color }]} />
@@ -45,6 +51,9 @@ const DNAScreen = () => {
         security,
         skills
     } = usePlayerStore();
+
+    // Relationship Buffs
+    const { intellectBoost, strengthBoost, socialBoost } = useRelationshipBuffs();
 
     const handleBack = () => navigation.goBack();
 
@@ -114,6 +123,7 @@ const DNAScreen = () => {
                         max={100}
                         color="#2ecc71"
                         icon="📈"
+                        buff={strengthBoost > 0 ? `+${strengthBoost}%` : undefined}
                     />
                 </View>
 
@@ -123,16 +133,34 @@ const DNAScreen = () => {
                     <ProgressBar label="Casino (VIP)" value={reputation?.casino} color="#E91E63" icon="🎰" />
                     <ProgressBar label="Street (Cred)" value={reputation?.street} color="#c0392b" icon="🗡️" />
                     <ProgressBar label="Business (Trust)" value={reputation?.business} color="#2980b9" icon="💼" />
-                    <ProgressBar label="High Society" value={reputation?.social} color="#8e44ad" icon="🥂" />
+                    <ProgressBar
+                        label="High Society"
+                        value={reputation?.social}
+                        color="#8e44ad"
+                        icon="🥂"
+                        buff={socialBoost > 0 ? `+${socialBoost}` : undefined}
+                    />
                 </View>
 
                 {/* 🧬 GENETICS - Temel Özellikler */}
                 <View style={styles.card}>
                     <SectionHeader title="Core Genetics" icon="🧬" />
-                    <ProgressBar label="Intellect" value={attributes?.intellect} color="#9b59b6" icon="🧠" />
+                    <ProgressBar
+                        label="Intellect"
+                        value={attributes?.intellect}
+                        color="#9b59b6"
+                        icon="🧠"
+                        buff={intellectBoost > 0 ? `+${intellectBoost}` : undefined}
+                    />
                     <ProgressBar label="Charm" value={attributes?.charm} color="#e91e63" icon="👄" />
                     <ProgressBar label="Looks" value={attributes?.looks} color="#f1c40f" icon="✨" />
-                    <ProgressBar label="Strength" value={attributes?.strength} color="#e74c3c" icon="💪" />
+                    <ProgressBar
+                        label="Strength"
+                        value={attributes?.strength}
+                        color="#e74c3c"
+                        icon="💪"
+                        buff={strengthBoost > 0 ? `+${strengthBoost}` : undefined}
+                    />
                 </View>
 
                 {/* 🧠 PERSONALITY - Karakter */}
@@ -227,6 +255,20 @@ const styles = StyleSheet.create({
         color: '#ccc',
         fontSize: 14,
         fontWeight: '500',
+    },
+    buffBadge: {
+        backgroundColor: '#1B5E20', // Dark Green
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 8,
+        marginLeft: 6,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    buffText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#4CAF50', // Bright Green Text
     },
     progressContainer: {
         flex: 1,

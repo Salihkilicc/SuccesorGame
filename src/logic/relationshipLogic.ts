@@ -59,8 +59,36 @@ export const applyPartnerBuffs = (partner: PartnerProfile): PartnerBuffResult =>
     };
     let notifications: string[] = [];
 
-    const { occupation, socialClass } = partner.stats;
-    const job = occupation.toLowerCase();
+    // Safely extract job and social class
+    let rawJob = '';
+    let socialClass = 'MiddleClass';
+
+    // 1. Legacy Structure
+    if (partner.stats) {
+        if (partner.stats.occupation) rawJob = partner.stats.occupation;
+        if (partner.stats.socialClass) socialClass = partner.stats.socialClass;
+    }
+
+    // 2. New Deep Persona Structure
+    if (!rawJob && 'job' in partner) {
+        const deepPartner = partner as any;
+        if (deepPartner.job?.title) rawJob = deepPartner.job.title;
+
+        // Map Tier to Class if needed
+        if (deepPartner.job?.tier) {
+            const tierMap: Record<string, string> = {
+                'HIGH_SOCIETY': 'HighSociety',
+                'CORPORATE_ELITE': 'OldMoney',
+                'UNDERGROUND': 'CriminalElite',
+                'BLUE_COLLAR': 'WorkingClass',
+                'STUDENT_LIFE': 'MiddleClass',
+                'ARTISTIC': 'MiddleClass'
+            };
+            socialClass = tierMap[deepPartner.job.tier] || 'MiddleClass';
+        }
+    }
+
+    const job = rawJob.toLowerCase();
 
     // --- 1. OCCUPATIONAL BUFFS ---
 
@@ -149,10 +177,37 @@ export interface Perk {
     color: string;
 }
 
-export const getPartnerPerks = (partner: PartnerProfile): Perk[] => {
+export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
     const perks: Perk[] = [];
-    const { occupation, socialClass } = partner.stats;
-    const job = occupation.toLowerCase();
+
+    // Safely extract job and social class (handling both Old Profile and Deep Persona structures)
+    let jobTitle = '';
+    let socialClass = 'MiddleClass'; // Default fallback
+
+    // 1. Try Old Structure (PartnerStats)
+    if (partner.stats) {
+        if (partner.stats.occupation) jobTitle = partner.stats.occupation;
+        if (partner.stats.socialClass) socialClass = partner.stats.socialClass;
+    }
+
+    // 2. Try Deep Persona Structure (JobDefinition) if failed
+    if (!jobTitle && partner.job && partner.job.title) {
+        jobTitle = partner.job.title;
+        // Map Tier to Class if needed found in simple mapping
+        const tierMap: Record<string, string> = {
+            'HIGH_SOCIETY': 'HighSociety',
+            'CORPORATE_ELITE': 'OldMoney',
+            'UNDERGROUND': 'CriminalElite',
+            'BLUE_COLLAR': 'WorkingClass',
+            'STUDENT_LIFE': 'MiddleClass',
+            'ARTISTIC': 'MiddleClass'
+        };
+        if (partner.job.tier) socialClass = tierMap[partner.job.tier] || 'MiddleClass';
+    }
+
+    if (!jobTitle) return []; // No job, no perks
+
+    const job = jobTitle.toLowerCase();
 
     // 🛡️ Security & Tech (Hacker, Engineer)
     if (['hacker', 'scientist', 'engineer', 'developer', 'cyber', 'it_specialist'].some(o => job.includes(o))) {
