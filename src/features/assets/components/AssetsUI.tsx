@@ -72,7 +72,7 @@ export const BreakdownSection = ({ title, items, isIncome }: { title: string, it
                 <View key={index} style={styles.breakdownRow}>
                     <Text style={styles.breakdownLabel}>{item.label}</Text>
                     <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : theme.colors.textPrimary }]}>
-                        {isIncome ? '+' : '-'}${item.amount.toLocaleString()}
+                        {isIncome ? '+' : '-'}${item.value.toLocaleString()}
                     </Text>
                 </View>
             ))}

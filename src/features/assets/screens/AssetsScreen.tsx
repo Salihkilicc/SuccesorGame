@@ -14,7 +14,7 @@ import {
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
-    const { stats, financialReport, formatMoney } = useAssetsLogic();
+    const { stats, finances, formatMoney } = useAssetsLogic();
 
     return (
         <View style={styles.safeArea}>
@@ -54,17 +54,17 @@ const AssetsScreen = () => {
                             </Pressable>
 
                             <View style={styles.incomeRow}>
-                                <SummaryRow label="Income" value={stats.monthlyIncome ? formatMoney(stats.monthlyIncome) : '$0'} />
-                                <SummaryRow label="Expenses" value={stats.monthlyExpenses ? formatMoney(stats.monthlyExpenses) : '$0'} />
+                                <SummaryRow label="Income" value={finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'} />
+                                <SummaryRow label="Expenses" value={finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'} />
                             </View>
                         </View>
                     </View>
 
                     {/* DETAIL BREAKDOWN */}
-                    {financialReport && (
+                    {finances && finances.breakdown && (
                         <View style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, marginTop: theme.spacing.lg, paddingTop: theme.spacing.md }}>
-                            <BreakdownSection title="Income Sources" items={financialReport.incomeBreakdown} isIncome />
-                            <BreakdownSection title="Monthly Expenses" items={financialReport.expenseBreakdown} />
+                            <BreakdownSection title="Income Sources" items={finances.breakdown.income} isIncome />
+                            <BreakdownSection title="Monthly Expenses" items={finances.breakdown.expenses} />
                         </View>
                     )}
                 </View>

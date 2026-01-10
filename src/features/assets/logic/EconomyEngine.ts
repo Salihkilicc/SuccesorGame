@@ -1,237 +1,79 @@
-import type { UserState } from '../../../core/store/useUserStore';
-import type { StatsState, SubsidiaryState } from '../../../core/store/useStatsStore';
-import type { GameState } from '../../../core/store/useGameStore';
-import type { HoldingItem } from '../../../components/Market/marketTypes';
-import { FinancialReport, IncomeSource, ExpenseCategory } from '../types/economyTypes';
 
-// Define a minimal MarketState interface if not available globally, or import it.
-// Based on useMarketStore.ts:
-interface MarketState {
-    holdings: HoldingItem[];
-}
+import { useUserStore } from '../../../core/store/useUserStore';
+import { useMarketStore } from '../../../core/store/useMarketStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
-/**
- * Calculates a detailed financial report for the month based on user and market state.
- * @param userState Current state of the user (partner, lifestyle, etc.)
- * @param statsState Current state of statistics (money, company, market data)
- * @param gameState Current game state
- */
-export const calculateMonthlyFinances = (
-    userState: UserState,
-    statsState: StatsState,
-    gameState: GameState,
-    marketState: MarketState
-): FinancialReport => {
+export const calculateMonthlyFinances = (userState: any, marketState: any, statsState: any) => {
+    // 1. Income
+    // Fallback to statsState.monthlyIncome because userState.job might not exist or be typed
+    const salary = statsState?.monthlyIncome || userState.job?.salary || 0;
 
-    // --- 1. MARKET / INVESTMENT IMPACT ---
-    // Calculate this first as it might produce dividends
-    const { totalValue: portfolioValue, monthlyReturn: portfolioReturn, dividendIncome } = calculatePortfolioPerformance(marketState);
-
-    // --- 2. INCOME CALCULATION ---
-    const incomeBreakdown: IncomeSource[] = [];
-
-    // Salary
-    const salary = calculateSalary(statsState);
-    if (salary > 0) {
-        incomeBreakdown.push({
-            id: 'source_salary',
-            label: 'Monthly Salary',
-            amount: salary,
-            type: 'SALARY'
+    // Simplification: Business Profit calculated via simple iteration if available, or placeholder
+    // If statsState has subsidiaryStates, use it
+    let businessProfit = 0;
+    if (statsState?.subsidiaryStates) {
+        Object.values(statsState.subsidiaryStates).forEach((sub: any) => {
+            if (!sub.isLossMaking && sub.currentProfit > 0) {
+                businessProfit += sub.currentProfit;
+            }
         });
     }
 
-    // Dividends (Stock Market)
-    if (dividendIncome > 0) {
-        incomeBreakdown.push({
-            id: 'source_dividend_portfolio',
-            label: 'Stock Dividends',
-            amount: dividendIncome,
-            type: 'DIVIDEND'
-        });
-    }
-
-    // Dividends (Business)
-    const dividends = calculateBusinessDividends(statsState);
-    if (dividends > 0) {
-        incomeBreakdown.push({
-            id: 'source_dividend_company',
-            label: 'Business Distributions',
-            amount: dividends,
-            type: 'DIVIDEND'
-        });
-    }
-
-    // Total Income
-    const totalIncome = incomeBreakdown.reduce((sum, item) => sum + item.amount, 0);
-
-    // --- 2. EXPENSE CALCULATION ---
-    const expenseBreakdown: ExpenseCategory[] = [];
-
-    // Relationship Costs
-    const relationshipCost = calculateRelationshipCost(userState);
-    if (relationshipCost > 0) {
-        expenseBreakdown.push({
-            id: 'expense_relationship',
-            label: 'Partner Support',
-            amount: relationshipCost,
-            type: 'RELATIONSHIP'
-        });
-    }
-
-    // Housing Costs
-    const housingCost = calculateHousingCost();
-    if (housingCost > 0) {
-        expenseBreakdown.push({
-            id: 'expense_housing',
-            label: 'Housing & Utilities',
-            amount: housingCost,
-            type: 'HOUSING'
-        });
-    }
-
-    // Lifestyle Costs
-    const lifestyleCost = calculateLifestyleCost(userState, statsState);
-    if (lifestyleCost > 0) {
-        expenseBreakdown.push({
-            id: 'expense_lifestyle',
-            label: 'Lifestyle & Social',
-            amount: lifestyleCost,
-            type: 'LIFESTYLE'
-        });
-    }
-
-    // Education Costs
-    const educationCost = calculateEducationCost(userState); // Using userState or playerStore if available
-    if (educationCost > 0) {
-        expenseBreakdown.push({
-            id: 'expense_education',
-            label: 'Education Fees',
-            amount: educationCost,
-            type: 'EDUCATION'
-        });
-    }
-
-    // Total Expenses
-    const totalExpenses = expenseBreakdown.reduce((sum, item) => sum + item.amount, 0);
-
-
-    // --- 4. AGGREGATION ---
-    return {
-        totalIncome,
-        totalExpenses,
-        netIncome: totalIncome - totalExpenses,
-        portfolioValue,
-        portfolioReturn,
-        incomeBreakdown,
-        expenseBreakdown
-    };
-};
-
-// --- HELPER FUNCTIONS ---
-
-const calculateSalary = (statsState: StatsState): number => {
-    // Currently utilizing monthlyIncome from StatsStore as the single source of truth for salary
-    return statsState.monthlyIncome || 0;
-};
-
-const calculateBusinessDividends = (statsState: StatsState): number => {
-    // If the user owns a company, check if it's generating distributable profit
-    if (!statsState.subsidiaryStates) return 0;
-
-    let totalProfit = 0;
-    Object.values(statsState.subsidiaryStates).forEach((sub: SubsidiaryState) => {
-        if (!sub.isLossMaking && sub.currentProfit > 0) {
-            totalProfit += sub.currentProfit;
-        }
-    });
-
-    return totalProfit;
-};
-
-const calculateRelationshipCost = (userState: UserState): number => {
-    const partner = userState.partner;
-    if (!partner) return 0;
-
-    // Check for 'finances' object (Dynamic / Future-proof)
-    // Casting to any because 'finances' is not yet in the official type definition
-    if ((partner as any).finances && typeof (partner as any).finances.monthlyCost === 'number') {
-        return (partner as any).finances.monthlyCost;
-    }
-
-    return 0;
-};
-
-const calculateHousingCost = (): number => {
-    // Placeholder for future Real Estate update
-    return 0;
-};
-
-const calculateLifestyleCost = (userState: UserState, statsState: StatsState): number => {
-    // Base calculation: SocialRep * 50
-    // Note: Social Reputation is in PlayerStore (Reputation), not UserState or StatsStore directly in some versions.
-    // However, checked UserState, it has gymState, etc. 
-    // Checked StatsStore, it has casinoReputation.
-    // UsePlayerStore has the full reputation object. 
-    // Since we don't have PlayerState passed in arguments of the main function signature from the prompt,
-    // we might need to assume 0 or check if it's available in the passed state objects.
-
-    // NOTE: The prompt asked to "Calculate Lifestyle Cost: Base calculation: SocialRep * 50".
-    // But SocialRep is in PlayerStore. 
-    // I will assume for now we cannot access PlayerStore inside this pure function unless passed.
-    // I will return a placeholder or 0 if I can't access it, or simpler: 
-    // If the user meant 'Reference' implementation, I'll add a TODO.
-    // OR, I can accept `playerReputation` as an optional argument or extract from a global if not pure.
-    // TO BE SAFE: I'll assume 0 for now to avoid compilation errors on missing types, 
-    // or add a comment that this needs PlayerState.
-
-    // Wait, I can try to see if I can use what I have.
-    // StatsStore has `salaryTier`. Maybe use that?
-    // "Rich people spend more".
-
-    // Revised: I will use a safe default or 0.
-    return 0;
-};
-
-const calculateEducationCost = (userState: UserState): number => {
-    // Check if student
-    // userState doesn't have education. PlayerStore does.
-    // Returning 0 as placeholder.
-    return 0;
-};
-
-// Portfolio Logic
-const calculatePortfolioPerformance = (
-    marketState: MarketState
-): { totalValue: number; monthlyReturn: number; dividendIncome: number } => {
-    let totalValue = 0;
-    let monthlyReturn = 0;
+    // 2. Portfolio (Stocks/Crypto)
+    let portfolioValue = 0;
     let dividendIncome = 0;
 
-    if (!marketState.holdings) return { totalValue, monthlyReturn, dividendIncome };
+    if (marketState?.holdings) {
+        marketState.holdings.forEach((holding: any) => {
+            const val = holding.estimatedValue || 0;
+            portfolioValue += val;
 
-    marketState.holdings.forEach((holding: HoldingItem) => {
-        // Calculate current value directly from holding's estimated value (which tracks market price)
-        const currentValue = holding.estimatedValue;
-        totalValue += currentValue;
+            // 0.5% Yield for Stocks
+            if (holding.type === 'stock') {
+                dividendIncome += val * 0.005;
+            }
+        });
+    }
 
-        // Calculate Return (PL)
-        // PL is "Profit/Loss", assuming it's total. For monthly change we might need dailyChange * 30
-        // For now, we take a simplified approach using estimated monthly movement
-        // We'll trust the simulation updates 'estimatedValue' over time. The 'pl' field is total profit.
-        // We can simulate a monthly fluctuation for the report based on asset type if needed, 
-        // but robustly we should track previous month value. 
-        // For this phase, we return 0 for monthlyReturn unless we have history. 
-        // OPTION B: Assume 1% growth for report purposes?
-        monthlyReturn += 0; // Placeholder until we have history tracking
-
-        // Calculate Dividends
-        if (holding.type === 'stock') {
-            // 0.5% Monthly Yield for Stocks
-            const yieldAmount = currentValue * 0.005;
-            dividendIncome += yieldAmount;
+    // 3. Expenses
+    let partnerCost = 0;
+    if (userState.partner) {
+        // Handle both simple and deep profile structures
+        if (userState.partner.finances?.monthlyCost) {
+            partnerCost = userState.partner.finances.monthlyCost;
+        } else if (typeof userState.partner.monthlyCost === 'number') {
+            partnerCost = userState.partner.monthlyCost;
         }
-    });
+    }
 
-    return { totalValue, monthlyReturn, dividendIncome };
+    // Hardcoded logic from prompt + robustness
+    const housingCost = 1500;
+    const tax = Math.floor(salary * 0.2);
+
+    // Lifestyle Cost (Placeholder from previous logic, or simplified)
+    // Prompt didn't ask for lifestyle, but it's good to keep if we have data. 
+    // We'll stick to strictly what was requested + criticals.
+
+    const totalIncome = salary + businessProfit + dividendIncome;
+    // Note: 'tax' is usually deducted from Gross, but here treating as expense category
+    const totalExpenses = partnerCost + housingCost + tax;
+
+    return {
+        netIncome: totalIncome - totalExpenses,
+        totalIncome,
+        totalExpenses,
+        portfolioValue,
+        breakdown: {
+            income: [
+                { label: 'Job Salary', value: salary },
+                ...(dividendIncome > 0 ? [{ label: 'Dividends', value: dividendIncome }] : []),
+                ...(businessProfit > 0 ? [{ label: 'Business Profit', value: businessProfit }] : [])
+            ],
+            expenses: [
+                { label: 'Tax (20%)', value: tax },
+                { label: 'Housing', value: housingCost },
+                ...(partnerCost > 0 ? [{ label: 'Partner Upkeep', value: partnerCost }] : [])
+            ]
+        }
+    };
 };

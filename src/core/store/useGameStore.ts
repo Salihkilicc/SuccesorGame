@@ -296,9 +296,8 @@ export const useGameStore = create<GameStore>()(
 
         const monthlyReport = calculateMonthlyFinances(
           useUserStore.getState(),
-          useStatsStore.getState(),
-          get(),
-          useMarketStore.getState()
+          useMarketStore.getState(),
+          useStatsStore.getState()
         );
 
         const playerIncome = monthlyReport.totalIncome * months;

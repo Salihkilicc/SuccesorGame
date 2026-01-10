@@ -1,29 +1,23 @@
-import { useMemo } from 'react';
-import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore, useGameStore } from '../../../core/store';
+
+import { useUserStore } from '../../../core/store/useUserStore';
+import { useMarketStore } from '../../../core/store/useMarketStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../core/store/usePlayerStore'; // Restore
+import { useEventStore } from '../../../core/store/useEventStore';   // Restore
 import { calculateMonthlyFinances } from '../logic/EconomyEngine';
 
 export const useAssetsLogic = () => {
-    const statsStore = useStatsStore();
-    const userStore = useUserStore();
-    const gameStore = useGameStore(); // If needed for GameState
-    const marketStore = useMarketStore();
+    const user = useUserStore();
+    const market = useMarketStore();
+    const stats = useStatsStore();
+    const player = usePlayerStore(); // Restore
+    const eventStore = useEventStore(); // Restore
 
-    // Destructure for direct usage but pass full objects to engine
-    const { netWorth, money, monthlyIncome, monthlyExpenses } = statsStore;
-    const { personality, attributes } = usePlayerStore();
-    const riskApetite = personality.riskAppetite;
-    const strategicSense = attributes.intellect;
-    const { lastMarketEvent } = useEventStore();
-    const { inventory } = userStore;
-    const { holdings } = marketStore;
+    // Calculate Real-Time Finances
+    // Passing stats to ensure salary is found
+    const finances = calculateMonthlyFinances(user, market, stats);
 
-    // --- NEW ECONOMY ENGINE INTEGRATION ---
-    const financialReport = useMemo(() => {
-        return calculateMonthlyFinances(userStore, statsStore, gameStore, marketStore);
-    }, [userStore, statsStore, gameStore, marketStore]);
-
-
-    // Helper: Para Formatla
+    // Helper for currency formatting
     const formatMoney = (value: number) => {
         const absolute = Math.abs(value);
         if (absolute >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
@@ -32,56 +26,40 @@ export const useAssetsLogic = () => {
         return `$${value.toLocaleString()}`;
     };
 
-    // Yatırımlar
-    const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
+    // --- RESTORED LOGIC FOR UI COMPATIBILITY ---
+    const riskApetite = player.personality.riskAppetite;
 
-    // Emlak
-    const propertiesValue = inventory
-        .filter(i => ['penthouse', 'mansion', 'villa', 'estate', 'apartment', 'yali', 'house', 'land', 'ranch', 'chalet', 'vineyard', 'townhouse', 'lodge', 'camp', 'riad', 'resort', 'suite', 'castle', 'island', 'marina'].includes(i.type))
-        .reduce((acc, item) => acc + item.price, 0);
+    // Inventory Calculations
+    const getCategoryValue = (types: string[]) =>
+        user.inventory.filter(i => types.includes(i.type)).reduce((acc, item) => acc + item.price, 0);
 
-    // Taşıtlar
-    const vehiclesValue = inventory
-        .filter(i => ['car', 'plane', 'helicopter', 'jet', 'yacht', 'boat', 'submarine', 'ship', 'cruise_ship'].includes(i.type))
-        .reduce((acc, item) => acc + item.price, 0);
+    const propertiesValue = getCategoryValue(['penthouse', 'mansion', 'villa', 'estate', 'apartment', 'yali', 'house', 'land', 'ranch', 'chalet', 'vineyard', 'townhouse', 'lodge', 'camp', 'riad', 'resort', 'suite', 'castle', 'island', 'marina']);
+    const vehiclesValue = getCategoryValue(['car', 'plane', 'helicopter', 'jet', 'yacht', 'boat', 'submarine', 'ship', 'cruise_ship']);
+    const belongingsValue = getCategoryValue(['art', 'antique', 'artifact', 'weapon', 'ring', 'watch', 'gem', 'necklace', 'bracelet', 'tiara', 'earrings', 'brooch', 'watch_jewelry', 'jewel']);
 
-    // Eşyalar
-    const belongingsValue = inventory
-        .filter(i => ['art', 'antique', 'artifact', 'weapon', 'ring', 'watch', 'gem', 'necklace', 'bracelet', 'tiara', 'earrings', 'brooch', 'watch_jewelry', 'jewel'].includes(i.type))
-        .reduce((acc, item) => acc + item.price, 0);
-
-    // Toplam Net Servet
-    const totalNetWorth = netWorth + propertiesValue + vehiclesValue + belongingsValue + investmentsValue;
-
-    // Tavsiye Mantığı
     const nextMove = (() => {
         if (riskApetite > 65) return 'Consider adding a small position in higher risk assets.';
         if (riskApetite < 40) return 'Keep it safe: focus on blue-chip and lower volatility.';
         return 'Balance your portfolio between growth and stability.';
     })();
 
-    // Expense Breakdown (Using new Report)
-    const expenseBreakdown = financialReport.expenseBreakdown;
-
     return {
-        stats: {
-            netWorth: totalNetWorth,
-            money,
-            monthlyIncome: financialReport.totalIncome, // Use Engine
-            monthlyExpenses: financialReport.totalExpenses, // Use Engine
+        finances, // { netIncome, totalExpenses, breakdown... }
+        cash: stats.money, // Using stats.money as that is the source of truth for cash
+        netWorth: stats.netWorth,
+        stats: { // Keep compatibility with UI if it checks stats.xyz
+            money: stats.money,
+            netWorth: stats.netWorth,
+            portfolioValue: finances.portfolioValue,
+            investmentsValue: finances.portfolioValue, // Alias
             riskApetite,
-            strategicSense,
-            investmentsValue,
+            strategicSense: player.attributes.intellect,
+            lastMarketEvent: eventStore.lastMarketEvent,
+            nextMove,
             propertiesValue,
             vehiclesValue,
-            belongingsValue,
-            lastMarketEvent,
-            nextMove,
-            expenseBreakdown, // Expose breakdown directly
-            portfolioValue: financialReport.portfolioValue,
-            netIncome: financialReport.netIncome,
+            belongingsValue
         },
-        financialReport, // Expose full report if needed
         formatMoney
     };
 };
