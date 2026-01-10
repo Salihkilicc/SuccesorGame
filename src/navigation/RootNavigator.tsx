@@ -140,7 +140,6 @@ const AssetsStackNavigator = () => (
       component={MyCompanyScreen}
       options={{ title: formatScreenTitle('My Company') }}
     />
-    {/* Products buradan kaldırıldı */}
     <AssetsStack.Screen
       name="StockDetail"
       component={StockDetailScreen}
@@ -152,7 +151,6 @@ const AssetsStackNavigator = () => (
       component={ShoppingScreen}
       options={{ title: formatScreenTitle('Shopping') }}
     />
-    {/* ✅ NEW RESEARCH SCREEN removed from here, moved to Root */}
     <AssetsStack.Screen
       name="ShopDetail"
       component={ShopDetailScreen}

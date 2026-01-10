@@ -5,6 +5,7 @@ import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import GameModal from '../../../../components/common/GameModal';
 import GameButton from '../../../../components/common/GameButton';
+import { useRelationshipBuffs } from '../../../love/hooks/useRelationshipBuffs';
 
 type PlasticSurgeryModalProps = {
     visible: boolean;
@@ -30,6 +31,10 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
     const [selectedProcedure, setSelectedProcedure] = useState<{ name: string, cost: number } | null>(null);
     const [stage, setStage] = useState<'selection' | 'warning' | 'processing'>('selection');
 
+    // Get relationship buffs
+    const { medicalDiscount, partnerName } = useRelationshipBuffs();
+    const hasDiscount = medicalDiscount > 0;
+
     // Reset state on close
     useEffect(() => {
         if (!visible) {
@@ -37,6 +42,12 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
             setSelectedProcedure(null);
         }
     }, [visible]);
+
+    // Calculate discounted price
+    const getDiscountedPrice = (originalPrice: number) => {
+        if (!hasDiscount) return originalPrice;
+        return Math.floor(originalPrice * (1 - medicalDiscount));
+    };
 
     const handleSelect = (proc: { name: string, cost: number }) => {
         setSelectedProcedure(proc);
@@ -55,11 +66,14 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
         const currentCharm = attributes.charm;
         const { stress, health } = core;
 
+        // Apply discount to actual cost
+        const finalCost = getDiscountedPrice(selectedProcedure.cost);
+
         // Simulate operation time
         setTimeout(() => {
             if (isSuccess) {
                 handleServicePurchase(
-                    selectedProcedure.cost,
+                    finalCost,
                     {
                         charisma: currentCharm + 20,
                         stress: Math.max(0, stress - 10)
@@ -73,7 +87,7 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
                 );
             } else {
                 handleServicePurchase(
-                    selectedProcedure.cost,
+                    finalCost,
                     {
                         charisma: Math.max(0, currentCharm - 15),
                         stress: stress + 20,
@@ -98,20 +112,47 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
             title="PLASTIC SURGERY"
             subtitle="Redefine Yourself. At a Cost."
         >
+            {/* DISCOUNT BANNER */}
+            {hasDiscount && stage === 'selection' && (
+                <View style={styles.discountBanner}>
+                    <Text style={styles.discountIcon}>💝</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.discountTitle}>Partner Perk Active!</Text>
+                        <Text style={styles.discountText}>
+                            {partnerName} secured you a {Math.round(medicalDiscount * 100)}% medical discount
+                        </Text>
+                    </View>
+                </View>
+            )}
+
             {/* SELECTION STAGE */}
             {stage === 'selection' && (
                 <>
                     <ScrollView contentContainerStyle={styles.listContent}>
-                        {PROCEDURES.map((proc) => (
-                            <Pressable
-                                key={proc.name}
-                                style={({ pressed }) => [styles.procItem, pressed && styles.procItemPressed]}
-                                onPress={() => handleSelect(proc)}
-                            >
-                                <Text style={styles.procName}>{proc.name}</Text>
-                                <Text style={styles.procCost}>${proc.cost.toLocaleString()}</Text>
-                            </Pressable>
-                        ))}
+                        {PROCEDURES.map((proc) => {
+                            const discountedPrice = getDiscountedPrice(proc.cost);
+                            const isDiscounted = discountedPrice < proc.cost;
+
+                            return (
+                                <Pressable
+                                    key={proc.name}
+                                    style={({ pressed }) => [styles.procItem, pressed && styles.procItemPressed]}
+                                    onPress={() => handleSelect(proc)}
+                                >
+                                    <Text style={styles.procName}>{proc.name}</Text>
+                                    <View style={styles.priceContainer}>
+                                        {isDiscounted && (
+                                            <Text style={styles.originalPrice}>
+                                                ${proc.cost.toLocaleString()}
+                                            </Text>
+                                        )}
+                                        <Text style={[styles.procCost, isDiscounted && styles.discountedPrice]}>
+                                            ${discountedPrice.toLocaleString()}
+                                        </Text>
+                                    </View>
+                                </Pressable>
+                            );
+                        })}
                     </ScrollView>
                     <GameButton title="Cancel" variant="secondary" onPress={onClose} />
                 </>
@@ -124,7 +165,21 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
                     <Text style={styles.warningText}>
                         Surgery carries significant risks. Results are NOT guaranteed.{'\n\n'}
                         If complications arise, you may suffer permanent loss of Charisma and Health.{'\n\n'}
-                        Do you wish to proceed with the <Text style={{ fontWeight: 'bold' }}>{selectedProcedure?.name}</Text> for <Text style={{ color: '#C5A065' }}>${selectedProcedure?.cost.toLocaleString()}</Text>?
+                        Do you wish to proceed with the <Text style={{ fontWeight: 'bold' }}>{selectedProcedure?.name}</Text> for{' '}
+                        {hasDiscount && (
+                            <Text style={{ color: '#718096', textDecorationLine: 'line-through' }}>
+                                ${selectedProcedure?.cost.toLocaleString()}
+                            </Text>
+                        )}
+                        {hasDiscount && ' '}
+                        <Text style={{ color: '#C5A065', fontWeight: 'bold' }}>
+                            ${selectedProcedure ? getDiscountedPrice(selectedProcedure.cost).toLocaleString() : '0'}
+                        </Text>
+                        {hasDiscount && (
+                            <Text style={{ color: '#48BB78', fontSize: 12 }}>
+                                {' '}(Partner Discount!)
+                            </Text>
+                        )}?
                     </Text>
                     <View style={styles.buttonGroup}>
                         <GameButton title="YES, I ACCEPT THE RISK" variant="danger" onPress={handleConfirm} style={{ flex: 1 }} />
@@ -148,6 +203,30 @@ const PlasticSurgeryModal = ({ visible, onClose, handleServicePurchase }: Plasti
 export default PlasticSurgeryModal;
 
 const styles = StyleSheet.create({
+    discountBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#48BB7820',
+        borderRadius: theme.radius.sm,
+        padding: 12,
+        marginBottom: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: '#48BB78',
+        gap: 10,
+    },
+    discountIcon: {
+        fontSize: 24,
+    },
+    discountTitle: {
+        color: '#48BB78',
+        fontWeight: '700',
+        fontSize: 14,
+        marginBottom: 2,
+    },
+    discountText: {
+        color: '#F7FAFC',
+        fontSize: 12,
+    },
     listContent: {
         gap: theme.spacing.sm,
         marginBottom: theme.spacing.md,
@@ -169,9 +248,21 @@ const styles = StyleSheet.create({
         color: '#F7FAFC',
         fontWeight: '600',
     },
+    priceContainer: {
+        alignItems: 'flex-end',
+        gap: 2,
+    },
+    originalPrice: {
+        color: '#718096',
+        fontSize: 12,
+        textDecorationLine: 'line-through',
+    },
     procCost: {
         color: '#C5A065',
         fontWeight: '700',
+    },
+    discountedPrice: {
+        color: '#48BB78',
     },
     // WARNING STYLES
     warningContent: {

@@ -263,10 +263,21 @@ export const useGameStore = create<GameStore>()(
           console.log(`[Game] R&D Results: Generated ${rndRPGenerated} RP, Cost $${rndSalaryCost}`);
         }
 
+
         // 4. OTHER EXPENSES
         const monthlyFixedExpenses = 5000;
         const totalFixedExpenses = monthlyFixedExpenses * months;
         const interestExpense = (stats.companyDebtTotal || 0) * 0.05 * (months / 12);
+
+        // 4b. PARTNER UPKEEP COST (Deep Persona System)
+        const partner = useUserStore.getState().partner;
+        let partnerUpkeepCost = 0;
+
+        // Check if partner has the new Deep Persona structure
+        if (partner && 'finances' in partner && 'monthlyCost' in (partner as any).finances) {
+          partnerUpkeepCost = (partner as any).finances.monthlyCost * months;
+          console.log(`[Partner Upkeep] ${(partner as any).name}: $${partnerUpkeepCost} (${months} months)`);
+        }
 
         // 5. CALCULATE NET PROFIT/LOSS
         const totalExpenses = totalCOGS + totalMarketingCost + totalStorageCost + factoryOverhead + rndSalaryCost + totalFixedExpenses + interestExpense;
@@ -277,8 +288,9 @@ export const useGameStore = create<GameStore>()(
 
         // 7. PLAYER FINANCIALS (Simplified)
         const playerIncome = baseSalary * months;
-        const playerExpenses = baseExpenses * months;
+        const playerExpenses = baseExpenses * months + partnerUpkeepCost; // Include partner cost
         const newPlayerCash = (stats.money || 0) + playerIncome - playerExpenses;
+
 
         // 3. Tarihi İlerlet
         const { currentMonth, age } = get();
