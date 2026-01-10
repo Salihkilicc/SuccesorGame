@@ -1,21 +1,27 @@
-import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore } from '../../../core/store';
+import { useMemo } from 'react';
+import { useStatsStore, useEventStore, useUserStore, useMarketStore, usePlayerStore, useGameStore } from '../../../core/store';
+import { calculateMonthlyFinances } from '../logic/EconomyEngine';
 
 export const useAssetsLogic = () => {
-    const { netWorth, money, monthlyIncome, monthlyExpenses } = useStatsStore();
+    const statsStore = useStatsStore();
+    const userStore = useUserStore();
+    const gameStore = useGameStore(); // If needed for GameState
+    const marketStore = useMarketStore();
+
+    // Destructure for direct usage but pass full objects to engine
+    const { netWorth, money, monthlyIncome, monthlyExpenses } = statsStore;
     const { personality, attributes } = usePlayerStore();
     const riskApetite = personality.riskAppetite;
     const strategicSense = attributes.intellect;
     const { lastMarketEvent } = useEventStore();
-    const { inventory, partner } = useUserStore();
-    const { holdings } = useMarketStore();
+    const { inventory } = userStore;
+    const { holdings } = marketStore;
 
-    // Partner Cost Calculation
-    const partnerCost = (partner && 'finances' in partner && (partner as any).finances?.monthlyCost)
-        ? (partner as any).finances.monthlyCost
-        : 0;
+    // --- NEW ECONOMY ENGINE INTEGRATION ---
+    const financialReport = useMemo(() => {
+        return calculateMonthlyFinances(userStore, statsStore, gameStore, marketStore);
+    }, [userStore, statsStore, gameStore, marketStore]);
 
-    // Total Monthly Expenses
-    const totalMonthlyExpenses = (monthlyExpenses || 0) + partnerCost;
 
     // Helper: Para Formatla
     const formatMoney = (value: number) => {
@@ -54,18 +60,15 @@ export const useAssetsLogic = () => {
         return 'Balance your portfolio between growth and stability.';
     })();
 
-    // Expense Breakdown
-    const expenseBreakdown = [
-        { id: 'base_living', label: 'Lifestyle & Housing', amount: monthlyExpenses || 0 },
-        ...(partnerCost > 0 ? [{ id: 'partner_cost', label: 'Relationship', amount: partnerCost }] : [])
-    ];
+    // Expense Breakdown (Using new Report)
+    const expenseBreakdown = financialReport.expenseBreakdown;
 
     return {
         stats: {
             netWorth: totalNetWorth,
             money,
-            monthlyIncome,
-            monthlyExpenses: totalMonthlyExpenses, // Override with total
+            monthlyIncome: financialReport.totalIncome, // Use Engine
+            monthlyExpenses: financialReport.totalExpenses, // Use Engine
             riskApetite,
             strategicSense,
             investmentsValue,
@@ -74,8 +77,11 @@ export const useAssetsLogic = () => {
             belongingsValue,
             lastMarketEvent,
             nextMove,
-            expenseBreakdown // Expose breakdown
+            expenseBreakdown, // Expose breakdown directly
+            portfolioValue: financialReport.portfolioValue,
+            netIncome: financialReport.netIncome,
         },
+        financialReport, // Expose full report if needed
         formatMoney
     };
 };

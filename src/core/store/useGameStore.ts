@@ -7,10 +7,12 @@ import { useStatsStore } from './useStatsStore';
 import { useUserStore } from './useUserStore';
 import { useLaboratoryStore } from './useLaboratoryStore';
 import { useProductStore } from './useProductStore';
-import { simulateEconomy } from '../../logic/EconomyEngine'; // <--- YENİ MOTOR
+import { simulateEconomy } from '../../logic/EconomyEngine'; // Legacy Engine (keep if needed for types or remove)
+import { calculateMonthlyFinances } from '../../features/assets/logic/EconomyEngine'; // New Engine
 import { calculateStatDecay } from '../../logic/statsLogic';
 import { applyPartnerBuffs } from '../../logic/relationshipLogic';
 import { usePlayerStore } from './usePlayerStore';
+import { useMarketStore } from './useMarketStore'; // Added to pass to engine
 
 const LOW_MORALE_REASONS = [
   "Factory strikes halted production for 3 days.",
@@ -286,10 +288,27 @@ export const useGameStore = create<GameStore>()(
         // 6. UPDATE CAPITAL
         const newCompanyCapital = (stats.companyCapital || 0) + netProfit;
 
-        // 7. PLAYER FINANCIALS (Simplified)
-        const playerIncome = baseSalary * months;
-        const playerExpenses = baseExpenses * months + partnerUpkeepCost; // Include partner cost
-        const newPlayerCash = (stats.money || 0) + playerIncome - playerExpenses;
+        // 7. PLAYER FINANCIALS (Using Economy Engine v2)
+        // We calculate for *each month* to account for potential compounding or state changes if we were advanced,
+        // but since simulateEconomy is stateless per call regarding accumulation, we can multiply if input stats don't change.
+        // However, best practice: run it once per month cycle if we want granular events, or multiply for simple projection.
+        // For now, we multiply the report result by 'months'.
+
+        const monthlyReport = calculateMonthlyFinances(
+          useUserStore.getState(),
+          useStatsStore.getState(),
+          get(),
+          useMarketStore.getState()
+        );
+
+        const playerIncome = monthlyReport.totalIncome * months;
+        const playerExpenses = monthlyReport.totalExpenses * months;
+        const netCashFlow = monthlyReport.netIncome * months;
+
+        // Update Cash with Net Income
+        const newPlayerCash = (stats.money || 0) + netCashFlow;
+
+        console.log(`[Economy] Monthly Report: Income $${monthlyReport.totalIncome}, Expenses $${monthlyReport.totalExpenses}, Net $${monthlyReport.netIncome}`);
 
 
         // 3. Tarihi İlerlet

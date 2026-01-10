@@ -63,6 +63,23 @@ export const ActionTile = ({ title, body, onPress, variant = 'market' }: any) =>
     </Pressable>
 );
 
+export const BreakdownSection = ({ title, items, isIncome }: { title: string, items: any[], isIncome?: boolean }) => {
+    if (!items || items.length === 0) return null;
+    return (
+        <View style={{ gap: theme.spacing.sm, marginTop: theme.spacing.lg }}>
+            <Text style={styles.sectionHeader}>{title}</Text>
+            {items.map((item, index) => (
+                <View key={index} style={styles.breakdownRow}>
+                    <Text style={styles.breakdownLabel}>{item.label}</Text>
+                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : theme.colors.textPrimary }]}>
+                        {isIncome ? '+' : '-'}${item.amount.toLocaleString()}
+                    </Text>
+                </View>
+            ))}
+        </View>
+    );
+};
+
 const styles = StyleSheet.create({
     header: { gap: theme.spacing.sm },
     headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -92,4 +109,8 @@ const styles = StyleSheet.create({
     actionBody: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 18 },
     actionTilePressed: { transform: [{ scale: 0.98 }], opacity: 0.94 },
     tileCta: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.subtitle, alignSelf: 'flex-end' },
+    sectionHeader: { fontSize: theme.typography.body, fontWeight: '700', color: theme.colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
+    breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border },
+    breakdownLabel: { fontSize: theme.typography.body, color: theme.colors.textPrimary },
+    breakdownValue: { fontSize: theme.typography.body, fontWeight: '700' },
 });

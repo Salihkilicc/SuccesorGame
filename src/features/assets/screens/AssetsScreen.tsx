@@ -8,12 +8,13 @@ import {
     InfoCard,
     SummaryRow,
     CategoryCard,
-    ActionTile
+    ActionTile,
+    BreakdownSection
 } from '../components/AssetsUI';
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
-    const { stats, formatMoney } = useAssetsLogic();
+    const { stats, financialReport, formatMoney } = useAssetsLogic();
 
     return (
         <View style={styles.safeArea}>
@@ -58,6 +59,14 @@ const AssetsScreen = () => {
                             </View>
                         </View>
                     </View>
+
+                    {/* DETAIL BREAKDOWN */}
+                    {financialReport && (
+                        <View style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, marginTop: theme.spacing.lg, paddingTop: theme.spacing.md }}>
+                            <BreakdownSection title="Income Sources" items={financialReport.incomeBreakdown} isIncome />
+                            <BreakdownSection title="Monthly Expenses" items={financialReport.expenseBreakdown} />
+                        </View>
+                    )}
                 </View>
 
                 {/* CATEGORIES */}
