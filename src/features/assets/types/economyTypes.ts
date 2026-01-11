@@ -2,7 +2,7 @@ export interface BreakdownItem {
     id: string;
     label: string;
     amount: number; // Quarterly amount
-    type: 'income' | 'expense';
+    type: 'income' | 'expense' | 'asset';
 }
 
 export interface FinancialReport {
@@ -11,4 +11,5 @@ export interface FinancialReport {
     netFlow: number; // Income - Expenses
     incomeBreakdown: BreakdownItem[];
     expenseBreakdown: BreakdownItem[];
+    assetsBreakdown: BreakdownItem[];
 }

@@ -12,6 +12,7 @@ import { useAssetsLogic } from '../hooks/useAssetsLogic';
 import AppScreen from '../../../components/layout/AppScreen';
 import MarketOverview from '../../../components/Market/MarketOverview';
 import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
+import PortfolioModal from '../../../components/Market/PortfolioModal';
 
 // Veriler (Yeni Dosyadan Geliyor)
 import { CATEGORIES, STOCKS, Category } from '../data/marketData';
@@ -19,6 +20,7 @@ import { CATEGORIES, STOCKS, Category } from '../data/marketData';
 const MarketScreen = () => {
   const navigation = useNavigation<any>();
   const [selectedCategory, setSelectedCategory] = useState<Category>('Tech');
+  const [showPortfolio, setShowPortfolio] = useState(false);
   const data = useMemo(() => STOCKS[selectedCategory] ?? [], [selectedCategory]);
   const { investmentsValue, handleLiquidation } = useAssetsLogic();
 
@@ -53,6 +55,7 @@ const MarketScreen = () => {
               investmentsValue={investmentsValue}
               handleLiquidation={handleLiquidation}
               formatMoney={formatMoney}
+              onSeeInvestments={() => setShowPortfolio(true)}
             />
             <MarketHeader
               selectedCategory={selectedCategory}
@@ -84,6 +87,7 @@ const MarketScreen = () => {
         )}
         showsVerticalScrollIndicator={false}
       />
+      <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
     </AppScreen>
   );
 };
@@ -93,27 +97,39 @@ const MarketScreen = () => {
 const PortfolioCard = ({
   investmentsValue,
   handleLiquidation,
-  formatMoney
+  formatMoney,
+  onSeeInvestments
 }: {
   investmentsValue: number;
   handleLiquidation: () => void;
   formatMoney: (value: number) => string;
+  onSeeInvestments: () => void;
 }) => (
   <View style={styles.portfolioCard}>
     <View style={styles.portfolioHeader}>
       <Text style={styles.portfolioLabel}>Total Investments</Text>
       <Text style={styles.portfolioValue}>{formatMoney(investmentsValue)}</Text>
     </View>
-    {investmentsValue > 0 && (
+    <View style={styles.portfolioActions}>
       <Pressable
-        onPress={handleLiquidation}
+        onPress={onSeeInvestments}
         style={({ pressed }) => [
-          styles.liquidateButton,
-          pressed && styles.liquidateButtonPressed
+          styles.seeInvestmentsButton,
+          pressed && styles.seeInvestmentsButtonPressed
         ]}>
-        <Text style={styles.liquidateButtonText}>Liquidate All</Text>
+        <Text style={styles.seeInvestmentsButtonText}>👁️ See Investments</Text>
       </Pressable>
-    )}
+      {investmentsValue > 0 && (
+        <Pressable
+          onPress={handleLiquidation}
+          style={({ pressed }) => [
+            styles.liquidateButton,
+            pressed && styles.liquidateButtonPressed
+          ]}>
+          <Text style={styles.liquidateButtonText}>Liquidate All</Text>
+        </Pressable>
+      )}
+    </View>
   </View>
 );
 
@@ -194,7 +210,11 @@ const styles = StyleSheet.create({
   portfolioHeader: { gap: theme.spacing.xs },
   portfolioLabel: { fontSize: theme.typography.caption, color: theme.colors.textSecondary, fontWeight: '600' },
   portfolioValue: { fontSize: theme.typography.title, color: theme.colors.textPrimary, fontWeight: '700' },
-  liquidateButton: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: theme.colors.danger, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  portfolioActions: { flexDirection: 'row', gap: theme.spacing.sm },
+  seeInvestmentsButton: { flex: 1, backgroundColor: theme.colors.accentSoft, borderWidth: 1.5, borderColor: theme.colors.accent, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  seeInvestmentsButtonPressed: { backgroundColor: theme.colors.accent + '20', transform: [{ scale: 0.98 }] },
+  seeInvestmentsButtonText: { color: theme.colors.accent, fontWeight: '700', fontSize: theme.typography.body },
+  liquidateButton: { flex: 1, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: theme.colors.danger, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
   liquidateButtonPressed: { backgroundColor: theme.colors.danger + '10', transform: [{ scale: 0.98 }] },
   liquidateButtonText: { color: theme.colors.danger, fontWeight: '700', fontSize: theme.typography.body },
 });

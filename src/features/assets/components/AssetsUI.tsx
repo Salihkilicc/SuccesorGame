@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     categoryLabel: { color: theme.colors.textMuted, fontSize: theme.typography.caption, letterSpacing: 0.4 },
     categoryValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },
     categoryMeta: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, lineHeight: 18 },
-    actionTile: { flex: 1, backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.md, justifyContent: 'space-between', minHeight: 140 },
+    actionTile: { flex: 1, backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.sm, justifyContent: 'space-between', minHeight: 120 },
     marketTile: { backgroundColor: theme.colors.success, borderColor: theme.colors.success },
     companyTile: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
     actionTitle: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },

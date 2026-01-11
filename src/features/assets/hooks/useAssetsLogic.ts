@@ -2,16 +2,33 @@ import { useUserStore, usePlayerStore, useMarketStore } from '../../../core/stor
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
+import { STOCKS } from '../data/marketData';
 
 export const useAssetsLogic = () => {
     const user = useUserStore((state) => state);
     const stats = useStatsStore((state) => state);
 
-    // Calculate "Projected" Report for UI
-    const report = calculateQuarterlyFinances(user);
-
     const { liquidatePortfolio, holdings } = useMarketStore();
-    const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
+
+    // Calculate "Projected" Report for UI
+    const report = calculateQuarterlyFinances(user, { holdings }, stats);
+
+    // Calculate investmentsValue based on CURRENT market prices
+    const investmentsValue = holdings.reduce((sum, holding) => {
+        // Find current price from market data
+        let currentPrice = holding.averageCost; // Fallback to average cost
+
+        // Search through all categories to find the stock
+        for (const category of Object.values(STOCKS)) {
+            const stock = category.find(s => s.symbol === holding.symbol);
+            if (stock) {
+                currentPrice = stock.price;
+                break;
+            }
+        }
+
+        return sum + (holding.quantity * currentPrice);
+    }, 0);
 
     // Assuming stats now has cash and bank properties, or they are derived
     const cash = stats.money; // Re-using stats.money for cash, adjust if stats has a separate 'cash' property
@@ -42,12 +59,48 @@ export const useAssetsLogic = () => {
         );
     };
 
+    // Get portfolio list with current market data
+    const getPortfolioList = () => {
+        return holdings.map(holding => {
+            let currentPrice = holding.averageCost;
+            let name = holding.symbol;
+
+            // Find current market data
+            for (const category of Object.values(STOCKS)) {
+                const stock = category.find(s => s.symbol === holding.symbol);
+                if (stock) {
+                    currentPrice = stock.price;
+                    name = stock.name || stock.symbol;
+                    break;
+                }
+            }
+
+            const currentValue = holding.quantity * currentPrice;
+            const costBasis = holding.quantity * holding.averageCost;
+            const profitLoss = currentValue - costBasis;
+            const profitLossPercent = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
+
+            return {
+                symbol: holding.symbol,
+                name,
+                quantity: holding.quantity,
+                averageCost: holding.averageCost,
+                currentPrice,
+                currentValue,
+                profitLoss,
+                profitLossPercent,
+                type: holding.type,
+            };
+        });
+    };
+
     return {
         cash,
         bank,
         netWorth: cash + bank + investmentsValue, // Include investments in Net Worth
         report, // { totalIncome, totalExpenses, netFlow, breakdowns... }
         handleLiquidation,
-        investmentsValue
+        investmentsValue,
+        getPortfolioList,
     };
 };

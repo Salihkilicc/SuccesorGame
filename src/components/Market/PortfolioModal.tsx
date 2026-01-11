@@ -1,173 +1,289 @@
-import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  Pressable,
+  FlatList,
+  Alert,
+} from 'react-native';
 import { theme } from '../../core/theme';
-import type { HoldingItem } from './marketTypes';
+import { useMarketStore } from '../../core/store/useMarketStore';
+import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 
-type Props = {
+interface PortfolioModalProps {
   visible: boolean;
-  holdings: HoldingItem[];
   onClose: () => void;
-  onLiquidate: () => void;
-};
+}
 
-const PortfolioModal = ({ visible, holdings, onClose, onLiquidate }: Props) => {
-  const totalValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
+const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => {
+  const { getPortfolioList } = useAssetsLogic();
+  const { buyAsset, sellAsset } = useMarketStore();
+  const portfolioList = getPortfolioList();
+
+  const handleBuy = (symbol: string, currentPrice: number, type: 'stock' | 'crypto' | 'bond') => {
+    Alert.prompt(
+      'Buy Stock',
+      `How many shares of ${symbol} would you like to buy at $${currentPrice.toFixed(2)}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Buy',
+          onPress: (quantity?: string) => {
+            const qty = parseInt(quantity || '0', 10);
+            if (qty > 0) {
+              buyAsset(symbol, currentPrice, qty, type);
+            }
+          },
+        },
+      ],
+      'plain-text',
+      '1'
+    );
+  };
+
+  const handleSell = (symbol: string, currentPrice: number, maxQuantity: number) => {
+    Alert.prompt(
+      'Sell Stock',
+      `How many shares of ${symbol} would you like to sell at $${currentPrice.toFixed(2)}? (Max: ${maxQuantity})`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sell',
+          onPress: (quantity?: string) => {
+            const qty = parseInt(quantity || '0', 10);
+            if (qty > 0 && qty <= maxQuantity) {
+              sellAsset(symbol, qty, currentPrice);
+            } else if (qty > maxQuantity) {
+              Alert.alert('Error', `You only have ${maxQuantity} shares`);
+            }
+          },
+        },
+      ],
+      'plain-text',
+      maxQuantity.toString()
+    );
+  };
+
+  const renderItem = ({ item }: { item: ReturnType<typeof getPortfolioList>[0] }) => {
+    const isProfitable = item.profitLoss >= 0;
+
+    return (
+      <View style={styles.itemRow}>
+        <View style={styles.itemLeft}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemSymbol}>{item.symbol}</Text>
+          <Text style={styles.itemQuantity}>{item.quantity} shares @ ${item.averageCost.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.itemRight}>
+          <Text style={styles.itemValue}>${item.currentValue.toLocaleString()}</Text>
+          <Text style={[styles.itemPL, isProfitable ? styles.profit : styles.loss]}>
+            {isProfitable ? '+' : ''}{item.profitLoss.toFixed(2)} ({item.profitLossPercent.toFixed(1)}%)
+          </Text>
+
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [styles.buyButton, pressed && styles.buttonPressed]}
+              onPress={() => handleBuy(item.symbol, item.currentPrice, item.type)}>
+              <Text style={styles.buyButtonText}>+ Buy</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.sellButton, pressed && styles.buttonPressed]}
+              onPress={() => handleSell(item.symbol, item.currentPrice, item.quantity)}>
+              <Text style={styles.sellButtonText}>- Sell</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const totalValue = portfolioList.reduce((sum, item) => sum + item.currentValue, 0);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
-        <View style={styles.card}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Portfolio Holdings</Text>
-            <Pressable
-              onPress={onClose}
-              style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
-              <Text style={styles.closeText}>×</Text>
+            <View>
+              <Text style={styles.title}>My Portfolio</Text>
+              <Text style={styles.totalValue}>Total Value: ${totalValue.toLocaleString()}</Text>
+            </View>
+            <Pressable onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>✕</Text>
             </Pressable>
           </View>
 
-          <View style={{ gap: theme.spacing.sm }}>
-            {holdings.length === 0 ? (
-              <Text style={styles.empty}>No holdings yet. Start investing to build this list.</Text>
-            ) : (
-              holdings.map(item => {
-                const isPositive = item.pl >= 0;
-                return (
-                  <View key={item.id} style={styles.row}>
-                    <View style={{ gap: theme.spacing.xs / 2 }}>
-                      <Text style={styles.name}>{item.name}</Text>
-                      <Text style={styles.meta}>
-                        {item.type.toUpperCase()} • Invested {formatMoney(item.amount)}
-                      </Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={styles.value}>{formatMoney(item.estimatedValue)}</Text>
-                      <Text style={[styles.meta, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
-                        P/L {isPositive ? '+' : ''}{item.pl.toFixed(1)}%
-                      </Text>
-                    </View>
-                  </View>
-                );
-              })
-            )}
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.total}>Estimated Total: {formatMoney(totalValue)}</Text>
-            <Pressable
-              onPress={() => {
-                onLiquidate();
-                onClose();
-              }}
-              style={({ pressed }) => [styles.liquidateButton, pressed && styles.liquidateButtonPressed]}>
-              <Text style={styles.liquidateText}>LIQUIDATE ALL</Text>
-            </Pressable>
-          </View>
+          {portfolioList.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No active investments</Text>
+              <Text style={styles.emptySubtext}>Buy stocks from the market to get started</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={portfolioList}
+              keyExtractor={(item) => item.symbol}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContent}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+          )}
         </View>
       </View>
     </Modal>
   );
 };
 
-export default PortfolioModal;
-
-const formatMoney = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-
 const styles = StyleSheet.create({
-  backdrop: {
+  overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
   },
-  card: {
-    width: '94%',
-    maxWidth: 540,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  modalContainer: {
+    backgroundColor: theme.colors.background,
+    borderTopLeftRadius: theme.radius.lg,
+    borderTopRightRadius: theme.radius.lg,
+    maxHeight: '85%',
+    paddingBottom: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: theme.spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
   title: {
+    fontSize: theme.typography.title,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle + 2,
-    fontWeight: '800',
   },
-  closeCircle: {
+  totalValue: {
+    fontSize: theme.typography.body,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
+  },
+  closeButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
     backgroundColor: theme.colors.cardSoft,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeCirclePressed: {
-    backgroundColor: theme.colors.card,
+  closeButtonText: {
+    fontSize: 18,
+    color: theme.colors.textPrimary,
   },
-  closeText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
+  listContent: {
+    padding: theme.spacing.lg,
   },
-  row: {
+  itemRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
     padding: theme.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
-  name: {
+  itemLeft: {
+    flex: 1,
+    gap: theme.spacing.xs,
+  },
+  itemName: {
+    fontSize: theme.typography.body,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
-    fontWeight: '800',
-    fontSize: theme.typography.body,
   },
-  meta: {
+  itemSymbol: {
+    fontSize: theme.typography.caption,
     color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
+    fontWeight: '700',
   },
-  value: {
+  itemQuantity: {
+    fontSize: theme.typography.caption,
+    color: theme.colors.textSecondary,
+  },
+  itemRight: {
+    alignItems: 'flex-end',
+    gap: theme.spacing.xs,
+  },
+  itemValue: {
+    fontSize: theme.typography.body,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
-    fontWeight: '800',
-    fontSize: theme.typography.body,
   },
-  empty: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
+  itemPL: {
+    fontSize: theme.typography.caption,
+    fontWeight: '600',
   },
-  footer: {
+  profit: {
+    color: theme.colors.success,
+  },
+  loss: {
+    color: theme.colors.danger,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: theme.spacing.xs,
+    marginTop: theme.spacing.xs,
+  },
+  buyButton: {
+    backgroundColor: theme.colors.success + '20',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.success,
+  },
+  sellButton: {
+    backgroundColor: theme.colors.danger + '20',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.97 }],
+  },
+  buyButtonText: {
+    color: theme.colors.success,
+    fontSize: theme.typography.caption,
+    fontWeight: '700',
+  },
+  sellButtonText: {
+    color: theme.colors.danger,
+    fontSize: theme.typography.caption,
+    fontWeight: '700',
+  },
+  separator: {
+    height: theme.spacing.sm,
+  },
+  emptyState: {
+    padding: theme.spacing.lg * 2,
+    alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  total: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
-    fontSize: theme.typography.body,
+  emptyText: {
+    fontSize: theme.typography.subtitle,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
   },
-  liquidateButton: {
-    backgroundColor: theme.colors.danger,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  liquidateButtonPressed: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.9,
-  },
-  liquidateText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '800',
-    fontSize: theme.typography.body,
+  emptySubtext: {
+    fontSize: theme.typography.caption,
+    color: theme.colors.textSecondary,
   },
 });
+
+export default PortfolioModal;

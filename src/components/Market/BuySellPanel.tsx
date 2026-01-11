@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useStatsStore } from '../../core/store';
+import { useStatsStore, useMarketStore } from '../../core/store';
 import { theme } from '../../core/theme';
 
 type BuySellPanelProps = {
   symbol: string;
   price: number;
+  category?: string; // Passed from StockDetail
 };
 
-const BuySellPanel = ({ symbol, price }: BuySellPanelProps) => {
-  const { money, setField } = useStatsStore();
+const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
+  const { money } = useStatsStore();
+  const { buyAsset, sellAsset, holdings } = useMarketStore();
   const [qty, setQty] = useState<number>(1);
+
+  // Determine asset type
+  const assetType = category === 'Crypto' ? 'crypto' : 'stock'; // Default/Fallback to stock
+
+  // Get current owned quantity for "Sell" validation
+  const heldItem = holdings.find((h) => h.symbol === symbol);
+  const ownedQty = heldItem ? heldItem.quantity : 0;
 
   const adjustQty = (delta: number) => {
     setQty(current => Math.max(1, current + delta));
@@ -19,20 +28,33 @@ const BuySellPanel = ({ symbol, price }: BuySellPanelProps) => {
   const handleBuy = () => {
     const cost = qty * price;
     if (money < cost) {
-      console.log('Not enough money to buy', { symbol, qty });
+      // Could show alert, but console warn is consistent with store logic
+      console.warn('UI: Not enough money');
       return;
     }
-    setField('money', money - cost);
-    console.log(`Bought ${qty} of ${symbol}`);
+    // Call store action
+    buyAsset(symbol, price, qty, assetType);
+    setQty(1); // Reset qty after trade
   };
 
   const handleSell = () => {
-    console.log(`Sold ${qty} of ${symbol} (placeholder portfolio update)`);
+    if (ownedQty < qty) {
+      console.warn(`UI: Cannot sell ${qty}, only have ${ownedQty}`);
+      return;
+    }
+    sellAsset(symbol, qty, price);
+    setQty(1);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trade</Text>
+
+      {/* Owned Indicator */}
+      {ownedQty > 0 && (
+        <Text style={styles.ownedText}>You own: {ownedQty.toFixed(2)} units</Text>
+      )}
+
       <View style={styles.qtyRow}>
         <Pressable
           onPress={() => adjustQty(-1)}
@@ -53,14 +75,17 @@ const BuySellPanel = ({ symbol, price }: BuySellPanelProps) => {
         </Pressable>
       </View>
       <Text style={styles.helper}>
-        Est. cost: ${(qty * price).toFixed(2)} • Balance: ${money.toLocaleString()}
+        Est. cost: ${(qty * price).toLocaleString()} • Balance: ${money.toLocaleString()}
       </Text>
       <View style={styles.actions}>
         <Pressable
           onPress={handleSell}
+          // Disable sell if we don't own enough
+          disabled={ownedQty < qty}
           style={({ pressed }) => [
             styles.button,
             styles.sellButton,
+            (ownedQty < qty) && styles.disabledButton,
             pressed && styles.buttonPressed,
           ]}>
           <Text style={styles.sellText}>SELL</Text>
@@ -94,6 +119,12 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
     color: theme.colors.textPrimary,
+  },
+  ownedText: {
+    fontSize: theme.typography.caption,
+    color: theme.colors.accent,
+    fontWeight: '600',
+    marginTop: -8, // Pull closer to title
   },
   qtyRow: {
     flexDirection: 'row',
@@ -141,6 +172,9 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     transform: [{ scale: 0.98 }],
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   sellButton: {
     backgroundColor: theme.colors.danger,
