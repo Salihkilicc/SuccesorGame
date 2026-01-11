@@ -1,61 +1,73 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store';
+import { useUserStore } from '../../../core/store/useUserStore';
+import { useMarketStore } from '../../../core/store/useMarketStore';
 import { theme } from '../../../core/theme';
-import { AcquisitionTarget, Category } from '../../../data/AcquisitionData';
-import { enrichStockData } from '../../../data/enrichStockData';
-import CompanyAnalysisModal from './CompanyAnalysisModal';
-import NegotiationModal from './NegotiationModal';
+import { INITIAL_MARKET_ITEMS, CATEGORIES, Category } from '../../../features/assets/data/marketData';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import { SubsidiaryState } from '../../../core/store/useStatsStore';
-
-// Import stock market data
-import { STOCKS } from '../../Market/StocksList';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
 };
 
-const CATEGORIES: Category[] = ['Technology', 'Media', 'Industrial', 'Retail'];
-
 const AcquireStartupModal = ({ visible, onClose }: Props) => {
-  const { companyCapital, acquisitions = [], subsidiaryStates } = useStatsStore();
+  const { companyCapital, subsidiaryStates } = useStatsStore();
+  const subsidiaries = useUserStore(state => state.subsidiaries);
+  const acquireCompany = useMarketStore(state => state.acquireCompany);
+
   const [viewMode, setViewMode] = useState<'marketplace' | 'owned'>('marketplace');
   const [activeTab, setActiveTab] = useState<Category>('Technology');
-  const [selectedCompany, setSelectedCompany] = useState<AcquisitionTarget | null>(null);
   const [selectedSubsidiary, setSelectedSubsidiary] = useState<SubsidiaryState | null>(null);
-  const [isNegotiating, setIsNegotiating] = useState(false);
 
-  // Enrich stock market data with acquisition fields
-  const enrichedTargets = useMemo(() => enrichStockData(STOCKS), []);
+  // Filter market items: only show unacquired companies
+  const availableTargets = useMemo(() => {
+    return INITIAL_MARKET_ITEMS.filter(item => {
+      const isAcquired = subsidiaries.some(s => s.symbol === item.symbol);
+      return !isAcquired && item.category === activeTab;
+    }).sort((a, b) => a.acquisitionCost - b.acquisitionCost); // Lowest cost first
+  }, [activeTab, subsidiaries]);
 
-  // Optimized Filter: Never shows 'All', defaults to 'Technology'
-  const filteredCompanies = useMemo(() => {
-    return enrichedTargets.filter(c => c.category === activeTab);
-  }, [activeTab, enrichedTargets]);
+  // Market Domination Progress
+  const totalMarketCompanies = INITIAL_MARKET_ITEMS.length;
+  const ownedCount = subsidiaries.length;
+  const dominationPercent = Math.round((ownedCount / totalMarketCompanies) * 100);
 
-  const handleInitiateAcquisition = (company: AcquisitionTarget) => {
-    // Note: Cost is dynamic now mostly, but simplified as MarketCap * Premium
-    const estimatedCost = company.marketCap * company.acquisitionPremium;
+  const handleAcquire = (item: typeof INITIAL_MARKET_ITEMS[0]) => {
+    const canAfford = companyCapital >= item.acquisitionCost;
 
-    // Basic validation
-    if (companyCapital < estimatedCost * 0.5) { // Looser check
-      Alert.alert('Insufficient Capital', `You need at least $${(estimatedCost * 0.5 / 1e9).toFixed(1)}B to start talks.`);
+    if (!canAfford) {
+      Alert.alert(
+        'Insufficient Capital',
+        `You need $${(item.acquisitionCost / 1_000_000).toFixed(0)}M to acquire ${item.name}.`
+      );
       return;
     }
 
-    // Close Analysis, Open Negotiation
-    // actually we can keep Analysis open behind it or close it. 
-    // Let's keep Analysis modal control as is, but we need to trigger Negotiation.
-    // Since Analysis is a Modal, Negotiation should be on top.
-    setIsNegotiating(true);
-  };
-
-  const onNegotiationSuccess = () => {
-    setIsNegotiating(false);
-    setSelectedCompany(null);
-    Alert.alert('Acquisition Complete', `You have successfully acquired ${selectedCompany?.name} !`);
+    Alert.alert(
+      'Hostile Takeover',
+      `Acquire 100% of ${item.name} for $${(item.acquisitionCost / 1_000_000).toFixed(0)}M?\n\nActive Buff: ${item.acquisitionBuff.label}`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'ACQUIRE',
+          style: 'destructive',
+          onPress: () => {
+            const success = acquireCompany(item.id);
+            if (success) {
+              Alert.alert(
+                'Acquisition Complete! 🎉',
+                `You now own ${item.name}!\n\nActive Bonus: ${item.acquisitionBuff.label}`
+              );
+            } else {
+              Alert.alert('Failed', 'Transaction error. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -64,19 +76,19 @@ const AcquireStartupModal = ({ visible, onClose }: Props) => {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>M&A Center</Text>
+            <Text style={styles.headerTitle}>Hostile Takeover</Text>
             <View style={styles.viewToggle}>
               <Pressable
                 onPress={() => setViewMode('marketplace')}
                 style={[styles.toggleBtn, viewMode === 'marketplace' && styles.toggleBtnActive]}
               >
-                <Text style={[styles.toggleText, viewMode === 'marketplace' && styles.toggleTextActive]}>Marketplace</Text>
+                <Text style={[styles.toggleText, viewMode === 'marketplace' && styles.toggleTextActive]}>Targets</Text>
               </Pressable>
               <Pressable
                 onPress={() => setViewMode('owned')}
                 style={[styles.toggleBtn, viewMode === 'owned' && styles.toggleBtnActive]}
               >
-                <Text style={[styles.toggleText, viewMode === 'owned' && styles.toggleTextActive]}>Owned ({Object.keys(subsidiaryStates).length})</Text>
+                <Text style={[styles.toggleText, viewMode === 'owned' && styles.toggleTextActive]}>Owned ({ownedCount})</Text>
               </Pressable>
             </View>
           </View>
@@ -87,6 +99,17 @@ const AcquireStartupModal = ({ visible, onClose }: Props) => {
           <Pressable onPress={onClose} style={styles.closeBtn}>
             <Text style={styles.closeText}>Done</Text>
           </Pressable>
+        </View>
+
+        {/* Market Domination Progress */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressLabel}>Market Domination</Text>
+            <Text style={styles.progressValue}>{ownedCount}/{totalMarketCompanies} ({dominationPercent}%)</Text>
+          </View>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${dominationPercent}%` }]} />
+          </View>
         </View>
 
         {/* Filter Tabs (only for marketplace) */}
@@ -111,92 +134,51 @@ const AcquireStartupModal = ({ visible, onClose }: Props) => {
         {/* Marketplace List */}
         {viewMode === 'marketplace' && (
           <ScrollView contentContainerStyle={styles.listContent}>
-            {filteredCompanies.map(company => {
-              // Robust check: Legacy state might be an object, so strictly check for Array
-              const isOwned = Array.isArray(acquisitions) && acquisitions.includes(company.id);
-              const estimatedCost = company.marketCap * company.acquisitionPremium;
-
-              return (
-                <Pressable
-                  key={company.id}
-                  onPress={() => !isOwned && setSelectedCompany(company)}
-                  style={({ pressed }) => [
-                    styles.card,
-                    pressed && !isOwned && styles.cardPressed,
-                    isOwned && styles.cardOwned
-                  ]}
-                >
-                  <View style={styles.cardLeft}>
-                    <View style={[styles.logoBox, isOwned && { borderColor: theme.colors.success }]}>
-                      <Text style={styles.logo}>{company.logo}</Text>
-                    </View>
-                    <View>
-                      <Text style={[styles.companyName, isOwned && { color: theme.colors.textMuted }]}>
-                        {company.name} {isOwned && '✅'}
-                      </Text>
-                      <Text style={styles.companyDesc}>{company.category}</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.cardRight}>
-                    {isOwned ? (
-                      <View style={styles.badgeOwned}>
-                        <Text style={styles.badgeTextOwned}>OWNED</Text>
-                      </View>
-                    ) : (
-                      <>
-                        <Text style={styles.valueLabel}>Est. Cost</Text>
-                        <Text style={styles.valueText}>${(estimatedCost / 1e9).toFixed(1)}B</Text>
-                      </>
-                    )}
-                  </View>
-                </Pressable>
-              )
-            })}
-            <View style={{ height: 40 }} />
-          </ScrollView>
-        )}
-
-        {/* Owned Companies List */}
-        {viewMode === 'owned' && (
-          <ScrollView contentContainerStyle={styles.listContent}>
-            {Object.values(subsidiaryStates).length === 0 ? (
+            {availableTargets.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>🏢</Text>
-                <Text style={styles.emptyText}>No subsidiaries yet</Text>
-                <Text style={styles.emptyHint}>Acquire companies from the Marketplace</Text>
+                <Text style={styles.emptyIcon}>🏆</Text>
+                <Text style={styles.emptyText}>All {activeTab} companies acquired!</Text>
+                <Text style={styles.emptyHint}>Try another category</Text>
               </View>
             ) : (
-              Object.values(subsidiaryStates).map(sub => {
-                const isHealthy = !sub.isLossMaking;
+              availableTargets.map(item => {
+                const canAfford = companyCapital >= item.acquisitionCost;
+
                 return (
-                  <Pressable
-                    key={sub.id}
-                    onPress={() => setSelectedSubsidiary(sub)}
-                    style={({ pressed }) => [
-                      styles.card,
-                      pressed && styles.cardPressed,
-                      !isHealthy && styles.cardCritical,
-                    ]}
-                  >
+                  <View key={item.id} style={styles.card}>
                     <View style={styles.cardLeft}>
-                      <View style={[styles.logoBox, !isHealthy && { borderColor: theme.colors.danger }]}>
+                      <View style={styles.logoBox}>
                         <Text style={styles.logo}>🏢</Text>
                       </View>
-                      <View>
-                        <Text style={styles.companyName}>{sub.name}</Text>
-                        <Text style={[styles.companyDesc, !isHealthy && { color: theme.colors.danger }]}>
-                          {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL'}
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.companyName}>
+                          {item.name} ({item.symbol})
+                        </Text>
+                        <Text style={styles.buffLabel}>
+                          Buff: {item.acquisitionBuff.label}
                         </Text>
                       </View>
                     </View>
+
                     <View style={styles.cardRight}>
-                      <Text style={styles.valueLabel}>Monthly P/L</Text>
-                      <Text style={[styles.valueText, { color: isHealthy ? theme.colors.success : theme.colors.danger }]}>
-                        ${(Math.abs(sub.currentProfit) / 12 / 1e6).toFixed(1)}M
-                      </Text>
+                      <Pressable
+                        onPress={() => handleAcquire(item)}
+                        disabled={!canAfford}
+                        style={({ pressed }) => [
+                          styles.acquireBtn,
+                          !canAfford && styles.acquireBtnDisabled,
+                          pressed && canAfford && styles.acquireBtnPressed
+                        ]}
+                      >
+                        <Text style={[styles.acquireBtnText, !canAfford && styles.acquireBtnTextDisabled]}>
+                          ACQUIRE
+                        </Text>
+                        <Text style={[styles.acquireCost, !canAfford && styles.acquireCostDisabled]}>
+                          ${(item.acquisitionCost / 1_000_000).toFixed(0)}M
+                        </Text>
+                      </Pressable>
                     </View>
-                  </Pressable>
+                  </View>
                 );
               })
             )}
@@ -204,27 +186,85 @@ const AcquireStartupModal = ({ visible, onClose }: Props) => {
           </ScrollView>
         )}
 
-        {/* Modals */}
+        {/* Owned Companies List (Acquired Subsidiaries) */}
+        {viewMode === 'owned' && (
+          <ScrollView contentContainerStyle={styles.listContent}>
+            {subsidiaries.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyIcon}>🏢</Text>
+                <Text style={styles.emptyText}>No acquisitions yet</Text>
+                <Text style={styles.emptyHint}>Start your hostile takeover campaign</Text>
+              </View>
+            ) : (
+              subsidiaries.map(sub => (
+                <View key={sub.id} style={[styles.card, styles.ownedCard]}>
+                  <View style={styles.cardLeft}>
+                    <View style={[styles.logoBox, { borderColor: theme.colors.success }]}>
+                      <Text style={styles.logo}>👑</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.companyName}>
+                        {sub.name} ({sub.symbol})
+                      </Text>
+                      <Text style={styles.buffLabel}>
+                        Active: {sub.acquisitionBuff.label}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.ownedBadge}>
+                    <Text style={styles.ownedBadgeText}>OWNED</Text>
+                  </View>
+                </View>
+              ))
+            )}
+
+            {/* Also show legacy startups if any */}
+            {Object.values(subsidiaryStates).length > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>Founded Startups</Text>
+                {Object.values(subsidiaryStates).map(sub => {
+                  const isHealthy = !sub.isLossMaking;
+                  return (
+                    <Pressable
+                      key={sub.id}
+                      onPress={() => setSelectedSubsidiary(sub)}
+                      style={({ pressed }) => [
+                        styles.card,
+                        pressed && styles.cardPressed,
+                        !isHealthy && styles.cardCritical,
+                      ]}
+                    >
+                      <View style={styles.cardLeft}>
+                        <View style={[styles.logoBox, !isHealthy && { borderColor: theme.colors.danger }]}>
+                          <Text style={styles.logo}>🚀</Text>
+                        </View>
+                        <View>
+                          <Text style={styles.companyName}>{sub.name}</Text>
+                          <Text style={[styles.companyDesc, !isHealthy && { color: theme.colors.danger }]}>
+                            {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL'}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.cardRight}>
+                        <Text style={styles.valueLabel}>Monthly P/L</Text>
+                        <Text style={[styles.valueText, { color: isHealthy ? theme.colors.success : theme.colors.danger }]}>
+                          ${(Math.abs(sub.currentProfit) / 12 / 1e6).toFixed(1)}M
+                        </Text>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </>
+            )}
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        )}
+
+        {/* Subsidiary Detail Modal (for legacy startups) */}
         <SubsidiaryDetailModal
           visible={selectedSubsidiary !== null}
           onClose={() => setSelectedSubsidiary(null)}
           subsidiary={selectedSubsidiary}
-        />
-
-        {/* Analysis Modal */}
-        <CompanyAnalysisModal
-          visible={!!selectedCompany && !isNegotiating}
-          company={selectedCompany}
-          onClose={() => setSelectedCompany(null)}
-          onAcquire={handleInitiateAcquisition}
-        />
-
-        {/* Negotiation Modal */}
-        <NegotiationModal
-          visible={isNegotiating}
-          company={selectedCompany}
-          onClose={() => setIsNegotiating(false)}
-          onSuccess={onNegotiationSuccess}
         />
       </View>
     </Modal>
@@ -274,7 +314,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-
   headerLeft: {
     gap: 12,
   },
@@ -299,6 +338,39 @@ const styles = StyleSheet.create({
   },
   toggleTextActive: {
     color: '#FFF',
+  },
+  progressContainer: {
+    padding: 16,
+    backgroundColor: theme.colors.card,
+    borderBottomWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+  },
+  progressValue: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: theme.colors.cardSoft,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: theme.colors.success,
+    borderRadius: 4,
   },
   emptyState: {
     alignItems: 'center',
@@ -366,6 +438,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
+  ownedCard: {
+    backgroundColor: theme.colors.success + '10',
+    borderColor: theme.colors.success + '40',
+  },
   cardPressed: {
     backgroundColor: theme.colors.cardSoft,
     transform: [{ scale: 0.99 }],
@@ -390,19 +466,73 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   companyName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: theme.colors.textPrimary,
     marginBottom: 2,
   },
+  buffLabel: {
+    fontSize: 12,
+    color: theme.colors.success,
+    fontWeight: '600',
+  },
   companyDesc: {
     fontSize: 12,
     color: theme.colors.textSecondary,
-    maxWidth: 160,
   },
   cardRight: {
     alignItems: 'flex-end',
-    gap: 4,
+  },
+  acquireBtn: {
+    backgroundColor: theme.colors.danger,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    minWidth: 100,
+  },
+  acquireBtnDisabled: {
+    backgroundColor: theme.colors.cardSoft,
+    opacity: 0.5,
+  },
+  acquireBtnPressed: {
+    transform: [{ scale: 0.95 }],
+  },
+  acquireBtnText: {
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  acquireBtnTextDisabled: {
+    color: theme.colors.textMuted,
+  },
+  acquireCost: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  acquireCostDisabled: {
+    color: theme.colors.textMuted,
+  },
+  ownedBadge: {
+    backgroundColor: theme.colors.success,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  ownedBadgeText: {
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 11,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    marginTop: 12,
+    marginBottom: 4,
   },
   valueLabel: {
     fontSize: 10,
@@ -413,36 +543,4 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: theme.colors.textPrimary,
   },
-  badgeHighSynergy: {
-    backgroundColor: 'rgba(76, 209, 55, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  badgeRisky: {
-    backgroundColor: 'rgba(255, 107, 107, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: theme.colors.success,
-  },
-  cardOwned: {
-    backgroundColor: theme.colors.background,
-    opacity: 0.7,
-  },
-  badgeOwned: {
-    backgroundColor: theme.colors.success,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  badgeTextOwned: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 10,
-  }
 });

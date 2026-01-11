@@ -160,9 +160,9 @@ const MyCompanyScreen = () => {
         <SectionHeader title="QUICK ACTIONS" />
         <View style={{ gap: 8 }}>
           <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => navigation.navigate('Research')} />
-          <SectionCard title="🧩 Acquire Company" subtitle="Expand your empire" onPress={() => toggleModal('acquire', true)} />
+          <SectionCard title="🏢 Hostile Takeover" subtitle="Buy public companies to gain their tech and buffs" onPress={() => toggleModal('acquire', true)} />
           <SectionCard title="👔 Board Members" subtitle="View shareholders" onPress={() => toggleModal('boardMembers', true)} />
-          <SectionCard title="🏢 Existing Companies" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />
+          <SectionCard title="🏆 My Empire" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />
         </View>
 
       </ScrollView>

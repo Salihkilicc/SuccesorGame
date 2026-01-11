@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
+import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 
 export interface HoldingItem {
     id: string; // same as symbol
@@ -17,6 +18,7 @@ interface MarketState {
     sellAsset: (symbol: string, quantity: number, currentPrice: number) => void;
     reset: () => void;
     liquidatePortfolio: () => number;
+    acquireCompany: (id: string) => boolean;
 }
 
 export const initialMarketState = {
@@ -144,7 +146,50 @@ export const useMarketStore = create<MarketState>()(
                     set({ holdings: [] });
                 }
                 return totalValue;
-            }
+            },
+
+            acquireCompany: (id) => {
+                const item = INITIAL_MARKET_ITEMS.find((i) => i.id === id);
+                if (!item) {
+                    console.warn(`[MarketStore] Company ${id} not found.`);
+                    return false;
+                }
+
+                const statsStore = require('./useStatsStore').useStatsStore.getState();
+                const canAfford = statsStore.spendMoney(item.acquisitionCost);
+
+                if (!canAfford) {
+                    return false;
+                }
+
+                // Add to User Store
+                const userStore = require('./useUserStore').useUserStore.getState();
+                userStore.addSubsidiary({
+                    id: item.id,
+                    name: item.name,
+                    symbol: item.symbol,
+                    category: item.category,
+                    acquisitionBuff: item.acquisitionBuff,
+                });
+
+                // Remove existing shares (Liquidate at current market price or cost?)
+                // Since we don't have live price feed easily here, we use item.price from CONSTANT. 
+                // This is strictly for the Acquire transaction so it's fine.
+                const { holdings } = get();
+                const holdingIndex = holdings.findIndex((h) => h.symbol === item.symbol);
+                if (holdingIndex !== -1) {
+                    const h = holdings[holdingIndex];
+                    const liquidationValue = h.quantity * item.price;
+                    statsStore.earnMoney(liquidationValue);
+
+                    const newHoldings = holdings.filter((h) => h.symbol !== item.symbol);
+                    set({ holdings: newHoldings });
+                    console.log(`[MarketStore] Liquidated ${h.quantity} shares of ${item.symbol} upon acquisition.`);
+                }
+
+                console.log(`[MarketStore] Acquired ${item.name} for $${item.acquisitionCost.toLocaleString()}`);
+                return true;
+            },
         }),
         {
             name: 'succesor_market_v4',

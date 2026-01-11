@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
+import { useUserStore } from '../../../core/store/useUserStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 
 type Props = {
@@ -11,14 +12,21 @@ type Props = {
 
 const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
     const { subsidiaryStates } = useStatsStore();
+    const { subsidiaries } = useUserStore();
     const [selectedSubsidiary, setSelectedSubsidiary] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-    const subsidiaries = Object.values(subsidiaryStates);
+    const startups = Object.values(subsidiaryStates);
+    const hasAnyCompany = startups.length > 0 || subsidiaries.length > 0;
 
     const handleOpenDetail = (subsidiary: any) => {
-        setSelectedSubsidiary(subsidiary);
-        setIsDetailModalOpen(true);
+        // Only open detail for Startups for now (as per existing logic), or implement simple alert for Acquired?
+        // Existing logic assumes 'subsidiary' structure. AcquiredCompany structure is different.
+        // For now, only startups open the detail modal.
+        if ('isLossMaking' in subsidiary) {
+            setSelectedSubsidiary(subsidiary);
+            setIsDetailModalOpen(true);
+        }
     };
 
     const handleCloseDetail = () => {
@@ -37,15 +45,15 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                 <View style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Existing Companies</Text>
+                        <Text style={styles.headerTitle}>My Empire</Text>
                         <Pressable onPress={onClose} style={styles.closeBtn}>
                             <Text style={styles.closeText}>Done</Text>
                         </Pressable>
                     </View>
 
                     {/* Content */}
-                    <ScrollView contentContainerStyle={styles.content}>
-                        {subsidiaries.length === 0 ? (
+                    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+                        {!hasAnyCompany ? (
                             <View style={styles.emptyState}>
                                 <Text style={styles.emptyIcon}>🏢</Text>
                                 <Text style={styles.emptyTitle}>No companies owned yet</Text>
@@ -54,46 +62,82 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                                 </Text>
                             </View>
                         ) : (
-                            subsidiaries.map(sub => {
-                                const isHealthy = !sub.isLossMaking;
-                                const monthlyImpact = sub.currentProfit / 12;
-
-                                return (
-                                    <Pressable
-                                        key={sub.id}
-                                        onPress={() => handleOpenDetail(sub)}
-                                        style={({ pressed }) => [
-                                            styles.card,
-                                            pressed && styles.cardPressed,
-                                            !isHealthy && styles.cardCritical,
-                                        ]}
-                                    >
-                                        <View style={styles.cardLeft}>
-                                            <View style={[styles.logoBox, !isHealthy && { borderColor: theme.colors.danger }]}>
-                                                <Text style={styles.logo}>🏢</Text>
+                            <>
+                                {/* ACQUIRED SUBSIDIARIES SECTION */}
+                                {subsidiaries.length > 0 && (
+                                    <View style={styles.section}>
+                                        <Text style={styles.sectionTitle}>Acquired Market Entities</Text>
+                                        {subsidiaries.map(sub => (
+                                            <View key={sub.id} style={[styles.card, styles.acquiredCard]}>
+                                                <View style={styles.cardLeft}>
+                                                    <View style={[styles.logoBox, { borderColor: theme.colors.success }]}>
+                                                        <Text style={styles.logo}>👑</Text>
+                                                    </View>
+                                                    <View>
+                                                        <Text style={styles.companyName}>{sub.name} ({sub.symbol})</Text>
+                                                        <Text style={styles.companySector}>
+                                                            {sub.category} • Subsidiary
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.cardRight}>
+                                                    <Text style={styles.impactLabel}>Active Buff</Text>
+                                                    <Text style={[styles.impactValue, { color: theme.colors.success, fontSize: 13 }]}>
+                                                        {sub.acquisitionBuff.label}
+                                                    </Text>
+                                                </View>
                                             </View>
-                                            <View>
-                                                <Text style={styles.companyName}>{sub.name}</Text>
-                                                <Text style={styles.companySector}>
-                                                    {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL LOSS'}
-                                                </Text>
-                                            </View>
-                                        </View>
+                                        ))}
+                                    </View>
+                                )}
 
-                                        <View style={styles.cardRight}>
-                                            <Text style={styles.impactLabel}>Monthly Impact</Text>
-                                            <Text
-                                                style={[
-                                                    styles.impactValue,
-                                                    { color: isHealthy ? theme.colors.success : theme.colors.danger },
-                                                ]}
-                                            >
-                                                {isHealthy ? '+' : ''}${(Math.abs(monthlyImpact) / 1e6).toFixed(1)}M
-                                            </Text>
-                                        </View>
-                                    </Pressable>
-                                );
-                            })
+                                {/* STARTUPS SECTION */}
+                                {startups.length > 0 && (
+                                    <View style={styles.section}>
+                                        <Text style={styles.sectionTitle}>Founded Startups</Text>
+                                        {startups.map(sub => {
+                                            const isHealthy = !sub.isLossMaking;
+                                            const monthlyImpact = sub.currentProfit / 12;
+
+                                            return (
+                                                <Pressable
+                                                    key={sub.id}
+                                                    onPress={() => handleOpenDetail(sub)}
+                                                    style={({ pressed }) => [
+                                                        styles.card,
+                                                        pressed && styles.cardPressed,
+                                                        !isHealthy && styles.cardCritical,
+                                                    ]}
+                                                >
+                                                    <View style={styles.cardLeft}>
+                                                        <View style={[styles.logoBox, !isHealthy && { borderColor: theme.colors.danger }]}>
+                                                            <Text style={styles.logo}>🚀</Text>
+                                                        </View>
+                                                        <View>
+                                                            <Text style={styles.companyName}>{sub.name}</Text>
+                                                            <Text style={styles.companySector}>
+                                                                {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL LOSS'}
+                                                            </Text>
+                                                        </View>
+                                                    </View>
+
+                                                    <View style={styles.cardRight}>
+                                                        <Text style={styles.impactLabel}>Monthly Impact</Text>
+                                                        <Text
+                                                            style={[
+                                                                styles.impactValue,
+                                                                { color: isHealthy ? theme.colors.success : theme.colors.danger },
+                                                            ]}
+                                                        >
+                                                            {isHealthy ? '+' : ''}${(Math.abs(monthlyImpact) / 1e6).toFixed(1)}M
+                                                        </Text>
+                                                    </View>
+                                                </Pressable>
+                                            );
+                                        })}
+                                    </View>
+                                )}
+                            </>
                         )}
                     </ScrollView>
                 </View>
@@ -220,6 +264,22 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
         fontWeight: '600',
         marginBottom: 4,
+    },
+    section: {
+        marginBottom: 20,
+        gap: 12
+    },
+    sectionTitle: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.caption,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        marginBottom: 4,
+        marginLeft: 4
+    },
+    acquiredCard: {
+        borderColor: theme.colors.success + '40', // transparent success
+        backgroundColor: theme.colors.success + '10',
     },
     impactValue: {
         fontSize: 18,

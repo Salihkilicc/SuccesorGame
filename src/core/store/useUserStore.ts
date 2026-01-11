@@ -4,6 +4,14 @@ import { zustandStorage } from '../../storage/persist';
 import { PartnerProfile, ExPartnerProfile, MarriageProposalResult } from '../types';
 import { useStatsStore } from './useStatsStore';
 
+export interface AcquiredCompany {
+  id: string;
+  name: string;
+  symbol: string;
+  category: string;
+  acquisitionBuff: { type: string; value: number; label: string };
+}
+
 export type FamilyMember = {
   id: string;
   name: string;
@@ -54,6 +62,7 @@ export type UserState = {
   friends: Friend[];
   exes: ExPartnerProfile[]; // Updated to use ExPartnerProfile with breakup details
   inventory: InventoryItem[];
+  subsidiaries: AcquiredCompany[];
   hasEngagementRing: boolean;
   gymState: {
     gymStatus: number; // 0-100
@@ -74,6 +83,8 @@ type UserStore = UserState & {
   setHasPremium: (value: boolean) => Promise<void>;
   addItem: (item: InventoryItem) => void;
   updateGymState: (partial: Partial<UserState['gymState']>) => void;
+  addSubsidiary: (company: AcquiredCompany) => void;
+  setAll: (partial: Partial<UserState>) => void; // Helper requested by user (same as update)
 
   // === RELATIONSHIP ENGINE ACTIONS ===
   setPartner: (newPartner: PartnerProfile | null) => void;
@@ -113,6 +124,7 @@ export const initialUserState: UserState = {
   ],
   exes: [],
   inventory: [],
+  subsidiaries: [],
   hasEngagementRing: false,
   gymState: {
     gymStatus: 0,
@@ -162,6 +174,11 @@ export const useUserStore = create<UserStore>()(
           ...state,
           gymState: { ...state.gymState, ...partial },
         })),
+
+      addSubsidiary: (company) => set((state) => ({
+        subsidiaries: [...state.subsidiaries, company]
+      })),
+      setAll: (partial) => set((state) => ({ ...state, ...partial })),
 
       // ============================================================================
       // RELATIONSHIP ENGINE ACTIONS
@@ -326,7 +343,7 @@ export const useUserStore = create<UserStore>()(
       reset: () => set(() => ({ ...initialUserState })),
     }),
     {
-      name: 'succesor_user_v1',
+      name: 'succesor_user_v3',
       storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         name: state.name,
@@ -341,6 +358,7 @@ export const useUserStore = create<UserStore>()(
         inventory: state.inventory,
         hasEngagementRing: state.hasEngagementRing,
         gymState: state.gymState,
+        subsidiaries: state.subsidiaries,
       }) as any,
     },
   ),

@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useEventStore } from '../../../core/store';
+import { useUserStore } from '../../../core/store/useUserStore';
 import { triggerEvent } from '../../../event/eventEngine';
 import { theme } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
@@ -19,10 +20,11 @@ import { CATEGORIES, STOCKS, Category } from '../data/marketData';
 
 const MarketScreen = () => {
   const navigation = useNavigation<any>();
-  const [selectedCategory, setSelectedCategory] = useState<Category>('Tech');
+  const [selectedCategory, setSelectedCategory] = useState<Category>('Technology');
   const [showPortfolio, setShowPortfolio] = useState(false);
   const data = useMemo(() => STOCKS[selectedCategory] ?? [], [selectedCategory]);
   const { investmentsValue, handleLiquidation } = useAssetsLogic();
+  const subsidiaries = useUserStore(state => state.subsidiaries);
 
   const formatMoney = (value: number) => {
     const absolute = Math.abs(value);
@@ -66,25 +68,30 @@ const MarketScreen = () => {
         ListFooterComponent={<MarketEventFooter />}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => navigation.navigate('StockDetail', {
-              symbol: item.symbol,
-              price: item.price,
-              change: item.change,
-              category: selectedCategory,
-            })
-            }>
-            <StockItemSkeleton
-              symbol={item.symbol}
-              name={item.name}
-              price={item.price}
-              change={item.change}
-              riskTag={item.riskTag}
-              meta={item.meta}
-            />
-          </Pressable>
-        )}
+        renderItem={({ item }) => {
+          const isAcquired = subsidiaries.some(s => s.symbol === item.symbol);
+          const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
+
+          return (
+            <Pressable
+              onPress={() => navigation.navigate('StockDetail', {
+                symbol: item.symbol,
+                price: item.price,
+                change: item.change,
+                category: selectedCategory,
+              })
+              }>
+              <StockItemSkeleton
+                symbol={item.symbol}
+                name={displayName}
+                price={item.price}
+                change={item.change}
+                riskTag={item.risk}
+                meta={item.description}
+              />
+            </Pressable>
+          );
+        }}
         showsVerticalScrollIndicator={false}
       />
       <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
