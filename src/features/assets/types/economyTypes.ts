@@ -1,26 +1,14 @@
-export interface IncomeSource {
+export interface BreakdownItem {
     id: string;
     label: string;
-    amount: number;
-    type: 'SALARY' | 'DIVIDEND' | 'REAL_ESTATE' | 'OTHER';
-}
-
-export interface ExpenseCategory {
-    id: string;
-    label: string;
-    amount: number;
-    type: 'LIFESTYLE' | 'RELATIONSHIP' | 'HOUSING' | 'EDUCATION' | 'LOAN' | 'TAX';
+    amount: number; // Quarterly amount
+    type: 'income' | 'expense';
 }
 
 export interface FinancialReport {
     totalIncome: number;
     totalExpenses: number;
-    netIncome: number;
-
-    // Market/Investment Impact
-    portfolioValue: number;
-    portfolioReturn: number; // Profit/Loss this month
-
-    incomeBreakdown: IncomeSource[];
-    expenseBreakdown: ExpenseCategory[];
+    netFlow: number; // Income - Expenses
+    incomeBreakdown: BreakdownItem[];
+    expenseBreakdown: BreakdownItem[];
 }

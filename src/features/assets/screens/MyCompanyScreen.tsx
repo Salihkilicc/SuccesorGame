@@ -84,14 +84,6 @@ const MyCompanyScreen = () => {
           <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
         </DashboardCard>
 
-        {/* PERSONAL FINANCE CARD */}
-        <DashboardCard title="Personal Finances">
-          <StatColumn label="Net Worth" value={formatCurrency(stats.netWorth)} />
-          <VerticalDivider />
-          <StatColumn label="Income" value={`+${formatCurrency(stats.monthlyIncome)}`} colorType="success" />
-          <VerticalDivider />
-          <StatColumn label="Expenses" value={`-${formatCurrency(stats.monthlyExpenses)}`} colorType="danger" />
-        </DashboardCard>
 
         {/* OPERATIONS */}
         <SectionHeader title="OPERATIONS MANAGEMENT" />

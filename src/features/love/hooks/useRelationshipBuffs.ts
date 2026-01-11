@@ -1,71 +1,47 @@
 import { useUserStore } from '../../../core/store/useUserStore';
 
-/**
- * Hook to retrieve active relationship buffs from the current partner.
- * Returns multipliers and bonuses based on partner's job and tier.
- */
 export const useRelationshipBuffs = () => {
     const partner = useUserStore(state => state.partner);
 
-    // Default values (no buff)
-    let medicalDiscount = 0; // 0 = no discount
-    let gymBoost = 0;
-    let legalProtection = 0;
-    let socialRepBonus = 0;
-
-    // New Visual Buffs
-    let intellectBoost = 0;
+    // Visual Buffs (Percentages for UI)
+    let intellectBoost = 0; // e.g. 10 for +10%
     let strengthBoost = 0;
     let socialBoost = 0;
 
-    // Check if partner exists and has the new Deep Persona structure
-    if (partner && 'job' in partner && 'buffType' in (partner as any).job) {
-        const deepPartner = partner as any;
-        const buffType = deepPartner.job.buffType;
-        const buffValue = deepPartner.job.buffValue || 0;
+    // Logic Buffs (Multipliers for calculation)
+    let medicalDiscount = 0; // 0.5 means 50% discount
+
+    if (partner && partner.job) {
+        const { buffType, buffValue = 0 } = partner.job;
+
+        // Handle Multipliers (e.g., 1.1 in DB means +10%)
+        // We convert them to user-friendly percentages
 
         switch (buffType) {
-            case 'MEDICAL_DISCOUNT':
-            case 'HEALTH_CARE':
-                // buffValue is typically a percentage (e.g., 25 = 25% discount)
-                medicalDiscount = buffValue / 100;
+            case 'INTELLECT_GAIN': // e.g. 1.1
+                intellectBoost = Math.round((buffValue - 1) * 100);
                 break;
-
+            case 'GYM_GAINS':      // e.g. 1.2
             case 'STRENGTH_TRAINING':
-            case 'BRAVERY':
-            case 'GYM_GAINS': // New Type
-                gymBoost = buffValue;
-                strengthBoost = buffValue; // Alias
+                strengthBoost = Math.round((buffValue - 1) * 100);
                 break;
-
-            case 'LEGAL_DEFENSE':
-            case 'LEGAL_IMMUNITY':
-                legalProtection = buffValue;
-                break;
-
+            case 'FAME_BOOST':     // e.g. 1.5
             case 'REPUTATION_BOOST':
-            case 'PARTY_INVITES':
-            case 'FAME_BOOST': // New Type
-                socialRepBonus = buffValue;
-                socialBoost = buffValue;
+                socialBoost = Math.round((buffValue - 1) * 100);
                 break;
-
-            case 'INTELLECT_GAIN': // New Type
-                intellectBoost = buffValue;
+            case 'MEDICAL_DISCOUNT': // e.g. 0.5 (meaning 50% cost)
+                // If value is 0.5, discount is 50%
+                medicalDiscount = 1 - buffValue;
                 break;
         }
     }
 
     return {
-        medicalDiscount, // 0 to 1 (e.g., 0.25 = 25% discount)
-        gymBoost,
+        intellectBoost, // Returns integer (e.g. 10)
         strengthBoost,
-        intellectBoost,
         socialBoost,
-        legalProtection,
-        socialRepBonus,
+        medicalDiscount,
         hasPartner: !!partner,
-        partnerName: partner?.name || null,
-        partnerJob: (partner as any)?.job?.title || null
+        partnerName: partner?.name || '',
     };
 };

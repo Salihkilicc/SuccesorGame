@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEventStore } from '../../../core/store';
 import { triggerEvent } from '../../../event/eventEngine';
 import { theme } from '../../../core/theme';
+import { useAssetsLogic } from '../hooks/useAssetsLogic';
 
 // Bileşenler
 import AppScreen from '../../../components/layout/AppScreen';
@@ -19,6 +20,20 @@ const MarketScreen = () => {
   const navigation = useNavigation<any>();
   const [selectedCategory, setSelectedCategory] = useState<Category>('Tech');
   const data = useMemo(() => STOCKS[selectedCategory] ?? [], [selectedCategory]);
+  const { investmentsValue, handleLiquidation } = useAssetsLogic();
+
+  const formatMoney = (value: number) => {
+    const absolute = Math.abs(value);
+    if (absolute >= 1_000_000) {
+      const formatted = (value / 1_000_000).toFixed(1);
+      return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
+    }
+    if (absolute >= 1_000) {
+      const formatted = (value / 1_000).toFixed(1);
+      return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
+    }
+    return `$${value.toLocaleString()}`;
+  };
 
   return (
     <AppScreen
@@ -33,10 +48,17 @@ const MarketScreen = () => {
 
         // Header ve Footer'ı aşağıda tanımladığımız bileşenlerden alıyoruz
         ListHeaderComponent={
-          <MarketHeader
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
+          <>
+            <PortfolioCard
+              investmentsValue={investmentsValue}
+              handleLiquidation={handleLiquidation}
+              formatMoney={formatMoney}
+            />
+            <MarketHeader
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+          </>
         }
         ListFooterComponent={<MarketEventFooter />}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
@@ -67,6 +89,33 @@ const MarketScreen = () => {
 };
 
 // --- ALT BİLEŞENLER (Okunabilirlik İçin Ayrıldı) ---
+
+const PortfolioCard = ({
+  investmentsValue,
+  handleLiquidation,
+  formatMoney
+}: {
+  investmentsValue: number;
+  handleLiquidation: () => void;
+  formatMoney: (value: number) => string;
+}) => (
+  <View style={styles.portfolioCard}>
+    <View style={styles.portfolioHeader}>
+      <Text style={styles.portfolioLabel}>Total Investments</Text>
+      <Text style={styles.portfolioValue}>{formatMoney(investmentsValue)}</Text>
+    </View>
+    {investmentsValue > 0 && (
+      <Pressable
+        onPress={handleLiquidation}
+        style={({ pressed }) => [
+          styles.liquidateButton,
+          pressed && styles.liquidateButtonPressed
+        ]}>
+        <Text style={styles.liquidateButtonText}>Liquidate All</Text>
+      </Pressable>
+    )}
+  </View>
+);
 
 const BackButton = ({ navigation }: { navigation: any }) => (
   <Pressable
@@ -141,4 +190,11 @@ const styles = StyleSheet.create({
   backButton: { width: 36, height: 36, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.card },
   backButtonPressed: { backgroundColor: theme.colors.cardSoft, transform: [{ scale: 0.97 }] },
   backIcon: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
+  portfolioCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.md, marginBottom: theme.spacing.md },
+  portfolioHeader: { gap: theme.spacing.xs },
+  portfolioLabel: { fontSize: theme.typography.caption, color: theme.colors.textSecondary, fontWeight: '600' },
+  portfolioValue: { fontSize: theme.typography.title, color: theme.colors.textPrimary, fontWeight: '700' },
+  liquidateButton: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: theme.colors.danger, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  liquidateButtonPressed: { backgroundColor: theme.colors.danger + '10', transform: [{ scale: 0.98 }] },
+  liquidateButtonText: { color: theme.colors.danger, fontWeight: '700', fontSize: theme.typography.body },
 });

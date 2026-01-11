@@ -11,6 +11,7 @@ type MarketActions = {
     buyAsset: (item: HoldingItem) => void;
     sellAsset: (id: string, amount?: number) => void;
     reset: () => void;
+    liquidatePortfolio: () => number;
     // Selectors/Helpers could be here or just derived in components
 };
 
@@ -49,6 +50,19 @@ export const useMarketStore = create<MarketState & MarketActions>()(
                     };
                 }),
             reset: () => set(() => ({ ...initialMarketState })),
+            liquidatePortfolio: () => {
+                const state = get();
+                const totalValue = state.holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
+
+                if (totalValue > 0) {
+                    // Import useStatsStore dynamically to avoid circular dependency issues if any.
+                    // useStatsStore is where the UI reads money from.
+                    const { earnMoney } = require('./useStatsStore').useStatsStore.getState();
+                    earnMoney(totalValue);
+                    set({ holdings: [] });
+                }
+                return totalValue;
+            },
         }),
         {
             name: 'succesor_market_v1',

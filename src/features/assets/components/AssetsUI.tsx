@@ -32,10 +32,10 @@ export const InfoCard = ({ title, body, variant = 'default' }: any) => (
     </View>
 );
 
-export const SummaryRow = ({ label, value, marginTop = false }: any) => (
+export const SummaryRow = ({ label, value, marginTop = false, valueColor }: any) => (
     <View style={marginTop && { marginTop: theme.spacing.md }}>
         <Text style={styles.summaryLabel}>{label}</Text>
-        <Text style={styles.summaryValue}>{value}</Text>
+        <Text style={[styles.summaryValue, valueColor && { color: valueColor }]}>{value}</Text>
     </View>
 );
 
@@ -72,7 +72,7 @@ export const BreakdownSection = ({ title, items, isIncome }: { title: string, it
                 <View key={index} style={styles.breakdownRow}>
                     <Text style={styles.breakdownLabel}>{item.label}</Text>
                     <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : theme.colors.textPrimary }]}>
-                        {isIncome ? '+' : '-'}${item.value.toLocaleString()}
+                        {isIncome ? '+' : '-'}${item.amount.toLocaleString()}
                     </Text>
                 </View>
             ))}

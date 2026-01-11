@@ -70,6 +70,17 @@ export type PartnerProfile = {
     photo: string | null;
     stats: PartnerStats;
 
+    // === Deep Persona Extension ===
+    job?: {
+        title: string;
+        tier: string;
+        buffType?: string;
+        buffValue?: number;
+    };
+    finances?: {
+        monthlyCost: number;
+    };
+
     // === Relationship Status ===
     love: number;           // 0-100 (Current relationship strength)
     relationYears: number;  // Years/months together

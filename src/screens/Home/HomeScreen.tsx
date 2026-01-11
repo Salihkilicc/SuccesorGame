@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
 import { useProductStore } from '../../core/store/useProductStore';
+import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
 import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
@@ -50,12 +51,10 @@ const HomeScreen = () => {
   const navigation = useNavigation<HomeNavProp>();
   const { name, bio, gender, hasPremium, partner } = useUserStore();
   const { age, currentMonth, advanceMonth } = useGameStore();
-  // TODO: Wire monthlyIncome/monthlyExpenses to real store values when available.
-  const { money, netWorth, monthlyIncome, monthlyExpenses, setField, factoryCount, employeeCount } = useStatsStore();
-  const { holdings } = useMarketStore();
+  // Using useAssetsLogic for real-time financial data
+  const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
+  const { setField, factoryCount, employeeCount } = useStatsStore();
   const { reset: resetProducts } = useProductStore();
-
-  const investmentsValue = holdings.reduce((sum, item) => sum + item.estimatedValue, 0);
 
 
   const { lastLifeEvent } = useEventStore();
@@ -221,22 +220,22 @@ const HomeScreen = () => {
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Cash</Text>
-              <Text style={styles.value}>${money.toLocaleString()}</Text>
+              <Text style={styles.value}>{formatMoney(cash)}</Text>
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Investments</Text>
               <Text style={styles.value}>{formatMoney(investmentsValue)}</Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Income (Monthly)</Text>
-              <Text style={styles.value}>
-                {monthlyIncome ? formatMoney(monthlyIncome) : '$0'}
+              <Text style={styles.label}>Income (Quarterly)</Text>
+              <Text style={[styles.value, { color: theme.colors.success }]}>
+                {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
               </Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Expenses (Monthly)</Text>
-              <Text style={styles.value}>
-                {monthlyExpenses ? formatMoney(monthlyExpenses) : '$0'}
+              <Text style={styles.label}>Expenses (Quarterly)</Text>
+              <Text style={[styles.value, { color: theme.colors.danger }]}>
+                {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
               </Text>
             </View>
 

@@ -14,7 +14,15 @@ import {
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
-    const { stats, finances, formatMoney } = useAssetsLogic();
+    const { cash, netWorth, report } = useAssetsLogic();
+
+    const formatMoney = (value: number) => {
+        const absolute = Math.abs(value);
+        if (absolute >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+        if (absolute >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+        if (absolute >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+        return `$${value.toLocaleString()}`;
+    };
 
     return (
         <View style={styles.safeArea}>
@@ -22,73 +30,47 @@ const AssetsScreen = () => {
 
                 {/* HEADER */}
                 <AssetsHeader
-                    risk={stats.riskApetite}
-                    strategy={stats.strategicSense}
+                    risk={0}
+                    strategy={0}
                     onBack={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
                 />
 
-                {/* INFO CARDS */}
-                <View style={styles.cardGroup}>
-                    <InfoCard title="Last Market Event" body={stats.lastMarketEvent ?? 'No significant market event yet.'} />
-                    <InfoCard title="Next Move Idea" body={stats.nextMove} variant="soft" />
-                </View>
-
-                {/* NET WORTH SUMMARY */}
+                {/* QUARTERLY FINANCIAL OVERVIEW */}
                 <View style={styles.summaryCard}>
+                    <Text style={styles.sectionTitle}>Quarterly Financial Report</Text>
+
                     <View style={styles.summaryRow}>
                         <View style={styles.summaryCol}>
-                            <SummaryRow label="Net Worth" value={formatMoney(stats.netWorth)} />
-                            <SummaryRow label="Cash" value={`$${stats.money.toLocaleString()}`} marginTop />
-                            <SummaryRow label="Investments" value={formatMoney(stats.investmentsValue)} marginTop />
+                            <SummaryRow label="Net Worth" value={formatMoney(netWorth)} />
+                            <SummaryRow label="Cash" value={formatMoney(cash)} marginTop />
                         </View>
 
                         <View style={styles.summaryCol}>
-                            <Pressable
-                                onPress={() => navigation.navigate('Shopping')}
-                                style={({ pressed }) => [styles.investmentsButton, pressed && { opacity: 0.9 }]}>
-                                <View>
-                                    <Text style={{ color: theme.colors.textMuted, fontSize: 10, textTransform: 'uppercase' }}>Shopping</Text>
-                                    <Text style={{ color: theme.colors.textPrimary, fontWeight: '800', fontSize: 18 }}>Go to Mall</Text>
-                                </View>
-                                <Text style={{ color: theme.colors.accent, fontSize: 24, fontWeight: '800' }}>›</Text>
-                            </Pressable>
-
-                            <View style={styles.incomeRow}>
-                                <SummaryRow label="Income" value={finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'} />
-                                <SummaryRow label="Expenses" value={finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'} />
-                            </View>
+                            <SummaryRow
+                                label="Income (Q)"
+                                value={formatMoney(report.totalIncome)}
+                                valueColor={theme.colors.success}
+                            />
+                            <SummaryRow
+                                label="Expenses (Q)"
+                                value={formatMoney(report.totalExpenses)}
+                                valueColor={theme.colors.error}
+                                marginTop
+                            />
+                            <SummaryRow
+                                label="Net Flow"
+                                value={formatMoney(report.netFlow)}
+                                valueColor={report.netFlow >= 0 ? theme.colors.success : theme.colors.error}
+                                marginTop
+                            />
                         </View>
                     </View>
 
                     {/* DETAIL BREAKDOWN */}
-                    {finances && finances.breakdown && (
-                        <View style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, marginTop: theme.spacing.lg, paddingTop: theme.spacing.md }}>
-                            <BreakdownSection title="Income Sources" items={finances.breakdown.income} isIncome />
-                            <BreakdownSection title="Monthly Expenses" items={finances.breakdown.expenses} />
-                        </View>
-                    )}
-                </View>
-
-                {/* CATEGORIES */}
-                <View style={styles.categoryGrid}>
-                    <CategoryCard
-                        label="Properties"
-                        value={formatMoney(stats.propertiesValue)}
-                        meta="Homes, estates, islands"
-                        onPress={() => navigation.navigate('Shopping')}
-                    />
-                    <CategoryCard
-                        label="Vehicles"
-                        value={formatMoney(stats.vehiclesValue)}
-                        meta="Cars, jets, yachts"
-                        onPress={() => navigation.navigate('Shopping')}
-                    />
-                    <CategoryCard
-                        label="Belongings"
-                        value={formatMoney(stats.belongingsValue)}
-                        meta="Art, jewelry, antiques"
-                        onPress={() => navigation.navigate('Shopping')}
-                    />
+                    <View style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, marginTop: theme.spacing.lg, paddingTop: theme.spacing.md }}>
+                        <BreakdownSection title="Income Sources" items={report.incomeBreakdown} isIncome />
+                        <BreakdownSection title="Quarterly Expenses" items={report.expenseBreakdown} />
+                    </View>
                 </View>
 
                 {/* ACTIONS */}
@@ -117,6 +99,7 @@ const styles = StyleSheet.create({
     content: { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl * 2 + theme.spacing.sm, gap: theme.spacing.md, paddingBottom: theme.spacing.xl * 2 },
     cardGroup: { gap: theme.spacing.sm },
     summaryCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
+    sectionTitle: { fontSize: theme.typography.subtitle, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: theme.spacing.md },
     summaryRow: { flexDirection: 'row', gap: theme.spacing.lg },
     summaryCol: { flex: 1, gap: theme.spacing.sm },
     investmentsButton: { backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
