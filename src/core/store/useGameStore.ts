@@ -380,6 +380,12 @@ export const useGameStore = create<GameStore>()(
           }));
           console.log(`[Quarterly Review] Morale Updated: ${newMorale} (Policy: ${state.salaryPolicy})`);
 
+          // 7a. MARKET SIMULATION (NEW)
+          // Simulate market for each quarter that passed
+          for (let q = 0; q < quarters; q++) {
+            useMarketStore.getState().simulateQuarter();
+          }
+          console.log(`[Market] Simulated ${quarters} quarter(s)`);
 
           // 7b. STAT DECAY LOGIC (Paslanma Kuralı)
           // "İşleyen demir ışıldar, işlemeyen paslanır."

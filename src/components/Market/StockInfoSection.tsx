@@ -1,44 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import PremiumBadge from '../common/PremiumBadge';
-import { useUserStore } from '../../core/store';
-import type { AssetsStackParamList } from '../../navigation';
+import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
 
-const StockInfoSection = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AssetsStackParamList>>();
-  const { hasPremium } = useUserStore();
+type StockInfoSectionProps = {
+  description?: string;
+  targetPrice?: number; // Optional
+};
 
-  const goPremium = () => navigation.navigate('Premium');
-
+const StockInfoSection = ({ description, targetPrice = 165 }: StockInfoSectionProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Stock Info</Text>
-      <Text style={styles.row}>🎯 Target Price: $165</Text>
+      <Text style={styles.row}>🎯 Target Price: ${targetPrice}</Text>
       <Text style={styles.row}>
-        Company Bio: Yapay zeka donanım sektöründe yükselen bir firma.
+        {description || "Company Bio: Rising player in its sector with strong fundamentals."}
       </Text>
       <View style={styles.sentimentChip}>
         <Text style={styles.sentimentText}>Market Sentiment: Mildly Positive</Text>
-      </View>
-      <View style={styles.expertCard}>
-        {hasPremium ? (
-          <View style={styles.expertRow}>
-            <PremiumBadge size="small" />
-            <Text style={styles.expertText}>Analyst: Orta vadede güçlü AL bölgesi.</Text>
-          </View>
-        ) : (
-          <>
-            <Text style={styles.lockedText}>Expert yorumları Premium ile açılır.</Text>
-            <Pressable
-              onPress={goPremium}
-              style={({ pressed }) => [styles.goPremiumButton, pressed && styles.goPremiumButtonPressed]}>
-              <Text style={styles.goPremiumLabel}>Go Premium</Text>
-            </Pressable>
-          </>
-        )}
       </View>
     </View>
   );
@@ -103,21 +81,6 @@ const styles = StyleSheet.create({
   },
   sentimentText: {
     color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption + 1,
-  },
-  goPremiumButton: {
-    backgroundColor: theme.colors.accent,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  goPremiumButtonPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.98 }],
-  },
-  goPremiumLabel: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
     fontSize: theme.typography.caption + 1,
   },
 });

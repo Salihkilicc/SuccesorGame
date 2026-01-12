@@ -8,25 +8,15 @@ export const useAssetsLogic = () => {
     const user = useUserStore((state) => state);
     const stats = useStatsStore((state) => state);
 
-    const { liquidatePortfolio, holdings } = useMarketStore();
+    const { liquidatePortfolio, holdings, marketPrices } = useMarketStore();
 
     // Calculate "Projected" Report for UI
     const report = calculateQuarterlyFinances(user, { holdings }, stats);
 
-    // Calculate investmentsValue based on CURRENT market prices
+    // Calculate investmentsValue based on CURRENT market prices from store
     const investmentsValue = holdings.reduce((sum, holding) => {
-        // Find current price from market data
-        let currentPrice = holding.averageCost; // Fallback to average cost
-
-        // Search through all categories to find the stock
-        for (const category of Object.values(STOCKS)) {
-            const stock = category.find(s => s.symbol === holding.symbol);
-            if (stock) {
-                currentPrice = stock.price;
-                break;
-            }
-        }
-
+        // Use live price from marketPrices, fallback to averageCost
+        const currentPrice = marketPrices[holding.id] || holding.averageCost;
         return sum + (holding.quantity * currentPrice);
     }, 0);
 
@@ -59,17 +49,17 @@ export const useAssetsLogic = () => {
         );
     };
 
-    // Get portfolio list with current market data
+    // Get portfolio list with current market data from live prices
     const getPortfolioList = () => {
         return holdings.map(holding => {
-            let currentPrice = holding.averageCost;
-            let name = holding.symbol;
+            // Use live market price from store
+            const currentPrice = marketPrices[holding.id] || holding.averageCost;
 
-            // Find current market data
+            // Find name from static data (name doesn't change)
+            let name = holding.symbol;
             for (const category of Object.values(STOCKS)) {
                 const stock = category.find(s => s.symbol === holding.symbol);
                 if (stock) {
-                    currentPrice = stock.price;
                     name = stock.name || stock.symbol;
                     break;
                 }

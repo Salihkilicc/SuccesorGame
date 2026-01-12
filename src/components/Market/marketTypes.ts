@@ -1,58 +1,63 @@
-export type CategoryKey = 'bonds' | 'crypto' | 'stocks';
+export type CategoryKey = 'bonds' | 'crypto' | 'stocks' | 'funds';
 
-export type BondCategory = 'government' | 'local' | 'corporate';
+export type BondCategory = 'Government' | 'Corporate' | 'Municipal';
+export type FundCategory = 'Index' | 'Sector' | 'Commodity';
 
-export type RiskLevel = 'Very Low' | 'Low' | 'Medium' | 'Medium-High' | 'High';
+export type RiskLevel = 'Very Low' | 'Low' | 'Medium' | 'Medium-High' | 'High' | 'Extreme';
 
 export interface BondItem {
   id: string;
   name: string;
-  years: number;
-  coupon: number;
+  faceValue: number;
+  couponRate: number; // Annual interest rate (e.g. 0.05 for 5%)
+  duration: number; // Years to maturity
   risk: RiskLevel;
-  category: BondCategory;
+  issuerType: BondCategory;
+  creditRating: 'AAA' | 'AA' | 'A' | 'B' | 'CCC';
+  maturityDate: number | string;
 }
 
 export interface CryptoAsset {
   id: string;
+  symbol: string;
   name: string;
-  cost: number;
-  trend: 'High Trend' | 'Low Trend';
+  price: number;
   change: number;
-  risk: 'High';
-  marketCap: number; // in billions (placeholder)
+  volatility: 'Low' | 'Medium' | 'High' | 'Extreme';
+  marketCap: number; // Circulating Supply Value
+  risk: RiskLevel;
+  description?: string;
+}
+
+export interface FundItem {
+  id: string;
+  name: string;
+  symbol?: string;
+  price: number;
+  change: number;
+  expenseRatio: number; // e.g. 0.005 for 0.5%
+  category: FundCategory;
+  risk: RiskLevel;
+  description?: string;
+  topHoldings: string[];
 }
 
 export interface AcquisitionBuff {
   type: 'R_AND_D_SPEED' | 'PRODUCTION_COST' | 'LOAN_INTEREST' | 'MARKETING_BOOST';
-  value: number; // e.g. 0.1 for 10%
-  label: string; // e.g. "R&D Speed +10%"
+  value: number;
+  label: string;
 }
 
 export interface StockItem {
   id: string;
   symbol: string;
-  name: string; // Maps to 'company' in legacy, keeping legacy support or refactoring? 
-  // User snippet uses 'name', legacy uses 'company'. I will use 'name' and map 'company' to it if needed or just use 'name'.
-  // Actually, existing has 'company'. I'll add 'name' and 'company' or just replace.
-  // User snippet: "name: 'Pear Inc.'".
-  // Legacy: "company: string".
-  // I will use `name` as primary, but maybe keep `company` optional to avoid breaking other files?
-  // No, I'll standardize on `name` as requested, but I should check if `company` is used elsewhere.
-  // Looking at `marketData.ts` (Step 715), STOCKS uses `name`.
-  // Wait, `marketTypes.ts` (Step 721) uses `company` in `StockItem`.
-  // `marketData.ts` (Step 715) uses `name` in `Stock` type (local definitions there).
-  // I will UNIFY to `name`.
-
+  name: string;
   price: number;
-  change: number; // Maps to 'dailyChange' in legacy?
-  // Legacy: dailyChange, yearlyChange.
-  // User snippet: change.
-  // I'll add `change` and keep `dailyChange` optional or just use `change`.
-
-  category: 'Technology' | 'Industrial' | 'Finance' | 'Health' | 'Energy' | 'Consumer' | 'Crypto' | 'High Risk';
+  change: number;
+  category: 'Technology' | 'Industrial' | 'Finance' | 'Health';
   risk: RiskLevel;
   description?: string;
+  marketCap: number; // Company Valuation
 
   // ACQUISITION FIELDS
   acquisitionCost: number; // Cost to buy 100% ownership
@@ -60,13 +65,12 @@ export interface StockItem {
   isAcquired: boolean; // Default false
 }
 
-// Ensure strict compatibility if others use "company"
-// I will just implement the user's requested structure.
+export type MarketItem = StockItem | BondItem | FundItem | CryptoAsset;
 
 export interface HoldingItem {
   id: string;
   symbol: string;
   quantity: number;
   averageCost: number;
-  type: 'stock' | 'crypto' | 'bond';
+  type: 'stock' | 'crypto' | 'bond' | 'fund';
 }

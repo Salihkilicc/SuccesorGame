@@ -1,10 +1,11 @@
 // dosya: src/screens/Assets/Market/MarketScreen.tsx
 
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
+import React, { useMemo, useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useEventStore } from '../../../core/store';
 import { useUserStore } from '../../../core/store/useUserStore';
+import { useMarketStore } from '../../../core/store/useMarketStore';
 import { triggerEvent } from '../../../event/eventEngine';
 import { theme } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
@@ -14,17 +15,78 @@ import AppScreen from '../../../components/layout/AppScreen';
 import MarketOverview from '../../../components/Market/MarketOverview';
 import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
 import PortfolioModal from '../../../components/Market/PortfolioModal';
+import MarketTicker from '../../../components/Market/MarketTicker';
+import { CategoryTabs, TabKey, TabOption } from '../components/CategoryTabs';
 
-// Veriler (Yeni Dosyadan Geliyor)
-import { CATEGORIES, STOCKS, Category } from '../data/marketData';
+// Veriler ve Tipler
+import { INITIAL_MARKET_ITEMS } from '../data/marketData';
+import { MarketItem, StockItem, BondItem, CryptoAsset, FundItem } from '../../../components/Market/marketTypes';
+
+// Type Guards
+function isCrypto(item: MarketItem): item is CryptoAsset {
+  return 'volatility' in item;
+}
+function isBond(item: MarketItem): item is BondItem {
+  return 'issuerType' in item;
+}
+function isFund(item: MarketItem): item is FundItem {
+  return 'expenseRatio' in item;
+}
+function isStock(item: MarketItem): item is StockItem {
+  return !isCrypto(item) && !isBond(item) && !isFund(item);
+}
+
+// --- TABS & CONFIG ---
+const MAIN_TABS: TabOption<TabKey>[] = [
+  { key: 'stocks', label: 'Stocks' },
+  { key: 'crypto', label: 'Crypto' },
+  { key: 'bonds', label: 'Bonds' },
+  { key: 'funds', label: 'Funds' },
+];
+
+type StockCategory = 'Technology' | 'Industrial' | 'Finance' | 'Health';
+const STOCK_SUB_TABS: TabOption<StockCategory>[] = [
+  { key: 'Technology', label: 'Technology' },
+  { key: 'Health', label: 'Health' },
+  { key: 'Industrial', label: 'Industrial' },
+  { key: 'Finance', label: 'Finance' },
+];
 
 const MarketScreen = () => {
   const navigation = useNavigation<any>();
-  const [selectedCategory, setSelectedCategory] = useState<Category>('Technology');
+  const [selectedTab, setSelectedTab] = useState<TabKey>('stocks');
+  const [stockCategory, setStockCategory] = useState<StockCategory>('Technology');
   const [showPortfolio, setShowPortfolio] = useState(false);
-  const data = useMemo(() => STOCKS[selectedCategory] ?? [], [selectedCategory]);
   const { investmentsValue, handleLiquidation } = useAssetsLogic();
   const subsidiaries = useUserStore(state => state.subsidiaries);
+
+  // Market Store for Dynamic Prices
+  const marketPrices = useMarketStore(state => state.marketPrices);
+  const initializePrices = useMarketStore(state => state.initializePrices);
+
+  useEffect(() => {
+    initializePrices();
+  }, [initializePrices]);
+
+  const displayedItems = useMemo(() => {
+    let items: MarketItem[] = [];
+
+    if (selectedTab === 'stocks') {
+      const stockItems = INITIAL_MARKET_ITEMS.filter(item => isStock(item)) as StockItem[];
+      items = stockItems.filter(s => s.category === stockCategory);
+    }
+    else if (selectedTab === 'crypto') {
+      items = INITIAL_MARKET_ITEMS.filter(item => isCrypto(item));
+    }
+    else if (selectedTab === 'bonds') {
+      items = INITIAL_MARKET_ITEMS.filter(item => isBond(item));
+    }
+    else if (selectedTab === 'funds') {
+      items = INITIAL_MARKET_ITEMS.filter(item => isFund(item));
+    }
+
+    return items;
+  }, [selectedTab, stockCategory]);
 
   const formatMoney = (value: number) => {
     const absolute = Math.abs(value);
@@ -42,58 +104,95 @@ const MarketScreen = () => {
   return (
     <AppScreen
       title="MARKET"
-      subtitle="Simulated Nasdaq & Crypto"
+      subtitle="Financial Instruments"
       leftNode={<BackButton navigation={navigation} />}
     >
-      <FlatList
-        data={data}
-        keyExtractor={item => item.symbol}
-        contentContainerStyle={styles.listContent}
+      <View style={{ flex: 1 }}>
+        {/* Ticker immediately below header - STICKY */}
+        <MarketTicker items={INITIAL_MARKET_ITEMS} />
 
-        // Header ve Footer'ı aşağıda tanımladığımız bileşenlerden alıyoruz
-        ListHeaderComponent={
-          <>
-            <PortfolioCard
-              investmentsValue={investmentsValue}
-              handleLiquidation={handleLiquidation}
-              formatMoney={formatMoney}
-              onSeeInvestments={() => setShowPortfolio(true)}
-            />
-            <MarketHeader
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-            />
-          </>
-        }
-        ListFooterComponent={<MarketEventFooter />}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        <FlatList
+          data={displayedItems}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
 
-        renderItem={({ item }) => {
-          const isAcquired = subsidiaries.some(s => s.symbol === item.symbol);
-          const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
-
-          return (
-            <Pressable
-              onPress={() => navigation.navigate('StockDetail', {
-                symbol: item.symbol,
-                price: item.price,
-                change: item.change,
-                category: selectedCategory,
-              })
-              }>
-              <StockItemSkeleton
-                symbol={item.symbol}
-                name={displayName}
-                price={item.price}
-                change={item.change}
-                riskTag={item.risk}
-                meta={item.description}
+          ListHeaderComponent={
+            <>
+              <PortfolioCard
+                investmentsValue={investmentsValue}
+                handleLiquidation={handleLiquidation}
+                formatMoney={formatMoney}
+                onSeeInvestments={() => setShowPortfolio(true)}
               />
-            </Pressable>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-      />
+              <MarketOverview trend="Bullish" volatility="Medium" />
+              <View style={{ height: 16 }} />
+
+              {/* ROW 1: Main Tabs */}
+              <CategoryTabs
+                tabs={MAIN_TABS}
+                selectedTab={selectedTab}
+                onSelectTab={setSelectedTab}
+              />
+
+              {/* ROW 2: Sub-Category Tabs (Conditional for Stocks) */}
+              {selectedTab === 'stocks' && (
+                <CategoryTabs
+                  tabs={STOCK_SUB_TABS}
+                  selectedTab={stockCategory}
+                  onSelectTab={setStockCategory}
+                  containerStyle={styles.subTabsContainer}
+                  tabStyle={styles.subTab}
+                  activeTabStyle={styles.subTabActive}
+                />
+              )}
+            </>
+          }
+          ListFooterComponent={<MarketEventFooter />}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+
+          renderItem={({ item }) => {
+            const isAcquired = isStock(item) && subsidiaries.some(s => s.symbol === item.symbol);
+            const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
+
+            // Get dynamic price if available, else static
+            const currentPrice = marketPrices[item.id] || (('price' in item) ? item.price : ('faceValue' in item) ? item.faceValue : 0);
+
+            let metaText = '';
+            const riskLevel = item.risk;
+
+            if (isBond(item)) {
+              metaText = `Yield: ${(item.couponRate * 100).toFixed(2)}% | ${(item as any).duration} Yr`;
+            } else if (isCrypto(item)) {
+              metaText = `Vol: ${item.volatility}`;
+            } else if (isFund(item)) {
+              metaText = `Exp: ${(item.expenseRatio * 100).toFixed(2)}%`;
+            } else if (isStock(item)) {
+              metaText = item.description || '';
+            }
+
+            return (
+              <Pressable
+                onPress={() => navigation.navigate('StockDetail', {
+                  symbol: (item as any).symbol || item.name,
+                  price: currentPrice,
+                  change: (item as any).change || 0,
+                  category: (item as any).category || selectedTab,
+                })
+                }>
+                <StockItemSkeleton
+                  symbol={(item as any).symbol || 'BOND'}
+                  name={displayName}
+                  price={currentPrice}
+                  change={(item as any).change || 0}
+                  riskTag={riskLevel}
+                  meta={metaText}
+                />
+              </Pressable>
+            );
+          }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
       <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
     </AppScreen>
   );

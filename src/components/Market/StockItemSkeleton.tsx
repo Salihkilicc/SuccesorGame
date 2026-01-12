@@ -22,6 +22,14 @@ const StockItemSkeleton = ({
   const changeColor = change >= 0 ? styles.changeUp : styles.changeDown;
   const formattedChange = `${change >= 0 ? '+' : ''}${change}%`;
 
+  const getRiskColor = (risk: string) => {
+    const r = risk.toLowerCase();
+    if (r.includes('low')) return theme.colors.success; // Green
+    if (r.includes('medium')) return theme.colors.warning || '#FFA500'; // Orange
+    if (r.includes('high') || r.includes('extreme')) return theme.colors.danger; // Red
+    return theme.colors.textSecondary;
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.row}>
@@ -29,7 +37,11 @@ const StockItemSkeleton = ({
           <Text style={styles.symbol}>{symbol}</Text>
           {name ? <Text style={styles.name}>{name}</Text> : null}
         </View>
-        {riskTag ? <Text style={styles.riskTag}>{riskTag}</Text> : null}
+        {riskTag ? (
+          <Text style={[styles.riskTag, { backgroundColor: getRiskColor(riskTag) }]}>
+            {riskTag}
+          </Text>
+        ) : null}
       </View>
       <View style={styles.row}>
         <Text style={styles.price}>${price.toLocaleString()}</Text>

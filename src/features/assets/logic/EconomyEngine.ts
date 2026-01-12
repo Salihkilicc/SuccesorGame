@@ -22,7 +22,29 @@ export const calculateQuarterlyFinances = (
             if (h.type === 'stock') {
                 // Simple 0.5% quarterly dividend for stocks
                 dividendIncome += val * 0.005;
+            } else if (h.type === 'bond') {
+                // Bonds pay coupons based on Face Value, not current price/cost
+                // Assuming h has faceValue and couponRate attached, OR we need to look it up?
+                // The HoldingItem in useMarketStore DOES NOT currently copy detailed fields like 'couponRate'.
+                // It only has { id, symbol, quantity, averageCost, type }.
+                // We MUST look up the static data to get the coupon rate.
+                // We'll trust the 'id' matches valid market items.
+                const { INITIAL_MARKET_ITEMS } = require('../data/marketData');
+                const itemData = INITIAL_MARKET_ITEMS.find((i: any) => i.id === h.id);
+
+                if (itemData && itemData.couponRate) {
+                    // Annual Coupon = faceValue * couponRate
+                    // Quarterly = (quantity * faceValue * couponRate) / 4
+                    // Note: BondItem definition has 'faceValue'.
+                    const faceValue = itemData.faceValue || 1000;
+                    const annualCoupon = h.quantity * faceValue * itemData.couponRate;
+                    dividendIncome += annualCoupon / 4;
+                }
+            } else if (h.type === 'fund') {
+                // Funds pay small distributions (0.3% quarterly)
+                dividendIncome += val * 0.003;
             }
+            // Crypto pays 0 (unless staking is added later)
         });
     }
 
@@ -66,7 +88,7 @@ export const calculateQuarterlyFinances = (
         // We can add portfolioValue here if needed by UI directly, currently it's in breakdown
         incomeBreakdown: [
             { id: 'salary', label: 'Job Salary', amount: salaryQuarterly, type: 'income' },
-            ...(dividendIncome > 0 ? [{ id: 'dividends', label: 'Dividends', amount: dividendIncome, type: 'income' as const }] : []),
+            ...(dividendIncome > 0 ? [{ id: 'dividends', label: 'Portfolio Income (Divs/Interest)', amount: dividendIncome, type: 'income' as const }] : []),
             ...(businessProfit > 0 ? [{ id: 'business', label: 'Business Profit', amount: businessProfit, type: 'income' as const }] : [])
         ],
         expenseBreakdown: [

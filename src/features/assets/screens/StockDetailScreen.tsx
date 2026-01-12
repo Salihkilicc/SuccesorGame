@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { AssetsStackParamList } from '../../../navigation';
 import StockDetailHeader from '../../../components/Market/StockDetailHeader';
+import MarketHeader from '../../../components/Market/MarketHeader';
 import StockInfoSection from '../../../components/Market/StockInfoSection';
 import BuySellPanel from '../../../components/Market/BuySellPanel';
 import { theme } from '../../../core/theme';
@@ -11,21 +12,27 @@ import AppScreen from '../../../components/layout/AppScreen';
 import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useUserStore } from '../../../core/store/useUserStore';
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
+import type { StockItem, CryptoAsset, FundItem } from '../../../components/Market/marketTypes';
 
 type Props = NativeStackScreenProps<AssetsStackParamList, 'StockDetail'>;
 
 const StockDetailScreen = ({ route, navigation }: Props) => {
   const { symbol, price: routePrice, change: routeChange, category: routeCategory } = route.params;
 
+  // Type guard for items with symbol
+  const hasSymbol = (item: any): item is StockItem | CryptoAsset | FundItem => {
+    return 'symbol' in item;
+  };
+
   // Fetch live item data for acquisition logic
   const marketItem = useMemo(() =>
-    INITIAL_MARKET_ITEMS.find(i => i.symbol === symbol),
+    INITIAL_MARKET_ITEMS.find(i => hasSymbol(i) && (i as any).symbol === symbol),
     [symbol]);
 
   // If item found in static list, use its details, otherwise fallback to route params
-  const categoryLabel = marketItem?.category ?? routeCategory ?? 'Tech';
+  const categoryLabel = (marketItem as any)?.category ?? routeCategory ?? 'Tech';
   const riskLabel = marketItem?.risk ?? 'Medium';
-  const acquisitionCost = marketItem?.acquisitionCost ?? 0;
+  const acquisitionCost = (marketItem as any)?.acquisitionCost ?? 0;
 
   const subsidiaries = useUserStore(state => state.subsidiaries);
   const isAcquired = subsidiaries.some(s => s.symbol === symbol);
@@ -36,7 +43,7 @@ const StockDetailScreen = ({ route, navigation }: Props) => {
 
     Alert.alert(
       'Hostile Takeover',
-      `Acquire 100% of ${marketItem.name} for $${(marketItem.acquisitionCost / 1_000_000).toFixed(0)}M?\n\nBuff: ${marketItem.acquisitionBuff.label}`,
+      `Acquire 100% of ${marketItem.name} for $${((marketItem as any).acquisitionCost / 1_000_000).toFixed(0)}M?\n\nBuff: ${(marketItem as any).acquisitionBuff?.label}`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -56,13 +63,11 @@ const StockDetailScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <AppScreen title={symbol} subtitle={`${categoryLabel} • Risk ${riskLabel}`}>
-      <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="white" />
-          <Text style={styles.backText}>Market</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <MarketHeader
+        title={symbol}
+        subtitle={`${categoryLabel} • Risk ${riskLabel}`}
+      />
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -71,15 +76,20 @@ const StockDetailScreen = ({ route, navigation }: Props) => {
           symbol={symbol}
           price={routePrice}
           change={routeChange}
-          category={routeCategory}
+          category={categoryLabel}
+          risk={riskLabel}
+          marketCap={(marketItem as any)?.marketCap}
+          volatility={(marketItem as any)?.volatility}
         />
-        <StockInfoSection />
+        <StockInfoSection
+          description={(marketItem as any)?.description}
+        />
 
         {isAcquired ? (
           <View style={styles.subsidiaryBanner}>
             <Text style={styles.subsidiaryTitle}>WHOLLY OWNED SUBSIDIARY</Text>
             <Text style={styles.subsidiaryBuff}>
-              ACTIVE BONUS: {marketItem?.acquisitionBuff.label}
+              ACTIVE BONUS: {(marketItem as any)?.acquisitionBuff?.label}
             </Text>
             <Ionicons name="shield-checkmark" size={32} color="white" />
           </View>
@@ -99,14 +109,14 @@ const StockDetailScreen = ({ route, navigation }: Props) => {
                   </Text>
                 </TouchableOpacity>
                 <Text style={styles.buffPreview}>
-                  Buff: {marketItem?.acquisitionBuff.label}
+                  Buff: {(marketItem as any)?.acquisitionBuff?.label}
                 </Text>
               </View>
             )}
           </>
         )}
       </ScrollView>
-    </AppScreen>
+    </View>
   );
 };
 

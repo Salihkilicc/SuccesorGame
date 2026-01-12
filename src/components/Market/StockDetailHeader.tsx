@@ -7,8 +7,16 @@ type Props = {
   price: number;
   change: number;
   category?: string;
-  risk?: 'Low' | 'Medium' | 'High';
-  volatility?: 'Low' | 'Medium' | 'High';
+  risk?: 'Low' | 'Medium' | 'High' | string;
+  volatility?: 'Low' | 'Medium' | 'High' | string;
+  marketCap?: number;
+};
+
+const formatCompactNumber = (num: number) => {
+  if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  return num.toString();
 };
 
 const StockDetailHeader = ({
@@ -17,7 +25,8 @@ const StockDetailHeader = ({
   change,
   category = 'Tech',
   risk = 'Low',
-  volatility = 'Low',
+  volatility,
+  marketCap,
 }: Props) => {
   const changePositive = change >= 0;
   const changeText = `${changePositive ? '+' : ''}${change.toFixed(1)}%`;
@@ -36,7 +45,12 @@ const StockDetailHeader = ({
           {changeText}
         </Text>
         <Text style={styles.meta}>Risk: {risk}</Text>
-        <Text style={styles.meta}>Volatility: {volatility}</Text>
+        {volatility && <Text style={styles.meta}>Vol: {volatility}</Text>}
+        {marketCap && (
+          <Text style={[styles.meta, { color: theme.colors.textPrimary, fontWeight: '700' }]}>
+            Cap: ${formatCompactNumber(marketCap)}
+          </Text>
+        )}
       </View>
       <View style={styles.divider} />
     </View>

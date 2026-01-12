@@ -22,7 +22,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
   const { buyAsset, sellAsset } = useMarketStore();
   const portfolioList = getPortfolioList();
 
-  const handleBuy = (symbol: string, currentPrice: number, type: 'stock' | 'crypto' | 'bond') => {
+  const handleBuy = (symbol: string, currentPrice: number, type: 'stock' | 'crypto' | 'bond' | 'fund') => {
     Alert.prompt(
       'Buy Stock',
       `How many shares of ${symbol} would you like to buy at $${currentPrice.toFixed(2)}?`,
@@ -74,7 +74,10 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
         <View style={styles.itemLeft}>
           <Text style={styles.itemName}>{item.name}</Text>
           <Text style={styles.itemSymbol}>{item.symbol}</Text>
-          <Text style={styles.itemQuantity}>{item.quantity} shares @ ${item.averageCost.toFixed(2)}</Text>
+          <Text style={styles.itemQuantity}>{item.quantity.toFixed(2)} shares</Text>
+          <Text style={styles.itemCostInfo}>
+            Avg: ${item.averageCost.toFixed(2)} → Now: ${item.currentPrice.toFixed(2)}
+          </Text>
         </View>
 
         <View style={styles.itemRight}>
@@ -212,6 +215,11 @@ const styles = StyleSheet.create({
   itemQuantity: {
     fontSize: theme.typography.caption,
     color: theme.colors.textSecondary,
+  },
+  itemCostInfo: {
+    fontSize: theme.typography.caption,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
   },
   itemRight: {
     alignItems: 'flex-end',
