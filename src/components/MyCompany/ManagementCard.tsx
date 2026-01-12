@@ -99,20 +99,18 @@ const ManagementCard = ({
                             </Text>
                         </>
                     )}
-                    {delta === 0 && (
-                        <>
-                            <Text style={styles.costLabel}>No Change</Text>
-                            <Text style={styles.costValue}>$0</Text>
-                        </>
-                    )}
                 </View>
-                <GameButton
-                    title={delta !== 0 ? "CONFIRM CHANGES" : "NO CHANGE"}
-                    onPress={handleSave}
-                    disabled={delta === 0}
-                    variant={delta !== 0 ? 'primary' : 'ghost'}
-                    style={{ width: 140 }}
-                />
+
+                {/* Only show button if there is a change */}
+                {delta !== 0 && (
+                    <GameButton
+                        title="CONFIRM"
+                        onPress={handleSave}
+                        variant='primary'
+                        style={{ height: 36, paddingHorizontal: 16, paddingVertical: 0, minWidth: 80 }}
+                        textStyle={{ fontSize: 12, fontWeight: '800' }}
+                    />
+                )}
             </View>
         </View>
     );
@@ -195,8 +193,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 4,
-        paddingTop: theme.spacing.sm,
+        marginTop: 0,
+        paddingTop: 6,
+        minHeight: 36, // Ensure it reserves space only when content exists or minimal
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: theme.colors.border,
     },

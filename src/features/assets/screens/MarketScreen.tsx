@@ -106,6 +106,7 @@ const MarketScreen = () => {
       title="MARKET"
       subtitle="Financial Instruments"
       leftNode={<BackButton navigation={navigation} />}
+      compact
     >
       <View style={{ flex: 1 }}>
         {/* Ticker immediately below header - STICKY */}

@@ -9,13 +9,17 @@ type Props = {
   leftNode?: React.ReactNode;
   rightNode?: React.ReactNode;
   children: React.ReactNode;
+  compact?: boolean;
 };
 
-const AppScreen = ({ title, subtitle, leftNode, rightNode, children }: Props) => {
+const AppScreen = ({ title, subtitle, leftNode, rightNode, children, compact = false }: Props) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
-      <View style={styles.header}>
+      <View style={[
+        styles.header,
+        compact && styles.headerCompact
+      ]}>
         {leftNode ? <View style={styles.sideNode}>{leftNode}</View> : <View style={styles.sideNode} />}
         <View style={styles.titleGroup}>
           <Text style={styles.title}>{title}</Text>
@@ -44,6 +48,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.card,
+  },
+  headerCompact: {
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
   },
   sideNode: {
     width: 48,

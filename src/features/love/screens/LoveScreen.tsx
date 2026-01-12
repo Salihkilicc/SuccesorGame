@@ -76,13 +76,12 @@ const LoveScreen = () => {
 
 
   const handleBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
+    // Navigate directly to HomeScreen as requested
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.navigate('Home' as never);
     } else {
-      const parent = navigation.getParent();
-      if (parent) {
-        parent.navigate('Home' as never);
-      }
+      navigation.navigate('Home' as never);
     }
   };
 

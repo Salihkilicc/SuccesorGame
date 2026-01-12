@@ -120,7 +120,7 @@ const ACTIONS: Array<{
     },
     {
       key: 'belongings',
-      label: 'My Belongings',
+      label: 'Belongings',
       description: 'Your secret vault',
       emoji: '🗝️',
     },
@@ -463,6 +463,7 @@ const LifeScreen = () => {
     <AppScreen
       title="LIFE"
       subtitle="Downtown District"
+      compact
       leftNode={
         <Pressable
           onPress={handleGoHome}

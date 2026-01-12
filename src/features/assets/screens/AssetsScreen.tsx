@@ -33,7 +33,7 @@ const AssetsScreen = () => {
     );
 
     return (
-        <AppScreen title="ASSETS" subtitle="Wealth Management" leftNode={backButton}>
+        <AppScreen title="ASSETS" subtitle="Wealth Management" leftNode={backButton} compact>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
                 {/* STATUS ROW (Risk & Strategy) */}
