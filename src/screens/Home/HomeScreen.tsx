@@ -202,13 +202,13 @@ const HomeScreen = () => {
                 <Text style={styles.nextMonthText}>Next Quarter &gt;&gt;</Text>
               </Pressable>
             </View>
-
-            <Pressable
-              onPress={() => setDrawerOpen(true)}
-              style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
-              <Text style={styles.hamburgerText}>☰</Text>
-            </Pressable>
           </View>
+
+          <Pressable
+            onPress={() => setDrawerOpen(true)}
+            style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
+            <Text style={styles.hamburgerText}>☰</Text>
+          </Pressable>
         </View>
 
         <View style={styles.section}>
@@ -408,6 +408,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    justifyContent: 'space-between',
     gap: theme.spacing.md,
   },
   nameRow: {
@@ -445,7 +446,9 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   ageGroup: {
-    gap: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   ageLabel: {
     color: theme.colors.textMuted,
@@ -460,7 +463,7 @@ const styles = StyleSheet.create({
   monthBadge: {
     color: theme.colors.accent,
     backgroundColor: theme.colors.accentSoft,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
@@ -468,21 +471,25 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   nextMonthButton: {
-    backgroundColor: theme.colors.accentSoft,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.accent,
+    paddingVertical: theme.spacing.sm * 1.3,
+    paddingHorizontal: theme.spacing.lg * 1.3,
     borderRadius: theme.radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.accent,
+    marginLeft: theme.spacing.sm,
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   nextMonthButtonPressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
   nextMonthText: {
-    color: theme.colors.accent,
+    color: '#FFF',
     fontWeight: '800',
-    fontSize: theme.typography.caption + 1,
+    fontSize: theme.typography.caption + 2,
   },
   hamburgerButton: {
     width: 42,
