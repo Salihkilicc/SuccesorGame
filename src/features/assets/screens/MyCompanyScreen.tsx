@@ -54,16 +54,16 @@ const MyCompanyScreen = () => {
 
   return (
     <View style={[styles.safeArea, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}>
-
-        {/* HEADER */}
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
-          <View>
-            <Text style={styles.title}>Command Center</Text>
-            <Text style={styles.subtitle}>Manage your company operations</Text>
-          </View>
+      {/* FIXED HEADER */}
+      <View style={[styles.header, { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm }]}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
+        <View>
+          <Text style={styles.title}>Command Center</Text>
+          <Text style={styles.subtitle}>Manage your company operations</Text>
         </View>
+      </View>
+
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40, paddingTop: 0 }]}>
 
         {/* COMPANY STATS CARD */}
         <DashboardCard
