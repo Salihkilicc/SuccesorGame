@@ -83,10 +83,10 @@ type GameStore = GameState & {
 
 export const initialGameState: GameState = {
   currentMonth: 1,
-  age: 18,
+  age: 25, // Beta Start Age
   actionsUsedThisMonth: 0,
   maxActionsPerMonth: 999,
-  employeeMorale: 75,
+  employeeMorale: 85, // Slightly higher for beta positive start
   salaryPolicy: 'avg',
   eventsHostedThisQuarter: 0,
   lastQuarterProfit: 0,
@@ -290,7 +290,11 @@ export const useGameStore = create<GameStore>()(
 
         // 7. PLAYER FINANCIALS (Using Quarterly Economy Engine)
         // Calculate quarterly finances once and apply to player cash
-        const quarterlyReport = calculateQuarterlyFinances(useUserStore.getState());
+        const quarterlyReport = calculateQuarterlyFinances(
+          useUserStore.getState(),
+          useMarketStore.getState(),
+          useStatsStore.getState()
+        );
 
         // Apply Net Flow to Cash
         const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow;
@@ -460,12 +464,12 @@ export const useGameStore = create<GameStore>()(
           }
 
           // 7d. EDUCATION ADVANCEMENT (New System)
-          const eduResult = playerStore.advanceEducationAction();
+          const { useEducationStore } = require('./useEducationStore'); // Safe import
+          const eduResult = useEducationStore.getState().advanceProgress();
+
           if (eduResult.message) {
             console.log(`[Education] ${eduResult.message}`);
-            // Append to setbackMessage if empty, or just log for now.
-            // If we have a mechanism to show positive news, we should use it.
-            // For now, if no setback, we can show this as a "status update".
+            // Report to UI if significant (graduation) or just progress
             if (!setbackMessage && !operationalSetback) {
               setbackMessage = eduResult.message;
             }

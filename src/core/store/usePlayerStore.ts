@@ -8,18 +8,12 @@ import {
     Reputation,
     SecurityState,
     SkillsState,
-    EducationState,
     QuarterlyActions,
     MartialArtsSkill,
-    HiddenStats // Types dosyasında bu interface'in olduğundan emin ol, yoksa aşağıda tanımladım.
+    HiddenStats
 } from '../types';
 
-// Eğer logic dosyasını henüz oluşturmadıysak hata vermemesi için placeholder (geçici) importlar:
-// Gerçek logic dosyaları hazır olunca burayı açacağız. Şimdilik store içinde basit mantıkla tutuyoruz.
-// import { advanceEducation, applyGraduationBuffs } from '../logic/educationLogic'; 
-
 // --- TYPES (Eksik kalanlar için güvence) ---
-// Eğer types.ts'de HiddenStats yoksa burada tanımlı kalsın çökmesin.
 interface LocalHiddenStats {
     luck: number;
     security: number;
@@ -33,7 +27,6 @@ export interface PlayerState {
     reputation: Reputation;
     security: SecurityState;
     skills: SkillsState;
-    education: EducationState;
 
     // Hub & Spoke: Action Flags
     quarterlyActions: QuarterlyActions;
@@ -64,15 +57,6 @@ export interface PlayerState {
     performAction: (action: keyof QuarterlyActions) => void;
     resetQuarterlyActions: () => void;
 
-    // 5. Education Helpers
-    enrollInProgram: (programId: string) => void;
-    makeStudyProgress: (amount: number) => void; // Eski koddan geri geldi
-    graduateCurrent: () => void; // Eski koddan geri geldi
-
-    // ⚠️ GERİ EKLENDİ: useGameStore bu fonksiyonu arıyor
-    advanceEducationAction: () => { message?: string; graduated?: boolean };
-    setEducationState: (state: Partial<EducationState>) => void;
-
     // ⚠️ GERİ EKLENDİ: useGameStore bu fonksiyonu arıyor (Save/Load için kritik)
     setAll: (partial: Partial<PlayerState>) => void;
 
@@ -87,7 +71,6 @@ const initialState = {
     reputation: { social: 0, street: 0, business: 0, police: 0, casino: 0 },
     security: { digital: 0, personal: 0 },
     skills: { martialArts: { belt: 'White' as const, progress: 0, level: 1 } },
-    education: { activeEnrollment: null, completedEducation: [] },
     quarterlyActions: { hasStudied: false, hasTrained: false, hasDated: false, hasSocialized: false },
     hidden: { luck: 50, security: 0 },
 };
@@ -159,88 +142,13 @@ export const usePlayerStore = create<PlayerState>()(
                 }
             })),
 
-            // --- Education ---
-            enrollInProgram: (programId) => set((state) => ({
-                education: {
-                    ...state.education,
-                    activeEnrollment: { programId, currentYear: 1, progress: 0 }
-                }
-            })),
-
-            // ⚠️ FIX: Eski 'Study' fonksiyonu (UI kullanıyor olabilir)
-            makeStudyProgress: (bonusAmount) => {
-                const state = get();
-                const { activeEnrollment } = state.education;
-                if (!activeEnrollment) return;
-
-                const newProgress = activeEnrollment.progress + bonusAmount;
-                set((prev) => ({
-                    education: {
-                        ...prev.education,
-                        activeEnrollment: {
-                            ...activeEnrollment,
-                            progress: Math.min(100, newProgress)
-                        }
-                    }
-                }));
-            },
-
-            // ⚠️ FIX: Manuel mezuniyet fonksiyonu
-            graduateCurrent: () => set((state) => {
-                const { activeEnrollment, completedEducation } = state.education;
-                if (!activeEnrollment) return state;
-
-                const newCompleted = completedEducation.includes(activeEnrollment.programId)
-                    ? completedEducation
-                    : [...completedEducation, activeEnrollment.programId];
-
-                return {
-                    education: {
-                        ...state.education,
-                        activeEnrollment: null,
-                        completedEducation: newCompleted
-                    }
-                };
-            }),
-
-            // ⚠️ FIX: useGameStore için kritik fonksiyon
-            // Logic dosyasını bağlayana kadar "Placeholder" olarak çalışır, oyunun çökmesini engeller.
-            advanceEducationAction: () => {
-                const state = get();
-                const { activeEnrollment } = state.education;
-
-                if (!activeEnrollment) return { message: undefined };
-
-                // LOGIC ENTEGRASYONU: İleride buraya gerçek mantığı bağlayacağız.
-                // Şimdilik sadece progress %100 ise yıl atlatıyor.
-                if (activeEnrollment.progress >= 100) {
-                    set((prev) => ({
-                        education: {
-                            ...prev.education,
-                            activeEnrollment: {
-                                ...activeEnrollment,
-                                currentYear: activeEnrollment.currentYear + 1,
-                                progress: 0
-                            }
-                        }
-                    }));
-                    return { message: "Year completed!" };
-                }
-
-                return { message: undefined };
-            },
-
-            setEducationState: (partial) => set((state) => ({
-                education: { ...state.education, ...partial }
-            })),
-
             // ⚠️ FIX: useGameStore için geri geldi
             setAll: (partial) => set((state) => ({ ...state, ...partial })),
 
             reset: () => set({ ...initialState })
         }),
         {
-            name: 'succesor_player_hub_v2', // Versiyonu artırdım
+            name: 'succesor_player_hub_v3', // Version bump for cleanup
             storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 core: state.core,
@@ -249,7 +157,6 @@ export const usePlayerStore = create<PlayerState>()(
                 reputation: state.reputation,
                 security: state.security,
                 skills: state.skills,
-                education: state.education,
                 quarterlyActions: state.quarterlyActions,
                 hidden: state.hidden,
             }),

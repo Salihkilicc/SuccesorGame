@@ -6,8 +6,32 @@ export const calculateQuarterlyFinances = (
     statsState: any
 ): FinancialReport => {
 
-    // 1. Calculate Income
-    const salaryQuarterly = 45000; // Fixed for now
+    // 1. Calculate Income with Education Multiplier
+    const baseSalary = 45000; // Base quarterly salary
+
+    // Calculate Education Salary Multiplier (Cumulative)
+    const { useEducationStore } = require('../../../core/store/useEducationStore');
+    const { completedEducations } = useEducationStore.getState();
+    const { EDUCATION_DATA } = require('../../education/data/educationData');
+
+    let educationMultiplier = 1.0;
+
+    completedEducations.forEach((id: string) => {
+        const item = EDUCATION_DATA.find((e: any) => e.id === id);
+        if (!item) return;
+
+        // Use explicit multiplier if set, otherwise infer from type
+        // Certificates have no multiplier (1.0), only academic degrees boost salary
+        const multiplier = item.salaryMultiplier ??
+            (item.type === 'degree' ? 1.2 :
+                item.type === 'master' ? 1.35 :
+                    item.type === 'phd' ? 1.5 : 1.0);
+
+        educationMultiplier *= multiplier;
+    });
+
+    const salaryQuarterly = baseSalary * educationMultiplier;
+
     let dividendIncome = 0;
 
     // Calculate Dividends & Portfolio Value
@@ -56,6 +80,24 @@ export const calculateQuarterlyFinances = (
     // 2. Calculate Expenses
     const housingCost = 20000;
     const lifestyleCost = 10000;
+
+    // Education Cost (Tuition) - Dual Track Support
+    // Note: useEducationStore already required above for salary calculation
+    const { activeAcademic, activeCertificate } = useEducationStore.getState();
+
+    let educationCost = 0;
+
+    // Academic Track (Degrees/Masters/PhDs)
+    if (activeAcademic && activeAcademic.item.isMonthlyCost) {
+        educationCost += activeAcademic.item.cost * 3; // Quarterly = Monthly * 3
+    }
+
+    // Certificate Track (Most are one-time, but handle monthly if exists)
+    if (activeCertificate && activeCertificate.item.isMonthlyCost) {
+        educationCost += activeCertificate.item.cost * 3;
+    }
+
+
     const tax = totalIncome * 0.20; // 20% Tax
 
     let partnerQuarterlyCost = 0;
@@ -64,7 +106,7 @@ export const calculateQuarterlyFinances = (
         partnerQuarterlyCost = (userState.partner.finances.monthlyCost || 0) * 3;
     }
 
-    const totalExpenses = housingCost + lifestyleCost + partnerQuarterlyCost + tax;
+    const totalExpenses = housingCost + lifestyleCost + partnerQuarterlyCost + educationCost + tax;
 
     // 3. Prepare Assets Breakdown
     const cash = statsState?.money || 0;
@@ -95,6 +137,7 @@ export const calculateQuarterlyFinances = (
             { id: 'tax', label: 'Tax (20%)', amount: tax, type: 'expense' },
             { id: 'housing', label: 'Housing & Rent', amount: housingCost, type: 'expense' },
             { id: 'lifestyle', label: 'Personal/Lifestyle', amount: lifestyleCost, type: 'expense' },
+            ...(educationCost > 0 ? [{ id: 'education', label: 'Tuition Fees', amount: educationCost, type: 'expense' as const }] : []),
             ...(partnerQuarterlyCost > 0 ? [{
                 id: 'partner',
                 label: 'Partner Upkeep',
@@ -102,6 +145,8 @@ export const calculateQuarterlyFinances = (
                 type: 'expense' as const
             }] : [])
         ],
-        assetsBreakdown
+        assetsBreakdown,
+        educationMultiplier,
+        educationBonus: educationMultiplier > 1.0 ? `+${Math.round((educationMultiplier - 1) * 100)}%` : undefined
     };
 };

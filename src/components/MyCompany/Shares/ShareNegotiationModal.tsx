@@ -46,79 +46,79 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                     <View style={[styles.content, styles.resultContent, result === 'success' ? styles.successBorder : styles.failBorder]}>
                         <Text style={styles.resultEmoji}>{result === 'success' ? '✅' : '❌'}</Text>
                         <Text style={styles.resultTitle}>
-                            {result === 'success' ? 'Anlaşma Sağlandı!' : 'Teklif Reddedildi!'}
+                            {result === 'success' ? 'Deal Reached!' : 'Offer Rejected!'}
                         </Text>
                         <Text style={styles.resultMessage}>
                             {result === 'success'
-                                ? "Hisse devri tamamlandı."
+                                ? "Share transfer completed."
                                 : transactionType === 'buy'
-                                    ? "Verdiğin fiyatı beğenmediler."
-                                    : "Reddetmen onları biraz kırdı."}
+                                    ? "They didn't like your price."
+                                    : "They were a bit offended by your rejection."}
                         </Text>
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
-                            <Text style={styles.closeBtnText}>Kapat</Text>
+                            <Text style={styles.closeBtnText}>Close</Text>
                         </Pressable>
                     </View>
                 ) : (
                     <View style={styles.content}>
-                        <Text style={styles.title}>Hisse Pazarlığı</Text>
+                        <Text style={styles.title}>Share Negotiation</Text>
 
                         {/* Tabs */}
                         <View style={styles.tabs}>
                             <Pressable
                                 onPress={() => setTransactionType('buy')}
                                 style={[styles.tab, transactionType === 'buy' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>AL</Text>
+                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>BUY</Text>
                             </Pressable>
                             <Pressable
                                 onPress={() => setTransactionType('sell')}
                                 style={[styles.tab, transactionType === 'sell' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>SAT</Text>
+                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>SELL</Text>
                             </Pressable>
                         </View>
 
                         {/* YENİ Quantity Seçici (Slider Yerine) */}
                         <View style={styles.section}>
                             <PercentageSelector
-                                label="Miktar (Lot)"
+                                label="Quantity (Lots)"
                                 value={quantity}
                                 min={1}
                                 max={Math.max(1, maxQuantity)}
                                 onChange={setQuantity}
                                 unit="lot"
                             />
-                            <Text style={styles.hint}>Toplam Etki: %{(quantity * 0.1).toFixed(1)} Hisse</Text>
+                            <Text style={styles.hint}>Total Impact: %{(quantity * 0.1).toFixed(1)} Share</Text>
                         </View>
 
                         {/* Fiyat Kartları */}
                         {transactionType === 'buy' ? (
                             <View style={styles.section}>
-                                <Text style={styles.label}>Teklifin (Hisse Başı)</Text>
+                                <Text style={styles.label}>Your Offer (Per Share)</Text>
                                 <TextInput
                                     style={styles.input}
                                     value={offerPrice}
                                     onChangeText={setOfferPrice}
                                     keyboardType="numeric"
-                                    placeholder="Fiyat"
+                                    placeholder="Price"
                                     placeholderTextColor={theme.colors.textMuted}
                                 />
                                 <View style={styles.marketRef}>
-                                    <Text style={styles.hint}>Piyasa: ${companySharePrice.toFixed(0)}</Text>
+                                    <Text style={styles.hint}>Market: ${companySharePrice.toFixed(0)}</Text>
                                 </View>
                             </View>
                         ) : (
                             <View style={styles.npcOfferCard}>
-                                <Text style={styles.npcOfferLabel}>ONLARIN TEKLİFİ (Piyasa +%20)</Text>
-                                <Text style={styles.npcOfferValue}>${npcOfferPrice.toFixed(0)} <Text style={styles.perShare}>/adet</Text></Text>
+                                <Text style={styles.npcOfferLabel}>THEIR OFFER (Market +20%)</Text>
+                                <Text style={styles.npcOfferValue}>${npcOfferPrice.toFixed(0)} <Text style={styles.perShare}>/share</Text></Text>
                                 <Text style={styles.npcOfferContext}>
-                                    "Senin lotların için adet başı ${npcOfferPrice.toFixed(0)} veriyorum. İşine gelirse."
+                                    "I'm offering ${npcOfferPrice.toFixed(0)} per share for your lots. Take it or leave it."
                                 </Text>
                             </View>
                         )}
 
                         {/* Toplam Tutar */}
                         <View style={styles.totalRow}>
-                            <Text style={styles.totalLabel}>Toplam Tutar</Text>
+                            <Text style={styles.totalLabel}>Total Amount</Text>
                             <Text style={styles.totalAmount}>${currentTotal.toLocaleString()}</Text>
                         </View>
 
@@ -126,14 +126,14 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                         <View style={styles.actions}>
                             {transactionType === 'sell' && (
                                 <Pressable style={styles.rejectBtn} onPress={handleRejectOffer}>
-                                    <Text style={styles.rejectText}>Reddet</Text>
+                                    <Text style={styles.rejectText}>Reject</Text>
                                 </Pressable>
                             )}
                             <Pressable
                                 style={[styles.mainBtn, transactionType === 'sell' ? styles.acceptBtn : styles.submitBtn]}
                                 onPress={handleAction}>
                                 <Text style={styles.mainBtnText}>
-                                    {transactionType === 'buy' ? 'Teklifi Sun' : 'Kabul Et & Sat'}
+                                    {transactionType === 'buy' ? 'Submit Offer' : 'Accept & Sell'}
                                 </Text>
                             </Pressable>
                         </View>

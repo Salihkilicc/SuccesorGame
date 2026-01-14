@@ -12,4 +12,6 @@ export interface FinancialReport {
     incomeBreakdown: BreakdownItem[];
     expenseBreakdown: BreakdownItem[];
     assetsBreakdown: BreakdownItem[];
+    educationMultiplier?: number; // Cumulative education salary multiplier (e.g., 1.62 = 62% boost)
+    educationBonus?: string; // Formatted bonus string (e.g., "+62%")
 }

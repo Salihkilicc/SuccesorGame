@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView, Dimensions, StyleProp, ViewStyle } from 'react-native';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import { EDUCATION_DATA, EducationProgram } from '../../../data/educationData';
+import { useEducationStore } from '../../../core/store/useEducationStore';
+import { EDUCATION_DATA } from '../../education/data/educationData';
+import { EducationItem, EducationType } from '../../education/educationTypes';
 import { canEnroll } from '../../../logic/educationLogic';
 import { theme } from '../../../core/theme';
-import SectionCard from '../../../components/common/SectionCard';
 import { Ionicons } from '@expo/vector-icons';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -13,58 +14,40 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 export default function EducationScreen() {
     const player = usePlayerStore();
     const stats = useStatsStore();
-    const { education, core } = player;
+    const educationStore = useEducationStore();
+    const { activeAcademic, activeCertificate, completedEducations, enroll } = educationStore;
+    const { core } = player;
 
-    const [activeTab, setActiveTab] = useState<'degrees' | 'certificates' | 'postgrad'>('degrees');
+    // Use activeAcademic for legacy screen (this screen is being phased out)
+    const activeEducation = activeAcademic;
+
+    const [activeTab, setActiveTab] = useState<EducationType | 'advanced'>('degree');
 
     // --- 1. ACTIVE STUDENT MODE ---
     const renderActiveMode = () => {
-        if (!education.activeEnrollment) return null;
+        if (!activeEducation) return null;
 
-        const { programId, currentYear, progress } = education.activeEnrollment;
+        const { item: program, progress } = activeEducation;
 
-        // Find Program
-        const allPrograms = [
-            ...EDUCATION_DATA.degrees,
-            ...EDUCATION_DATA.postgrad,
-            ...EDUCATION_DATA.certificates,
-        ];
-        const program = allPrograms.find(p => p.id === programId);
-        if (!program) return <Text style={{ color: 'red' }}>Error: Program not found</Text>;
+        if (!program) return null;
 
-        // Calculate Stats
-        const quartersCompleted = Math.floor(progress / 25);
-        const quartersRemaining = 4 - quartersCompleted;
+        // Progress Calculation
+        const progressPerQuarter = 100 / program.durationQuarter;
+        const quartersRemaining = Math.max(0, Math.ceil((100 - progress) / progressPerQuarter));
 
-        // Calculate accrued bonus (Simulated display)
-        // Logic: +10 stat per year completed.
-        // Current Bonus = (Current Year - 1) * 10
-        const statName = program.buffs.statBoost ? Object.keys(program.buffs.statBoost)[0] : 'Intellect';
-        const totalBonus = (currentYear - 1) * 10;
+        const benefitText = `+${program.benefits.intelligenceBonus} Intellect`;
 
-        const handleStudyHard = () => {
-            // Stress Check
-            if (core.stress >= 90) {
-                Alert.alert('Burnout Warning', 'You are too stressed to study! Take a break.');
-                return;
-            }
 
-            // Apply Actions
-            player.updateCore('stress', core.stress + 15);
-            player.makeStudyProgress(25); // Bonus 25% (1 Quarter worth)
-
-            Alert.alert('Study Hard', 'You crammed effectively! (+25% Progress, +15 Stress)');
-        };
 
         return (
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.activeContainer}>
                     {/* Header Info */}
                     <View style={styles.activeHeader}>
-                        <View>
-                            <Text style={styles.activeTitle}>{program.name}</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.activeTitle}>{program.title}</Text>
                             <Text style={styles.activeSubtitle}>
-                                {program.type === 'certificate' ? 'Certificate Program' : `Year ${currentYear} / ${program.durationYears}`}
+                                {program.type.toUpperCase()} • {program.field}
                             </Text>
                         </View>
                         <View style={styles.iconCircle}>
@@ -72,40 +55,37 @@ export default function EducationScreen() {
                         </View>
                     </View>
 
-                    {/* Circular Progress (Simplified as Bar for now as no library) */}
+                    {/* Progress Bar */}
                     <View style={styles.progressSection}>
                         <View style={styles.progressBarBg}>
                             <View style={[styles.progressBarFill, { width: `${Math.min(100, Math.max(5, progress))}%` }]} />
                         </View>
-                        <Text style={styles.progressText}>{Math.floor(progress)}% Complete (Year {currentYear})</Text>
+                        <Text style={styles.progressText}>{progress.toFixed(1)}% Complete</Text>
                     </View>
 
-                    {/* Countdown Information */}
-                    <View style={styles.infoRow}>
-                        <Ionicons name="time-outline" size={16} color={theme.colors.textSecondary} />
-                        <Text style={styles.infoText}>
-                            {quartersRemaining > 0
-                                ? `${quartersRemaining} Quarters until Year ${currentYear + 1}`
-                                : "Final Exams Pending..."
-                            }
-                        </Text>
-                    </View>
-
-                    {/* Stat Bonus Tracking */}
-                    <View style={styles.bonusCard}>
-                        <Text style={styles.bonusLabel}>Current Bonus Gained:</Text>
-                        <Text style={styles.bonusValue}>+{totalBonus} {statName.charAt(0).toUpperCase() + statName.slice(1)}</Text>
+                    {/* Info Grid */}
+                    <View style={styles.infoGrid}>
+                        <View style={styles.infoItem}>
+                            <Ionicons name="time-outline" size={16} color={theme.colors.textSecondary} />
+                            <Text style={styles.infoText}>
+                                {quartersRemaining} Qtrs Left
+                            </Text>
+                        </View>
+                        <View style={styles.infoItem}>
+                            <Ionicons name="bulb-outline" size={16} color={theme.colors.textSecondary} />
+                            <Text style={styles.infoText}>
+                                {benefitText}
+                            </Text>
+                        </View>
                     </View>
 
                     {/* Action Button */}
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleStudyHard}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={styles.actionButtonText}>Study Hard / Cram</Text>
-                        <Text style={styles.actionButtonSubtext}>+15 Stress • Guarantees Progress</Text>
-                    </TouchableOpacity>
+                    {/* Action Button */}
+                    <View style={styles.infoItem}>
+                        <Text style={{ fontSize: 12, color: theme.colors.textSecondary, fontStyle: 'italic', textAlign: 'center', width: '100%' }}>
+                            Progress advances 1 quarter every specific time logic.
+                        </Text>
+                    </View>
 
                 </View>
             </ScrollView>
@@ -114,17 +94,19 @@ export default function EducationScreen() {
 
     // --- 2. CATALOG MODE ---
     const renderCatalog = () => {
-        // Tab Headers
-        const tabs = [
-            { id: 'degrees', label: 'Degrees' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'postgrad', label: 'Masters/PhD' },
+        type TabOption = { id: EducationType | 'advanced', label: string };
+        const tabs: TabOption[] = [
+            { id: 'certificate', label: 'Certificates' },
+            { id: 'degree', label: 'Degrees' },
+            { id: 'advanced', label: 'Masters/PhD' },
         ];
 
-        let currentList: EducationProgram[] = [];
-        if (activeTab === 'degrees') currentList = EDUCATION_DATA.degrees;
-        else if (activeTab === 'certificates') currentList = EDUCATION_DATA.certificates;
-        else currentList = EDUCATION_DATA.postgrad;
+        let currentList = EDUCATION_DATA.filter(p => {
+            if (activeTab === 'advanced') {
+                return p.type === 'master' || p.type === 'phd';
+            }
+            return p.type === activeTab;
+        });
 
         return (
             <View style={{ flex: 1 }}>
@@ -134,7 +116,7 @@ export default function EducationScreen() {
                         <TouchableOpacity
                             key={tab.id}
                             style={[styles.tabButton, activeTab === tab.id && styles.activeTabButton]}
-                            onPress={() => setActiveTab(tab.id as any)}
+                            onPress={() => setActiveTab(tab.id)}
                         >
                             <Text style={[styles.tabText, activeTab === tab.id && styles.activeTabText]}>{tab.label}</Text>
                         </TouchableOpacity>
@@ -144,10 +126,14 @@ export default function EducationScreen() {
                 {/* List */}
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     {currentList.map(program => {
-                        const check = canEnroll(player, stats.money, program.id);
-                        const isCompleted = education.completedEducation.includes(program.id);
+                        const check = canEnroll({
+                            completedEducations,
+                            activeProgramId: activeEducation?.item?.id,
+                            money: stats.money
+                        }, program.id);
+                        const isCompleted = completedEducations.includes(program.id);
 
-                        // Button Text & State
+                        // Layout
                         let btnText = 'Enroll';
                         let btnDisabled = false;
                         let btnStyle: StyleProp<ViewStyle> = styles.enrollButton;
@@ -157,9 +143,10 @@ export default function EducationScreen() {
                             btnDisabled = true;
                             btnStyle = styles.completedButton;
                         } else if (!check.success) {
-                            btnText = check.reason ? check.reason.substring(0, 15) + '...' : 'Locked';
-                            if (check.reason?.includes('Intellect')) btnText = `Req: Int ${program.reqIntellect}`;
+                            btnText = 'Locked';
+                            if (check.reason?.includes('Intellect')) btnText = `Req: Int ${program.requirements.minIntelligence}`;
                             else if (check.reason?.includes('funds')) btnText = 'No Funds';
+                            else if (check.reason?.includes('Prerequisite')) btnText = 'Missing Deg.';
 
                             btnDisabled = true;
                             btnStyle = styles.lockedButton;
@@ -167,28 +154,38 @@ export default function EducationScreen() {
 
                         const handleEnroll = () => {
                             if (check.success) {
+                                const cost = check.costToPay || program.cost || 0;
+                                const costLabel = program.isMonthlyCost ? 'Monthly/Quarterly Tuition' : 'Tuition Fee';
+
                                 Alert.alert(
                                     'Enrollment',
-                                    `Enroll in ${program.name}?\n${program.type === 'certificate' ? 'Fee' : 'Yearly Tuition'}: $${program.costPerYear.toLocaleString()}`,
+                                    `Enroll in ${program.title}?\n${costLabel}: $${cost.toLocaleString()}`,
                                     [
                                         { text: 'Cancel', style: 'cancel' },
                                         {
                                             text: 'Confirm', onPress: () => {
-                                                if (stats.spendMoney(program.costPerYear)) {
-                                                    player.enrollInProgram(program.id);
-                                                    Alert.alert('Success', `Welcome to ${program.name}!`);
-                                                } else {
-                                                    Alert.alert('Error', 'Insufficient funds.');
+                                                try {
+                                                    enroll(program);
+                                                    Alert.alert('Success', `Welcome to ${program.title}!`);
+                                                } catch (e: any) {
+                                                    Alert.alert('Enrollment Failed', e.message);
                                                 }
                                             }
                                         }
                                     ]
                                 );
+                            } else {
+                                if (check.reason) Alert.alert('Cannot Enroll', check.reason);
                             }
                         };
 
                         return (
-                            <View key={program.id} style={styles.programCard}>
+                            <TouchableOpacity
+                                key={program.id}
+                                style={styles.programCard}
+                                onPress={() => !check.success && !isCompleted ? Alert.alert("Requirements", check.reason) : null}
+                                activeOpacity={0.9}
+                            >
                                 {/* Left Icon */}
                                 <View style={styles.programIcon}>
                                     <Ionicons
@@ -200,12 +197,17 @@ export default function EducationScreen() {
 
                                 {/* Center Info */}
                                 <View style={styles.programInfo}>
-                                    <Text style={styles.cardTitle}>{program.name}</Text>
-                                    <Text style={styles.cardSubtitle}>
-                                        ${program.costPerYear.toLocaleString()}/{program.type === 'certificate' ? 'total' : 'yr'}
-                                    </Text>
-                                    {program.buffs?.salaryMultiplier && (
-                                        <Text style={styles.cardBonus}>Potential: {program.buffs.salaryMultiplier}x Salary</Text>
+                                    <Text style={styles.cardTitle}>{program.title}</Text>
+                                    <View style={styles.tagsRow}>
+                                        <View style={styles.tag}>
+                                            <Text style={styles.tagText}>${program.cost.toLocaleString()}{program.isMonthlyCost ? '/mo' : ''}</Text>
+                                        </View>
+                                        <View style={styles.tag}>
+                                            <Text style={styles.tagText}>{program.durationQuarter} Qtrs</Text>
+                                        </View>
+                                    </View>
+                                    {program.requirements.minIntelligence && (
+                                        <Text style={styles.reqText}>Min Intellect: {program.requirements.minIntelligence}</Text>
                                     )}
                                 </View>
 
@@ -217,7 +219,7 @@ export default function EducationScreen() {
                                 >
                                     <Text style={styles.enrollButtonText}>{btnText}</Text>
                                 </TouchableOpacity>
-                            </View>
+                            </TouchableOpacity>
                         );
                     })}
                     <View style={{ height: 40 }} />
@@ -228,7 +230,7 @@ export default function EducationScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {education.activeEnrollment ? renderActiveMode() : renderCatalog()}
+            {activeEducation ? renderActiveMode() : renderCatalog()}
         </SafeAreaView>
     );
 }
@@ -276,7 +278,7 @@ const styles = StyleSheet.create({
     },
     progressSection: {
         width: '100%',
-        marginBottom: theme.spacing.lg,
+        marginBottom: theme.spacing.md,
     },
     progressBarBg: {
         height: 12,
@@ -295,34 +297,24 @@ const styles = StyleSheet.create({
         color: theme.colors.textSecondary,
         fontSize: theme.typography.caption,
     },
-    infoRow: {
+    infoGrid: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'space-between',
+        marginBottom: theme.spacing.lg,
+    },
+    infoItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: theme.spacing.xl,
+        backgroundColor: theme.colors.background,
+        padding: 8,
+        borderRadius: 8,
     },
     infoText: {
         marginLeft: 6,
         color: theme.colors.textSecondary,
-        fontSize: theme.typography.body,
-    },
-    bonusCard: {
-        backgroundColor: theme.colors.success + '20', // transparent green
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: theme.spacing.xl,
-        borderWidth: 1,
-        borderColor: theme.colors.success + '50',
-    },
-    bonusLabel: {
-        color: theme.colors.success,
+        fontSize: 12,
         fontWeight: '600',
-    },
-    bonusValue: {
-        color: theme.colors.success,
-        fontWeight: 'bold',
     },
     actionButton: {
         backgroundColor: theme.colors.error, // Red for "Action/Stress"
@@ -399,15 +391,25 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         marginBottom: 2,
     },
-    cardSubtitle: {
-        fontSize: 12,
-        color: theme.colors.textSecondary,
-        marginBottom: 2,
+    tagsRow: {
+        flexDirection: 'row',
+        marginBottom: 4,
     },
-    cardBonus: {
+    tag: {
+        backgroundColor: theme.colors.cardSoft,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        marginRight: 6,
+    },
+    tagText: {
         fontSize: 10,
-        color: theme.colors.success,
-        fontWeight: '600',
+        color: theme.colors.textSecondary,
+    },
+    reqText: {
+        fontSize: 10,
+        color: '#ffc107',
+        fontStyle: 'italic',
     },
     enrollButton: {
         backgroundColor: theme.colors.accent,

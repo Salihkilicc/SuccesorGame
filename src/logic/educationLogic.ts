@@ -1,221 +1,125 @@
-import { EDUCATION_DATA } from '../data/educationData';
+import { EDUCATION_DATA } from '../features/education/data/educationData';
 import { PlayerState } from '../core/store/usePlayerStore';
+import { EducationItem } from '../features/education/educationTypes';
 
 /**
  * Checks if a player can enroll in a specific education program.
- * @param player The current player state (for attributes and previous education).
- * @param currentMoney The player's current money (from useStatsStore).
- * @param programId The ID of the program to enroll in.
- * @returns { success: boolean; reason?: string }
  */
 export const canEnroll = (
-    player: PlayerState,
-    currentMoney: number,
+    params: {
+        completedEducations: string[];
+        activeProgramId?: string;
+        money: number;
+    },
     programId: string
-): { success: boolean; reason?: string } => {
-    // 1. Find the program
-    const allPrograms = [
-        ...EDUCATION_DATA.degrees,
-        ...EDUCATION_DATA.postgrad,
-        ...EDUCATION_DATA.certificates,
-    ];
-    const program = allPrograms.find((p) => p.id === programId);
+): { success: boolean; reason?: string; costToPay?: number } => {
+    const { completedEducations, activeProgramId, money } = params;
+    const program = EDUCATION_DATA.find((p) => p.id === programId);
 
     if (!program) {
         return { success: false, reason: 'Program not found.' };
     }
 
+    // 1. Check Already Completed/Enrolled
+    if (completedEducations.includes(programId)) {
+        return { success: false, reason: 'Already completed this program.' };
+    }
+    if (activeProgramId === programId) {
+        return { success: false, reason: 'Already enrolled.' };
+    }
+
     // 2. Check Money
-    if (currentMoney < program.costPerYear) {
-        return { success: false, reason: 'Insufficient funds.' };
+    const costToPay = program.isMonthlyCost ? program.cost * 3 : program.cost;
+
+    if (money < costToPay) {
+        return { success: false, reason: `Insufficient funds. Need $${costToPay.toLocaleString()}.` };
     }
 
-    // 3. Check Intellect
-    if (player.attributes.intellect < program.reqIntellect) {
-        return { success: false, reason: `Intellect too low (Required: ${program.reqIntellect}).` };
-    }
-
-    // 4. Check Prerequisites
-    if (program.prerequisite) {
-        // Generic check for "Any Bachelor Degree"
-        if (program.prerequisite === 'Any Bachelor Degree') {
-            const hasDegree = player.education.completedEducation.some(id =>
-                EDUCATION_DATA.degrees.some(d => d.id === id)
-            );
-            if (!hasDegree) {
-                return { success: false, reason: 'Requires any Bachelor Degree.' };
-            }
-        }
-        else if (program.prerequisite === 'Master Degree or Medicine') {
-            // Check for specific high level degrees
-            const hasMaster = player.education.completedEducation.some(id =>
-                id === 'mba' || id === 'md_medicine' // Assuming MBA is master level for logic simplicity here
-            );
-            if (!hasMaster) {
-                return { success: false, reason: 'Requires a Master Degree or MD.' };
-            }
-        }
-        else {
-            const hasPrerequisite = player.education.completedEducation.includes(program.prerequisite);
-            if (!hasPrerequisite) {
-                const prereqProgram = allPrograms.find((p) => p.id === program.prerequisite);
-                const prereqName = prereqProgram ? prereqProgram.name : program.prerequisite;
-                return { success: false, reason: `Prerequisite missing: ${prereqName}` };
-            }
+    // 3. Check Prerequisite Degree
+    if (program.requirements.requiredDegreeId) {
+        const hasDegree = completedEducations.includes(program.requirements.requiredDegreeId);
+        if (!hasDegree) {
+            // Find name of required degree
+            const reqProgram = EDUCATION_DATA.find(p => p.id === program.requirements.requiredDegreeId);
+            const reqName = reqProgram ? reqProgram.title : program.requirements.requiredDegreeId;
+            return { success: false, reason: `Prerequisite: ${reqName}` };
         }
     }
 
-    // 5. Check already completed or enrolled
-    if (player.education.completedEducation.includes(programId)) {
-        return { success: false, reason: 'You have already completed this program.' };
-    }
-    if (player.education.activeEnrollment?.programId === programId) {
-        return { success: false, reason: 'You are already enrolled in this program.' };
-    }
-
-    return { success: true };
+    return { success: true, costToPay };
 };
 
-// --- ADVANCEMENT LOGIC ---
-
 export type EducationResult = {
-    status: 'in_progress' | 'year_complete' | 'graduated';
+    status: 'in_progress' | 'graduated';
     message: string;
-    statReward?: { stat: string; amount: number };
-    newProgress?: number;
-    newYear?: number;
+    progressChange?: number;
 };
 
 /**
  * Advances the active education program by one quarter.
- * @param activeProgram The player's active program state.
- * @returns EducationResult identifying what happened (progress, year up, or graduation).
  */
 export const advanceEducation = (
     activeProgram: { programId: string; currentYear: number; progress: number },
-    bonusProgress: number = 0 // Extra progress from "Study Hard"
+    bonusProgressMultiplier: number = 1.0 // 1.0 normal, 1.25 study hard etc.
 ): EducationResult => {
-    // 1. Find Data
-    const allPrograms = [
-        ...EDUCATION_DATA.degrees,
-        ...EDUCATION_DATA.postgrad,
-        ...EDUCATION_DATA.certificates,
-    ];
-    const programData = allPrograms.find(p => p.id === activeProgram.programId);
+    const program = EDUCATION_DATA.find(p => p.id === activeProgram.programId);
 
-    if (!programData) {
+    if (!program) {
         return { status: 'in_progress', message: 'Error: Program data not found.' };
     }
 
-    // 2. Calculate Progress Increment
-    // 4 Quarters = 1 Year. So 1 Quarter = 25% of a year (if year based).
-    // HOWEVER: Store treats 'progress' as annual progress (0-100%).
-    // So +25% progress per quarter is correct for 1 year = 100%.
-    const progressIncrement = 25 + bonusProgress;
-    let newProgress = activeProgram.progress + progressIncrement;
+    // Calculate raw progress increment based on Duration
+    // If duration is 16 quarters, each quarter is 100/16 = 6.25%
+    const baseProgress = 100 / program.durationQuarter;
+    const actualProgress = baseProgress * bonusProgressMultiplier;
 
-    // 3. Check for Year Completion
+    const newProgress = activeProgram.progress + actualProgress;
+
     if (newProgress >= 100) {
-        // Year Completed!
-        const nextYear = activeProgram.currentYear + 1;
-
-        // Check for Graduation
-        if (activeProgram.currentYear >= programData.durationYears) {
-            // GRADUATION
-            return {
-                status: 'graduated',
-                message: `Congratulations! You have graduated from ${programData.name}!`,
-                // Graduation might also give a final large buff, but for now we rely on the catalog's 'Graduation Buffs' applied externally.
-                // The 'Yearly Boost' logic below applies to INTERMEDIATE years.
-            };
-        } else {
-            // YEAR UP
-            // Determine Stat Reward
-            const statReward = getYearlyStatReward(programData);
-
-            return {
-                status: 'year_complete',
-                message: `You completed Year ${activeProgram.currentYear} of ${programData.name}.`,
-                statReward,
-                newProgress: 0, // Reset progress for next year
-                newYear: nextYear
-            };
-        }
+        return {
+            status: 'graduated',
+            message: `Congratulations! You have completed ${program.title}!`,
+        };
     }
 
-    // Normal Progress
     return {
         status: 'in_progress',
-        message: 'Studied hard this quarter.',
-        newProgress
+        message: 'You made progress in your studies.',
+        progressChange: actualProgress
     };
 };
 
 /**
- * Helper to determine which stat to boost (+10) automatically upon year completion.
+ * Helper: Get stat reward. 
+ * Since new data system has explicit 'benefits', we can use that to determine rewards.
+ * But benefits are usually "Permanent Buffs" on graduation.
+ * Intermediate "Study" rewards might just be small Intellect bumps.
  */
-const getYearlyStatReward = (program: any): { stat: string; amount: number } | undefined => {
-    if (!program.buffs || !program.buffs.statBoost) return undefined;
+export const getQuarterlyStudyReward = (programId: string): { stat: string; amount: number } | undefined => {
+    const program = EDUCATION_DATA.find(p => p.id === programId);
+    if (!program) return undefined;
 
-    const stats = program.buffs.statBoost;
-    // Priority: Intellect -> Charm -> Looks -> Strength -> Health -> First Key
-    if (stats.intellect) return { stat: 'intellect', amount: 10 };
-    if (stats.charm) return { stat: 'charm', amount: 10 };
-    if (stats.looks) return { stat: 'looks', amount: 10 };
-    if (stats.strength) return { stat: 'strength', amount: 10 };
-    if (stats.health) return { stat: 'health', amount: 10 };
-
-    // Fallback: take first key
-    const distinctKeys = Object.keys(stats).filter(k => k !== 'salaryMultiplier');
-    if (distinctKeys.length > 0) {
-        return { stat: distinctKeys[0], amount: 10 };
-    }
-    return undefined;
+    // Award small fraction of the total benefit?
+    // Or just generic logic:
+    return { stat: 'intellect', amount: 1 };
 };
 
 /**
- * Applies the graduation buffs to the player.
- * @param programId The ID of the program graduated from.
- * @param updateAttribute Callback to update player attributes.
- * @param updateReputation Callback to update player reputation.
- * @returns The applied buffs for display purposes.
+ * Applies the benefits of a graduated program to the player's stats.
  */
 export const applyGraduationBuffs = (
     programId: string,
     updateAttribute: (key: any, value: number) => void,
     updateReputation: (key: any, value: number) => void,
-    currentAttributes: { intellect: number; charm: number; looks: number; strength: number },
-    currentReputation: { social: number; street: number; business: number; police: number }
+    currentAttributes: any,
+    currentReputation: any
 ) => {
-    const allPrograms = [
-        ...EDUCATION_DATA.degrees,
-        ...EDUCATION_DATA.postgrad,
-        ...EDUCATION_DATA.certificates,
-    ];
-    const program = allPrograms.find((p) => p.id === programId);
+    const program = EDUCATION_DATA.find(p => p.id === programId);
+    if (!program) return;
 
-    if (!program || !program.buffs) return null;
-
-    const { buffs } = program;
-
-    // Apply Stat Boosts
-    if (buffs.statBoost) {
-        if (buffs.statBoost.intellect) {
-            updateAttribute('intellect', currentAttributes.intellect + buffs.statBoost.intellect);
-        }
-        if (buffs.statBoost.charm) {
-            updateAttribute('charm', currentAttributes.charm + buffs.statBoost.charm);
-        }
-        if (buffs.statBoost.looks) {
-            updateAttribute('looks', currentAttributes.looks + buffs.statBoost.looks);
-        }
-        if (buffs.statBoost.strength) {
-            updateAttribute('strength', currentAttributes.strength + buffs.statBoost.strength);
-        }
-        // Health is usually core stat, handled separately if passed, but updateAttribute typically handles attributes.
-        // If updateAttribute accepts 'health', good. If not, player store logic needs to handle it.
-        // For strict typing, we assume updateAttribute handles Attributes. 
+    // Apply Intelligence Bonus
+    if (program.benefits.intelligenceBonus) {
+        const currentIntel = currentAttributes.intellect || 0;
+        updateAttribute('intellect', currentIntel + program.benefits.intelligenceBonus);
     }
-
-    return buffs;
 };

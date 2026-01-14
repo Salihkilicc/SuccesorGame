@@ -24,7 +24,9 @@ import {
   ShopDetailScreen,
   ProductsScreen,
   TechTreeScreen,
-  EducationScreen,
+  EducationScreen, // Kept for safety if used elsewhere, but route updated
+  EducationDashboard,
+  EducationBrowseScreen,
   DNAScreen,
   ResearchScreen,
 } from '../screens';
@@ -37,6 +39,7 @@ export type LifeStackParamList = {
   Profile: undefined;
   Achievements: undefined;
   Education: undefined;
+  EducationBrowse: undefined;
   DNA: undefined;
 };
 
@@ -104,7 +107,8 @@ const LifeStackNavigator = () => (
     {/* TODO: Restore these screens or create new ones */}
     {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
     {/* <LifeStack.Screen name="Achievements" component={AchievementsScreen} /> */}
-    <LifeStack.Screen name="Education" component={EducationScreen} />
+    <LifeStack.Screen name="Education" component={EducationDashboard} />
+    <LifeStack.Screen name="EducationBrowse" component={EducationBrowseScreen} />
     <LifeStack.Screen name="DNA" component={DNAScreen} />
   </LifeStack.Navigator>
 );

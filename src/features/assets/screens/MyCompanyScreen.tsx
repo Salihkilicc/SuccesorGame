@@ -101,16 +101,20 @@ const MyCompanyScreen = () => {
             headerRight={
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
                 {/* Morale Bar */}
-                <View style={{ width: 80, height: 8, backgroundColor: theme.colors.cardSoft, borderRadius: 4, overflow: 'hidden' }}>
-                  <View style={{
-                    width: `${employeeMorale}%`,
-                    height: '100%',
-                    backgroundColor:
-                      employeeMorale < 30 ? theme.colors.danger :
-                        employeeMorale < 50 ? '#F59E0B' : // Orange
-                          employeeMorale < 70 ? '#10B981' : // Light Green
-                            theme.colors.success // Dark Green
-                  }} />
+                {/* Morale Bar with Label */}
+                <View style={{ alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 9, color: theme.colors.textMuted, fontWeight: '800', letterSpacing: 0.5 }}>MORALE</Text>
+                  <View style={{ width: 80, height: 8, backgroundColor: theme.colors.cardSoft, borderRadius: 4, overflow: 'hidden' }}>
+                    <View style={{
+                      width: `${employeeMorale}%`,
+                      height: '100%',
+                      backgroundColor:
+                        employeeMorale < 30 ? theme.colors.danger :
+                          employeeMorale < 50 ? '#F59E0B' : // Orange
+                            employeeMorale < 70 ? '#10B981' : // Light Green
+                              theme.colors.success // Dark Green
+                    }} />
+                  </View>
                 </View>
                 <Pressable
                   onPress={() => toggleModal('employees', true)}

@@ -115,27 +115,27 @@ const FACTORY_COST_MONTHLY = 50_000;
 const BASE_SHARES = 10_000_000;
 
 export const initialStatsState: StatsState = {
-  money: 450_000,
-  netWorth: 15000,
-  monthlyIncome: 0,
-  monthlyExpenses: 0,
+  money: 1_000_000, // Beta Start: $1M Personal Cash
+  netWorth: 551_000_000, // Approx (Cash + Company Equity)
+  monthlyIncome: 50_000, // CEO Salary
+  monthlyExpenses: 20_000,
   companyDebt: 0,
   companyDebtTotal: 0,
-  companyOwnership: 72,
-  companyValue: 18_600_000,
-  companySharePrice: 120.5,
+  companyOwnership: 100, // 100% Owned at start
+  companyValue: 550_000_000, // BetaCorp Valuation
+  companySharePrice: 55.00, // Derived
   companyDailyChange: 0,
   casinoReputation: 0,
-  companyRevenueMonthly: 0,
-  companyExpensesMonthly: 0,
-  companyCapital: 100_000_000_000, // 100 Billion for M&A testing
-  factoryCount: 5,
+  companyRevenueMonthly: 2_000_000, // Profitable start
+  companyExpensesMonthly: 1_500_000,
+  companyCapital: 500_000_000, // $500M Treasury
+  factoryCount: 10, // Increased for scale
   employeeCount: 100,
-  employeeMorale: 75,
-  salaryTier: 'average',
-  productionCapacity: 1000,
-  productionLevel: 2000,
-  researchPoints: 0,
+  employeeMorale: 80,
+  salaryTier: 'above_average', // Paid well
+  productionCapacity: 10000,
+  productionLevel: 6000,
+  researchPoints: 500, // Some starting research
   stockSplitCount: 0,
   isPublic: false,
   techLevels: {

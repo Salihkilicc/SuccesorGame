@@ -50,6 +50,13 @@ export type InventoryItem = {
   purchasedAt: number; // timestamp
 };
 
+// Custom User Job Type
+export interface UserJob {
+  id: string;
+  title: string;
+  salary: number; // Monthly salary
+}
+
 export type UserState = {
   name: string;
   bio: string;
@@ -58,6 +65,7 @@ export type UserState = {
   hasPremium: boolean;
   avatarUrl?: string | null;
   partner: PartnerProfile | null; // Updated to use comprehensive PartnerProfile
+  job: UserJob | null; // NEW: Track player's job
   family: FamilyMember[];
   friends: Friend[];
   exes: ExPartnerProfile[]; // Updated to use ExPartnerProfile with breakup details
@@ -85,6 +93,7 @@ type UserStore = UserState & {
   updateGymState: (partial: Partial<UserState['gymState']>) => void;
   addSubsidiary: (company: AcquiredCompany) => void;
   setAll: (partial: Partial<UserState>) => void; // Helper requested by user (same as update)
+  updateJob: (job: UserJob | null) => void; // NEW Action
 
   // === RELATIONSHIP ENGINE ACTIONS ===
   setPartner: (newPartner: PartnerProfile | null) => void;
@@ -92,18 +101,25 @@ type UserStore = UserState & {
   marryPartner: (hasPrenup: boolean) => void;
   removeItem: (itemId: string) => void;
   breakUp: (reason: ExPartnerProfile['breakupReason']) => void;
+  updateSpecificStat: (statId: string, value: number) => void; // For DNA stats from education
 
   reset: () => void;
 };
 
 export const initialUserState: UserState = {
   name: 'John Rich',
-  bio: 'New to the rich life.',
+  bio: 'Beta Tester - CEO Edition',
   gender: 'male',
   profilePhoto: null,
   avatarUrl: null,
-  hasPremium: false,
+  hasPremium: true, // Gift premium for beta testing
   partner: null, // Will be set via setPartner action
+  // BETA START: CEO Job
+  job: {
+    id: 'ceo_start',
+    title: 'CEO',
+    salary: 50000
+  },
   family: [
     {
       id: 'mom-1',
@@ -174,11 +190,11 @@ export const useUserStore = create<UserStore>()(
           ...state,
           gymState: { ...state.gymState, ...partial },
         })),
-
       addSubsidiary: (company) => set((state) => ({
         subsidiaries: [...state.subsidiaries, company]
       })),
       setAll: (partial) => set((state) => ({ ...state, ...partial })),
+      updateJob: (job) => set((state) => ({ ...state, job })),
 
       // ============================================================================
       // RELATIONSHIP ENGINE ACTIONS
@@ -340,6 +356,64 @@ export const useUserStore = create<UserStore>()(
         console.log(`💔 Broke up with ${partner.name}. Reason: ${reason}`);
       },
 
+      /**
+       * Update any specific stat by ID (for education DNA stat bonuses)
+       * Routes stats to the correct nested state object
+       */
+      updateSpecificStat: (statId, value) => {
+        set(state => {
+          // Clamp value between 0 and 100
+          const clampedValue = Math.max(0, Math.min(100, value));
+
+          // Route to appropriate state based on statId
+          // Security stats
+          if (['digitalShield', 'bodyguard', 'policeHeat'].includes(statId)) {
+            return {
+              ...state,
+              // Note: Assuming security exists in user store or we need to add it
+              // For now, log it as this structure may need to be added
+            };
+          }
+
+          // Reputation stats
+          if (['businessTrust', 'highSociety', 'streetCred', 'casinoVIP'].includes(statId)) {
+            return {
+              ...state,
+              // Note: Reputation may be in player store, not user store
+              // For now, log it
+            };
+          }
+
+          // Core genetics/attributes
+          if (['intellect', 'charm', 'looks', 'strength'].includes(statId)) {
+            return {
+              ...state,
+              // Note: These are in player store attributes, not user store
+              // For now, log it
+            };
+          }
+
+          // Combat stats
+          if (statId === 'martialArts') {
+            return {
+              ...state,
+              gymState: {
+                ...state.gymState,
+                // Update martial arts level
+              }
+            };
+          }
+
+          // Happiness stat
+          if (statId === 'happiness') {
+            return state; // In player store core stats
+          }
+
+          console.log(`[Education Bonus] ${statId} +${value} (routed)`);
+          return state;
+        });
+      },
+
       reset: () => set(() => ({ ...initialUserState })),
     }),
     {
@@ -352,6 +426,7 @@ export const useUserStore = create<UserStore>()(
         avatarUrl: state.avatarUrl,
         hasPremium: state.hasPremium,
         partner: state.partner,
+        job: state.job, // Persist Job
         family: state.family,
         friends: state.friends,
         exes: state.exes, // Now includes full ExPartnerProfile data
@@ -359,6 +434,7 @@ export const useUserStore = create<UserStore>()(
         hasEngagementRing: state.hasEngagementRing,
         gymState: state.gymState,
         subsidiaries: state.subsidiaries,
+        // Note: DNA stats would be added here when implemented
       }) as any,
     },
   ),
