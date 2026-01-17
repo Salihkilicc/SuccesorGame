@@ -64,10 +64,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
 
     // Helper for number increment with dynamic max for marketing
     const adjustValue = (field: keyof typeof formState, delta: number, min = 0, max?: number) => {
-        // Calculate dynamic max for marketing budget (40% of selling price)
+        // Calculate dynamic max for marketing budget (50% of selling price)
         let effectiveMax = max;
         if (field === 'marketingBudget' && !max) {
-            effectiveMax = Math.floor(formState.sellingPrice * 0.40);
+            effectiveMax = Math.floor(formState.sellingPrice * 0.5);
         }
         effectiveMax = effectiveMax || 10000; // Fallback
 
@@ -77,27 +77,104 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
         }));
     };
 
-    const renderControl = (label: string, field: 'sellingPrice' | 'marketingBudget' | 'productionLevel', step: number, suffix = '', max = 10000) => (
-        <View style={styles.controlRow}>
-            <View>
-                <Text style={styles.label}>{label}</Text>
-                {field === 'productionLevel' && (
-                    <Text style={styles.subLabel}>Market Demand: {product.marketDemand}%</Text>
+    // Helper for percentage-based marketing budget adjustment
+    const adjustMarketingByPercent = (percent: number) => {
+        const maxLimit = Math.floor(formState.sellingPrice * 0.5);
+        const delta = Math.floor(maxLimit * (percent / 100));
+        const newValue = formState.marketingBudget + delta;
+
+        setFormState(prev => ({
+            ...prev,
+            marketingBudget: Math.max(0, Math.min(maxLimit, newValue))
+        }));
+    };
+
+    const renderControl = (label: string, field: 'sellingPrice' | 'marketingBudget' | 'productionLevel', step: number, suffix = '', max = 10000) => {
+        let subLabelText = '';
+        let demandBoostElement = null;
+        let percentageButtons = null;
+
+        if (field === 'productionLevel') {
+            subLabelText = `Market Demand: ${product.marketDemand}%`;
+        } else if (field === 'marketingBudget') {
+            const limit = Math.floor(formState.sellingPrice * 0.5);
+
+            // Demand Boost Calculation
+            const efficiency = Math.min(1, formState.marketingBudget / limit);
+            const boostPercentage = Math.floor(efficiency * 30);
+
+            subLabelText = `Max Limit: $${limit}`;
+
+            if (boostPercentage > 0) {
+                demandBoostElement = (
+                    <Text style={[styles.boostText, { color: theme.colors.success }]}>
+                        Demand Boost: +{boostPercentage}%
+                    </Text>
+                );
+            } else {
+                demandBoostElement = (
+                    <Text style={[styles.boostText, { color: theme.colors.textSecondary }]}>
+                        Etki: Yok (Organic)
+                    </Text>
+                );
+            }
+
+            // Percentage adjustment buttons
+            percentageButtons = (
+                <View style={styles.percentButtonsContainer}>
+                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(-5)}>
+                        <Text style={styles.percentBtnText}>-5%</Text>
+                    </Pressable>
+                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(-3)}>
+                        <Text style={styles.percentBtnText}>-3%</Text>
+                    </Pressable>
+                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(3)}>
+                        <Text style={styles.percentBtnText}>+3%</Text>
+                    </Pressable>
+                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(5)}>
+                        <Text style={styles.percentBtnText}>+5%</Text>
+                    </Pressable>
+                </View>
+            );
+        }
+
+        return (
+            <View style={styles.controlRow}>
+                <View>
+                    <Text style={styles.label}>{label}</Text>
+                    {subLabelText ? (
+                        <Text style={styles.subLabel}>{subLabelText}</Text>
+                    ) : null}
+                </View>
+
+                <View style={styles.stepperContainer}>
+                    <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, -step, 0, max)}>
+                        <Text style={styles.stepperText}>-</Text>
+                    </Pressable>
+
+                    <View style={styles.valueContainer}>
+                        <Text style={styles.stepperValue}>
+                            {field === 'sellingPrice' ? '$' : ''}{formState[field]}{suffix}
+                        </Text>
+                    </View>
+
+                    <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, step, 0, max)}>
+                        <Text style={styles.stepperText}>+</Text>
+                    </Pressable>
+                </View>
+
+                {/* Percentage buttons for marketing */}
+                {percentageButtons}
+
+                {/* Demand Boost Display below the slider/stepper */}
+                {demandBoostElement && (
+                    <View style={styles.boostContainer}>
+                        {demandBoostElement}
+                    </View>
                 )}
             </View>
-            <View style={styles.stepperContainer}>
-                <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, -step, 0, max)}>
-                    <Text style={styles.stepperText}>-</Text>
-                </Pressable>
-                <Text style={styles.stepperValue}>
-                    {field === 'sellingPrice' ? '$' : ''}{formState[field]}{suffix}
-                </Text>
-                <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, step, 0, max)}>
-                    <Text style={styles.stepperText}>+</Text>
-                </Pressable>
-            </View>
-        </View>
-    );
+        );
+    };
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -128,7 +205,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                         <Text style={styles.sectionHeader}>Management</Text>
 
                         {renderControl('Selling Price', 'sellingPrice', 5, '', undefined)}
-                        {renderControl('Marketing Budget', 'marketingBudget', 100, '', undefined)}
+                        {renderControl('Marketing Budget', 'marketingBudget', 10, '', undefined)}
                         {renderControl('Production Level', 'productionLevel', 5, '%', 100)}
 
                         <Text style={styles.sectionHeader}>R&D Upgrades</Text>
@@ -348,5 +425,42 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     disabledBtn: { backgroundColor: '#444', opacity: 0.7 },
-    upgradeBtnText: { fontSize: 10, fontWeight: 'bold', color: '#000' }
+    upgradeBtnText: { fontSize: 10, fontWeight: 'bold', color: '#000' },
+    boostContainer: { alignItems: 'center', marginTop: 8 },
+    boostText: { fontSize: 13, fontWeight: 'bold' },
+    valueContainer: { flex: 1, alignItems: 'center' },
+    barContainer: {
+        height: 4,
+        width: '80%',
+        backgroundColor: theme.colors.cardSoft,
+        borderRadius: 2,
+        marginTop: 4,
+        overflow: 'hidden'
+    },
+    barFill: {
+        height: '100%',
+        backgroundColor: theme.colors.primary,
+        borderRadius: 2
+    },
+    percentButtonsContainer: {
+        flexDirection: 'row',
+        gap: 8,
+        marginTop: 8,
+        justifyContent: 'center'
+    },
+    percentBtn: {
+        backgroundColor: theme.colors.cardSoft,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        minWidth: 50,
+        alignItems: 'center'
+    },
+    percentBtnText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: theme.colors.textPrimary
+    }
 });

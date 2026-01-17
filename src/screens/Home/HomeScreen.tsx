@@ -129,6 +129,7 @@ const HomeScreen = () => {
           setbackMessage: result.data.setbackMessage || '',
           lostRevenue: result.data.lostRevenue || 0,
           lostUnits: result.data.lostUnits || 0,
+          productBreakdown: result.data.productBreakdown || [], // PASS THE DATA!
         };
         setLastReportData(mappedData);
         setReportVisible(true);

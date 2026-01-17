@@ -147,10 +147,10 @@ const MyCompanyScreen = () => {
           {/* 👆 -------------------------------------------------- 👆 */}
 
           <DepartmentCard
-            icon="👥"
-            title="HR & Management"
-            subtitle={`${stats.employeeCount} Employees`}
-            onPress={() => toggleModal('management', true)}
+            icon="📊"
+            title="Financial Report"
+            subtitle="Expenses, Profits & ROI"
+            onPress={() => navigation.navigate('FinancialReport')}
           />
           <DepartmentCard
             icon="📈"

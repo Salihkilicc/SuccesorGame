@@ -54,6 +54,16 @@ export type EconomyResult = {
     playerIncome: number;
     playerExpenses: number;
     companyValuation: number;
+    productBreakdown: {
+      id: string;
+      name: string;
+      produced: number;
+      sold: number;
+      revenue: number;
+      expense: number;
+      profit: number;
+      stock: number;
+    }[];
   };
 };
 
@@ -148,6 +158,17 @@ export const useGameStore = create<GameStore>()(
 
         // Loop through each active product and calculate financials
         const updatedProducts: any[] = [];
+        const productBreakdownList: {
+          id: string;
+          name: string;
+          produced: number;
+          sold: number;
+          revenue: number;
+          expense: number;
+          profit: number;
+          stock: number;
+        }[] = [];
+
         products.forEach((product: any) => {
           if (product.status === 'active') {
             // Get actual cost and price (with R&D upgrades applied)
@@ -235,6 +256,19 @@ export const useGameStore = create<GameStore>()(
               ...product,
               inventory: newInventory
             });
+
+            // Add to breakdown list
+            const productProfit = productRevenue - (productCOGS + marketingCost + storageCost);
+            productBreakdownList.push({
+              id: product.id,
+              name: product.name,
+              produced: quarterlyProduction, // CORRECTED: Use this product's quarterly production
+              sold: quarterlySales,
+              revenue: productRevenue,
+              expense: (productCOGS + marketingCost + storageCost),
+              profit: productProfit,
+              stock: newInventory
+            });
           } else {
             updatedProducts.push(product);
           }
@@ -248,7 +282,7 @@ export const useGameStore = create<GameStore>()(
         });
 
         // 3. FACTORY OVERHEAD (Corporate Fixed Costs)
-        const OVERHEAD_PER_FACTORY = 30000000; // $30M per factory per quarter
+        const OVERHEAD_PER_FACTORY = 5000; // $5k per factory per quarter
         const factoryOverhead = (stats.factoryCount || 5) * OVERHEAD_PER_FACTORY * quarters;
 
         // 3. R&D LABORATORY COSTS (Updated to $500k per researcher)
@@ -502,7 +536,8 @@ export const useGameStore = create<GameStore>()(
             playerNetWorth: newPlayerCash + (newCompanyCapital * 1.5 * (stats.companyOwnership / 100)),
             playerIncome: baseSalary, // FIXED: Return the actual salary used
             playerExpenses: baseExpenses,
-            companyValuation: newCompanyCapital * 1.5
+            companyValuation: newCompanyCapital * 1.5,
+            productBreakdown: productBreakdownList
           }
         };
 

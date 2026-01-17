@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 // Veri Tipi
 export interface FinancialData {
@@ -16,6 +16,16 @@ export interface FinancialData {
   setbackMessage?: string;
   lostRevenue?: number;
   lostUnits?: number;
+  productBreakdown?: {
+    id: string;
+    name: string;
+    produced: number;
+    sold: number;
+    revenue: number;
+    expense: number;
+    profit: number;
+    stock: number;
+  }[];
 }
 
 // Para Formatlayıcı
@@ -67,35 +77,36 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
             <Text style={styles.subtitle}>Financial Performance</Text>
           </View>
 
-          <View style={styles.grid}>
-            {/* Production */}
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Production</Text>
-              <Text style={styles.value}>{production} units</Text>
-              <Text style={styles.stockLabel}>(Stock: {stock} units)</Text>
+          {/* Product Breakdown List */}
+          <View style={styles.listContainer}>
+            <View style={styles.listHeader}>
+              <Text style={styles.listHeaderTitle}>Product</Text>
+              <Text style={styles.listHeaderTitle}>Perf (Prd / Sld)</Text>
+              <Text style={styles.listHeaderTitle}>Net Profit</Text>
             </View>
-
-            {/* Sales */}
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Sales</Text>
-              <Text style={styles.value}>{sales} units</Text>
-            </View>
-
-            {/* Revenue */}
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Revenue</Text>
-              <Text style={[styles.value, { color: '#4CAF50' }]}>
-                +{formatCurrency(revenue)}
-              </Text>
-            </View>
-
-            {/* Expenses */}
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Total Expenses</Text>
-              <Text style={[styles.value, { color: '#F44336' }]}>
-                -{formatCurrency(expenses)}
-              </Text>
-            </View>
+            <ScrollView style={{ maxHeight: 250 }} showsVerticalScrollIndicator={false}>
+              {data.productBreakdown && data.productBreakdown.length > 0 ? (
+                data.productBreakdown.map((item) => (
+                  <View key={item.id} style={styles.listItem}>
+                    <View style={styles.colName}>
+                      <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                      <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+                    </View>
+                    <View style={styles.colPerf}>
+                      <Text style={styles.itemPerf}>P: {item.produced}</Text>
+                      <Text style={styles.itemPerf}>S: {item.sold}</Text>
+                    </View>
+                    <View style={styles.colProfit}>
+                      <Text style={[styles.itemProfit, { color: item.profit >= 0 ? '#4CAF50' : '#F44336' }]}>
+                        {item.profit >= 0 ? '+' : ''}{formatCurrency(item.profit)}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>No active products this quarter.</Text>
+              )}
+            </ScrollView>
           </View>
 
           <View style={styles.divider} />
@@ -115,19 +126,35 @@ const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
               </View>
             )}
 
-            <Text style={styles.resultLabel}>NET PROFIT</Text>
-            <Text style={[styles.resultValue, { color: isProfit ? '#4CAF50' : '#F44336' }]}>
-              {isProfit ? '+' : ''}{formatCurrency(profit)}
-            </Text>
-            {/* R&D Display */}
-            <Text style={{
-              fontSize: 18,
-              fontWeight: '600',
-              color: '#9C27B0', // Purple/Lila
-              marginTop: 4
-            }}>
-              🟣 Current R&D: {currentRP >= 1000 ? (currentRP >= 1000000 ? `${(currentRP / 1000000).toFixed(1)}M` : `${(currentRP / 1000).toFixed(1)}K`) : currentRP} Pts
-            </Text>
+            {/* Footer Summary */}
+            <View style={styles.footerSummary}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Total Revenue</Text>
+                <Text style={styles.summaryValuePos}>+{formatCurrency(revenue)}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Total Expenses</Text>
+                <Text style={styles.summaryValueNeg}>-{formatCurrency(expenses)}</Text>
+              </View>
+              <View style={[styles.divider, { marginVertical: 8 }]} />
+              <View style={styles.summaryRow}>
+                <Text style={styles.resultLabelLarge}>NET PROFIT</Text>
+                <Text style={[styles.resultValueLarge, { color: isProfit ? '#4CAF50' : '#F44336' }]}>
+                  {isProfit ? '+' : ''}{formatCurrency(profit)}
+                </Text>
+              </View>
+              {/* R&D Display */}
+              <Text style={{
+                fontSize: 12,
+                fontWeight: '600',
+                color: '#9C27B0', // Purple/Lila
+                marginTop: 8,
+                textAlign: 'center',
+                width: '100%'
+              }}>
+                🟣 Current R&D: {currentRP >= 1000 ? (currentRP >= 1000000 ? `${(currentRP / 1000000).toFixed(1)}M` : `${(currentRP / 1000).toFixed(1)}K`) : currentRP} Pts
+              </Text>
+            </View>
           </View>
 
           <View style={styles.footerInfo}>
@@ -196,5 +223,28 @@ const styles = StyleSheet.create({
   alertIcon: { fontSize: 16 },
   alertTitle: { color: '#F44336', fontWeight: '900', fontSize: 12, letterSpacing: 0.5 },
   alertMessage: { color: '#FFCDD2', fontSize: 11, fontStyle: 'italic', marginBottom: 6, textAlign: 'center' },
-  alertLoss: { color: '#FF5252', fontSize: 13, fontWeight: '700' }
+  alertLoss: { color: '#FF5252', fontSize: 13, fontWeight: '700' },
+
+  // New List Styles
+  listContainer: { width: '100%', marginBottom: 16, backgroundColor: '#252525', borderRadius: 8, padding: 8 },
+  listHeader: { flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#444', marginBottom: 8 },
+  listHeaderTitle: { fontSize: 10, color: '#888', textTransform: 'uppercase', flex: 1, textAlign: 'center' },
+  listItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  colName: { flex: 1.2 },
+  colPerf: { flex: 1, alignItems: 'center' },
+  colProfit: { flex: 1, alignItems: 'flex-end' },
+  itemName: { color: '#FFF', fontSize: 13, fontWeight: '600' },
+  itemStock: { color: '#666', fontSize: 10 },
+  itemPerf: { color: '#CCC', fontSize: 11 },
+  itemProfit: { fontSize: 13, fontWeight: '700' },
+  emptyText: { color: '#666', fontSize: 12, textAlign: 'center', fontStyle: 'italic', padding: 10 },
+
+  // Footer Summary Styles
+  footerSummary: { width: '100%', paddingHorizontal: 4 },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  summaryLabel: { color: '#AAA', fontSize: 12 },
+  summaryValuePos: { color: '#4CAF50', fontSize: 13, fontWeight: '600' },
+  summaryValueNeg: { color: '#F44336', fontSize: 13, fontWeight: '600' },
+  resultLabelLarge: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  resultValueLarge: { fontSize: 20, fontWeight: '900' }
 });

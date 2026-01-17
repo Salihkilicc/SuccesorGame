@@ -20,3 +20,4 @@ export { default as EducationDashboard } from '../features/education/screens/Edu
 export { default as EducationBrowseScreen } from '../features/education/screens/EducationBrowseScreen';
 export { default as DNAScreen } from '../features/life/screens/DNAScreen';
 export { default as ResearchScreen } from '../features/assets/screens/ResearchScreen';
+export { default as FinancialReportScreen } from '../features/assets/screens/FinancialReportScreen';

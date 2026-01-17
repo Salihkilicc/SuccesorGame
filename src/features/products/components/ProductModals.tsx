@@ -253,18 +253,35 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         <View style={styles.controlGroup}>
                             <Text style={styles.controlTitle}>Marketing Spend (Per Unit)</Text>
                             <Text style={styles.hint}>Higher spend increases sales conversion</Text>
+                            <Text style={styles.hint}>Max Limit: ${Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5)}</Text>
                             <View style={styles.progressBarContainer}>
                                 <View style={styles.progressBarBg}>
-                                    <View style={[styles.progressBarFill, { width: `${Math.min(100, (marketingPerUnit / 100) * 100)}%` }]} />
+                                    <View style={[styles.progressBarFill, { width: `${Math.min(100, (marketingPerUnit / Math.max(1, Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5))) * 100)}%` }]} />
                                 </View>
                                 <Text style={styles.progressValue}>${marketingPerUnit}</Text>
                             </View>
                             <View style={styles.sliderRow}>
-                                <Pressable onPress={() => setMarketingPerUnit(Math.max(0, marketingPerUnit - 10))} style={styles.adjBtn}><Text style={styles.adjText}>-$10</Text></Pressable>
-                                <Pressable onPress={() => setMarketingPerUnit(Math.max(0, marketingPerUnit - 5))} style={styles.adjBtn}><Text style={styles.adjText}>-$5</Text></Pressable>
+                                <Pressable onPress={() => {
+                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
+                                    const delta = Math.floor(maxLimit * 0.05);
+                                    setMarketingPerUnit(Math.max(0, marketingPerUnit - delta));
+                                }} style={styles.adjBtn}><Text style={styles.adjText}>-5%</Text></Pressable>
+                                <Pressable onPress={() => {
+                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
+                                    const delta = Math.floor(maxLimit * 0.03);
+                                    setMarketingPerUnit(Math.max(0, marketingPerUnit - delta));
+                                }} style={styles.adjBtn}><Text style={styles.adjText}>-3%</Text></Pressable>
 
-                                <Pressable onPress={() => setMarketingPerUnit(Math.min(100, marketingPerUnit + 5))} style={styles.adjBtn}><Text style={styles.adjText}>+$5</Text></Pressable>
-                                <Pressable onPress={() => setMarketingPerUnit(Math.min(100, marketingPerUnit + 10))} style={styles.adjBtn}><Text style={styles.adjText}>+$10</Text></Pressable>
+                                <Pressable onPress={() => {
+                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
+                                    const delta = Math.floor(maxLimit * 0.03);
+                                    setMarketingPerUnit(Math.min(maxLimit, marketingPerUnit + delta));
+                                }} style={styles.adjBtn}><Text style={styles.adjText}>+3%</Text></Pressable>
+                                <Pressable onPress={() => {
+                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
+                                    const delta = Math.floor(maxLimit * 0.05);
+                                    setMarketingPerUnit(Math.min(maxLimit, marketingPerUnit + delta));
+                                }} style={styles.adjBtn}><Text style={styles.adjText}>+5%</Text></Pressable>
                             </View>
                         </View>
 

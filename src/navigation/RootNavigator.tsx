@@ -29,6 +29,7 @@ import {
   EducationBrowseScreen,
   DNAScreen,
   ResearchScreen,
+  FinancialReportScreen,
 } from '../screens';
 
 import { formatScreenTitle } from '../core/utils';
@@ -64,6 +65,7 @@ export type AssetsStackParamList = {
     change: number;
     category?: string;
   };
+  FinancialReport: undefined;
 };
 
 export type CasinoStackParamList = {
@@ -99,6 +101,7 @@ export type RootStackParamList = {
   Products: undefined;
   Research: undefined;
   TechTree: undefined;
+  FinancialReport: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -148,6 +151,11 @@ const AssetsStackNavigator = () => (
       name="StockDetail"
       component={StockDetailScreen}
       options={{ title: formatScreenTitle('Stock Detail') }}
+    />
+    <AssetsStack.Screen
+      name="FinancialReport"
+      component={FinancialReportScreen}
+      options={{ title: 'Quarterly Financial Report' }}
     />
 
     <AssetsStack.Screen
@@ -243,10 +251,14 @@ const RootNavigator = () => (
           options={{ title: 'Innovation Tech Tree' }}
         />
 
-        {/* TODO: Restore these screens */}
         {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
         {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
         <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
+        <RootStack.Screen
+          name="FinancialReport"
+          component={FinancialReportScreen}
+          options={{ title: 'Quarterly Financial Report' }}
+        />
       </RootStack.Navigator>
       <BottomStatsBar
         onHomePress={() => {
