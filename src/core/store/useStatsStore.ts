@@ -115,83 +115,46 @@ const FACTORY_COST_MONTHLY = 50_000;
 const BASE_SHARES = 10_000_000;
 
 export const initialStatsState: StatsState = {
-  money: 1_000_000, // Beta Start: $1M Personal Cash
-  netWorth: 551_000_000, // Approx (Cash + Company Equity)
-  monthlyIncome: 50_000, // CEO Salary
-  monthlyExpenses: 20_000,
+  money: 250_000, // Player Personal Cash (Lowered for challenge)
+  netWorth: 20_250_000, // Approx
+  monthlyIncome: 15_000, // Moderate CEO Salary
+  monthlyExpenses: 5_000,
+
   companyDebt: 0,
   companyDebtTotal: 0,
-  companyOwnership: 100, // 100% Owned at start
-  companyValue: 550_000_000, // BetaCorp Valuation
-  companySharePrice: 55.00, // Derived
+  companyOwnership: 100,
+
+  companyValue: 22_000_000, // Valuation based on new capital + assets
+  companySharePrice: 2.20, // Lower starting share price ($22M / 10M shares)
   companyDailyChange: 0,
   casinoReputation: 0,
-  companyRevenueMonthly: 2_000_000, // Profitable start
-  companyExpensesMonthly: 1_500_000,
-  companyCapital: 500_000_000, // $500M Treasury
-  factoryCount: 10, // Increased for scale
-  employeeCount: 100,
-  employeeMorale: 80,
-  salaryTier: 'above_average', // Paid well
-  productionCapacity: 10000,
-  productionLevel: 6000,
-  researchPoints: 500, // Some starting research
+
+  companyRevenueMonthly: 500_000, // Starting Revenue
+  companyExpensesMonthly: 400_000, // Starting Expenses
+  companyCapital: 20_000_000, // $20M Capital (Enough runway, but not infinite)
+
+  factoryCount: 4, // Start with 4 Factories
+  employeeCount: 40, // Start with 40 Employees
+  employeeMorale: 75,
+  salaryTier: 'average', // Start with average salaries
+
+  productionCapacity: 4000,
+  productionLevel: 3000,
+  researchPoints: 100, // Start with less RP to encourage R&D
   stockSplitCount: 0,
   isPublic: false,
+
   techLevels: {
     hardware: 1,
     software: 1,
-    future: 1,
+    future: 0, // Future tech locked at start
   },
-  acquisitions: [], // Ensure this is initialized
-  subsidiaryStates: {}, // Track subsidiary performance
+
+  acquisitions: [],
+  subsidiaryStates: {},
+
   shareholders: [
-    { id: 'player', name: 'Player', type: 'player', percentage: 51, avatar: 'P' },
-    {
-      id: 'family',
-      name: 'Uncle Sam',
-      type: 'family',
-      percentage: 10,
-      relationship: 90,
-      avatar: 'U',
-      bio: 'Your supportive uncle who provided the initial seed funding. He trusts you completely.'
-    },
-    {
-      id: 'partner',
-      name: 'Jessica (Partner)',
-      type: 'family',
-      percentage: 5,
-      relationship: 100,
-      avatar: 'J',
-      bio: 'Your life partner and confidant. She supports your vision but worries about the risks.'
-    },
-    {
-      id: 'vp',
-      name: 'Angel Investor Mike',
-      type: 'investor',
-      percentage: 14,
-      relationship: 65,
-      avatar: 'M',
-      bio: 'An early-stage tech investor looking for the next unicorn. Impatient but wealthy.'
-    },
-    {
-      id: 'vc_small',
-      name: 'Nebula VC',
-      type: 'investor',
-      percentage: 10,
-      relationship: 45,
-      avatar: 'N',
-      bio: 'A mid-tier venture firm focused on rapid growth. They push for aggressive expansion.'
-    },
-    {
-      id: 'vc_big',
-      name: 'BlackRock VC',
-      type: 'investor',
-      percentage: 10,
-      relationship: 30,
-      avatar: 'B',
-      bio: 'A global investment giant. They care only about returns and have zero patience for failure.'
-    },
+    { id: 'player', name: 'Player', type: 'player', percentage: 100, avatar: 'P' },
   ],
 };
 
