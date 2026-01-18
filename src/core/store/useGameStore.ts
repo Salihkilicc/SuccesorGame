@@ -1,18 +1,18 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { useEventStore } from './useEventStore';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
 import { simulateNewMonth } from '../../event/eventEngine';
+import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyEngine';
+import { applyPartnerBuffs } from '../../logic/relationshipLogic';
+import { calculateStatDecay } from '../../logic/statsLogic';
 import { zustandStorage } from '../../storage/persist';
+import { useEventStore } from './useEventStore';
+import { useLaboratoryStore } from './useLaboratoryStore';
+import { useMarketStore } from './useMarketStore';
+import { usePlayerStore } from './usePlayerStore';
+import { useProductStore } from './useProductStore';
 import { useStatsStore } from './useStatsStore';
 import { useUserStore } from './useUserStore';
-import { useLaboratoryStore } from './useLaboratoryStore';
-import { useProductStore } from './useProductStore';
-import { simulateEconomy } from '../../logic/EconomyEngine'; // Legacy Engine (keep if needed for types or remove)
-import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyEngine'; // Quarterly Engine
-import { calculateStatDecay } from '../../logic/statsLogic';
-import { applyPartnerBuffs } from '../../logic/relationshipLogic';
-import { usePlayerStore } from './usePlayerStore';
-import { useMarketStore } from './useMarketStore'; // Added to pass to engine
 
 const LOW_MORALE_REASONS = [
   "Factory strikes halted production for 3 days.",
@@ -112,7 +112,7 @@ export const useGameStore = create<GameStore>()(
         const { resetCycleFlags } = useEventStore.getState();
         resetCycleFlags();
         set(state => ({ ...state, actionsUsedThisMonth: 0 }));
-        console.log('[Game] Monthly state reset (placeholder)');
+
       },
       advanceMonth: async (monthsInput?: number) => {
         // Input güvenliği (Varsayılan 3 ay)
@@ -231,7 +231,7 @@ export const useGameStore = create<GameStore>()(
             totalEndingStock += newInventory;
 
             // DEBUG LOGGING
-            console.log(`[Product: ${product.name}] Stock: ${previousInventory}, Prod: ${quarterlyProduction}, Total: ${availableGoods}, Sales: ${quarterlySales}, NewStock: ${newInventory}`);
+
 
             // 5. Costs & Revenue
             // Storage costs: $5 per unit in NEW inventory
@@ -296,7 +296,7 @@ export const useGameStore = create<GameStore>()(
             const { rpAwarded } = useLaboratoryStore.getState().processQuarter(() => { });
             rndRPGenerated += rpAwarded;
           }
-          console.log(`[Game] R&D Results: Generated ${rndRPGenerated} RP, Cost $${rndSalaryCost}`);
+
         }
 
 
@@ -312,7 +312,7 @@ export const useGameStore = create<GameStore>()(
         // Check if partner has the new Deep Persona structure
         if (partner && 'finances' in partner && 'monthlyCost' in (partner as any).finances) {
           partnerUpkeepCost = (partner as any).finances.monthlyCost * months;
-          console.log(`[Partner Upkeep] ${(partner as any).name}: $${partnerUpkeepCost} (${months} months)`);
+
         }
 
         // 5. CALCULATE NET PROFIT/LOSS
@@ -333,7 +333,7 @@ export const useGameStore = create<GameStore>()(
         // Apply Net Flow to Cash
         const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow;
 
-        console.log(`[Economy] Quarterly Result: ${quarterlyReport.netFlow} (Income: ${quarterlyReport.totalIncome} - Exp: ${quarterlyReport.totalExpenses})`);
+
 
 
         // 3. Tarihi İlerlet
@@ -352,7 +352,7 @@ export const useGameStore = create<GameStore>()(
           age: newAge,
           actionsUsedThisMonth: 0,
         }));
-        console.log(`[Game] Advanced ${months} months. New Date: Month ${newMonth}, Age ${newAge}`);
+
 
         // 4. Aylık Flagleri Sıfırla
         get().resetMonthlyState();
@@ -370,22 +370,7 @@ export const useGameStore = create<GameStore>()(
           netWorth: newPlayerCash + (newCompanyCapital * 1.5 * (stats.companyOwnership / 100))
         });
 
-        console.log('[Game] Store updated with new values:', {
-          cash: newPlayerCash,
-          capital: newCompanyCapital,
-          income: baseSalary,
-          revenue: totalRevenue,
-          expenses: {
-            total: totalExpenses,
-            cogs: totalCOGS,
-            marketing: totalMarketingCost,
-            storage: totalStorageCost,
-            factoryOverhead: factoryOverhead,
-            rnd: rndSalaryCost,
-            fixed: totalFixedExpenses
-          },
-          netProfit: netProfit
-        });
+
 
         // 6. Yan Etkileri Tetikle (Eventler vs.)
         simulateNewMonth();
@@ -416,14 +401,14 @@ export const useGameStore = create<GameStore>()(
             lastQuarterProfit: netProfit,
             bonusDistributedThisQuarter: false,
           }));
-          console.log(`[Quarterly Review] Morale Updated: ${newMorale} (Policy: ${state.salaryPolicy})`);
+
 
           // 7a. MARKET SIMULATION (NEW)
           // Simulate market for each quarter that passed
           for (let q = 0; q < quarters; q++) {
             useMarketStore.getState().simulateQuarter();
           }
-          console.log(`[Market] Simulated ${quarters} quarter(s)`);
+
 
           // 7b. STAT DECAY LOGIC (Paslanma Kuralı)
           // "İşleyen demir ışıldar, işlemeyen paslanır."
@@ -436,7 +421,7 @@ export const useGameStore = create<GameStore>()(
             if (value < 0) {
               const currentVal = currentAttributes[stat as keyof typeof currentAttributes];
               playerStore.updateAttribute(stat as any, Math.max(0, currentVal + value));
-              console.log(`[Stat Decay] ${stat} decayed by ${value}`);
+
             }
           });
 
@@ -446,7 +431,7 @@ export const useGameStore = create<GameStore>()(
             const { changes, notification } = applyPartnerBuffs(partner);
 
             if (notification) {
-              console.log(`[Partner Buff] ${notification}`);
+
               // Show notification in report if no crisis
               if (!operationalSetback) {
                 setbackMessage = notification;
@@ -502,7 +487,7 @@ export const useGameStore = create<GameStore>()(
           const eduResult = useEducationStore.getState().advanceProgress();
 
           if (eduResult.message) {
-            console.log(`[Education] ${eduResult.message}`);
+
             // Report to UI if significant (graduation) or just progress
             if (!setbackMessage && !operationalSetback) {
               setbackMessage = eduResult.message;
@@ -541,7 +526,7 @@ export const useGameStore = create<GameStore>()(
           }
         };
 
-        console.log('[Game] Returning result to UI:', result);
+
 
         return result;
       },
@@ -560,7 +545,7 @@ export const useGameStore = create<GameStore>()(
         // Apply
         update({ companyCapital: companyCapital - bonusAmount });
         set({ employeeMorale: Math.min(100, employeeMorale + 15), bonusDistributedThisQuarter: true });
-        console.log(`Bonus distributed: $${bonusAmount}`);
+
       },
 
       organizeEvent: (cost: number, boost: number) => {
@@ -592,7 +577,7 @@ export const useGameStore = create<GameStore>()(
 
         set(() => ({ ...initialGameState }));
 
-        // NativeEconomy.restartGame() KALDIRILDI çünkü artık yok.
+
 
         await zustandStorage.removeItem('succesor_stats_v1');
         await zustandStorage.removeItem('succesor_user_v1');
@@ -601,7 +586,7 @@ export const useGameStore = create<GameStore>()(
         await zustandStorage.removeItem('succesor_products_v3'); // Remove Product Persist
         await zustandStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
 
-        console.log('[Game] Full game reset complete');
+
       },
     }),
     {

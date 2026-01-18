@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import React from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
-import { Product } from '../data/productsData';
-import { ProductLaunchModal, ProductDetailModal as DetailModalComponent } from '../components/ProductModals';
+import { useProductDetail } from '../hooks/useProductDetail';
 import { useProductsLogic } from '../logic/useProductsLogic';
 
 interface ProductDetailModalProps {
@@ -15,79 +14,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
     const { products, actions, totalRP } = useProductsLogic();
     const product = products.find(p => p.id === productId);
 
-    const [formState, setFormState] = useState<{
-        sellingPrice: number;
-        marketingBudget: number;
-        productionLevel: number;
-        supplierId: string;
-    }>({ sellingPrice: 0, marketingBudget: 0, productionLevel: 0, supplierId: '' });
-
-    const [tip, setTip] = useState('');
-
-    useEffect(() => {
-        if (product) {
-            setFormState({
-                sellingPrice: product.sellingPrice || product.suggestedPrice || 0,
-                marketingBudget: product.marketingBudget || 0,
-                productionLevel: product.productionLevel || 0,
-                supplierId: product.supplierId || 'local',
-            });
-            setTip('');
-        }
-    }, [product, visible]);
+    const logic = useProductDetail(product, visible, onClose);
 
     if (!visible || !product) return null;
-
-    const handleSave = () => {
-        actions.updateProductSettings(product.id, formState);
-        Alert.alert('Saved', 'Product settings updated.');
-        onClose();
-    };
-
-    const handleRetire = () => {
-        Alert.alert('Retire Product', 'Are you sure? This cannot be undone.', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Retire',
-                style: 'destructive',
-                onPress: () => {
-                    actions.retireProduct(product.id);
-                    onClose();
-                }
-            }
-        ]);
-    };
-
-    const handleGetInsight = () => {
-        setTip(actions.getInsightTip(product));
-    };
-
-    // Helper for number increment with dynamic max for marketing
-    const adjustValue = (field: keyof typeof formState, delta: number, min = 0, max?: number) => {
-        // Calculate dynamic max for marketing budget (50% of selling price)
-        let effectiveMax = max;
-        if (field === 'marketingBudget' && !max) {
-            effectiveMax = Math.floor(formState.sellingPrice * 0.5);
-        }
-        effectiveMax = effectiveMax || 10000; // Fallback
-
-        setFormState(prev => ({
-            ...prev,
-            [field]: Math.max(min, Math.min(effectiveMax, (prev[field] as number) + delta))
-        }));
-    };
-
-    // Helper for percentage-based marketing budget adjustment
-    const adjustMarketingByPercent = (percent: number) => {
-        const maxLimit = Math.floor(formState.sellingPrice * 0.5);
-        const delta = Math.floor(maxLimit * (percent / 100));
-        const newValue = formState.marketingBudget + delta;
-
-        setFormState(prev => ({
-            ...prev,
-            marketingBudget: Math.max(0, Math.min(maxLimit, newValue))
-        }));
-    };
 
     const renderControl = (label: string, field: 'sellingPrice' | 'marketingBudget' | 'productionLevel', step: number, suffix = '', max = 10000) => {
         let subLabelText = '';
@@ -97,18 +26,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
         if (field === 'productionLevel') {
             subLabelText = `Market Demand: ${product.marketDemand}%`;
         } else if (field === 'marketingBudget') {
-            const limit = Math.floor(formState.sellingPrice * 0.5);
+            subLabelText = `Max Limit: $${logic.maxMarketingLimit}`;
 
-            // Demand Boost Calculation
-            const efficiency = Math.min(1, formState.marketingBudget / limit);
-            const boostPercentage = Math.floor(efficiency * 30);
-
-            subLabelText = `Max Limit: $${limit}`;
-
-            if (boostPercentage > 0) {
+            if (logic.boostPercentage > 0) {
                 demandBoostElement = (
                     <Text style={[styles.boostText, { color: theme.colors.success }]}>
-                        Demand Boost: +{boostPercentage}%
+                        Demand Boost: +{logic.boostPercentage}%
                     </Text>
                 );
             } else {
@@ -122,16 +45,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
             // Percentage adjustment buttons
             percentageButtons = (
                 <View style={styles.percentButtonsContainer}>
-                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(-5)}>
+                    <Pressable style={styles.percentBtn} onPress={() => logic.adjustMarketingByPercent(-5)}>
                         <Text style={styles.percentBtnText}>-5%</Text>
                     </Pressable>
-                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(-3)}>
+                    <Pressable style={styles.percentBtn} onPress={() => logic.adjustMarketingByPercent(-3)}>
                         <Text style={styles.percentBtnText}>-3%</Text>
                     </Pressable>
-                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(3)}>
+                    <Pressable style={styles.percentBtn} onPress={() => logic.adjustMarketingByPercent(3)}>
                         <Text style={styles.percentBtnText}>+3%</Text>
                     </Pressable>
-                    <Pressable style={styles.percentBtn} onPress={() => adjustMarketingByPercent(5)}>
+                    <Pressable style={styles.percentBtn} onPress={() => logic.adjustMarketingByPercent(5)}>
                         <Text style={styles.percentBtnText}>+5%</Text>
                     </Pressable>
                 </View>
@@ -148,17 +71,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                 </View>
 
                 <View style={styles.stepperContainer}>
-                    <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, -step, 0, max)}>
+                    <Pressable style={styles.stepperBtn} onPress={() => logic.adjustValue(field, -step, 0, max)}>
                         <Text style={styles.stepperText}>-</Text>
                     </Pressable>
 
                     <View style={styles.valueContainer}>
                         <Text style={styles.stepperValue}>
-                            {field === 'sellingPrice' ? '$' : ''}{formState[field]}{suffix}
+                            {field === 'sellingPrice' ? '$' : ''}{logic.formState[field]}{suffix}
                         </Text>
                     </View>
 
-                    <Pressable style={styles.stepperBtn} onPress={() => adjustValue(field, step, 0, max)}>
+                    <Pressable style={styles.stepperBtn} onPress={() => logic.adjustValue(field, step, 0, max)}>
                         <Text style={styles.stepperText}>+</Text>
                     </Pressable>
                 </View>
@@ -197,7 +120,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                             <View style={styles.statBox}>
                                 <Text style={styles.statLabel}>Profit Margin</Text>
                                 <Text style={styles.statValue}>
-                                    {Math.round(((formState.sellingPrice - (product.unitCost || product.baseProductionCost)) / formState.sellingPrice) * 100)}%
+                                    {Math.round(((logic.formState.sellingPrice - (product.unitCost || product.baseProductionCost)) / logic.formState.sellingPrice) * 100)}%
                                 </Text>
                             </View>
                         </View>
@@ -262,21 +185,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                                 {['Local', 'Global', 'Premium'].map(s => (
                                     <Pressable
                                         key={s}
-                                        style={[styles.supplierBtn, formState.supplierId === s.toLowerCase() && styles.supplierBtnActive]}
-                                        onPress={() => setFormState(prev => ({ ...prev, supplierId: s.toLowerCase() }))}
+                                        style={[styles.supplierBtn, logic.formState.supplierId === s.toLowerCase() && styles.supplierBtnActive]}
+                                        onPress={() => logic.handleSupplierChange(s.toLowerCase())}
                                     >
-                                        <Text style={[styles.supplierText, formState.supplierId === s.toLowerCase() && styles.supplierTextActive]}>{s}</Text>
+                                        <Text style={[styles.supplierText, logic.formState.supplierId === s.toLowerCase() && styles.supplierTextActive]}>{s}</Text>
                                     </Pressable>
                                 ))}
                             </View>
                         </View>
 
-                        {tip ? (
+                        {logic.tip ? (
                             <View style={styles.tipBox}>
-                                <Text style={styles.tipText}>💡 {tip}</Text>
+                                <Text style={styles.tipText}>💡 {logic.tip}</Text>
                             </View>
                         ) : (
-                            <Pressable style={styles.insightBtn} onPress={handleGetInsight}>
+                            <Pressable style={styles.insightBtn} onPress={logic.handleGetInsight}>
                                 <Text style={styles.insightBtnText}>Get AI Insight</Text>
                             </Pressable>
                         )}
@@ -284,10 +207,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                     </ScrollView>
 
                     <View style={styles.footer}>
-                        <Pressable style={styles.retireBtn} onPress={handleRetire}>
+                        <Pressable style={styles.retireBtn} onPress={logic.handleRetire}>
                             <Text style={styles.retireText}>Retire</Text>
                         </Pressable>
-                        <Pressable style={styles.saveBtn} onPress={handleSave}>
+                        <Pressable style={styles.saveBtn} onPress={logic.handleSave}>
                             <Text style={styles.saveText}>Save Changes</Text>
                         </Pressable>
                     </View>

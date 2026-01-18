@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, ScrollView, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
-import { useFinancialReportLogic } from '../hooks/useFinancialReportLogic';
 import { formatCurrency } from '../hooks/NativeEconomy';
+import { useFinancialReportLogic } from '../hooks/useFinancialReportLogic';
 
 const FinancialReportScreen = () => {
     const navigation = useNavigation();
