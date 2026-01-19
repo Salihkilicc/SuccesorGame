@@ -1,271 +1,351 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { create } from 'zustand';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { useUserStore } from '../../../../core/store/useUserStore';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
-import { Alert } from 'react-native';
+import { useGameStore } from '../../../../core/store/useGameStore';
 
-// --- TYPES ---
-export type GymTier = 'titanium' | 'elite';
-export type GymMembershipType = GymTier; // Alias for compatibility
-export type TrainerId = 'sarah' | 'marcus' | 'ken';
-export type SupplementType = 'none' | 'protein' | 'creatine' | 'preworkout' | 'steroids';
-export type MartialArtDiscipline = 'boxing' | 'mma' | 'kungfu' | 'karate' | 'kravmaga';
+// ============================================================================
+// 1. TYPE DEFINITIONS & CONSTANTS
+// ============================================================================
 
-export const GYM_TIERS: Record<GymTier, { name: string; cost: number; multiplier: number }> = {
-    titanium: { name: 'Titanium Club', cost: 2000, multiplier: 1 },
-    elite: { name: 'Olympus Elite', cost: 25000, multiplier: 2 },
+export type GymViewType = 'HUB' | 'MEMBERSHIP' | 'MARTIAL_ARTS' | 'TRAINER' | 'SUPPLEMENTS' | 'WORKOUT';
+
+export type MembershipTier = 'STANDARD' | 'TITANIUM'; // $2500 vs $50k
+export type BodyType = 'Skinny' | 'Fit' | 'Muscular' | 'Godlike';
+export type MartialArtStyle = 'boxing' | 'mma' | 'muaythai' | 'bjj' | 'karate';
+export type BeltRank = 0 | 1 | 2 | 3 | 4 | 5; // White -> Black
+export type TrainerTier = 'none' | 'rookie' | 'local' | 'influencer' | 'legend';
+export type WorkoutType = 'Yoga' | 'Weights' | 'Running' | 'Pilates';
+export type SupplementType = 'protein' | 'creatine' | 'steroids';
+
+export const BELT_TITLES: Record<BeltRank, string> = {
+    0: 'White Belt',
+    1: 'Blue Belt',
+    2: 'Purple Belt',
+    3: 'Brown Belt',
+    4: 'Black Belt',
+    5: 'Grandmaster',
 };
 
-export const TRAINERS: Record<TrainerId, { name: string; cost: number; multiplier: number; label: string }> = {
-    sarah: { name: 'Sarah', cost: 2000, multiplier: 1.15, label: 'Fitness' },
-    marcus: { name: 'Marcus', cost: 3500, multiplier: 1.25, label: 'Hypertrophy' },
-    ken: { name: 'Master Ken', cost: 5000, multiplier: 1.4, label: 'Martial Arts' },
+export const MEMBERSHIP_PRICING = {
+    STANDARD: { annual: 2500, monthly: 250 },
+    TITANIUM: { annual: 50000, monthly: 5000, req: 'Godlike' },
+} as const;
+
+export const TRAINER_COSTS: Record<TrainerTier, number> = {
+    none: 0,
+    rookie: 50,
+    local: 200,
+    influencer: 1000,
+    legend: 10000,
 };
 
-export const MARTIAL_ARTS_BELTS = ['White', 'Yellow', 'Orange', 'Green', 'Blue', 'Brown', 'Black'];
-
-export type WorkoutResult = {
-    healthChange: number;
-    stressChange: number;
-    charismaChange: number;
-    enjoyment?: number;
-    message: string;
-    promoted?: boolean;
-    newBelt?: string;
+export const TRAINER_MULTIPLIERS: Record<TrainerTier, number> = {
+    none: 1.0,
+    rookie: 1.1,
+    local: 1.5,
+    influencer: 2.5,
+    legend: 5.0,
 };
+
+export const FATIGUE_LIMIT = 80;
+
+// ============================================================================
+// 2. MODAL VISIBILITY STORE (Internal)
+// ============================================================================
+
+interface GymUIState {
+    isVisible: boolean;
+    activeView: GymViewType;
+    openGym: () => void;
+    closeGym: () => void;
+    navigate: (view: GymViewType) => void;
+}
+
+export const useGymUIStore = create<GymUIState>((set) => ({
+    isVisible: false,
+    activeView: 'HUB',
+    openGym: () => set({ isVisible: true, activeView: 'HUB' }),
+    closeGym: () => set({ isVisible: false }),
+    navigate: (view) => set({ activeView: view }),
+}));
+
+// ============================================================================
+// 3. MAIN HOOK
+// ============================================================================
 
 export const useGymSystem = () => {
+    // Stores
     const { money, spendMoney, update: updateStats } = useStatsStore();
     const { gymState, updateGymState } = useUserStore();
-    const { core, attributes, updateCore, updateAttribute } = usePlayerStore();
-    const { health, stress } = core;
-    const charisma = attributes.charm;
+    const { attributes, core, updateAttribute, updateCore } = usePlayerStore();
+    const { currentMonth } = useGameStore();
 
-    // --- MODAL VISIBILITY ---
-    const [membershipModalVisible, setMembershipModalVisible] = useState(false);
-    const [hubModalVisible, setHubModalVisible] = useState(false);
-    const [trainerModalVisible, setTrainerModalVisible] = useState(false);
-    const [supplementModalVisible, setSupplementModalVisible] = useState(false);
-    const [fitnessConfigVisible, setFitnessConfigVisible] = useState(false);
-    const [martialArtsModalVisible, setMartialArtsModalVisible] = useState(false);
-    const [resultModalVisible, setResultModalVisible] = useState(false);
+    // UI Store
+    const ui = useGymUIStore();
 
-    // --- SELECTION STATE ---
-    const [selectedFitnessType, setSelectedFitnessType] = useState<'cardio' | 'hypertrophy' | 'yoga' | 'calisthenics' | null>(null);
-    const [selectedMartialArt, setSelectedMartialArt] = useState<MartialArtDiscipline | null>(null);
+    // --- Computed Values ---
+    const currentQuarter = Math.floor((currentMonth - 1) / 3) + 1;
+    const strength = attributes.strength || 0;
 
-    const [workoutInProgress, setWorkoutInProgress] = useState(false);
-    const [lastResult, setLastResult] = useState<WorkoutResult | null>(null);
+    const bodyType: BodyType = useMemo(() => {
+        if (strength < 25) return 'Skinny';
+        if (strength < 50) return 'Fit';
+        if (strength < 90) return 'Muscular';
+        return 'Godlike';
+    }, [strength]);
 
-    // --- ACTIONS ---
+    const fatigue = gymState.combatStrength || 0;
+    const membership = gymState.membership; // 'STANDARD' | 'TITANIUM' | null
+    const trainerId = (gymState.trainerId || 'none') as TrainerTier;
 
-    const buyMembership = useCallback((tier: GymTier) => {
-        const cost = GYM_TIERS[tier].cost;
-        if (money < cost) {
-            Alert.alert('Insufficient Funds', "You can't afford this membership.");
-            return;
+    const selectedArt = gymState.selectedArt as MartialArtStyle | null;
+    const trainingCount = gymState.trainingCount || 0;
+    const lastTrainedQuarter = gymState.lastTrainedQuarter || 0;
+    const gymMastery = gymState.gymStatus || 0;
+
+    // Supplement Usage tracking
+    const supplementUsage = gymState.supplementUsage || { protein: 0, creatine: 0, steroids: 0 };
+
+    // Get current rank for selected art
+    const beltRank = selectedArt
+        ? ((gymState.martialArts?.[selectedArt] || 0) as BeltRank)
+        : 0;
+
+    const beltTitle = BELT_TITLES[beltRank];
+
+    // --- Helpers ---
+
+    const getMartialArtsLabel = useCallback(() => {
+        if (!selectedArt) return 'Martial Arts';
+        return `${selectedArt.toUpperCase()} 🥊`;
+    }, [selectedArt]);
+
+    const getMartialArtsButtonLabel = getMartialArtsLabel;
+
+    const calculatePotentialGain = useCallback(() => {
+        const baseGain = 0.2; // REDUCED from 0.5
+        const multiplier = TRAINER_MULTIPLIERS[trainerId] || 1.0;
+        return baseGain * multiplier;
+    }, [trainerId]);
+
+    // --- Actions ---
+
+    const selectArt = useCallback((style: MartialArtStyle) => {
+        updateGymState({ selectedArt: style });
+        // Initialize if empty
+        if (gymState.martialArts?.[style] === undefined) {
+            updateGymState({
+                martialArts: { ...gymState.martialArts, [style]: 0 }
+            });
         }
+    }, [gymState, updateGymState]);
 
-        // Check Unlock
-        if (tier === 'elite' && !gymState.unlockedTiers.includes('elite')) {
-            // Double check status just in case (though UI should block)
-            if (gymState.gymStatus < 90) {
-                Alert.alert('Locked', 'You need higher gym status.');
-                return;
-            }
-        }
+    const trainMartialArts = useCallback((style?: MartialArtStyle) => {
+        const artToTrain = style || selectedArt;
 
-        if (!spendMoney(cost)) {
-            Alert.alert('Insufficient Funds', "You can't afford this membership.");
-            return;
-        }
+        if (!artToTrain) return { success: false, message: 'Select a style first.' };
+        if (fatigue > FATIGUE_LIMIT) return { success: false, message: 'Too fatigued (>80%)' };
+        if (lastTrainedQuarter === currentQuarter) return { success: false, message: 'Already trained this quarter.' };
 
-        updateGymState({ membership: tier });
+        const newFatigue = Math.min(100, fatigue + 45);
 
-        // Auto-unlock elite if buying it
-        if (tier === 'elite' && !gymState.unlockedTiers.includes('elite')) {
-            updateGymState({ unlockedTiers: [...gymState.unlockedTiers, 'elite'] });
-        }
+        // Progression
+        let nextCount = trainingCount + 1;
+        let nextRank = beltRank;
+        const currentArtRank = (gymState.martialArts?.[artToTrain] || 0) as BeltRank;
 
-        setMembershipModalVisible(false);
-        setTimeout(() => setHubModalVisible(true), 500);
-    }, [money, gymState, updateStats, updateGymState]);
-
-
-    const hireTrainer = useCallback((id: TrainerId) => {
-        const trainer = TRAINERS[id];
-        if (money < trainer.cost) {
-            Alert.alert('Insufficient Funds', 'Cannot afford this trainer.');
-            return;
-        }
-        if (!spendMoney(trainer.cost)) {
-            Alert.alert('Insufficient Funds', 'Cannot afford this trainer.');
-            return;
-        }
-        updateGymState({ trainerId: id });
-        setTrainerModalVisible(false);
-    }, [money, updateStats, updateGymState]);
-
-
-    const attemptUnlockElite = useCallback(() => {
-        if (gymState.gymStatus >= 90) {
-            if (!gymState.unlockedTiers.includes('elite')) {
-                updateGymState({ unlockedTiers: [...gymState.unlockedTiers, 'elite'] });
-                Alert.alert('Unlocked!', 'You have been invited to Olympus Elite.');
-            }
-        } else {
-            Alert.alert('Access Denied', `You need 90% Gym Status. Current: ${gymState.gymStatus.toFixed(1)}%`);
-        }
-    }, [gymState.gymStatus, gymState.unlockedTiers, updateGymState]);
-
-    // --- WORKOUT LOGIC ---
-
-    const completeFitnessWorkout = useCallback((type: string, config: any) => {
-        // Base calculation
-        let dHealth = 0, dStress = 0, dCharisma = 0, dStatus = 0.5;
-        let message = "Workout Complete";
-
-        // Apply Config specifics (simplified for now)
-        if (type === 'cardio') {
-            dHealth = 2; dStress = -3; dCharisma = 1; dStatus = 1;
-        } else if (type === 'hypertrophy') {
-            dHealth = 1; dStress = -1; dCharisma = 3; dStatus = 1.5;
-        } else if (type === 'yoga') {
-            dHealth = 1; dStress = -5; dStatus = 0.5;
-        } else if (type === 'calisthenics') {
-            dHealth = 2; dStress = -2; dCharisma = 2; dStatus = 1;
-        }
-
-        // Multipliers
-        const tierMult = gymState.membership === 'elite' ? 2 : 1;
-        const trainerMult = gymState.trainerId ? TRAINERS[gymState.trainerId].multiplier : 1;
-
-        dHealth *= tierMult * trainerMult;
-        dStress *= tierMult * trainerMult;
-        dCharisma *= tierMult * trainerMult;
-        dStatus *= tierMult;
-
-        // Update State
-        // Update State
-        updateCore('health', health + dHealth);
-        updateCore('stress', stress + dStress);
-        updateAttribute('charm', charisma + dCharisma);
-
-        updateGymState({
-            gymStatus: Math.min(100, gymState.gymStatus + dStatus)
-        });
-
-        setLastResult({
-            healthChange: Math.round(dHealth),
-            stressChange: Math.round(dStress),
-            charismaChange: Math.round(dCharisma),
-            enjoyment: Math.floor(Math.random() * 40) + 60, // 60-100%
-            message
-        });
-
-        setWorkoutInProgress(false);
-        setResultModalVisible(true);
-    }, [health, stress, charisma, gymState, updateStats, updateGymState, updateCore, updateAttribute]);
-
-    const startFitnessWorkout = useCallback((type: string, config: any) => {
-        setFitnessConfigVisible(false);
-        setWorkoutInProgress(true);
-
-        setTimeout(() => {
-            completeFitnessWorkout(type, config);
-        }, 2000);
-    }, [completeFitnessWorkout]);
-
-
-    const completeMartialArtsTraining = useCallback((discipline: MartialArtDiscipline) => {
-        const currentLevel = gymState.martialArts[discipline] || 0;
-        // 3 sessions per level approx (simplified logic: randomness slightly aids progression or fixed counter)
-        // Implementation Plan requested: "Every 3rd workout promotes". 
-        // To strictly track "3rd workout", we'd need a counter per discipline. 
-        // For now, I'll assume probability or just use status increment as proxy, 
-        // BUT to follow user request exactly, let's just use RNG for promotion (33%) OR add a field later.
-        // Let's use flexible RNG for now to avoid schema bloat, effectively simulates "sometimes you level up".
-        // actually, let's just make it simpler: Level Up Chance = 35%. 
-
+        const req = currentArtRank === 3 ? 6 : 3;
         let promoted = false;
-        let newLevel = currentLevel;
-        if (currentLevel < 6 && Math.random() < 0.35) {
+
+        if (currentArtRank < 5 && nextCount >= req) {
+            nextRank = (currentArtRank + 1) as BeltRank;
+            nextCount = 0;
             promoted = true;
-            newLevel = currentLevel + 1;
-        }
-
-        const dStrength = 2;
-        const dCharisma = promoted ? 5 : 1;
-
-        updateAttribute('charm', charisma + dCharisma);
-        const newMartialArts = { ...gymState.martialArts, [discipline]: newLevel };
-        updateGymState({
-            martialArts: newMartialArts,
-            combatStrength: gymState.combatStrength + dStrength,
-            gymStatus: Math.min(100, gymState.gymStatus + 0.8)
-        });
-
-        setLastResult({
-            healthChange: 0,
-            stressChange: -2,
-            charismaChange: dCharisma,
-            message: promoted ? `Training Complete! You feel stronger.` : "Good training session.",
-            promoted,
-            newBelt: promoted ? MARTIAL_ARTS_BELTS[newLevel] : undefined
-        });
-
-        setWorkoutInProgress(false);
-        setResultModalVisible(true);
-    }, [gymState, charisma, updateStats, updateGymState, updateAttribute]);
-
-    const startMartialArtsTraining = useCallback((discipline: MartialArtDiscipline) => {
-        setWorkoutInProgress(true);
-
-        setTimeout(() => {
-            completeMartialArtsTraining(discipline);
-        }, 2000);
-    }, [completeMartialArtsTraining]);
-
-    const openGym = useCallback(() => {
-        if (gymState.membership) {
-            setHubModalVisible(true);
         } else {
-            setMembershipModalVisible(true);
+            nextRank = currentArtRank;
         }
-    }, [gymState.membership]);
+
+        updateGymState({
+            combatStrength: newFatigue,
+            trainingCount: nextCount,
+            lastTrainedQuarter: currentQuarter,
+            martialArts: {
+                ...gymState.martialArts,
+                [artToTrain]: nextRank
+            }
+        });
+
+        updateAttribute('strength', Math.min(100, strength + 3));
+
+        return {
+            success: true,
+            newBelt: promoted ? BELT_TITLES[nextRank] : undefined,
+            newRank: nextRank,
+            message: promoted ? `Promoted to ${BELT_TITLES[nextRank]}!` : 'Training Complete'
+        };
+
+    }, [fatigue, selectedArt, lastTrainedQuarter, currentQuarter, trainingCount, beltRank, gymState, updateGymState, strength, updateAttribute]);
+
+    const trainWorkout = useCallback((type: WorkoutType) => {
+        if (fatigue > FATIGUE_LIMIT) return { success: false, message: 'Too fatigued (Must be < 80%)' };
+
+        const gain = calculatePotentialGain();
+
+        // Stats Affected: Strength and GymMastery = Gain. Charm = 10% of Gain.
+        const charmGain = gain * 0.10;
+
+        const newMastery = Math.min(100, gymMastery + gain);
+        const newFatigue = Math.min(100, fatigue + 15);
+
+        // Apply Updates
+        updateGymState({
+            gymStatus: newMastery,
+            combatStrength: newFatigue,
+        });
+
+        // Update Stats
+        updateAttribute('strength', Math.min(100, strength + gain));
+        updateAttribute('charm', Math.min(100, (attributes.charm || 0) + charmGain)); // NEW: Charm Gain
+
+        // Trainer Health Bonus (small perk to keep trainer relevant for health)
+        // Original logic had specific bonuses, but request implies strict simplified formula.
+        // "Strength += actualGain".
+        // Use existing health bonus logic? Request says "Stats Affected: Strength, GymMastery, Charm". 
+        // It does NOT mention Health. I will remove health gain to strictly follow request.
+
+        return {
+            success: true,
+            message: `${type} Complete! Mastery +${gain.toFixed(2)}%`,
+            gains: { mastery: gain, strength: gain, charm: charmGain }
+        };
+    }, [fatigue, trainerId, gymMastery, calculatePotentialGain, updateGymState, updateAttribute, strength, attributes.charm]);
+
+
+    const buyMembership = useCallback((tier: MembershipTier) => {
+        const price = MEMBERSHIP_PRICING[tier].annual;
+        if (tier === 'TITANIUM' && bodyType !== 'Godlike') {
+            return { success: false, message: 'Requires Godlike Body' };
+        }
+        if (money < price) return { success: false, message: 'Insufficient Funds' };
+
+        spendMoney(price);
+        updateGymState({ membership: tier });
+        return { success: true, message: `Joined ${tier} Membership!` };
+    }, [money, bodyType, spendMoney, updateGymState]);
+
+    const hireTrainer = useCallback((tier: TrainerTier) => {
+        updateGymState({ trainerId: tier });
+        return { success: true, message: 'Trainer Hired' };
+    }, [updateGymState]);
+
+    // --- Consumable Supplement Logic ---
+    const consumeSupplement = useCallback((type: SupplementType) => {
+        // Init usage if undefined (safe check)
+        const usage = gymState.supplementUsage || { protein: 0, creatine: 0, steroids: 0 };
+
+        // Check if already used this quarter
+        if (usage[type] === currentQuarter) {
+            return { success: false, message: `Already used ${type} this quarter.` };
+        }
+
+        let masteryGain = 0;
+        let healthCost = 0;
+        let strengthGain = 0;
+
+        if (type === 'steroids') {
+            masteryGain = 7.0; // Massive Gain
+            healthCost = 45;   // Massive Damage
+            strengthGain = 5;
+        } else {
+            // Protein & Creatine: NO STAT GAINS strictly as requested.
+            masteryGain = 0;
+            healthCost = 0;
+            strengthGain = 0;
+        }
+
+        // Safety Valve for Steroids
+        if (type === 'steroids' && (core.health || 0) < 50) {
+            return { success: false, message: 'Health too low for steroids! (Need > 50)' };
+        }
+
+        // Apply Logic
+        const newMastery = Math.min(100, gymMastery + masteryGain);
+        const newHealth = Math.max(0, (core.health || 0) - healthCost); // Clamp at 0
+        const newStrength = Math.min(100, strength + strengthGain);
+
+        // Update State
+        updateGymState({
+            gymStatus: newMastery,
+            supplementUsage: {
+                ...usage,
+                [type]: currentQuarter
+            }
+        });
+
+        if (healthCost > 0) updateCore('health', newHealth);
+        if (strengthGain > 0) updateAttribute('strength', newStrength);
+
+        return {
+            success: true,
+            message: `Consumed ${type}!`,
+            effects: { mastery: masteryGain, health: -healthCost }
+        };
+
+    }, [gymState, currentQuarter, gymMastery, core.health, strength, updateGymState, updateCore, updateAttribute]);
 
     return {
-        // State
-        membershipModalVisible,
-        hubModalVisible,
-        trainerModalVisible,
-        supplementModalVisible,
-        fitnessConfigVisible,
-        martialArtsModalVisible,
-        resultModalVisible,
-        workoutInProgress,
-        selectedFitnessType,
-        selectedMartialArt,
-        lastResult,
-        gymState,
-
-        // Setters
-        setMembershipModalVisible,
-        setHubModalVisible,
-        setTrainerModalVisible,
-        setSupplementModalVisible,
-        setFitnessConfigVisible,
-        setMartialArtsModalVisible,
-        setResultModalVisible,
-        setSelectedFitnessType,
-        setSelectedMartialArt,
+        // State (Single Modal Architecture)
+        isVisible: ui.isVisible,
+        activeView: ui.activeView,
 
         // Actions
-        openGym,
+        openGym: ui.openGym,
+        closeGym: ui.closeGym,
+        navigate: ui.navigate,
+        goBackToHub: () => ui.navigate('HUB'), // Logic Alias as requested
+
+        // Convenience wrappers (Component Compatibility)
+        openMartialArts: () => ui.navigate('MARTIAL_ARTS'),
+        openTrainer: () => ui.navigate('TRAINER'),
+        openMembership: () => ui.navigate('MEMBERSHIP'),
+        openSupplements: () => ui.navigate('SUPPLEMENTS'),
+        openWorkout: () => ui.navigate('WORKOUT'),
+
+        // Data
+        membership,
+        bodyType,
+        fatigue,
+        selectedArt,
+        beltRank,
+        beltTitle,
+        trainingCount,
+        lastTrainedQuarter,
+        gymState,
+        currentQuarter,
+        trainerId,
+        gymMastery,
+        supplementUsage,
+
+        // Constants
+        BELT_TITLES,
+        MEMBERSHIP_PRICING,
+        TRAINER_COSTS,
+        TRAINER_MULTIPLIERS,
+
+        // Actions
+        getMartialArtsLabel,
+        getMartialArtsButtonLabel,
+        calculatePotentialGain,
+        selectArt,
+        trainMartialArts,
+        trainWorkout,
         buyMembership,
         hireTrainer,
-        attemptUnlockElite,
-        startFitnessWorkout,
-        startMartialArtsTraining
+        consumeSupplement,
+
+        // Legacy/Alias for back compat if needed (but we strictly follow new API)
+        exitGym: ui.closeGym
     };
 };

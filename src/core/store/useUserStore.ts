@@ -74,11 +74,21 @@ export type UserState = {
   hasEngagementRing: boolean;
   gymState: {
     gymStatus: number; // 0-100
-    membership: 'titanium' | 'elite' | null;
-    unlockedTiers: ('titanium' | 'elite')[];
-    trainerId: 'sarah' | 'marcus' | 'ken' | null;
+    membership: 'STANDARD' | 'TITANIUM' | null;
+    unlockedTiers: ('STANDARD' | 'TITANIUM')[];
+    trainerId: 'none' | 'rookie' | 'local' | 'influencer' | 'legend' | null;
     martialArts: Record<string, number>; // discipline -> level (0-6)
     combatStrength: number;
+    // Gym 3.0 Fields
+    selectedArt: string | null; // e.g., 'Boxing', 'Muay Thai'
+    trainingCount: number; // Progress to next belt
+    lastTrainedQuarter: number; // To lock training once per quarter
+    // NEW: Supplement Tracking
+    supplementUsage?: {
+      protein: number;
+      creatine: number;
+      steroids: number;
+    };
   };
 };
 
@@ -145,7 +155,7 @@ export const initialUserState: UserState = {
   gymState: {
     gymStatus: 0,
     membership: null,
-    unlockedTiers: ['titanium'],
+    unlockedTiers: ['titanium'] as ('STANDARD' | 'TITANIUM')[],
     trainerId: null,
     martialArts: {
       boxing: 0,
@@ -155,6 +165,14 @@ export const initialUserState: UserState = {
       kravmaga: 0,
     },
     combatStrength: 0,
+    selectedArt: null,
+    trainingCount: 0,
+    lastTrainedQuarter: 0,
+    supplementUsage: {
+      protein: 0,
+      creatine: 0,
+      steroids: 0
+    }
   },
 };
 

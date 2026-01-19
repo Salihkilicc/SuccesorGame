@@ -493,9 +493,42 @@ export const useGameStore = create<GameStore>()(
               setbackMessage = eduResult.message;
             }
           }
+
+          // 7e. GYM QUARTERLY RESET (Gym 3.0 Integration)
+          const userStore = useUserStore.getState();
+          userStore.updateGymState({
+            combatStrength: 0, // Reset fatigue to 0%
+          });
+          console.log('[Gym] Quarterly reset: Fatigue cleared to 0%');
         }
 
-        // 8. Sonucu UI'ın beklediği formatta döndür
+        // 8. ANNUAL GYM MEMBERSHIP PAYMENT (Gym 3.0 Integration)
+        if (newMonth === 1) { // January
+          const userStore = useUserStore.getState();
+          const { membership } = userStore.gymState;
+
+          if (membership) { // Check if membership exists (not null)
+            const { MEMBERSHIP_PRICING } = require('../../features/life/components/Gym/useGymSystem');
+            const annualCost = MEMBERSHIP_PRICING[membership].annual;
+
+            // Try to deduct payment
+            const statsStore = useStatsStore.getState();
+            if (statsStore.spendMoney(annualCost)) {
+              console.log(`[Gym] Annual ${membership} membership renewed: $${annualCost.toLocaleString()}`);
+            } else {
+              // Insufficient funds - cancel membership
+              userStore.updateGymState({ membership: null });
+              console.warn(`[Gym] Membership cancelled due to insufficient funds.`);
+
+              // Add to setback message if not already set
+              if (!setbackMessage && !operationalSetback) {
+                setbackMessage = `Your gym membership was cancelled due to insufficient funds.`;
+              }
+            }
+          }
+        }
+
+        // 9. Sonucu UI'ın beklediği formatta döndür
         const result: EconomyResult = {
           status: newCompanyCapital < 0 ? 'bankrupt' : 'active',
           reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,

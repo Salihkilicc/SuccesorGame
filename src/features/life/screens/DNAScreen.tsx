@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { theme } from '../../../core/theme';
 import { useRelationshipBuffs } from '../../love/hooks/useRelationshipBuffs';
+import { useGymSystem } from '../components/Gym/useGymSystem';
 
 // İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
 // Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
@@ -55,6 +56,17 @@ const DNAScreen = () => {
     // Relationship Buffs
     const { intellectBoost, strengthBoost, socialBoost } = useRelationshipBuffs();
 
+    // Gym 3.0 Integration
+    const { selectedArt, beltTitle, beltRank, bodyType, fatigue } = useGymSystem();
+
+    // Security Level based on belt rank (0-5 = 0-50%)
+    const securityLevel = beltRank * 10;
+
+    // Display text for martial arts
+    const martialArtsDisplay = selectedArt
+        ? `${selectedArt.charAt(0).toUpperCase() + selectedArt.slice(1)} - ${beltTitle}`
+        : 'None';
+
     const handleBack = () => navigation.goBack();
 
     // Kuşak rengine göre yazı rengini ayarlayan yardımcı fonksiyon
@@ -96,34 +108,38 @@ const DNAScreen = () => {
                 <View style={styles.card}>
                     <SectionHeader title="Security & Safety" icon="🛡️" />
                     <ProgressBar label="Digital Shield" value={security?.digital} color="#3498db" icon="💻" />
-                    <ProgressBar label="Bodyguard / Armor" value={security?.personal} color="#e74c3c" icon="🥋" />
+                    <ProgressBar label="Bodyguard / Armor" value={securityLevel} color="#e74c3c" icon="🥋" />
                     <ProgressBar label="Police Heat" value={reputation?.police} color="#f39c12" icon="🚨" />
                 </View>
 
-                {/* 🥋 SKILLS - Yeni Özellik */}
+                {/* 🥋 SKILLS - Gym 3.0 Integration */}
                 <View style={styles.card}>
                     <SectionHeader title="Combat Mastery" icon="👊" />
                     <View style={styles.skillRow}>
                         <View>
-                            <Text style={styles.skillName}>Martial Arts</Text>
+                            <Text style={styles.skillName}>Self Defense</Text>
                             <Text style={styles.skillDetail}>
-                                Rank: <Text style={{ fontWeight: 'bold' }}>{skills?.martialArts?.belt || 'White'}</Text> Belt
-                                (Lvl {skills?.martialArts?.level || 1})
+                                {martialArtsDisplay}
+                            </Text>
+                            <Text style={styles.skillDetail}>
+                                Security Boost: <Text style={{ fontWeight: 'bold', color: '#2ecc71' }}>+{securityLevel}%</Text>
+                            </Text>
+                            <Text style={styles.skillDetail}>
+                                Body Type: <Text style={{ fontWeight: 'bold', color: '#f39c12' }}>{bodyType}</Text>
                             </Text>
                         </View>
-                        <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(skills?.martialArts?.belt) }]} >
-                            <Text style={[styles.beltText, { color: getBeltTextColor(skills?.martialArts?.belt) }]}>
-                                {skills?.martialArts?.belt || 'White'}
+                        <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(beltTitle) }]} >
+                            <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>
+                                {beltTitle}
                             </Text>
                         </View>
                     </View>
                     <ProgressBar
-                        label="Next Belt Progress"
-                        value={skills?.martialArts?.progress}
+                        label="Fatigue Level"
+                        value={fatigue}
                         max={100}
-                        color="#2ecc71"
-                        icon="📈"
-                        buff={strengthBoost > 0 ? `+${strengthBoost}%` : undefined}
+                        color={fatigue > 80 ? '#e74c3c' : '#2ecc71'}
+                        icon="⚡"
                     />
                 </View>
 

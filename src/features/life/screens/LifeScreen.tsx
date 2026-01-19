@@ -18,8 +18,7 @@ import NightOutSetupModal from '../components/NightOut/NightOutSetupModal';
 import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
 import CondomDecisionModal from '../components/NightOut/CondomDecisionModal';
 import { useGymSystem } from '../components/Gym/useGymSystem';
-import GymMembershipModal from '../components/Gym/GymMembershipModal';
-import GymHubModal from '../components/Gym/GymHubModal';
+import GymMasterModal from '../components/Gym/GymMasterModal';
 import { useTravelSystem } from '../components/Travel/useTravelSystem';
 import TravelDestinationModal from '../components/Travel/TravelDestinationModal';
 import TravelCompanionModal from '../components/Travel/TravelCompanionModal';
@@ -205,40 +204,8 @@ const LifeScreen = () => {
     handleCondomDecision,
   } = useNightOutSystem(triggerEncounter);
 
-  const {
-    membershipModalVisible,
-    hubModalVisible,
-    trainerModalVisible,
-    supplementModalVisible,
-    fitnessConfigVisible,
-    martialArtsModalVisible,
-    resultModalVisible,
-
-    workoutInProgress,
-    selectedFitnessType,
-    selectedMartialArt,
-    lastResult,
-    gymState,
-
-    setMembershipModalVisible,
-    setHubModalVisible,
-    setTrainerModalVisible,
-    setSupplementModalVisible,
-    setFitnessConfigVisible,
-    setMartialArtsModalVisible,
-    setResultModalVisible,
-
-    setSelectedFitnessType,
-    setSelectedMartialArt,
-
-    openGym,
-    buyMembership,
-    hireTrainer,
-    // attemptUnlockElite,
-    // attemptUnlockElite,
-    startFitnessWorkout,
-    startMartialArtsTraining
-  } = useGymSystem();
+  // Gym System Hook
+  const { openGym } = useGymSystem();
 
   const {
     // Visibility
@@ -564,26 +531,8 @@ const LifeScreen = () => {
         onDecision={handleCondomDecision}
       />
 
-      {/* Gym Modals */}
-      <GymMembershipModal
-        visible={membershipModalVisible}
-        onClose={() => setMembershipModalVisible(false)}
-        onPurchase={buyMembership}
-      />
-      <GymHubModal
-        visible={hubModalVisible}
-        onClose={() => setHubModalVisible(false)}
-        gymStatus={gymState.gymStatus}
-        trainerId={gymState.trainerId}
-        onHireTrainer={hireTrainer}
-        onStartFitness={startFitnessWorkout}
-        martialArtsLevels={gymState.martialArts}
-        onStartMartialArts={startMartialArtsTraining}
-        workoutInProgress={workoutInProgress}
-        lastResult={lastResult}
-        onResultClose={() => setResultModalVisible(false)}
-        showResult={resultModalVisible}
-      />
+      {/* Gym System (Layered Master Modal) */}
+      <GymMasterModal />
 
       {/* Travel Modals */}
       <TravelDestinationModal
