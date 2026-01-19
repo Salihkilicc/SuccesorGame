@@ -17,15 +17,18 @@ interface Props {
 }
 
 const GymMembershipView = () => {
+    const { data, actions, activeView, isVisible } = useGymSystem();
     const {
-        activeView,
-        isVisible,
+        membership,
+        stats
+    } = data;
+    const { bodyType } = stats;
+
+    const {
         openGym,
         goBackToHub,
-        membership,
-        buyMembership,
-        bodyType
-    } = useGymSystem();
+        buyMembership
+    } = actions;
 
     const prices = MEMBERSHIP_PRICING;
 
@@ -178,18 +181,18 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    cardTitle: { fontSize: 18, fontWeight: '900', color: '#FFF', letterSpacing: 1 },
+    cardTitle: { fontSize: 15, fontWeight: '900', color: '#FFF', letterSpacing: 0.5 },
     ownedBadge: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         color: '#111827',
         backgroundColor: '#FFF',
-        paddingHorizontal: 8,
+        paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 8
+        borderRadius: 6
     },
-    cardContent: { padding: 16, gap: 12 },
-    price: { fontSize: 24, fontWeight: '800', color: '#111827' },
+    cardContent: { padding: 12, gap: 8 },
+    price: { fontSize: 18, fontWeight: '800', color: '#111827' },
     features: { gap: 4 },
     featureItem: { fontSize: 14, color: '#4B5563', fontWeight: '500' },
     actionBtn: {

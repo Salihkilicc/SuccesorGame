@@ -1,126 +1,107 @@
 import React from 'react';
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    SafeAreaView,
-    Alert
-} from 'react-native';
-import { useGymSystem, WorkoutType, TRAINER_MULTIPLIERS } from './useGymSystem';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { useGymSystem, WorkoutType } from './useGymSystem';
 
-interface Props {
-    visible?: boolean;
-    onClose?: () => void;
-}
-
-const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; focus: string; color: string }[] = [
-    { id: 'Weights', label: 'Weights', icon: '🏋️‍♂️', focus: 'Strength Focus', color: '#EF4444' },
-    { id: 'Yoga', label: 'Yoga', icon: '🧘‍♂️', focus: 'Health Focus', color: '#10B981' },
-    { id: 'Running', label: 'Running', icon: '🏃‍♂️', focus: 'Stamina Focus', color: '#F59E0B' },
-    { id: 'Pilates', label: 'Pilates', icon: '🤸', focus: 'Flexibility Focus', color: '#8B5CF6' },
+const WORKOUTS: { type: WorkoutType; icon: string; label: string; desc: string }[] = [
+    { type: 'Weights', icon: '🏋️', label: 'Weights', desc: 'Build raw power' },
+    { type: 'Yoga', icon: '🧘', label: 'Yoga', desc: 'Flexibility & balance' },
+    { type: 'Running', icon: '🏃', label: 'Running', desc: 'Cardio endurance' },
+    { type: 'Pilates', icon: '🤸', label: 'Pilates', desc: 'Core strength' },
 ];
 
+/**
+ * GYM WORKOUT CONFIG VIEW
+ * 
+ * Displays workout options in a 2x2 grid.
+ * Each workout applies the same base formula with trainer multipliers.
+ */
 const GymWorkoutConfigView = () => {
-    const {
-        activeView,
-        isVisible,
-        goBackToHub, // Navigation Alias
-        trainWorkout,
-        trainerId,
-        calculatePotentialGain,
-    } = useGymSystem();
+    // --- Hook Destructuring ---
+    const { data, actions } = useGymSystem();
+    const { stats, trainerId } = data;
+    const { goBackToHub, trainWorkout, calculatePotentialGain } = actions;
 
-    const handleBack = () => {
-        goBackToHub();
-    };
+    const { fatigue } = stats;
+    const potentialGain = calculatePotentialGain();
 
-    const handleTrain = (type: WorkoutType) => {
+    // --- Handler ---
+    const handleWorkout = (type: WorkoutType) => {
         const result = trainWorkout(type);
-        if (result.success) {
+        if (result.success && result.gains) {
             Alert.alert(
                 'Workout Complete! 💪',
-                `${result.message}\nFatigue: +15%`,
-                [{ text: 'OK', onPress: handleBack }]
+                `Strength +${result.gains.strength.toFixed(2)}\nCharm +${result.gains.charm.toFixed(2)}`
             );
         } else {
             Alert.alert('Cannot Train', result.message);
         }
     };
 
-    const multiplier = TRAINER_MULTIPLIERS[trainerId] || 1.0;
-    const potentialGain = calculatePotentialGain().toFixed(2);
-
-    // Trainer Badge Display
-    const trainerName = trainerId === 'none' ? 'No Trainer' : trainerId.charAt(0).toUpperCase() + trainerId.slice(1);
-
     return (
         <View style={styles.backdrop}>
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.card}>
-
-                    {/* Header (Back Navigation) */}
+                    {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+                        <TouchableOpacity onPress={goBackToHub} style={styles.backBtn}>
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.title}>CHOOSE WORKOUT</Text>
-                            <Text style={styles.subtitle}>Develop your physique</Text>
+                            <Text style={styles.title}>WORKOUT</Text>
+                            <Text style={styles.subtitle}>Choose your training</Text>
                         </View>
                         <View style={{ width: 60 }} />
                     </View>
 
-                    {/* Trainer Badge */}
-                    <View style={styles.trainerBadge}>
-                        <Text style={styles.trainerIcon}>🧢</Text>
-                        <View>
-                            <Text style={styles.trainerLabel}>Current Trainer</Text>
-                            <Text style={styles.trainerValue}>
-                                {trainerName}{' '}
-                                <Text style={styles.multiplier}>(x{multiplier} Boost)</Text>
+                    {/* Stats Summary */}
+                    <View style={styles.statsCard}>
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>FATIGUE</Text>
+                            <Text style={[styles.statValue, { color: fatigue > 80 ? '#EF4444' : '#10B981' }]}>
+                                {fatigue}%
                             </Text>
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>POTENTIAL GAIN</Text>
+                            <Text style={styles.statValue}>+{potentialGain.toFixed(2)}</Text>
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>TRAINER BOOST</Text>
+                            <Text style={styles.statValue}>{trainerId === 'none' ? 'None' : trainerId.toUpperCase()}</Text>
                         </View>
                     </View>
 
-                    {/* Grid */}
+                    {/* Workout Grid (2x2) */}
                     <View style={styles.grid}>
-                        {WORKOUT_TYPES.map((item) => (
+                        {WORKOUTS.map((workout) => (
                             <TouchableOpacity
-                                key={item.id}
-                                style={[styles.gridItem, { borderColor: item.color }]}
-                                onPress={() => handleTrain(item.id)}
+                                key={workout.type}
+                                style={styles.workoutCard}
+                                onPress={() => handleWorkout(workout.type)}
+                                activeOpacity={0.7}
                             >
-                                <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-                                    <Text style={styles.itemIcon}>{item.icon}</Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.itemLabel}>{item.label}</Text>
-                                    <Text style={styles.itemFocus}>{item.focus}</Text>
-                                </View>
+                                <Text style={styles.workoutIcon}>{workout.icon}</Text>
+                                <Text style={styles.workoutLabel}>{workout.label}</Text>
+                                <Text style={styles.workoutDesc}>{workout.desc}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
 
-                    {/* Footer Info */}
-                    <View style={styles.footer}>
-                        <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Fatigue Cost:</Text>
-                            <Text style={styles.statValueBad}>15%</Text>
-                        </View>
-                        <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Potential Mastery:</Text>
-                            <Text style={styles.statValueGood}>+{potentialGain}%</Text>
-                        </View>
+                    {/* Info Footer */}
+                    <View style={styles.infoFooter}>
+                        <Text style={styles.infoText}>
+                            💡 Each workout: +15% Fatigue, +{potentialGain.toFixed(2)} Strength, +{(potentialGain * 0.1).toFixed(2)} Charm
+                        </Text>
                     </View>
-
                 </View>
             </SafeAreaView>
         </View>
     );
 };
 
+// --- Styles ---
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
@@ -128,7 +109,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    safeArea: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
+    safeArea: {
+        width: '100%',
+        alignItems: 'center',
+    },
     card: {
         width: '90%',
         backgroundColor: '#FFFFFF',
@@ -155,68 +139,82 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     backText: { fontSize: 14, color: '#374151', fontWeight: '700' },
-
     headerTitleContainer: { alignItems: 'center' },
-    title: { fontSize: 18, fontWeight: '900', color: '#111827', textTransform: 'uppercase' },
-    subtitle: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-
-    trainerBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#EFF6FF',
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 24,
-        borderWidth: 1,
-        borderColor: '#BFDBFE',
+    title: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#111827',
+        letterSpacing: 0.5,
     },
-    trainerIcon: { fontSize: 24, marginRight: 12 },
-    trainerLabel: { fontSize: 10, color: '#6B7280', fontWeight: '700', textTransform: 'uppercase' },
-    trainerValue: { fontSize: 14, color: '#1E40AF', fontWeight: '800' },
-    multiplier: { color: '#059669' },
-
-    grid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        rowGap: 12,
-        marginBottom: 24,
+    subtitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#6B7280',
+        marginTop: 4,
     },
-    gridItem: {
-        width: '48%',
-        aspectRatio: 1.1,
+    statsCard: {
         backgroundColor: '#F9FAFB',
         borderRadius: 16,
-        padding: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-        gap: 8,
-    },
-    iconContainer: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    itemIcon: { fontSize: 24 },
-    itemLabel: { fontSize: 14, fontWeight: '800', color: '#111827', textAlign: 'center' },
-    itemFocus: { fontSize: 10, color: '#6B7280', fontWeight: '600', textAlign: 'center' },
-
-    footer: {
-        borderTopWidth: 1,
-        borderTopColor: '#F3F4F6',
-        paddingTop: 16,
-        gap: 8,
+        padding: 16,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
     },
     statRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
-    statLabel: { fontSize: 14, color: '#4B5563', fontWeight: '600' },
-    statValueBad: { fontSize: 14, color: '#EF4444', fontWeight: '800' },
-    statValueGood: { fontSize: 14, color: '#10B981', fontWeight: '800' },
+    divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 8 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: '#6B7280', letterSpacing: 0.5 },
+    statValue: { fontSize: 14, fontWeight: '900', color: '#111827' },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        // gap: 12, // Removing gap to rely on space-between for horizontal
+        marginBottom: 20,
+    },
+    workoutCard: {
+        width: '47%', // Reduced slightly to ensure fit
+        marginBottom: 12, // vertical spacing
+
+        backgroundColor: '#EFF6FF',
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#2563EB',
+        shadowColor: '#2563EB',
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    workoutIcon: { fontSize: 36, marginBottom: 8 },
+    workoutLabel: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#1F2937',
+        marginBottom: 4,
+    },
+    workoutDesc: {
+        fontSize: 11,
+        color: '#6B7280',
+        textAlign: 'center',
+    },
+    infoFooter: {
+        backgroundColor: '#FFFBEB',
+        borderRadius: 12,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: '#FCD34D',
+    },
+    infoText: {
+        fontSize: 12,
+        color: '#92400E',
+        textAlign: 'center',
+        lineHeight: 16,
+    },
 });
 
 export default GymWorkoutConfigView;

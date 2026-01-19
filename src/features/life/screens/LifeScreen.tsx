@@ -205,7 +205,8 @@ const LifeScreen = () => {
   } = useNightOutSystem(triggerEncounter);
 
   // Gym System Hook
-  const { openGym } = useGymSystem();
+  const { actions } = useGymSystem();
+  const { openGym } = actions;
 
   const {
     // Visibility

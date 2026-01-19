@@ -10,7 +10,8 @@ import {
     SafeAreaView,
     Image
 } from 'react-native';
-import { useGymSystem, TRAINER_COSTS, TrainerTier } from './useGymSystem';
+import { useGymSystem, TrainerTier } from './useGymSystem';
+import { TRAINER_COSTS } from './gymData';
 
 interface Props {
     visible?: boolean;
@@ -25,8 +26,10 @@ const TRAINERS: { id: TrainerTier; name: string; title: string; cost: number; ic
 ];
 
 const GymTrainerView = () => {
-    const { activeView, isVisible, goBackToHub, gymState, hireTrainer } = useGymSystem();
-    const currentTrainer = gymState.trainerId;
+    const { data, actions, activeView, isVisible } = useGymSystem();
+    const { trainerId: currentTrainer } = data;
+    const { goBackToHub, hireTrainer } = actions;
+    // const currentTrainer = gymState.trainerId; // Removed legacy line
 
     const handleBack = () => {
         goBackToHub();

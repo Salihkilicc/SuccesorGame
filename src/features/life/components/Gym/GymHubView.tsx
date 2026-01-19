@@ -1,66 +1,56 @@
-import React, { useEffect } from 'react';
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    SafeAreaView,
-} from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useGymSystem } from './useGymSystem';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
 
-interface GymHubModalProps {
-    visible?: boolean; // Deprecated, controlled by store
-    onClose?: () => void;
-}
-
+/**
+ * GYM HUB VIEW
+ * 
+ * Main entry point for the Gym system.
+ * Displays body stats and navigation menu to sub-features.
+ */
 const GymHubView = () => {
-    // 1. Hook Integration
-    const {
-        isVisible,
-        activeView,
-        closeGym,
-        openMartialArts,
-        openTrainer,
-        openMembership,
-        openWorkout,
-        openSupplements,
+    // --- Hook Destructuring ---
+    const { data, actions } = useGymSystem();
+    const { stats, martialArts, membership } = data;
+    const { navigate, closeGym } = actions;
 
-        bodyType,
-        fatigue,
-        membership,
-        selectedArt,
-        beltTitle,
-    } = useGymSystem();
+    const { bodyType, fatigue } = stats;
+    const { style: selectedArt, title: beltTitle } = martialArts;
 
-    // 2. Computed Visibility (Managed by Parent Container now via conditional rendering)
-    // But we keep hook access.
-
-    // Handle Closing
-    const handleClose = () => {
-        closeGym();
+    // --- Helpers ---
+    const getBodyTypeColor = (type: string) => {
+        switch (type) {
+            case 'Godlike': return '#F59E0B';
+            case 'Muscular': return '#EF4444';
+            case 'Fit': return '#10B981';
+            default: return '#6B7280';
+        }
     };
 
-    // 3. Dynamic Button Logic
+    const getFatigueColor = (value: number) => {
+        if (value > 80) return '#EF4444';
+        if (value > 50) return '#F59E0B';
+        return '#10B981';
+    };
+
     const renderMartialArtsButton = () => {
         const isSelected = !!selectedArt;
-        const label = isSelected
-            ? `${selectedArt?.toUpperCase()} - ${beltTitle}`
-            : 'Choose Martial Art';
-
+        const label = isSelected ? `${selectedArt?.toUpperCase()} - ${beltTitle}` : 'Choose Martial Art';
         const subtitle = isSelected ? 'Train Now' : 'Select Discipline';
 
         return (
             <TouchableOpacity
                 style={[styles.menuButton, isSelected ? styles.maButtonActive : styles.maButtonInactive]}
-                onPress={openMartialArts}
+                onPress={() => navigate('MARTIAL_ARTS')}
                 activeOpacity={0.8}
             >
                 <Text style={styles.menuIcon}>{isSelected ? '🥋' : '👊'}</Text>
                 <View>
                     <Text style={[styles.menuLabel, isSelected && { color: '#FFF' }]}>{label}</Text>
-                    <Text style={[styles.menuSubLabel, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>{subtitle}</Text>
+                    <Text style={[styles.menuSubLabel, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>
+                        {subtitle}
+                    </Text>
                 </View>
             </TouchableOpacity>
         );
@@ -69,12 +59,10 @@ const GymHubView = () => {
     return (
         <View style={styles.backdrop}>
             <SafeAreaView style={styles.safeArea}>
-
                 <View style={styles.glassCard}>
-
                     {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+                        <TouchableOpacity onPress={closeGym} style={styles.closeBtn}>
                             <Text style={styles.closeIcon}>✕</Text>
                         </TouchableOpacity>
                         <View style={styles.titleContainer}>
@@ -88,11 +76,13 @@ const GymHubView = () => {
                         <View style={{ width: 40 }} />
                     </View>
 
-                    {/* Top Stats Card */}
+                    {/* Stats Card */}
                     <View style={styles.statsCard}>
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>BODY TYPE</Text>
-                            <Text style={[styles.statValue, { color: getBodyTypeColor(bodyType) }]}>{bodyType}</Text>
+                            <Text style={[styles.statValue, { color: getBodyTypeColor(bodyType) }]}>
+                                {bodyType}
+                            </Text>
                         </View>
 
                         <View style={styles.divider} />
@@ -116,13 +106,10 @@ const GymHubView = () => {
                         </View>
                     </View>
 
-                    {/* Grid Menu */}
+                    {/* Menu Grid */}
                     <View style={styles.grid}>
-                        {/* 1. Workout Button */}
-                        <TouchableOpacity
-                            style={styles.menuButton}
-                            onPress={openWorkout}
-                        >
+                        {/* Workout */}
+                        <TouchableOpacity style={styles.menuButton} onPress={() => navigate('WORKOUT')}>
                             <Text style={styles.menuIcon}>🏋️</Text>
                             <View>
                                 <Text style={styles.menuLabel}>Workout</Text>
@@ -130,14 +117,11 @@ const GymHubView = () => {
                             </View>
                         </TouchableOpacity>
 
-                        {/* 2. Martial Arts */}
+                        {/* Martial Arts */}
                         {renderMartialArtsButton()}
 
-                        {/* 3. Trainer */}
-                        <TouchableOpacity
-                            style={styles.menuButton}
-                            onPress={openTrainer}
-                        >
+                        {/* Trainer */}
+                        <TouchableOpacity style={styles.menuButton} onPress={() => navigate('TRAINER')}>
                             <Text style={styles.menuIcon}>🧢</Text>
                             <View>
                                 <Text style={styles.menuLabel}>Trainer</Text>
@@ -145,11 +129,8 @@ const GymHubView = () => {
                             </View>
                         </TouchableOpacity>
 
-                        {/* 4. Membership */}
-                        <TouchableOpacity
-                            style={styles.menuButton}
-                            onPress={openMembership}
-                        >
+                        {/* Membership */}
+                        <TouchableOpacity style={styles.menuButton} onPress={() => navigate('MEMBERSHIP')}>
                             <Text style={styles.menuIcon}>💳</Text>
                             <View>
                                 <Text style={styles.menuLabel}>Membership</Text>
@@ -157,11 +138,8 @@ const GymHubView = () => {
                             </View>
                         </TouchableOpacity>
 
-                        {/* 5. Locker Room (Supplements) */}
-                        <TouchableOpacity
-                            style={styles.menuButton}
-                            onPress={openSupplements}
-                        >
+                        {/* Locker Room */}
+                        <TouchableOpacity style={styles.menuButton} onPress={() => navigate('SUPPLEMENTS')}>
                             <Text style={styles.menuIcon}>🧪</Text>
                             <View>
                                 <Text style={styles.menuLabel}>Locker Room</Text>
@@ -169,32 +147,15 @@ const GymHubView = () => {
                             </View>
                         </TouchableOpacity>
                     </View>
-
                 </View>
             </SafeAreaView>
 
-            {/* Bottom Bar */}
+            {/* Bottom Stats Bar */}
             <View style={styles.bottomBarContainer}>
                 <BottomStatsBar />
             </View>
         </View>
     );
-};
-
-// --- Helpers ---
-const getBodyTypeColor = (type: string) => {
-    switch (type) {
-        case 'Godlike': return '#F59E0B';
-        case 'Muscular': return '#EF4444';
-        case 'Fit': return '#10B981';
-        default: return '#6B7280';
-    }
-};
-
-const getFatigueColor = (fatigue: number) => {
-    if (fatigue > 80) return '#EF4444';
-    if (fatigue > 50) return '#F59E0B';
-    return '#10B981';
 };
 
 // --- Styles ---
@@ -256,7 +217,6 @@ const styles = StyleSheet.create({
     badgeText: { fontSize: 10, fontWeight: '700' },
     textStandard: { color: '#4B5563' },
     textTitanium: { color: '#D97706' },
-
     statsCard: {
         width: '100%',
         backgroundColor: '#F9FAFB',
@@ -274,7 +234,6 @@ const styles = StyleSheet.create({
     divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 12 },
     statLabel: { fontSize: 12, fontWeight: '700', color: '#6B7280', letterSpacing: 0.5 },
     statValue: { fontSize: 16, fontWeight: '900' },
-
     fatigueContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     fatigueBar: {
         width: 100,
@@ -285,7 +244,6 @@ const styles = StyleSheet.create({
     },
     fatigueFill: { height: '100%', borderRadius: 4 },
     fatigueText: { fontSize: 12, fontWeight: '700', color: '#374151' },
-
     grid: {
         width: '100%',
         gap: 12,
@@ -307,7 +265,6 @@ const styles = StyleSheet.create({
     menuIcon: { fontSize: 28 },
     menuLabel: { fontSize: 16, fontWeight: '700', color: '#111827' },
     menuSubLabel: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-
     maButtonActive: {
         backgroundColor: '#2563EB',
         borderColor: '#2563EB',
@@ -317,15 +274,11 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         backgroundColor: '#EFF6FF',
     },
-
     bottomBarContainer: {
         position: 'absolute',
         bottom: 20,
         width: '90%',
     }
 });
-
-// --- Styles ---
-// ... (styles omitted)
 
 export default GymHubView;

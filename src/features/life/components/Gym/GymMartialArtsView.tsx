@@ -1,20 +1,6 @@
-import React, { useState } from 'react';
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Alert,
-    SafeAreaView
-} from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
 import { useGymSystem, MartialArtStyle } from './useGymSystem';
-
-interface GymMartialArtsModalProps {
-    visible: boolean;
-    onClose: () => void;
-}
 
 const MARTIAL_ARTS_LIST: { id: MartialArtStyle; name: string; icon: string; desc: string }[] = [
     { id: 'boxing', name: 'Boxing', icon: '🥊', desc: 'Focus on punches and footwork.' },
@@ -24,36 +10,32 @@ const MARTIAL_ARTS_LIST: { id: MartialArtStyle; name: string; icon: string; desc
     { id: 'karate', name: 'Karate', icon: '🥷', desc: 'Striking, kicking, and knee strikes.' },
 ];
 
+/**
+ * GYM MARTIAL ARTS VIEW
+ * 
+ * Two-state component:
+ * - Selection Mode: Choose a martial art style
+ * - Training Mode: View progress and train
+ */
 const GymMartialArtsView = () => {
-    const {
-        activeView,
-        isVisible,
-        goBackToHub,
-        selectedArt,
-        beltTitle,
-        beltRank,
-        trainingCount,
-        fatigue,
-        currentQuarter,
-        lastTrainedQuarter,
-        selectArt,
-        trainMartialArts
-    } = useGymSystem();
+    // --- Hook Destructuring ---
+    const { data, actions } = useGymSystem();
+    const { stats, martialArts, currentQuarter } = data;
+    const { goBackToHub, selectArt, trainMartialArts } = actions;
 
-    const handleBack = () => {
-        goBackToHub();
-    };
+    const { fatigue } = stats;
+    const { style: selectedArt, title: beltTitle, rank: beltRank, progress: trainingCount, lastTrainedQ } = martialArts;
 
-    // Local Logic
+    // --- Local Logic ---
     const isSelectionMode = !selectedArt;
     const maxTrainings = beltRank === 3 ? 6 : 3;
 
-    // Check constraints
+    // Constraints
     const isFatigued = fatigue > 80;
-    const isTrainedThisQuarter = lastTrainedQuarter === currentQuarter;
+    const isTrainedThisQuarter = lastTrainedQ === currentQuarter;
     const canTrain = !isFatigued && !isTrainedThisQuarter;
 
-    // Handlers
+    // --- Handlers ---
     const handleSelect = (art: MartialArtStyle) => {
         selectArt(art);
     };
@@ -72,15 +54,31 @@ const GymMartialArtsView = () => {
         }
     };
 
-    // Render Content
+    // --- Helpers ---
+    const getBeltColor = (rank: number) => {
+        switch (rank) {
+            case 0: return '#F3F4F6';
+            case 1: return '#3B82F6';
+            case 2: return '#8B5CF6';
+            case 3: return '#92400E';
+            case 4:
+            case 5: return '#111827';
+            default: return '#F3F4F6';
+        }
+    };
+
+    const getBeltTextColor = (rank: number) => {
+        if (rank === 0) return '#1F2937';
+        return '#FFFFFF';
+    };
+
     return (
         <View style={styles.backdrop}>
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.card}>
-
-                    {/* Header (Back Navigation) */}
+                    {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+                        <TouchableOpacity onPress={goBackToHub} style={styles.backBtn}>
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
@@ -174,29 +172,10 @@ const GymMartialArtsView = () => {
                             </TouchableOpacity>
                         </View>
                     )}
-
                 </View>
             </SafeAreaView>
         </View>
     );
-};
-
-// --- Helpers ---
-const getBeltColor = (rank: number) => {
-    switch (rank) {
-        case 0: return '#F3F4F6';
-        case 1: return '#3B82F6';
-        case 2: return '#8B5CF6';
-        case 3: return '#92400E';
-        case 4:
-        case 5: return '#111827';
-        default: return '#F3F4F6';
-    }
-};
-
-const getBeltTextColor = (rank: number) => {
-    if (rank === 0) return '#1F2937';
-    return '#FFFFFF';
 };
 
 // --- Styles ---
@@ -238,7 +217,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     backText: { fontSize: 14, color: '#374151', fontWeight: '700' },
-
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,

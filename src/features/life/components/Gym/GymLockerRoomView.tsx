@@ -1,86 +1,72 @@
 import React from 'react';
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Alert,
-    SafeAreaView
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useGymSystem, SupplementType } from './useGymSystem';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 
-interface Props {
-    visible?: boolean;
-    onClose?: () => void;
-}
+const SUPPLEMENTS: { type: SupplementType; icon: string; label: string; desc: string; price: number }[] = [
+    { type: 'protein', icon: '🥤', label: 'Protein Shake', desc: 'Track usage', price: 50 },
+    { type: 'creatine', icon: '💊', label: 'Creatine', desc: 'Track usage', price: 100 },
+    { type: 'steroids', icon: '💉', label: 'Steroids', desc: '+7 Mastery, -45 Health', price: 500 },
+];
 
+/**
+ * GYM LOCKER ROOM VIEW
+ * 
+ * Displays player stats and consumable supplements.
+ * Supplements can only be used once per quarter.
+ */
 const GymLockerRoomView = () => {
-    const {
-        activeView,
-        isVisible,
-        goBackToHub,
-        currentQuarter,
-        supplementUsage,
-        consumeSupplement,
-        fatigue
-    } = useGymSystem();
+    // --- Hook Destructuring ---
+    const { data, actions } = useGymSystem();
+    const { inventory, currentQuarter } = data;
+    const { goBackToHub, consumeSupplement } = actions;
 
-    const handleBack = () => {
-        goBackToHub();
-    };
+    const { attributes, core } = usePlayerStore();
+    const { strength, charm } = attributes;
+    const { health } = core;
 
+    // --- Handler ---
     const handleConsume = (type: SupplementType) => {
-        // Steroid Warning
+        // Special warning for Steroids
         if (type === 'steroids') {
             Alert.alert(
-                '⚠️ DANGEROUS SUBSTANCE',
-                'Injecting steroids will grant huge gains (+7 Mastery) but implies SEVERE health risks (-45 Health).\n\nThis cannot be undone.',
+                '⚠️ WARNING: STEROIDS',
+                'Massive gains (+7 Mastery, +5 Strength) but severe health damage (-45 HP). Continue?',
                 [
                     { text: 'Cancel', style: 'cancel' },
                     {
-                        text: 'INJECT',
+                        text: 'Use Anyway',
                         style: 'destructive',
-                        onPress: () => performConsumption(type)
+                        onPress: () => executeConsume(type)
                     }
                 ]
             );
             return;
         }
 
-        // Regular Supplements
-        performConsumption(type);
+        executeConsume(type);
     };
 
-    const performConsumption = (type: SupplementType) => {
+    const executeConsume = (type: SupplementType) => {
         const result = consumeSupplement(type);
         if (result.success) {
-            // Optional: Add simple Toast if library available, else Alert is fine for now
-            if (type !== 'steroids') {
-                Alert.alert('Consumable Used', result.message);
-            } else {
-                Alert.alert('💉 Injected', 'You feel a surge of power... and pain.');
-            }
+            Alert.alert('Consumed! 💪', result.message);
         } else {
-            Alert.alert('Cannot Consume', result.message);
+            Alert.alert('Cannot Use', result.message);
         }
     };
 
-    const ITEMS: { id: SupplementType; name: string; icon: string; desc: string; effect: string }[] = [
-        { id: 'protein', name: 'Whey Protein', icon: '🥤', desc: 'Essential recovery.', effect: '+0.5% Gains' },
-        { id: 'creatine', name: 'Creatine', icon: '🔋', desc: 'Energy boost.', effect: '+0.5% Gains' },
-        { id: 'steroids', name: 'Steroids', icon: '💉', desc: 'High Risk / Reward', effect: 'Massive Gains' },
-    ];
+    const isUsed = (type: SupplementType) => {
+        return inventory[type] === currentQuarter;
+    };
 
     return (
         <View style={styles.backdrop}>
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.card}>
-
-                    {/* Header (Back Navigation) */}
+                    {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+                        <TouchableOpacity onPress={goBackToHub} style={styles.backBtn}>
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
@@ -90,54 +76,77 @@ const GymLockerRoomView = () => {
                         <View style={{ width: 60 }} />
                     </View>
 
-                    {/* Grid */}
-                    <View style={styles.grid}>
-                        {ITEMS.map((item) => {
-                            const isUsed = supplementUsage[item.id] === currentQuarter;
-                            const isSteroid = item.id === 'steroids';
+                    {/* Stats Summary */}
+                    <View style={styles.statsCard}>
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>STRENGTH</Text>
+                            <Text style={styles.statValue}>{strength.toFixed(0)}</Text>
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>HEALTH</Text>
+                            <Text style={[styles.statValue, { color: health < 50 ? '#EF4444' : '#10B981' }]}>
+                                {health.toFixed(0)}
+                            </Text>
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={styles.statRow}>
+                            <Text style={styles.statLabel}>CHARM</Text>
+                            <Text style={styles.statValue}>{charm.toFixed(0)}</Text>
+                        </View>
+                    </View>
 
+                    {/* Supplements Grid (2x2) */}
+                    <View style={styles.grid}>
+                        {SUPPLEMENTS.map((supplement) => {
+                            const used = isUsed(supplement.type);
                             return (
                                 <TouchableOpacity
-                                    key={item.id}
+                                    key={supplement.type}
                                     style={[
-                                        styles.itemCard,
-                                        isUsed && styles.itemUsed,
-                                        isSteroid && styles.itemSteroid
+                                        styles.supplementCard,
+                                        used && styles.supplementCardUsed,
+                                        supplement.type === 'steroids' && styles.supplementCardDanger
                                     ]}
-                                    onPress={() => !isUsed && handleConsume(item.id)}
-                                    activeOpacity={0.8}
-                                    disabled={isUsed}
+                                    onPress={() => handleConsume(supplement.type)}
+                                    activeOpacity={0.7}
+                                    disabled={used}
                                 >
-                                    <Text style={[styles.itemIcon, isUsed && styles.textUsed]}>{item.icon}</Text>
-                                    <View style={styles.itemInfo}>
-                                        <Text style={[styles.itemName, isUsed && styles.textUsed, isSteroid && styles.textSteroid]}>
-                                            {item.name}
-                                        </Text>
-                                        <Text style={[styles.itemEffect, isUsed && styles.textUsed]}>
-                                            {item.effect}
-                                        </Text>
-                                        <Text style={[styles.itemDesc, isUsed && styles.textUsed]}>
-                                            {isUsed ? 'Consumed ⏳' : item.desc}
-                                        </Text>
-                                    </View>
-
-                                    {/* Status Badge */}
-                                    {isUsed && (
+                                    <Text style={[styles.supplementIcon, used && styles.usedIcon]}>
+                                        {supplement.icon}
+                                    </Text>
+                                    <Text style={[styles.supplementLabel, used && styles.usedText]}>
+                                        {supplement.label}
+                                    </Text>
+                                    <Text style={[styles.supplementDesc, used && styles.usedText]}>
+                                        {supplement.desc}
+                                    </Text>
+                                    {used && (
                                         <View style={styles.usedBadge}>
-                                            <Text style={styles.usedText}>USED</Text>
+                                            <Text style={styles.usedBadgeText}>CONSUMED ⏳</Text>
                                         </View>
+                                    )}
+                                    {!used && (
+                                        <Text style={styles.priceText}>${supplement.price}</Text>
                                     )}
                                 </TouchableOpacity>
                             );
                         })}
                     </View>
 
+                    {/* Info Footer */}
+                    <View style={styles.infoFooter}>
+                        <Text style={styles.infoText}>
+                            ⚠️ Each supplement can only be used once per quarter
+                        </Text>
+                    </View>
                 </View>
             </SafeAreaView>
         </View>
     );
 };
 
+// --- Styles ---
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
@@ -145,10 +154,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    safeArea: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
+    safeArea: {
+        width: '100%',
+        alignItems: 'center',
+    },
     card: {
         width: '90%',
-        maxHeight: '60%', // Smaller height as content is less
         backgroundColor: '#FFFFFF',
         borderRadius: 24,
         padding: 24,
@@ -174,58 +185,109 @@ const styles = StyleSheet.create({
     },
     backText: { fontSize: 14, color: '#374151', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
-    title: { fontSize: 24, fontWeight: '900', color: '#111827' },
-    subtitle: { fontSize: 14, color: '#6B7280', marginTop: 4 },
-
+    title: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#111827',
+        letterSpacing: 0.5,
+    },
+    subtitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#6B7280',
+        marginTop: 4,
+    },
+    statsCard: {
+        backgroundColor: '#F9FAFB',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    statRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 8 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: '#6B7280', letterSpacing: 0.5 },
+    statValue: { fontSize: 14, fontWeight: '900', color: '#111827' },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        rowGap: 12,
-        marginBottom: 24,
+        // gap: 12, // Removed for safer wrap
+        marginBottom: 20,
     },
-    itemCard: {
-        width: '48%',
-        aspectRatio: 1.1,
-        backgroundColor: '#F9FAFB',
+    supplementCard: {
+        width: '47%',
+        marginBottom: 12,
+        backgroundColor: '#EFF6FF',
         borderRadius: 16,
-        padding: 12,
-        borderWidth: 2,
-        borderColor: '#E5E7EB',
-        justifyContent: 'center',
+        padding: 16,
         alignItems: 'center',
-        gap: 8,
+        borderWidth: 2,
+        borderColor: '#2563EB',
+        minHeight: 140,
+        justifyContent: 'center',
     },
-    itemSteroid: {
-        borderColor: '#EF4444',
-        borderWidth: 1,
-        backgroundColor: '#FEF2F2'
-    },
-    itemUsed: {
+    supplementCardUsed: {
         backgroundColor: '#F3F4F6',
-        borderColor: '#E5E7EB',
+        borderColor: '#D1D5DB',
         opacity: 0.6,
     },
-    itemIcon: { fontSize: 32 },
-    itemInfo: { alignItems: 'center', gap: 2 },
-    itemName: { fontSize: 16, fontWeight: '800', color: '#111827' },
-    itemEffect: { fontSize: 11, fontWeight: '700', color: '#2563EB' },
-    itemDesc: { fontSize: 10, color: '#6B7280', textAlign: 'center' },
-
-    // Steroid specific text override
-    textSteroid: { color: '#B91C1C' },
-    textUsed: { color: '#9CA3AF' },
-
-    usedBadge: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        backgroundColor: '#D1D5DB',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
+    supplementCardDanger: {
+        backgroundColor: '#FEF2F2',
+        borderColor: '#EF4444',
     },
-    usedText: { fontSize: 8, fontWeight: '900', color: '#FFFFFF' }
+    supplementIcon: { fontSize: 36, marginBottom: 8 },
+    usedIcon: { opacity: 0.4 },
+    supplementLabel: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#1F2937',
+        marginBottom: 4,
+        textAlign: 'center',
+    },
+    supplementDesc: {
+        fontSize: 10,
+        color: '#6B7280',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+    usedText: { color: '#9CA3AF' },
+    usedBadge: {
+        backgroundColor: '#FCD34D',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        marginTop: 4,
+    },
+    usedBadgeText: {
+        fontSize: 9,
+        fontWeight: '700',
+        color: '#92400E',
+    },
+    priceText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#2563EB',
+        marginTop: 4,
+    },
+    infoFooter: {
+        backgroundColor: '#FEF2F2',
+        borderRadius: 12,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: '#FCA5A5',
+    },
+    infoText: {
+        fontSize: 12,
+        color: '#991B1B',
+        textAlign: 'center',
+        lineHeight: 16,
+    },
 });
 
 export default GymLockerRoomView;
