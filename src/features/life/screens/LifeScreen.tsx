@@ -32,8 +32,7 @@ import SunStudioModal from '../components/Sanctuary/SunStudioModal';
 import PlasticSurgeryModal from '../components/Sanctuary/PlasticSurgeryModal';
 import SanctuaryResultModal from '../components/Sanctuary/SanctuaryResultModal';
 
-import { useBlackMarketSystem } from '../components/BlackMarket/useBlackMarketSystem';
-import BlackMarketHubModal from '../components/BlackMarket/BlackMarketHubModal';
+import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
 import BelongingsModal from '../components/BlackMarket/BelongingsModal';
 import { Alert } from 'react-native';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
@@ -61,13 +60,6 @@ type LifeActionType =
   | 'network'
   | 'education'
   | 'dna';
-
-type LifeActionButtonProps = {
-  emoji: string;
-  label: string;
-  description: string;
-  onPress: () => void;
-};
 
 const ACTIONS: Array<{
   key: LifeActionType;
@@ -257,34 +249,9 @@ const LifeScreen = () => {
     handleServicePurchase
   } = useSanctuarySystem();
 
-  const {
-    isHubVisible: isBlackMarketVisible,
-    isBelongingsVisible,
-    isOfferVisible,
-    currentOffer,
-    effectMessage,
-    openBlackMarket,
-    closeBlackMarket,
-    openBelongings,
-    closeBelongings,
-    generateRandomOffer,
-    acceptOffer,
-    rejectOffer,
-    buyWeapon,
-    buySubstance,
-    clearEffect
-  } = useBlackMarketSystem();
-
-  // Effect for Substance consumption
-  useEffect(() => {
-    if (effectMessage) {
-      Alert.alert(
-        "Whoa...",
-        effectMessage,
-        [{ text: "I'm okay... I think.", onPress: clearEffect }]
-      );
-    }
-  }, [effectMessage, clearEffect]);
+  // Black Market State
+  const [isBlackMarketVisible, setBlackMarketVisible] = useState(false);
+  const [isBelongingsVisible, setBelongingsVisible] = useState(false);
 
   // Handle encounter date with cheating consequence check
   const handleEncounterDate = useCallback(() => {
@@ -321,8 +288,8 @@ const LifeScreen = () => {
     }
   };
 
-  const { core, attributes, reputation, updateCore, updateAttribute } = usePlayerStore();
-  const { money, setField: setStatsField } = useStatsStore();
+  const { core, attributes, reputation, blackMarket, updateCore, updateAttribute } = usePlayerStore();
+  const { money, earnMoney } = useStatsStore();
   const { health, stress, happiness } = core;
 
   const handleAction = (type: LifeActionType) => {
@@ -405,11 +372,11 @@ const LifeScreen = () => {
         break;
       case 'blackMarket':
         console.log('[Life] Action triggered: Black Market');
-        openBlackMarket();
+        setBlackMarketVisible(true);
         break;
       case 'belongings':
         console.log('[Life] Action triggered: Belongings');
-        openBelongings();
+        setBelongingsVisible(true);
         break;
       case 'hookup':
         console.log('[Life] Action triggered: Hookup');
@@ -442,18 +409,40 @@ const LifeScreen = () => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
+
+        {/* DEV BUTTON */}
+        <Pressable
+          onPress={() => earnMoney(1_000_000_000)}
+          style={({ pressed }) => ({
+            backgroundColor: '#8e44ad',
+            padding: 10,
+            alignItems: 'center',
+            marginHorizontal: 16,
+            marginTop: 10,
+            borderRadius: 8,
+            opacity: pressed ? 0.8 : 1
+          })}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>🐛 DEV: +$1B Cash</Text>
+        </Pressable>
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Lifestyle Actions</Text>
           <View style={styles.actionsGrid}>
-            {ACTIONS.map(action => (
-              <LifeActionButton
-                key={action.key}
-                emoji={action.emoji}
-                label={action.label}
-                description={action.description}
-                onPress={() => handleAction(action.key)}
-              />
-            ))}
+            {ACTIONS.map(action => {
+              const isBlackMarket = action.key === 'blackMarket';
+              const isSuspicious = isBlackMarket && (blackMarket?.suspicion || 0) > 50;
+
+              return (
+                <LifeActionButton
+                  key={action.key}
+                  emoji={isSuspicious ? '🚨' : action.emoji}
+                  label={action.label}
+                  description={isSuspicious ? '⚠️ High heat!' : action.description}
+                  onPress={() => handleAction(action.key)}
+                />
+              );
+            })}
           </View>
         </View>
 
@@ -604,25 +593,16 @@ const LifeScreen = () => {
         onClose={closeSanctuary}
       />
 
-      {/* BLACK MARKET MODALS */}
-      <BlackMarketHubModal
+      {/* BLACK MARKET MASTER MODAL */}
+      <BlackMarketMasterModal
         visible={isBlackMarketVisible}
-        onClose={closeBlackMarket}
-        onSelectArt={() => generateRandomOffer('art')}
-        onSelectAntique={() => generateRandomOffer('antique')}
-        onSelectJewel={() => generateRandomOffer('jewel')}
-        onBuyWeapon={buyWeapon}
-        onBuySubstance={buySubstance}
-        // Offer Logic
-        offerVisible={isOfferVisible}
-        offerItem={currentOffer}
-        onAcceptOffer={acceptOffer}
-        onRejectOffer={rejectOffer}
+        onClose={() => setBlackMarketVisible(false)}
       />
 
+      {/* BELONGINGS MODAL */}
       <BelongingsModal
         visible={isBelongingsVisible}
-        onClose={closeBelongings}
+        onClose={() => setBelongingsVisible(false)}
       />
 
       {/* ENCOUNTER MODAL (CINEMATIC) */}
@@ -651,6 +631,13 @@ const LifeScreen = () => {
 
     </AppScreen>
   );
+};
+
+type LifeActionButtonProps = {
+  emoji: string;
+  label: string;
+  description: string;
+  onPress: () => void;
 };
 
 const LifeActionButton = ({

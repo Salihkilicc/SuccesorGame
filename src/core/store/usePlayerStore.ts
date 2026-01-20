@@ -34,6 +34,12 @@ export interface PlayerState {
     // Hidden / Meta (Legacy Support)
     hidden: LocalHiddenStats;
 
+    // Black Market Persistence
+    blackMarket: {
+        suspicion: number;
+        quarterlyDrugUsage: number;
+    };
+
     // --- ACTIONS ---
 
     // 1. Generic Updaters
@@ -44,7 +50,10 @@ export interface PlayerState {
     updateSecurity: (key: keyof SecurityState, value: number) => void;
 
     // ⚠️ GERİ EKLENDİ: useGameStore bu fonksiyonu arıyor
+    // ⚠️ GERİ EKLENDİ: useGameStore bu fonksiyonu arıyor
     updateHidden: (key: keyof LocalHiddenStats, value: number) => void;
+
+    updateBlackMarket: (key: 'suspicion' | 'quarterlyDrugUsage', value: number) => void;
 
     // 2. Skill Management
     updateSkill: (skill: keyof SkillsState, data: Partial<MartialArtsSkill>) => void;
@@ -73,6 +82,7 @@ const initialState = {
     skills: { martialArts: { belt: 'White' as const, progress: 0, level: 1 } },
     quarterlyActions: { hasStudied: false, hasTrained: false, hasDated: false, hasSocialized: false },
     hidden: { luck: 50, security: 0 },
+    blackMarket: { suspicion: 0, quarterlyDrugUsage: 0 },
 };
 
 // --- STORE CREATION ---
@@ -105,6 +115,10 @@ export const usePlayerStore = create<PlayerState>()(
             // ⚠️ FIX: useGameStore için geri geldi
             updateHidden: (key, value) => set((state) => ({
                 hidden: { ...state.hidden, [key]: Math.max(0, value) }
+            })),
+
+            updateBlackMarket: (key, value) => set((state) => ({
+                blackMarket: { ...state.blackMarket, [key]: Math.max(0, value) }
             })),
 
             // --- Skill Management ---
@@ -159,6 +173,7 @@ export const usePlayerStore = create<PlayerState>()(
                 skills: state.skills,
                 quarterlyActions: state.quarterlyActions,
                 hidden: state.hidden,
+                blackMarket: state.blackMarket,
             }),
         }
     )

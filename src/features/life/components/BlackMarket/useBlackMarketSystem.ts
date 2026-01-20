@@ -1,170 +1,387 @@
-import { useState, useCallback } from 'react';
-import { Alert } from 'react-native';
+import { useState, useCallback, useMemo } from 'react';
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { useUserStore, InventoryItem } from '../../../../core/store/useUserStore';
+import { useGameStore } from '../../../../core/store/useGameStore';
 import {
-    BLACK_MARKET_ARTS,
-    BLACK_MARKET_ANTIQUES,
-    BLACK_MARKET_JEWELRY,
-    BLACK_MARKET_WEAPONS,
-    BLACK_MARKET_SUBSTANCES
-} from '../../../../data/BlackMarketData';
+    BlackMarketItem,
+    BlackMarketCategory,
+    getRandomDeal
+} from './blackMarketData';
 
-// Types
-export type BlackMarketCategory = 'art' | 'antique' | 'jewel' | 'weapon' | 'substance';
+// --- TYPES ---
 
+export interface BlackMarketState {
+    suspicion: number; // Police Heat (0-100)
+    quarterlyDrugUsage: number; // Tracks drug consumption per quarter
+    currentDeal: BlackMarketItem | null; // The ONE random item being offered
+    activeView: 'HUB' | 'DEAL' | 'RAID'; // NEW: View State Manager
+}
+
+export interface BlackMarketData {
+    suspicion: number;
+    quarterlyDrugUsage: number;
+    currentDeal: BlackMarketItem | null;
+    streetRep: number;
+    currentQuarter: number;
+    activeView: 'HUB' | 'DEAL' | 'RAID';
+}
+
+export interface BlackMarketActions {
+    openCategory: (category: BlackMarketCategory) => void;
+    buyItem: () => { success: boolean; message: string; warning?: string };
+    passItem: () => void;
+    consumeDrug: (item: BlackMarketItem) => { success: boolean; message: string; warning?: string };
+    triggerRaid: () => { shouldRaid: boolean; chance: number }; // Kept for manual checks if needed
+    resetQuarterlyUsage: () => void;
+    decaySuspicion: () => void; // NEW: Quarterly decay
+    closeRaid: () => void; // NEW: Reset view after raid
+}
+
+// --- CONSTANTS ---
+
+const SUSPICION_THRESHOLD = 80; // Raid chance activates above this
+const RAID_BASE_CHANCE = 0.50; // 50% chance when suspicion > 80
+const ADDICTION_THRESHOLD = 3; // Drugs per quarter before addiction kicks in
+const CATEGORY_OPEN_SUSPICION = 15; // Opening a category adds +15% suspicion
+
+// --- HOOK ---
+
+/**
+ * BLACK MARKET SYSTEM HOOK (REFACTORED)
+ * 
+ * Uses massive data sets with tier-based Street Rep system.
+ * Single random deal mechanic per category.
+ */
 export const useBlackMarketSystem = () => {
-    const { money, update: updateStats } = useStatsStore();
-    const { addItem, inventory } = useUserStore();
+    // --- Store Access ---
+    const { money, spendMoney } = useStatsStore();
+    const { addItem } = useUserStore();
+    const {
+        reputation,
+        attributes,
+        core,
+        blackMarket, // Persistent state
+        updateReputation,
+        updateAttribute,
+        updateCore,
+        updatePersonality,
+        updateBlackMarket // Updater
+    } = usePlayerStore();
+    const { currentMonth } = useGameStore();
 
-    // Modals Visibility
-    const [isHubVisible, setHubVisible] = useState(false);
-    const [isBelongingsVisible, setBelongingsVisible] = useState(false);
+    // --- Local State (Transient) ---
+    // Suspicion and drug usage are now in store
+    const [currentDeal, setCurrentDeal] = useState<BlackMarketItem | null>(null);
+    const [pendingItem, setPendingItem] = useState<BlackMarketItem | null>(null); // NEW: Item pending purchase during raid
+    const [activeView, setActiveView] = useState<'HUB' | 'DEAL' | 'RAID'>('HUB');
 
-    // Offer State (For Art/Antique/Jewel)
-    const [isOfferVisible, setOfferVisible] = useState(false);
-    const [currentOffer, setCurrentOffer] = useState<any | null>(null);
+    // --- Computed State ---
+    const suspicion = blackMarket?.suspicion || 0;
+    const quarterlyDrugUsage = blackMarket?.quarterlyDrugUsage || 0;
+    const currentQuarter = Math.floor((currentMonth - 1) / 3) + 1;
+    const streetRep = reputation.street || 0;
 
-    // Weapon/Substance State is handled within their specific sub-modals/lists if needed,
-    // but we can track "Active Category for Selection" here if we use a generic modal.
-    // For simplicity, we might just pass data to the Hub to render.
-
-    // Effect Message State (Substances)
-    const [effectMessage, setEffectMessage] = useState<string | null>(null);
+    // --- HELPER: Raid Trigger Logic ---
+    /**
+     * "The Any Button Rule"
+     * Checks if raid should trigger BEFORE any action.
+     * @returns true if Raid Triggered (Action should be blocked)
+     */
+    const checkRaidRisk = useCallback((itemAttempted?: BlackMarketItem): boolean => {
+        if (suspicion >= SUSPICION_THRESHOLD) {
+            const roll = Math.random();
+            if (roll < RAID_BASE_CHANCE) {
+                // TRIGGER RAID
+                setActiveView('RAID');
+                if (itemAttempted) {
+                    setPendingItem(itemAttempted); // Store the item we wanted
+                }
+                setCurrentDeal(null); // Clear the immediate deal view
+                console.log(`[BlackMarket] RAID TRIGGERED! Suspicion: ${suspicion}, Roll: ${roll}`);
+                return true; // BLOCK ACTION
+            }
+        }
+        return false; // ALLOW ACTION
+    }, [suspicion]);
 
     // --- ACTIONS ---
 
-    const openBlackMarket = useCallback(() => setHubVisible(true), []);
-    const closeBlackMarket = useCallback(() => setHubVisible(false), []);
+    /**
+     * Open a category and get ONE random deal
+     * Increases suspicion immediately
+     */
+    const openCategory = useCallback((category: BlackMarketCategory) => {
+        // 1. Check Raid Risk FIRST
+        if (checkRaidRisk()) return;
 
-    const openBelongings = useCallback(() => setBelongingsVisible(true), []);
-    const closeBelongings = useCallback(() => setBelongingsVisible(false), []);
+        // Increase suspicion
+        const newSuspicion = Math.min(100, suspicion + CATEGORY_OPEN_SUSPICION);
+        updateBlackMarket('suspicion', newSuspicion);
 
-    // Type A: Random Offer (Art, Antique, Jewel)
-    const generateRandomOffer = useCallback((category: 'art' | 'antique' | 'jewel') => {
-        let dataset: any[] = [];
-        if (category === 'art') dataset = BLACK_MARKET_ARTS;
-        if (category === 'antique') dataset = BLACK_MARKET_ANTIQUES;
-        if (category === 'jewel') dataset = BLACK_MARKET_JEWELRY;
+        // Get random deal based on Street Rep
+        const deal = getRandomDeal(category, streetRep);
+        setCurrentDeal(deal);
+        setActiveView('DEAL'); // Switch to Deal View
 
-        // Filter out already owned items?
-        // Assuming unique IDs.
-        const ownedIds = new Set(inventory.map(i => i.id));
-        const availableItems = dataset.filter(item => !ownedIds.has(item.id));
+        console.log(`[BlackMarket] Opened ${category}, Suspicion +${CATEGORY_OPEN_SUSPICION}%`);
+    }, [streetRep, suspicion, updateBlackMarket, checkRaidRisk]);
 
-        if (availableItems.length === 0) {
-            Alert.alert('Dry Market', 'You have bought everything available in this category!');
-            return;
+    /**
+     * Consume a drug item
+     * Applies immediate effects and tracks addiction
+     */
+    const consumeDrug = useCallback((item: BlackMarketItem): { success: boolean; message: string; warning?: string } => {
+        // NOTE: Raid Risk is now ONLY during browsing (openCategory).
+        // Once deal is open, consumption is "safe" (bribed/secured).
+
+        if (!item.isDrug) {
+            return { success: false, message: 'This item is not consumable.' };
         }
 
-        const randomIndex = Math.floor(Math.random() * availableItems.length);
-        const item = availableItems[randomIndex];
-        setCurrentOffer(item);
-        setOfferVisible(true);
-    }, [inventory]);
+        // Apply Immediate Effects
+        updateCore('health', Math.max(0, (core.health || 0) - 20));
+        updateCore('happiness', Math.min(100, (core.happiness || 0) + 25));
+        updateAttribute('charm', Math.max(0, (attributes.charm || 0) - 5));
 
-    const acceptOffer = useCallback(() => {
-        if (!currentOffer) return;
+        // Street Rep gain (50% of normal for drugs)
+        const newStreetRep = Math.min(100, streetRep + item.streetRepGain);
+        updateReputation('street', newStreetRep);
 
-        if (money < currentOffer.price) {
-            Alert.alert('Insufficient Funds', "You can't afford this piece.");
-            return;
+        // Increase Suspicion
+        const newSuspicion = Math.min(100, suspicion + 10);
+        updateBlackMarket('suspicion', newSuspicion);
+
+        // Track Quarterly Usage
+        const newUsage = quarterlyDrugUsage + 1;
+        updateBlackMarket('quarterlyDrugUsage', newUsage);
+
+        // Addiction Check
+        let warningMessage: string | undefined;
+        if (newUsage > ADDICTION_THRESHOLD) {
+            // Addiction Penalties
+            const penaltySuspicion = Math.min(100, newSuspicion + 10); // Additional Police Heat +10
+            updateBlackMarket('suspicion', penaltySuspicion);
+
+            updatePersonality('morality', Math.max(0, (usePlayerStore.getState().personality.morality || 0) - 10));
+            updateAttribute('intellect', Math.max(0, (attributes.intellect || 0) - 5));
+            updateReputation('business', Math.max(0, (reputation.business || 0) - 10));
+
+            warningMessage = '⚠️ ADDICTION WARNING: Your excessive usage is affecting your life.';
+        }
+
+        setCurrentDeal(null); // Close deal view
+        setPendingItem(null); // Clear pending
+        setActiveView('HUB'); // Return to hub
+
+        return {
+            success: true,
+            message: `Consumed ${item.name}. Health -20, Happiness +25, Charisma -5`,
+            warning: warningMessage
+        };
+    }, [quarterlyDrugUsage, core, attributes, reputation, streetRep, suspicion, updateCore, updateAttribute, updateReputation, updatePersonality, updateBlackMarket]);
+
+    /**
+     * Buy the current deal
+     */
+    const buyItem = useCallback((): { success: boolean; message: string; warning?: string } => {
+        // NOTE: Raid Risk is ONLY during openCategory now.
+        // Purchasing is considered "safe" once the deal is presented.
+
+        if (!currentDeal) {
+            return { success: false, message: 'No deal available.' };
+        }
+
+        // Check Money
+        if (money < currentDeal.price) {
+            return { success: false, message: 'Insufficient funds.' };
         }
 
         // Deduct Money
-        updateStats({ money: money - currentOffer.price });
+        if (!spendMoney(currentDeal.price)) {
+            return { success: false, message: 'Transaction failed.' };
+        }
 
-        // Add to Inventory
-        const newItem: InventoryItem = {
-            id: currentOffer.id,
-            name: currentOffer.name,
-            price: currentOffer.price,
-            type: currentOffer.type, // 'art', 'antique' etc.
-            shopId: 'black_market',
-            purchasedAt: Date.now(),
-            // Store description/effect if needed, or lookup by ID later.
-            // For now InventoryItem is minimal.
+        // Route based on item type
+        if (currentDeal.isDrug) {
+            // Drugs are consumed immediately
+            const result = consumeDrug(currentDeal);
+            return result;
+        } else {
+            // Assets/Weapons/Jewelry are added to inventory
+            const newItem: InventoryItem = {
+                id: currentDeal.id,
+                name: currentDeal.name,
+                price: currentDeal.price,
+                type: currentDeal.type,
+                shopId: 'black_market',
+                purchasedAt: Date.now()
+            };
+            addItem(newItem);
+
+            // Apply Street Rep gain
+            const newStreetRep = Math.min(100, streetRep + currentDeal.streetRepGain);
+            updateReputation('street', newStreetRep);
+
+            // High Society Bonus Logic
+            let messageAddition = '';
+
+            // Tier 4 Bonus (Business Trust)
+            if (currentDeal.tier === 4) {
+                updateReputation('business', Math.min(100, (reputation.business || 0) + 5));
+            }
+
+            // High Value Bonus (High Society)
+            // If item costs >= $100M, gain +5 High Society (Social Rep)
+            if (currentDeal.price >= 100_000_000) {
+                const currentHighSociety = reputation.social || 0;
+                updateReputation('social', Math.min(100, currentHighSociety + 5));
+                messageAddition = ' +5 High Society 🎩';
+            }
+
+            setCurrentDeal(null); // Clear deal after purchase
+            setActiveView('HUB'); // Return to Hub
+
+            return {
+                success: true,
+                message: `Acquired ${currentDeal.name}. Street Rep +${currentDeal.streetRepGain.toFixed(1)}${messageAddition}`
+            };
+        }
+    }, [currentDeal, money, streetRep, reputation, spendMoney, addItem, updateReputation, consumeDrug]);
+
+    /**
+     * Pass on the current deal (close overlay and return to hub)
+     */
+    const passItem = useCallback(() => {
+        setCurrentDeal(null);
+        setActiveView('HUB');
+    }, []);
+
+    /**
+     * Resolve Raid Outcome
+     * Called when the police game ends.
+     */
+    const resolveRaid = useCallback((won: boolean): { message: string, success: boolean } => {
+        let resultMessage = '';
+
+        if (won) {
+            // SCENE A: ESCAPED
+            // Reward: Halve Suspicion (don't reset to 0)
+            const halvedSuspicion = Math.floor(suspicion * 0.5);
+            updateBlackMarket('suspicion', halvedSuspicion);
+
+            // Note: NO free item reward anymore.
+            resultMessage = 'Escaped! You shook off the heat. Suspicion halved.';
+
+            // If there was a pending item (from openCategory interruption if we used it there?), 
+            // since we removed risk from buyItem, pendingItem might not be set.
+            // But if we ever re-introduce risk, clearing it is safe.
+            setPendingItem(null);
+        } else {
+            // SCENE B: CAUGHT
+            // 1. Financial Tiered Penalty
+            let fine = 0;
+            if (money > 100_000_000) {
+                fine = 1_000_000;
+            } else if (money > 1_000_000) {
+                fine = 100_000;
+            } else {
+                fine = Math.floor(money * 0.10);
+            }
+
+            if (fine > 0) spendMoney(fine);
+
+            // 2. Stat Penalties
+            updateCore('happiness', Math.max(0, (core.happiness || 0) - 10));
+            updateReputation('business', Math.max(0, (reputation.business || 0) - 10)); // Business Trust
+            updateReputation('social', Math.max(0, (reputation.social || 0) - 10)); // High Society
+            updatePersonality('morality', Math.max(0, (usePlayerStore.getState().personality.morality || 0) - 5));
+
+            // 3. Street Rep GAIN (Criminal Cred)
+            updateReputation('street', Math.min(100, streetRep + 1));
+
+            // 4. Reset Suspicion
+            updateBlackMarket('suspicion', 0);
+
+            resultMessage = `Caught! Fined $${fine.toLocaleString()}. Lost Trust, gained Street Rep (+1).`;
+        }
+
+        // --- IMMEDIATE VIEW RESET ---
+        // Ensuring zero delay transition back to Hub
+        console.log('[BlackMarket] Raid Resolved. Switching to HUB immediately.');
+        setPendingItem(null);
+        setCurrentDeal(null);
+        setActiveView('HUB');
+
+        return { success: won, message: resultMessage };
+    }, [money, suspicion, reputation, activeView, updateBlackMarket, spendMoney, updateReputation, updateCore, updatePersonality, core, streetRep]);
+
+    /**
+     * Check if a police raid should be triggered (Legacy/Manual check)
+     * Now primarily handled by checkRaidRisk internally.
+     */
+    const triggerRaid = useCallback((): { shouldRaid: boolean; chance: number } => {
+        const triggered = checkRaidRisk();
+        return {
+            shouldRaid: triggered,
+            chance: RAID_BASE_CHANCE * 100
         };
-        addItem(newItem);
+    }, [checkRaidRisk]);
 
-        setOfferVisible(false);
-        setCurrentOffer(null);
-        Alert.alert('Acquired', `You are now the owner of ${newItem.name}. Keep it hidden.`);
-    }, [money, currentOffer, updateStats, addItem]);
+    /**
+     * Reset quarterly drug usage counter
+     */
+    const resetQuarterlyUsage = useCallback(() => {
+        updateBlackMarket('quarterlyDrugUsage', 0);
+    }, [updateBlackMarket]);
 
-    const rejectOffer = useCallback(() => {
-        setOfferVisible(false);
-        setCurrentOffer(null);
+    /**
+     * Decay Suspicion (Quarterly)
+     * Reduces suspicion by 90%
+     */
+    const decaySuspicion = useCallback(() => {
+        const decayed = Math.floor(suspicion * 0.10); // Reduce TO 10% (drop by 90%)
+        updateBlackMarket('suspicion', decayed);
+        console.log(`[BlackMarket] Decay Applied. ${suspicion} -> ${decayed}`);
+    }, [suspicion, updateBlackMarket]);
+
+    /**
+     * Manually close raid view (e.g. after game)
+     * @deprecated Use resolveRaid instead
+     */
+    const closeRaid = useCallback(() => {
+        setActiveView('HUB');
     }, []);
 
-    // Type B: Buy Weapon (Selection List)
-    const buyWeapon = useCallback((weaponId: string) => {
-        const weapon = BLACK_MARKET_WEAPONS.find(w => w.id === weaponId);
-        if (!weapon) return;
-
-        // Check ownership
-        if (inventory.some(i => i.id === weapon.id)) {
-            Alert.alert('Already Owned', 'You already have this weapon.');
-            return;
-        }
-
-        if (money < weapon.price) {
-            Alert.alert('Insufficient Funds', "Not enough cash.");
-            return;
-        }
-
-        updateStats({ money: money - weapon.price });
-        addItem({
-            id: weapon.id,
-            name: weapon.name,
-            price: weapon.price,
-            type: 'weapon',
-            shopId: 'black_market_arms',
-            purchasedAt: Date.now(),
-        });
-        Alert.alert('Purchased', `${weapon.name} added to your arsenal.`);
-    }, [money, inventory, updateStats, addItem]);
-
-    // Type C: Buy Consumable (Substances)
-    const buySubstance = useCallback((substanceId: string) => {
-        const item = BLACK_MARKET_SUBSTANCES.find(s => s.id === substanceId);
-        if (!item) return;
-
-        if (money < item.price) {
-            Alert.alert('Insufficient Funds', "Need cash for the stash.");
-            return;
-        }
-
-        updateStats({ money: money - item.price });
-
-        // Show Effect
-        setEffectMessage(item.effect || "Whoa...");
-    }, [money, updateStats]);
-
-    const clearEffect = useCallback(() => {
-        setEffectMessage(null);
-    }, []);
+    // --- RETURN API ---
 
     return {
-        // State
-        isHubVisible,
-        isBelongingsVisible,
-        isOfferVisible,
-        currentOffer,
-        effectMessage,
+        // Data Group
+        data: {
+            suspicion,
+            quarterlyDrugUsage,
+            currentDeal,
+            pendingItem, // Expose for debugging if needed
+            streetRep,
+            currentQuarter,
+            activeView
+        } as BlackMarketData & { pendingItem: BlackMarketItem | null },
 
-        // Actions
-        openBlackMarket,
-        closeBlackMarket,
-        openBelongings,
-        closeBelongings,
-
-        generateRandomOffer,
-        acceptOffer,
-        rejectOffer,
-
-        buyWeapon,
-        buySubstance,
-        clearEffect
+        // Actions Group
+        actions: {
+            openCategory,
+            buyItem,
+            passItem,
+            consumeDrug,
+            triggerRaid,
+            resetQuarterlyUsage,
+            decaySuspicion,
+            closeRaid,
+            resolveRaid // NEW
+        } as BlackMarketActions & { resolveRaid: (won: boolean) => { message: string, success: boolean } }
     };
 };
+
+// --- RE-EXPORTS ---
+export type { BlackMarketItem, BlackMarketCategory };
+export { getRandomDeal };

@@ -500,6 +500,22 @@ export const useGameStore = create<GameStore>()(
             combatStrength: 0, // Reset fatigue to 0%
           });
           console.log('[Gym] Quarterly reset: Fatigue cleared to 0%');
+
+          // 7f. BLACK MARKET QUARTERLY LOGIC
+          // Note: playerStore variable is already declared above (around line 415)
+          const { blackMarket } = playerStore;
+
+          // Reset quarterly usage
+          if (blackMarket) {
+            playerStore.updateBlackMarket('quarterlyDrugUsage', 0);
+
+            // Decay Suspicion (90% reduction)
+            const currentSuspicion = blackMarket.suspicion || 0;
+            const decayedSuspicion = Math.floor(currentSuspicion * 0.10);
+            playerStore.updateBlackMarket('suspicion', decayedSuspicion);
+
+            console.log(`[BlackMarket] Quarterly Reset: Usage=0, Suspicion Decay: ${currentSuspicion} -> ${decayedSuspicion}`);
+          }
         }
 
         // 8. ANNUAL GYM MEMBERSHIP PAYMENT (Gym 3.0 Integration)

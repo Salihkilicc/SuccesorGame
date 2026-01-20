@@ -6,6 +6,7 @@ import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { theme } from '../../../core/theme';
 import { useRelationshipBuffs } from '../../love/hooks/useRelationshipBuffs';
 import { useGymSystem } from '../components/Gym/useGymSystem';
+import { useBlackMarketSystem } from '../components/BlackMarket/useBlackMarketSystem';
 
 // İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
 // Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
@@ -53,11 +54,19 @@ const DNAScreen = () => {
         skills
     } = usePlayerStore();
 
+    // Black Market System Integration
+    const { data: { suspicion } } = useBlackMarketSystem();
+
     // Relationship Buffs
     const { intellectBoost, strengthBoost, socialBoost } = useRelationshipBuffs();
 
     // Gym 3.0 Integration
-    const { selectedArt, beltTitle, beltRank, bodyType, fatigue } = useGymSystem();
+    const { data: gymData } = useGymSystem();
+    const { stats, martialArts } = gymData;
+    const selectedArt = martialArts.style;
+    const beltTitle = martialArts.title;
+    const beltRank = martialArts.rank;
+    const { bodyType, fatigue } = stats;
 
     // Security Level based on belt rank (0-5 = 0-50%)
     const securityLevel = beltRank * 10;
@@ -92,6 +101,13 @@ const DNAScreen = () => {
         return colors[lowerBelt] || '#ccc';
     };
 
+    // Dynamic Color for Police Heat
+    const getHeatColor = (val: number) => {
+        if (val > 80) return '#ef4444'; // Red
+        if (val < 30) return '#3b82f6'; // Blue (Safe/Cool)
+        return '#f39c12'; // Orange/Yellow
+    };
+
     return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
             {/* Header */}
@@ -109,7 +125,12 @@ const DNAScreen = () => {
                     <SectionHeader title="Security & Safety" icon="🛡️" />
                     <ProgressBar label="Digital Shield" value={security?.digital} color="#3498db" icon="💻" />
                     <ProgressBar label="Bodyguard / Armor" value={securityLevel} color="#e74c3c" icon="🥋" />
-                    <ProgressBar label="Police Heat" value={reputation?.police} color="#f39c12" icon="🚨" />
+                    <ProgressBar
+                        label="Police Heat"
+                        value={suspicion}
+                        color={getHeatColor(suspicion)}
+                        icon="🚨"
+                    />
                 </View>
 
                 {/* 🥋 SKILLS - Gym 3.0 Integration */}
