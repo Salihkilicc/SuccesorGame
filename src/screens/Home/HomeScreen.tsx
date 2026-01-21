@@ -21,6 +21,8 @@ import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from 
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+// ADDED: Education System Import
+import { useEducationSystem } from '../../features/life/components/Education/useEducationSystem';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -110,6 +112,10 @@ const HomeScreen = () => {
 
       // 1. Advance by 3 months (Quarterly gameplay)
       const result = await advanceMonth(3);
+      
+      // 2. ADDED: Advance Education System (Degrees, Certificates, Refresh Library)
+      useEducationSystem.getState().progressQuarter();
+
       console.log('>>> Advance Result:', result);
 
       if (result && result.data) {

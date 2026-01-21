@@ -37,7 +37,11 @@ import BelongingsModal from '../components/BlackMarket/BelongingsModal';
 import { Alert } from 'react-native';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 import { EncounterModal } from '../../love/components/EncounterModal';
-import BreakupModal from '../../love/components/BreakupModal'; // Import New Modal
+import BreakupModal from '../../love/components/BreakupModal';
+
+// --- NEW EDUCATION SYSTEM IMPORTS ---
+import { useEducationSystem } from '../components/Education/useEducationSystem';
+import { EducationMasterModal } from '../components/Education/EducationMasterModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -162,7 +166,7 @@ const LifeScreen = () => {
     closeHookupModal,
   } = useHookupSystem();
 
-  // Encounter System Hook - MUST be before useNightOutSystem and useTravelSystem
+  // Encounter System Hook
   const {
     isVisible: isEncounterVisible,
     currentScenario,
@@ -173,7 +177,6 @@ const LifeScreen = () => {
     getCheatingConsequence
   } = useEncounterSystem();
 
-  // Cheating consequence state
   const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
 
   const {
@@ -199,6 +202,9 @@ const LifeScreen = () => {
   // Gym System Hook
   const { actions } = useGymSystem();
   const { openGym } = actions;
+
+  // --- EDUCATION SYSTEM HOOK ---
+  const { openEducation } = useEducationSystem();
 
   const {
     // Visibility
@@ -257,22 +263,6 @@ const LifeScreen = () => {
   const handleEncounterDate = useCallback(() => {
     const result = handleDate();
     if (result.wasCaught) {
-      // This will trigger the BreakupModal
-      const partnerName = useUserStore.getState().partner?.name || 'Your partner'; // Get name BEFORE it's cleared? Actually handleDate likely clears it.
-      // Wait, handleDate calls breakUp in store, which clears partner.
-      // So we need to capture partner name locally perhaps?
-      // Actually useEncounterSystem handleDate: 'if (wasCaught) breakUp(...)'
-      // The store updates immediately.
-      // So 'partner' in store became null.
-      // We should grab the name from the 'cheatingConsequence' state logic or pass it from handleDate return?
-      // handleDate in useEncounterSystem doesn't return partner name.
-      // But we can fallback to 'Your Ex' or just 'Partner'.
-      // Better fix: ensure handleDate returns the name of the person you cheated on.
-
-      // For now, let's use the fallback. 
-      // Actually, in useEncounterSystem, breakUp is called.
-      // Let's trust useEncounterSystem to have done the deed.
-      // We will set state.
       setCheatingConsequence({ settlement: result.settlement, partnerName: 'Your Partner' });
     }
   }, [handleDate]);
@@ -296,24 +286,6 @@ const LifeScreen = () => {
     switch (type) {
       case 'nightOut':
         console.log('[Life] Action triggered: Night Out');
-        // Logic handled in NightOutSystem, mostly. But user request says:
-        // "Para düş. Stress azalt. Health düşür (Yorgunluk). %30 Şansla triggerEncounter('nightclub')."
-        // NightOutSystem handles the setup/cost/outcome modal. 
-        // We should probably rely on the NightOutSystem to do the heavy lifting, 
-        // but ensure IT does the right thing, OR do simple actions here if bypass is intended.
-        // User said: "handleNightOut: Para düş. Stress azalt. Health düşür... %30 Şansla triggerEncounter"
-        // The existing 'startNightOut' opens a setup modal. Let's keep that UI flow but update logic there OR apply encounter check here.
-        // Actually, triggerEncounter is better placed AFTER the night out happens? 
-        // Or IS "Night Out" just a button press now without the modal? 
-        // The specific instruction implies a direct action logic:
-        // "handleNightOut: Para düş... triggerEncounter..."
-        // If we keep the setup modal, we should pass this logic into the confirm step.
-
-        // For now, let's keep the modal flow for Night Out as it's complex (Club/Jet selection).
-        // I will let NightOutSystem handle the stats, but I will add the Encounter trigger here or inside system.
-        // Wait, useNightOutSystem ALREADY takes 'triggerEncounter' as an argument!
-        // So I just need to verify useNightOutSystem.ts (which I did in previous turn, it was refactored).
-        // Let's just open the modal.
         startNightOut();
         break;
 
@@ -327,42 +299,22 @@ const LifeScreen = () => {
         break;
 
       case 'gym':
-        // User request: "Para düş. Stress azalt. Strength artır. %5 Şansla triggerEncounter('gym')."
-        // GymHubModal is a complex feature. 
-        // If the user wants "Gym" to be a simple button press action, I should replace openGym() with direct logic.
-        // But "GymHubModal" has Trainer, Martial Arts etc. 
-        // I will assume "Gym" enters the Hub. Inside the Hub (GymHubModal), there are actions.
-        // HOWEVER, the user specific request "handleGym: ... %5 sansla triggerEncounter('gym')" might imply
-        // checking for encounter BEFORE entering? Or upon "Working Out"?
-        // Let's add the chance here as a "Meeting someone at the entrance" event?
-        // Or simpler: The "Gym" button is "Go to Gym".
-
         if (Math.random() < 0.05) {
           if (triggerEncounter('gym')) {
             console.log('[Life] Gym Encounter Triggered!');
             return;
           }
         }
-
         openGym();
         break;
 
       case 'shopping':
         console.log('[Life] Navigating to Shopping');
-        // User request: "ShoppingScreen ... Satın alımdan sonra %5 şansla triggerEncounter"
-        // This logic belongs in ShoppingScreen, not here.
-        // Here we just navigate.
-        navigation.navigate('Assets', { screen: 'Shopping' } as any); // Correctly target nested stack
+        navigation.navigate('Assets', { screen: 'Shopping' } as any);
         break;
 
       case 'travel':
         console.log('[Life] Action triggered: Travel');
-        // User request: "Para düş. Stress 0. Happiness 100. %60 Şansla triggerEncounter('vacation')."
-        // Travel has a wizard (Destination -> Companion -> Result).
-        // This heavy logic should probably stay in the wizard confirm step.
-        // But the ENCOUNTER check is new.
-        // useTravelSystem also takes triggerEncounter.
-        // I will let the system handle the flow.
         openTravel();
         break;
 
@@ -386,8 +338,8 @@ const LifeScreen = () => {
         console.log('[Life] Action triggered: Network (placeholder)');
         break;
       case 'education':
-        console.log('[Life] Navigating to Education');
-        navigation.navigate('Education' as any);
+        console.log('[Life] Opening Education Hub');
+        openEducation();
         break;
       default:
         break;
@@ -523,6 +475,9 @@ const LifeScreen = () => {
 
       {/* Gym System (Layered Master Modal) */}
       <GymMasterModal />
+
+      {/* EDUCATION SYSTEM (Layered Master Modal) */}
+      <EducationMasterModal />
 
       {/* Travel Modals */}
       <TravelDestinationModal
