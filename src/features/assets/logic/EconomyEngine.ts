@@ -9,26 +9,9 @@ export const calculateQuarterlyFinances = (
     // 1. Calculate Income with Education Multiplier
     const baseSalary = 45000; // Base quarterly salary
 
-    // Calculate Education Salary Multiplier (Cumulative)
-    const { useEducationStore } = require('../../../core/store/useEducationStore');
-    const { completedEducations } = useEducationStore.getState();
-    const { EDUCATION_DATA } = require('../../education/data/educationData');
-
-    let educationMultiplier = 1.0;
-
-    completedEducations.forEach((id: string) => {
-        const item = EDUCATION_DATA.find((e: any) => e.id === id);
-        if (!item) return;
-
-        // Use explicit multiplier if set, otherwise infer from type
-        // Certificates have no multiplier (1.0), only academic degrees boost salary
-        const multiplier = item.salaryMultiplier ??
-            (item.type === 'degree' ? 1.2 :
-                item.type === 'master' ? 1.35 :
-                    item.type === 'phd' ? 1.5 : 1.0);
-
-        educationMultiplier *= multiplier;
-    });
+    // Get Education Salary Multiplier from new system
+    const { useEducationSystem } = require('../../life/components/Education/useEducationSystem');
+    const educationMultiplier = useEducationSystem.getState().salaryMultiplier();
 
     const salaryQuarterly = baseSalary * educationMultiplier;
 
@@ -81,21 +64,9 @@ export const calculateQuarterlyFinances = (
     const housingCost = 20000;
     const lifestyleCost = 10000;
 
-    // Education Cost (Tuition) - Dual Track Support
-    // Note: useEducationStore already required above for salary calculation
-    const { activeAcademic, activeCertificate } = useEducationStore.getState();
+    // Education Cost (Tuition) - Get from new system
+    const educationCost = useEducationSystem.getState().getCurrentQuarterlyCost();
 
-    let educationCost = 0;
-
-    // Academic Track (Degrees/Masters/PhDs)
-    if (activeAcademic && activeAcademic.item.isMonthlyCost) {
-        educationCost += activeAcademic.item.cost * 3; // Quarterly = Monthly * 3
-    }
-
-    // Certificate Track (Most are one-time, but handle monthly if exists)
-    if (activeCertificate && activeCertificate.item.isMonthlyCost) {
-        educationCost += activeCertificate.item.cost * 3;
-    }
 
 
     const tax = totalIncome * 0.20; // 20% Tax

@@ -8,6 +8,7 @@ import {
     SafeAreaView,
     ImageBackground
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from './useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, MASTERS_DATA, MastersType } from './educationData';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
@@ -27,8 +28,9 @@ interface EducationHubViewProps {
 // ========================================
 
 export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, onStudy }) => {
-    const { activeDegree, activeCertificate, salaryMultiplier, closeEducation } = useEducationSystem();
+    const { activeDegree, activeCertificate, salaryMultiplier, dropProgram, closeEducation } = useEducationSystem();
     const hasStudied = usePlayerStore((state) => state.quarterlyActions.hasStudied);
+    const navigation = useNavigation<any>();
 
     // Helper to get program display details
     const getProgramDisplay = (id: string, type: string, isCertificate: boolean) => {
@@ -109,6 +111,15 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                         {remainingQuarters === 0 ? 'Final Quarter!' : `${remainingQuarters} Quarter${remainingQuarters !== 1 ? 's' : ''} Remaining`}
                     </Text>
                 </View>
+
+                {/* Drop Button */}
+                <TouchableOpacity
+                    style={styles.dropButton}
+                    onPress={() => dropProgram('degree')}
+                    activeOpacity={0.7}
+                >
+                    <Text style={styles.dropButtonText}>Drop Out</Text>
+                </TouchableOpacity>
             </View>
         );
     };
@@ -138,6 +149,15 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                     <Text style={styles.secondaryRemaining}>
                         {remainingQuarters === 0 ? 'Completing Soon!' : `${remainingQuarters} Quarter${remainingQuarters !== 1 ? 's' : ''} Left`}
                     </Text>
+
+                    {/* Drop Button */}
+                    <TouchableOpacity
+                        style={styles.dropButton}
+                        onPress={() => dropProgram('certificate')}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.dropButtonText}>Drop</Text>
+                    </TouchableOpacity>
                 </View>
             );
         }
@@ -268,7 +288,10 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
 
             {/* Bottom Stats Bar */}
             <View style={styles.bottomBarContainer}>
-                <BottomStatsBar />
+                <BottomStatsBar onHomePress={() => {
+                    closeEducation();
+                    navigation.navigate('Home' as never);
+                }} />
             </View>
         </View>
     );
@@ -640,6 +663,26 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         marginTop: 4,
         textAlign: 'right',
+    },
+
+    dropButton: {
+        position: 'absolute',
+        bottom: 12,
+        left: 12,
+        backgroundColor: '#dc2626',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    dropButtonText: {
+        color: '#ffffff',
+        fontSize: 11,
+        fontWeight: '600',
     },
 
     bottomBarContainer: {

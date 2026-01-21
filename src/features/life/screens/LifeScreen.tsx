@@ -42,6 +42,7 @@ import BreakupModal from '../../love/components/BreakupModal';
 // --- NEW EDUCATION SYSTEM IMPORTS ---
 import { useEducationSystem } from '../components/Education/useEducationSystem';
 import { EducationMasterModal } from '../components/Education/EducationMasterModal';
+import { EducationExamModal } from '../components/Education/EducationExamModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
@@ -478,6 +479,7 @@ const LifeScreen = () => {
 
       {/* EDUCATION SYSTEM (Layered Master Modal) */}
       <EducationMasterModal />
+      <EducationExamModal />
 
       {/* Travel Modals */}
       <TravelDestinationModal

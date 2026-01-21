@@ -8,6 +8,7 @@ import {
     Alert,
     SafeAreaView
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from './useEducationSystem';
 import {
     MAJOR_DATA,
@@ -49,8 +50,25 @@ const TAB_LABELS: Record<TabType, string> = {
 // ========================================
 
 export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = ({ onBack, initialTab = 'Undergraduate' }) => {
-    const { activeDegree, activeCertificate, enroll, checkPrerequisites, closeEducation } = useEducationSystem();
+    const navigation = useNavigation();
+    const { activeDegree, activeCertificate, completedDegrees, enroll, checkPrerequisites, closeEducation } = useEducationSystem();
     const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
+
+    // Helper to check if a program should be visible (not active or completed)
+    const isVisible = (id: string, type: TabType): boolean => {
+        // Check if currently active
+        if (type === 'Certificate') {
+            if (activeCertificate?.id === id) return false;
+        } else {
+            if (activeDegree?.id === id && activeDegree?.type === type) return false;
+        }
+
+        // Check if already completed
+        const isCompleted = completedDegrees.some(d => d.id === id && d.type === type);
+        if (isCompleted) return false;
+
+        return true;
+    };
 
     const handleEnroll = (id: string) => {
         const isCertificate = selectedTab === 'Certificate';
@@ -120,226 +138,234 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
     const renderContent = () => {
         if (selectedTab === 'Certificate') {
             const certificates = Object.keys(CERTIFICATE_DATA) as CertificateType[];
-            return certificates.map((certId) => {
-                const cert = CERTIFICATE_DATA[certId];
-                const isCurrent = activeCertificate?.id === certId;
+            return certificates
+                .filter((certId) => isVisible(certId, 'Certificate'))
+                .map((certId) => {
+                    const cert = CERTIFICATE_DATA[certId];
+                    const isCurrent = activeCertificate?.id === certId;
 
-                return (
-                    <View key={certId} style={styles.majorCard}>
-                        <View style={styles.cardHeader}>
-                            <Text style={styles.majorTitle}>{cert.label}</Text>
-                        </View>
-
-                        <View style={styles.cardDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Duration:</Text>
-                                <Text style={styles.detailValue}>{cert.duration}</Text>
+                    return (
+                        <View key={certId} style={styles.majorCard}>
+                            <View style={styles.cardHeader}>
+                                <Text style={styles.majorTitle}>{cert.label}</Text>
                             </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Cost:</Text>
-                                <Text style={styles.detailValue}>${cert.cost.toLocaleString()}</Text>
-                            </View>
-                        </View>
 
-                        <View style={styles.badgeContainer}>
-                            <View style={styles.statBadge}>
-                                <Text style={styles.statBadgeText}>
-                                    Boosts: {cert.relatedStat.charAt(0).toUpperCase() + cert.relatedStat.slice(1)}
-                                    {getStatIcon(cert.relatedStat)}
+                            <View style={styles.cardDetails}>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailValue}>{cert.duration}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailValue}>${cert.cost.toLocaleString()}</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.badgeContainer}>
+                                <View style={styles.statBadge}>
+                                    <Text style={styles.statBadgeText}>
+                                        Boosts: {cert.relatedStat.charAt(0).toUpperCase() + cert.relatedStat.slice(1)}
+                                        {getStatIcon(cert.relatedStat)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.enrollButton,
+                                    isCurrent && styles.enrollButtonDisabled
+                                ]}
+                                onPress={() => handleEnroll(certId)}
+                                disabled={isCurrent}
+                            >
+                                <Text style={styles.enrollButtonText}>
+                                    {isCurrent ? 'Enrolled' : activeCertificate ? 'Switch Program' : 'Enroll Now'}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.enrollButton,
-                                isCurrent && styles.enrollButtonDisabled
-                            ]}
-                            onPress={() => handleEnroll(certId)}
-                            disabled={isCurrent}
-                        >
-                            <Text style={styles.enrollButtonText}>
-                                {isCurrent ? 'Enrolled' : activeCertificate ? 'Switch Program' : 'Enroll Now'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                );
-            });
+                    );
+                });
         } else if (selectedTab === 'Master') {
             const masterPrograms = Object.keys(MASTERS_DATA) as MastersType[];
-            return masterPrograms.map((masterId) => {
-                const masters = MASTERS_DATA[masterId];
-                const parentMajor = MAJOR_DATA[masters.parentMajor];
-                const { allowed, reason } = checkPrerequisites(masterId, 'Master');
-                const isCurrent = activeDegree?.id === masterId && activeDegree.type === 'Master';
+            return masterPrograms
+                .filter((masterId) => isVisible(masterId, 'Master'))
+                .map((masterId) => {
+                    const masters = MASTERS_DATA[masterId];
+                    const parentMajor = MAJOR_DATA[masters.parentMajor];
+                    const { allowed, reason } = checkPrerequisites(masterId, 'Master');
+                    const isCurrent = activeDegree?.id === masterId && activeDegree.type === 'Master';
 
-                return (
-                    <View key={masterId} style={[styles.majorCard, !allowed && styles.disabledCard]}>
-                        <View style={styles.cardHeader}>
-                            <View style={styles.titleRow}>
-                                <Text style={styles.masterTitle}>
-                                    {!allowed && '🔒 '}🎓 {masters.label}
+                    return (
+                        <View key={masterId} style={[styles.majorCard, !allowed && styles.disabledCard]}>
+                            <View style={styles.cardHeader}>
+                                <View style={styles.titleRow}>
+                                    <Text style={styles.masterTitle}>
+                                        {!allowed && '🔒 '}🎓 {masters.label}
+                                    </Text>
+                                </View>
+                                <Text style={styles.masterSubtitle}>
+                                    Field: {parentMajor.label} • {masters.duration}
                                 </Text>
                             </View>
-                            <Text style={styles.masterSubtitle}>
-                                Field: {parentMajor.label} • {masters.duration}
-                            </Text>
-                        </View>
 
-                        <View style={styles.cardDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Duration:</Text>
-                                <Text style={styles.detailValue}>{masters.duration}</Text>
+                            <View style={styles.cardDetails}>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailValue}>{masters.duration}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailValue}>${masters.cost.toLocaleString()}</Text>
+                                </View>
                             </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Cost:</Text>
-                                <Text style={styles.detailValue}>${masters.cost.toLocaleString()}</Text>
-                            </View>
-                        </View>
 
-                        <View style={styles.badgeContainer}>
-                            <View style={styles.statBadge}>
-                                <Text style={styles.statBadgeText}>
-                                    Boosts: {parentMajor.relatedStat.charAt(0).toUpperCase() + parentMajor.relatedStat.slice(1)}
-                                    {getStatIcon(parentMajor.relatedStat)}
+                            <View style={styles.badgeContainer}>
+                                <View style={styles.statBadge}>
+                                    <Text style={styles.statBadgeText}>
+                                        Boosts: {parentMajor.relatedStat.charAt(0).toUpperCase() + parentMajor.relatedStat.slice(1)}
+                                        {getMajorIcon(masters.parentMajor) || getStatIcon(parentMajor.relatedStat)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {!allowed && (
+                                <View style={styles.prerequisiteContainer}>
+                                    <Text style={styles.prerequisiteText}>
+                                        ⚠️ {reason}
+                                    </Text>
+                                </View>
+                            )}
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.enrollButton,
+                                    (isCurrent || !allowed) && styles.enrollButtonDisabled
+                                ]}
+                                onPress={() => handleEnroll(masterId)}
+                                disabled={isCurrent || !allowed}
+                            >
+                                <Text style={styles.enrollButtonText}>
+                                    {isCurrent ? 'Enrolled' : !allowed ? 'Locked' : activeDegree ? 'Switch Major' : 'Enroll Now'}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
-
-                        {!allowed && (
-                            <View style={styles.prerequisiteContainer}>
-                                <Text style={styles.prerequisiteText}>
-                                    ⚠️ {reason}
-                                </Text>
-                            </View>
-                        )}
-
-                        <TouchableOpacity
-                            style={[
-                                styles.enrollButton,
-                                (isCurrent || !allowed) && styles.enrollButtonDisabled
-                            ]}
-                            onPress={() => handleEnroll(masterId)}
-                            disabled={isCurrent || !allowed}
-                        >
-                            <Text style={styles.enrollButtonText}>
-                                {isCurrent ? 'Enrolled' : !allowed ? 'Locked' : activeDegree ? 'Switch Major' : 'Enroll Now'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                );
-            });
+                    );
+                });
         } else if (selectedTab === 'PhD') {
             // PhD Programs
             const phdPrograms = Object.keys(PHD_DATA) as PhDType[];
-            return phdPrograms.map((phdId) => {
-                const phd = PHD_DATA[phdId];
-                const parentMajor = MAJOR_DATA[phd.parentMajor];
-                const { allowed, reason } = checkPrerequisites(phdId, 'PhD');
-                const isCurrent = activeDegree?.id === phdId && activeDegree.type === 'PhD';
+            return phdPrograms
+                .filter((phdId) => isVisible(phdId, 'PhD'))
+                .map((phdId) => {
+                    const phd = PHD_DATA[phdId];
+                    const parentMajor = MAJOR_DATA[phd.parentMajor];
+                    const { allowed, reason } = checkPrerequisites(phdId, 'PhD');
+                    const isCurrent = activeDegree?.id === phdId && activeDegree.type === 'PhD';
 
-                return (
-                    <View key={phdId} style={[styles.majorCard, !allowed && styles.disabledCard]}>
-                        <View style={styles.cardHeader}>
-                            <View style={styles.titleRow}>
-                                <Text style={styles.masterTitle}>
-                                    {!allowed && '🔒 '}🎓 {phd.label}
+                    return (
+                        <View key={phdId} style={[styles.majorCard, !allowed && styles.disabledCard]}>
+                            <View style={styles.cardHeader}>
+                                <View style={styles.titleRow}>
+                                    <Text style={styles.masterTitle}>
+                                        {!allowed && '🔒 '}🎓 {phd.label}
+                                    </Text>
+                                </View>
+                                <Text style={styles.masterSubtitle}>
+                                    Field: {parentMajor.label} • {phd.duration / 4} Years
                                 </Text>
                             </View>
-                            <Text style={styles.masterSubtitle}>
-                                Field: {parentMajor.label} • {phd.duration / 4} Years
-                            </Text>
-                        </View>
 
-                        {!allowed && reason && (
-                            <View style={styles.prerequisiteWarning}>
-                                <Text style={styles.prerequisiteText}>⚠️ {reason}</Text>
-                            </View>
-                        )}
+                            {!allowed && reason && (
+                                <View style={styles.prerequisiteWarning}>
+                                    <Text style={styles.prerequisiteText}>⚠️ {reason}</Text>
+                                </View>
+                            )}
 
-                        <View style={styles.cardDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Duration:</Text>
-                                <Text style={styles.detailValue}>{phd.duration / 4} Years ({phd.duration} Quarters)</Text>
+                            <View style={styles.cardDetails}>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailValue}>{phd.duration / 4} Years ({phd.duration} Quarters)</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailValue}>${phd.cost.toLocaleString()}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Boosts:</Text>
+                                    <Text style={styles.detailValue}>
+                                        {parentMajor.relatedStat.charAt(0).toUpperCase() + parentMajor.relatedStat.slice(1)}
+                                        {getMajorIcon(phd.parentMajor) || getStatIcon(parentMajor.relatedStat)}
+                                    </Text>
+                                </View>
                             </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Cost:</Text>
-                                <Text style={styles.detailValue}>${phd.cost.toLocaleString()}</Text>
-                            </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Boosts:</Text>
-                                <Text style={styles.detailValue}>
-                                    {parentMajor.relatedStat.charAt(0).toUpperCase() + parentMajor.relatedStat.slice(1)}
-                                    {getStatIcon(parentMajor.relatedStat)}
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.enrollButton,
+                                    (!allowed || isCurrent) && styles.enrollButtonDisabled
+                                ]}
+                                onPress={() => handleEnroll(phdId)}
+                                disabled={!allowed || isCurrent}
+                            >
+                                <Text style={styles.enrollButtonText}>
+                                    {isCurrent ? 'Enrolled' : !allowed ? 'Locked' : activeDegree ? 'Switch Program' : 'Enroll Now'}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.enrollButton,
-                                (!allowed || isCurrent) && styles.enrollButtonDisabled
-                            ]}
-                            onPress={() => handleEnroll(phdId)}
-                            disabled={!allowed || isCurrent}
-                        >
-                            <Text style={styles.enrollButtonText}>
-                                {isCurrent ? 'Enrolled' : !allowed ? 'Locked' : activeDegree ? 'Switch Program' : 'Enroll Now'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                );
-            });
+                    );
+                });
         } else {
             const majors = Object.keys(MAJOR_DATA) as MajorType[];
             const programDetails = PROGRAM_DETAILS[selectedTab];
             const cost = programDetails.cost === 0 ? 'Free' : `$${programDetails.cost.toLocaleString()}`;
 
-            return majors.map((majorId) => {
-                const major = MAJOR_DATA[majorId];
-                const isCurrent = activeDegree?.id === majorId && activeDegree.type === selectedTab;
+            return majors
+                .filter((majorId) => isVisible(majorId, 'Undergraduate'))
+                .map((majorId) => {
+                    const major = MAJOR_DATA[majorId];
+                    const isCurrent = activeDegree?.id === majorId && activeDegree.type === selectedTab;
 
-                return (
-                    <View key={majorId} style={styles.majorCard}>
-                        <View style={styles.cardHeader}>
-                            <Text style={styles.majorTitle}>{major.label}</Text>
-                        </View>
-
-                        <View style={styles.cardDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Duration:</Text>
-                                <Text style={styles.detailValue}>{programDetails.duration}</Text>
+                    return (
+                        <View key={majorId} style={styles.majorCard}>
+                            <View style={styles.cardHeader}>
+                                <Text style={styles.majorTitle}>{major.label}</Text>
                             </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Cost:</Text>
-                                <Text style={styles.detailValue}>{cost}</Text>
-                            </View>
-                        </View>
 
-                        <View style={styles.badgeContainer}>
-                            <View style={styles.statBadge}>
-                                <Text style={styles.statBadgeText}>
-                                    Boosts: {major.relatedStat.charAt(0).toUpperCase() + major.relatedStat.slice(1)}
-                                    {getStatIcon(major.relatedStat)}
+                            <View style={styles.cardDetails}>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailValue}>{programDetails.duration}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailValue}>{cost}</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.badgeContainer}>
+                                <View style={styles.statBadge}>
+                                    <Text style={styles.statBadgeText}>
+                                        Boosts: {major.relatedStat.charAt(0).toUpperCase() + major.relatedStat.slice(1)}
+                                        {getMajorIcon(majorId) || getStatIcon(major.relatedStat)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.enrollButton,
+                                    isCurrent && styles.enrollButtonDisabled
+                                ]}
+                                onPress={() => handleEnroll(majorId)}
+                                disabled={isCurrent}
+                            >
+                                <Text style={styles.enrollButtonText}>
+                                    {isCurrent ? 'Enrolled' : activeDegree ? 'Switch Major' : 'Enroll Now'}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.enrollButton,
-                                isCurrent && styles.enrollButtonDisabled
-                            ]}
-                            onPress={() => handleEnroll(majorId)}
-                            disabled={isCurrent}
-                        >
-                            <Text style={styles.enrollButtonText}>
-                                {isCurrent ? 'Enrolled' : activeDegree ? 'Switch Major' : 'Enroll Now'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                );
-            });
+                    );
+                });
         }
     };
 
@@ -411,7 +437,10 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
 
             {/* Bottom Stats Bar */}
             <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={closeEducation} />
+                <BottomStatsBar onHomePress={() => {
+                    closeEducation();
+                    navigation.navigate('Home' as never);
+                }} />
             </View>
         </View>
     );
@@ -428,6 +457,14 @@ const getStatIcon = (stat: string) => {
         case 'morality': return ' ⚖️';
         case 'highSociety': return ' 🎩';
         case 'health': return ' ❤️';
+        default: return '';
+    }
+};
+
+// Helper to get icon for major (overrides stat icon for specific majors)
+const getMajorIcon = (majorId: MajorType) => {
+    switch (majorId) {
+        case 'ComputerScience': return ' 🛡️';
         default: return '';
     }
 };

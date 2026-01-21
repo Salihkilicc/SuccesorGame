@@ -7,6 +7,7 @@ import {
     SafeAreaView,
     ScrollView
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from './useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, DegreeType, MASTERS_DATA, MastersType } from './educationData';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
@@ -24,6 +25,7 @@ interface EducationTranscriptViewProps {
 // ========================================
 
 export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = ({ onBack }) => {
+    const navigation = useNavigation();
     const { completedDegrees, salaryMultiplier, closeEducation } = useEducationSystem();
 
     return (
@@ -95,7 +97,10 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
 
             {/* Bottom Stats Bar */}
             <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={closeEducation} />
+                <BottomStatsBar onHomePress={() => {
+                    closeEducation();
+                    navigation.navigate('Home' as never);
+                }} />
             </View>
         </View>
     );

@@ -50,11 +50,11 @@ export type ClubType =
 
 export interface MajorInfo {
     label: string;
-    relatedStat: 'intellect' | 'businessTrust' | 'charm' | 'happiness' | 'strength' | 'morality' | 'highSociety' | 'health';
+    relatedStat: 'intellect' | 'businessTrust' | 'charm' | 'happiness' | 'strength' | 'morality' | 'highSociety' | 'health' | 'digital';
 }
 
 export const MAJOR_DATA: Record<MajorType, MajorInfo> = {
-    'ComputerScience': { label: 'Computer Science', relatedStat: 'intellect' },
+    'ComputerScience': { label: 'Computer Science', relatedStat: 'digital' },
     'Business': { label: 'Business', relatedStat: 'businessTrust' },
     'Psychology': { label: 'Psychology', relatedStat: 'charm' },
     'Law': { label: 'Law', relatedStat: 'intellect' },
@@ -566,11 +566,31 @@ export const EXAM_QUESTIONS: Record<MajorType, ExamQuestion[]> = {
             options: ['Liver', 'Heart', 'Skin', 'Brain'],
             correctIndex: 2,
         },
+        {
+            question: 'What is the normal human body temperature in Celsius?',
+            options: ['35°C', '37°C', '39°C', '40°C'],
+            correctIndex: 1,
+        },
+        {
+            question: 'Which blood type is the universal donor?',
+            options: ['A+', 'B-', 'AB+', 'O-'],
+            correctIndex: 3,
+        },
     ],
     'Engineering': [
         {
             question: 'What is Ohms Law?',
             options: ['V=IR', 'F=ma', 'E=mc^2', 'P=IV'],
+            correctIndex: 0,
+        },
+        {
+            question: 'What is the SI unit of force?',
+            options: ['Joule', 'Newton', 'Watt', 'Pascal'],
+            correctIndex: 1,
+        },
+        {
+            question: 'What does CAD stand for in engineering?',
+            options: ['Computer Aided Design', 'Central Analysis Data', 'Calculated Area Diagram', 'Core Application Development'],
             correctIndex: 0,
         },
     ],
@@ -580,11 +600,31 @@ export const EXAM_QUESTIONS: Record<MajorType, ExamQuestion[]> = {
             options: ['Rule by one', 'Rule by few', 'Rule by people', 'Rule by military'],
             correctIndex: 2,
         },
+        {
+            question: 'What are the three branches of US government?',
+            options: ['Executive, Legislative, Judicial', 'President, Senate, Court', 'Federal, State, Local', 'Military, Police, FBI'],
+            correctIndex: 0,
+        },
+        {
+            question: 'What is federalism?',
+            options: ['One central government', 'Power divided between national and state', 'Rule by states only', 'International cooperation'],
+            correctIndex: 1,
+        },
     ],
     'History': [
         {
             question: 'When did WWII end?',
             options: ['1940', '1945', '1950', '1939'],
+            correctIndex: 1,
+        },
+        {
+            question: 'Who was the first President of the United States?',
+            options: ['Thomas Jefferson', 'George Washington', 'John Adams', 'Benjamin Franklin'],
+            correctIndex: 1,
+        },
+        {
+            question: 'In which year did the Berlin Wall fall?',
+            options: ['1987', '1989', '1991', '1985'],
             correctIndex: 1,
         },
     ],
@@ -594,11 +634,31 @@ export const EXAM_QUESTIONS: Record<MajorType, ExamQuestion[]> = {
             options: ['Frank Lloyd Wright', 'Frank Gehry', 'Zaha Hadid', 'Le Corbusier'],
             correctIndex: 1,
         },
+        {
+            question: 'What architectural style is characterized by pointed arches?',
+            options: ['Baroque', 'Gothic', 'Renaissance', 'Modernist'],
+            correctIndex: 1,
+        },
+        {
+            question: 'What does the Golden Ratio approximately equal?',
+            options: ['1.414', '1.618', '2.718', '3.142'],
+            correctIndex: 1,
+        },
     ],
     'Economics': [
         {
             question: 'What is inflation?',
             options: ['Falling prices', 'Rising prices', 'Stable prices', 'No prices'],
+            correctIndex: 1,
+        },
+        {
+            question: 'What does GDP stand for?',
+            options: ['Gross Domestic Product', 'General Development Plan', 'Global Distribution Process', 'Government Debt Payment'],
+            correctIndex: 0,
+        },
+        {
+            question: 'What is supply and demand?',
+            options: ['Government control', 'Market forces determining price', 'Fixed pricing', 'Random pricing'],
             correctIndex: 1,
         },
     ],
@@ -608,6 +668,16 @@ export const EXAM_QUESTIONS: Record<MajorType, ExamQuestion[]> = {
             options: ['Socrates', 'Plato', 'Aristotle', 'Descartes'],
             correctIndex: 1,
         },
+        {
+            question: 'What is the study of knowledge called?',
+            options: ['Ontology', 'Epistemology', 'Ethics', 'Logic'],
+            correctIndex: 1,
+        },
+        {
+            question: 'Who said "I think, therefore I am"?',
+            options: ['Kant', 'Nietzsche', 'Descartes', 'Hume'],
+            correctIndex: 2,
+        },
     ],
     'Marketing': [
         {
@@ -615,5 +685,18 @@ export const EXAM_QUESTIONS: Record<MajorType, ExamQuestion[]> = {
             options: ['Search Engine Optimization', 'Sales Executive Officer', 'Senior Executive Officer', 'Site Extraction Option'],
             correctIndex: 0,
         },
+        {
+            question: 'What is a target market?',
+            options: ['All customers', 'Specific group of potential customers', 'Competitors', 'Suppliers'],
+            correctIndex: 1,
+        },
+        {
+            question: 'What does B2B stand for?',
+            options: ['Business to Business', 'Back to Basics', 'Brand to Brand', 'Buyer to Buyer'],
+            correctIndex: 0,
+        },
     ],
 };
+
+// Export alias for backward compatibility
+export const EXAM_DATA = EXAM_QUESTIONS;

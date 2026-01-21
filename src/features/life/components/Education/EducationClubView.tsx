@@ -8,6 +8,7 @@ import {
     SafeAreaView,
     Alert
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from './useEducationSystem';
 import { CLUB_DATA, ClubType } from './educationData';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
@@ -39,6 +40,7 @@ const generateMemberAvatars = () => {
 // ========================================
 
 export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) => {
+    const navigation = useNavigation();
     const { activeClub, joinClub, leaveClub, closeEducation } = useEducationSystem();
 
     const handleClubAction = (clubType: ClubType) => {
@@ -161,7 +163,10 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 
             {/* Bottom Stats Bar */}
             <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={closeEducation} />
+                <BottomStatsBar onHomePress={() => {
+                    closeEducation();
+                    navigation.navigate('Home' as never);
+                }} />
             </View>
         </View>
     );
