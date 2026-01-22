@@ -24,6 +24,8 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 // ADDED: Education System Import
 import { useEducationSystem } from '../../features/life/components/Education/store/useEducationSystem';
 import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
+// ADDED: Sanctuary System Import
+import { startNewQuarter } from '../../features/life/components/Sanctuary/useSanctuarySystem';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -58,7 +60,6 @@ const HomeScreen = () => {
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
   const { setField, factoryCount, employeeCount } = useStatsStore();
   const { reset: resetProducts } = useProductStore();
-
 
   const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -114,8 +115,11 @@ const HomeScreen = () => {
       // 1. Advance by 3 months (Quarterly gameplay)
       const result = await advanceMonth(3);
 
-      // 2. ADDED: Advance Education System (Degrees, Certificates, Refresh Library)
+      // 2. Advance Education System (Degrees, Certificates, Refresh Library)
       useEducationSystem.getState().progressQuarter();
+
+      // 3. Sanctuary Cleanup (Reset Limits, Remove Temporary Luck Buffs)
+      startNewQuarter();
 
       console.log('>>> Advance Result:', result);
 

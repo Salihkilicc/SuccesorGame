@@ -25,11 +25,7 @@ import TravelCompanionModal from '../components/Travel/TravelCompanionModal';
 import TravelResultModal from '../components/Travel/TravelResultModal';
 
 import { useSanctuarySystem } from '../components/Sanctuary/useSanctuarySystem';
-import SanctuaryHubModal from '../components/Sanctuary/SanctuaryHubModal';
-import GroomingLoungeModal from '../components/Sanctuary/GroomingLoungeModal';
-import RoyalMassageModal from '../components/Sanctuary/RoyalMassageModal';
-import SunStudioModal from '../components/Sanctuary/SunStudioModal';
-import PlasticSurgeryModal from '../components/Sanctuary/PlasticSurgeryModal';
+import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
 import SanctuaryResultModal from '../components/Sanctuary/SanctuaryResultModal';
 
 import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
@@ -244,18 +240,24 @@ const LifeScreen = () => {
   } = useTravelSystem(triggerEncounter);
 
   const {
+    // Visibility & Nav
     isHubVisible,
-    closeSanctuary,
+    activeView,
     openSanctuary,
-    // Sub-modals
-    isGroomingVisible, setGroomingVisible, openGrooming,
-    isMassageVisible, setMassageVisible, openMassage,
-    isSunStudioVisible, setSunStudioVisible, openSunStudio,
-    isSurgeryVisible, setSurgeryVisible, openSurgery,
+    closeSanctuary,
+    navigate,
+    goBack,
 
-    // Result
-    isResultVisible, resultData,
-    handleServicePurchase
+    // Actions
+    performSurgery,
+    getFreshCut,
+    handleServicePurchase,
+    buyMembership,
+
+    // State
+    isVIPMember,
+    isResultVisible,
+    resultData,
   } = useSanctuarySystem();
 
   // Black Market State
@@ -518,32 +520,17 @@ const LifeScreen = () => {
       />
 
       {/* The Wellness Sanctuary Modals */}
-      <SanctuaryHubModal
-        visible={isHubVisible}
-        onClose={closeSanctuary}
-        onOpenGrooming={openGrooming}
-        onOpenMassage={openMassage}
-        onOpenSunStudio={openSunStudio}
-        onOpenSurgery={openSurgery}
-      />
-      <GroomingLoungeModal
-        visible={isGroomingVisible}
-        onClose={() => setGroomingVisible(false)}
-        handleServicePurchase={handleServicePurchase}
-      />
-      <RoyalMassageModal
-        visible={isMassageVisible}
-        onClose={() => setMassageVisible(false)}
-        handleServicePurchase={handleServicePurchase}
-      />
-      <SunStudioModal
-        visible={isSunStudioVisible}
-        onClose={() => setSunStudioVisible(false)}
-        handleServicePurchase={handleServicePurchase}
-      />
-      <PlasticSurgeryModal
-        visible={isSurgeryVisible}
-        onClose={() => setSurgeryVisible(false)}
+      {/* The Wellness Sanctuary Master System */}
+      <SanctuaryMasterModal
+        isHubVisible={isHubVisible}
+        activeView={activeView}
+        closeSanctuary={closeSanctuary}
+        navigate={navigate}
+        goBack={goBack}
+        isVIPMember={isVIPMember}
+        buyMembership={buyMembership}
+        performSurgery={performSurgery}
+        getFreshCut={getFreshCut}
         handleServicePurchase={handleServicePurchase}
       />
 

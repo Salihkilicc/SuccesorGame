@@ -7,6 +7,8 @@ type SanctuaryMenuGridProps = {
     onOpenMassage: () => void;
     onOpenSunStudio: () => void;
     onOpenSurgery: () => void;
+    onBuyMembership: () => void;
+    isVIPMember: boolean;
 };
 
 const HubCard = ({
@@ -15,23 +17,26 @@ const HubCard = ({
     subtitle,
     onPress,
     isDanger = false,
+    isVIP = false,
 }: {
     icon: string;
     title: string;
     subtitle: string;
     onPress: () => void;
     isDanger?: boolean;
+    isVIP?: boolean;
 }) => (
     <Pressable
         onPress={onPress}
         style={({ pressed }) => [
             styles.card,
             isDanger && styles.dangerCard,
+            isVIP && styles.vipCard,
             pressed && styles.cardPressed,
         ]}>
         <Text style={styles.cardIcon}>{icon}</Text>
         <View style={styles.cardContent}>
-            <Text style={[styles.cardTitle, isDanger && styles.dangerText]}>
+            <Text style={[styles.cardTitle, isDanger && styles.dangerText, isVIP && styles.vipText]}>
                 {title}
             </Text>
             <Text style={styles.cardSubtitle}>{subtitle}</Text>
@@ -45,9 +50,31 @@ const SanctuaryMenuGrid = ({
     onOpenMassage,
     onOpenSunStudio,
     onOpenSurgery,
+    onBuyMembership,
+    isVIPMember,
 }: SanctuaryMenuGridProps) => {
     return (
         <View style={styles.grid}>
+            {/* VIP MEMBERSHIP CARD */}
+            {!isVIPMember && (
+                <HubCard
+                    icon="👑"
+                    title="VIP Platinum Access"
+                    subtitle="$20,000 - FREE Massages This Quarter"
+                    onPress={onBuyMembership}
+                    isVIP
+                />
+            )}
+            {isVIPMember && (
+                <View style={styles.vipActiveBanner}>
+                    <Text style={styles.vipActiveIcon}>👑</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.vipActiveTitle}>VIP Platinum Member</Text>
+                        <Text style={styles.vipActiveText}>All massages are FREE this quarter!</Text>
+                    </View>
+                </View>
+            )}
+
             <HubCard
                 icon="💈"
                 title="Grooming Lounge"
@@ -94,6 +121,11 @@ const styles = StyleSheet.create({
         borderColor: '#552222',
         backgroundColor: '#2A1A1A',
     },
+    vipCard: {
+        borderWidth: 2,
+        borderColor: '#C5A065',
+        backgroundColor: '#2A2520',
+    },
     cardPressed: {
         opacity: 0.8,
         transform: [{ scale: 0.99 }],
@@ -114,6 +146,9 @@ const styles = StyleSheet.create({
     dangerText: {
         color: '#FF6B6B',
     },
+    vipText: {
+        color: '#C5A065',
+    },
     cardSubtitle: {
         fontSize: 12,
         color: '#8A9BA8',
@@ -121,6 +156,29 @@ const styles = StyleSheet.create({
     chevron: {
         fontSize: 18,
         color: theme.colors.textMuted,
+    },
+    vipActiveBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#C5A06520',
+        borderRadius: theme.radius.md,
+        padding: 12,
+        borderWidth: 2,
+        borderColor: '#C5A065',
+        gap: 10,
+    },
+    vipActiveIcon: {
+        fontSize: 28,
+    },
+    vipActiveTitle: {
+        color: '#C5A065',
+        fontWeight: '700',
+        fontSize: 15,
+        marginBottom: 2,
+    },
+    vipActiveText: {
+        color: '#F7FAFC',
+        fontSize: 12,
     },
 });
 

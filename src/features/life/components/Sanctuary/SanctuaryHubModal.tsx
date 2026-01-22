@@ -10,6 +10,8 @@ type SanctuaryHubModalProps = {
     onOpenMassage: () => void;
     onOpenSunStudio: () => void;
     onOpenSurgery: () => void;
+    onBuyMembership: () => void;
+    isVIPMember: boolean;
 };
 
 const SanctuaryHubModal = ({
@@ -19,6 +21,8 @@ const SanctuaryHubModal = ({
     onOpenMassage,
     onOpenSunStudio,
     onOpenSurgery,
+    onBuyMembership,
+    isVIPMember,
 }: SanctuaryHubModalProps) => {
     return (
         <GameModal
@@ -32,6 +36,8 @@ const SanctuaryHubModal = ({
                 onOpenMassage={onOpenMassage}
                 onOpenSunStudio={onOpenSunStudio}
                 onOpenSurgery={onOpenSurgery}
+                onBuyMembership={onBuyMembership}
+                isVIPMember={isVIPMember}
             />
 
             <GameButton

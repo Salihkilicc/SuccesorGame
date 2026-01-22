@@ -51,7 +51,8 @@ const DNAScreen = () => {
         personality,
         reputation,
         security,
-        skills
+        skills,
+        hidden
     } = usePlayerStore();
 
     // Black Market System Integration
@@ -206,6 +207,7 @@ const DNAScreen = () => {
                     <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
                     <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
                     <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
+                    <ProgressBar label="Luck" value={hidden?.luck} color="#10b981" icon="🍀" />
                 </View>
 
             </ScrollView>
