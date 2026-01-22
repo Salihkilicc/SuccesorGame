@@ -12,7 +12,7 @@ import { useEventStore, useUserStore, useStatsStore, usePlayerStore } from '../.
 import { theme } from '../../../core/theme';
 import AppScreen from '../../../components/layout/AppScreen';
 import { useHookupSystem } from '../components/useHookupSystem';
-import HookupModal from '../components/HookupModal';
+import { HookupModal } from '../components/HookupModal';
 import { useNightOutSystem } from '../components/NightOut/useNightOutSystem';
 import NightOutSetupModal from '../components/NightOut/NightOutSetupModal';
 import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
@@ -159,11 +159,13 @@ const LifeScreen = () => {
   } = useMatchSystem();
 
   const {
-    isHookupVisible,
-    hookupCandidate,
+    isModalVisible,
+    currentCandidate,
+    matchStatus,
     startHookup,
-    acceptHookup,
-    rejectHookup,
+    swipeRight,
+    swipeLeft,
+    nextCandidate,
     closeHookupModal,
   } = useHookupSystem();
 
@@ -443,10 +445,12 @@ const LifeScreen = () => {
         onClose={closeMatch}
       />
       <HookupModal
-        visible={isHookupVisible}
-        candidate={hookupCandidate}
-        onAccept={acceptHookup}
-        onReject={rejectHookup}
+        visible={isModalVisible}
+        candidate={currentCandidate}
+        matchStatus={matchStatus}
+        onSwipeRight={swipeRight}
+        onSwipeLeft={swipeLeft}
+        nextCandidate={nextCandidate}
         onClose={closeHookupModal}
       />
 

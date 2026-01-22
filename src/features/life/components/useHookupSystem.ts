@@ -1,90 +1,107 @@
+/**
+ * Hookup System - Logic Layer
+ * Custom Hook managing all hookup state and business logic
+ */
+
 import { useState, useCallback } from 'react';
-import { Alert } from 'react-native';
+import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { generateCandidate, HookupCandidate } from './hookupData';
 
-export type HookupCandidate = {
-    id: string;
-    name: string;
-    gender: 'Male' | 'Female';
-    age: number;
-    sexuality: 'Straight' | 'Bisexual' | 'Gay';
-    scenario: string;
-    avatarUrl?: string; // Placeholder for now
-};
+type MatchStatus = 'IDLE' | 'MATCHED' | 'NO_MATCH';
 
-const NAMES_FEMALE = ['Jessica', 'Elena', 'Sarah', 'Maria', 'Chloe', 'Sofia', 'Emma', 'Isabella', 'Mia', 'Ava'];
-const NAMES_MALE = ['Marcus', 'David', 'James', 'Michael', 'Lucas', 'Alexander', 'William', 'Benjamin', 'Daniel', 'Henry'];
+interface UseHookupSystemReturn {
+    // State
+    currentCandidate: HookupCandidate | null;
+    matchStatus: MatchStatus;
+    isModalVisible: boolean;
 
-const SCENARIOS = [
-    '{NAME} is smiling at you from across the bar.',
-    '{NAME} looks like they want to get to know you better.',
-    'You made eye contact with {NAME} and felt a spark.',
-    '{NAME} just bought you a drink and winked.',
-    '{NAME} is staring at you with intense interest.',
-];
+    // Actions
+    startHookup: () => void;
+    swipeLeft: () => void;
+    swipeRight: () => void;
+    nextCandidate: () => void; // New action for UI to trigger after animation
+    closeHookupModal: () => void;
+}
 
-export const useHookupSystem = () => {
-    const [modalVisible, setModalVisible] = useState(false);
+export function useHookupSystem(): UseHookupSystemReturn {
     const [currentCandidate, setCurrentCandidate] = useState<HookupCandidate | null>(null);
+    const [matchStatus, setMatchStatus] = useState<MatchStatus>('IDLE');
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const generateRandomPerson = useCallback((): HookupCandidate => {
-        const isFemale = Math.random() > 0.5;
-        const gender = isFemale ? 'Female' : 'Male';
-        const nameList = isFemale ? NAMES_FEMALE : NAMES_MALE;
-        const name = nameList[Math.floor(Math.random() * nameList.length)];
-        const age = Math.floor(Math.random() * (50 - 18 + 1)) + 18; // 18 - 50
+    // Get player charm from store
+    const playerCharm = usePlayerStore((state) => state.attributes.charm);
 
-        // Simple random sexuality distribution
-        const randSex = Math.random();
-        let sexuality: 'Straight' | 'Bisexual' | 'Gay' = 'Straight';
-        if (randSex > 0.85) sexuality = 'Gay';
-        else if (randSex > 0.70) sexuality = 'Bisexual';
-
-        const rawScenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
-        const scenario = rawScenario.replace('{NAME}', name);
-
-        return {
-            id: Math.random().toString(36).substr(2, 9),
-            name,
-            gender,
-            age,
-            sexuality,
-            scenario,
-        };
-    }, []);
-
+    /**
+     * Start the hookup process - generate candidate and open modal
+     */
     const startHookup = useCallback(() => {
-        const candidate = generateRandomPerson();
-        setCurrentCandidate(candidate);
-        setModalVisible(true);
-    }, [generateRandomPerson]);
-
-    const acceptHookup = useCallback(() => {
-        setModalVisible(false);
-        // TODO: Integrate with actual stats system in the future
-        // e.g., decrease stress, health risk check, etc.
-
-        // Wait for modal fade out
-        setTimeout(() => {
-            // Simple toast for now (Alert in RN)
-            // In a real app we might use a dedicated Toast component
-            console.log('Hookup accepted with:', currentCandidate?.name);
-        }, 300);
+        if (!currentCandidate) {
+            const newCandidate = generateCandidate();
+            setCurrentCandidate(newCandidate);
+        }
+        setMatchStatus('IDLE');
+        setIsModalVisible(true);
     }, [currentCandidate]);
 
-    const rejectHookup = useCallback(() => {
-        setModalVisible(false);
+    /**
+     * Generate the next candidate (Called by UI after animation completes)
+     */
+    const nextCandidate = useCallback(() => {
+        const newCandidate = generateCandidate();
+        setCurrentCandidate(newCandidate);
+        setMatchStatus('IDLE');
     }, []);
 
+    /**
+     * Swipe Left - Reject candidate
+     * Logic is now handled by UI animation -> nextCandidate()
+     */
+    const swipeLeft = useCallback(() => {
+        // No-op here, waiting for UI to call nextCandidate()
+    }, []);
+
+    /**
+     * Swipe Right - Like candidate
+     * Success formula: (Random * 100) + (Charm * 0.8) >= Difficulty
+     */
+    const swipeRight = useCallback(() => {
+        if (!currentCandidate) return;
+
+        // Calculate success chance
+        const randomFactor = Math.random() * 100;
+        const charmBonus = playerCharm * 0.8;
+        const totalScore = randomFactor + charmBonus;
+
+        const isMatch = totalScore >= currentCandidate.difficulty;
+
+        if (isMatch) {
+            setMatchStatus('MATCHED');
+        } else {
+            setMatchStatus('NO_MATCH');
+            // Timeout removed - UI will handle the delay and call nextCandidate
+        }
+    }, [currentCandidate, playerCharm]);
+
+    /**
+     * Close modal and reset state
+     */
     const closeHookupModal = useCallback(() => {
-        setModalVisible(false);
+        setIsModalVisible(false);
+        setMatchStatus('IDLE');
+        // Keep current candidate for next open
     }, []);
 
     return {
-        isHookupVisible: modalVisible,
-        hookupCandidate: currentCandidate,
+        // State
+        currentCandidate,
+        matchStatus,
+        isModalVisible,
+
+        // Actions
         startHookup,
-        acceptHookup,
-        rejectHookup,
-        closeHookupModal
+        swipeLeft,
+        swipeRight,
+        nextCandidate,
+        closeHookupModal,
     };
-};
+}
