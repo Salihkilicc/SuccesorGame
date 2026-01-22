@@ -22,8 +22,8 @@ import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../.
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 // ADDED: Education System Import
-import { useEducationSystem } from '../../features/life/components/Education/useEducationSystem';
-import { EducationExamModal } from '../../features/life/components/Education/EducationExamModal';
+import { useEducationSystem } from '../../features/life/components/Education/store/useEducationSystem';
+import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,

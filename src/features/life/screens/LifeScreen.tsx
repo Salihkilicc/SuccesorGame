@@ -40,9 +40,9 @@ import { EncounterModal } from '../../love/components/EncounterModal';
 import BreakupModal from '../../love/components/BreakupModal';
 
 // --- NEW EDUCATION SYSTEM IMPORTS ---
-import { useEducationSystem } from '../components/Education/useEducationSystem';
-import { EducationMasterModal } from '../components/Education/EducationMasterModal';
-import { EducationExamModal } from '../components/Education/EducationExamModal';
+import { useEducationSystem } from '../components/Education/store/useEducationSystem';
+import { EducationMasterModal } from '../components/Education/modals/EducationMasterModal';
+import { EducationExamModal } from '../components/Education/modals/EducationExamModal';
 
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,

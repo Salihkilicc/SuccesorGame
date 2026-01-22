@@ -10,7 +10,7 @@ export const calculateQuarterlyFinances = (
     const baseSalary = 45000; // Base quarterly salary
 
     // Get Education Salary Multiplier from new system
-    const { useEducationSystem } = require('../../life/components/Education/useEducationSystem');
+    const { useEducationSystem } = require('../../life/components/Education/store/useEducationSystem');
     const educationMultiplier = useEducationSystem.getState().salaryMultiplier();
 
     const salaryQuarterly = baseSalary * educationMultiplier;
