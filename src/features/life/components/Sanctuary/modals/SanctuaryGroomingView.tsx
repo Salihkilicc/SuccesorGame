@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
-import { theme } from '../../../../core/theme';
-import GameButton from '../../../../components/common/GameButton';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import { theme } from '../../../../../core/theme';
+import GameButton from '../../../../../components/common/GameButton';
+import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
 
-import { useStatsStore } from '../../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
 
-import { GROOMING_SERVICES } from './sanctuaryData';
+import { GROOMING_SERVICES } from '../data/sanctuaryData';
 
 type GroomingLoungeModalProps = {
     visible: boolean; // Kept for prop compatibility, not used

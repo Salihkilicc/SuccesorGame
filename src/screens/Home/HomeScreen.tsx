@@ -25,7 +25,7 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useEducationSystem } from '../../features/life/components/Education/store/useEducationSystem';
 import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
 // ADDED: Sanctuary System Import
-import { startNewQuarter } from '../../features/life/components/Sanctuary/useSanctuarySystem';
+import { startNewQuarter } from '../../features/life/components/Sanctuary/store/useSanctuarySystem';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,

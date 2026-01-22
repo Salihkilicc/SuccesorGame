@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
-import { theme } from '../../../../core/theme';
-import GameButton from '../../../../components/common/GameButton';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import { theme } from '../../../../../core/theme';
+import GameButton from '../../../../../components/common/GameButton';
+import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
 
-import { useStatsStore } from '../../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
 
-import { MASSAGE_SERVICES } from './sanctuaryData';
+import { MASSAGE_SERVICES } from '../data/sanctuaryData';
 
 type RoyalMassageModalProps = {
     visible: boolean; // Kept for prop compatibility

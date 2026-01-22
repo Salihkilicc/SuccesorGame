@@ -4,9 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 
 // Import Views
 import SanctuaryHubView from './SanctuaryHubView';
-import SanctuaryMassageView from './SanctuaryMassageView';
-import SanctuaryGroomingView from './SanctuaryGroomingView';
-import SanctuarySurgeryView from './SanctuarySurgeryView';
+import SanctuaryMassageView from './modals/SanctuaryMassageView';
+import SanctuaryGroomingView from './modals/SanctuaryGroomingView';
+import SanctuarySurgeryView from './modals/SanctuarySurgeryView';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -31,7 +31,7 @@ type SanctuaryMasterModalProps = {
         displayStats: { label: string; value: string; isPositive: boolean }[]
     ) => void;
     activeBuffs: { freshCut: boolean };
-    usageTracker: { surgery: number | null; massage: number | null; grooming: number | null };
+    usageTracker: { surgery: boolean; massage: boolean; grooming: boolean };
 };
 
 /**
@@ -51,7 +51,9 @@ const SanctuaryMasterModal = ({
     buyMembership,
     performSurgery,
     getFreshCut,
-    handleServicePurchase
+    handleServicePurchase,
+    activeBuffs,
+    usageTracker
 }: SanctuaryMasterModalProps) => {
 
     const navigation = useNavigation<any>();
@@ -90,6 +92,7 @@ const SanctuaryMasterModal = ({
                         getFreshCut={getFreshCut}
                         handleServicePurchase={handleServicePurchase}
                         onGoHome={handleGoHome}
+                        activeBuffs={activeBuffs}
                     />
                 );
             case 'SURGERY':

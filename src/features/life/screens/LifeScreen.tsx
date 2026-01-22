@@ -24,9 +24,9 @@ import TravelDestinationModal from '../components/Travel/TravelDestinationModal'
 import TravelCompanionModal from '../components/Travel/TravelCompanionModal';
 import TravelResultModal from '../components/Travel/TravelResultModal';
 
-import { useSanctuarySystem } from '../components/Sanctuary/useSanctuarySystem';
+import { useSanctuarySystem } from '../components/Sanctuary/store/useSanctuarySystem';
 import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
-import SanctuaryResultModal from '../components/Sanctuary/SanctuaryResultModal';
+import SanctuaryResultModal from '../components/Sanctuary/modals/SanctuaryResultModal';
 
 import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
 import BelongingsModal from '../components/BlackMarket/BelongingsModal';
@@ -258,6 +258,8 @@ const LifeScreen = () => {
     isVIPMember,
     isResultVisible,
     resultData,
+    activeBuffs,
+    usageTracker,
   } = useSanctuarySystem();
 
   // Black Market State
@@ -532,6 +534,8 @@ const LifeScreen = () => {
         performSurgery={performSurgery}
         getFreshCut={getFreshCut}
         handleServicePurchase={handleServicePurchase}
+        activeBuffs={activeBuffs}
+        usageTracker={usageTracker}
       />
 
       {/* RESULT MODAL */}

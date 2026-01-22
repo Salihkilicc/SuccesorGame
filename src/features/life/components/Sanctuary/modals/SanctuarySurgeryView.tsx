@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
-import { theme } from '../../../../core/theme';
-import { useStatsStore } from '../../../../core/store/useStatsStore';
-import { usePlayerStore } from '../../../../core/store/usePlayerStore';
-import GameModal from '../../../../components/common/GameModal'; // Wait, I should replace GameModal with View structure if it's inside MasterModal?
+import { theme } from '../../../../../core/theme';
+import { useStatsStore } from '../../../../../core/store/useStatsStore';
+import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
+import GameModal from '../../../../../components/common/GameModal'; // Wait, I should replace GameModal with View structure if it's inside MasterModal?
 // Actually, earlier in the conversation I converted it to a View structure (Step 319).
 // currently viewed content in Step 417 SHOWS it using GameModal.
 // This means I reverted it or never fully converted it?
@@ -20,10 +20,10 @@ import GameModal from '../../../../components/common/GameModal'; // Wait, I shou
 
 // CORRECT IMPLEMENTATION FOR SanctuarySurgeryView (View-based):
 import { SafeAreaView } from 'react-native';
-import GameButton from '../../../../components/common/GameButton';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
-import { useRelationshipBuffs } from '../../../love/hooks/useRelationshipBuffs';
-import { DOCTORS, Doctor } from './sanctuaryData';
+import GameButton from '../../../../../components/common/GameButton';
+import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import { useRelationshipBuffs } from '../../../../love/hooks/useRelationshipBuffs';
+import { DOCTORS, Doctor } from '../data/sanctuaryData';
 
 type SanctuarySurgeryViewProps = {
     visible: boolean; // Kept for prop compatibility

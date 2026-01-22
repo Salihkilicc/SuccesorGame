@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { create } from 'zustand';
-import { useStatsStore } from '../../../../core/store/useStatsStore';
-import { useEventStore } from '../../../../core/store/useEventStore';
-import { usePlayerStore } from '../../../../core/store/usePlayerStore';
-import { useGameStore } from '../../../../core/store/useGameStore';
-import { DOCTORS, Doctor, GROOMING_SERVICES } from './sanctuaryData';
+import { useStatsStore } from '../../../../../core/store/useStatsStore';
+import { useEventStore } from '../../../../../core/store/useEventStore';
+import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
+import { useGameStore } from '../../../../../core/store/useGameStore';
+import { DOCTORS, Doctor, GROOMING_SERVICES, VIP_MEMBERSHIP } from '../data/sanctuaryData';
 
 export type SanctuaryResult = {
     title: string;
@@ -119,13 +119,15 @@ export const useSanctuarySystem = () => {
     const buyMembership = () => {
         const currentStats = useStatsStore.getState();
 
-        if (currentStats.money < 20000) {
+        const { cost, benefits } = VIP_MEMBERSHIP;
+
+        if (currentStats.money < cost) {
             // Not enough money - ideally show alert
             return false;
         }
 
         // Deduct money
-        updateStats({ money: currentStats.money - 20000 });
+        updateStats({ money: currentStats.money - cost });
 
         // Set VIP status
         setVIPMember(true);
@@ -133,9 +135,9 @@ export const useSanctuarySystem = () => {
         // Show success result
         setResultData({
             title: 'VIP PLATINUM ACTIVATED',
-            message: 'Welcome to the elite club! Enjoy FREE Royal Massages this quarter. 👑',
+            message: `Welcome to the elite club! Enjoy ${benefits[0]} this quarter. 👑`,
             stats: [
-                { label: 'Money', value: '-$20,000', isPositive: false },
+                { label: 'Money', value: `-$${cost.toLocaleString()}`, isPositive: false },
                 { label: 'Status', value: 'VIP Member', isPositive: true },
             ],
         });
@@ -269,7 +271,7 @@ export const useSanctuarySystem = () => {
         // Show result
         setResultData({
             title: service.name.toUpperCase(),
-            message: 'Fresh cut! +5 Luck (Temporary)',
+            message: service.message,
             stats: [
                 { label: 'Luck', value: `+${service.luck}`, isPositive: true },
                 { label: 'Duration', value: '1 Quarter', isPositive: true },
