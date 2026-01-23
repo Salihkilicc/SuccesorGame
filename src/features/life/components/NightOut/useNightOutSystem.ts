@@ -26,6 +26,8 @@ const generateMiniGamePartner = (region: RegionCode) => {
 };
 
 export type NightOutOutcome = 'enjoyment' | 'hookup';
+export type SetupStep = 'region_select' | 'venue_select' | 'travel_select' | 'completed';
+export type TravelMethod = 'budget' | 'standard' | 'luxury' | 'own';
 
 export const useNightOutSystem = (triggerEncounter?: (context: string) => boolean) => {
     const [setupModalVisible, setSetupModalVisible] = useState(false);
@@ -38,6 +40,10 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         text: string;
         stats: string[];
         isWild?: boolean;
+        enjoymentScore?: number;
+        themeColor?: string;
+        venueEmoji?: string;
+        venueName?: string;
     } | null>(null);
 
     // Hookup Game State
@@ -46,9 +52,12 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     // Product Note: Using Partner type from main game, but will populate with local data
     const [currentPartner, setCurrentPartner] = useState<any | null>(null);
 
-    // Selection State
-    const [selectedClub, setSelectedClub] = useState<Venue>(VENUES[0]);
-    const [selectedAircraft, setSelectedAircraft] = useState<InventoryItem | null>(null);
+    // Multi-Step Flow State
+    const [step, setStep] = useState<SetupStep>('region_select');
+    const [selectedRegion, setSelectedRegion] = useState<RegionCode | null>(null);
+    const [selectedClub, setSelectedClub] = useState<Venue | null>(null);
+    const [travelCostAmount, setTravelCostAmount] = useState(0);
+    const [travelReputationChange, setTravelReputationChange] = useState(0);
 
     // Store access
     const { money, update: updateStats } = useStatsStore();
@@ -57,49 +66,101 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     // Helper to keep code consistent with snippet
     const playerStore = { reputation };
 
-    // Filter Aircrafts
-    const aircrafts = useMemo(() => {
-        return inventory.filter(item => item.type === 'aircraft' || item.type === 'plane');
+    // Check if user owns a private jet
+    const hasPrivateJet = useMemo(() => {
+        return inventory.some(item => item.type === 'aircraft' || item.type === 'plane');
     }, [inventory]);
 
-    const needsTravel = selectedClub.region !== 'LOCAL';
-
-    const travelCost = useMemo(() => {
-        if (!needsTravel) return 0;
-        if (selectedAircraft) {
-            // Dynamic cost based on aircraft price (more expensive plane = higher op cost)
-            // Heuristic: 0.5% of plane value per trip? Or fixed scaling?
-            // Let's go with a simpler model: Base $5k + 0.1% of value
-            return 5000 + (selectedAircraft.price * 0.001);
-        }
-        // Charter Flight default
-        return 50000;
-    }, [needsTravel, selectedAircraft]);
-
-    const totalCost = selectedClub.entryFee + travelCost;
+    const totalCost = (selectedClub?.entryFee || 0) + travelCostAmount;
 
     const startNightOut = useCallback(() => {
         setSetupModalVisible(true);
-        // Reset selections
-        setSelectedClub(VENUES[0]);
-        setSelectedAircraft(aircrafts.length > 0 ? aircrafts[0] : null);
-    }, [aircrafts]);
+        // Reset to initial step
+        setStep('region_select');
+        setSelectedRegion(null);
+        setSelectedClub(null);
+        setTravelCostAmount(0);
+        setTravelReputationChange(0);
+    }, []);
+
+    const selectRegion = useCallback((region: RegionCode) => {
+        setSelectedRegion(region);
+        setStep('venue_select');
+    }, []);
+
+    const selectVenue = useCallback((venue: Venue) => {
+        setSelectedClub(venue);
+        // If USA (Local) venue, skip travel selection and go straight to confirmation
+        if (venue.region === 'USA') {
+            setTravelCostAmount(0);
+            setTravelReputationChange(0);
+            setStep('completed');
+        } else {
+            setStep('travel_select');
+        }
+    }, []);
+
+    const selectTravelMethod = useCallback((method: TravelMethod) => {
+        let cost = 0;
+        let repChange = 0;
+
+        switch (method) {
+            case 'budget':
+                cost = 20000;
+                repChange = -1;
+                break;
+            case 'standard':
+                cost = 30000;
+                repChange = 0;
+                break;
+            case 'luxury':
+                cost = 50000;
+                repChange = 1;
+                break;
+            case 'own':
+                if (!hasPrivateJet) {
+                    Alert.alert('No Private Jet', 'You need to own a private jet to use this option.');
+                    return;
+                }
+                cost = 5000; // Fuel cost
+                repChange = 0;
+                break;
+        }
+
+        setTravelCostAmount(cost);
+        setTravelReputationChange(repChange);
+
+        // Apply reputation change immediately
+        if (repChange !== 0) {
+            const currentSocial = reputation?.social || 0;
+            updateReputation('social', Math.max(0, Math.min(100, currentSocial + repChange)));
+        }
+
+        setStep('completed');
+    }, [hasPrivateJet, reputation, updateReputation]);
 
     const confirmNightOut = useCallback(() => {
+        if (!selectedClub) {
+            Alert.alert('No Venue Selected', 'Please select a venue first.');
+            return;
+        }
+
         if (money < totalCost) {
             Alert.alert('Insufficient Funds', "You can't afford this night out yet.");
             return;
         }
 
-        // 1. Deduct Money & Update Stats
+        // 1. Deduct Money
         updateStats({
             money: money - totalCost,
         });
 
-        // Update Player Stats (Base benefits from going out)
-        updateCore('stress', Math.max(0, core.stress - 10));
-        updateCore('health', Math.max(0, core.health - 5));
+        // Update Attribute Charm (Base benefit)
         updateAttribute('charm', Math.min(100, attributes.charm + 5));
+        // Note: Stress/Health base updates moved to specific outcomes for finer control, 
+        // except keeping a small base health cost for realism? 
+        // Let's stick to the plan: modify stress based on outcome.
+        updateCore('health', Math.max(0, core.health - 5));
 
         setSetupModalVisible(false);
 
@@ -127,27 +188,45 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
                     return;
                 }
             }
-            // If encounter fails to trigger, fall through to enjoyment
+            // If encounter fails to trigger, fall through to enjoyment logic
+            // (Using the same logic as below for consistency)
+            const enjoymentScore = Math.floor(Math.random() * 100) + 1;
+            const stressReduction = Math.ceil(enjoymentScore / 10);
+            updateCore('stress', Math.max(0, core.stress - stressReduction));
+
             setTimeout(() => {
                 setConclusionData({
-                    text: "You had a great time dancing and blowing off steam.",
-                    stats: ["Stress -10"]
+                    text: selectedClub.vibeText,
+                    stats: [`Stress -${stressReduction}`],
+                    enjoymentScore,
+                    themeColor: selectedClub.themeColor,
+                    venueEmoji: selectedClub.emoji,
+                    venueName: selectedClub.name
                 });
                 setConclusionModalVisible(true);
             }, 300);
 
         } else {
             // 70% Chance: Just Enjoyment (30% - 100%)
+            const enjoymentScore = Math.floor(Math.random() * 100) + 1;
+            const stressReduction = Math.ceil(enjoymentScore / 10); // 1 to 10
+
+            updateCore('stress', Math.max(0, core.stress - stressReduction));
+
             setTimeout(() => {
                 setConclusionData({
-                    text: "You had a great time dancing and blowing off steam.",
-                    stats: ["Stress -10"]
+                    text: selectedClub.vibeText,
+                    stats: [`Stress -${stressReduction}`],
+                    enjoymentScore,
+                    themeColor: selectedClub.themeColor,
+                    venueEmoji: selectedClub.emoji,
+                    venueName: selectedClub.name
                 });
                 setConclusionModalVisible(true);
             }, 300);
         }
 
-    }, [money, totalCost, updateStats, triggerEncounter, core, attributes, updateCore, updateAttribute]);
+    }, [money, totalCost, updateStats, triggerEncounter, core, attributes, updateCore, updateAttribute, selectedClub]);
 
     const handleHookupGameSuccess = useCallback(() => {
         setHookupGameVisible(false);
@@ -292,6 +371,37 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         setConclusionModalVisible(false);
     }, []);
 
+    const [isHangarOpen, setIsHangarOpen] = useState(false);
+
+    // Navigation Helper
+    const goBack = useCallback(() => {
+        if (isHangarOpen) {
+            setIsHangarOpen(false);
+            return;
+        }
+
+        switch (step) {
+            case 'completed':
+                // From confirmation to travel (or venue if USA)
+                if (selectedClub?.region === 'USA') {
+                    setStep('venue_select');
+                } else {
+                    setStep('travel_select');
+                }
+                break;
+            case 'travel_select':
+                setStep('venue_select');
+                break;
+            case 'venue_select':
+                setStep('region_select');
+                setSelectedRegion(null);
+                break;
+            case 'region_select':
+                setSetupModalVisible(false);
+                break;
+        }
+    }, [step, selectedClub, isHangarOpen]);
+
     return {
         // State
         setupModalVisible,
@@ -304,17 +414,26 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         hookupGameVisible,
         currentScenario,
         currentPartner,
+        // Multi-step flow state
+        step,
+        selectedRegion,
         selectedClub,
-        selectedAircraft,
-        aircrafts,
-        needsTravel,
+        travelCostAmount,
+        travelReputationChange,
+        hasPrivateJet,
         totalCost,
+
+        // Hangar State
+        isHangarOpen,
+        setIsHangarOpen,
+        goBack,
 
         // Actions
         setSetupModalVisible,
         startNightOut,
-        setSelectedClub,
-        setSelectedAircraft,
+        selectRegion,
+        selectVenue,
+        selectTravelMethod,
         confirmNightOut,
         handleHookupAccept,
         handleOutcomeClose,

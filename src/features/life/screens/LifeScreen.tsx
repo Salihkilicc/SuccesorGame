@@ -192,15 +192,24 @@ const LifeScreen = () => {
     hookupGameVisible,
     currentScenario,
     currentPartner,
+    // Multi-step flow state
+    step,
+    selectedRegion,
     selectedClub,
-    selectedAircraft,
-    aircrafts,
-    needsTravel,
+    travelCostAmount,
+    hasPrivateJet,
     totalCost,
+    // Navigation & Hangar
+    goBack: goBackNightOut,
+    isHangarOpen,
+    setIsHangarOpen,
+
+    // Actions
     setSetupModalVisible,
     startNightOut,
-    setSelectedClub,
-    setSelectedAircraft,
+    selectRegion,
+    selectVenue,
+    selectTravelMethod,
     confirmNightOut,
     handleHookupAccept,
     handleOutcomeClose,
@@ -476,14 +485,19 @@ const LifeScreen = () => {
       <NightOutSetupModal
         visible={setupModalVisible}
         onClose={() => setSetupModalVisible(false)}
-        onConfirm={confirmNightOut}
+        step={step}
+        selectedRegion={selectedRegion}
         selectedClub={selectedClub}
-        setSelectedClub={setSelectedClub}
-        selectedAircraft={selectedAircraft}
-        setSelectedAircraft={setSelectedAircraft}
-        aircrafts={aircrafts}
-        needsTravel={needsTravel}
+        travelCostAmount={travelCostAmount}
+        hasPrivateJet={hasPrivateJet}
         totalCost={totalCost}
+        selectRegion={selectRegion}
+        selectVenue={selectVenue}
+        selectTravelMethod={selectTravelMethod}
+        confirmNightOut={confirmNightOut}
+        goBack={goBackNightOut}
+        isHangarOpen={isHangarOpen}
+        setIsHangarOpen={setIsHangarOpen}
       />
       <NightOutOutcomeModal
         visible={outcomeModalVisible}
