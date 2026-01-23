@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 // 5 tane ../ koyuyoruz
-import { theme } from '../../../../../core/theme';import { NightOutClub } from '../useNightOutSystem';
+import { theme } from '../../../../../core/theme';
+import { Venue } from '../data/nightOutVenues';
 
 type NightOutLocationViewProps = {
-    clubs: NightOutClub[];
-    selectedClub: NightOutClub;
-    onSelectClub: (club: NightOutClub) => void;
+    clubs: Venue[];
+    selectedClub: Venue;
+    onSelectClub: (club: Venue) => void;
 };
 
 const NightOutLocationView = ({ clubs, selectedClub, onSelectClub }: NightOutLocationViewProps) => {
@@ -32,7 +33,7 @@ const NightOutLocationView = ({ clubs, selectedClub, onSelectClub }: NightOutLoc
                                 {club.name}
                             </Text>
                             <Text style={styles.optionSubText}>
-                                {club.location}, {club.country}
+                                {club.location}, {club.region}
                             </Text>
                             <Text style={styles.feeText}>
                                 Entry: ${club.entryFee.toLocaleString()}

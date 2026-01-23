@@ -8,7 +8,7 @@ import {
     ScrollView,
 } from 'react-native';
 import { theme } from '../../../../core/theme';
-import { CLUBS, NightOutClub } from './useNightOutSystem';
+import { VENUES, Venue } from './data/nightOutVenues';
 import { InventoryItem } from '../../../../core/store/useUserStore';
 
 import NightOutLocationView from './components/NightOutLocationView';
@@ -19,8 +19,8 @@ type NightOutSetupModalProps = {
     visible: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    selectedClub: NightOutClub;
-    setSelectedClub: (club: NightOutClub) => void;
+    selectedClub: Venue;
+    setSelectedClub: (club: Venue) => void;
     selectedAircraft: InventoryItem | null;
     setSelectedAircraft: (item: InventoryItem | null) => void;
     aircrafts: InventoryItem[];
@@ -56,7 +56,7 @@ const NightOutSetupModal = ({
                     <ScrollView style={styles.scrollContent}>
                         {/* LOCATION SELECTOR */}
                         <NightOutLocationView
-                            clubs={CLUBS}
+                            clubs={VENUES}
                             selectedClub={selectedClub}
                             onSelectClub={setSelectedClub}
                         />

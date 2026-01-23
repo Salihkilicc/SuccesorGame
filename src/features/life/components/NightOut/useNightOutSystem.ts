@@ -3,22 +3,27 @@ import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { useUserStore, InventoryItem } from '../../../../core/store/useUserStore';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import { Alert } from 'react-native';
+import { HOOKUP_SCENARIOS, HookupScenario, getRandomScenario } from './data/hookupGameData';
+import { Partner } from '../../../love/types';
+import { generatePartner } from '../../../love/logic/partnerGenerator';
 
-export type NightOutClub = {
-    id: string;
-    name: string;
-    location: string;
-    entryFee: number;
-    country: string;
+import { VENUES, REGIONAL_NAMES, RegionCode, Venue } from './data/nightOutVenues';
+
+// Mini-Game Jobs
+const NIGHT_JOBS = ['Model', 'Influencer', 'CEO', 'Artist', 'Student', 'Designer', 'DJ', 'Actor', 'Heir/Heiress'];
+
+const generateMiniGamePartner = (region: RegionCode) => {
+    const isMale = Math.random() < 0.5;
+    const nameList = isMale ? REGIONAL_NAMES[region].male : REGIONAL_NAMES[region].female;
+    const name = nameList[Math.floor(Math.random() * nameList.length)];
+    const jobTitle = NIGHT_JOBS[Math.floor(Math.random() * NIGHT_JOBS.length)];
+
+    return {
+        name,
+        job: { title: jobTitle },
+        gender: isMale ? 'male' : 'female'
+    };
 };
-
-export const CLUBS: NightOutClub[] = [
-    { id: '1', name: 'Omnia', location: 'Las Vegas', country: 'USA', entryFee: 5000 },
-    { id: '2', name: 'Berghain', location: 'Berlin', country: 'Germany', entryFee: 3000 },
-    { id: '3', name: 'Ushuaïa', location: 'Ibiza', country: 'Spain', entryFee: 6000 },
-    { id: '4', name: 'Cavalli Club', location: 'Dubai', country: 'UAE', entryFee: 10000 },
-    { id: '5', name: 'Octagon', location: 'Seoul', country: 'South Korea', entryFee: 4000 },
-];
 
 export type NightOutOutcome = 'enjoyment' | 'hookup';
 
@@ -26,23 +31,38 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     const [setupModalVisible, setSetupModalVisible] = useState(false);
     const [outcomeModalVisible, setOutcomeModalVisible] = useState(false);
     const [outcomeType, setOutcomeType] = useState<NightOutOutcome | null>(null);
-    const [condomModalVisible, setCondomModalVisible] = useState(false);
+    const [nightEndModalVisible, setNightEndModalVisible] = useState(false);
+    const [pregnancyModalVisible, setPregnancyModalVisible] = useState(false);
+    const [conclusionModalVisible, setConclusionModalVisible] = useState(false);
+    const [conclusionData, setConclusionData] = useState<{
+        text: string;
+        stats: string[];
+        isWild?: boolean;
+    } | null>(null);
+
+    // Hookup Game State
+    const [hookupGameVisible, setHookupGameVisible] = useState(false);
+    const [currentScenario, setCurrentScenario] = useState<HookupScenario | null>(null);
+    // Product Note: Using Partner type from main game, but will populate with local data
+    const [currentPartner, setCurrentPartner] = useState<any | null>(null);
 
     // Selection State
-    const [selectedClub, setSelectedClub] = useState<NightOutClub>(CLUBS[0]);
+    const [selectedClub, setSelectedClub] = useState<Venue>(VENUES[0]);
     const [selectedAircraft, setSelectedAircraft] = useState<InventoryItem | null>(null);
 
     // Store access
     const { money, update: updateStats } = useStatsStore();
     const { inventory } = useUserStore();
-    const { updateCore, updateAttribute, core, attributes } = usePlayerStore();
+    const { updateCore, updateAttribute, updateReputation, core, attributes, reputation } = usePlayerStore();
+    // Helper to keep code consistent with snippet
+    const playerStore = { reputation };
 
     // Filter Aircrafts
     const aircrafts = useMemo(() => {
         return inventory.filter(item => item.type === 'aircraft' || item.type === 'plane');
     }, [inventory]);
 
-    const needsTravel = selectedClub.country !== 'USA';
+    const needsTravel = selectedClub.region !== 'LOCAL';
 
     const travelCost = useMemo(() => {
         if (!needsTravel) return 0;
@@ -61,7 +81,7 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     const startNightOut = useCallback(() => {
         setSetupModalVisible(true);
         // Reset selections
-        setSelectedClub(CLUBS[0]);
+        setSelectedClub(VENUES[0]);
         setSelectedAircraft(aircrafts.length > 0 ? aircrafts[0] : null);
     }, [aircrafts]);
 
@@ -76,40 +96,86 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
             money: money - totalCost,
         });
 
-        // Update Player Stats
-        updateCore('stress', Math.max(0, core.stress - 15));
+        // Update Player Stats (Base benefits from going out)
+        updateCore('stress', Math.max(0, core.stress - 10));
         updateCore('health', Math.max(0, core.health - 5));
         updateAttribute('charm', Math.min(100, attributes.charm + 5));
 
         setSetupModalVisible(false);
 
-        // 2. Try to trigger encounter
-        if (triggerEncounter) {
-            const hasEncounter = triggerEncounter('club');
-            if (hasEncounter) {
-                // Encounter modal will open, don't show outcome modal yet
-                // The outcome modal will be shown after encounter closes
-                return;
+        // 2. Determine outcome with specific probabilities
+        const roll = Math.random(); // 0.0 to 1.0
+
+        if (roll < 0.20) {
+            // 20% Chance: Hookup Mini-Game
+            const scenario = getRandomScenario();
+            const partner = generatePartner();
+
+            setCurrentScenario(scenario);
+            setCurrentPartner(partner);
+
+            setTimeout(() => {
+                setHookupGameVisible(true);
+            }, 300);
+
+        } else if (roll < 0.30) {
+            // 10% Chance: Love Encounter (20% - 30%)
+            if (triggerEncounter) {
+                const hasEncounter = triggerEncounter('club');
+                if (hasEncounter) {
+                    // Encounter modal will open automatically
+                    return;
+                }
             }
+            // If encounter fails to trigger, fall through to enjoyment
+            setTimeout(() => {
+                setConclusionData({
+                    text: "You had a great time dancing and blowing off steam.",
+                    stats: ["Stress -10"]
+                });
+                setConclusionModalVisible(true);
+            }, 300);
+
+        } else {
+            // 70% Chance: Just Enjoyment (30% - 100%)
+            setTimeout(() => {
+                setConclusionData({
+                    text: "You had a great time dancing and blowing off steam.",
+                    stats: ["Stress -10"]
+                });
+                setConclusionModalVisible(true);
+            }, 300);
         }
 
-        // 3. No encounter - proceed with normal outcome
-        const roll = Math.random();
-        const type: NightOutOutcome = roll < 0.66 ? 'enjoyment' : 'hookup';
+    }, [money, totalCost, updateStats, triggerEncounter, core, attributes, updateCore, updateAttribute]);
 
-        setOutcomeType(type);
+    const handleHookupGameSuccess = useCallback(() => {
+        setHookupGameVisible(false);
 
-        // Small delay for transition
+        // Success rewards
+        updateCore('stress', Math.max(0, core.stress - 20));
+        updateCore('happiness', Math.min(100, core.happiness + 30));
+        updateAttribute('charm', Math.min(100, attributes.charm + 3));
+
+        // Show Night End decision modal (replaces Condom Modal)
         setTimeout(() => {
-            setOutcomeModalVisible(true);
+            setNightEndModalVisible(true);
         }, 300);
+    }, [core, attributes, updateCore, updateAttribute]);
 
-    }, [money, totalCost, updateStats, triggerEncounter]);
+    const handleHookupGameFail = useCallback(() => {
+        setHookupGameVisible(false);
+
+        // No rewards, just close
+        setTimeout(() => {
+            Alert.alert('Better Luck Next Time', 'She wasn\'t feeling the vibe. Maybe next time!');
+        }, 300);
+    }, []);
 
     const handleHookupAccept = useCallback(() => {
         setOutcomeModalVisible(false);
         setTimeout(() => {
-            setCondomModalVisible(true);
+            setNightEndModalVisible(true);
         }, 300);
     }, []);
 
@@ -118,14 +184,112 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         setOutcomeType(null);
     }, []);
 
-    const handleCondomDecision = useCallback((choice: 'safe' | 'risky') => {
-        setCondomModalVisible(false);
-        // TODO: Record this risky decision flag for future consequences
-        if (choice === 'safe') {
-            console.log('[NightOut] Safe choice made');
+    const handleNightEndDecision = useCallback((choice: 'classy' | 'wild') => {
+        setNightEndModalVisible(false);
+
+        if (choice === 'classy') {
+            const hotelCost = 2000;
+            updateCore('stress', Math.max(0, core.stress - 10));
+
+            updateStats({ money: money - hotelCost });
+            setConclusionData({
+                text: "You ended the night peacefully in fresh sheets. A well-deserved rest.",
+                stats: ["Stress -10", "-$2,000"],
+                isWild: false
+            });
+            setTimeout(() => setConclusionModalVisible(true), 300);
+
         } else {
-            console.log('[NightOut] Risky choice made');
+            // WILD CALCULATION (High Risk, High Reward: Stress -25, but independent risks)
+            const events: string[] = [];
+            let currentMoney = money;
+            let moneyLost = 0;
+            let stressChange = -25;
+            let healthChange = 0;
+
+            // 1. Robbery Risk (7%)
+            if (Math.random() < 0.07) {
+                // Robbery takes 11% of CURRENT money
+                const stolenAmount = Math.floor(currentMoney * 0.11);
+
+                if (stolenAmount > 0) {
+                    currentMoney -= stolenAmount;
+                    moneyLost += stolenAmount;
+                    events.push(`Mugged outside club: -$${stolenAmount.toLocaleString()} (11%)`);
+                }
+            }
+
+            // 2. Disease Risk (7%)
+            if (Math.random() < 0.07) {
+                healthChange -= 20;
+                updateCore('health', Math.max(0, core.health - 20));
+                events.push('Caught a virus: Health -20');
+            }
+
+            // 3. Blackmail Risk (7%)
+            if (Math.random() < 0.07) {
+                const blackmailCost = 50000;
+                currentMoney -= blackmailCost;
+                moneyLost += blackmailCost;
+
+                // Business Trust -5
+                const currentTrust = playerStore.reputation?.business || 0;
+                updateReputation('business', Math.max(0, currentTrust - 5));
+
+                events.push('Scandal leaked: Trust -5 & -$50k');
+            }
+
+            // Apply Final Money Update
+            if (moneyLost > 0) {
+                updateStats({ money: money - moneyLost });
+            }
+
+            // Apply Stats Update (Massive Stress Relief)
+            updateCore('stress', Math.max(0, core.stress - 25));
+
+            // Build narrative and stats
+            let story = "It was a legendary night...";
+            let currentStats = ["Stress -25"];
+
+            // Add narrative based on events
+            if (events.some(e => e.includes('Mugged'))) {
+                story += " until you realized your wallet was gone.";
+                const robberyEvent = events.find(e => e.includes('Mugged'));
+                if (robberyEvent) {
+                    // Extract the dollar amount properly
+                    const match = robberyEvent.match(/\$([0-9,]+)/);
+                    if (match) {
+                        currentStats.push(`-$${match[1]} (Mugged)`);
+                    }
+                }
+            }
+            if (events.some(e => e.includes('Health'))) {
+                story += " but you woke up feeling terrible.";
+                currentStats.push("Health -20");
+            }
+            if (events.some(e => e.includes('Scandal'))) {
+                story += " and someone took compromising photos.";
+                currentStats.push("Trust -5");
+                currentStats.push("-$50k (Blackmail)");
+            }
+
+            setConclusionData({
+                text: story,
+                stats: currentStats,
+                isWild: true
+            });
+
+            // 4. Pregnancy Risk (7%)
+            if (Math.random() < 0.07) {
+                setPregnancyModalVisible(true);
+            }
+
+            setTimeout(() => setConclusionModalVisible(true), 300);
         }
+    }, [core, money, updateCore, updateStats]);
+
+    const handleConclusionClose = useCallback(() => {
+        setConclusionModalVisible(false);
     }, []);
 
     return {
@@ -133,7 +297,13 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         setupModalVisible,
         outcomeModalVisible,
         outcomeType,
-        condomModalVisible,
+        nightEndModalVisible,
+        pregnancyModalVisible,
+        conclusionModalVisible,
+        conclusionData,
+        hookupGameVisible,
+        currentScenario,
+        currentPartner,
         selectedClub,
         selectedAircraft,
         aircrafts,
@@ -148,6 +318,11 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         confirmNightOut,
         handleHookupAccept,
         handleOutcomeClose,
-        handleCondomDecision,
+        handleNightEndDecision,
+        setPregnancyModalVisible,
+        setConclusionModalVisible,
+        handleConclusionClose,
+        handleHookupGameSuccess,
+        handleHookupGameFail,
     };
 };

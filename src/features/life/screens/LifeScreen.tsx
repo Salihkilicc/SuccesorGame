@@ -16,7 +16,10 @@ import { HookupModal } from '../components/HookupModal';
 import { useNightOutSystem } from '../components/NightOut/useNightOutSystem';
 import NightOutSetupModal from '../components/NightOut/NightOutSetupModal';
 import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
-import CondomDecisionModal from '../components/NightOut/CondomDecisionModal';
+import HookupGameModal from '../components/NightOut/HookupGameModal';
+import NightEndModal from '../components/NightOut/NightEndModal';
+import PregnancyRevealModal from '../components/NightOut/PregnancyRevealModal';
+import NightConclusionModal from '../components/NightOut/NightConclusionModal';
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import GymMasterModal from '../components/Gym/GymMasterModal';
 import { useTravelSystem } from '../components/Travel/useTravelSystem';
@@ -168,7 +171,7 @@ const LifeScreen = () => {
   // Encounter System Hook
   const {
     isVisible: isEncounterVisible,
-    currentScenario,
+    currentScenario: encounterScenario,
     candidate: encounterCandidate,
     triggerEncounter,
     handleDate,
@@ -182,7 +185,13 @@ const LifeScreen = () => {
     setupModalVisible,
     outcomeModalVisible,
     outcomeType,
-    condomModalVisible,
+    nightEndModalVisible,
+    pregnancyModalVisible,
+    conclusionModalVisible,
+    conclusionData,
+    hookupGameVisible,
+    currentScenario,
+    currentPartner,
     selectedClub,
     selectedAircraft,
     aircrafts,
@@ -195,7 +204,12 @@ const LifeScreen = () => {
     confirmNightOut,
     handleHookupAccept,
     handleOutcomeClose,
-    handleCondomDecision,
+    handleNightEndDecision,
+    setPregnancyModalVisible,
+    setConclusionModalVisible,
+    handleConclusionClose,
+    handleHookupGameSuccess,
+    handleHookupGameFail,
   } = useNightOutSystem(triggerEncounter);
 
   // Gym System Hook
@@ -477,9 +491,25 @@ const LifeScreen = () => {
         onClose={handleOutcomeClose}
         onHookupAccept={handleHookupAccept}
       />
-      <CondomDecisionModal
-        visible={condomModalVisible}
-        onDecision={handleCondomDecision}
+      <HookupGameModal
+        visible={hookupGameVisible}
+        scenario={currentScenario}
+        partner={currentPartner}
+        onSuccess={handleHookupGameSuccess}
+        onFail={handleHookupGameFail}
+      />
+      <NightEndModal
+        visible={nightEndModalVisible}
+        onDecision={handleNightEndDecision}
+      />
+      <NightConclusionModal
+        visible={conclusionModalVisible}
+        data={conclusionData}
+        onClose={handleConclusionClose}
+      />
+      <PregnancyRevealModal
+        visible={pregnancyModalVisible}
+        onClose={() => setPregnancyModalVisible(false)}
       />
 
       {/* Gym System (Layered Master Modal) */}
@@ -561,8 +591,8 @@ const LifeScreen = () => {
       <EncounterModal
         visible={isEncounterVisible}
         candidate={encounterCandidate}
-        scenario={currentScenario}
-        context={currentScenario?.id.split('_')[0] || 'Unknown'}
+        scenario={encounterScenario}
+        context={encounterScenario?.id.split('_')[0] || 'Unknown'}
         onDate={handleEncounterDate}
         onHookup={() => {
           Alert.alert("Fling", "You had a great night! (Stress -10)");
