@@ -1,179 +1,193 @@
 import { useState, useCallback } from 'react';
+import { Alert } from 'react-native';
+import { VACATION_SPOTS, VacationSpot, TravelClass } from './data/travelData';
+import { useTravelStore } from './store/useTravelStore';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
-import { useUserStore } from '../../../../core/store/useUserStore';
-import { triggerEvent } from '../../../../event/eventEngine'; // Assuming we might want to trigger random events later
+import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 
-export type TripVibe = 'Standard' | 'Ultra-Rich';
+export type TravelView = 'HUB' | 'BOOKING' | 'EXPERIENCE' | 'MINIGAME' | 'COLLECTION' | null;
 
-export type ActivityType =
-    | 'All-Inclusive Resort' | 'Cultural Trip' | 'Partying & Nightclubs' | 'Family Vacation' // Standard
-    | 'Private Island Retreat' | 'Superyacht Week' | 'Luxury Safari' | 'High-Stakes Gambling Tour' | 'Wellness & Detox Sanctuary'; // Ultra-Rich
+interface ResultData {
+    enjoyment: number;
+    narrative: string;
+    happiness: number;
+    foundSouvenir: boolean;
+}
 
-export type CompanionType = 'Myself' | 'Partner' | 'Kids' | 'Family'; // Family = Partner + Kids
+export const useTravelSystem = () => {
+    // --- STORES ---
+    const { money, update: updateStats } = useStatsStore();
+    const { updateCore, core } = usePlayerStore();
+    const { collectSouvenir, hasSouvenir } = useTravelStore();
 
-export const COUNTRIES = [
-    'Switzerland', 'Maldives', 'Japan', 'Italy', 'France', 'USA', 'Monaco', 'Dubai', 'Thailand', 'Greece',
-    'Bora Bora', 'Brazil', 'Singapore', 'UK', 'Australia', 'Egypt', 'Turkey', 'Aspen', 'Caribbean', 'South Africa'
-];
+    // --- UI STATE ---
+    const [currentView, setCurrentView] = useState<TravelView>(null);
 
-export const ACTIVITIES: Record<TripVibe, ActivityType[]> = {
-    'Standard': ['All-Inclusive Resort', 'Cultural Trip', 'Partying & Nightclubs', 'Family Vacation'],
-    'Ultra-Rich': ['Private Island Retreat', 'Superyacht Week', 'Luxury Safari', 'High-Stakes Gambling Tour', 'Wellness & Detox Sanctuary'],
-};
+    // --- DATA STATE ---
+    const [selectedSpot, setSelectedSpot] = useState<VacationSpot | null>(null);
+    const [travelClass, setTravelClass] = useState<TravelClass>('ECONOMY');
+    const [bringPartner, setBringPartner] = useState(false);
+    const [resultData, setResultData] = useState<ResultData | null>(null);
 
-// Base costs
-const BASE_COST_PER_COUNTRY = 2000;
-const ACTIVITY_COSTS: Record<ActivityType, number> = {
-    'All-Inclusive Resort': 1500,
-    'Cultural Trip': 1000,
-    'Partying & Nightclubs': 2000,
-    'Family Vacation': 2500,
-    'Private Island Retreat': 20000,
-    'Superyacht Week': 50000,
-    'Luxury Safari': 15000,
-    'High-Stakes Gambling Tour': 10000, // + gambling money potentially?
-    'Wellness & Detox Sanctuary': 8000,
-};
+    // --- HELPERS ---
+    const getClassMultiplier = (tClass: TravelClass): number => {
+        switch (tClass) {
+            case 'ECONOMY': return 1;
+            case 'BUSINESS': return 2;
+            case 'PRIVATE': return 5;
+        }
+    };
 
-export const useTravelSystem = (triggerEncounter?: (context: string, countryId?: string) => boolean) => {
-    // Modal Visibility States
-    const [destinationModalVisible, setDestinationModalVisible] = useState(false);
-    const [companionModalVisible, setCompanionModalVisible] = useState(false);
-    const [resultModalVisible, setResultModalVisible] = useState(false);
+    const calculateEnjoyment = (tClass: TravelClass): number => {
+        let min = 0;
+        let max = 80;
 
-    // Selection States
-    const [selectedCountry, setSelectedCountry] = useState<string>(COUNTRIES[0]);
-    const [selectedVibe, setSelectedVibe] = useState<TripVibe>('Standard');
-    const [selectedActivity, setSelectedActivity] = useState<ActivityType>(ACTIVITIES['Standard'][0]);
-    const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>(null);
+        if (tClass === 'BUSINESS') {
+            min = 30;
+            max = 90;
+        } else if (tClass === 'PRIVATE') {
+            min = 60;
+            max = 100;
+        }
 
-    // Result States
-    const [totalCost, setTotalCost] = useState(0);
-    const [enjoyment, setEnjoyment] = useState(0);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
 
-    // Store access
-    const { money, spendMoney, setField: setStatsField } = useStatsStore();
-    const { partner, family } = useUserStore();
+    const getNarrative = (spot: VacationSpot, enjoyment: number): string => {
+        if (enjoyment < 40) {
+            const narratives = spot.narratives.low;
+            return narratives[Math.floor(Math.random() * narratives.length)];
+        } else if (enjoyment < 75) {
+            const narratives = spot.narratives.mid;
+            return narratives[Math.floor(Math.random() * narratives.length)];
+        } else {
+            const narratives = spot.narratives.high;
+            return narratives[Math.floor(Math.random() * narratives.length)];
+        }
+    };
 
-    const children = family.filter(m => m.relation === 'Son' || m.relation === 'Daughter');
-    const hasPartner = !!partner;
-    const hasChildren = children.length > 0;
-
+    // --- ACTIONS ---
     const openTravel = useCallback(() => {
-        setDestinationModalVisible(true);
-        // Reset selection defaults
-        setSelectedCountry(COUNTRIES[0]);
-        setSelectedVibe('Standard');
-        setSelectedActivity(ACTIVITIES['Standard'][0]);
+        setCurrentView('HUB');
     }, []);
 
     const closeTravel = useCallback(() => {
-        setDestinationModalVisible(false);
-        setCompanionModalVisible(false);
-        setResultModalVisible(false);
+        setCurrentView(null);
+        setSelectedSpot(null);
+        setResultData(null);
     }, []);
 
-    const goToCompanionSelection = useCallback(() => {
-        setDestinationModalVisible(false);
-        // Short delay for smooth transition if needed, or immediate
-        setTimeout(() => setCompanionModalVisible(true), 300);
+    const openBooking = useCallback((spot: VacationSpot) => {
+        setSelectedSpot(spot);
+        setCurrentView('BOOKING');
     }, []);
 
-    const calculateCost = useCallback((companion: CompanionType) => {
-        let multiplier = 1;
-        if (companion === 'Partner') multiplier = 2;
-        if (companion === 'Kids') multiplier = 1 + children.length;
-        if (companion === 'Family') multiplier = 1 + 1 + children.length; // Self + Partner + Kids
+    const startTrip = useCallback(() => {
+        if (!selectedSpot) {
+            Alert.alert('Error', 'No destination selected.');
+            return;
+        }
 
-        const base = BASE_COST_PER_COUNTRY; // Could vary by country later
-        const activity = ACTIVITY_COSTS[selectedActivity];
+        const classMultiplier = getClassMultiplier(travelClass);
+        const partnerMultiplier = bringPartner ? 2 : 1;
+        const totalCost = selectedSpot.baseCost * classMultiplier * partnerMultiplier;
 
-        return (base + activity) * multiplier;
-    }, [selectedActivity, children.length]);
-
-    const confirmTrip = useCallback((companion: CompanionType) => {
-        const cost = calculateCost(companion);
-        console.log(`[Travel] Calculating cost: (${BASE_COST_PER_COUNTRY} + ${ACTIVITY_COSTS[selectedActivity]}) * multiplier = ${cost}`);
-
-        if (money < cost) {
-            // Insufficient funds - could show alert
+        if (money < totalCost) {
+            Alert.alert('Insufficient Funds', "You can't afford this trip.");
             return;
         }
 
         // Deduct money
-        if (!spendMoney(cost)) {
-            console.warn('[Travel] Insufficient funds for trip');
-            return;
+        updateStats({ money: money - totalCost });
+
+        // Calculate enjoyment
+        const enjoyment = calculateEnjoyment(travelClass);
+        const narrative = getNarrative(selectedSpot, enjoyment);
+
+        // Calculate happiness gain (scaled by enjoyment)
+        const happinessGain = Math.floor(enjoyment / 5); // 0-20 for economy, up to 20 for private
+        updateCore('happiness', Math.min(100, core.happiness + happinessGain));
+
+        // Check for souvenir discovery
+        const foundSouvenir = enjoyment > 70 && !hasSouvenir(selectedSpot.souvenir.id);
+
+        setResultData({
+            enjoyment,
+            narrative,
+            happiness: happinessGain,
+            foundSouvenir,
+        });
+
+        setCurrentView('EXPERIENCE');
+    }, [selectedSpot, travelClass, bringPartner, money, updateStats, core, updateCore, hasSouvenir]);
+
+    const onExperienceComplete = useCallback(() => {
+        if (!resultData || !selectedSpot) return;
+
+        // Souvenir Probability
+        const chance = travelClass === 'PRIVATE' ? 0.70 : travelClass === 'BUSINESS' ? 0.33 : 0.25;
+
+        // Check probability and specific souvenir ID ownership
+        if (Math.random() < chance && !hasSouvenir(selectedSpot.souvenir.id)) {
+            // Trigger mini-game
+            setCurrentView('MINIGAME');
+        } else {
+            // Close experience, return to LIFE SCREEN (close travel system)
+            setCurrentView(null);
+            setSelectedSpot(null);
+            setResultData(null);
         }
-        setTotalCost(cost);
-        setSelectedCompanion(companion);
+    }, [resultData, selectedSpot, travelClass, hasSouvenir]);
 
-        // Calculate RNG Enjoyment
-        const minEnjoyment = 60;
-        const maxEnjoyment = 100;
-        const randomEnjoyment = Math.floor(Math.random() * (maxEnjoyment - minEnjoyment + 1)) + minEnjoyment;
-        setEnjoyment(randomEnjoyment);
-
-        // Close companion modal
-        setCompanionModalVisible(false);
-
-        // CRITICAL: Only trigger encounter if traveling ALONE
-        if (companion === 'Myself' && triggerEncounter) {
-            // Map country name to encounter system country ID
-            const countryMap: Record<string, string> = {
-                'Japan': 'japan',
-                'France': 'france',
-                'USA': 'usa',
-                'Dubai': 'dubai'
-            };
-            const countryId = countryMap[selectedCountry];
-
-            const hasEncounter = triggerEncounter('travel', countryId);
-            if (hasEncounter) {
-                // Encounter modal will open, don't show result modal yet
-                return;
-            }
+    const onMiniGameComplete = useCallback((success: boolean) => {
+        if (success && selectedSpot) {
+            collectSouvenir(selectedSpot.souvenir.id);
+            Alert.alert('Souvenir Found!', `You collected: ${selectedSpot.souvenir.emoji} ${selectedSpot.souvenir.name}`);
         }
 
-        // No encounter or traveling with companion - show result
-        setTimeout(() => setResultModalVisible(true), 300);
+        // Return to LIFE SCREEN (close travel system)
+        setCurrentView(null);
+        setSelectedSpot(null);
+        setResultData(null);
+    }, [selectedSpot, collectSouvenir]);
 
-    }, [money, selectedActivity, selectedCountry, calculateCost, setStatsField, triggerEncounter]);
+    const openCollection = useCallback(() => {
+        setCurrentView('COLLECTION');
+    }, []);
+
+    const closeCollection = useCallback(() => {
+        setCurrentView('HUB');
+    }, []);
+
+    const closeBooking = useCallback(() => {
+        setCurrentView('HUB');
+        setSelectedSpot(null);
+    }, []);
 
     return {
-        // Visibility
-        destinationModalVisible,
-        companionModalVisible,
-        resultModalVisible,
+        // State
+        currentView,
+        selectedSpot,
+        travelClass,
+        bringPartner,
+        resultData,
+        vacationSpots: VACATION_SPOTS,
 
         // Actions
         openTravel,
         closeTravel,
-        goToCompanionSelection,
-        confirmTrip,
+        setTravelClass,
+        setBringPartner,
+        openBooking,
+        startTrip,
+        onExperienceComplete,
+        onMiniGameComplete,
+        openCollection,
+        closeCollection,
+        closeBooking,
+        setCurrentView,
 
-        // State Setters
-        setDestinationModalVisible,
-        setCompanionModalVisible,
-        setResultModalVisible,
-        setSelectedCountry,
-        setSelectedVibe,
-        setSelectedActivity,
-
-        // Selection Values
-        selectedCountry,
-        selectedVibe,
-        selectedActivity,
-
-        // Computed / Context
-        hasPartner,
-        hasChildren,
-        partnerName: partner?.name,
-        childrenCount: children.length,
-
-        // Results
-        totalCost,
-        enjoyment,
-        selectedCompanion
+        // Store methods
+        hasSouvenir,
     };
 };

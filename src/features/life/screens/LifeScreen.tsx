@@ -23,9 +23,11 @@ import NightConclusionModal from '../components/NightOut/NightConclusionModal';
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import GymMasterModal from '../components/Gym/GymMasterModal';
 import { useTravelSystem } from '../components/Travel/useTravelSystem';
-import TravelDestinationModal from '../components/Travel/TravelDestinationModal';
-import TravelCompanionModal from '../components/Travel/TravelCompanionModal';
-import TravelResultModal from '../components/Travel/TravelResultModal';
+import TravelHubModal from '../components/Travel/TravelHubModal';
+import TravelBookingModal from '../components/Travel/TravelBookingModal';
+import TravelExperienceModal from '../components/Travel/TravelExperienceModal';
+import SouvenirMiniGame from '../components/Travel/SouvenirMiniGame';
+import SouvenirCollectionModal from '../components/Travel/SouvenirCollectionModal';
 
 import { useSanctuarySystem } from '../components/Sanctuary/store/useSanctuarySystem';
 import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
@@ -229,38 +231,31 @@ const LifeScreen = () => {
   const { openEducation } = useEducationSystem();
 
   const {
-    // Visibility
-    destinationModalVisible,
-    companionModalVisible,
-    resultModalVisible: travelResultVisible,
+    // State
+    currentView,
+    selectedSpot,
+    travelClass,
+    bringPartner,
+    resultData: travelResultData,
+    vacationSpots,
 
     // Actions
     openTravel,
     closeTravel,
-    goToCompanionSelection,
-    confirmTrip,
+    setTravelClass,
+    setBringPartner,
+    openBooking,
+    startTrip,
+    onExperienceComplete,
+    onMiniGameComplete,
+    openCollection,
+    closeCollection,
+    closeBooking,
+    setCurrentView,
 
-    // State Setters
-    setSelectedCountry,
-    setSelectedVibe,
-    setSelectedActivity,
-
-    // Selection Values
-    selectedCountry,
-    selectedVibe,
-    selectedActivity,
-
-    // Computed / Context
-    hasPartner,
-    hasChildren,
-    partnerName,
-    childrenCount,
-
-    // Results
-    totalCost: travelCost,
-    enjoyment: travelEnjoyment,
-    selectedCompanion
-  } = useTravelSystem(triggerEncounter);
+    // Store methods
+    hasSouvenir,
+  } = useTravelSystem();
 
   const {
     // Visibility & Nav
@@ -306,6 +301,17 @@ const LifeScreen = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
+  };
+
+  const handleTravelHome = () => {
+    closeTravel();
+    // Navigate home similar to Night Out
+    const rootNav = navigation.getParent()?.getParent();
+    if (rootNav) {
+      rootNav.navigate('Home' as never);
+      return;
+    }
+    navigation.navigate('Home' as never);
   };
 
   const { core, attributes, reputation, blackMarket, updateCore, updateAttribute } = usePlayerStore();
@@ -534,35 +540,43 @@ const LifeScreen = () => {
       <EducationExamModal />
 
       {/* Travel Modals */}
-      <TravelDestinationModal
-        visible={destinationModalVisible}
+      <TravelHubModal
+        visible={currentView === 'HUB'}
+        vacationSpots={vacationSpots}
+        onSelectSpot={openBooking}
         onClose={closeTravel}
-        onNext={goToCompanionSelection}
-        selectedCountry={selectedCountry}
-        setSelectedCountry={setSelectedCountry}
-        selectedVibe={selectedVibe}
-        setSelectedVibe={setSelectedVibe}
-        selectedActivity={selectedActivity}
-        setSelectedActivity={setSelectedActivity}
+        onOpenCollection={openCollection}
+        onHomePress={handleTravelHome}
       />
-      <TravelCompanionModal
-        visible={companionModalVisible}
-        onClose={closeTravel}
-        onConfirm={confirmTrip}
-        hasPartner={hasPartner}
-        hasChildren={hasChildren}
-        partnerName={partnerName}
-        childrenCount={childrenCount}
+      <TravelBookingModal
+        visible={currentView === 'BOOKING'}
+        spot={selectedSpot}
+        travelClass={travelClass}
+        bringPartner={bringPartner}
+        onSelectClass={setTravelClass}
+        onTogglePartner={setBringPartner}
+        onConfirm={startTrip}
+        onClose={closeBooking}
+        onHomePress={handleTravelHome}
       />
-      <TravelResultModal
-        visible={travelResultVisible}
-        onClose={closeTravel}
-        country={selectedCountry}
-        activity={selectedActivity}
-        companion={selectedCompanion}
-        partnerName={partnerName}
-        cost={travelCost}
-        enjoyment={travelEnjoyment}
+      <TravelExperienceModal
+        visible={currentView === 'EXPERIENCE'}
+        spot={selectedSpot}
+        resultData={travelResultData}
+        onComplete={onExperienceComplete}
+        onHomePress={handleTravelHome}
+      />
+      <SouvenirMiniGame
+        visible={currentView === 'MINIGAME'}
+        souvenir={selectedSpot?.souvenir || null}
+        onComplete={onMiniGameComplete}
+        onHomePress={handleTravelHome}
+      />
+      <SouvenirCollectionModal
+        visible={currentView === 'COLLECTION'}
+        collectedIds={vacationSpots.filter(spot => hasSouvenir(spot.souvenir.id)).map(spot => spot.souvenir.id)}
+        onClose={closeCollection}
+        onHomePress={handleTravelHome}
       />
 
       {/* The Wellness Sanctuary Modals */}

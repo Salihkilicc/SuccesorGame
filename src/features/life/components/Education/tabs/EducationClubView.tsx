@@ -162,12 +162,11 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={() => {
-                    closeEducation();
-                    navigation.navigate('Home' as never);
-                }} />
-            </View>
+            <BottomStatsBar onHomePress={() => {
+                closeEducation();
+                // @ts-ignore - Simple navigation
+                navigation.navigate('Home');
+            }} />
         </View>
     );
 };
@@ -333,14 +332,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#ffffff',
-    },
-    bottomBarContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        width: '100%',
-        zIndex: 100,
-        elevation: 10,
     },
 });

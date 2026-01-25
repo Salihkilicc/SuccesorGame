@@ -436,12 +436,11 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={() => {
-                    closeEducation();
-                    navigation.navigate('Home' as never);
-                }} />
-            </View>
+            <BottomStatsBar onHomePress={() => {
+                closeEducation();
+                // @ts-ignore - Simple navigation
+                navigation.navigate('Home');
+            }} />
         </View>
     );
 };
@@ -694,14 +693,6 @@ const styles = StyleSheet.create({
         color: '#0a192f',
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    bottomBarContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        width: '100%',
-        zIndex: 100,
-        elevation: 10,
+        paddingHorizontal: 32, // Added padding to ensure text doesn't overflow
     },
 });

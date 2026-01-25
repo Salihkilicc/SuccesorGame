@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useGymSystem } from './useGymSystem';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
 
@@ -14,6 +15,7 @@ const GymHubView = () => {
     const { data, actions } = useGymSystem();
     const { stats, martialArts, membership } = data;
     const { navigate, closeGym } = actions;
+    const navigation = useNavigation<any>();
 
     const { bodyType, fatigue } = stats;
     const { style: selectedArt, title: beltTitle } = martialArts;
@@ -151,9 +153,11 @@ const GymHubView = () => {
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar />
-            </View>
+            {/* Bottom Stats Bar */}
+            <BottomStatsBar onHomePress={() => {
+                closeGym();
+                navigation.navigate('Home');
+            }} />
         </View>
     );
 };
@@ -274,11 +278,6 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         backgroundColor: '#EFF6FF',
     },
-    bottomBarContainer: {
-        position: 'absolute',
-        bottom: 20,
-        width: '90%',
-    }
 });
 
 export default GymHubView;
