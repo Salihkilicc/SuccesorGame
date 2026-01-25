@@ -102,70 +102,101 @@ const HookupGameModal = ({
             onRequestClose={() => { }}>
             <View style={styles.backdrop}>
                 <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
-                    {/* Partner Info */}
-                    <View style={styles.partnerSection}>
-                        <View style={styles.partnerAvatar}>
-                            <Text style={styles.avatarEmoji}>
-                                {partner.gender === 'female' ? '💃' : '🕺'}
-                            </Text>
-                        </View>
-                        <Text style={styles.partnerName}>{partner.name}</Text>
-                        <Text style={styles.partnerJob}>{partner.job.title}</Text>
-                    </View>
+                    <PartnerHeader partner={partner} />
 
-                    {/* The Clue */}
-                    <View style={styles.clueSection}>
-                        <Text style={styles.clueLabel}>THE SITUATION</Text>
-                        <View style={styles.clueBox}>
-                            <Text style={styles.clueText}>{scenario.clue}</Text>
-                        </View>
-                    </View>
+                    <ClueSection text={scenario.clue} />
 
-                    {/* The Choices */}
                     <View style={styles.choicesSection}>
                         <Text style={styles.choicesLabel}>YOUR MOVE</Text>
-                        {shuffledOptions.map((option, index) => {
-                            const isSelected = selectedStrategy === option.strategy;
-                            const isCorrectChoice = showResult && option.strategy === scenario.correctStrategy;
-                            const isWrongChoice = showResult && isSelected && !isCorrect;
-
-                            return (
-                                <Pressable
-                                    key={index}
-                                    onPress={() => handleChoice(option.strategy)}
-                                    disabled={showResult}
-                                    style={({ pressed }) => [
-                                        styles.choiceButton,
-                                        pressed && !showResult && styles.choiceButtonPressed,
-                                        isCorrectChoice && styles.choiceButtonCorrect,
-                                        isWrongChoice && styles.choiceButtonWrong,
-                                    ]}>
-                                    <View style={styles.choiceContent}>
-                                        <Text style={styles.choiceText}>{option.text}</Text>
-                                        <View style={styles.choiceTag}>
-                                            <Text style={styles.choiceTagText}>
-                                                {option.icon} {option.strategy}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </Pressable>
-                            );
-                        })}
+                        {shuffledOptions.map((option, index) => (
+                            <OptionButton
+                                key={index}
+                                option={option}
+                                isSelected={selectedStrategy === option.strategy}
+                                showResult={showResult}
+                                isCorrectResult={showResult && option.strategy === scenario.correctStrategy}
+                                isCorrectGuess={isCorrect}
+                                onPress={() => handleChoice(option.strategy)}
+                            />
+                        ))}
                     </View>
 
-                    {/* Result Feedback */}
-                    {showResult && (
-                        <View style={styles.resultSection}>
-                            <Text style={[styles.resultText, isCorrect ? styles.resultSuccess : styles.resultFail]}>
-                                {isCorrect ? '✨ Perfect Match!' : '❌ She wasn\'t impressed...'}
-                            </Text>
-                        </View>
-                    )}
+                    {showResult && <ResultFeedback isCorrect={isCorrect} />}
                 </Animated.View>
             </View>
         </Modal>
     );
 };
+
+const PartnerHeader = ({ partner }: { partner: Partner }) => (
+    <View style={styles.partnerSection}>
+        <View style={styles.partnerAvatar}>
+            <Text style={styles.avatarEmoji}>
+                {partner.gender === 'female' ? '💃' : '🕺'}
+            </Text>
+        </View>
+        <Text style={styles.partnerName}>{partner.name}</Text>
+        <Text style={styles.partnerJob}>{partner.job.title}</Text>
+    </View>
+);
+
+const ClueSection = ({ text }: { text: string }) => (
+    <View style={styles.clueSection}>
+        <Text style={styles.clueLabel}>THE SITUATION</Text>
+        <View style={styles.clueBox}>
+            <Text style={styles.clueText}>{text}</Text>
+        </View>
+    </View>
+);
+
+type OptionButtonProps = {
+    option: ShuffledOption;
+    isSelected: boolean;
+    showResult: boolean;
+    isCorrectResult: boolean;
+    isCorrectGuess: boolean;
+    onPress: () => void;
+};
+
+const OptionButton = ({
+    option,
+    isSelected,
+    showResult,
+    isCorrectResult,
+    isCorrectGuess,
+    onPress
+}: OptionButtonProps) => {
+    const isWrongChoice = showResult && isSelected && !isCorrectGuess;
+
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={showResult}
+            style={({ pressed }) => [
+                styles.choiceButton,
+                pressed && !showResult && styles.choiceButtonPressed,
+                isCorrectResult && styles.choiceButtonCorrect,
+                isWrongChoice && styles.choiceButtonWrong,
+            ]}>
+            <View style={styles.choiceContent}>
+                <Text style={styles.choiceText}>{option.text}</Text>
+                <View style={styles.choiceTag}>
+                    <Text style={styles.choiceTagText}>
+                        {option.icon} {option.strategy}
+                    </Text>
+                </View>
+            </View>
+        </Pressable>
+    );
+};
+
+const ResultFeedback = ({ isCorrect }: { isCorrect: boolean }) => (
+    <View style={styles.resultSection}>
+        <Text style={[styles.resultText, isCorrect ? styles.resultSuccess : styles.resultFail]}>
+            {isCorrect ? '✨ Perfect Match!' : '❌ She wasn\'t impressed...'}
+        </Text>
+    </View>
+);
 
 export default HookupGameModal;
 

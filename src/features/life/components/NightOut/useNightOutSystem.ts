@@ -5,37 +5,29 @@ import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import { Alert } from 'react-native';
 import { HOOKUP_SCENARIOS, HookupScenario, getRandomScenario } from './data/hookupGameData';
 import { Partner } from '../../../love/types';
-import { generatePartner } from '../../../love/logic/partnerGenerator';
+
 
 import { VENUES, REGIONAL_NAMES, RegionCode, Venue } from './data/nightOutVenues';
+import { generateMiniGamePartner, calculateWildNightOutcome } from './logic/nightOutUtils';
 
-// Mini-Game Jobs
-const NIGHT_JOBS = ['Model', 'Influencer', 'CEO', 'Artist', 'Student', 'Designer', 'DJ', 'Actor', 'Heir/Heiress'];
 
-const generateMiniGamePartner = (region: RegionCode) => {
-    const isMale = Math.random() < 0.5;
-    const nameList = isMale ? REGIONAL_NAMES[region].male : REGIONAL_NAMES[region].female;
-    const name = nameList[Math.floor(Math.random() * nameList.length)];
-    const jobTitle = NIGHT_JOBS[Math.floor(Math.random() * NIGHT_JOBS.length)];
-
-    return {
-        name,
-        job: { title: jobTitle },
-        gender: isMale ? 'male' : 'female'
-    };
-};
 
 export type NightOutOutcome = 'enjoyment' | 'hookup';
 export type SetupStep = 'region_select' | 'venue_select' | 'travel_select' | 'completed';
 export type TravelMethod = 'budget' | 'standard' | 'luxury' | 'own';
 
 export const useNightOutSystem = (triggerEncounter?: (context: string) => boolean) => {
+    // --- UI STATES ---
     const [setupModalVisible, setSetupModalVisible] = useState(false);
     const [outcomeModalVisible, setOutcomeModalVisible] = useState(false);
-    const [outcomeType, setOutcomeType] = useState<NightOutOutcome | null>(null);
     const [nightEndModalVisible, setNightEndModalVisible] = useState(false);
     const [pregnancyModalVisible, setPregnancyModalVisible] = useState(false);
     const [conclusionModalVisible, setConclusionModalVisible] = useState(false);
+    const [hookupGameVisible, setHookupGameVisible] = useState(false);
+    const [isHangarOpen, setIsHangarOpen] = useState(false);
+
+    // --- DATA STATES ---
+    const [outcomeType, setOutcomeType] = useState<NightOutOutcome | null>(null);
     const [conclusionData, setConclusionData] = useState<{
         text: string;
         stats: string[];
@@ -46,13 +38,11 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         venueName?: string;
     } | null>(null);
 
-    // Hookup Game State
-    const [hookupGameVisible, setHookupGameVisible] = useState(false);
     const [currentScenario, setCurrentScenario] = useState<HookupScenario | null>(null);
     // Product Note: Using Partner type from main game, but will populate with local data
     const [currentPartner, setCurrentPartner] = useState<any | null>(null);
 
-    // Multi-Step Flow State
+    // --- WIZARD STATES ---
     const [step, setStep] = useState<SetupStep>('region_select');
     const [selectedRegion, setSelectedRegion] = useState<RegionCode | null>(null);
     const [selectedClub, setSelectedClub] = useState<Venue | null>(null);
@@ -170,10 +160,11 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         if (roll < 0.20) {
             // 20% Chance: Hookup Mini-Game
             const scenario = getRandomScenario();
-            const partner = generatePartner();
+            // Use selectedClub region if available, ensuring fallback is handled but club should always be selected here
+            const miniPartner = generateMiniGamePartner(selectedClub.region);
 
             setCurrentScenario(scenario);
-            setCurrentPartner(partner);
+            setCurrentPartner(miniPartner);
 
             setTimeout(() => {
                 setHookupGameVisible(true);
@@ -280,86 +271,33 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
 
         } else {
             // WILD CALCULATION (High Risk, High Reward: Stress -25, but independent risks)
-            const events: string[] = [];
-            let currentMoney = money;
-            let moneyLost = 0;
-            let stressChange = -25;
-            let healthChange = 0;
+            const result = calculateWildNightOutcome(money);
 
-            // 1. Robbery Risk (7%)
-            if (Math.random() < 0.07) {
-                // Robbery takes 11% of CURRENT money
-                const stolenAmount = Math.floor(currentMoney * 0.11);
-
-                if (stolenAmount > 0) {
-                    currentMoney -= stolenAmount;
-                    moneyLost += stolenAmount;
-                    events.push(`Mugged outside club: -$${stolenAmount.toLocaleString()} (11%)`);
-                }
+            // Apply Results
+            if (result.moneyLost > 0) {
+                updateStats({ money: money - result.moneyLost });
             }
 
-            // 2. Disease Risk (7%)
-            if (Math.random() < 0.07) {
-                healthChange -= 20;
-                updateCore('health', Math.max(0, core.health - 20));
-                events.push('Caught a virus: Health -20');
+            if (result.healthChange !== 0) {
+                updateCore('health', Math.max(0, core.health + result.healthChange));
             }
 
-            // 3. Blackmail Risk (7%)
-            if (Math.random() < 0.07) {
-                const blackmailCost = 50000;
-                currentMoney -= blackmailCost;
-                moneyLost += blackmailCost;
-
-                // Business Trust -5
+            if (result.trustChange !== 0) {
                 const currentTrust = playerStore.reputation?.business || 0;
-                updateReputation('business', Math.max(0, currentTrust - 5));
-
-                events.push('Scandal leaked: Trust -5 & -$50k');
-            }
-
-            // Apply Final Money Update
-            if (moneyLost > 0) {
-                updateStats({ money: money - moneyLost });
+                updateReputation('business', Math.max(0, currentTrust + result.trustChange));
             }
 
             // Apply Stats Update (Massive Stress Relief)
-            updateCore('stress', Math.max(0, core.stress - 25));
-
-            // Build narrative and stats
-            let story = "It was a legendary night...";
-            let currentStats = ["Stress -25"];
-
-            // Add narrative based on events
-            if (events.some(e => e.includes('Mugged'))) {
-                story += " until you realized your wallet was gone.";
-                const robberyEvent = events.find(e => e.includes('Mugged'));
-                if (robberyEvent) {
-                    // Extract the dollar amount properly
-                    const match = robberyEvent.match(/\$([0-9,]+)/);
-                    if (match) {
-                        currentStats.push(`-$${match[1]} (Mugged)`);
-                    }
-                }
-            }
-            if (events.some(e => e.includes('Health'))) {
-                story += " but you woke up feeling terrible.";
-                currentStats.push("Health -20");
-            }
-            if (events.some(e => e.includes('Scandal'))) {
-                story += " and someone took compromising photos.";
-                currentStats.push("Trust -5");
-                currentStats.push("-$50k (Blackmail)");
-            }
+            updateCore('stress', Math.max(0, core.stress + result.stressChange));
 
             setConclusionData({
-                text: story,
-                stats: currentStats,
+                text: result.narrative,
+                stats: result.statsDisplay,
                 isWild: true
             });
 
             // 4. Pregnancy Risk (7%)
-            if (Math.random() < 0.07) {
+            if (result.triggerPregnancy) {
                 setPregnancyModalVisible(true);
             }
 
@@ -371,7 +309,7 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         setConclusionModalVisible(false);
     }, []);
 
-    const [isHangarOpen, setIsHangarOpen] = useState(false);
+
 
     // Navigation Helper
     const goBack = useCallback(() => {
