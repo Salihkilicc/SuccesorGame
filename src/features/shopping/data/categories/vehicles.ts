@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // VEHICLES - Ultracars & Hyper-Luxury (Min $250k)
 // ============================================================================
 
-export const vehiclesData: CategoryData = {
+export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_velocity_motors',

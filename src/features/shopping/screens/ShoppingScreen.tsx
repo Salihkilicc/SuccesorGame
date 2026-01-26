@@ -9,7 +9,7 @@ import CartModal from '../components/CartModal';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { Alert } from 'react-native';
-import { SHOPS, ITEMS } from '../data/ShoppingData';
+import { SHOPS, ITEMS } from '../data/shoppingRegistry';
 import { useLuxeNetNavigation } from '../hooks/useLuxeNetNavigation';
 import BrowserHeader from '../components/BrowserHeader';
 import AdBannerCarousel from '../components/AdBannerCarousel';

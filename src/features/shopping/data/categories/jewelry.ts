@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // JEWELRY - Rare Gems & Wedding Rings
 // ============================================================================
 
-export const jewelryData: CategoryData = {
+export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_gem_vault',

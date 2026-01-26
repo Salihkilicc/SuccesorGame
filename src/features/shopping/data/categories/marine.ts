@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // MARINE - OCEANS OF MONEY
 // ============================================================================
 
-export const marineData: CategoryData = {
+export const marineData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_poseidon_yards',

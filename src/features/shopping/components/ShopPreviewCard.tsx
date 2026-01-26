@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme';
-import { ITEMS } from '../data/ShoppingData';
+import { ITEMS } from '../data/shoppingRegistry';
 
 type ShopPreviewCardProps = {
     shopId: string;

@@ -1,37 +1,27 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
+import { ShoppingItem, OwnedAsset } from '../types';
+
+// Simple UUID generator (JS only, no native dependencies)
+const generateId = () => {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
+};
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type OwnedItem = {
-    itemId: string;        // Item ID from ITEMS data
-    purchaseDate: number;  // timestamp
-    condition: number;     // 0-100, starts at 100 (mint condition)
-};
-
-export type CartItem = {
-    id: string;
-    name: string;
-    price: number;
-    type: string;
-    brand?: string;
-    category: string;
-    website: string;
-    brandColor: string;
-    specs: string[];
-    description: string;
+export interface CartItem extends ShoppingItem {
     location?: string;
-};
+}
 
 // ============================================================================
 // STATE & ACTIONS
 // ============================================================================
 
 type AssetState = {
-    ownedItems: OwnedItem[];
+    ownedItems: OwnedAsset[];
     cart: CartItem[];
 };
 
@@ -43,9 +33,9 @@ type AssetActions = {
 
     // Purchase & Ownership
     purchaseCart: () => void;
-    isOwned: (id: string) => boolean;
-    removeOwnedItem: (itemId: string) => void;
-    repairOwnedItem: (itemId: string, condition?: number) => void;
+    isOwned: (catalogId: string) => boolean;
+    removeOwnedItem: (instanceId: string) => void;
+    repairOwnedItem: (instanceId: string, condition?: number) => void;
 
     // Utility
     reset: () => void;
@@ -75,99 +65,65 @@ export const useAssetStore = create<AssetStore>()(
             // CART MANAGEMENT
             // ========================================================================
 
-            /**
-             * Add an item to the shopping cart
-             */
             addToCart: (item) =>
                 set((state) => {
-                    // Prevent duplicates
                     const exists = state.cart.some((cartItem) => cartItem.id === item.id);
                     if (exists) {
                         console.warn(`Item ${item.id} is already in cart`);
                         return state;
                     }
-
-                    return {
-                        ...state,
-                        cart: [...state.cart, item],
-                    };
+                    return { ...state, cart: [...state.cart, item] };
                 }),
 
-            /**
-             * Remove an item from the cart
-             */
             removeFromCart: (itemId) =>
                 set((state) => ({
                     ...state,
                     cart: state.cart.filter((item) => item.id !== itemId),
                 })),
 
-            /**
-             * Clear all items from the cart
-             */
-            clearCart: () =>
-                set((state) => ({
-                    ...state,
-                    cart: [],
-                })),
+            clearCart: () => set((state) => ({ ...state, cart: [] })),
 
             // ========================================================================
             // PURCHASE & OWNERSHIP
             // ========================================================================
 
-            /**
-             * Purchase all items in the cart
-             * Moves items from cart to ownedItems with purchase timestamp
-             */
             purchaseCart: () =>
                 set((state) => {
                     const purchaseDate = Date.now();
 
-                    // Convert cart items to owned items with full metadata
-                    const newOwnedItems = state.cart.map((item) => ({
-                        itemId: item.id,
+                    // Create full OwnedAsset objects
+                    const newAssets: OwnedAsset[] = state.cart.map((item) => ({
+                        ...item,
+                        instanceId: generateId(), // Unique ID for this specific asset instance
                         purchaseDate,
-                        condition: 100, // Mint condition
+                        condition: 100,
+                        marketValue: item.price, // Initial value = purchase price
                     }));
 
-                    console.log('[AssetStore] Purchased items:', newOwnedItems.map(i => i.itemId));
+                    console.log('[AssetStore] Purchased assets:', newAssets.map(a => a.name));
 
                     return {
                         ...state,
-                        ownedItems: [...state.ownedItems, ...newOwnedItems],
-                        cart: [], // Clear cart after purchase
+                        ownedItems: [...state.ownedItems, ...newAssets],
+                        cart: [],
                     };
                 }),
 
-            /**
-             * Check if an item is owned
-             */
-            isOwned: (id) => {
+            isOwned: (catalogId) => {
                 const state = get();
-                return state.ownedItems.some((item) => item.itemId === id);
+                // Check if we own any asset with this catalog ID
+                return state.ownedItems.some((asset) => asset.id === catalogId);
             },
 
-            /**
-             * Remove an item from owned items (e.g., when sold)
-             * Removes the FIRST matching instance found.
-             */
-            removeOwnedItem: (itemId) =>
-                set((state) => {
-                    const index = state.ownedItems.findIndex(i => i.itemId === itemId);
-                    if (index === -1) return state;
+            removeOwnedItem: (instanceId) =>
+                set((state) => ({
+                    ...state,
+                    ownedItems: state.ownedItems.filter(i => i.instanceId !== instanceId),
+                })),
 
-                    const newOwned = [...state.ownedItems];
-                    newOwned.splice(index, 1);
-                    return { ...state, ownedItems: newOwned };
-                }),
-
-            /**
-             * Repair an item (restore condition)
-             * Updates the FIRST matching instance (usually assumes unique items for repairables)
-             */
-            repairOwnedItem: (itemId, condition = 100) =>
+            repairOwnedItem: (instanceId, condition = 100) =>
                 set((state) => {
-                    const index = state.ownedItems.findIndex(i => i.itemId === itemId);
+                    const index = state.ownedItems.findIndex(i => i.instanceId === instanceId);
                     if (index === -1) return state;
 
                     const newOwned = [...state.ownedItems];
@@ -179,13 +135,10 @@ export const useAssetStore = create<AssetStore>()(
             // UTILITY
             // ========================================================================
 
-            /**
-             * Reset store to initial state
-             */
             reset: () => set(() => ({ ...initialState })),
         }),
         {
-            name: 'succesor_assets_v1',
+            name: 'succesor_assets_v2', // Bumped version
             storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 ownedItems: state.ownedItems,
@@ -194,3 +147,4 @@ export const useAssetStore = create<AssetStore>()(
         },
     ),
 );
+

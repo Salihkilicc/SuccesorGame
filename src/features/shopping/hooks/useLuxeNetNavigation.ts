@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { SHOPS } from '../data/ShoppingData';
+import { SHOPS } from '../data/shoppingRegistry';
 
 export type LuxeNetView = 'HUB' | 'CATEGORY_LIST' | 'SHOP_DETAIL';
 

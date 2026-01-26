@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, useUserStore, usePlayerStore } from '../../../core/store';
 import { calculateShoppingDiscount } from '../../../logic/statsLogic';
-import { SHOP_DATA } from '../data/ShoppingData';
+import { SHOP_DATA } from '../data/shoppingRegistry';
 
 export interface ShopItem {
     id: string;
@@ -153,7 +153,7 @@ export const useShoppingWithInventory = () => {
      */
     const getShopItems = (shopId: string) => {
         // Import ITEMS from data
-        const { ITEMS } = require('../data/ShoppingData');
+        const { ITEMS } = require('../data/shoppingRegistry');
 
         return ITEMS.filter((item: any) => {
             // 1. Must belong to this shop
@@ -177,7 +177,7 @@ export const useShoppingWithInventory = () => {
      * Get trending items (excludes owned items except rings)
      */
     const getTrendingItems = (count: number = 6) => {
-        const { ITEMS } = require('../data/ShoppingData');
+        const { ITEMS } = require('../data/shoppingRegistry');
 
         const availableItems = ITEMS.filter((item: any) => {
             const itemIsOwned = isOwned(item.id);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
 import { theme } from '../../../core/theme';
-import { SHOPS } from '../data/ShoppingData';
+import { SHOPS } from '../data/shoppingRegistry';
 
 const { width } = Dimensions.get('window');
 

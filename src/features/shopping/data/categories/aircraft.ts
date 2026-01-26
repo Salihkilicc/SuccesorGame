@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // AIRCRAFT - SKY HIGH SPENDING
 // ============================================================================
 
-export const aircraftData: CategoryData = {
+export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_elitas_travel',

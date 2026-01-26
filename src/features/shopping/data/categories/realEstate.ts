@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // REAL ESTATE - The Billionaire's Portfolio
 // ============================================================================
 
-export const realEstateData: CategoryData = {
+export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_eden_islands',

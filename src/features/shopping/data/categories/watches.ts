@@ -1,10 +1,10 @@
-import { CategoryData } from '../shopTypes';
+import { Shop, ShoppingItem } from '../../types';
 
 // ============================================================================
 // WATCHES - WRISTS OF GOLD (Min $150k)
 // ============================================================================
 
-export const watchesData: CategoryData = {
+export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
     shops: [
         {
             id: 'shop_chronos_swiss',

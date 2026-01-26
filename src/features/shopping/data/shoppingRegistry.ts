@@ -1,7 +1,8 @@
 // ============================================================================
-// LUXENET - BILLIONAIRE'S SHOPPING LIST
+// LUXENET - BILLIONAIRE'S SHOPPING REGISTRY
 // ============================================================================
 
+import { Shop, ShoppingItem } from '../types';
 import { realEstateData } from './categories/realEstate';
 import { vehiclesData } from './categories/vehicles';
 import { marineData } from './categories/marine';
@@ -13,7 +14,7 @@ import { jewelryData } from './categories/jewelry';
 // AGGREGATE ALL SHOPS (25+ Distinct Brands)
 // ============================================================================
 
-export const SHOPS = [
+export const SHOPS: Shop[] = [
     // Real Estate (6 shops)
     ...realEstateData.shops,
 
@@ -37,7 +38,7 @@ export const SHOPS = [
 // AGGREGATE ALL ITEMS (The Inventory)
 // ============================================================================
 
-export const ITEMS = [
+export const ITEMS: ShoppingItem[] = [
     // Real Estate
     ...realEstateData.items,
 
@@ -83,7 +84,7 @@ export const validateLuxeNetData = () => {
 
     // Check for duplicate IDs
     const itemIds = new Set();
-    const duplicates = [];
+    const duplicates: string[] = [];
     ITEMS.forEach(item => {
         if (itemIds.has(item.id)) duplicates.push(item.id);
         itemIds.add(item.id);

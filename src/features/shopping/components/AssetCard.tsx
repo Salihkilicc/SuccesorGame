@@ -2,20 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
+import { OwnedAsset } from '../types';
+
 interface AssetCardProps {
-    item: {
-        id: string;
-        name: string;
-        price: number;
-        category: string;
-        shopId: string;
-        condition: number;
-        marketValue: number;
-        brandColor?: string;
-    };
-    onSell: (item: any) => void;
-    onRepair: (item: any) => void;
-    onPropose?: (item: any) => void;
+    item: OwnedAsset;
+    onSell: (item: OwnedAsset) => void;
+    onRepair: (item: OwnedAsset) => void;
+    onPropose?: (item: OwnedAsset) => void;
     variant?: 'list' | 'grid';
 }
 

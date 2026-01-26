@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
-import { SHOP_DATA } from '../data/ShoppingData';
+import { SHOP_DATA } from '../data/shoppingRegistry';
 import BottomStatsBar from '../../../components/common/BottomStatsBar';
 
 const { width } = Dimensions.get('window');
