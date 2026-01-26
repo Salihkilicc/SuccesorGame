@@ -7,6 +7,15 @@ import { theme } from '../../../core/theme';
 import { useRelationshipBuffs } from '../../love/hooks/useRelationshipBuffs';
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import { useBlackMarketSystem } from '../components/BlackMarket/useBlackMarketSystem';
+import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
+
+// Helper for currency formatting
+const formatCurrency = (value: number) => {
+    if (value >= 1000000000) return `$${(value / 1000000000).toFixed(1)}B`;
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
+    return `$${value}`;
+};
 
 // İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
 // Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
@@ -41,6 +50,46 @@ const SectionHeader = ({ title, icon }: { title: string, icon: string }) => (
         <Text style={styles.sectionTitle}>{title}</Text>
     </View>
 );
+
+const LuxuryBar = () => {
+    const { netWorth, maxWealth, percentage, buffAmount } = useLuxurySystem();
+    const isBuffActive = buffAmount > 0;
+    const buffColor = isBuffActive ? '#FFD700' : '#444'; // Gold or Gray
+    const buffTextColor = isBuffActive ? '#000' : '#888';
+
+    return (
+        <View style={[styles.card, styles.luxuryCard]}>
+            <SectionHeader title="LUXURY LIFESTYLE" icon="💎" />
+
+            <View style={styles.luxuryContent}>
+                {/* Progress Bar Row */}
+                <View style={styles.luxuryProgressRow}>
+                    <Text style={styles.luxuryValue}>{formatCurrency(netWorth)}</Text>
+                    <View style={styles.luxuryProgressBarBg}>
+                        <View style={[styles.luxuryProgressBarFill, { width: `${percentage}%` }]} />
+                    </View>
+                    <Text style={styles.luxuryTarget}>{formatCurrency(maxWealth)}</Text>
+                </View>
+
+                {/* Percentage Label */}
+                <Text style={styles.luxuryPercentage}>{percentage.toFixed(1)}% to Empire Status</Text>
+
+                {/* Buff Badges */}
+                <View style={styles.buffRow}>
+                    <View style={[styles.luxuryBuffBadge, { backgroundColor: buffColor }]}>
+                        <Text style={[styles.luxuryBuffText, { color: buffTextColor }]}>High Society: +{buffAmount}</Text>
+                    </View>
+                    <View style={[styles.luxuryBuffBadge, { backgroundColor: buffColor }]}>
+                        <Text style={[styles.luxuryBuffText, { color: buffTextColor }]}>Business: +{buffAmount}</Text>
+                    </View>
+                    <View style={[styles.luxuryBuffBadge, { backgroundColor: buffColor }]}>
+                        <Text style={[styles.luxuryBuffText, { color: buffTextColor }]}>Charisma: +{buffAmount}</Text>
+                    </View>
+                </View>
+            </View>
+        </View>
+    );
+};
 
 const DNAScreen = () => {
     const navigation = useNavigation();
@@ -120,6 +169,9 @@ const DNAScreen = () => {
             </View>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+
+                {/* 💎 LUXURY STATS - New Feature */}
+                <LuxuryBar />
 
                 {/* 🛡️ SECURITY - Yeni Özellik */}
                 <View style={styles.card}>
@@ -361,6 +413,69 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
+    },
+    // Luxury Specific Styles
+    luxuryCard: {
+        borderColor: '#FFD700', // Gold Border
+        borderWidth: 1,
+    },
+    luxuryContent: {
+        gap: 8,
+    },
+    luxuryProgressRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    luxuryValue: {
+        color: '#FFD700',
+        fontWeight: '700',
+        fontSize: 12,
+        width: 60,
+    },
+    luxuryTarget: {
+        color: '#666',
+        fontWeight: '700',
+        fontSize: 12,
+        width: 60,
+        textAlign: 'right',
+    },
+    luxuryProgressBarBg: {
+        flex: 1,
+        height: 12,
+        backgroundColor: '#222',
+        borderRadius: 6,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#444',
+    },
+    luxuryProgressBarFill: {
+        height: '100%',
+        backgroundColor: '#FFD700',
+        borderRadius: 6,
+    },
+    luxuryPercentage: {
+        color: '#888',
+        fontSize: 11,
+        textAlign: 'center',
+        marginTop: 4,
+    },
+    buffRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+        marginTop: 8,
+        flexWrap: 'wrap',
+    },
+    luxuryBuffBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    luxuryBuffText: {
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
     }
 });
 

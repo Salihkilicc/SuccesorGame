@@ -23,6 +23,7 @@ export interface CartItem extends ShoppingItem {
 type AssetState = {
     ownedItems: OwnedAsset[];
     cart: CartItem[];
+    appliedLuxuryBuff: number;
 };
 
 type AssetActions = {
@@ -37,6 +38,9 @@ type AssetActions = {
     removeOwnedItem: (instanceId: string) => void;
     repairOwnedItem: (instanceId: string, condition?: number) => void;
 
+    // Luxury System
+    setAppliedLuxuryBuff: (amount: number) => void;
+
     // Utility
     reset: () => void;
 };
@@ -50,6 +54,7 @@ type AssetStore = AssetState & AssetActions;
 const initialState: AssetState = {
     ownedItems: [],
     cart: [],
+    appliedLuxuryBuff: 0,
 };
 
 // ============================================================================
@@ -132,6 +137,12 @@ export const useAssetStore = create<AssetStore>()(
                 }),
 
             // ========================================================================
+            // LUXURY SYSTEM
+            // ========================================================================
+
+            setAppliedLuxuryBuff: (amount) => set({ appliedLuxuryBuff: amount }),
+
+            // ========================================================================
             // UTILITY
             // ========================================================================
 
@@ -143,6 +154,7 @@ export const useAssetStore = create<AssetStore>()(
             partialize: (state) => ({
                 ownedItems: state.ownedItems,
                 cart: state.cart,
+                appliedLuxuryBuff: state.appliedLuxuryBuff,
             }),
         },
     ),

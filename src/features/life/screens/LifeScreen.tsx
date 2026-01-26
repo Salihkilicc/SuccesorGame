@@ -146,8 +146,13 @@ const ACTIONS: Array<{
     },
   ];
 
+import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
+
 const LifeScreen = () => {
   const navigation = useNavigation<LifeNavigationProp>();
+  // Activate Passive Luxury Stat Sync
+  useLuxurySystem();
+
   const { lastLifeEvent } = useEventStore();
   const {
     visible,
