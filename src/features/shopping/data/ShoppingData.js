@@ -1,493 +1,115 @@
-export const SHOP_DATA = [
-    // ==========================================
-    // 1. 🏎️ CAR SHOPS (5 Shops)
-    // ==========================================
-    {
-        id: 'car_shop_philadelphia',
-        name: 'Philadelphia Motors',
-        category: 'Cars',
-        description: 'American Luxury & Muscles',
-        items: [
-            { id: 'c_ph_1', name: 'Cadillac Escalade V-Series', price: 155000, type: 'car', brand: 'Cadillac' },
-            { id: 'c_ph_2', name: 'Corvette Z06 Carbon', price: 180000, type: 'car', brand: 'Chevrolet' },
-            { id: 'c_ph_3', name: 'Shelby GT500 Code Red', price: 230000, type: 'car', brand: 'Ford' },
-            { id: 'c_ph_4', name: 'Lucid Air Sapphire', price: 250000, type: 'car', brand: 'Lucid' },
-            { id: 'c_ph_5', name: 'Hennessey Venom F5', price: 3000000, type: 'car', brand: 'Hennessey' },
-            { id: 'c_ph_6', name: 'SSC Tuatara', price: 1900000, type: 'car', brand: 'SSC' },
-            { id: 'c_ph_7', name: 'Dodge Demon 170', price: 200000, type: 'car', brand: 'Dodge' },
-            { id: 'c_ph_8', name: 'Ford GT Liquid Carbon', price: 1200000, type: 'car', brand: 'Ford' },
-            { id: 'c_ph_9', name: 'Hummer EV Omega', price: 150000, type: 'car', brand: 'GMC' },
-            { id: 'c_ph_10', name: 'Saleen S7 Twin Turbo', price: 1000000, type: 'car', brand: 'Saleen' },
-        ],
-    },
-    {
-        id: 'car_shop_holyangel',
-        name: 'Holyangel Exotics',
-        category: 'Cars',
-        description: 'Hypercars & Rare Collectibles',
-        items: [
-            { id: 'c_ha_1', name: 'Bugatti La Voiture Noire', price: 18000000, type: 'car', brand: 'Bugatti' },
-            { id: 'c_ha_2', name: 'Pagani Zonda HP Barchetta', price: 17500000, type: 'car', brand: 'Pagani' },
-            { id: 'c_ha_3', name: 'Bugatti Centodieci', price: 9000000, type: 'car', brand: 'Bugatti' },
-            { id: 'c_ha_4', name: 'Koenigsegg Jesko Absolut', price: 3400000, type: 'car', brand: 'Koenigsegg' },
-            { id: 'c_ha_5', name: 'Aston Martin Valkyrie', price: 3200000, type: 'car', brand: 'Aston Martin' },
-            { id: 'c_ha_6', name: 'McLaren Speedtail', price: 2250000, type: 'car', brand: 'McLaren' },
-            { id: 'c_ha_7', name: 'Rimac Nevera', price: 2400000, type: 'car', brand: 'Rimac' },
-            { id: 'c_ha_8', name: 'Lotus Evija', price: 2300000, type: 'car', brand: 'Lotus' },
-            { id: 'c_ha_9', name: 'Pininfarina Battista', price: 2200000, type: 'car', brand: 'Pininfarina' },
-            { id: 'c_ha_10', name: 'Mercedes-AMG One', price: 2700000, type: 'car', brand: 'Mercedes' },
-        ],
-    },
-    {
-        id: 'car_shop_tokyo',
-        name: 'Tokyo Drift Imports',
-        category: 'Cars',
-        description: 'JDM Legends & Tuner Specials',
-        items: [
-            { id: 'c_td_1', name: 'Nissan GTR50 by Italdesign', price: 1100000, type: 'car', brand: 'Nissan' },
-            { id: 'c_td_2', name: 'Lexus LFA Nürburgring', price: 1500000, type: 'car', brand: 'Lexus' },
-            { id: 'c_td_3', name: 'Toyota Supra MK4 (Gold Top)', price: 300000, type: 'car', brand: 'Toyota' },
-            { id: 'c_td_4', name: 'Honda NSX Type S Zero', price: 250000, type: 'car', brand: 'Honda' },
-            { id: 'c_td_5', name: 'Mazda RX-7 Spirit R', price: 180000, type: 'car', brand: 'Mazda' },
-            { id: 'c_td_6', name: 'Subaru Impreza 22B', price: 400000, type: 'car', brand: 'Subaru' },
-            { id: 'c_td_7', name: 'Nissan Skyline R34 Z-Tune', price: 2000000, type: 'car', brand: 'Nissan' },
-            { id: 'c_td_8', name: 'Mitsubishi Evo VI TME', price: 150000, type: 'car', brand: 'Mitsubishi' },
-            { id: 'c_td_9', name: 'Toyota 2000GT', price: 1200000, type: 'car', brand: 'Toyota' },
-            { id: 'c_td_10', name: 'Liberty Walk GTR Carbon', price: 500000, type: 'car', brand: 'Nissan' },
-        ],
-    },
-    {
-        id: 'car_shop_berlin',
-        name: 'Berlin Autobahn',
-        category: 'Cars',
-        description: 'German Engineering Perfection',
-        items: [
-            { id: 'c_ba_1', name: 'Porsche 918 Spyder', price: 1600000, type: 'car', brand: 'Porsche' },
-            { id: 'c_ba_2', name: 'Mercedes-Maybach S680', price: 230000, type: 'car', brand: 'Mercedes' },
-            { id: 'c_ba_3', name: 'Audi R8 GT Final Edition', price: 250000, type: 'car', brand: 'Audi' },
-            { id: 'c_ba_4', name: 'BMW 3.0 CSL Hommage', price: 780000, type: 'car', brand: 'BMW' },
-            { id: 'c_ba_5', name: 'Porsche 911 GT3 RS Weissach', price: 350000, type: 'car', brand: 'Porsche' },
-            { id: 'c_ba_6', name: 'Mercedes G63 AMG 6x6', price: 1200000, type: 'car', brand: 'Mercedes' },
-            { id: 'c_ba_7', name: 'Maybach Exelero', price: 8000000, type: 'car', brand: 'Maybach' },
-            { id: 'c_ba_8', name: 'Audi RS6 Avant GT', price: 220000, type: 'car', brand: 'Audi' },
-            { id: 'c_ba_9', name: 'BMW M8 Competition Manhart', price: 280000, type: 'car', brand: 'BMW' },
-            { id: 'c_ba_10', name: 'Porsche Carrera GT', price: 2000000, type: 'car', brand: 'Porsche' },
-        ],
-    },
-    {
-        id: 'car_shop_italian',
-        name: 'Italian Horsepower',
-        category: 'Cars',
-        description: 'Passion & Speed',
-        items: [
-            { id: 'c_it_1', name: 'Ferrari 250 GTO', price: 70000000, type: 'car', brand: 'Ferrari' },
-            { id: 'c_it_2', name: 'Lamborghini Veneno Roadster', price: 8300000, type: 'car', brand: 'Lamborghini' },
-            { id: 'c_it_3', name: 'Ferrari LaFerrari Aperta', price: 5000000, type: 'car', brand: 'Ferrari' },
-            { id: 'c_it_4', name: 'Lamborghini Sian', price: 3600000, type: 'car', brand: 'Lamborghini' },
-            { id: 'c_it_5', name: 'Pagani Huayra Imola', price: 5400000, type: 'car', brand: 'Pagani' },
-            { id: 'c_it_6', name: 'Ferrari Daytona SP3', price: 2300000, type: 'car', brand: 'Ferrari' },
-            { id: 'c_it_7', name: 'Lamborghini Countach LPI 800-4', price: 2600000, type: 'car', brand: 'Lamborghini' },
-            { id: 'c_it_8', name: 'Maserati MC12', price: 4000000, type: 'car', brand: 'Maserati' },
-            { id: 'c_it_9', name: 'Ferrari F40', price: 3000000, type: 'car', brand: 'Ferrari' },
-            { id: 'c_it_10', name: 'Lamborghini Centenario', price: 2500000, type: 'car', brand: 'Lamborghini' },
-        ],
-    },
+// ============================================================================
+// LUXENET - BILLIONAIRE'S SHOPPING LIST
+// ============================================================================
 
-    // ==========================================
-    // 2. 💎 JEWELRY & WATCH SHOPS (5 Shops)
-    // ==========================================
-    {
-        id: 'jewelry_shop_proposal',
-        name: 'Forever Diamond Vault',
-        category: 'Jewelry',
-        subCategory: 'Rings',
-        description: 'Exclusive Engagement & Wedding Rings',
-        items: [
-            { id: 'j_rg_1', name: 'Tiffany Setting 5ct', price: 250000, type: 'ring', brand: 'Tiffany & Co.' },
-            { id: 'j_rg_2', name: 'Cartier Destinée Solitaire', price: 180000, type: 'ring', brand: 'Cartier' },
-            { id: 'j_rg_3', name: 'Graff Pink Diamond Ring', price: 1500000, type: 'ring', brand: 'Graff' },
-            { id: 'j_rg_4', name: 'Harry Winston The One', price: 300000, type: 'ring', brand: 'Harry Winston' },
-            { id: 'j_rg_5', name: 'Blue Moon of Josephine', price: 2500000, type: 'ring', brand: 'Private Collection' },
-            { id: 'j_rg_6', name: 'Bulgari Griffe', price: 120000, type: 'ring', brand: 'Bulgari' },
-            { id: 'j_rg_7', name: 'Chopard For Love', price: 90000, type: 'ring', brand: 'Chopard' },
-            { id: 'j_rg_8', name: 'Piaget Passion', price: 110000, type: 'ring', brand: 'Piaget' },
-            { id: 'j_rg_9', name: 'Van Cleef & Arpels Romance', price: 85000, type: 'ring', brand: 'Van Cleef & Arpels' },
-            { id: 'j_rg_10', name: 'Cullinan Blue Diamond Ring', price: 5000000, type: 'ring', brand: 'Sotheby\'s' },
-            { id: 'j_rg_11', name: 'The Pink Star', price: 10000000, type: 'ring', brand: 'Private Collection' },
-            { id: 'j_rg_12', name: 'Oppenheimer Blue', price: 8000000, type: 'ring', brand: 'Christie\'s' },
-            { id: 'j_rg_13', name: 'Wittelsbach-Graff', price: 7500000, type: 'ring', brand: 'Graff' },
-            { id: 'j_rg_14', name: 'The Orange', price: 3500000, type: 'ring', brand: 'Private Collection' },
-            { id: 'j_rg_15', name: 'Eternal Promise 10ct', price: 900000, type: 'ring', brand: 'Custom' },
-        ],
-    },
-    {
-        id: 'jewelry_shop_chronos',
-        name: 'Chronos Swiss Master',
-        category: 'Jewelry',
-        subCategory: 'Watches',
-        description: 'Masterpieces of Horology',
-        items: [
-            { id: 'w_ch_1', name: 'Rolex Daytona Rainbow', price: 650000, type: 'watch', brand: 'Rolex' },
-            { id: 'w_ch_2', name: 'Audemars Piguet Royal Oak Concept', price: 400000, type: 'watch', brand: 'Audemars Piguet' },
-            { id: 'w_ch_3', name: 'Patek Philippe Nautilus Tiffany', price: 3200000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ch_4', name: 'Richard Mille RM 56-02 Sapphire', price: 2200000, type: 'watch', brand: 'Richard Mille' },
-            { id: 'w_ch_5', name: 'Jacob & Co. Billionaire', price: 18000000, type: 'watch', brand: 'Jacob & Co.' },
-            { id: 'w_ch_6', name: 'Vacheron Constantin 57260', price: 8000000, type: 'watch', brand: 'Vacheron Constantin' },
-            { id: 'w_ch_7', name: 'Hublot Big Bang Diamond', price: 5000000, type: 'watch', brand: 'Hublot' },
-            { id: 'w_ch_8', name: 'Breguet Grande Complication', price: 750000, type: 'watch', brand: 'Breguet' },
-            { id: 'w_ch_9', name: 'Lange & Söhne Grand Complication', price: 2500000, type: 'watch', brand: 'AL&S' },
-            { id: 'w_ch_10', name: 'Rolex Paul Newman Daytona', price: 17800000, type: 'watch', brand: 'Rolex' },
-            { id: 'w_ch_11', name: 'Jaeger-LeCoultre Hybris Mechanica', price: 1500000, type: 'watch', brand: 'Jaeger-LeCoultre' },
-            { id: 'w_ch_12', name: 'Ulysse Nardin Hannibal', price: 450000, type: 'watch', brand: 'Ulysse Nardin' },
-            { id: 'w_ch_13', name: 'Richard Mille RM 008', price: 950000, type: 'watch', brand: 'Richard Mille' },
-            { id: 'w_ch_14', name: 'Patek Philippe Grandmaster Chime', price: 31000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ch_15', name: 'Greubel Forsey Art Piece 1', price: 1300000, type: 'watch', brand: 'Greubel Forsey' },
-        ],
-    },
-    {
-        id: 'jewelry_shop_patek',
-        name: 'Patek Heritage',
-        category: 'Jewelry',
-        subCategory: 'Watches',
-        description: 'Legacy & Tradition',
-        items: [
-            { id: 'w_ph_1', name: 'Patek Philippe Henry Graves', price: 24000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_2', name: 'Patek Philippe 1518 Stainless', price: 11000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_3', name: 'Patek Philippe Gobbi Milan', price: 9000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_4', name: 'Patek Philippe Platinum World Time', price: 4000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_5', name: 'Patek Philippe 1928 Single Button', price: 3600000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_6', name: 'Patek Philippe 2499 First Series', price: 3000000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_7', name: 'Patek Philippe 2523 Heures Universelles', price: 2900000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_8', name: 'Patek Philippe 3448 "Pink"', price: 2100000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_9', name: 'Patek Philippe Aquanaut Jumbo', price: 150000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_10', name: 'Patek Philippe Celestial', price: 350000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_11', name: 'Patek Philippe Sky Moon Tourbillon', price: 1700000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_12', name: 'Patek Philippe 5270P', price: 200000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_13', name: 'Patek Philippe 5320G', price: 95000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_14', name: 'Patek Philippe Calatrava Pilot', price: 55000, type: 'watch', brand: 'Patek Philippe' },
-            { id: 'w_ph_15', name: 'Patek Philippe 5711 Olive Green', price: 450000, type: 'watch', brand: 'Patek Philippe' },
-        ],
-    },
-    {
-        id: 'jewelry_shop_gems',
-        name: 'Royal Gemstones',
-        category: 'Jewelry',
-        subCategory: 'Gems',
-        description: 'Precious Stones & Necklaces',
-        items: [
-            { id: 'j_gem_1', name: 'The Hope Diamond (Replica)', price: 250000000, type: 'necklace', brand: 'Royal' },
-            { id: 'j_gem_2', name: 'Peacock Brooch', price: 100000000, type: 'brooch', brand: 'Graff' },
-            { id: 'j_gem_3', name: 'Wittelsbach-Graff Diamond', price: 80000000, type: 'gem', brand: 'Graff' },
-            { id: 'j_gem_4', name: 'Pink Star Diamond', price: 71200000, type: 'gem', brand: 'Private' },
-            { id: 'j_gem_5', name: 'L’Incomparable Necklace', price: 55000000, type: 'necklace', brand: 'Mouawad' },
-            { id: 'j_gem_6', name: 'Blue Moon of Josephine', price: 48400000, type: 'gem', brand: 'Private' },
-            { id: 'j_gem_7', name: 'Graff Pink', price: 46000000, type: 'gem', brand: 'Graff' },
-            { id: 'j_gem_8', name: 'Hutton-Mdivani Jadeite', price: 27400000, type: 'necklace', brand: 'Cartier' },
-            { id: 'j_gem_9', name: 'Chopard 201-Carat Watch', price: 25000000, type: 'watch_jewelry', brand: 'Chopard' },
-            { id: 'j_gem_10', name: 'Winston Blue', price: 23800000, type: 'gem', brand: 'Harry Winston' },
-            { id: 'j_gem_11', name: 'The Perfect Pink', price: 23000000, type: 'gem', brand: 'Christie\'s' },
-            { id: 'j_gem_12', name: 'Heart of the Ocean', price: 20000000, type: 'necklace', brand: 'Asprey' },
-            { id: 'j_gem_13', name: 'Blue Belle of Asia', price: 17300000, type: 'necklace', brand: 'Private' },
-            { id: 'j_gem_14', name: 'Crimson Flame Ruby', price: 18000000, type: 'gem', brand: 'Private' },
-            { id: 'j_gem_15', name: 'Sunrise Ruby', price: 30000000, type: 'ring', brand: 'Cartier' },
-        ],
-    },
-    {
-        id: 'jewelry_shop_imperial',
-        name: 'Imperial Treasures',
-        category: 'Jewelry',
-        subCategory: 'Artifacts',
-        description: 'Historic & Royal Jewelry',
-        items: [
-            { id: 'j_imp_1', name: 'Wallis Simpson Panther Bracelet', price: 12400000, type: 'bracelet', brand: 'Cartier' },
-            { id: 'j_imp_2', name: 'Emerald & Diamond Tiara', price: 12700000, type: 'tiara', brand: 'Chaumet' },
-            { id: 'j_imp_3', name: 'La Peregrina Pearl', price: 11800000, type: 'necklace', brand: 'Cartier' },
-            { id: 'j_imp_4', name: 'The Oriental Sunrise', price: 11000000, type: 'earrings', brand: 'Private' },
-            { id: 'j_imp_5', name: 'Empress Eugenie Brooch', price: 10500000, type: 'brooch', brand: 'Royal' },
-            { id: 'j_imp_6', name: 'Begum Blue Diamond', price: 10000000, type: 'gem', brand: 'Private' },
-            { id: 'j_imp_7', name: 'Patiala Necklace', price: 25000000, type: 'necklace', brand: 'Cartier' },
-            { id: 'j_imp_8', name: 'Marie Antoinette Necklace', price: 30000000, type: 'necklace', brand: 'Royal' },
-            { id: 'j_imp_9', name: 'Romanov Crown Replica', price: 5000000, type: 'tiara', brand: 'Royal' },
-            { id: 'j_imp_10', name: 'Star of China Diamond', price: 11150000, type: 'gem', brand: 'Private' },
-            { id: 'j_imp_11', name: 'Martian Pink', price: 17000000, type: 'gem', brand: 'Private' },
-            { id: 'j_imp_12', name: 'The Orange', price: 35000000, type: 'gem', brand: 'Private' },
-            { id: 'j_imp_13', name: 'Princie Diamond', price: 39000000, type: 'gem', brand: 'Private' },
-            { id: 'j_imp_14', name: 'Moussaieff Red Diamond', price: 20000000, type: 'gem', brand: 'Moussaieff' },
-            { id: 'j_imp_15', name: 'Imperial Fabergé Egg', price: 33000000, type: 'artifact', brand: 'Fabergé' },
-        ],
-    },
+import { realEstateData } from './categories/realEstate';
+import { vehiclesData } from './categories/vehicles';
+import { marineData } from './categories/marine';
+import { aircraftData } from './categories/aircraft';
+import { watchesData } from './categories/watches';
+import { jewelryData } from './categories/jewelry';
 
-    // ==========================================
-    // 3. 🏰 REAL ESTATE AGENCIES (8 Regions)
-    // ==========================================
-    {
-        id: 're_usa',
-        name: 'USA Luxury Estates',
-        category: 'RealEstate',
-        description: 'Penthouses & Mansions',
-        items: [
-            { id: 're_us_1', name: 'NYC Central Park Penthouse', price: 250000000, type: 'penthouse', location: 'New York' },
-            { id: 're_us_2', name: 'The One Bel Air', price: 295000000, type: 'mansion', location: 'Los Angeles' },
-            { id: 're_us_3', name: 'Beverly Hills Mega Mansion', price: 180000000, type: 'mansion', location: 'Beverly Hills' },
-            { id: 're_us_4', name: 'Hamptons Beachfront Estate', price: 150000000, type: 'estate', location: 'New York' },
-            { id: 're_us_5', name: 'Aspen Ski Lodge', price: 85000000, type: 'villa', location: 'Colorado' },
-            { id: 're_us_6', name: 'Miami Star Island Villa', price: 75000000, type: 'villa', location: 'Miami' },
-            { id: 're_us_7', name: 'Malibu Oceanfront', price: 110000000, type: 'mansion', location: 'Malibu' },
-            { id: 're_us_8', name: 'Tribeca Loft', price: 45000000, type: 'apartment', location: 'New York' },
-            { id: 're_us_9', name: 'Palm Beach Historic Estate', price: 130000000, type: 'estate', location: 'Florida' },
-            { id: 're_us_10', name: 'San Francisco Gold Coast', price: 55000000, type: 'mansion', location: 'San Francisco' },
-            { id: 're_us_11', name: 'Silicon Valley Tech Compound', price: 90000000, type: 'estate', location: 'Palo Alto' },
-            { id: 're_us_12', name: 'Las Vegas Penthouse', price: 25000000, type: 'penthouse', location: 'Las Vegas' },
-            { id: 're_us_13', name: 'Chicago Trump Tower Penthouse', price: 30000000, type: 'penthouse', location: 'Chicago' },
-            { id: 're_us_14', name: 'Wyoming Ranch', price: 300000000, type: 'ranch', location: 'Wyoming' },
-            { id: 're_us_15', name: 'Hawaii North Shore Villa', price: 60000000, type: 'villa', location: 'Hawaii' },
-        ],
-    },
-    {
-        id: 're_istanbul',
-        name: 'Istanbul Bosphorus Realty',
-        category: 'RealEstate',
-        description: 'Historic Yalis & Residences',
-        items: [
-            { id: 're_ist_1', name: 'Erbilginler Yali', price: 150000000, type: 'yali', location: 'Bosphorus' },
-            { id: 're_ist_2', name: 'Zeki Pasa Yali', price: 120000000, type: 'yali', location: 'Bosphorus' },
-            { id: 're_ist_3', name: 'Hasip Pasa Yali', price: 100000000, type: 'yali', location: 'Beylerbeyi' },
-            { id: 're_ist_4', name: 'Muhsinzade Yali (Hotel)', price: 90000000, type: 'yali', location: 'Kurucesme' },
-            { id: 're_ist_5', name: 'Fethi Pasa Yali', price: 85000000, type: 'yali', location: 'Kuzguncuk' },
-            { id: 're_ist_6', name: 'Kibrisli Yali', price: 70000000, type: 'yali', location: 'Kandilli' },
-            { id: 're_ist_7', name: 'Canturer Yali', price: 60000000, type: 'yali', location: 'Kanlica' },
-            { id: 're_ist_8', name: 'Abud Efendi Yali', price: 55000000, type: 'yali', location: 'Bosphorus' },
-            { id: 're_ist_9', name: 'Count Ostrerog Yali', price: 50000000, type: 'yali', location: 'Kandilli' },
-            { id: 're_ist_10', name: 'Edip Efendi Yali', price: 45000000, type: 'yali', location: 'Bosphorus' },
-            { id: 're_ist_11', name: 'Luxury Residence Zorlu Center', price: 15000000, type: 'penthouse', location: 'Besiktas' },
-            { id: 're_ist_12', name: 'Sapphire Penthouse', price: 10000000, type: 'penthouse', location: 'Levent' },
-            { id: 're_ist_13', name: 'Bebek Modern Villa', price: 25000000, type: 'villa', location: 'Bebek' },
-            { id: 're_ist_14', name: 'Emirgan Grove Mansion', price: 35000000, type: 'mansion', location: 'Emirgan' },
-            { id: 're_ist_15', name: 'Galata Tower View Loft', price: 8000000, type: 'apartment', location: 'Galata' },
-        ],
-    },
-    {
-        id: 're_dubai',
-        name: 'Dubai Skyscrapers',
-        category: 'RealEstate',
-        description: 'Future of Living',
-        items: [
-            { id: 're_dxb_1', name: 'Burj Khalifa Top Penthouse', price: 120000000, type: 'penthouse', location: 'Downtown' },
-            { id: 're_dxb_2', name: 'Palm Jumeirah Signature Villa', price: 80000000, type: 'villa', location: 'The Palm' },
-            { id: 're_dxb_3', name: 'World Islands Palace', price: 65000000, type: 'mansion', location: 'World Islands' },
-            { id: 're_dxb_4', name: 'Emirates Hills Mega Mansion', price: 50000000, type: 'mansion', location: 'Emirates Hills' },
-            { id: 're_dxb_5', name: 'Atlantis The Royal Penthouse', price: 45000000, type: 'penthouse', location: 'The Palm' },
-            { id: 're_dxb_6', name: 'Bugatti Residences Penthouse', price: 200000000, type: 'penthouse', location: 'Business Bay' },
-            { id: 're_dxb_7', name: 'Jumeirah Bay Island Plot', price: 35000000, type: 'land', location: 'Jumeirah Bay' },
-            { id: 're_dxb_8', name: 'Dubai Marina Duplex', price: 15000000, type: 'apartment', location: 'Dubai Marina' },
-            { id: 're_dxb_9', name: 'One & Only Private Home', price: 30000000, type: 'villa', location: 'Zaabeel' },
-            { id: 're_dxb_10', name: 'Al Barari Reserve', price: 25000000, type: 'villa', location: 'Al Barari' },
-            { id: 're_dxb_11', name: 'District One Mansion', price: 28000000, type: 'mansion', location: 'MBR City' },
-            { id: 're_dxb_12', name: 'Marsa Al Arab Villa', price: 95000000, type: 'villa', location: 'Jumeirah' },
-            { id: 're_dxb_13', name: 'Downtown Address Sky View', price: 12000000, type: 'apartment', location: 'Downtown' },
-            { id: 're_dxb_14', name: 'Bulgari Resort Mansion', price: 110000000, type: 'mansion', location: 'Jumeirah Bay' },
-            { id: 're_dxb_15', name: 'Six Senses Palm Villa', price: 40000000, type: 'villa', location: 'The Palm' },
-        ],
-    },
-    {
-        id: 're_europe',
-        name: 'Europe Royal Homes',
-        category: 'RealEstate',
-        description: 'Castles & Manors',
-        items: [
-            { id: 're_eu_1', name: 'Château Louis XIV', price: 300000000, type: 'castle', location: 'France' },
-            { id: 're_eu_2', name: 'Villa Leopolda', price: 750000000, type: 'villa', location: 'France' },
-            { id: 're_eu_3', name: 'Bran Castle (Dracula)', price: 140000000, type: 'castle', location: 'Romania' },
-            { id: 're_eu_4', name: 'Swiss Alp Chalet Gstaad', price: 65000000, type: 'chalet', location: 'Switzerland' },
-            { id: 're_eu_5', name: 'Lake Como Historic Villa', price: 50000000, type: 'villa', location: 'Italy' },
-            { id: 're_eu_6', name: 'Monaco Tour Odéon Penthouse', price: 387000000, type: 'penthouse', location: 'Monaco' },
-            { id: 're_eu_7', name: 'Schloss Neuschwanstein (Replica)', price: 100000000, type: 'castle', location: 'Germany' },
-            { id: 're_eu_8', name: 'Mallorca Seafront Estate', price: 45000000, type: 'estate', location: 'Spain' },
-            { id: 're_eu_9', name: 'Tuscany Vineyard', price: 35000000, type: 'vineyard', location: 'Italy' },
-            { id: 're_eu_10', name: 'Parisian Palace Hotel Particulier', price: 85000000, type: 'mansion', location: 'Paris' },
-            { id: 're_eu_11', name: 'Saint-Tropez Mansion', price: 70000000, type: 'mansion', location: 'France' },
-            { id: 're_eu_12', name: 'Mykonos Super Paradise Villa', price: 20000000, type: 'villa', location: 'Greece' },
-            { id: 're_eu_13', name: 'Vienna Opera House Loft', price: 15000000, type: 'apartment', location: 'Austria' },
-            { id: 're_eu_14', name: 'Portofino Cliffside Villa', price: 30000000, type: 'villa', location: 'Italy' },
-            { id: 're_eu_15', name: 'Amsterdam Canal House (Whole)', price: 12000000, type: 'house', location: 'Netherlands' },
-        ],
-    },
-    {
-        id: 're_london',
-        name: 'London Prime',
-        category: 'RealEstate',
-        description: 'Nobility & Class',
-        items: [
-            { id: 're_ldn_1', name: 'Buckingham Gate Palace', price: 200000000, type: 'mansion', location: 'Westminster' },
-            { id: 're_ldn_2', name: 'One Hyde Park Penthouse', price: 175000000, type: 'penthouse', location: 'Knightsbridge' },
-            { id: 're_ldn_3', name: 'Kensington Palace Gardens Villa', price: 150000000, type: 'mansion', location: 'Kensington' },
-            { id: 're_ldn_4', name: 'Chelsea Barracks Townhouse', price: 60000000, type: 'townhouse', location: 'Chelsea' },
-            { id: 're_ldn_5', name: 'The Shard Penthouse', price: 45000000, type: 'penthouse', location: 'London Bridge' },
-            { id: 're_ldn_6', name: 'Eaton Square Estate', price: 55000000, type: 'mansion', location: 'Belgravia' },
-            { id: 're_ldn_7', name: 'Mayfair Historic Home', price: 40000000, type: 'townhouse', location: 'Mayfair' },
-            { id: 're_ldn_8', name: 'Regent\'s Park Nash Villa', price: 90000000, type: 'villa', location: 'Regent\'s Park' },
-            { id: 're_ldn_9', name: 'Notting Hill White Villa', price: 30000000, type: 'house', location: 'Notting Hill' },
-            { id: 're_ldn_10', name: 'Battersea Power Station Penthouse', price: 25000000, type: 'penthouse', location: 'Battersea' },
-            { id: 're_ldn_11', name: 'Hampstead Heath Mansion', price: 35000000, type: 'mansion', location: 'Hampstead' },
-            { id: 're_ldn_12', name: 'Canary Wharf Sky Loft', price: 10000000, type: 'apartment', location: 'Canary Wharf' },
-            { id: 're_ldn_13', name: 'Holland Park Villa', price: 45000000, type: 'villa', location: 'Kensington' },
-            { id: 're_ldn_14', name: 'Richmond Riverside Estate', price: 20000000, type: 'estate', location: 'Richmond' },
-            { id: 're_ldn_15', name: 'Primrose Hill House', price: 18000000, type: 'house', location: 'Primrose Hill' },
-        ],
-    },
-    {
-        id: 're_africa',
-        name: 'African Safari Lodges',
-        category: 'RealEstate',
-        description: 'Wilderness & Luxury',
-        items: [
-            { id: 're_af_1', name: 'Serengeti Private Reserve', price: 25000000, type: 'lodge', location: 'Tanzania' },
-            { id: 're_af_2', name: 'Cape Town Clifton Villa', price: 20000000, type: 'villa', location: 'South Africa' },
-            { id: 're_af_3', name: 'Maasai Mara Luxury Camp', price: 15000000, type: 'camp', location: 'Kenya' },
-            { id: 're_af_4', name: 'Seychelles Private Island Villa', price: 45000000, type: 'villa', location: 'Seychelles' },
-            { id: 're_af_5', name: 'Moroccan Royal Palace Riad', price: 30000000, type: 'riad', location: 'Marrakech' },
-            { id: 're_af_6', name: 'Okavango Delta Lodge', price: 18000000, type: 'lodge', location: 'Botswana' },
-            { id: 're_af_7', name: 'Zanzibar Beach Resort', price: 12000000, type: 'resort', location: 'Tanzania' },
-            { id: 're_af_8', name: 'Kruger Park Private Concession', price: 22000000, type: 'land', location: 'South Africa' },
-            { id: 're_af_9', name: 'Victoria Falls Estate', price: 5000000, type: 'estate', location: 'Zimbabwe' },
-            { id: 're_af_10', name: 'Namib Desert Retreat', price: 8000000, type: 'lodge', location: 'Namibia' },
-            { id: 're_af_11', name: 'Cairo Nile View Penthouse', price: 4000000, type: 'penthouse', location: 'Egypt' },
-            { id: 're_af_12', name: 'Mauritius Golf Estate', price: 10000000, type: 'estate', location: 'Mauritius' },
-            { id: 're_af_13', name: 'Madagascar Rain Forest Lodge', price: 3000000, type: 'lodge', location: 'Madagascar' },
-            { id: 're_af_14', name: 'Rwanda Gorilla Trekking Base', price: 6000000, type: 'lodge', location: 'Rwanda' },
-            { id: 're_af_15', name: 'Johannesburg Sandton Mansion', price: 9000000, type: 'mansion', location: 'South Africa' },
-        ],
-    },
-    {
-        id: 're_china',
-        name: 'China Dynasties',
-        category: 'RealEstate',
-        description: 'Eastern Power',
-        items: [
-            { id: 're_cn_1', name: 'Beijing Courtyard (Siheyuan)', price: 150000000, type: 'house', location: 'Beijing' },
-            { id: 're_cn_2', name: 'Shanghai The Bund Penthouse', price: 80000000, type: 'penthouse', location: 'Shanghai' },
-            { id: 're_cn_3', name: 'Hong Kong The Peak Mansion', price: 450000000, type: 'mansion', location: 'Hong Kong' },
-            { id: 're_cn_4', name: 'Shenzhen Bay One Penthouse', price: 60000000, type: 'penthouse', location: 'Shenzhen' },
-            { id: 're_cn_5', name: 'Hangzhou West Lake Villa', price: 40000000, type: 'villa', location: 'Hangzhou' },
-            { id: 're_cn_6', name: 'Guangzhou Pearl River Tower', price: 35000000, type: 'apartment', location: 'Guangzhou' },
-            { id: 're_cn_7', name: 'Macau Casino Resort Suite (Buy)', price: 90000000, type: 'suite', location: 'Macau' },
-            { id: 're_cn_8', name: 'Sanya Tropical Beach House', price: 20000000, type: 'villa', location: 'Sanya' },
-            { id: 're_cn_9', name: 'Chengdu Classical Estate', price: 15000000, type: 'estate', location: 'Chengdu' },
-            { id: 're_cn_10', name: 'Xi\'an Historic District Home', price: 10000000, type: 'house', location: 'Xi\'an' },
-            { id: 're_cn_11', name: 'Suzhou Garden Villa', price: 25000000, type: 'villa', location: 'Suzhou' },
-            { id: 're_cn_12', name: 'Taiwan Taipei 101 View', price: 18000000, type: 'apartment', location: 'Taipei' },
-            { id: 're_cn_13', name: 'Repulse Bay Apartment', price: 50000000, type: 'apartment', location: 'Hong Kong' },
-            { id: 're_cn_14', name: 'Deep Water Bay Mansion', price: 200000000, type: 'mansion', location: 'Hong Kong' },
-            { id: 're_cn_15', name: 'Qingdao Seaside Castle', price: 30000000, type: 'castle', location: 'Qingdao' },
-        ],
-    },
-    {
-        id: 're_islands',
-        name: 'Private Islands Broker',
-        category: 'RealEstate',
-        description: 'Kingdom of Your Own',
-        items: [
-            { id: 're_isl_1', name: 'Lanai Island (98%)', price: 3000000000, type: 'island', location: 'Hawaii' },
-            { id: 're_isl_2', name: 'Necker Island', price: 500000000, type: 'island', location: 'BVI' },
-            { id: 're_isl_3', name: 'Musha Cay', price: 450000000, type: 'island', location: 'Bahamas' },
-            { id: 're_isl_4', name: 'Skorpios Island', price: 200000000, type: 'island', location: 'Greece' },
-            { id: 're_isl_5', name: 'Rang Yai Island', price: 160000000, type: 'island', location: 'Thailand' },
-            { id: 're_isl_6', name: 'Pumpkin Key', price: 95000000, type: 'island', location: 'Florida Keys' },
-            { id: 're_isl_7', name: 'Spectabilis Island', price: 62000000, type: 'island', location: 'Bahamas' },
-            { id: 're_isl_8', name: 'Vatuvara Private Islands', price: 75000000, type: 'island', location: 'Fiji' },
-            { id: 're_isl_9', name: 'Motu Tane', price: 50000000, type: 'island', location: 'Bora Bora' },
-            { id: 're_isl_10', name: 'Tetiaroa', price: 300000000, type: 'island', location: 'French Polynesia' },
-            { id: 're_isl_11', name: 'Lisca Bianca', price: 40000000, type: 'island', location: 'Italy' },
-            { id: 're_isl_12', name: 'Ronde Island', price: 100000000, type: 'island', location: 'Grenada' },
-            { id: 're_isl_13', name: 'Katafanga Island', price: 25000000, type: 'island', location: 'Fiji' },
-            { id: 're_isl_14', name: 'Big Darby Island', price: 45000000, type: 'island', location: 'Bahamas' },
-            { id: 're_isl_15', name: 'Al Marjan Island (Plot)', price: 1000000000, type: 'island', location: 'UAE' },
-        ],
-    },
+// ============================================================================
+// AGGREGATE ALL SHOPS (25+ Distinct Brands)
+// ============================================================================
 
-    // ==========================================
-    // 4. ✈️ & ⚓ SPECIAL VEHICLES (2 Shops)
-    // ==========================================
-    {
-        id: 'veh_aviation',
-        name: 'Sky High Aviation',
-        category: 'SpecialVehicles',
-        subCategory: 'Air',
-        description: 'Conquer the Skies',
-        items: [
-            { id: 'veh_air_1', name: 'Boeing 747-8 VIP', price: 560000000, type: 'plane', brand: 'Boeing' },
-            { id: 'veh_air_2', name: 'Airbus A380 Private Palace', price: 600000000, type: 'plane', brand: 'Airbus' },
-            { id: 'veh_air_3', name: 'Gulfstream G700', price: 78000000, type: 'plane', brand: 'Gulfstream' },
-            { id: 'veh_air_4', name: 'Bombardier Global 8000', price: 81000000, type: 'plane', brand: 'Bombardier' },
-            { id: 'veh_air_5', name: 'Dassault Falcon 10X', price: 75000000, type: 'plane', brand: 'Dassault' },
-            { id: 'veh_air_6', name: 'Boeing BBJ 777X', price: 450000000, type: 'plane', brand: 'Boeing' },
-            { id: 'veh_air_7', name: 'Embraer Lineage 1000E', price: 53000000, type: 'plane', brand: 'Embraer' },
-            { id: 'veh_air_8', name: 'Cessna Citation Hemisphere', price: 38000000, type: 'plane', brand: 'Cessna' },
-            { id: 'veh_air_9', name: 'Gulfstream G800', price: 72000000, type: 'plane', brand: 'Gulfstream' },
-            { id: 'veh_air_10', name: 'Airbus ACJ350', price: 350000000, type: 'plane', brand: 'Airbus' },
-            { id: 'veh_air_11', name: 'Boeing 787 Dreamliner BJ', price: 280000000, type: 'plane', brand: 'Boeing' },
-            { id: 'veh_air_12', name: 'Sikorsky S-92 VIP', price: 27000000, type: 'helicopter', brand: 'Sikorsky' },
-            { id: 'veh_air_13', name: 'Airbus H160 VIP', price: 18000000, type: 'helicopter', brand: 'Airbus' },
-            { id: 'veh_air_14', name: 'Bell 525 Relentless', price: 22000000, type: 'helicopter', brand: 'Bell' },
-            { id: 'veh_air_15', name: 'AgustaWestland AW101', price: 25000000, type: 'helicopter', brand: 'Leonardo' },
-            { id: 'veh_air_16', name: 'F-16 Fighting Falcon (Demilitarized)', price: 15000000, type: 'jet', brand: 'General Dynamics' },
-            { id: 'veh_air_17', name: 'Spitfire MK. IX (Restored)', price: 5000000, type: 'plane', brand: 'Supermarine' },
-            { id: 'veh_air_18', name: 'P-51 Mustang (Restored)', price: 4000000, type: 'plane', brand: 'North American' },
-            { id: 'veh_air_19', name: 'Black Hawk (Civilian)', price: 12000000, type: 'helicopter', brand: 'Sikorsky' },
-            { id: 'veh_air_20', name: 'Icon A5 Limited', price: 500000, type: 'plane', brand: 'Icon' },
-        ],
-    },
-    {
-        id: 'veh_marine',
-        name: 'Poseidon Marine',
-        category: 'SpecialVehicles',
-        subCategory: 'Sea',
-        description: 'Rule the Seven Seas',
-        items: [
-            { id: 'veh_sea_1', name: 'History Supreme (Gold)', price: 4800000000, type: 'yacht', brand: 'Custom' },
-            { id: 'veh_sea_2', name: 'Eclipse', price: 1500000000, type: 'yacht', brand: 'Blohm+Voss' },
-            { id: 'veh_sea_3', name: 'Azzam', price: 600000000, type: 'yacht', brand: 'Lürssen' },
-            { id: 'veh_sea_4', name: 'Dilbar', price: 800000000, type: 'yacht', brand: 'Lürssen' },
-            { id: 'veh_sea_5', name: 'Flying Fox', price: 400000000, type: 'yacht', brand: 'Lürssen' },
-            { id: 'veh_sea_6', name: 'Sailing Yacht A', price: 500000000, type: 'yacht', brand: 'Nobiskrug' },
-            { id: 'veh_sea_7', name: 'Black Pearl', price: 200000000, type: 'yacht', brand: 'Oceanco' },
-            { id: 'veh_sea_8', name: 'Migaloo M5 Submersible', price: 2000000000, type: 'submarine', brand: 'Migaloo' },
-            { id: 'veh_sea_9', name: 'Triton 36000/2', price: 50000000, type: 'submarine', brand: 'Triton' },
-            { id: 'veh_sea_10', name: 'Riva Aquarama Special', price: 1000000, type: 'boat', brand: 'Riva' },
-            { id: 'veh_sea_11', name: 'Wally wallywhy200', price: 15000000, type: 'boat', brand: 'Wally' },
-            { id: 'veh_sea_12', name: 'Royal Caribbean Icon (Buy Ship)', price: 2000000000, type: 'cruise_ship', brand: 'Royal Caribbean' },
-            { id: 'veh_sea_13', name: 'Personal Destroyer (Demilitarized)', price: 300000000, type: 'ship', brand: 'Naval Surplus' },
-            { id: 'veh_sea_14', name: 'Seabreacher Y', price: 120000, type: 'submarine', brand: 'Seabreacher' },
-            { id: 'veh_sea_15', name: 'Sunseeker 131', price: 25000000, type: 'yacht', brand: 'Sunseeker' },
-            { id: 'veh_sea_16', name: 'Azimut Grande 35', price: 18000000, type: 'yacht', brand: 'Azimut' },
-            { id: 'veh_sea_17', name: 'Bugatti Niniette 66', price: 4000000, type: 'boat', brand: 'Bugatti' },
-            { id: 'veh_sea_18', name: 'Lamborghini 63 Yacht', price: 3500000, type: 'boat', brand: 'Lamborghini' },
-            { id: 'veh_sea_19', name: 'Aston Martin AM37', price: 2000000, type: 'boat', brand: 'Aston Martin' },
-            { id: 'veh_sea_20', name: 'Mercedes-AMG Cigarette Boat', price: 2500000, type: 'boat', brand: 'Mercedes' },
-        ],
-    },
+export const SHOPS = [
+    // Real Estate (6 shops)
+    ...realEstateData.shops,
 
-    // ==========================================
-    // 5. ⚓ MARINAS (Port Ownership)
-    // ==========================================
-    {
-        id: 'marina_global',
-        name: 'Global Port Authority',
-        category: 'Marinas',
-        description: 'Own the Gates of the Ocean',
-        items: [
-            { id: 'mar_1', name: 'Dubai Marina', price: 3500000000, type: 'marina', location: 'Dubai' },
-            { id: 'mar_2', name: 'Port Hercules', price: 5000000000, type: 'marina', location: 'Monaco' },
-            { id: 'mar_3', name: 'Marina Grande', price: 1200000000, type: 'marina', location: 'Capri' },
-            { id: 'mar_4', name: 'Port de Saint-Tropez', price: 1500000000, type: 'marina', location: 'France' },
-            { id: 'mar_5', name: 'Ibiza Magna', price: 1800000000, type: 'marina', location: 'Spain' },
-            { id: 'mar_6', name: 'Yacht Haven Grande', price: 800000000, type: 'marina', location: 'US Virgin Islands' },
-            { id: 'mar_7', name: 'Porto Montenegro', price: 750000000, type: 'marina', location: 'Montenegro' },
-            { id: 'mar_8', name: 'Miami Beach Marina', price: 2200000000, type: 'marina', location: 'USA' },
-            { id: 'mar_9', name: 'Vilamoura Marina', price: 600000000, type: 'marina', location: 'Portugal' },
-            { id: 'mar_10', name: 'Port Vell', price: 900000000, type: 'marina', location: 'Barcelona' },
-            { id: 'mar_11', name: 'Yas Marina', price: 2800000000, type: 'marina', location: 'Abu Dhabi' },
-            { id: 'mar_12', name: 'OneOcean Port Vell', price: 1100000000, type: 'marina', location: 'Spain' },
-        ],
-    },
+    // Vehicles (6 shops)
+    ...vehiclesData.shops,
+
+    // Marine (3 shops)
+    ...marineData.shops,
+
+    // Aircraft (3 shops)
+    ...aircraftData.shops,
+
+    // Watches (4 shops - Luxury Only)
+    ...watchesData.shops,
+
+    // Jewelry (5 shops)
+    ...jewelryData.shops,
 ];
+
+// ============================================================================
+// AGGREGATE ALL ITEMS (The Inventory)
+// ============================================================================
+
+export const ITEMS = [
+    // Real Estate
+    ...realEstateData.items,
+
+    // Vehicles
+    ...vehiclesData.items,
+
+    // Marine
+    ...marineData.items,
+
+    // Aircraft
+    ...aircraftData.items,
+
+    // Watches
+    ...watchesData.items,
+
+    // Jewelry
+    ...jewelryData.items,
+];
+
+// ============================================================================
+// LEGACY COMPATIBILITY
+// ============================================================================
+
+// Transform SHOPS into the old SHOP_DATA format if needed by legacy components
+export const SHOP_DATA = SHOPS.map(shop => ({
+    id: shop.id,
+    name: shop.name,
+    category: shop.category,
+    items: ITEMS.filter(item => item.shopId === shop.id),
+}));
+
+// ============================================================================
+// VALIDATION & INTEGRITY CHECK
+// ============================================================================
+
+export const validateLuxeNetData = () => {
+    const shopIds = new Set(SHOPS.map(s => s.id));
+    const orphanedItems = ITEMS.filter(item => !shopIds.has(item.shopId));
+
+    if (orphanedItems.length > 0) {
+        console.warn('⚠️ LUXENET ALERT: Found orphaned items (no matching shop):', orphanedItems.map(i => i.name));
+    }
+
+    // Check for duplicate IDs
+    const itemIds = new Set();
+    const duplicates = [];
+    ITEMS.forEach(item => {
+        if (itemIds.has(item.id)) duplicates.push(item.id);
+        itemIds.add(item.id);
+    });
+
+    if (duplicates.length > 0) {
+        console.warn('⚠️ LUXENET ALERT: Found duplicate Item IDs:', duplicates);
+    }
+
+    return {
+        totalShops: SHOPS.length,
+        totalItems: ITEMS.length,
+        inventoryValue: ITEMS.reduce((acc, item) => acc + item.price, 0),
+        categories: {
+            REAL_ESTATE: SHOPS.filter(s => s.category === 'REAL_ESTATE').length,
+            VEHICLE: SHOPS.filter(s => s.category === 'VEHICLE').length,
+            MARINE: SHOPS.filter(s => s.category === 'MARINE').length,
+            AIRCRAFT: SHOPS.filter(s => s.category === 'AIRCRAFT').length,
+            WATCH: SHOPS.filter(s => s.category === 'WATCH').length,
+            JEWELRY: SHOPS.filter(s => s.category === 'JEWELRY').length,
+        },
+    };
+};
+
+if (__DEV__) {
+    const stats = validateLuxeNetData();
+    console.log('💎 LuxeNet Billionaire Market Loaded:', stats);
+    console.log(`💰 Total Inventory Value: $${(stats.inventoryValue / 1000000000).toFixed(2)} Billion`);
+}
