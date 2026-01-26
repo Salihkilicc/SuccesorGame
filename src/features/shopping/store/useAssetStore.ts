@@ -7,8 +7,9 @@ import { zustandStorage } from '../../../storage/persist';
 // ============================================================================
 
 export type OwnedItem = {
-    id: string;
-    purchaseDate: number; // timestamp
+    itemId: string;        // Item ID from ITEMS data
+    purchaseDate: number;  // timestamp
+    condition: number;     // 0-100, starts at 100 (mint condition)
 };
 
 export type CartItem = {
@@ -120,11 +121,14 @@ export const useAssetStore = create<AssetStore>()(
                 set((state) => {
                     const purchaseDate = Date.now();
 
-                    // Convert cart items to owned items
+                    // Convert cart items to owned items with full metadata
                     const newOwnedItems = state.cart.map((item) => ({
-                        id: item.id,
+                        itemId: item.id,
                         purchaseDate,
+                        condition: 100, // Mint condition
                     }));
+
+                    console.log('[AssetStore] Purchased items:', newOwnedItems.map(i => i.itemId));
 
                     return {
                         ...state,
@@ -138,7 +142,7 @@ export const useAssetStore = create<AssetStore>()(
              */
             isOwned: (id) => {
                 const state = get();
-                return state.ownedItems.some((item) => item.id === id);
+                return state.ownedItems.some((item) => item.itemId === id);
             },
 
             // ========================================================================

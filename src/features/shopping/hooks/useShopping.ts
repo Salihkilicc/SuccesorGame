@@ -133,3 +133,70 @@ export const useShopLogic = (shopId?: string, triggerEncounter?: (type: string) 
         discountPercent
     };
 };
+
+// ============================================================================
+// INVENTORY-AWARE SHOPPING HOOK
+// ============================================================================
+
+/**
+ * Hook for shopping with inventory management
+ * Filters out owned items from shops (except rings)
+ */
+export const useShoppingWithInventory = () => {
+    const { ownedItems, isOwned } = useAssetStore();
+
+    // Ring shop IDs (these items can be purchased multiple times)
+    const RING_SHOP_IDS = ['shop_vow_eternity', 'shop_the_promise'];
+
+    /**
+     * Get filtered shop items (hides owned items except rings)
+     */
+    const getShopItems = (shopId: string) => {
+        // Import ITEMS from data
+        const { ITEMS } = require('../data/ShoppingData');
+
+        return ITEMS.filter((item: any) => {
+            // 1. Must belong to this shop
+            if (item.shopId !== shopId) return false;
+
+            // 2. Check ownership
+            const itemIsOwned = isOwned(item.id);
+
+            // 3. Ring Exception: Always show rings even if owned
+            const isRingShop = RING_SHOP_IDS.includes(item.shopId);
+
+            if (itemIsOwned && !isRingShop) {
+                return false; // Hide owned items (stock depleted)
+            }
+
+            return true; // Show item
+        });
+    };
+
+    /**
+     * Get trending items (excludes owned items except rings)
+     */
+    const getTrendingItems = (count: number = 6) => {
+        const { ITEMS } = require('../data/ShoppingData');
+
+        const availableItems = ITEMS.filter((item: any) => {
+            const itemIsOwned = isOwned(item.id);
+            const isRingShop = RING_SHOP_IDS.includes(item.shopId);
+            return !itemIsOwned || isRingShop;
+        });
+
+        return [...availableItems]
+            .sort(() => 0.5 - Math.random())
+            .slice(0, count);
+    };
+
+    return {
+        getShopItems,
+        getTrendingItems,
+        ownedItems,
+        isOwned,
+    };
+};
+
+// Re-export for convenience
+import { useAssetStore } from '../store/useAssetStore';

@@ -15,6 +15,7 @@ import BrowserHeader from '../components/BrowserHeader';
 import AdBannerCarousel from '../components/AdBannerCarousel';
 import ShopPreviewCard from '../components/ShopPreviewCard';
 import LuxeNetFooter from '../components/LuxeNetFooter';
+import { useShoppingWithInventory } from '../hooks/useShopping';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
@@ -33,6 +34,7 @@ const ShoppingScreen = () => {
     const navigation = useNavigation<any>();
     const userName = useUserStore((state) => state.name);
     const { addToCart, isOwned, cart } = useAssetStore();
+    const { getShopItems, getTrendingItems } = useShoppingWithInventory();
 
     // Internal Navigation Hook
     const {
@@ -84,10 +86,10 @@ const ShoppingScreen = () => {
     // DATA HELPERS
     // ============================================================================
 
-    // Random trending items for Hub
+    // Trending items (filtered by ownership)
     const trendingItems = useMemo(() => {
-        return [...ITEMS].sort(() => 0.5 - Math.random()).slice(0, 6);
-    }, []);
+        return getTrendingItems(6);
+    }, [getTrendingItems]);
 
     const formatPrice = (price: number) => {
         if (price >= 1000000000) return `$${(price / 1000000000).toFixed(1)}B`;
@@ -207,7 +209,8 @@ const ShoppingScreen = () => {
         const shop = SHOPS.find(s => s.id === selectedShopId);
         if (!shop) return null;
 
-        const shopItems = ITEMS.filter(item => item.shopId === shop.id).map(item => ({
+        // Get filtered shop items (hides owned items except rings)
+        const shopItems = getShopItems(shop.id).map((item: any) => ({
             ...item,
             website: shop.name,
             brandColor: shop.bannerColor,
@@ -226,7 +229,7 @@ const ShoppingScreen = () => {
 
                 {/* Items Grid */}
                 <View style={styles.itemsGrid}>
-                    {shopItems.map(item => {
+                    {shopItems.map((item: any) => {
                         const owned = isOwned(item.id);
                         const isInCart = cart.some(c => c.id === item.id);
 
