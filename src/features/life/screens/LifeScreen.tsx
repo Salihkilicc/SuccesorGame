@@ -34,7 +34,6 @@ import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
 import SanctuaryResultModal from '../components/Sanctuary/modals/SanctuaryResultModal';
 
 import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
-import BelongingsModal from '../components/BlackMarket/BelongingsModal';
 import { Alert } from 'react-native';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 import { EncounterModal } from '../../love/components/EncounterModal';
@@ -282,7 +281,6 @@ const LifeScreen = () => {
 
   // Black Market State
   const [isBlackMarketVisible, setBlackMarketVisible] = useState(false);
-  const [isBelongingsVisible, setBelongingsVisible] = useState(false);
 
   // Handle encounter date with cheating consequence check
   const handleEncounterDate = useCallback(() => {
@@ -364,7 +362,8 @@ const LifeScreen = () => {
         break;
       case 'belongings':
         console.log('[Life] Action triggered: Belongings');
-        setBelongingsVisible(true);
+        // Navigate to new Portfolio Screen
+        navigation.navigate('Assets', { screen: 'Belongings' } as any);
         break;
       case 'hookup':
         console.log('[Life] Action triggered: Hookup');
@@ -609,11 +608,7 @@ const LifeScreen = () => {
         onClose={() => setBlackMarketVisible(false)}
       />
 
-      {/* BELONGINGS MODAL */}
-      <BelongingsModal
-        visible={isBelongingsVisible}
-        onClose={() => setBelongingsVisible(false)}
-      />
+
 
       {/* ENCOUNTER MODAL (CINEMATIC) */}
       <EncounterModal

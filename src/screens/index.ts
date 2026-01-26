@@ -13,6 +13,7 @@ export { default as BlackjackGameScreen } from '../features/casino/screens/Black
 
 export { default as ShoppingScreen } from '../features/shopping/screens/ShoppingScreen';
 export { default as ShopDetailScreen } from '../features/shopping/screens/ShopDetailScreen';
+export { default as BelongingsScreen } from '../features/shopping/screens/BelongingsScreen';
 export { default as ProductsScreen } from '../features/products/screens/ProductsScreen';
 export { default as TechTreeScreen } from '../features/products/screens/TechTreeScreen';
 export { default as EducationScreen } from '../features/life/screens/EducationScreen';

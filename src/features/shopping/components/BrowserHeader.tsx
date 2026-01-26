@@ -8,10 +8,11 @@ type BrowserHeaderProps = {
     canGoBack: boolean;
     onBack: () => void;
     onCartPress: () => void;
+    onBelongingsPress: () => void;
     onHomePress?: () => void; // Optional: to quickly jump to Hub if needed, though Back handles hierarchy
 };
 
-const BrowserHeader = ({ currentUrl, canGoBack, onBack, onCartPress }: BrowserHeaderProps) => {
+const BrowserHeader = ({ currentUrl, canGoBack, onBack, onCartPress, onBelongingsPress }: BrowserHeaderProps) => {
     const cart = useAssetStore((state) => state.cart);
 
     return (
@@ -29,11 +30,21 @@ const BrowserHeader = ({ currentUrl, canGoBack, onBack, onCartPress }: BrowserHe
                 <Text style={[styles.backIcon, !canGoBack && styles.disabledIcon]}>←</Text>
             </Pressable>
 
-            {/* Address Bar */}
             <View style={styles.addressBar}>
                 <Text style={styles.lockIcon}>🔒</Text>
                 <Text style={styles.urlText} numberOfLines={1}>{currentUrl}</Text>
             </View>
+
+            {/* Assets Button */}
+            <Pressable
+                onPress={onBelongingsPress}
+                style={({ pressed }) => [
+                    styles.cartButton, // Reusing button style
+                    pressed && styles.pressed
+                ]}
+            >
+                <Text style={styles.cartIcon}>🎒</Text>
+            </Pressable>
 
             {/* Cart Button */}
             <Pressable

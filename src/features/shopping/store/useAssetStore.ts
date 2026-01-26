@@ -44,6 +44,8 @@ type AssetActions = {
     // Purchase & Ownership
     purchaseCart: () => void;
     isOwned: (id: string) => boolean;
+    removeOwnedItem: (itemId: string) => void;
+    repairOwnedItem: (itemId: string, condition?: number) => void;
 
     // Utility
     reset: () => void;
@@ -144,6 +146,34 @@ export const useAssetStore = create<AssetStore>()(
                 const state = get();
                 return state.ownedItems.some((item) => item.itemId === id);
             },
+
+            /**
+             * Remove an item from owned items (e.g., when sold)
+             * Removes the FIRST matching instance found.
+             */
+            removeOwnedItem: (itemId) =>
+                set((state) => {
+                    const index = state.ownedItems.findIndex(i => i.itemId === itemId);
+                    if (index === -1) return state;
+
+                    const newOwned = [...state.ownedItems];
+                    newOwned.splice(index, 1);
+                    return { ...state, ownedItems: newOwned };
+                }),
+
+            /**
+             * Repair an item (restore condition)
+             * Updates the FIRST matching instance (usually assumes unique items for repairables)
+             */
+            repairOwnedItem: (itemId, condition = 100) =>
+                set((state) => {
+                    const index = state.ownedItems.findIndex(i => i.itemId === itemId);
+                    if (index === -1) return state;
+
+                    const newOwned = [...state.ownedItems];
+                    newOwned[index] = { ...newOwned[index], condition };
+                    return { ...state, ownedItems: newOwned };
+                }),
 
             // ========================================================================
             // UTILITY

@@ -77,7 +77,10 @@ const ShoppingScreen = () => {
             Alert.alert(
                 "Acquisition Complete",
                 "The assets have been transferred to your portfolio. Delivery agents have been dispatched.",
-                [{ text: "Excellent" }]
+                [{
+                    text: "Excellent",
+                    onPress: () => navigation.navigate('Life')
+                }]
             );
         }, 500);
     };
@@ -255,13 +258,13 @@ const ShoppingScreen = () => {
 
                                 {/* Add Button */}
                                 <Pressable
-                                    onPress={() => !owned && !isInCart && addToCart(item)}
+                                    onPress={() => isInCart ? setShowCart(true) : !owned && addToCart(item)}
                                     style={({ pressed }) => [
                                         styles.addButton,
                                         { backgroundColor: owned ? '#333' : isInCart ? '#27AE60' : shop.bannerColor },
-                                        pressed && !owned && !isInCart && styles.pressed
+                                        pressed && !owned && styles.pressed
                                     ]}
-                                    disabled={owned || isInCart}
+                                    disabled={owned}
                                 >
                                     <Text style={styles.addButtonText}>
                                         {owned ? 'Owned' : isInCart ? 'In Cart' : 'Add to Cart'}
@@ -281,6 +284,17 @@ const ShoppingScreen = () => {
     // ============================================================================
     // MAIN RENDER
     // ============================================================================
+    const handleGoToBelongings = () => navigation.navigate('Belongings');
+
+    // Handle Back Button: Exit if on HUB, otherwise go up hierarchy
+    const handleBack = () => {
+        if (currentView === 'HUB') {
+            navigation.goBack();
+        } else {
+            goBack();
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
@@ -288,9 +302,10 @@ const ShoppingScreen = () => {
             {/* Persistent Browser Header */}
             <BrowserHeader
                 currentUrl={currentUrl}
-                canGoBack={currentView !== 'HUB'}
-                onBack={goBack}
+                canGoBack={true} // Always enabled (Hub -> LifeScreen)
+                onBack={handleBack}
                 onCartPress={() => setShowCart(true)}
+                onBelongingsPress={handleGoToBelongings}
             />
 
             {/* Dynamic Content */}

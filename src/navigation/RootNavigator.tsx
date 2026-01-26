@@ -30,6 +30,7 @@ import {
   DNAScreen,
   ResearchScreen,
   FinancialReportScreen,
+  BelongingsScreen,
 } from '../screens';
 
 import { formatScreenTitle } from '../core/utils';
@@ -66,6 +67,7 @@ export type AssetsStackParamList = {
     category?: string;
   };
   FinancialReport: undefined;
+  Belongings: undefined;
 };
 
 export type CasinoStackParamList = {
@@ -162,6 +164,11 @@ const AssetsStackNavigator = () => (
       name="Shopping"
       component={ShoppingScreen}
       options={{ title: formatScreenTitle('Shopping') }}
+    />
+    <AssetsStack.Screen
+      name="Belongings"
+      component={BelongingsScreen}
+      options={{ title: 'Asset Portfolio' }}
     />
     <AssetsStack.Screen
       name="ShopDetail"
