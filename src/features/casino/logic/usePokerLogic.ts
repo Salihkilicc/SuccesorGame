@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../core/store'; // Store yolunu kontrol et
+import { useStatsStore, usePlayerStore } from '../../../core/store'; // Store yolunu kontrol et
 
 // --- TİPLER ---
 export type Card = {
@@ -40,7 +40,9 @@ const createDeck = (): Card[] => {
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 export const usePokerLogic = (initialBet: number = 10000) => {
-  const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
+  const { money, setField } = useStatsStore();
+  const { reputation, updateReputation } = usePlayerStore();
+  const casinoReputation = reputation.casino;
 
   // States
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
@@ -50,24 +52,27 @@ export const usePokerLogic = (initialBet: number = 10000) => {
   const [status, setStatus] = useState('2-player Hold’em. Progressive betting.');
   const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss', amount: number } | null>(null);
   const [gamePhase, setGamePhase] = useState<GamePhase>('idle');
-  const [currentBet, setCurrentBet] = useState(initialBet);
+
+  // Betting States
+  const [baseBet, setBaseBet] = useState(initialBet); // The selected Ante
+  const [currentBet, setCurrentBet] = useState(initialBet); // The active accumulation in pot/round
+
   const lossStreak = useRef(0);
 
   // --- OYUN MOTORU ---
   const reputationUp = (delta: number) => {
-    setCasinoReputation(clamp(casinoReputation + delta, 0, 100));
+    updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
   };
 
   const reputationDownSmall = () => {
     if (lossStreak.current >= 3) {
-      setCasinoReputation(clamp(casinoReputation - 1, 0, 100));
+      updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
       lossStreak.current = 0;
     }
   };
 
   const scoreHand = (hand: Card[], community: Card[]) => {
     // Basitleştirilmiş skorlama (sadece yüksek kart toplamı)
-    // Gerçek bir poker mantığı çok uzundur, mevcut kodundaki mantığı korudum.
     const topBoard = [...community]
       .map(card => card.value)
       .sort((a, b) => b - a)
@@ -78,6 +83,15 @@ export const usePokerLogic = (initialBet: number = 10000) => {
   };
 
   // --- ACTIONS ---
+
+  const setAnte = (amount: number) => {
+    // Allow confirming a new bet size only if idle
+    if (gamePhase === 'idle') {
+      const valid = clamp(amount, 10, 100000); // 10 min, 100k max
+      setBaseBet(valid);
+      setCurrentBet(valid); // Sync display
+    }
+  };
 
   const handleRegame = () => {
     // Fold / Çekilme Mantığı
@@ -94,20 +108,24 @@ export const usePokerLogic = (initialBet: number = 10000) => {
     setPlayerHand([]);
     setDealerHand([]);
     setBoard([]);
-    setCurrentBet(initialBet);
+    setCurrentBet(baseBet);
   };
 
   const playHand = () => {
     if (gamePhase === 'idle') {
       // 1. AŞAMA: Kart Dağıt
       setResultPopup(null);
-      if (money < initialBet) {
-        Alert.alert('Not enough cash', 'You need ' + initialBet + ' to start.');
+      if (baseBet <= 0) {
+        Alert.alert('Place Bet', 'The ante is required to play.');
+        return;
+      }
+      if (money < baseBet) {
+        Alert.alert('Not enough cash', 'You need ' + baseBet + ' to start.');
         return;
       }
 
-      setField('money', money - initialBet);
-      setCurrentBet(initialBet);
+      setField('money', money - baseBet);
+      setCurrentBet(baseBet);
 
       const deck = createDeck();
       const nextPlayer = [deck.pop()!, deck.pop()!];
@@ -124,12 +142,13 @@ export const usePokerLogic = (initialBet: number = 10000) => {
 
     } else if (gamePhase === 'flop') {
       // 2. AŞAMA: Turn (Bahis 2x)
-      if (money < initialBet) {
+      // Uses baseBet as the increment unit
+      if (money < baseBet) {
         Alert.alert('Not enough cash', 'You need more funds to continue.');
         return;
       }
-      setField('money', money - initialBet);
-      setCurrentBet(currentBet + initialBet);
+      setField('money', money - baseBet);
+      setCurrentBet(currentBet + baseBet);
 
       setRevealedBoard(4);
       setGamePhase('turn');
@@ -137,12 +156,12 @@ export const usePokerLogic = (initialBet: number = 10000) => {
 
     } else if (gamePhase === 'turn') {
       // 3. AŞAMA: River (Bahis 3x)
-      if (money < initialBet) {
+      if (money < baseBet) {
         Alert.alert('Not enough cash', 'You need more funds to continue.');
         return;
       }
-      setField('money', money - initialBet);
-      setCurrentBet(currentBet + initialBet);
+      setField('money', money - baseBet);
+      setCurrentBet(currentBet + baseBet);
 
       setRevealedBoard(5);
       setGamePhase('river');
@@ -187,7 +206,7 @@ export const usePokerLogic = (initialBet: number = 10000) => {
       setPlayerHand([]);
       setDealerHand([]);
       setBoard([]);
-      setCurrentBet(initialBet);
+      setCurrentBet(baseBet);
       setStatus('Ready for next hand.');
     }
   };
@@ -202,12 +221,14 @@ export const usePokerLogic = (initialBet: number = 10000) => {
       status,
       resultPopup,
       gamePhase,
-      currentBet,
+      currentBet, // For display
+      baseBet, // For selector
       money
     },
     actions: {
       playHand,
       handleRegame,
+      setAnte,
       closePopup
     }
   };

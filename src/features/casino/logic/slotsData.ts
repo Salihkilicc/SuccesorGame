@@ -23,7 +23,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
       '🥊': 5, '🔥': 6, '💰': 8, '⭐': 9, '⚡': 10,
     },
     twoKindMultiplier: 1.6,
-    minBet: 1000,
+    minBet: 10,
     maxBet: 30000,
   },
   poseidon: {
@@ -35,7 +35,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
       '⚓': 5, '🌊': 6, '🐚': 7, '🐙': 8, '💎': 11,
     },
     twoKindMultiplier: 1.8,
-    minBet: 1000,
+    minBet: 10,
     maxBet: 35000,
   },
   high_roller: {
@@ -47,7 +47,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
       '💎': 10, '7️⃣': 9, '🍀': 7, '💰': 8, '👑': 12,
     },
     twoKindMultiplier: 2,
-    minBet: 5000,
+    minBet: 10,
     maxBet: 100_000,
   },
 };

@@ -1,32 +1,39 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import AppScreen from '../../../components/layout/AppScreen';
 import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
-import { useRouletteLogic, BetType, ResultEntry } from '../logic/useRouletteLogic'; // Logic yolunu kontrol et
+import { useRouletteLogic, BetType, ResultEntry } from '../logic/useRouletteLogic';
+import { useCasinoSystem } from '../hooks/useCasinoSystem';
+import CasinoHeader from '../components/CasinoHeader';
+import { CustomChipSelector } from '../components/CustomChipSelector';
 
 const RouletteGameScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const initialBet = route.params?.betAmount;
 
-  // Logic Hook Bağlantısı
+  // Global Theme
+  const { currentLocation, casinoReputation } = useCasinoSystem();
+
+  // Logic Hook
   const { state, actions } = useRouletteLogic(initialBet);
   const { money, chip, selectedBet, lastResult, history, status, resultPopup, CHIP_VALUES } = state;
 
-  // --- RENDER HELPERS ---
+  // Render Helpers
   const renderBetButton = (type: BetType, label: string) => {
     const active = selectedBet === type;
+    const color = active ? currentLocation.theme.primary : '#374151';
+
     return (
       <Pressable
         onPress={() => actions.selectBet(type)}
         style={({ pressed }) => [
           styles.betButton,
-          active && styles.betButtonActive,
+          { borderColor: active ? currentLocation.theme.primary : '#4B5563', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
           pressed && styles.betButtonPressed,
         ]}>
-        <Text style={styles.betButtonText}>{label}</Text>
+        <Text style={[styles.betButtonText, active && { color: currentLocation.theme.primary }]}>{label}</Text>
       </Pressable>
     );
   };
@@ -45,112 +52,136 @@ const RouletteGameScreen = () => {
   );
 
   return (
-    <AppScreen
-      title="Roulette"
-      subtitle="European table"
-      leftNode={
-        <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-      }>
+    <View style={styles.container}>
+      {/* 1. HEADER */}
+      <CasinoHeader
+        onBack={() => navigation.goBack()}
+        location={currentLocation}
+        reputation={casinoReputation}
+        cash={money}
+      />
 
       <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* INFO ROW */}
+
+        {/* INFO */}
         <View style={styles.topRow}>
-          <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.title}>Bankroll ${money.toLocaleString()}</Text>
-            <Text style={styles.subtitle}>{status}</Text>
-          </View>
+          <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>{status.toUpperCase()}</Text>
           <View style={styles.historyRow}>{history.map(renderResultPill)}</View>
         </View>
 
-        {/* TABLE (BET SELECTION) */}
-        <View style={styles.tableCard}>
-          <Text style={styles.tableTitle}>Wheel</Text>
-          <Text style={styles.tableNote}>
-            European single-zero. Choose a simple bet, pick a chip, and spin.
-          </Text>
+        {/* BETTING TABLE */}
+        <View style={[styles.tableCard, { borderColor: currentLocation.theme.secondary }]}>
+          <Text style={styles.tableTitle}>PLACE YOUR BETS</Text>
           <View style={styles.betGrid}>
-            {renderBetButton('RED', 'Red')}
-            {renderBetButton('BLACK', 'Black')}
-            {renderBetButton('EVEN', 'Even')}
-            {renderBetButton('ODD', 'Odd')}
-            {renderBetButton('LOW', '1 - 18')}
-            {renderBetButton('HIGH', '19 - 36')}
+            {renderBetButton('RED', 'RED')}
+            {renderBetButton('BLACK', 'BLACK')}
+            {renderBetButton('EVEN', 'EVEN')}
+            {renderBetButton('ODD', 'ODD')}
+            {renderBetButton('LOW', '1-18')}
+            {renderBetButton('HIGH', '19-36')}
           </View>
         </View>
 
-        {/* CHIP SELECTION */}
-        <View style={styles.chipRow}>
-          {CHIP_VALUES.map(value => {
-            const active = chip === value;
-            return (
-              <Pressable
-                key={value}
-                onPress={() => actions.selectChip(value)}
-                style={({ pressed }) => [
-                  styles.chip,
-                  active && styles.chipActive,
-                  pressed && styles.chipPressed,
-                ]}>
-                <Text style={styles.chipText}>${value / 1000}K</Text>
-              </Pressable>
-            );
-          })}
+        {/* CONTROLS */}
+        <View style={styles.controlsSection}>
+
+          {/* CHIP SELECTOR (Uses internal game state 'chip' value via selectChip) */}
+          <CustomChipSelector
+            chips={currentLocation.chips} // Or CHIP_VALUES if logic enforces specific ones. 
+            // Note: The logic hook uses 'chip' state to determine next bet amount.
+            selectedChip={chip}
+            onSelect={(val) => actions.selectChip(val)}
+            gameTheme={currentLocation.theme}
+          />
+
+          <View style={styles.bottomControls}>
+            <View style={styles.betDisplay}>
+              <Text style={styles.betLabel}>SELECTED CHIP</Text>
+              <Text style={styles.betValueText}>${chip.toLocaleString()}</Text>
+            </View>
+
+            {/* SPIN BTN */}
+            <Pressable
+              onPress={actions.handleSpin}
+              style={({ pressed }) => [
+                styles.spinButton,
+                { backgroundColor: currentLocation.theme.primary },
+                pressed && styles.spinButtonPressed
+              ]}>
+              <Text style={styles.spinText}>SPIN WHEEL</Text>
+            </Pressable>
+          </View>
         </View>
 
-        {/* SPIN BUTTON */}
-        <Pressable
-          onPress={actions.handleSpin}
-          style={({ pressed }) => [styles.spinButton, pressed && styles.spinButtonPressed]}>
-          <Text style={styles.spinText}>SPIN</Text>
-          {lastResult ? (
-            <Text style={styles.spinSub}>
-              Result: {lastResult.value} ({lastResult.color === 'green' ? 'Green' : lastResult.color === 'red' ? 'Red' : 'Black'})
-            </Text>
-          ) : (
-            <Text style={styles.spinSub}>Awaiting first spin</Text>
-          )}
-        </Pressable>
       </ScrollView>
-    </AppScreen>
+    </View>
   );
 };
 
 export default RouletteGameScreen;
 
-// STYLES (Orijinal ile aynı)
 const styles = StyleSheet.create({
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: theme.spacing.xl * 2 },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: theme.spacing.md },
-  title: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },
-  subtitle: { color: theme.colors.textSecondary, fontSize: theme.typography.body },
-  historyRow: { flexDirection: 'row', gap: theme.spacing.xs },
-  tableCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.sm },
-  tableTitle: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },
-  tableNote: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 18 },
-  betGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
-  betButton: { flexBasis: '48%', paddingVertical: theme.spacing.md, borderRadius: theme.radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, backgroundColor: theme.colors.cardSoft, alignItems: 'center' },
-  betButtonActive: { borderColor: theme.colors.accent },
-  betButtonPressed: { transform: [{ scale: 0.97 }] },
-  betButtonText: { color: theme.colors.textPrimary, fontWeight: '700' },
-  chipRow: { flexDirection: 'row', gap: theme.spacing.sm, justifyContent: 'space-between' },
-  chip: { flex: 1, paddingVertical: theme.spacing.md, borderRadius: theme.radius.md, backgroundColor: theme.colors.cardSoft, alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  chipActive: { borderColor: theme.colors.accent },
-  chipPressed: { transform: [{ scale: 0.97 }] },
-  chipText: { color: theme.colors.textPrimary, fontWeight: '800' },
-  spinButton: { backgroundColor: theme.colors.accent, borderRadius: theme.radius.lg, padding: theme.spacing.lg, alignItems: 'center', gap: theme.spacing.xs },
+  container: { flex: 1, backgroundColor: '#111827' },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
+
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  historyRow: { flexDirection: 'row', gap: 4 },
+
+  tableCard: {
+    backgroundColor: '#1F2937',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    gap: 16
+  },
+  tableTitle: { color: '#9CA3AF', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
+  betGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  betButton: {
+    flexBasis: '48%',
+    paddingVertical: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  betButtonPressed: { opacity: 0.8 },
+  betButtonText: { color: '#D1D5DB', fontWeight: '800', letterSpacing: 1 },
+
+  controlsSection: { marginTop: 'auto', gap: 20 },
+  bottomControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1F2937',
+    padding: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#374151'
+  },
+  betDisplay: { gap: 2 },
+  betLabel: { color: '#9CA3AF', fontSize: 10, fontWeight: '700' },
+  betValueText: { color: '#F3F4F6', fontSize: 20, fontWeight: '800' },
+
+  spinButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4
+  },
   spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
-  spinText: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },
-  spinSub: { color: theme.colors.textPrimary, fontSize: theme.typography.body },
-  resultPill: { paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs, borderRadius: 999, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  resultRed: { backgroundColor: 'rgba(220,38,38,0.18)' },
-  resultBlack: { backgroundColor: 'rgba(255,255,255,0.08)' },
-  resultGreen: { backgroundColor: 'rgba(16,185,129,0.18)' },
-  resultText: { color: theme.colors.textPrimary, fontWeight: '800' },
-  backButton: { width: 42, height: 42, borderRadius: 999, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.cardSoft },
-  backButtonPressed: { transform: [{ scale: 0.96 }] },
-  backIcon: { color: theme.colors.textPrimary, fontSize: 18 },
+  spinText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
+
+  resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  resultRed: { backgroundColor: '#EF4444' },
+  resultBlack: { backgroundColor: '#1F2937' },
+  resultGreen: { backgroundColor: '#10B981' },
+  resultText: { color: '#FFF', fontSize: 10, fontWeight: '700' },
 });

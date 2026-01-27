@@ -220,7 +220,7 @@ const DNAScreen = () => {
                 {/* 🃏 REPUTATION - Detaylı İtibar Ağı */}
                 <View style={styles.card}>
                     <SectionHeader title="Reputation Network" icon="🕸️" />
-                    <ProgressBar label="Casino (VIP)" value={reputation?.casino} color="#E91E63" icon="🎰" />
+                    <ProgressBar label="Casino (VIP)" value={reputation?.casino} max={1000} color="#E91E63" icon="🎰" />
                     <ProgressBar label="Street (Cred)" value={reputation?.street} color="#c0392b" icon="🗡️" />
                     <ProgressBar label="Business (Trust)" value={reputation?.business} color="#2980b9" icon="💼" />
                     <ProgressBar

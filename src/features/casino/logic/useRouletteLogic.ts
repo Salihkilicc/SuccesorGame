@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../core/store'; // Store yolunu kontrol et
+import { useStatsStore, usePlayerStore } from '../../../core/store'; // Store yolunu kontrol et
 
 // --- TİPLER VE SABİTLER ---
 export type BetType = 'RED' | 'BLACK' | 'EVEN' | 'ODD' | 'LOW' | 'HIGH';
@@ -18,7 +18,9 @@ const isRed = (value: number) => RED_NUMBERS.includes(value);
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 export const useRouletteLogic = (initialBet?: number) => {
-  const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
+  const { money, setField } = useStatsStore();
+  const { reputation, updateReputation } = usePlayerStore();
+  const casinoReputation = reputation.casino;
 
   // State
   const [selectedBet, setSelectedBet] = useState<BetType | null>(null);
@@ -31,12 +33,12 @@ export const useRouletteLogic = (initialBet?: number) => {
 
   // --- OYUN MOTORU ---
   const reputationUp = (delta: number) => {
-    setCasinoReputation(clamp(casinoReputation + delta, 0, 100));
+    updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
   };
 
   const reputationDownSmall = () => {
     if (lossStreak.current >= 3) {
-      setCasinoReputation(clamp(casinoReputation - 1, 0, 100));
+      updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
       lossStreak.current = 0;
     }
   };
@@ -56,7 +58,11 @@ export const useRouletteLogic = (initialBet?: number) => {
     setResultPopup(null);
 
     if (!selectedBet) {
-      Alert.alert('Pick a bet', 'Select RED, BLACK, EVEN, ODD, LOW, or HIGH first.');
+      Alert.alert('Place Bet', 'Place your chips on the table.');
+      return;
+    }
+    if (chip <= 0) {
+      Alert.alert('Place Bet', 'Chip value must be positive.');
       return;
     }
     if (money < chip) {

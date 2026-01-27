@@ -4,15 +4,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
 // --- HEADER ---
-export const CasinoHeader = ({ onBack, money }: { onBack: () => void, money: number }) => (
-    <View style={styles.header}>
-        <Pressable onPress={onBack} style={({ pressed }) => [styles.headerLeft, pressed && { opacity: 0.7 }]}>
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.headerTitle}>Casino</Text>
-        </Pressable>
-        <Text style={styles.balanceText}>${money.toLocaleString()}</Text>
-    </View>
-);
+// --- HEADER ---
+// Moved to src/features/casino/components/CasinoHeader.tsx
 
 // --- REPUTATION BAR ---
 export const ReputationSection = ({ reputation }: { reputation: number }) => {

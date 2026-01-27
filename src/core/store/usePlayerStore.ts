@@ -104,9 +104,12 @@ export const usePlayerStore = create<PlayerState>()(
                 personality: { ...state.personality, [key]: Math.max(0, Math.min(100, value)) }
             })),
 
-            updateReputation: (key, value) => set((state) => ({
-                reputation: { ...state.reputation, [key]: Math.max(0, Math.min(100, value)) }
-            })),
+            updateReputation: (key, value) => set((state) => {
+                const max = key === 'casino' ? 1000 : 100;
+                return {
+                    reputation: { ...state.reputation, [key]: Math.max(0, Math.min(max, value)) }
+                };
+            }),
 
             updateSecurity: (key, value) => set((state) => ({
                 security: { ...state.security, [key]: Math.max(0, Math.min(100, value)) }

@@ -1,7 +1,7 @@
 // src/features/casino/logic/useBlackjackLogic.ts
 import { useState, useRef, useMemo } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore } from '../../../core/store'; // Store yolunu projene göre ayarla
+import { useStatsStore, usePlayerStore } from '../../../core/store';
 
 // --- TİPLER VE SABİTLER ---
 export type Card = {
@@ -43,7 +43,9 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 export const useBlackjackLogic = (initialBet: number = 5000) => {
     // Global Store
-    const { money, setField, casinoReputation, setCasinoReputation } = useStatsStore();
+    const { money, setField } = useStatsStore();
+    const { reputation, updateReputation } = usePlayerStore();
+    const casinoReputation = reputation.casino;
 
     // Game State
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
@@ -72,12 +74,12 @@ export const useBlackjackLogic = (initialBet: number = 5000) => {
 
     // --- OYUN MANTIĞI ---
     const reputationUp = (delta: number) => {
-        setCasinoReputation(clamp(casinoReputation + delta, 0, 100));
+        updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
     };
 
     const reputationDownSmall = () => {
         if (lossStreak.current >= 3) {
-            setCasinoReputation(clamp(casinoReputation - 1, 0, 100));
+            updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
             lossStreak.current = 0;
         }
     };
@@ -119,6 +121,10 @@ export const useBlackjackLogic = (initialBet: number = 5000) => {
         deal: () => {
             setResultPopup(null);
             if (roundState === 'player') return;
+            if (bet <= 0) {
+                Alert.alert('Place Bet', 'Please place a bet on the table.');
+                return;
+            }
             if (money < bet) {
                 Alert.alert('Not enough cash', 'Lower your bet or build more bankroll.');
                 return;
@@ -186,7 +192,7 @@ export const useBlackjackLogic = (initialBet: number = 5000) => {
 
         adjustBet: (delta: number) => {
             setResultPopup(null);
-            const next = clamp(bet + delta, 1000, 100_000);
+            const next = clamp(bet + delta, 10, 100_000);
             setBet(next);
         },
 
