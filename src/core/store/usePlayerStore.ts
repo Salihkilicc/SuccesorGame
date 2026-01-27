@@ -76,7 +76,7 @@ export interface PlayerState {
 const initialState = {
     core: { health: 100, happiness: 100, stress: 0, money: 5000, netWorth: 5000 },
     attributes: { intellect: 10, charm: 10, looks: 50, strength: 10 },
-    personality: { riskAppetite: 50, morality: 50, ambition: 50 },
+    personality: { riskAppetite: 50, strategicSense: 50, morality: 50, ambition: 50 },
     reputation: { social: 0, street: 0, business: 0, police: 0, casino: 0 },
     security: { digital: 0, personal: 0 },
     skills: { martialArts: { belt: 'White' as const, progress: 0, level: 1 } },

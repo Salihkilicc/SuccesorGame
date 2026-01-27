@@ -258,6 +258,7 @@ const DNAScreen = () => {
                     <SectionHeader title="Personality Traits" icon="🎭" />
                     <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
                     <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
+                    <ProgressBar label="Strategic Sense" value={personality?.strategicSense ?? 50} color="#3498db" icon="♟️" />
                     <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
                     <ProgressBar label="Luck" value={hidden?.luck} color="#10b981" icon="🍀" />
                 </View>

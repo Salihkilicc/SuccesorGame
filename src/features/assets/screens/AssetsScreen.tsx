@@ -13,7 +13,7 @@ import {
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
-    const { cash, netWorth, report } = useAssetsLogic();
+    const { cash, netWorth, report, personality } = useAssetsLogic();
 
     const formatMoney = (value: number) => {
         const absolute = Math.abs(value);
@@ -36,11 +36,10 @@ const AssetsScreen = () => {
         <AppScreen title="ASSETS" subtitle="Wealth Management" leftNode={backButton} compact>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* STATUS ROW (Risk & Strategy) */}
+                {/* RISK & STRATEGY - Connected to Player Store */}
                 <View style={styles.riskRow}>
-                    {/* Hardcoded 0 for now as in previous version, or pass real data if available in logic */}
-                    <StatPill label="Risk Appetite" value="0%" />
-                    <StatPill label="Strategic Sense" value="0%" />
+                    <StatPill label="Risk Appetite" value={`${personality?.riskAppetite ?? 50}%`} />
+                    <StatPill label="Strategic Sense" value={`${personality?.strategicSense ?? 50}%`} />
                 </View>
 
                 {/* ACTIONS (Moved to Top) */}

@@ -49,6 +49,7 @@ export interface Attributes {
 // 3. PERSONALITY (Karakter)
 export interface Personality {
     riskAppetite: number; // 0-100
+    strategicSense: number; // 0-100
     morality: number;     // 0-100
     ambition: number;     // 0-100
 }

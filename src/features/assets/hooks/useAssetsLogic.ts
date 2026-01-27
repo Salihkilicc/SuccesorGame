@@ -8,6 +8,7 @@ export const useAssetsLogic = () => {
     const user = useUserStore((state) => state);
     const stats = useStatsStore((state) => state);
 
+    const player = usePlayerStore((state) => state); // Get player store for personality
     const { liquidatePortfolio, holdings, marketPrices } = useMarketStore();
 
     // Calculate "Projected" Report for UI
@@ -92,5 +93,6 @@ export const useAssetsLogic = () => {
         handleLiquidation,
         investmentsValue,
         getPortfolioList,
+        personality: player.personality
     };
 };
