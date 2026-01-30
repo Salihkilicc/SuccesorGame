@@ -74,10 +74,7 @@ const SlotsGameScreen = () => {
         cash={money}
       />
 
-      <GameResultPopup
-        result={showResult ? lastResult : null}
-        onHide={actions.hideResult}
-      />
+      {/* GameResultPopup removed as requested */}
 
       {/* BIG WIN OVERLAY */}
       {showResult && lastResult?.type === 'win' && (
@@ -108,12 +105,12 @@ const SlotsGameScreen = () => {
           <View style={styles.reelsWrapper}>
             {columns.map((colSymbols, colIdx) => (
               <Reel
+                symbols={state.config.symbols}
                 key={colIdx}
                 index={colIdx}
-                isSpinning={isSpinning}
-                delay={colIdx * 500}
-                finalSymbol={colSymbols[1]}
-                symbols={colSymbols}
+                finalSymbol={colSymbols[1]} // The target symbol
+                isSpinning={state.isSpinning}
+                delay={colIdx * 300} // Staggered stop
               />
             ))}
           </View>

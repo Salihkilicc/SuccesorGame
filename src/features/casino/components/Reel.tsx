@@ -13,7 +13,10 @@ interface ReelProps {
 
 const MOCK_STRIP = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🔔', '🍀', '🍊'];
 
-export const Reel = ({ finalSymbol, isSpinning, delay, index }: ReelProps) => {
+export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index }: ReelProps) => {
+    // Fallback if symbols is empty
+    const stripSymbols = symbols && symbols.length > 0 ? symbols : MOCK_STRIP;
+
     // Standard Animated Value
     const translateY = useRef(new Animated.Value(0)).current;
 
@@ -24,8 +27,8 @@ export const Reel = ({ finalSymbol, isSpinning, delay, index }: ReelProps) => {
 
             Animated.loop(
                 Animated.timing(translateY, {
-                    toValue: -SYMBOL_HEIGHT * MOCK_STRIP.length,
-                    duration: 500, // Speed of one full loop
+                    toValue: -SYMBOL_HEIGHT * stripSymbols.length,
+                    duration: 500 + (stripSymbols.length * 20), // Adjust speed based on length
                     easing: Easing.linear,
                     useNativeDriver: true,
                 })
@@ -44,31 +47,34 @@ export const Reel = ({ finalSymbol, isSpinning, delay, index }: ReelProps) => {
                     // Calculate nearest slot or just reset and land?
                     // For smoothness, let's reset to 0 (top) and slide to the target index.
 
-                    const symbolIndex = MOCK_STRIP.indexOf(finalSymbol);
+                    const symbolIndex = stripSymbols.indexOf(finalSymbol);
                     const targetIndex = symbolIndex !== -1 ? symbolIndex : 0;
+
+                    // If symbol not found, we might land on wrong image. 
+                    // But now stripSymbols matches logic, so it should be found.
 
                     // Instant reset to top (virtual wrap) - in a real app we'd calc the offset
                     translateY.setValue(0);
 
                     Animated.sequence([
-                        // Bounce effect landing
+                        // Smooth landing with no bounce
                         Animated.timing(translateY, {
                             toValue: -targetIndex * SYMBOL_HEIGHT,
-                            duration: 800,
-                            easing: Easing.out(Easing.bounce),
+                            duration: 400,
+                            easing: Easing.out(Easing.poly(2)),
                             useNativeDriver: true
                         })
                     ]).start();
                 });
             }, delay);
         }
-    }, [isSpinning, finalSymbol, delay]);
+    }, [isSpinning, finalSymbol, delay, stripSymbols]);
 
     return (
         <View style={styles.reelContainer}>
             <Animated.View style={[styles.strip, { transform: [{ translateY }] }]}>
                 {/* Render the strip repeatedly for the loop illusion */}
-                {[...MOCK_STRIP, ...MOCK_STRIP].map((sym, i) => (
+                {[...stripSymbols, ...stripSymbols, ...stripSymbols].map((sym, i) => (
                     <View key={i} style={styles.symbolContainer}>
                         <Text style={styles.symbol}>{sym}</Text>
                     </View>
