@@ -1,11 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { useStatsStore } from '../../core/store/useStatsStore';
+import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import ShareControlHub from './Shares/ShareControlHub';
 
 const CompanyPortfolio = () => {
-  const { companyOwnership } = useStatsStore();
+  const { companyOwnership, companyValue, update } = useStatsStore();
+  const goPublic = useEquityStore((state) => state.goPublic);
   const [showShareControl, setShowShareControl] = useState(false);
+
+  const handleLaunchIPO = () => {
+    // Validation
+    if (companyValue <= 0) {
+      Alert.alert('Cannot Launch IPO', 'Company valuation must be greater than $0.');
+      return;
+    }
+
+    // Calculate IPO details
+    const cashRaised = companyValue * 0.20;
+
+    // Show confirmation dialog
+    Alert.alert(
+      '🔔 Launch IPO',
+      `Going public will:\n\n` +
+      `• Sell 20% of shares to public investors\n` +
+      `• Raise $${(cashRaised / 1_000_000).toFixed(1)}M in capital\n` +
+      `• Reduce your ownership to 80%\n` +
+      `• Apply 1.5x IPO hype multiplier\n\n` +
+      `Company Valuation: $${(companyValue / 1_000_000).toFixed(1)}M\n\n` +
+      `Are you ready to go public?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Launch IPO',
+          style: 'default',
+          onPress: () => {
+            // Execute IPO via Equity Store
+            const result = goPublic(companyValue);
+
+            // Add cash to company capital
+            update({
+              companyCapital: (useStatsStore.getState().companyCapital || 0) + result.cashRaised,
+              companyOwnership: result.newOwnershipPercent,
+              isPublic: true,
+            });
+
+            console.log('[CompanyPortfolio] IPO Executed:', result);
+
+            // Success feedback
+            Alert.alert(
+              '🎉 IPO Successful!',
+              `You raised $${(result.cashRaised / 1_000_000).toFixed(1)}M!\n\n` +
+              `The market is now open for trading.\n` +
+              `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+            );
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <>
@@ -28,7 +81,7 @@ const CompanyPortfolio = () => {
       <ShareControlHub
         visible={showShareControl}
         onClose={() => setShowShareControl(false)}
-        onOpenIPO={() => console.log('IPO')}
+        onOpenIPO={handleLaunchIPO}
         onOpenDilution={() => console.log('Dilution')}
         onOpenDividend={() => console.log('Dividend')}
         onOpenBuyback={() => console.log('Buyback')}

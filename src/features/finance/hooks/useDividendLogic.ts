@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useEquityStore } from '../stores/useEquityStore';
 
 export interface DividendLogicResult {
     // State
@@ -25,15 +26,19 @@ export interface DividendLogicResult {
  * Handles business logic for DividendModal.
  * - Auto-resets state when modal opens/closes.
  * - Calculates financial projections.
+ * 
+ * REFACTORED: Now uses useEquityStore for centralized equity management.
  */
 export const useDividendLogic = (visible: boolean, onClose: () => void): DividendLogicResult => {
     // Local State
     const [dividendPercentage, setDividendPercentage] = useState(10);
 
     // Store Data
-    const companyCapital = useStatsStore((state: any) => state.companyCapital || 0);
-    const companyOwnership = useStatsStore((state: any) => state.companyOwnership || 0);
-    const payDividend = useStatsStore((state: any) => state.payDividend);
+    const companyCapital = useStatsStore((state) => state.companyCapital || 0);
+
+    // Equity Store Data
+    const totalShares = useEquityStore((state) => state.totalShares);
+    const getPlayerOwnership = useEquityStore((state) => state.getPlayerOwnership);
 
     // BUG FIX: State Reset Logic
     useEffect(() => {
@@ -53,8 +58,9 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
     // Effect on Company
     const remainingCapital = companyCapital - distributionAmount;
 
-    // Effect on Player
-    const playerDividend = (distributionAmount * companyOwnership) / 100;
+    // Effect on Player (preview - actual will come from equity store)
+    const playerSharePercentage = getPlayerOwnership();
+    const playerDividend = (distributionAmount * playerSharePercentage) / 100;
 
     // Risk Check: Warn if remaining capital < 20% of CURRENT capital
     const isRisky = remainingCapital < (companyCapital * 0.2);
@@ -66,17 +72,33 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
             return;
         }
 
-        // Call the store action
-        payDividend(dividendPercentage);
+        // Calculate amount per share for equity store
+        const amountPerShare = distributionAmount / totalShares;
 
-        console.log('[DividendLogic] Confirmed:', {
-            amount: distributionAmount,
-            remaining: remainingCapital
+        // Get distribution details from equity store
+        const result = useEquityStore.getState().distributeDividend(amountPerShare);
+
+        // Verify affordability
+        if (companyCapital < result.totalRequired) {
+            Alert.alert("Error", "Insufficient company capital!");
+            return;
+        }
+
+        // Execute dividend distribution
+        useStatsStore.getState().update({
+            companyCapital: companyCapital - result.totalRequired
+        });
+        useStatsStore.getState().earnMoney(result.playerPortion);
+
+        console.log('[DividendLogic] Dividend distributed:', {
+            totalRequired: result.totalRequired,
+            playerPortion: result.playerPortion,
+            remaining: companyCapital - result.totalRequired
         });
 
         Alert.alert(
             "Success",
-            `$${(playerDividend / 1_000_000).toFixed(2)}M Dividend Paid!`,
+            `$${(result.playerPortion / 1_000_000).toFixed(2)}M Dividend Paid!`,
             [
                 {
                     text: "OK",
@@ -97,7 +119,7 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
         distributionAmount,
         playerDividend,
         remainingCapital,
-        playerSharePercentage: companyOwnership,
+        playerSharePercentage,
         isRisky,
         handleConfirm
     };

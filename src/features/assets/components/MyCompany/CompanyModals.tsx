@@ -9,7 +9,7 @@ import CorporateFinanceHubModal from '../../../../components/MyCompany/Finance/C
 import BorrowModal from '../../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../../components/MyCompany/Finance/RepayModal';
 import GameModal from '../../../../components/common/GameModal';
-import ProductsScreen from '../../../../features/products/screens/ProductsScreen';import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
+import ProductsScreen from '../../../../features/products/screens/ProductsScreen'; import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../../components/MyCompany/Management/EmployeesModule';
 import ShareControlHub from '../../../../components/MyCompany/Shares/ShareControlHub';
 import BoardMembersModal from '../../../../components/MyCompany/Shares/BoardMembersModal';
@@ -35,6 +35,7 @@ type CompanyModalsProps = {
   shareActions: {
     onOpenAction: (actionType: string) => void;
     onSelectMember: (member: any) => void;
+    handleLaunchIPO?: () => void;
   };
   companyCapital: number;
   companyDebtTotal: number;
@@ -110,7 +111,7 @@ export const CompanyModals = ({
       <ShareControlHub
         visible={!!modals.shareControl}
         onClose={() => toggleModal('shareControl', false)}
-        onOpenIPO={() => shareActions.onOpenAction('ipo')}
+        onOpenIPO={shareActions.handleLaunchIPO || (() => shareActions.onOpenAction('ipo'))}
         onOpenDilution={() => shareActions.onOpenAction('dilution')}
         onOpenDividend={() => shareActions.onOpenAction('dividend')}
         onOpenBuyback={() => shareActions.onOpenAction('buyback')}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useEquityStore } from '../stores/useEquityStore';
 
 export interface DilutionLogicResult {
     // State
@@ -12,6 +13,7 @@ export interface DilutionLogicResult {
     newOwnership: number;
     estimatedNewSharePrice: number;
     currentOwnership: number;
+    currentStockPrice: number;
 
     // Actions
     handleConfirm: () => void;
@@ -23,17 +25,21 @@ export interface DilutionLogicResult {
  * Handles business logic for DilutionModal.
  * - Manages dilution percentage state.
  * - Calculates capital raised and ownership impact.
- * - Executes dilution action via store.
+ * - Executes dilution action via EQUITY STORE.
+ * 
+ * REFACTORED: Now uses useEquityStore for centralized equity management.
  */
 export const useDilutionLogic = (visible: boolean, onClose: () => void): DilutionLogicResult => {
     // Local State
     const [dilutionPercentage, setDilutionPercentage] = useState(5);
 
     // Store Data
-    const companyValue = useStatsStore((state: any) => state.companyValue || 0);
-    const companyOwnership = useStatsStore((state: any) => state.companyOwnership || 0);
-    const companySharePrice = useStatsStore((state: any) => state.companySharePrice || 0);
-    const performDilution = useStatsStore((state: any) => state.performDilution);
+    const companyValue = useStatsStore((state) => state.companyValue || 0);
+    const companyCapital = useStatsStore((state) => state.companyCapital || 0);
+
+    // Equity Store Data
+    const stockPrice = useEquityStore((state) => state.stockPrice);
+    const getPlayerOwnership = useEquityStore((state) => state.getPlayerOwnership);
 
     // Reset Condition
     useEffect(() => {
@@ -43,31 +49,47 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
     }, [visible]);
 
     // Financial Calculations
+    const currentOwnership = getPlayerOwnership();
 
-    // 1. Cash raised from new shares
+    // 1. Preview calculations (actual values will come from equity store)
     const capitalRaised = companyValue * (dilutionPercentage / 100);
+    const newOwnership = currentOwnership * (1 - (dilutionPercentage / 100));
 
-    // 2. New Ownership %
-    // Formula: Current * (1 - Dilution%)
-    const newOwnership = companyOwnership * (1 - (dilutionPercentage / 100));
-
-    // 3. Estimated Price Drop (Market perception)
-    // Supply up -> Price down approx 3%
-    const estimatedNewSharePrice = companySharePrice * 0.97;
+    // 2. Estimated Price Drop (5% market shock from dilution)
+    const estimatedNewSharePrice = stockPrice * 0.95;
 
     // Actions
     const handleConfirm = () => {
         Alert.alert(
             "Confirm Dilution",
-            `Diluting shares by ${dilutionPercentage}%. Your ownership will drop to ${newOwnership.toFixed(1)}%.`,
+            `Diluting shares by ${dilutionPercentage}%.\n\n` +
+            `⚠️ Market Shock: Stock price will drop by 5%\n\n` +
+            `Your ownership will drop to ${newOwnership.toFixed(1)}%.`,
             [
                 { text: "Cancel", style: "cancel" },
                 {
                     text: "Confirm & Sell",
                     style: "destructive",
                     onPress: () => {
-                        performDilution(dilutionPercentage);
-                        Alert.alert("Success", `$${(capitalRaised / 1_000_000).toFixed(1)}M Raised!`);
+                        // Execute dilution via Equity Store
+                        const result = useEquityStore.getState().executeDilution(
+                            dilutionPercentage,
+                            companyValue
+                        );
+
+                        // Update company capital with raised funds
+                        useStatsStore.getState().update({
+                            companyCapital: companyCapital + result.capitalRaised,
+                            companyOwnership: result.newOwnershipPercent
+                        });
+
+                        console.log('[DilutionLogic] Dilution executed:', result);
+
+                        Alert.alert(
+                            "Success",
+                            `$${(result.capitalRaised / 1_000_000).toFixed(1)}M Raised!\n` +
+                            `New Ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+                        );
                         onClose();
                     }
                 }
@@ -81,7 +103,8 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
         capitalRaised,
         newOwnership,
         estimatedNewSharePrice,
-        currentOwnership: companyOwnership,
+        currentOwnership,
+        currentStockPrice: stockPrice,
         handleConfirm
     };
 };

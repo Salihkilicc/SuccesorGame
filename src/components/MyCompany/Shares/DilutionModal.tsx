@@ -73,6 +73,13 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                     />
                 </View>
 
+                {/* Market Shock Warning */}
+                <View style={[styles.warningBox, { borderColor: theme.colors.warning, backgroundColor: 'rgba(255, 193, 7, 0.1)' }]}>
+                    <Text style={[styles.warningText, { color: theme.colors.warning }]}>
+                        📉 Market Shock: Stock price will drop by ~5%
+                    </Text>
+                </View>
+
                 {/* Kritik Uyarı */}
                 {newOwnership < 51 && currentOwnership >= 51 && (
                     <View style={styles.warningBox}>

@@ -1,16 +1,31 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
-// 👇 DÜZELTME: Bir "../" daha eklendi (Toplam 4 tane)
 import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { useEquityStore } from '../../../../features/finance/stores/useEquityStore';
 
+/**
+ * Hook: useBuybackLogic
+ * 
+ * REFACTORED: Now uses useEquityStore for centralized equity management.
+ */
 export const useBuybackLogic = (onClose: () => void) => {
-    const { companyValue, companyOwnership, companyCapital, performBuyback } = useStatsStore();
+    const { companyValue, companyCapital } = useStatsStore();
     const [buybackPercentage, setBuybackPercentage] = useState(1);
 
+    // Equity Store Data
+    const stockPrice = useEquityStore((state) => state.stockPrice);
+    const getPlayerOwnership = useEquityStore((state) => state.getPlayerOwnership);
+
+    // Calculate cost based on company value
     const cost = companyValue * (buybackPercentage / 100);
 
+    // Preview new ownership (actual value will come from equity store)
+    const currentOwnership = getPlayerOwnership();
     const multiplier = 1 / (1 - (buybackPercentage / 100));
-    const newOwnership = Math.min(100, companyOwnership * multiplier);
+    const newOwnership = Math.min(100, currentOwnership * multiplier);
+
+    // Estimated new stock price (5% boost from buyback)
+    const estimatedNewStockPrice = stockPrice * 1.05;
 
     const isAffordable = companyCapital >= cost;
 
@@ -26,18 +41,31 @@ export const useBuybackLogic = (onClose: () => void) => {
 
         Alert.alert(
             'Confirm Buyback',
-            `Spend $${(cost / 1_000_000).toFixed(1)}M to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\nThis will increase your ownership to ${newOwnership.toFixed(1)}%.`,
+            `Spend $${(cost / 1_000_000).toFixed(1)}M to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\n` +
+            `📈 Market Boost: Stock price will increase by 5%\n\n` +
+            `This will increase your ownership to ${newOwnership.toFixed(1)}%.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
                     text: 'Confirm',
                     style: 'destructive',
                     onPress: () => {
-                        performBuyback(buybackPercentage);
+                        // Execute buyback via Equity Store
+                        const result = useEquityStore.getState().executeBuyback(cost);
+
+                        // Deduct cost from company capital
+                        useStatsStore.getState().update({
+                            companyCapital: companyCapital - cost,
+                            companyOwnership: result.newOwnershipPercent
+                        });
+
+                        console.log('[BuybackLogic] Buyback executed:', result);
+
                         onClose();
                         Alert.alert(
                             'Buyback Complete',
-                            `Company shares retired. Your ownership increased to ${newOwnership.toFixed(1)}%.`
+                            `${result.sharesBurned.toLocaleString()} shares retired.\n` +
+                            `Your ownership increased to ${result.newOwnershipPercent.toFixed(1)}%.`
                         );
                     },
                 },
@@ -52,6 +80,8 @@ export const useBuybackLogic = (onClose: () => void) => {
         newOwnership,
         companyCapital,
         isAffordable,
+        currentStockPrice: stockPrice,
+        estimatedNewStockPrice,
         handleConfirm
     };
 };

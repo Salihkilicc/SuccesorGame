@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import InfoTooltipModal from './InfoTooltipModal';
 
 interface Props {
@@ -64,17 +65,29 @@ const ActionCardButton = ({
 const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
     const {
         companyValue,
-        companySharePrice,
         companyDailyChange,
-        companyOwnership,
-        isPublic,
         performStockSplit,
     } = useStatsStore();
 
+    // Equity Store Integration
+    const stockPrice = useEquityStore((state) => state.stockPrice);
+    const playerShares = useEquityStore((state) => state.playerShares);
+    const totalShares = useEquityStore((state) => state.totalShares);
+    const getPlayerOwnership = useEquityStore((state) => state.getPlayerOwnership);
+    const syncStockPrice = useEquityStore((state) => state.syncStockPrice);
+    const isPublic = useEquityStore((state) => state.isPublic);
+
     const [tooltipTerm, setTooltipTerm] = useState<string | null>(null);
 
+    // Sync stock price when valuation changes
+    useEffect(() => {
+        if (companyValue > 0) {
+            syncStockPrice(companyValue);
+        }
+    }, [companyValue, syncStockPrice]);
+
     const handleStockSplit = () => {
-        if (companySharePrice <= 1000) {
+        if (stockPrice <= 1000) {
             Alert.alert('Not Available', 'Stock split is only available when share price exceeds $1,000.');
             return;
         }
@@ -116,7 +129,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <View style={styles.statDivider} />
                             <View style={styles.statCol}>
                                 <Text style={styles.statLabel}>Share Price</Text>
-                                <Text style={styles.statValue}>${companySharePrice.toFixed(2)}</Text>
+                                <Text style={styles.statValue}>${stockPrice.toFixed(2)}</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statCol}>
@@ -149,7 +162,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     title="Stock Split"
                                     description="Split shares (Requires $1,000+ share price)."
                                     onPress={handleStockSplit}
-                                    disabled={companySharePrice <= 1000}
+                                    disabled={stockPrice <= 1000}
                                 />
                             )}
 

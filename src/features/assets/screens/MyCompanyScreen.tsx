@@ -1,13 +1,14 @@
 // src/screens/MyCompany/MyCompanyScreen.tsx
 
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, StyleSheet, Text, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useGameStore } from '../../../core/store/useGameStore';
+import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
@@ -39,6 +40,17 @@ const MyCompanyScreen = () => {
   // Store Data
   const stats = useStatsStore();
 
+  // Equity Store - Dynamic Stock Price
+  const stockPrice = useEquityStore((state) => state.stockPrice);
+  const syncStockPrice = useEquityStore((state) => state.syncStockPrice);
+
+  // Sync stock price when company valuation changes
+  useEffect(() => {
+    if (stats.companyValue > 0) {
+      syncStockPrice(stats.companyValue);
+    }
+  }, [stats.companyValue, syncStockPrice]);
+
   // --- UI STATES ---
   const [modals, setModals] = useState<any>({});
   const toggleModal = (key: string, val: boolean) => setModals((p: any) => ({ ...p, [key]: val }));
@@ -51,6 +63,60 @@ const MyCompanyScreen = () => {
   const [selectedShareholder, setSelectedShareholder] = useState<any>(null);
 
   const activeProductsCount = products.filter(p => p.status === 'active').length;
+
+  // IPO Handler
+  const goPublic = useEquityStore((state) => state.goPublic);
+
+  const handleLaunchIPO = () => {
+    // Validation
+    if (stats.companyValue <= 0) {
+      Alert.alert('Cannot Launch IPO', 'Company valuation must be greater than $0.');
+      return;
+    }
+
+    // Calculate IPO details
+    const cashRaised = stats.companyValue * 0.20;
+
+    // Show confirmation dialog
+    Alert.alert(
+      '🔔 Launch IPO',
+      `Going public will:\n\n` +
+      `• Sell 20% of shares to public investors\n` +
+      `• Raise $${(cashRaised / 1_000_000).toFixed(1)}M in capital\n` +
+      `• Reduce your ownership to 80%\n` +
+      `• Apply 1.5x IPO hype multiplier\n\n` +
+      `Company Valuation: $${(stats.companyValue / 1_000_000).toFixed(1)}M\n\n` +
+      `Are you ready to go public?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Launch IPO',
+          style: 'default',
+          onPress: () => {
+            // Execute IPO via Equity Store
+            const result = goPublic(stats.companyValue);
+
+            // Add cash to company capital
+            stats.update({
+              companyCapital: stats.companyCapital + result.cashRaised,
+              companyOwnership: result.newOwnershipPercent,
+              isPublic: true,
+            });
+
+            console.log('[MyCompanyScreen] IPO Executed:', result);
+
+            // Success feedback
+            Alert.alert(
+              '🎉 IPO Successful!',
+              `You raised $${(result.cashRaised / 1_000_000).toFixed(1)}M!\n\n` +
+              `The market is now open for trading.\n` +
+              `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+            );
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={[styles.safeArea, { paddingTop: insets.top }]}>
@@ -70,7 +136,7 @@ const MyCompanyScreen = () => {
           title="My Company"
           rightContent={
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Text style={styles.sharePrice}>${stats.companySharePrice.toFixed(2)}</Text>
+              <Text style={styles.sharePrice}>${stockPrice.toFixed(2)}</Text>
               <Text style={{ color: (stats.companyDailyChange || 0) >= 0 ? theme.colors.success : theme.colors.danger, fontWeight: '700' }}>
                 {(stats.companyDailyChange || 0).toFixed(2)}%
               </Text>
@@ -189,7 +255,8 @@ const MyCompanyScreen = () => {
             toggleModal('boardMembers', false);
             setSelectedShareholder(m);
             setTimeout(() => toggleModal('profile', true), 300);
-          }
+          },
+          handleLaunchIPO,
         }}
       />
     </View>

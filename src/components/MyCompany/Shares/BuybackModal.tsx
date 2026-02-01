@@ -21,6 +21,8 @@ const BuybackModal = ({ visible, onClose }: Props) => {
         newOwnership,
         companyCapital,
         isAffordable,
+        currentStockPrice,
+        estimatedNewStockPrice,
         handleConfirm
     } = useBuybackLogic(onClose);
 
@@ -50,6 +52,15 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                     <SectionCard
                         title="Available Capital"
                         rightText={`$${(companyCapital / 1_000_000).toFixed(2)}M`}
+                    />
+                    <SectionCard
+                        title="Current Stock Price"
+                        rightText={`$${currentStockPrice.toFixed(2)}`}
+                    />
+                    <SectionCard
+                        title="Estimated New Price"
+                        rightText={`$${estimatedNewStockPrice.toFixed(2)} (+5%)`}
+                        style={{ borderColor: theme.colors.success }}
                     />
                     <SectionCard
                         title="New Ownership"
