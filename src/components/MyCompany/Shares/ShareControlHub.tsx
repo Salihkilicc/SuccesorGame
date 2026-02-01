@@ -8,6 +8,7 @@ import {
     ScrollView,
     Alert,
     TouchableOpacity,
+    SafeAreaView,
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -23,45 +24,6 @@ interface Props {
     onOpenBuyback: () => void;
 }
 
-const ActionCardButton = ({
-    icon,
-    title,
-    description,
-    onPress,
-    tone = 'default',
-    disabled = false
-}: {
-    icon: string;
-    title: string;
-    description: string;
-    onPress: () => void;
-    tone?: 'default' | 'success' | 'danger' | 'accent';
-    disabled?: boolean;
-}) => (
-    <TouchableOpacity
-        onPress={() => {
-            console.log(`[ShareControl] Pressed: ${title}`);
-            onPress();
-        }}
-        disabled={disabled}
-        activeOpacity={0.7}
-        style={[
-            styles.actionCard,
-            tone === 'success' && styles.actionCardSuccess,
-            tone === 'accent' && styles.actionCardAccent,
-            disabled && styles.actionCardDisabled,
-        ]}>
-        <View style={styles.actionIconContainer}>
-            <Text style={styles.actionIcon}>{icon}</Text>
-        </View>
-        <View style={styles.actionInfo}>
-            <Text style={[styles.actionTitle, disabled && styles.textDisabled]}>{title}</Text>
-            <Text style={[styles.actionDesc, disabled && styles.textDisabled]}>{description}</Text>
-        </View>
-        <Text style={[styles.actionArrow, disabled && styles.textDisabled]}>›</Text>
-    </TouchableOpacity>
-);
-
 const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
     const {
         companyValue,
@@ -73,6 +35,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
     const stockPrice = useEquityStore((state) => state.stockPrice);
     const playerShares = useEquityStore((state) => state.playerShares);
     const totalShares = useEquityStore((state) => state.totalShares);
+    const publicShares = useEquityStore((state) => state.publicShares);
     const getPlayerOwnership = useEquityStore((state) => state.getPlayerOwnership);
     const syncStockPrice = useEquityStore((state) => state.syncStockPrice);
     const isPublic = useEquityStore((state) => state.isPublic);
@@ -108,95 +71,173 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         );
     };
 
+    const marketCap = stockPrice * totalShares;
+    const playerOwnership = getPlayerOwnership();
+
     return (
         <>
-            <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
-                <View style={styles.overlay} pointerEvents="box-none">
-                    <View style={styles.content}>
-                        <View style={styles.header}>
-                            <Text style={styles.title}>📊 Share Control</Text>
-                            <Pressable onPress={onClose} style={styles.closeBtn}>
-                                <Text style={styles.closeBtnText}>×</Text>
-                            </Pressable>
+            <Modal visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
+                <SafeAreaView style={styles.container}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={onClose} style={styles.backButton}>
+                            <Text style={styles.backButtonText}>← Close</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Equity Management</Text>
+                        <View style={styles.headerSpacer} />
+                    </View>
+
+                    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                        {/* Stock Price Hero Card */}
+                        <View style={styles.heroCard}>
+                            <Text style={styles.heroLabel}>Current Stock Price</Text>
+                            <View style={styles.heroRow}>
+                                <Text style={styles.heroPrice}>${stockPrice.toFixed(2)}</Text>
+                                <View style={[
+                                    styles.changeBadge,
+                                    { backgroundColor: companyDailyChange >= 0 ? '#30D15820' : '#FF453A20' }
+                                ]}>
+                                    <Text style={[
+                                        styles.changeBadgeText,
+                                        { color: companyDailyChange >= 0 ? '#30D158' : '#FF453A' }
+                                    ]}>
+                                        {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
 
-                        {/* Company Stats Header */}
-                        <View style={styles.statsCard}>
-                            <View style={styles.statCol}>
-                                <Text style={styles.statLabel}>Valuation</Text>
-                                <Text style={styles.statValue}>${(companyValue / 1_000_000).toFixed(1)}M</Text>
+                        {/* Stats Grid */}
+                        <View style={styles.statsGrid}>
+                            <View style={styles.statCard}>
+                                <Text style={styles.statIcon}>📊</Text>
+                                <Text style={styles.statLabel}>Total Shares</Text>
+                                <Text style={styles.statValue}>{(totalShares / 1_000_000).toFixed(2)}M</Text>
                             </View>
-                            <View style={styles.statDivider} />
-                            <View style={styles.statCol}>
-                                <Text style={styles.statLabel}>Share Price</Text>
-                                <Text style={styles.statValue}>${stockPrice.toFixed(2)}</Text>
+                            <View style={styles.statCard}>
+                                <Text style={styles.statIcon}>💎</Text>
+                                <Text style={styles.statLabel}>Market Cap</Text>
+                                <Text style={styles.statValue}>${(marketCap / 1_000_000).toFixed(1)}M</Text>
                             </View>
-                            <View style={styles.statDivider} />
-                            <View style={styles.statCol}>
-                                <Text style={styles.statLabel}>Change</Text>
-                                <Text style={[
-                                    styles.statValue,
-                                    { color: companyDailyChange >= 0 ? theme.colors.success : theme.colors.danger }
-                                ]}>
-                                    {companyDailyChange >= 0 ? '+' : ''}{companyDailyChange.toFixed(2)}%
+                            <View style={styles.statCard}>
+                                <Text style={styles.statIcon}>🌐</Text>
+                                <Text style={styles.statLabel}>Public Float</Text>
+                                <Text style={styles.statValue}>{((publicShares / totalShares) * 100).toFixed(1)}%</Text>
+                            </View>
+                            <View style={styles.statCard}>
+                                <Text style={styles.statIcon}>👤</Text>
+                                <Text style={styles.statLabel}>My Ownership</Text>
+                                <Text style={styles.statValue}>{playerOwnership.toFixed(1)}%</Text>
+                            </View>
+                        </View>
+
+                        {/* Actions Section */}
+                        <Text style={styles.sectionTitle}>Market Actions</Text>
+
+                        {/* IPO / Stock Split */}
+                        {!isPublic ? (
+                            <TouchableOpacity
+                                style={styles.actionRow}
+                                onPress={onOpenIPO}
+                                activeOpacity={0.7}
+                            >
+                                <View style={[styles.actionIconBox, { backgroundColor: '#0A84FF20' }]}>
+                                    <Text style={styles.actionIcon}>🔔</Text>
+                                </View>
+                                <View style={styles.actionContent}>
+                                    <Text style={styles.actionTitle}>Launch IPO</Text>
+                                    <Text style={styles.actionDescription}>Go public to maximize valuation</Text>
+                                </View>
+                                <Text style={styles.actionArrow}>›</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={[styles.actionRow, stockPrice <= 1000 && styles.actionRowDisabled]}
+                                onPress={handleStockSplit}
+                                disabled={stockPrice <= 1000}
+                                activeOpacity={0.7}
+                            >
+                                <View style={styles.actionIconBox}>
+                                    <Text style={styles.actionIcon}>✂️</Text>
+                                </View>
+                                <View style={styles.actionContent}>
+                                    <Text style={[styles.actionTitle, stockPrice <= 1000 && styles.textDisabled]}>
+                                        Stock Split
+                                    </Text>
+                                    <Text style={[styles.actionDescription, stockPrice <= 1000 && styles.textDisabled]}>
+                                        Requires $1,000+ share price
+                                    </Text>
+                                </View>
+                                <Text style={[styles.actionArrow, stockPrice <= 1000 && styles.textDisabled]}>›</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {/* Buyback */}
+                        <TouchableOpacity
+                            style={[styles.actionRow, !isPublic && styles.actionRowDisabled]}
+                            onPress={onOpenBuyback}
+                            disabled={!isPublic}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.actionIconBox, { backgroundColor: '#0A84FF20' }]}>
+                                <Text style={styles.actionIcon}>📈</Text>
+                            </View>
+                            <View style={styles.actionContent}>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
+                                    Stock Buyback
+                                </Text>
+                                <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
+                                    {isPublic ? 'Buy back shares using company cash' : 'Requires IPO first'}
                                 </Text>
                             </View>
-                        </View>
+                            <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
+                        </TouchableOpacity>
 
-                        <ScrollView contentContainerStyle={styles.actionBody} showsVerticalScrollIndicator={false}>
-                            {/* 1. IPO / Stock Split */}
-                            {!isPublic ? (
-                                <ActionCardButton
-                                    icon="🔔"
-                                    title="Launch IPO"
-                                    description="Go public to maximize valuation and unlock growth."
-                                    onPress={() => {
-                                        console.log("Launch IPO Pressed");
-                                        onOpenIPO();
-                                    }}
-                                    tone="accent"
-                                />
-                            ) : (
-                                <ActionCardButton
-                                    icon="✂️"
-                                    title="Stock Split"
-                                    description="Split shares (Requires $1,000+ share price)."
-                                    onPress={handleStockSplit}
-                                    disabled={stockPrice <= 1000}
-                                />
-                            )}
+                        {/* Dilution */}
+                        <TouchableOpacity
+                            style={[styles.actionRow, !isPublic && styles.actionRowDisabled]}
+                            onPress={onOpenDilution}
+                            disabled={!isPublic}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.actionIconBox, { backgroundColor: '#FF9F0A20' }]}>
+                                <Text style={styles.actionIcon}>📉</Text>
+                            </View>
+                            <View style={styles.actionContent}>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
+                                    Issue Shares
+                                </Text>
+                                <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
+                                    {isPublic ? 'Raise capital by diluting ownership' : 'Requires IPO first'}
+                                </Text>
+                            </View>
+                            <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
+                        </TouchableOpacity>
 
-                            {/* 2. Dilution */}
-                            <ActionCardButton
-                                icon="📉"
-                                title="Dilution / Raise Capital"
-                                description={isPublic ? "Issue new shares to investors." : "Requires IPO first."}
-                                onPress={() => onOpenDilution()}
-                                disabled={!isPublic}
-                            />
+                        {/* Dividend */}
+                        <TouchableOpacity
+                            style={[styles.actionRow, !isPublic && styles.actionRowDisabled]}
+                            onPress={onOpenDividend}
+                            disabled={!isPublic}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.actionIconBox, { backgroundColor: '#30D15820' }]}>
+                                <Text style={styles.actionIcon}>💰</Text>
+                            </View>
+                            <View style={styles.actionContent}>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
+                                    Distribute Dividends
+                                </Text>
+                                <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
+                                    {isPublic ? 'Pay cash to shareholders' : 'Requires IPO first'}
+                                </Text>
+                            </View>
+                            <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
+                        </TouchableOpacity>
 
-                            {/* 3. Buyback */}
-                            <ActionCardButton
-                                icon="📈"
-                                title="Stock Buyback"
-                                description={isPublic ? "Buy back shares using company cash." : "Requires IPO first."}
-                                onPress={() => onOpenBuyback()}
-                                disabled={!isPublic}
-                            />
-
-                            {/* 4. Dividend */}
-                            <ActionCardButton
-                                icon="💰"
-                                title="Distribute Dividends"
-                                description={isPublic ? "Pay cash to shareholders." : "Requires IPO first."}
-                                onPress={() => onOpenDividend()}
-                                disabled={!isPublic}
-                                tone="success"
-                            />
-                        </ScrollView>
-
-                    </View>
-                </View>
+                        <View style={{ height: 40 }} />
+                    </ScrollView>
+                </SafeAreaView>
             </Modal>
 
             <InfoTooltipModal
@@ -209,139 +250,152 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 };
 
 const styles = StyleSheet.create({
-    overlay: {
+    container: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        padding: theme.spacing.lg,
-    },
-    content: {
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        maxHeight: '85%',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-        overflow: 'hidden',
+        backgroundColor: '#121212',
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: theme.spacing.lg,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-        backgroundColor: theme.colors.card,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    closeBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: theme.colors.cardSoft,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    closeBtnText: {
-        fontSize: 24,
-        color: theme.colors.textSecondary,
-        lineHeight: 24,
-    },
-    statsCard: {
-        flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
+        paddingHorizontal: 20,
+        paddingVertical: 16,
         borderBottomWidth: 1,
-        borderColor: theme.colors.border,
+        borderBottomColor: '#2C2C2E',
     },
-    statCol: {
+    backButton: {
+        paddingVertical: 8,
+    },
+    backButtonText: {
+        fontSize: 17,
+        color: '#0A84FF',
+        fontWeight: '600',
+    },
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+    },
+    headerSpacer: {
+        width: 60,
+    },
+    scrollView: {
         flex: 1,
-        alignItems: 'center',
-        gap: 4,
+        paddingHorizontal: 20,
     },
-    statDivider: {
-        width: 1,
-        backgroundColor: theme.colors.border,
-        height: '100%',
+    heroCard: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 16,
+        padding: 24,
+        marginTop: 20,
+    },
+    heroLabel: {
+        fontSize: 14,
+        color: '#8E8E93',
+        fontWeight: '500',
+        marginBottom: 8,
+    },
+    heroRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    heroPrice: {
+        fontSize: 48,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        letterSpacing: -1,
+    },
+    changeBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+    },
+    changeBadgeText: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    statsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
+        marginTop: 16,
+    },
+    statCard: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        padding: 16,
+        width: '48%',
+    },
+    statIcon: {
+        fontSize: 24,
+        marginBottom: 8,
     },
     statLabel: {
         fontSize: 12,
-        color: theme.colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        color: '#8E8E93',
+        fontWeight: '500',
+        marginBottom: 4,
     },
     statValue: {
-        fontSize: 15,
+        fontSize: 20,
         fontWeight: '700',
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
     },
-    actionBody: {
-        padding: theme.spacing.lg,
-        gap: theme.spacing.md,
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        marginTop: 32,
+        marginBottom: 16,
     },
-    actionCard: {
+    actionRow: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 16,
+        padding: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-        gap: theme.spacing.md,
+        marginBottom: 12,
     },
-    actionCardSuccess: {
-        borderColor: theme.colors.success + '40',
-        backgroundColor: theme.colors.success + '10',
+    actionRowDisabled: {
+        opacity: 0.4,
     },
-    actionCardAccent: {
-        borderColor: theme.colors.accent + '40',
-        backgroundColor: theme.colors.accent + '10',
-    },
-    actionCardPressed: {
-        backgroundColor: theme.colors.background,
-        transform: [{ scale: 0.98 }],
-    },
-    actionCardDisabled: {
-        opacity: 0.5,
-        backgroundColor: theme.colors.background,
-    },
-    actionIconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: theme.colors.card,
+    actionIconBox: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#2C2C2E',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
+        marginRight: 16,
     },
     actionIcon: {
-        fontSize: 20,
+        fontSize: 24,
     },
-    actionInfo: {
+    actionContent: {
         flex: 1,
-        gap: 2,
     },
     actionTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: theme.colors.textPrimary,
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 2,
     },
-    actionDesc: {
-        fontSize: 12,
-        color: theme.colors.textSecondary,
+    actionDescription: {
+        fontSize: 14,
+        color: '#8E8E93',
     },
     actionArrow: {
-        fontSize: 20,
-        color: theme.colors.textSecondary,
-        fontWeight: '700',
+        fontSize: 28,
+        color: '#3A3A3C',
+        fontWeight: '300',
     },
     textDisabled: {
-        color: theme.colors.textMuted,
+        color: '#3A3A3C',
     },
 });
 

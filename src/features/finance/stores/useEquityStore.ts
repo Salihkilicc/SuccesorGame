@@ -108,10 +108,16 @@ export const useEquityStore = create<EquityState>()(
                 // Execute Logic
                 spendCashFn(amountToSpend); // Deduct from Company via Callback
 
+                // VOLUME-WEIGHTED PRICE IMPACT
+                // Formula: Impact = (SharesTraded / TotalShares) * SENSITIVITY
+                const BUYBACK_SENSITIVITY = 1.2;
+                const ratio = actualSharesBurned / totalShares;
+                const impact = ratio * BUYBACK_SENSITIVITY;
+
                 set((state) => ({
                     totalShares: state.totalShares - actualSharesBurned,
                     publicShares: Math.max(0, state.publicShares - actualSharesBurned), // Remove from public float
-                    marketMultiplier: state.marketMultiplier + 0.05, // Price goes UP (Hype)
+                    marketMultiplier: state.marketMultiplier + impact, // Dynamic price impact
                 }));
 
                 // CRITICAL: Recalculate Price Immediately with NEW state
@@ -142,10 +148,16 @@ export const useEquityStore = create<EquityState>()(
 
                 addCashFn(cashRaised); // Add to Company
 
+                // VOLUME-WEIGHTED PRICE IMPACT
+                // Formula: Impact = (Percent / 100) * SENSITIVITY
+                // Dilution has higher sensitivity due to panic factor
+                const DILUTION_SENSITIVITY = 1.5;
+                const impact = decimal * DILUTION_SENSITIVITY;
+
                 set((state) => ({
                     totalShares: state.totalShares + sharesCreated,
                     publicShares: state.publicShares + sharesCreated, // Goes to public
-                    marketMultiplier: Math.max(0.5, state.marketMultiplier - 0.10), // Panic! Price drops
+                    marketMultiplier: Math.max(0.1, state.marketMultiplier - impact), // Panic! Price drops (clamped to 0.1)
                 }));
 
                 // CRITICAL: Recalculate Price Immediately

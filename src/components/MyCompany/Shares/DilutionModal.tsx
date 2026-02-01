@@ -1,14 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '../../../core/theme';
-
-// Common Components
-import GameModal from '../../common/GameModal';
-import GameButton from '../../common/GameButton';
-import SectionCard from '../../common/SectionCard';
-
-// Hook & Atoms
-import { PercentageSelector } from '../../atoms/PercentageSelector';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
 
 interface Props {
@@ -17,8 +8,6 @@ interface Props {
 }
 
 const DilutionModal = ({ visible, onClose }: Props) => {
-
-    // Use the Hook
     const {
         dilutionPercentage,
         setDilutionPercentage,
@@ -29,112 +18,376 @@ const DilutionModal = ({ visible, onClose }: Props) => {
         handleConfirm
     } = useDilutionLogic(visible, onClose);
 
+    // Stepper handler - clamps between 1% and 49%
+    const adjustPercent = (delta: number) => {
+        const newValue = dilutionPercentage + delta;
+        const clampedValue = Math.min(49, Math.max(1, newValue));
+        setDilutionPercentage(clampedValue);
+    };
+
+    // VOLUME-WEIGHTED PRICE IMPACT PREDICTION
+    // Match the store's formula: Impact = (Percent / 100) * DILUTION_SENSITIVITY
+    const DILUTION_SENSITIVITY = 1.5;
+    const predictedDrop = (dilutionPercentage / 100) * DILUTION_SENSITIVITY;
+    const currentStockPrice = estimatedNewSharePrice / (1 - predictedDrop); // Reverse calculate current price
+    const predictedPrice = currentStockPrice * (1 - predictedDrop);
+
+
     return (
-        <GameModal
+        <Modal
             visible={visible}
-            onClose={onClose}
-            title="Sermaye Artırımı (Dilution)"
+            transparent={true}
+            animationType="fade"
+            onRequestClose={onClose}
         >
-            <View style={styles.container}>
+            <View style={styles.overlay}>
+                <View style={styles.card}>
+                    {/* Header */}
+                    <Text style={styles.title}>Issue Shares</Text>
+                    <Text style={styles.subtitle}>Raise capital by diluting ownership</Text>
 
-                <Text style={styles.description}>
-                    Yeni hisse basarak yatırımcılardan nakit toplayabilirsin.
-                    Ancak bu işlem, şirketteki sahiplik oranını düşürür.
-                </Text>
-
-                {/* YENİ KONTROL PANELİ */}
-                <PercentageSelector
-                    label="Sulandırma Oranı"
-                    value={dilutionPercentage}
-                    min={1}
-                    max={20} // Maksimum %20 sulandırmaya izin ver (Oyun dengesi)
-                    onChange={setDilutionPercentage}
-                    unit="%"
-                />
-
-                {/* Finansal Etkiler */}
-                <View style={styles.impactContainer}>
-                    <SectionCard
-                        title="Toplanacak Nakit"
-                        rightText={`+$${(capitalRaised / 1_000_000).toFixed(2)}M`}
-                        style={{ borderColor: theme.colors.success }}
-                    />
-
-                    <SectionCard
-                        title="Yeni Hisseniz"
-                        rightText={`%${newOwnership.toFixed(2)}`}
-                        // Eğer hissen %50'nin altına düşüyorsa kırmızı uyarı ver
-                        danger={newOwnership < 50}
-                    />
-
-                    <SectionCard
-                        title="Tahmini Hisse Fiyatı"
-                        rightText={`$${estimatedNewSharePrice.toFixed(2)}`}
-                    />
-                </View>
-
-                {/* Market Shock Warning */}
-                <View style={[styles.warningBox, { borderColor: theme.colors.warning, backgroundColor: 'rgba(255, 193, 7, 0.1)' }]}>
-                    <Text style={[styles.warningText, { color: theme.colors.warning }]}>
-                        📉 Market Shock: Stock price will drop by ~5%
-                    </Text>
-                </View>
-
-                {/* Kritik Uyarı */}
-                {newOwnership < 51 && currentOwnership >= 51 && (
-                    <View style={styles.warningBox}>
-                        <Text style={styles.warningText}>
-                            ⚠️ DİKKAT: Bu işlemden sonra çoğunluk hissesini kaybedeceksiniz!
+                    {/* Warning Banner */}
+                    <View style={styles.warningBanner}>
+                        <Text style={styles.warningBannerText}>
+                            ⚡ This will dilute your ownership and impact stock price
                         </Text>
                     </View>
-                )}
 
-                {/* Aksiyonlar */}
-                <View style={styles.actionRow}>
-                    <GameButton
-                        title="İşlemi Gerçekleştir"
-                        onPress={handleConfirm}
-                        variant="primary"
-                        style={{ flex: 1 }}
-                    />
-                    <GameButton
-                        title="İptal"
-                        onPress={onClose}
-                        variant="ghost"
-                        style={{ flex: 1 }}
-                    />
+                    {/* Stepper Interface */}
+                    <View style={styles.stepperSection}>
+                        <Text style={styles.label}>Select Dilution Percentage</Text>
+                        <View style={styles.stepperContainer}>
+                            {/* Decrease Button */}
+                            <TouchableOpacity
+                                onPress={() => adjustPercent(-1)}
+                                style={styles.stepperBtn}
+                                activeOpacity={0.7}
+                                disabled={dilutionPercentage <= 1}
+                            >
+                                <Text style={[
+                                    styles.stepperText,
+                                    dilutionPercentage <= 1 && styles.stepperTextDisabled
+                                ]}>
+                                    −
+                                </Text>
+                            </TouchableOpacity>
+
+                            {/* Display */}
+                            <View style={styles.valueContainer}>
+                                <Text style={styles.valueText}>{dilutionPercentage}%</Text>
+                                <Text style={styles.labelSmall}>EQUITY</Text>
+                            </View>
+
+                            {/* Increase Button */}
+                            <TouchableOpacity
+                                onPress={() => adjustPercent(1)}
+                                style={styles.stepperBtn}
+                                activeOpacity={0.7}
+                                disabled={dilutionPercentage >= 49}
+                            >
+                                <Text style={[
+                                    styles.stepperText,
+                                    dilutionPercentage >= 49 && styles.stepperTextDisabled
+                                ]}>
+                                    +
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    {/* Quick Presets */}
+                    <View style={styles.presetsRow}>
+                        <TouchableOpacity
+                            style={styles.presetButton}
+                            onPress={() => setDilutionPercentage(5)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={styles.presetButtonText}>5%</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.presetButton}
+                            onPress={() => setDilutionPercentage(10)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={styles.presetButtonText}>10%</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.presetButton}
+                            onPress={() => setDilutionPercentage(20)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={styles.presetButtonText}>20%</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Impact Analysis */}
+                    <View style={styles.impactSection}>
+                        <View style={styles.impactRow}>
+                            <Text style={styles.impactLabel}>💵 Cash Raised</Text>
+                            <Text style={[styles.impactValue, { color: '#30D158' }]}>
+                                +${(capitalRaised / 1_000_000).toFixed(2)}M
+                            </Text>
+                        </View>
+                        <View style={styles.impactRow}>
+                            <Text style={styles.impactLabel}>👤 Your Ownership</Text>
+                            <Text style={[
+                                styles.impactValue,
+                                { color: newOwnership < 50 ? '#FF453A' : '#FF9F0A' }
+                            ]}>
+                                {currentOwnership.toFixed(1)}% → {newOwnership.toFixed(1)}%
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* Stock Price Warning */}
+                    <View style={styles.stockWarningBox}>
+                        <Text style={styles.stockWarningIcon}>📉</Text>
+                        <View style={styles.stockWarningContent}>
+                            <Text style={styles.stockWarningTitle}>Stock Price Impact</Text>
+                            <Text style={styles.stockWarningText}>
+                                Est. Price Drop: <Text style={{ color: '#FF453A', fontWeight: '700' }}>
+                                    -{(predictedDrop * 100).toFixed(1)}%
+                                </Text>
+                            </Text>
+                            <Text style={styles.stockWarningValue}>
+                                New Price: ${predictedPrice.toFixed(2)}
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* Critical Warning */}
+                    {newOwnership < 50 && (
+                        <View style={styles.criticalBox}>
+                            <Text style={styles.criticalText}>⚠️ You will lose majority control</Text>
+                        </View>
+                    )}
+
+                    {/* Buttons */}
+                    <View style={styles.buttonRow}>
+                        <TouchableOpacity
+                            style={styles.cancelButton}
+                            onPress={onClose}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.authorizeButton}
+                            onPress={handleConfirm}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={styles.authorizeButtonText}>Authorize Dilution</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-
             </View>
-        </GameModal>
+        </Modal>
     );
 };
 
-export default DilutionModal;
-
 const styles = StyleSheet.create({
-    container: { gap: 16, paddingVertical: 10 },
-    description: {
-        color: theme.colors.textSecondary,
-        fontSize: 13,
-        textAlign: 'center',
-        marginBottom: 4,
-        lineHeight: 18,
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
-    impactContainer: { gap: 8 },
-    warningBox: {
-        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    card: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 20,
+        padding: 24,
+        width: '100%',
+        maxWidth: 400,
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#8E8E93',
+        marginBottom: 16,
+    },
+    warningBanner: {
+        backgroundColor: 'rgba(255, 159, 10, 0.15)',
+        borderRadius: 12,
         padding: 12,
-        borderRadius: 8,
+        marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#FF6B6B',
+        borderColor: '#FF9F0A40',
+    },
+    warningBannerText: {
+        fontSize: 13,
+        color: '#FF9F0A',
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    stepperSection: {
+        marginBottom: 16,
+    },
+    label: {
+        fontSize: 14,
+        color: '#FFFFFF',
+        fontWeight: '600',
+        marginBottom: 12,
+    },
+    stepperContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#2C2C2E',
+        borderRadius: 16,
+        padding: 8,
+        justifyContent: 'space-between',
+    },
+    stepperBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: '#3A3A3C',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    stepperText: {
+        fontSize: 28,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
+    stepperTextDisabled: {
+        color: '#666',
+    },
+    valueContainer: {
+        alignItems: 'center',
+        flex: 1,
+    },
+    valueText: {
+        fontSize: 32,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        marginBottom: 2,
+    },
+    labelSmall: {
+        fontSize: 11,
+        color: '#8E8E93',
+        fontWeight: '600',
+        letterSpacing: 1,
+    },
+    presetsRow: {
+        flexDirection: 'row',
+        gap: 8,
+        marginBottom: 20,
+    },
+    presetButton: {
+        flex: 1,
+        backgroundColor: '#2C2C2E',
+        borderRadius: 10,
+        paddingVertical: 10,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#3A3A3C',
+    },
+    presetButtonText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#8E8E93',
+    },
+    impactSection: {
+        backgroundColor: '#2C2C2E',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+    },
+    impactRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+    },
+    impactLabel: {
+        fontSize: 14,
+        color: '#FFFFFF',
+        fontWeight: '500',
+    },
+    impactValue: {
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    stockWarningBox: {
+        backgroundColor: 'rgba(255, 159, 10, 0.15)',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 2,
+        borderColor: '#FF9F0A',
+        flexDirection: 'row',
+        gap: 12,
+    },
+    stockWarningIcon: {
+        fontSize: 24,
+    },
+    stockWarningContent: {
+        flex: 1,
+    },
+    stockWarningTitle: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#FF9F0A',
+        marginBottom: 4,
+    },
+    stockWarningText: {
+        fontSize: 13,
+        color: '#FFFFFF',
+        marginBottom: 6,
+    },
+    stockWarningValue: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FF9F0A',
+    },
+    criticalBox: {
+        backgroundColor: '#FF453A20',
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#FF453A40',
+    },
+    criticalText: {
+        fontSize: 14,
+        color: '#FF453A',
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    cancelButton: {
+        flex: 1,
+        backgroundColor: '#2C2C2E',
+        borderRadius: 12,
+        paddingVertical: 14,
         alignItems: 'center',
     },
-    warningText: {
-        color: '#FF6B6B',
-        fontWeight: 'bold',
-        fontSize: 12,
-        textAlign: 'center',
+    cancelButtonText: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#FFFFFF',
     },
-    actionRow: { flexDirection: 'row', gap: 12, marginTop: 10 }
+    authorizeButton: {
+        flex: 1,
+        backgroundColor: '#FF9F0A',
+        borderRadius: 12,
+        paddingVertical: 14,
+        alignItems: 'center',
+    },
+    authorizeButtonText: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#000000',
+    },
 });
+
+export default DilutionModal;
