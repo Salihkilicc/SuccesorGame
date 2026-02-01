@@ -12,6 +12,9 @@ import GameModal from '../../../../components/common/GameModal';
 import ProductsScreen from '../../../../features/products/screens/ProductsScreen'; import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
 import EmployeesModule from '../../../../components/MyCompany/Management/EmployeesModule';
 import ShareControlHub from '../../../../components/MyCompany/Shares/ShareControlHub';
+import BuybackModal from '../../../../components/MyCompany/Shares/BuybackModal';
+import DilutionModal from '../../../../components/MyCompany/Shares/DilutionModal';
+import DividendModal from '../../../../components/MyCompany/Shares/DividendModal';
 import BoardMembersModal from '../../../../components/MyCompany/Shares/BoardMembersModal';
 import ShareholderProfileModal from '../../../../components/MyCompany/Shares/ShareholderProfileModal';
 import GiftSelectionModal from '../../../../components/MyCompany/Shares/GiftSelectionModal';
@@ -112,9 +115,25 @@ export const CompanyModals = ({
         visible={!!modals.shareControl}
         onClose={() => toggleModal('shareControl', false)}
         onOpenIPO={shareActions.handleLaunchIPO || (() => shareActions.onOpenAction('ipo'))}
-        onOpenDilution={() => shareActions.onOpenAction('dilution')}
-        onOpenDividend={() => shareActions.onOpenAction('dividend')}
-        onOpenBuyback={() => shareActions.onOpenAction('buyback')}
+        onOpenDilution={() => { toggleModal('shareControl', false); setTimeout(() => toggleModal('dilution', true), 300); }}
+        onOpenDividend={() => { toggleModal('shareControl', false); setTimeout(() => toggleModal('dividend', true), 300); }}
+        onOpenBuyback={() => { toggleModal('shareControl', false); setTimeout(() => toggleModal('buyback', true), 300); }}
+      />
+
+      {/* Equity Action Modals */}
+      <BuybackModal
+        visible={!!modals.buyback}
+        onClose={() => toggleModal('buyback', false)}
+      />
+
+      <DilutionModal
+        visible={!!modals.dilution}
+        onClose={() => toggleModal('dilution', false)}
+      />
+
+      <DividendModal
+        visible={!!modals.dividend}
+        onClose={() => toggleModal('dividend', false)}
       />
 
       <BoardMembersModal
