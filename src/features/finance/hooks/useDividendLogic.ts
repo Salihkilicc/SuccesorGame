@@ -75,20 +75,14 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
         // Calculate amount per share for equity store
         const amountPerShare = distributionAmount / totalShares;
 
-        // Get distribution details from equity store
-        const result = useEquityStore.getState().distributeDividend(amountPerShare);
-
-        // Verify affordability
-        if (companyCapital < result.totalRequired) {
-            Alert.alert("Error", "Insufficient company capital!");
-            return;
-        }
-
-        // Execute dividend distribution
-        useStatsStore.getState().update({
-            companyCapital: companyCapital - result.totalRequired
-        });
-        useStatsStore.getState().earnMoney(result.playerPortion);
+        // Execute dividend distribution via Equity Store
+        const result = useEquityStore.getState().distributeDividend(
+            amountPerShare,
+            (amount) => {
+                const currentCapital = useStatsStore.getState().companyCapital;
+                useStatsStore.getState().update({ companyCapital: currentCapital - amount });
+            }
+        );
 
         console.log('[DividendLogic] Dividend distributed:', {
             totalRequired: result.totalRequired,

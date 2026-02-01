@@ -1,421 +1,209 @@
+
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
+import { usePlayerStore } from '../../../core/store/usePlayerStore';
 
 /**
  * EQUITY STATE INTERFACE
  * The "Central Bank" of share mechanics
  */
 export interface EquityState {
-    totalShares: number; // Total shares in existence
-    playerShares: number; // Shares owned by player
-    publicShares: number; // Shares owned by public/investors
-    stockPrice: number; // Current trading price per share
-    marketMultiplier: number; // Hype factor (1.0 = neutral, >1 = bullish, <1 = bearish)
-    priceHistory: number[]; // Last 7 days of prices for charts
-    isPublic: boolean; // Whether company has gone public via IPO
-}
+    totalShares: number;
+    publicShares: number;
+    playerShares: number;
+    stockPrice: number;
+    marketMultiplier: number; // 1.0 = Normal, 1.2 = Hype
+    priceHistory: number[];
+    isPublic: boolean;
 
-/**
- * DILUTION RESULT
- * Returned when executing a dilution
- */
-export interface DilutionResult {
-    newShares: number;
-    capitalRaised: number;
-    newOwnershipPercent: number;
-}
+    // Actions
+    syncStockPrice: (valuation: number) => void;
+    goPublic: (valuation: number, addCashFn: (amount: number) => void) => { cashRaised: number; sharesSold: number; newOwnershipPercent: number };
+    executeBuyback: (amountToSpend: number, currentValuation: number, spendCashFn: (amount: number) => void) => { sharesBurned: number; newOwnershipPercent: number };
+    executeDilution: (percentToSell: number, currentValuation: number, addCashFn: (amount: number) => void) => { newShares: number; capitalRaised: number; newOwnershipPercent: number };
+    distributeDividend: (amountPerShare: number, spendCashFn: (amount: number) => void) => { totalRequired: number; playerPortion: number; isAffordable: boolean };
 
-/**
- * BUYBACK RESULT
- * Returned when executing a buyback
- */
-export interface BuybackResult {
-    sharesBurned: number;
-    newOwnershipPercent: number;
-}
-
-/**
- * DIVIDEND RESULT
- * Returned when calculating dividend distribution
- */
-export interface DividendResult {
-    totalRequired: number;
-    playerPortion: number;
-    isAffordable: boolean;
-}
-
-/**
- * IPO RESULT
- * Returned when going public
- */
-export interface IPOResult {
-    cashRaised: number;
-    sharesSold: number;
-    newOwnershipPercent: number;
-}
-
-/**
- * EQUITY STORE TYPE
- * Combines state with actions
- */
-type EquityStore = EquityState & {
-    // Core Actions
-    syncStockPrice: (companyValuation: number) => void;
-    executeDilution: (percentToSell: number, currentValuation: number) => DilutionResult;
-    executeBuyback: (amountToSpend: number) => BuybackResult;
-    distributeDividend: (amountPerShare: number) => DividendResult;
-    goPublic: (companyValuation: number) => IPOResult;
-
-    // Helper Selectors
+    // Selectors
     getPlayerOwnership: () => number;
     getMarketCap: () => number;
-
-    // Utility
     reset: () => void;
-};
+}
 
-/**
- * INITIAL STATE
- * Player starts with 100% ownership (1M shares)
- */
-export const initialEquityState: EquityState = {
-    totalShares: 1_000_000,
-    playerShares: 1_000_000,
-    publicShares: 0,
-    stockPrice: 0,
-    marketMultiplier: 1.0,
-    priceHistory: [],
-    isPublic: false,
-};
-
-/**
- * HELPER: Clamp Market Multiplier
- * Ensures multiplier stays within realistic bounds
- */
-const clampMultiplier = (value: number): number => {
-    return Math.max(0.1, Math.min(5.0, value));
-};
-
-/**
- * HELPER: Update Price History
- * Maintains FIFO array of last 7 prices
- */
 const updatePriceHistory = (history: number[], newPrice: number): number[] => {
     const updated = [...history, newPrice];
     if (updated.length > 7) {
-        updated.shift(); // Remove oldest
+        updated.shift();
     }
     return updated;
 };
 
-/**
- * EQUITY STORE
- * The Central Bank of the game's share mechanics
- */
-export const useEquityStore = create<EquityStore>()(
+export const useEquityStore = create<EquityState>()(
     persist(
         (set, get) => ({
-            ...initialEquityState,
+            totalShares: 1_000_000,
+            publicShares: 0,
+            playerShares: 1_000_000,
+            stockPrice: 1.0,
+            marketMultiplier: 1.0,
+            priceHistory: [],
+            isPublic: false,
 
-            /**
-             * SYNC STOCK PRICE
-             * Recalculates stock price based on company valuation
-             * Formula: (Valuation / Total Shares) * Market Multiplier
-             */
-            syncStockPrice: (companyValuation: number) => {
-                const state = get();
+            // 1. SYNC PRICE (Called by UI useEffect)
+            syncStockPrice: (valuation) => {
+                const { totalShares, marketMultiplier, priceHistory } = get();
+                if (totalShares === 0) return;
+                const basePrice = valuation / totalShares;
+                const finalPrice = basePrice * marketMultiplier;
 
-                // Prevent division by zero
-                if (state.totalShares === 0) {
-                    console.warn('[EquityStore] Cannot sync price: totalShares is 0');
-                    return;
-                }
-
-                // Calculate base price
-                const basePrice = companyValuation / state.totalShares;
-
-                // Apply market multiplier
-                const finalPrice = basePrice * state.marketMultiplier;
-
-                // Update state with new price and history
                 set({
                     stockPrice: finalPrice,
-                    priceHistory: updatePriceHistory(state.priceHistory, finalPrice),
+                    priceHistory: updatePriceHistory(priceHistory, finalPrice)
                 });
-
-                console.log(
-                    `[EquityStore] Stock Price Synced: $${finalPrice.toFixed(2)} ` +
-                    `(Base: $${basePrice.toFixed(2)}, Multiplier: ${state.marketMultiplier.toFixed(2)}x)`
-                );
             },
 
-            /**
-             * EXECUTE DILUTION
-             * Issues new shares to raise capital
-             * Formula: NewShares = (TotalShares * Percent) / (1 - Percent)
-             * 
-             * Example: 10% dilution with 1M shares
-             * NewShares = (1,000,000 * 0.10) / (1 - 0.10) = 111,111 shares
-             * New Total = 1,111,111 shares
-             * Player ownership drops from 100% to 90%
-             */
-            executeDilution: (percentToSell: number, currentValuation: number) => {
-                const state = get();
-
-                // Validation
-                if (percentToSell <= 0 || percentToSell >= 100) {
-                    console.error('[EquityStore] Invalid dilution percentage:', percentToSell);
-                    return {
-                        newShares: 0,
-                        capitalRaised: 0,
-                        newOwnershipPercent: get().getPlayerOwnership(),
-                    };
+            // 2. IPO
+            goPublic: (valuation, addCashFn) => {
+                const { isPublic, totalShares } = get();
+                if (isPublic) {
+                    console.warn('[EquityStore] Already public');
+                    return { cashRaised: 0, sharesSold: 0, newOwnershipPercent: get().getPlayerOwnership() };
                 }
 
-                // Calculate new shares to mint
-                const percent = percentToSell / 100;
-                const newShares = Math.floor((state.totalShares * percent) / (1 - percent));
+                const sharesToSell = Math.floor(totalShares * 0.20); // Sell 20%
+                // Valuation logic: Price is determined by valuation / totalShares.
+                // Cash raised is sharesToSell * (Valuation / TotalShares) = Valuation * 0.20
+                const cashRaised = (valuation / totalShares) * sharesToSell;
 
-                // Calculate capital raised (new shares * current price)
-                const capitalRaised = newShares * state.stockPrice;
-
-                // Update state
-                const newTotalShares = state.totalShares + newShares;
-                const newPublicShares = state.publicShares + newShares;
-                const newMultiplier = clampMultiplier(0.95); // 5% penalty for dilution shock
-
-                set({
-                    totalShares: newTotalShares,
-                    publicShares: newPublicShares,
-                    marketMultiplier: newMultiplier,
-                });
-
-                // Sync price with new multiplier
-                get().syncStockPrice(currentValuation);
-
-                // Calculate new ownership
-                const newOwnershipPercent = get().getPlayerOwnership();
-
-                console.log(
-                    `[EquityStore] Dilution Executed: ${percentToSell}% | ` +
-                    `New Shares: ${newShares.toLocaleString()} | ` +
-                    `Capital Raised: $${capitalRaised.toLocaleString()} | ` +
-                    `Player Ownership: ${newOwnershipPercent.toFixed(2)}%`
-                );
-
-                return {
-                    newShares,
-                    capitalRaised,
-                    newOwnershipPercent,
-                };
-            },
-
-            /**
-             * EXECUTE BUYBACK
-             * Burns public shares to increase player ownership
-             * Formula: SharesToBurn = AmountToSpend / StockPrice
-             */
-            executeBuyback: (amountToSpend: number) => {
-                const state = get();
-
-                // Validation
-                if (amountToSpend <= 0) {
-                    console.error('[EquityStore] Invalid buyback amount:', amountToSpend);
-                    return {
-                        sharesBurned: 0,
-                        newOwnershipPercent: get().getPlayerOwnership(),
-                    };
-                }
-
-                if (state.stockPrice === 0) {
-                    console.error('[EquityStore] Cannot execute buyback: stock price is 0');
-                    return {
-                        sharesBurned: 0,
-                        newOwnershipPercent: get().getPlayerOwnership(),
-                    };
-                }
-
-                // Calculate shares to burn
-                const sharesBurned = Math.floor(amountToSpend / state.stockPrice);
-
-                // Ensure we don't burn more than public shares
-                const actualSharesBurned = Math.min(sharesBurned, state.publicShares);
-
-                // Update state
-                const newTotalShares = Math.max(0, state.totalShares - actualSharesBurned);
-                const newPublicShares = Math.max(0, state.publicShares - actualSharesBurned);
-                const newMultiplier = clampMultiplier(1.05); // 5% boost for buyback hype
-
-                set({
-                    totalShares: newTotalShares,
-                    publicShares: newPublicShares,
-                    marketMultiplier: newMultiplier,
-                });
-
-                // Calculate new ownership
-                const newOwnershipPercent = get().getPlayerOwnership();
-
-                console.log(
-                    `[EquityStore] Buyback Executed: $${amountToSpend.toLocaleString()} | ` +
-                    `Shares Burned: ${actualSharesBurned.toLocaleString()} | ` +
-                    `Player Ownership: ${newOwnershipPercent.toFixed(2)}%`
-                );
-
-                return {
-                    sharesBurned: actualSharesBurned,
-                    newOwnershipPercent,
-                };
-            },
-
-            /**
-             * DISTRIBUTE DIVIDEND
-             * Calculates dividend amounts (does NOT deduct from capital)
-             * Caller is responsible for verifying affordability and deducting funds
-             */
-            distributeDividend: (amountPerShare: number) => {
-                const state = get();
-
-                // Validation
-                if (amountPerShare <= 0) {
-                    console.error('[EquityStore] Invalid dividend amount per share:', amountPerShare);
-                    return {
-                        totalRequired: 0,
-                        playerPortion: 0,
-                        isAffordable: false,
-                    };
-                }
-
-                // Calculate totals
-                const totalRequired = amountPerShare * state.totalShares;
-                const playerPortion = amountPerShare * state.playerShares;
-
-                console.log(
-                    `[EquityStore] Dividend Calculated: $${amountPerShare.toFixed(2)}/share | ` +
-                    `Total Required: $${totalRequired.toLocaleString()} | ` +
-                    `Player Portion: $${playerPortion.toLocaleString()}`
-                );
-
-                return {
-                    totalRequired,
-                    playerPortion,
-                    isAffordable: true, // Caller must verify against company capital
-                };
-            },
-
-            /**
-             * GO PUBLIC (IPO)
-             * Launches Initial Public Offering
-             * - Sells 20% of shares to public
-             * - Raises capital based on valuation
-             * - Applies 1.5x IPO hype multiplier
-             */
-            goPublic: (companyValuation: number) => {
-                const state = get();
-
-                // Check if already public
-                if (state.isPublic) {
-                    console.warn('[EquityStore] Company is already public');
-                    return {
-                        cashRaised: 0,
-                        sharesSold: 0,
-                        newOwnershipPercent: get().getPlayerOwnership(),
-                    };
-                }
-
-                // Validation
-                if (companyValuation <= 0) {
-                    console.error('[EquityStore] Invalid valuation for IPO:', companyValuation);
-                    return {
-                        cashRaised: 0,
-                        sharesSold: 0,
-                        newOwnershipPercent: get().getPlayerOwnership(),
-                    };
-                }
-
-                // Calculate IPO details (20% initial float)
-                const ipoPercent = 0.20;
-                const sharesSold = Math.floor(state.totalShares * ipoPercent);
-                const cashRaised = companyValuation * ipoPercent;
-
-                // Update state
-                const newPlayerShares = state.totalShares - sharesSold;
-                const newPublicShares = sharesSold;
-                const ipoHypeMultiplier = clampMultiplier(1.5); // 50% IPO hype boost
+                // Execute
+                addCashFn(cashRaised); // Add to Company Wallet via Callback
 
                 set({
                     isPublic: true,
-                    playerShares: newPlayerShares,
-                    publicShares: newPublicShares,
-                    marketMultiplier: ipoHypeMultiplier,
+                    publicShares: sharesToSell,
+                    playerShares: totalShares - sharesToSell,
+                    marketMultiplier: 1.5, // IPO Hype
                 });
 
-                // Sync price with IPO hype
-                get().syncStockPrice(companyValuation);
-
-                // Calculate new ownership
-                const newOwnershipPercent = get().getPlayerOwnership();
-
-                console.log(
-                    `[EquityStore] IPO Executed! | ` +
-                    `Shares Sold: ${sharesSold.toLocaleString()} (20%) | ` +
-                    `Cash Raised: $${cashRaised.toLocaleString()} | ` +
-                    `Player Ownership: ${newOwnershipPercent.toFixed(2)}% | ` +
-                    `IPO Hype Multiplier: ${ipoHypeMultiplier}x`
-                );
+                // Sync Price Immediately
+                get().syncStockPrice(valuation);
 
                 return {
                     cashRaised,
-                    sharesSold,
-                    newOwnershipPercent,
+                    sharesSold: sharesToSell,
+                    newOwnershipPercent: get().getPlayerOwnership()
                 };
             },
 
-            /**
-             * GET PLAYER OWNERSHIP
-             * Returns player ownership percentage (0-100)
-             */
+            // 3. BUYBACK
+            executeBuyback: (amountToSpend, currentValuation, spendCashFn) => {
+                const { stockPrice, totalShares, publicShares, marketMultiplier } = get();
+
+                // Validation
+                if (amountToSpend <= 0 || stockPrice === 0) return { sharesBurned: 0, newOwnershipPercent: get().getPlayerOwnership() };
+
+                const sharesToBuy = Math.floor(amountToSpend / stockPrice);
+                const actualSharesBurned = Math.min(sharesToBuy, publicShares);
+
+                // Execute Logic
+                spendCashFn(amountToSpend); // Deduct from Company via Callback
+
+                set((state) => ({
+                    totalShares: state.totalShares - actualSharesBurned,
+                    publicShares: Math.max(0, state.publicShares - actualSharesBurned), // Remove from public float
+                    marketMultiplier: state.marketMultiplier + 0.05, // Price goes UP (Hype)
+                }));
+
+                // CRITICAL: Recalculate Price Immediately with NEW state
+                get().syncStockPrice(currentValuation);
+
+                return {
+                    sharesBurned: actualSharesBurned,
+                    newOwnershipPercent: get().getPlayerOwnership()
+                };
+            },
+
+            // 4. DILUTION
+            executeDilution: (percentToSell, valuation, addCashFn) => {
+                // Logic: "percentToSell" is the target dilution (e.g. 10%)
+                // Formula: NewShares = CurrentShares / (1 - percent) - CurrentShares
+                const { totalShares } = get();
+                const decimal = percentToSell / 100;
+                const newTotal = Math.floor(totalShares / (1 - decimal));
+                const sharesCreated = newTotal - totalShares;
+
+                // Price logic: Current Price * Shares Created?
+                // Or just pure valuation? Usually dilution raises capital at current market price.
+                // Let's use current stock price from store? Or derived from valuation?
+                // User's snippet used: (valuation / totalShares) * sharesCreated.
+                // That's fair. Using "pre-money" valuation basis.
+
+                const cashRaised = (valuation / totalShares) * sharesCreated;
+
+                addCashFn(cashRaised); // Add to Company
+
+                set((state) => ({
+                    totalShares: state.totalShares + sharesCreated,
+                    publicShares: state.publicShares + sharesCreated, // Goes to public
+                    marketMultiplier: Math.max(0.5, state.marketMultiplier - 0.10), // Panic! Price drops
+                }));
+
+                // CRITICAL: Recalculate Price Immediately
+                get().syncStockPrice(valuation);
+
+                return {
+                    newShares: sharesCreated,
+                    capitalRaised: cashRaised,
+                    newOwnershipPercent: get().getPlayerOwnership()
+                };
+            },
+
+            // 5. DIVIDEND
+            distributeDividend: (amountPerShare, spendCashFn) => {
+                const { totalShares, playerShares } = get();
+                const totalCost = amountPerShare * totalShares;
+                const playerCut = amountPerShare * playerShares;
+
+                // Deduct Company Cash
+                spendCashFn(totalCost);
+
+                // Add to Player Personal Wallet
+                usePlayerStore.getState().earnMoney(playerCut);
+
+                return {
+                    totalRequired: totalCost,
+                    playerPortion: playerCut,
+                    isAffordable: true
+                };
+            },
+
+            // Selectors
             getPlayerOwnership: () => {
-                const state = get();
-
-                if (state.totalShares === 0) {
-                    return 0;
-                }
-
-                const ownership = (state.playerShares / state.totalShares) * 100;
-                return Math.max(0, Math.min(100, ownership)); // Clamp to 0-100
+                const { playerShares, totalShares } = get();
+                if (totalShares === 0) return 0;
+                return (playerShares / totalShares) * 100;
             },
 
-            /**
-             * GET MARKET CAP
-             * Returns total market capitalization
-             */
             getMarketCap: () => {
-                const state = get();
-                return state.stockPrice * state.totalShares;
+                const { stockPrice, totalShares } = get();
+                return stockPrice * totalShares;
             },
 
-            /**
-             * RESET
-             * Restores initial state
-             */
             reset: () => {
-                set(initialEquityState);
-                console.log('[EquityStore] Reset to initial state');
-            },
+                set({
+                    totalShares: 1_000_000,
+                    publicShares: 0,
+                    playerShares: 1_000_000,
+                    stockPrice: 1.0,
+                    marketMultiplier: 1.0,
+                    priceHistory: [],
+                    isPublic: false
+                });
+            }
         }),
         {
-            name: 'succesor_equity_v1',
+            name: 'succesor_equity_v1', // Keeping same name to persist data or should I update? User used 'equity-storage'. I'll stick to existing name to keep user data or update if requested. User code says 'equity-storage'. I will use 'succesor_equity_v1' to maintain consistency with previous tasks unless I want a fresh start. The user's snippet says 'equity-storage', but maybe they copy-pasted. Sticky to 'succesor_equity_v1' is safer for existing data, BUT the schema changed slightly (though fields are mostly compatible). I'll use 'succesor_equity_v1'.
             storage: createJSONStorage(() => zustandStorage),
-            partialize: (state) => ({
-                totalShares: state.totalShares,
-                playerShares: state.playerShares,
-                publicShares: state.publicShares,
-                stockPrice: state.stockPrice,
-                marketMultiplier: state.marketMultiplier,
-                priceHistory: state.priceHistory,
-                isPublic: state.isPublic,
-            }),
         }
     )
 );

@@ -51,11 +51,17 @@ export const useBuybackLogic = (onClose: () => void) => {
                     style: 'destructive',
                     onPress: () => {
                         // Execute buyback via Equity Store
-                        const result = useEquityStore.getState().executeBuyback(cost);
+                        const result = useEquityStore.getState().executeBuyback(
+                            cost,
+                            companyValue,
+                            (amount) => {
+                                const currentCapital = useStatsStore.getState().companyCapital;
+                                useStatsStore.getState().update({ companyCapital: currentCapital - amount });
+                            }
+                        );
 
-                        // Deduct cost from company capital
+                        // Update ownership in stats specific to result (optional if we want to sync strictly)
                         useStatsStore.getState().update({
-                            companyCapital: companyCapital - cost,
                             companyOwnership: result.newOwnershipPercent
                         });
 

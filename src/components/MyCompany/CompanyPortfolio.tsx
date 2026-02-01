@@ -36,11 +36,16 @@ const CompanyPortfolio = () => {
           style: 'default',
           onPress: () => {
             // Execute IPO via Equity Store
-            const result = goPublic(companyValue);
+            const result = goPublic(
+              companyValue,
+              (amount) => {
+                const currentCapital = useStatsStore.getState().companyCapital;
+                update({ companyCapital: currentCapital + amount });
+              }
+            );
 
-            // Add cash to company capital
+            // Update stats ownership and status
             update({
-              companyCapital: (useStatsStore.getState().companyCapital || 0) + result.cashRaised,
               companyOwnership: result.newOwnershipPercent,
               isPublic: true,
             });

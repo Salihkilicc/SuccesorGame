@@ -74,12 +74,15 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
                         // Execute dilution via Equity Store
                         const result = useEquityStore.getState().executeDilution(
                             dilutionPercentage,
-                            companyValue
+                            companyValue,
+                            (amount) => {
+                                const currentCapital = useStatsStore.getState().companyCapital;
+                                useStatsStore.getState().update({ companyCapital: currentCapital + amount });
+                            }
                         );
 
-                        // Update company capital with raised funds
+                        // Update stats ownership (optional sync)
                         useStatsStore.getState().update({
-                            companyCapital: companyCapital + result.capitalRaised,
                             companyOwnership: result.newOwnershipPercent
                         });
 

@@ -94,11 +94,16 @@ const MyCompanyScreen = () => {
           style: 'default',
           onPress: () => {
             // Execute IPO via Equity Store
-            const result = goPublic(stats.companyValue);
+            const result = goPublic(
+              stats.companyValue,
+              (amount) => {
+                const currentCapital = useStatsStore.getState().companyCapital;
+                stats.update({ companyCapital: currentCapital + amount });
+              }
+            );
 
-            // Add cash to company capital
+            // Update stats ownership and status (sync)
             stats.update({
-              companyCapital: stats.companyCapital + result.cashRaised,
               companyOwnership: result.newOwnershipPercent,
               isPublic: true,
             });
