@@ -63,30 +63,19 @@ export const CompanyModals = ({
       <CorporateFinanceHubModal
         visible={!!modals.finance}
         onClose={() => toggleModal('finance', false)}
-        onSelectLoan={(type, rate) => { toggleModal('finance', false); setBorrowConfig({ visible: true, type, rate }); }}
-        onSelectRepay={() => { toggleModal('finance', false); setRepayConfig({ visible: true }); }}
+        onRequestLoan={() => { toggleModal('finance', false); toggleModal('borrow', true); }}
+        onRepayDebt={() => { toggleModal('finance', false); toggleModal('repay', true); }}
       />
 
-      {borrowConfig.visible && (
-        <BorrowModal
-          visible={borrowConfig.visible}
-          type={borrowConfig.type}
-          rate={borrowConfig.rate}
-          maxLimit={Math.max(10_000_000, companyCapital * 0.5)}
-          onClose={() => { setBorrowConfig({ ...borrowConfig, visible: false }); setTimeout(() => toggleModal('finance', true), 300); }}
-          onConfirm={(amount) => handleBorrow(amount, borrowConfig.rate)}
-        />
-      )}
+      <BorrowModal
+        visible={!!modals.borrow}
+        onClose={() => { toggleModal('borrow', false); setTimeout(() => toggleModal('finance', true), 300); }}
+      />
 
-      {repayConfig.visible && (
-        <RepayModal
-          visible={repayConfig.visible}
-          totalDebt={companyDebtTotal}
-          cash={companyCapital}
-          onClose={() => { setRepayConfig({ ...repayConfig, visible: false }); setTimeout(() => toggleModal('finance', true), 300); }}
-          onRepay={handleRepay}
-        />
-      )}
+      <RepayModal
+        visible={!!modals.repay}
+        onClose={() => { toggleModal('repay', false); setTimeout(() => toggleModal('finance', true), 300); }}
+      />
 
       {/* --- ÜRÜN & YÖNETİM --- */}
       <GameModal visible={!!modals.product} onClose={() => toggleModal('product', false)}>

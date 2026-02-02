@@ -1,68 +1,180 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
-import { useBorrowLogic } from '../../../features/finance/hooks/useBorrowLogic';
+import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { useStatsStore } from '../../../core/store';
 
 type Props = {
     visible: boolean;
-    type: string;
-    rate: number;
-    maxLimit: number; // Keep for display or constraint if needed, but hook handles logic
     onClose: () => void;
-    onConfirm?: (amount: number) => void; // Optional now as hook handles it, but keep for compat if needed (though we will ignore it in favor of hook)
 };
 
-const BorrowModal = ({ visible, type, rate, maxLimit, onClose }: Props) => {
-
-    // Use the Hook
+const BorrowModal = ({ visible, onClose }: Props) => {
+    const { companyValue, companyCapital, update } = useStatsStore();
     const {
-        amount,
-        setAmount,
-        maxBorrowable,
-        monthlyInterestCost,
-        handleConfirm
-    } = useBorrowLogic(visible, onClose, rate);
+        takeLoan,
+        getBorrowingCapacity,
+        getInterestRate,
+        creditScore
+    } = useCorporateFinanceStore();
 
-    // Ensure min range is at least 1M
-    const safeMax = Math.max(1_000_000, maxBorrowable);
+    const [amount, setAmount] = useState(1_000_000);
+    const [selectedType, setSelectedType] = useState<'Bank' | 'Bonds' | 'Shark'>('Bank');
+
+    const borrowingCapacity = getBorrowingCapacity(companyValue);
+    const baseRate = getInterestRate() * 100; // Convert to percentage
+
+    // Calculate rates for each loan type
+    const bankRate = baseRate;
+    const bondsRate = Math.max(2, baseRate - 2);
+    const sharkRate = 40;
+
+    // Get current rate based on selected type
+    const getCurrentRate = () => {
+        switch (selectedType) {
+            case 'Bank': return bankRate;
+            case 'Bonds': return bondsRate;
+            case 'Shark': return sharkRate;
+        }
+    };
+
+    const currentRate = getCurrentRate();
+
+    // Calculate monthly payment preview
+    const calculateMonthlyPayment = () => {
+        const annualRate = currentRate / 100;
+        const monthlyRate = annualRate / 12;
+        const term = 12;
+        return (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) /
+            (Math.pow(1 + monthlyRate, term) - 1);
+    };
+
+    const monthlyPayment = calculateMonthlyPayment();
+
+    const handleConfirm = () => {
+        const result = takeLoan(
+            amount,
+            companyValue,
+            selectedType,
+            currentRate,
+            (cashToAdd) => {
+                update({ companyCapital: companyCapital + cashToAdd });
+            }
+        );
+
+        if (result.success) {
+            onClose();
+        } else {
+            // Could show error toast here
+            console.warn('[BorrowModal] Loan failed:', result.message);
+        }
+    };
+
+    // Reset amount when modal opens
+    useEffect(() => {
+        if (visible) {
+            setAmount(Math.min(1_000_000, borrowingCapacity));
+        }
+    }, [visible, borrowingCapacity]);
+
+    const safeMax = Math.max(1_000_000, borrowingCapacity);
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <View style={styles.subModalBackdrop}>
-                <View style={styles.subModalContainer}>
-                    <Text style={styles.subModalTitle}>Borrow Capital</Text>
-                    <Text style={styles.subModalSubtitle}>{type} • {rate}% APR</Text>
+            <View style={styles.backdrop}>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Request New Loan</Text>
+                    <Text style={styles.subtitle}>
+                        Credit Score: {creditScore} • {borrowingCapacity > 0 ? `$${(borrowingCapacity / 1_000_000).toFixed(1)}M Available` : 'No Capacity'}
+                    </Text>
 
+                    {/* Loan Type Selection */}
+                    <View style={styles.typeSelector}>
+                        <Pressable
+                            style={[styles.typeButton, selectedType === 'Bank' && styles.typeButtonActive]}
+                            onPress={() => setSelectedType('Bank')}
+                        >
+                            <Text style={styles.typeEmoji}>🏛️</Text>
+                            <Text style={[styles.typeLabel, selectedType === 'Bank' && styles.typeLabelActive]}>
+                                Bank
+                            </Text>
+                            <Text style={styles.typeRate}>{bankRate.toFixed(1)}%</Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={[styles.typeButton, selectedType === 'Bonds' && styles.typeButtonActive]}
+                            onPress={() => setSelectedType('Bonds')}
+                        >
+                            <Text style={styles.typeEmoji}>📜</Text>
+                            <Text style={[styles.typeLabel, selectedType === 'Bonds' && styles.typeLabelActive]}>
+                                Bonds
+                            </Text>
+                            <Text style={styles.typeRate}>{bondsRate.toFixed(1)}%</Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={[styles.typeButton, selectedType === 'Shark' && styles.typeButtonActive]}
+                            onPress={() => setSelectedType('Shark')}
+                        >
+                            <Text style={styles.typeEmoji}>🦈</Text>
+                            <Text style={[styles.typeLabel, selectedType === 'Shark' && styles.typeLabelActive]}>
+                                Shark
+                            </Text>
+                            <Text style={[styles.typeRate, { color: '#FF6B6B' }]}>{sharkRate}%</Text>
+                        </Pressable>
+                    </View>
+
+                    {/* Amount Selector */}
                     <View style={styles.sliderContainer}>
                         <PercentageSelector
                             label="Loan Amount"
                             value={amount}
                             min={1_000_000}
-                            max={safeMax} // Use calculated max from hook (based on valuation)
+                            max={safeMax}
                             onChange={setAmount}
                             unit="$"
                         />
                     </View>
 
-                    <View style={styles.calculationBox}>
-                        <Text style={styles.calcLabel}>New Monthly Expense</Text>
-                        <Text style={styles.calcValue}>+${Math.round(monthlyInterestCost).toLocaleString()}/mo</Text>
+                    {/* Live Preview */}
+                    <View style={styles.previewContainer}>
+                        <View style={styles.previewRow}>
+                            <Text style={styles.previewLabel}>Interest Rate</Text>
+                            <Text style={styles.previewValue}>{currentRate.toFixed(1)}% APR</Text>
+                        </View>
+                        <View style={styles.previewRow}>
+                            <Text style={styles.previewLabel}>Monthly Payment</Text>
+                            <Text style={[styles.previewValue, { color: '#FFD700' }]}>
+                                ${Math.round(monthlyPayment).toLocaleString()}
+                            </Text>
+                        </View>
+                        <View style={styles.previewRow}>
+                            <Text style={styles.previewLabel}>Term</Text>
+                            <Text style={styles.previewValue}>12 Months</Text>
+                        </View>
                     </View>
 
-                    {/* Warning if trying to borrow close to limit */}
-                    {amount > maxBorrowable * 0.9 && (
+                    {/* Warning */}
+                    {amount > borrowingCapacity * 0.9 && (
                         <Text style={styles.warningText}>
                             ⚠️ Approaching maximum credit limit
                         </Text>
                     )}
 
-                    <View style={styles.modalActions}>
-                        <Pressable onPress={onClose} style={styles.cancelAction}>
+                    {/* Actions */}
+                    <View style={styles.actions}>
+                        <Pressable onPress={onClose} style={styles.cancelButton}>
                             <Text style={styles.cancelText}>Cancel</Text>
                         </Pressable>
-                        <Pressable onPress={handleConfirm} style={styles.confirmAction}>
-                            <Text style={styles.confirmText}>Confirm Loan</Text>
+                        <Pressable
+                            onPress={handleConfirm}
+                            style={({ pressed }) => [
+                                styles.confirmButton,
+                                pressed && styles.confirmButtonPressed
+                            ]}
+                        >
+                            <Text style={styles.confirmText}>Sign Loan Agreement</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -74,73 +186,108 @@ const BorrowModal = ({ visible, type, rate, maxLimit, onClose }: Props) => {
 export default BorrowModal;
 
 const styles = StyleSheet.create({
-    subModalBackdrop: {
+    backdrop: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
     },
-    subModalContainer: {
+    container: {
         width: '100%',
-        maxWidth: 400,
-        backgroundColor: '#1E222B',
+        maxWidth: 420,
+        backgroundColor: '#1C1C1E',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: '#FFD700',
     },
-    subModalTitle: {
-        fontSize: 22,
+    title: {
+        fontSize: 24,
         fontWeight: '800',
         color: '#FFF',
         textAlign: 'center',
         marginBottom: 4,
     },
-    subModalSubtitle: {
-        fontSize: 14,
+    subtitle: {
+        fontSize: 13,
         color: '#8A9BA8',
         textAlign: 'center',
         marginBottom: 24,
     },
-    sliderContainer: {
-        gap: 12,
+    typeSelector: {
+        flexDirection: 'row',
+        gap: 8,
         marginBottom: 24,
-        alignItems: 'center',
     },
-    calculationBox: {
-        backgroundColor: '#232730',
-        padding: 16,
+    typeButton: {
+        flex: 1,
+        backgroundColor: '#2A2D35',
         borderRadius: 12,
+        padding: 12,
         alignItems: 'center',
-        marginBottom: 24,
-        borderWidth: 1,
-        borderColor: '#2E3540',
+        borderWidth: 2,
+        borderColor: 'transparent',
     },
-    calcLabel: {
-        fontSize: 12,
-        color: '#8A9BA8',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
+    typeButtonActive: {
+        borderColor: '#FFD700',
+        backgroundColor: '#1C1C1E',
+    },
+    typeEmoji: {
+        fontSize: 24,
         marginBottom: 4,
     },
-    calcValue: {
-        fontSize: 18,
-        fontWeight: '700',
+    typeLabel: {
+        fontSize: 12,
+        color: '#8A9BA8',
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    typeLabelActive: {
         color: '#FFF',
+    },
+    typeRate: {
+        fontSize: 14,
+        color: '#FFD700',
+        fontWeight: '700',
+    },
+    sliderContainer: {
+        marginBottom: 24,
+    },
+    previewContainer: {
+        backgroundColor: '#2A2D35',
+        borderRadius: 12,
+        padding: 16,
+        gap: 12,
+        marginBottom: 16,
+    },
+    previewRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    previewLabel: {
+        fontSize: 13,
+        color: '#8A9BA8',
+        fontWeight: '600',
+    },
+    previewValue: {
+        fontSize: 15,
+        color: '#FFF',
+        fontWeight: '700',
     },
     warningText: {
         color: '#ffdd57',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
-        fontWeight: '600'
+        fontWeight: '600',
     },
-    modalActions: {
+    actions: {
         flexDirection: 'row',
         gap: 12,
     },
-    cancelAction: {
+    cancelButton: {
         flex: 1,
         padding: 16,
         alignItems: 'center',
@@ -151,16 +298,24 @@ const styles = StyleSheet.create({
         color: '#AAA',
         fontWeight: '600',
     },
-    confirmAction: {
+    confirmButton: {
         flex: 2,
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: theme.colors.success,
+        backgroundColor: '#FFD700',
+        shadowColor: '#FFD700',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    confirmButtonPressed: {
+        opacity: 0.8,
     },
     confirmText: {
-        color: '#FFF',
-        fontWeight: '700',
-        fontSize: 16,
+        color: '#000',
+        fontWeight: '800',
+        fontSize: 15,
     },
 });
