@@ -9,6 +9,7 @@ import { useStatsStore } from '../../../core/store';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { useEquityStore } from '../../finance/stores/useEquityStore';
+import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
@@ -17,6 +18,7 @@ import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../co
 import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
+import CompanyActions from '../../../components/MyCompany/CompanyActions';
 
 // Helper Component
 const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
@@ -50,6 +52,15 @@ const MyCompanyScreen = () => {
       syncStockPrice(stats.companyValue);
     }
   }, [stats.companyValue, syncStockPrice]);
+
+  // Initialize Board Members if empty
+  const { members, initializeGame } = useShareholderStore();
+  useEffect(() => {
+    if (!members || members.length === 0) {
+      console.log('[MyCompanyScreen] Initializing board members...');
+      initializeGame();
+    }
+  }, [members, initializeGame]);
 
   // --- UI STATES ---
   const [modals, setModals] = useState<any>({});
@@ -158,6 +169,14 @@ const MyCompanyScreen = () => {
             <VerticalDivider />
             <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
           </DashboardCard>
+
+          {/* COMPANY ACTIONS */}
+          <CompanyActions
+            onOpenFinance={() => toggleModal('finance', true)}
+            onOpenBoard={() => toggleModal('boardMembers', true)}
+            onOpenProduction={() => toggleModal('factories', true)}
+            onOpenHR={() => toggleModal('employees', true)}
+          />
 
 
           {/* OPERATIONS */}

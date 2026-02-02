@@ -1,37 +1,35 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import RAndDModal from './Actions/RAndDModal';
-import LoanModal from './Actions/LoanModal';
-import IssueSharesModal from './Actions/IssueSharesModal';
-import AcquireStartupModal from './Actions/AcquireStartupModal';
 import { theme } from '../../core/theme';
 
+interface CompanyActionsProps {
+  onOpenFinance: () => void;
+  onOpenBoard: () => void;
+  onOpenProduction: () => void;
+  onOpenHR: () => void;
+}
+
 const ACTIONS = [
-  { label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation', borderColor: 'rgba(10, 132, 255, 0.4)' }, // Blue for operations
-  { label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital', borderColor: 'rgba(255, 215, 0, 0.4)' }, // Gold for finance
-  { label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash', borderColor: 'rgba(255, 215, 0, 0.4)' }, // Gold for finance
-  { label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio', borderColor: 'rgba(10, 132, 255, 0.4)' }, // Blue for operations
+  { label: 'Finance Hub', key: 'finance', icon: '🏦', description: 'Capital & debt', borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#FFD700' }, // Gold
+  { label: 'Boardroom', key: 'board', icon: '📈', description: 'Board & shareholders', borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#30D158' }, // Green
+  { label: 'Production', key: 'production', icon: '🏭', description: 'Factories & output', borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#0A84FF' }, // Blue
+  { label: 'Workforce', key: 'hr', icon: '👥', description: 'Employees & morale', borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#BF5AF2' }, // Purple
 ] as const;
 
-const CompanyActions = () => {
-  const [isRAndDVisible, setRAndDVisible] = useState(false);
-  const [isLoanVisible, setLoanVisible] = useState(false);
-  const [isIssueVisible, setIssueVisible] = useState(false);
-  const [isAcquisitionVisible, setAcquisitionVisible] = useState(false);
-
+const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {
   const handlePress = (key: (typeof ACTIONS)[number]['key']) => {
     switch (key) {
-      case 'rnd':
-        setRAndDVisible(true);
+      case 'finance':
+        onOpenFinance();
         return;
-      case 'loan':
-        setLoanVisible(true);
+      case 'board':
+        onOpenBoard();
         return;
-      case 'issue':
-        setIssueVisible(true);
+      case 'production':
+        onOpenProduction();
         return;
-      case 'acquire':
-        setAcquisitionVisible(true);
+      case 'hr':
+        onOpenHR();
         return;
       default:
         return;
@@ -59,17 +57,6 @@ const CompanyActions = () => {
           </Pressable>
         ))}
       </View>
-
-      <RAndDModal visible={isRAndDVisible} onClose={() => setRAndDVisible(false)} />
-      <LoanModal visible={isLoanVisible} onClose={() => setLoanVisible(false)} />
-      <IssueSharesModal
-        visible={isIssueVisible}
-        onClose={() => setIssueVisible(false)}
-      />
-      <AcquireStartupModal
-        visible={isAcquisitionVisible}
-        onClose={() => setAcquisitionVisible(false)}
-      />
     </View>
   );
 };

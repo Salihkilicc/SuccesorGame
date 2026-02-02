@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
+import SharkDealModal from './SharkDealModal';
 
 type Props = {
     visible: boolean;
@@ -24,6 +26,12 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
         getMonthlyInterestTotal,
         refreshCreditScore
     } = useCorporateFinanceStore();
+
+    const { members } = useShareholderStore();
+    const [sharkDealModalVisible, setSharkDealModalVisible] = useState(false);
+
+    // Find Shark board members
+    const sharkMember = members.find((m) => m.trait === 'Shark');
 
     // Refresh credit score when modal opens
     React.useEffect(() => {
@@ -162,6 +170,44 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     )}
                 </View>
 
+                {/* SHARK DEAL - SPECIAL OFFER */}
+                {sharkMember && (
+                    <View>
+                        <Text style={styles.sectionTitle}>⚠️ Special Offer</Text>
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.sharkDealCard,
+                                pressed && styles.sharkDealCardPressed
+                            ]}
+                            onPress={() => setSharkDealModalVisible(true)}
+                        >
+                            <View style={styles.sharkDealHeader}>
+                                <View style={styles.sharkAvatar}>
+                                    <Text style={styles.sharkAvatarText}>
+                                        {sharkMember.name.charAt(0)}
+                                    </Text>
+                                </View>
+                                <View style={styles.sharkDealInfo}>
+                                    <Text style={styles.sharkDealTitle}>
+                                        Private Equity Injection
+                                    </Text>
+                                    <Text style={styles.sharkDealSubtitle}>
+                                        from {sharkMember.name}
+                                    </Text>
+                                </View>
+                                <View style={styles.instantBadge}>
+                                    <Text style={styles.instantBadgeText}>INSTANT CASH</Text>
+                                </View>
+                            </View>
+                            <View style={styles.sharkDealFooter}>
+                                <Text style={styles.sharkDealWarning}>
+                                    ⚡ No credit check required • Equity-backed financing
+                                </Text>
+                            </View>
+                        </Pressable>
+                    </View>
+                )}
+
                 {/* CTA BUTTONS */}
                 <View style={styles.ctaContainer}>
                     {totalDebt > 0 && (
@@ -188,6 +234,15 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 </View>
 
             </ScrollView>
+
+            {/* Shark Deal Modal */}
+            {sharkMember && (
+                <SharkDealModal
+                    visible={sharkDealModalVisible}
+                    onClose={() => setSharkDealModalVisible(false)}
+                    sharkMember={sharkMember}
+                />
+            )}
         </GameModal>
     );
 };
@@ -437,5 +492,78 @@ const styles = StyleSheet.create({
         color: '#000',
         textTransform: 'uppercase',
         letterSpacing: 1,
+    },
+    // Shark Deal Styles
+    sharkDealCard: {
+        backgroundColor: '#000000',
+        borderRadius: 16,
+        padding: 20,
+        borderWidth: 2,
+        borderColor: '#FF3B30',
+        shadowColor: '#FF3B30',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 12,
+        elevation: 12,
+    },
+    sharkDealCardPressed: {
+        opacity: 0.9,
+        transform: [{ scale: 0.98 }],
+    },
+    sharkDealHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 12,
+    },
+    sharkAvatar: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#FF3B30',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    sharkAvatarText: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#000',
+    },
+    sharkDealInfo: {
+        flex: 1,
+    },
+    sharkDealTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        marginBottom: 2,
+    },
+    sharkDealSubtitle: {
+        fontSize: 12,
+        color: '#FF3B30',
+        fontWeight: '600',
+    },
+    instantBadge: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+    },
+    instantBadgeText: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: '#000',
+        letterSpacing: 0.5,
+    },
+    sharkDealFooter: {
+        borderTopWidth: 1,
+        borderTopColor: '#FF3B30',
+        paddingTop: 12,
+    },
+    sharkDealWarning: {
+        fontSize: 11,
+        color: '#FF6B6B',
+        fontStyle: 'italic',
+        textAlign: 'center',
     },
 });
