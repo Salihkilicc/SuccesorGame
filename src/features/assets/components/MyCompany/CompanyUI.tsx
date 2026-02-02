@@ -39,16 +39,16 @@ export const SectionHeader = ({ title }: { title: string }) => (
 );
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: theme.colors.primary, marginBottom: theme.spacing.sm, gap: 8 },
+  card: { backgroundColor: '#1C1C1E', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: '#FFD700', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  cardTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.textPrimary },
-  contentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12, borderTopWidth: 1, borderTopColor: theme.colors.border },
+  cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' }, // White
+  contentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12, borderTopWidth: 1, borderTopColor: '#333' },
   col: { flex: 1, gap: 4 },
-  separator: { width: 1, backgroundColor: theme.colors.border, marginHorizontal: 12 },
-  label: { fontSize: 11, color: theme.colors.textSecondary, textTransform: 'uppercase' },
-  value: { fontSize: 14, fontWeight: '700', color: theme.colors.textPrimary },
-  success: { color: theme.colors.success },
+  separator: { width: 1, backgroundColor: '#333', marginHorizontal: 12 },
+  label: { fontSize: 11, color: '#8E8E93', textTransform: 'uppercase' }, // Text Secondary
+  value: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' }, // White
+  success: { color: '#30D158' }, // Green
   danger: { color: theme.colors.danger },
   sectionHeader: { marginTop: theme.spacing.sm },
-  sectionTitle: { color: theme.colors.textMuted, fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
+  sectionTitle: { color: '#8E8E93', fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
 });

@@ -271,16 +271,16 @@ const MyCompanyScreen = () => {
 export default MyCompanyScreen;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: theme.colors.background },
+  safeArea: { flex: 1, backgroundColor: '#121212' }, // Deep Black
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
-  backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: theme.colors.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: theme.colors.border },
-  backTxt: { fontSize: 20, color: theme.colors.textPrimary },
-  title: { fontSize: 24, fontWeight: '800', color: theme.colors.textPrimary },
-  subtitle: { color: theme.colors.textSecondary, fontSize: 14 },
+  backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#1C1C1E', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#333' },
+  backTxt: { fontSize: 20, color: '#FFFFFF' },
+  title: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
+  subtitle: { color: '#8E8E93', fontSize: 14 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  deptCard: { flexBasis: '48%', backgroundColor: theme.colors.card, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: theme.colors.border, alignItems: 'center', gap: 8, minHeight: 120, justifyContent: 'center' },
-  deptTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary, textAlign: 'center' },
-  deptSub: { fontSize: 12, color: theme.colors.textSecondary, textAlign: 'center' },
-  sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
+  deptCard: { flexBasis: '48%', backgroundColor: '#1C1C1E', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#333', alignItems: 'center', gap: 8, minHeight: 120, justifyContent: 'center' },
+  deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
+  deptSub: { fontSize: 12, color: '#8E8E93', textAlign: 'center' },
+  sharePrice: { fontSize: 18, fontWeight: '700', color: '#FFD700' }, // Gold for money
 });

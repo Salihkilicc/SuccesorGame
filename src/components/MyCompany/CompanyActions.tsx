@@ -77,12 +77,12 @@ export default CompanyActions;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: '#1C1C1E', // Dark Gray
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: '#333',
   },
   headerRow: {
     flexDirection: 'row',
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF', // White
   },
   grid: {
     flexDirection: 'row',
@@ -101,30 +101,31 @@ const styles = StyleSheet.create({
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: theme.colors.card,
+    backgroundColor: '#2C2C2E', // Light Gray
     borderRadius: theme.radius.md,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: '#333',
     gap: theme.spacing.xs,
   },
   buttonPressed: {
-    backgroundColor: theme.colors.cardSoft,
+    backgroundColor: '#3A3A3C',
     transform: [{ scale: 0.98 }],
+    borderColor: '#FFD700', // Gold border on press
   },
   icon: {
     fontSize: 22,
   },
   buttonText: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF', // White
     fontWeight: '700',
     fontSize: theme.typography.body,
     textAlign: 'center',
   },
   description: {
-    color: theme.colors.textSecondary,
+    color: '#8E8E93', // Text Secondary
     fontSize: theme.typography.caption + 1,
     textAlign: 'center',
   },

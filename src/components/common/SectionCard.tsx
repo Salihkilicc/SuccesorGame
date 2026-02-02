@@ -42,11 +42,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#2D3748',
+        backgroundColor: '#1C1C1E', // Dark Gray
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#4A5568',
+        borderColor: '#333',
         marginBottom: theme.spacing.sm,
     },
     dangerCard: {
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         borderColor: '#FF6B6B',
     },
     selectedCard: {
-        borderColor: '#C5A065',
+        borderColor: '#FFD700', // Gold
         backgroundColor: '#232730',
     },
     pressed: {
@@ -68,23 +68,23 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#E2E8F0',
+        color: '#FFFFFF', // White
     },
     subtitle: {
         fontSize: 12,
-        color: '#A0AEC0',
+        color: '#8E8E93', // Text Secondary
         marginTop: 2,
     },
     rightText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C5A065',
+        color: '#0A84FF', // Apple Blue
     },
     dangerText: {
         color: '#FF6B6B',
     },
     selectedText: {
-        color: '#C5A065',
+        color: '#FFD700', // Gold
     },
 });
 

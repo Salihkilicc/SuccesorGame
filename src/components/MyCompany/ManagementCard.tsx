@@ -118,11 +118,11 @@ const ManagementCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: theme.colors.card,
+        backgroundColor: '#1C1C1E', // Dark Gray
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.border,
+        borderWidth: 1,
+        borderColor: '#333',
         gap: theme.spacing.md,
     },
     header: {
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: theme.radius.md,
-        backgroundColor: theme.colors.cardSoft,
+        backgroundColor: '#2C2C2E', // Light Gray for icon box
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -142,23 +142,23 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     title: {
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF', // White
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
     subtitle: {
-        color: theme.colors.textSecondary,
+        color: '#8E8E93', // Text Secondary
         fontSize: theme.typography.caption,
     },
     badge: {
         marginLeft: 'auto',
-        backgroundColor: theme.colors.cardSoft,
+        backgroundColor: '#2C2C2E',
         paddingHorizontal: theme.spacing.sm,
         paddingVertical: 4,
         borderRadius: theme.radius.sm,
     },
     badgeText: {
-        color: theme.colors.textSecondary,
+        color: '#8E8E93',
         fontSize: theme.typography.caption,
         fontWeight: '600',
     },
@@ -171,11 +171,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        color: theme.colors.textSecondary,
+        color: '#8E8E93',
         fontSize: theme.typography.caption,
     },
     value: {
-        color: theme.colors.textPrimary,
+        color: '#0A84FF', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
         color: theme.colors.success,
     },
     limitLabel: {
-        color: theme.colors.textMuted,
+        color: '#8E8E93',
         fontSize: 10,
     },
     footer: {
@@ -195,12 +195,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 0,
         paddingTop: 6,
-        minHeight: 36, // Ensure it reserves space only when content exists or minimal
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: theme.colors.border,
+        minHeight: 36,
+        borderTopWidth: 1,
+        borderTopColor: '#333',
     },
     costLabel: {
-        color: theme.colors.textSecondary,
+        color: '#8E8E93',
         fontSize: theme.typography.caption,
     },
     costValue: {
