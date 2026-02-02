@@ -77,13 +77,15 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
     borderWidth: 1,
     borderColor: '#333',
   },
   title: {
     color: '#FFFFFF', // White
     fontSize: theme.typography.subtitle + 8,
-    fontWeight: '800',
+    fontWeight: 'bold',
     letterSpacing: 0.5,
   },
   subtitle: {
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   metricValue: {
-    color: '#30D158', // Green for positive values
+    color: '#30D158', // Green for valuation
     fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
   },
@@ -117,13 +119,13 @@ const styles = StyleSheet.create({
     color: '#30D158', // Green
   },
   changeDown: {
-    color: theme.colors.danger,
+    color: '#FF453A', // Red
   },
   meta: {
     color: '#8E8E93',
     fontSize: theme.typography.caption + 1,
   },
   debt: {
-    color: theme.colors.danger,
+    color: '#FF453A', // Red
   },
 });

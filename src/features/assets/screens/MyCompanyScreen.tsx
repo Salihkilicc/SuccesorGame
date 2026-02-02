@@ -1,7 +1,7 @@
 // src/screens/MyCompany/MyCompanyScreen.tsx
 
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Text, Pressable, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, Pressable, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
@@ -124,147 +124,164 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
-      {/* FIXED HEADER */}
-      <View style={[styles.header, { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm }]}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
-        <View>
-          <Text style={styles.title}>Command Center</Text>
-          <Text style={styles.subtitle}>Manage your company operations</Text>
+    <>
+      <StatusBar barStyle="light-content" />
+      <View style={[styles.safeArea, { paddingTop: insets.top, backgroundColor: '#121212' }]}>
+        {/* FIXED HEADER */}
+        <View style={[styles.header, { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm }]}>
+          <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
+          <View>
+            <Text style={styles.title}>Command Center</Text>
+            <Text style={styles.subtitle}>Manage your company operations</Text>
+          </View>
         </View>
-      </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40, paddingTop: 0 }]}>
+        <ScrollView
+          style={{ backgroundColor: '#121212' }}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40, paddingTop: 0 }]}>
 
-        {/* COMPANY STATS CARD */}
-        <DashboardCard
-          title="My Company"
-          rightContent={
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Text style={styles.sharePrice}>${stockPrice.toFixed(2)}</Text>
-              <Text style={{ color: (stats.companyDailyChange || 0) >= 0 ? theme.colors.success : theme.colors.danger, fontWeight: '700' }}>
-                {(stats.companyDailyChange || 0).toFixed(2)}%
-              </Text>
-            </View>
-          }
-        >
-          <StatColumn label="Valuation" value={formatCurrency(stats.companyValue)} />
-          <VerticalDivider />
-          <StatColumn label="Capital" value={formatCurrency(stats.companyCapital)} />
-          <VerticalDivider />
-          <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
-        </DashboardCard>
-
-
-        {/* OPERATIONS */}
-        <SectionHeader title="OPERATIONS MANAGEMENT" />
-        <View style={{ gap: 12 }}>
-          <ManagementCard title="Factories" icon="🏭" currentValue={stats.factoryCount} maxValue={limits.maxFactories} costPerUnit={costs.factory} onSave={handlePurchaseFactory} />
-
-          <ManagementCard
-            title="Employees"
-            icon="👥"
-            currentValue={stats.employeeCount}
-            minValue={limits.minEmployees}
-            maxValue={limits.maxEmployees}
-            costPerUnit={costs.employee}
-            onSave={handleHireEmployees}
-            headerRight={
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-                {/* Morale Bar */}
-                {/* Morale Bar with Label */}
-                <View style={{ alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 9, color: theme.colors.textMuted, fontWeight: '800', letterSpacing: 0.5 }}>MORALE</Text>
-                  <View style={{ width: 80, height: 8, backgroundColor: theme.colors.cardSoft, borderRadius: 4, overflow: 'hidden' }}>
-                    <View style={{
-                      width: `${employeeMorale}%`,
-                      height: '100%',
-                      backgroundColor:
-                        employeeMorale < 30 ? theme.colors.danger :
-                          employeeMorale < 50 ? '#F59E0B' : // Orange
-                            employeeMorale < 70 ? '#10B981' : // Light Green
-                              theme.colors.success // Dark Green
-                    }} />
-                  </View>
-                </View>
-                <Pressable
-                  onPress={() => toggleModal('employees', true)}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: theme.colors.cardSoft, borderRadius: 8 }}
-                >
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.textPrimary }}>+ Boost</Text>
-                </Pressable>
+          {/* COMPANY STATS CARD */}
+          <DashboardCard
+            title="My Company"
+            rightContent={
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Text style={styles.sharePrice}>${stockPrice.toFixed(2)}</Text>
+                <Text style={{ color: (stats.companyDailyChange || 0) >= 0 ? theme.colors.success : theme.colors.danger, fontWeight: '700' }}>
+                  {(stats.companyDailyChange || 0).toFixed(2)}%
+                </Text>
               </View>
             }
-          />
-        </View>
+          >
+            <StatColumn label="Valuation" value={formatCurrency(stats.companyValue)} />
+            <VerticalDivider />
+            <StatColumn label="Capital" value={formatCurrency(stats.companyCapital)} />
+            <VerticalDivider />
+            <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
+          </DashboardCard>
 
-        {/* DEPARTMENTS */}
-        <SectionHeader title="DEPARTMENTS" />
-        <View style={styles.grid}>
-          <DepartmentCard
-            icon="🏦"
-            title="Finance"
-            subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
-            onPress={() => toggleModal('finance', true)}
-          />
 
-          {/* 👇 DÜZELTME BURADA YAPILDI: ARTIK NAVİGASYONA GİDİYOR 👇 */}
-          <DepartmentCard
-            icon="🏭"
-            title="Products"
-            subtitle={`${activeProductsCount} Active`}
-            onPress={() => navigation.navigate('Products')}
-          />
-          {/* 👆 -------------------------------------------------- 👆 */}
+          {/* OPERATIONS */}
+          <SectionHeader title="OPERATIONS MANAGEMENT" />
+          <View style={{ gap: 12 }}>
+            <ManagementCard title="Factories" icon="🏭" currentValue={stats.factoryCount} maxValue={limits.maxFactories} costPerUnit={costs.factory} onSave={handlePurchaseFactory} />
 
-          <DepartmentCard
-            icon="📊"
-            title="Financial Report"
-            subtitle="Expenses, Profits & ROI"
-            onPress={() => navigation.navigate('FinancialReport')}
-          />
-          <DepartmentCard
-            icon="📈"
-            title="Stock Market"
-            subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
-            onPress={() => toggleModal('shareControl', true)}
-          />
-        </View>
+            <ManagementCard
+              title="Employees"
+              icon="👥"
+              currentValue={stats.employeeCount}
+              minValue={limits.minEmployees}
+              maxValue={limits.maxEmployees}
+              costPerUnit={costs.employee}
+              onSave={handleHireEmployees}
+              headerRight={
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+                  {/* Morale Bar */}
+                  {/* Morale Bar with Label */}
+                  <View style={{ alignItems: 'center', gap: 4 }}>
+                    <Text style={{ fontSize: 9, color: '#8E8E93', fontWeight: '800', letterSpacing: 0.5 }}>MORALE</Text>
+                    <View style={{ width: 80, height: 8, backgroundColor: '#2C2C2E', borderRadius: 4, overflow: 'hidden' }}>
+                      <View style={{
+                        width: `${employeeMorale}%`,
+                        height: '100%',
+                        backgroundColor:
+                          employeeMorale < 30 ? '#FF453A' : // Red
+                            employeeMorale < 50 ? '#FF9F0A' : // Orange
+                              employeeMorale < 70 ? '#32D74B' : // Light Green
+                                '#30D158' // Success Green
+                      }} />
+                    </View>
+                  </View>
+                  <Pressable
+                    onPress={() => toggleModal('employees', true)}
+                    style={({ pressed }) => [{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      backgroundColor: pressed ? '#0A84FF' : '#2C2C2E',
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: 'rgba(10, 132, 255, 0.3)',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }]}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#FFFFFF' }}>+ Boost</Text>
+                  </Pressable>
+                </View>
+              }
+            />
+          </View>
 
-        {/* QUICK ACTIONS */}
-        <SectionHeader title="QUICK ACTIONS" />
-        <View style={{ gap: 8 }}>
-          <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => navigation.navigate('Research')} />
-          <SectionCard title="🏢 Hostile Takeover" subtitle="Buy public companies to gain their tech and buffs" onPress={() => toggleModal('acquire', true)} />
-          <SectionCard title="👔 Board Members" subtitle="View shareholders" onPress={() => toggleModal('boardMembers', true)} />
-          <SectionCard title="🏆 My Empire" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />
-        </View>
+          {/* DEPARTMENTS */}
+          <SectionHeader title="DEPARTMENTS" />
+          <View style={styles.grid}>
+            <DepartmentCard
+              icon="🏦"
+              title="Finance"
+              subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
+              onPress={() => toggleModal('finance', true)}
+            />
 
-      </ScrollView>
+            {/* 👇 DÜZELTME BURADA YAPILDI: ARTIK NAVİGASYONA GİDİYOR 👇 */}
+            <DepartmentCard
+              icon="🏭"
+              title="Products"
+              subtitle={`${activeProductsCount} Active`}
+              onPress={() => navigation.navigate('Products')}
+            />
+            {/* 👆 -------------------------------------------------- 👆 */}
 
-      {/* --- MODAL MANAGER --- */}
-      <CompanyModals
-        modals={modals}
-        toggleModal={toggleModal}
-        companyCapital={stats.companyCapital}
-        companyDebtTotal={stats.companyDebtTotal}
-        selectedShareholder={selectedShareholder}
-        financeActions={{
-          borrowConfig, setBorrowConfig, repayConfig, setRepayConfig,
-          handleBorrow: (amt: number, rate: number) => { stats.borrowCapital(amt, rate); setBorrowConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); },
-          handleRepay: (amt: number) => { stats.repayCapital(amt); setRepayConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); }
-        }}
-        shareActions={{
-          onOpenAction: (type: string) => { toggleModal('shareControl', false); setTimeout(() => setActiveShareAction(type), 300); },
-          onSelectMember: (m: any) => {
-            toggleModal('boardMembers', false);
-            setSelectedShareholder(m);
-            setTimeout(() => toggleModal('profile', true), 300);
-          },
-          handleLaunchIPO,
-        }}
-      />
-    </View>
+            <DepartmentCard
+              icon="📊"
+              title="Financial Report"
+              subtitle="Expenses, Profits & ROI"
+              onPress={() => navigation.navigate('FinancialReport')}
+            />
+            <DepartmentCard
+              icon="📈"
+              title="Stock Market"
+              subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
+              onPress={() => toggleModal('shareControl', true)}
+            />
+          </View>
+
+          {/* QUICK ACTIONS */}
+          <SectionHeader title="QUICK ACTIONS" />
+          <View style={{ gap: 8 }}>
+            <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => navigation.navigate('Research')} />
+            <SectionCard title="🏢 Hostile Takeover" subtitle="Buy public companies to gain their tech and buffs" onPress={() => toggleModal('acquire', true)} />
+            <SectionCard title="👔 Board Members" subtitle="View shareholders" onPress={() => toggleModal('boardMembers', true)} />
+            <SectionCard title="🏆 My Empire" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />
+          </View>
+
+        </ScrollView>
+
+        {/* --- MODAL MANAGER --- */}
+        <CompanyModals
+          modals={modals}
+          toggleModal={toggleModal}
+          companyCapital={stats.companyCapital}
+          companyDebtTotal={stats.companyDebtTotal}
+          selectedShareholder={selectedShareholder}
+          financeActions={{
+            borrowConfig, setBorrowConfig, repayConfig, setRepayConfig,
+            handleBorrow: (amt: number, rate: number) => { stats.borrowCapital(amt, rate); setBorrowConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); },
+            handleRepay: (amt: number) => { stats.repayCapital(amt); setRepayConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); }
+          }}
+          shareActions={{
+            onOpenAction: (type: string) => { toggleModal('shareControl', false); setTimeout(() => setActiveShareAction(type), 300); },
+            onSelectMember: (m: any) => {
+              toggleModal('boardMembers', false);
+              setSelectedShareholder(m);
+              setTimeout(() => toggleModal('profile', true), 300);
+            },
+            handleLaunchIPO,
+          }}
+        />
+      </View>
+    </>
   );
 };
 
@@ -272,14 +289,44 @@ export default MyCompanyScreen;
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#121212' }, // Deep Black
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
-  backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#1C1C1E', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#333' },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, backgroundColor: '#121212' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8, backgroundColor: '#121212' },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#1C1C1E',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 8,
+  },
   backTxt: { fontSize: 20, color: '#FFFFFF' },
   title: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
   subtitle: { color: '#8E8E93', fontSize: 14 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  deptCard: { flexBasis: '48%', backgroundColor: '#1C1C1E', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#333', alignItems: 'center', gap: 8, minHeight: 120, justifyContent: 'center' },
+  deptCard: {
+    flexBasis: '48%',
+    backgroundColor: '#1C1C1E',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 120,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 8,
+  },
   deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
   deptSub: { fontSize: 12, color: '#8E8E93', textAlign: 'center' },
   sharePrice: { fontSize: 18, fontWeight: '700', color: '#FFD700' }, // Gold for money

@@ -7,10 +7,10 @@ import AcquireStartupModal from './Actions/AcquireStartupModal';
 import { theme } from '../../core/theme';
 
 const ACTIONS = [
-  { label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation' },
-  { label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital' },
-  { label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash' },
-  { label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio' },
+  { label: 'R&D Investment', key: 'rnd', icon: '🔬', description: 'Invest in innovation', borderColor: 'rgba(10, 132, 255, 0.4)' }, // Blue for operations
+  { label: 'Take Loan', key: 'loan', icon: '💳', description: 'Raise quick capital', borderColor: 'rgba(255, 215, 0, 0.4)' }, // Gold for finance
+  { label: 'Issue Shares', key: 'issue', icon: '📈', description: 'Sell equity for cash', borderColor: 'rgba(255, 215, 0, 0.4)' }, // Gold for finance
+  { label: 'Acquire Startup', key: 'acquire', icon: '🧩', description: 'Expand your portfolio', borderColor: 'rgba(10, 132, 255, 0.4)' }, // Blue for operations
 ] as const;
 
 const CompanyActions = () => {
@@ -50,6 +50,7 @@ const CompanyActions = () => {
             onPress={() => handlePress(action.key)}
             style={({ pressed }) => [
               styles.button,
+              { borderColor: action.borderColor },
               pressed && styles.buttonPressed,
             ]}>
             <Text style={styles.icon}>{action.icon}</Text>
@@ -101,32 +102,40 @@ const styles = StyleSheet.create({
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: '#2C2C2E', // Light Gray
-    borderRadius: theme.radius.md,
+    backgroundColor: '#1C1C1E', // Dark Gray - HARDCODED
+    borderRadius: 16,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#333', // Subtle border - HARDCODED
     gap: theme.spacing.xs,
+    // Premium shadows - CRUCIAL
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 8,
   },
   buttonPressed: {
-    backgroundColor: '#3A3A3C',
+    backgroundColor: '#2C2C2E',
     transform: [{ scale: 0.98 }],
-    borderColor: '#FFD700', // Gold border on press
+    shadowOpacity: 0.6,
+    elevation: 12,
   },
   icon: {
     fontSize: 22,
   },
   buttonText: {
-    color: '#FFFFFF', // White
+    color: '#FFFFFF', // White - HARDCODED
     fontWeight: '700',
     fontSize: theme.typography.body,
     textAlign: 'center',
   },
   description: {
-    color: '#8E8E93', // Text Secondary
+    color: '#FFFFFF', // White - HARDCODED
     fontSize: theme.typography.caption + 1,
     textAlign: 'center',
+    opacity: 0.7,
   },
 });

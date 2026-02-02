@@ -49,17 +49,17 @@ export default FinancialSummary;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1C1C1E', // Dark Gray
-    borderRadius: 16,
+    backgroundColor: '#1C1C1E', // Dark Gray - HARDCODED
+    borderRadius: 12,
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#333', // Subtle border - HARDCODED
   },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF', // White
+    color: '#FFFFFF', // White - HARDCODED
     letterSpacing: 0.3,
   },
   list: {
@@ -71,11 +71,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    color: '#8E8E93', // Text Secondary
+    color: '#8E8E93', // Gray labels - HARDCODED
   },
   value: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF', // White
+    color: '#FFFFFF', // White values - HARDCODED
   },
 });
