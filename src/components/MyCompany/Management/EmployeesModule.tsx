@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { theme } from '../../../core/theme';
 import { COMPANY_EVENTS, useCompanyManagement } from '../useCompanyManagement';
 import GameModal from '../../common/GameModal';
@@ -223,12 +223,22 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
 
             </ScrollView>
 
-            {/* Events Modal - Premium Dark Fintech Style */}
             <GameModal
                 visible={eventsVisible}
                 onClose={() => setEventsVisible(false)}
-                title="🚀 Boost Employee Morale"
             >
+                <View style={styles.modalHeader}>
+                    {/* LEFT: Close Button */}
+                    <TouchableOpacity onPress={() => setEventsVisible(false)} style={{ padding: 8 }}>
+                        <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>✕</Text>
+                    </TouchableOpacity>
+
+                    {/* CENTER: Title */}
+                    <Text style={styles.modalTitle}>Boost Morale</Text>
+
+                    {/* RIGHT: Empty View for centering */}
+                    <View style={{ width: 24 }} />
+                </View>
                 <View style={{ gap: 20 }}>
                     {/* Current Morale Display */}
                     <View style={styles.moraleSection}>
@@ -568,5 +578,17 @@ const styles = StyleSheet.create({
     eventButton: {
         minWidth: 90,
         paddingVertical: 10,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        width: '100%',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
     },
 });
