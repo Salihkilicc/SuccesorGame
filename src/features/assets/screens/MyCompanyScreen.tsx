@@ -18,11 +18,16 @@ import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../co
 import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
-import CompanyActions from '../../../components/MyCompany/CompanyActions';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
-  <Pressable onPress={onPress} style={({ pressed }) => [styles.deptCard, pressed && { opacity: 0.8 }]}>
+const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any) => (
+  <Pressable
+    onPress={onPress}
+    style={({ pressed }) => [
+      styles.deptCard,
+      { borderColor: color },
+      pressed && { opacity: 0.8, backgroundColor: color.replace('0.5', '0.1') } // Subtle tint on press if rgba, or just opacity
+    ]}>
     <Text style={{ fontSize: 32 }}>{icon}</Text>
     <Text style={styles.deptTitle}>{title}</Text>
     <Text style={styles.deptSub}>{subtitle}</Text>
@@ -170,13 +175,39 @@ const MyCompanyScreen = () => {
             <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
           </DashboardCard>
 
-          {/* COMPANY ACTIONS */}
-          <CompanyActions
-            onOpenFinance={() => toggleModal('finance', true)}
-            onOpenBoard={() => toggleModal('boardMembers', true)}
-            onOpenProduction={() => toggleModal('factories', true)}
-            onOpenHR={() => toggleModal('employees', true)}
-          />
+          {/* DEPARTMENTS */}
+          <View style={styles.grid}>
+            <DepartmentCard
+              icon="🏦"
+              title="Finance"
+              subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
+              onPress={() => toggleModal('finance', true)}
+              color="rgba(255, 215, 0, 0.5)" // Gold
+            />
+
+            <DepartmentCard
+              icon="🏭"
+              title="Products"
+              subtitle={`${activeProductsCount} Active`}
+              onPress={() => navigation.navigate('Products')}
+              color="rgba(10, 132, 255, 0.5)" // Blue
+            />
+
+            <DepartmentCard
+              icon="📊"
+              title="Financial Report"
+              subtitle="Expenses, Profits & ROI"
+              onPress={() => navigation.navigate('FinancialReport')}
+              color="rgba(191, 90, 242, 0.5)" // Purple
+            />
+            <DepartmentCard
+              icon="📈"
+              title="Stock Market"
+              subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
+              onPress={() => toggleModal('shareControl', true)}
+              color="rgba(48, 209, 88, 0.5)" // Green
+            />
+          </View>
 
 
           {/* OPERATIONS */}
@@ -233,38 +264,7 @@ const MyCompanyScreen = () => {
             />
           </View>
 
-          {/* DEPARTMENTS */}
-          <SectionHeader title="DEPARTMENTS" />
-          <View style={styles.grid}>
-            <DepartmentCard
-              icon="🏦"
-              title="Finance"
-              subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
-              onPress={() => toggleModal('finance', true)}
-            />
 
-            {/* 👇 DÜZELTME BURADA YAPILDI: ARTIK NAVİGASYONA GİDİYOR 👇 */}
-            <DepartmentCard
-              icon="🏭"
-              title="Products"
-              subtitle={`${activeProductsCount} Active`}
-              onPress={() => navigation.navigate('Products')}
-            />
-            {/* 👆 -------------------------------------------------- 👆 */}
-
-            <DepartmentCard
-              icon="📊"
-              title="Financial Report"
-              subtitle="Expenses, Profits & ROI"
-              onPress={() => navigation.navigate('FinancialReport')}
-            />
-            <DepartmentCard
-              icon="📈"
-              title="Stock Market"
-              subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
-              onPress={() => toggleModal('shareControl', true)}
-            />
-          </View>
 
           {/* QUICK ACTIONS */}
           <SectionHeader title="QUICK ACTIONS" />

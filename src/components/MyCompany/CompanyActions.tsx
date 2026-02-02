@@ -53,7 +53,6 @@ const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR
             ]}>
             <Text style={styles.icon}>{action.icon}</Text>
             <Text style={styles.buttonText}>{action.label}</Text>
-            <Text style={styles.description}>{action.description}</Text>
           </Pressable>
         ))}
       </View>
