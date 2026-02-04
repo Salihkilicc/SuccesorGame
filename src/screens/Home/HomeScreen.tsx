@@ -26,6 +26,8 @@ import { useEducationSystem } from '../../features/life/components/Education/sto
 import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
 // ADDED: Sanctuary System Import
 import { startNewQuarter } from '../../features/life/components/Sanctuary/store/useSanctuarySystem';
+import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
+import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -60,6 +62,13 @@ const HomeScreen = () => {
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
   const { setField, factoryCount, employeeCount } = useStatsStore();
   const { reset: resetProducts } = useProductStore();
+
+  // Real Net Worth Calculation
+  const { playerShareCount } = useShareholderStore();
+  const { stockPrice } = useEquityStore();
+
+  const equityValue = (playerShareCount || 0) * (stockPrice || 0);
+  const realNetWorth = cash + equityValue + investmentsValue; // Total Wealth
 
   const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -228,7 +237,12 @@ const HomeScreen = () => {
           <View style={styles.card}>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Net Worth</Text>
-              <Text style={styles.value}>{formatMoney(netWorth)}</Text>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={styles.value}>{formatMoney(realNetWorth)}</Text>
+                <Text style={{ fontSize: 10, color: theme.colors.textSecondary }}>
+                  (Equity: {formatMoney(equityValue)})
+                </Text>
+              </View>
             </View>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Cash</Text>

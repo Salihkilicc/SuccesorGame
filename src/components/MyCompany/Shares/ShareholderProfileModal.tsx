@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 
 interface ShareholderProfileModalProps {
@@ -35,7 +36,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     const [activeTab, setActiveTab] = useState<TabType>('relations');
     const [tradeMode, setTradeMode] = useState<TradeModeType>('buy');
     const [offerPremium, setOfferPremium] = useState(0);
-    const [tradePercent, setTradePercent] = useState(1);
+    const [shareCount, setShareCount] = useState(100_000); // Default 100k shares (1%)
     const [animationState, setAnimationState] = useState<AnimationStateType>('idle');
     const [adviceText, setAdviceText] = useState<string | null>(null);
     const [adviceQuality, setAdviceQuality] = useState<'good' | 'bad' | 'neutral' | null>(null);
@@ -43,8 +44,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
     // STORES
     // ============================================================================
-    const { giftMember, askForAdvice, calculateNegotiationChance, buySharesFromMember, sellSharesToMember, playerShares } = useShareholderStore();
+    const { giftMember, askForAdvice, calculateNegotiationChance, negotiateSharePurchase, sellSharesToMember, totalShares } = useShareholderStore();
     const { money } = useStatsStore();
+    const { stockPrice } = useEquityStore();
 
     // ============================================================================
     // ANIMATIONS
@@ -63,7 +65,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
             setActiveTab('relations');
             setTradeMode('buy');
             setOfferPremium(0);
-            setTradePercent(1);
+            setShareCount(100_000); // Reset to 100k shares
             setAnimationState('idle');
             setAdviceText(null);
             setAdviceQuality(null);
@@ -150,11 +152,11 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         let result: { success: boolean; message: string };
 
         if (tradeMode === 'buy') {
-            result = buySharesFromMember(member.id, tradePercent, offerPremium);
+            result = negotiateSharePurchase(member.id, shareCount, offerPremium);
         } else {
             // For sell mode, convert premium to multiplier
             const priceMultiplier = 1 + (offerPremium / 100);
-            result = sellSharesToMember(member.id, tradePercent, priceMultiplier);
+            result = sellSharesToMember(member.id, shareCount, priceMultiplier);
         }
 
         // Show result
@@ -222,10 +224,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     };
 
     const calculateOfferPrice = () => {
-        // Placeholder - should use actual stock price from equity store
-        const basePrice = 100; // $100 per share
         const premiumMultiplier = 1 + offerPremium / 100;
-        return basePrice * premiumMultiplier;
+        const totalCost = stockPrice * shareCount * premiumMultiplier;
+        return totalCost;
     };
 
     const getAdviceBubbleStyle = () => {
@@ -399,6 +400,12 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     </TouchableOpacity>
                                 </View>
 
+                                {/* Current Stock Price Info */}
+                                <View style={{ backgroundColor: '#2C2C2E', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
+                                    <Text style={{ fontSize: 14, color: '#8E8E93', marginBottom: 4 }}>Current Stock Price</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#30D158' }}>${stockPrice.toFixed(2)}</Text>
+                                </View>
+
                                 {/* Context Text */}
                                 <Text style={styles.tradeContext}>
                                     {tradeMode === 'buy' ? 'Buy their shares' : 'Sell your shares to them'}
@@ -409,26 +416,26 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <Text style={styles.stepperLabel}>Share Amount</Text>
                                     <View style={styles.stepperRow}>
                                         <TouchableOpacity
-                                            style={[styles.stepperButton, tradePercent <= 1 && styles.stepperButtonDisabled]}
-                                            onPress={() => setTradePercent(Math.max(1, tradePercent - 1))}
-                                            disabled={tradePercent <= 1}
+                                            style={[styles.stepperButton, shareCount <= 10_000 && styles.stepperButtonDisabled]}
+                                            onPress={() => setShareCount(Math.max(10_000, shareCount - 10_000))}
+                                            disabled={shareCount <= 10_000}
                                         >
                                             <Text style={styles.stepperButtonText}>−</Text>
                                         </TouchableOpacity>
 
                                         <View style={styles.stepperDisplay}>
                                             <Text style={styles.stepperValue}>
-                                                {tradePercent.toFixed(1)}%
+                                                {shareCount.toLocaleString()} Shares
                                             </Text>
                                             <Text style={styles.stepperPremium}>
-                                                of company
+                                                (= {((shareCount / totalShares) * 100).toFixed(2)}% Ownership)
                                             </Text>
                                         </View>
 
                                         <TouchableOpacity
-                                            style={[styles.stepperButton, tradePercent >= 20 && styles.stepperButtonDisabled]}
-                                            onPress={() => setTradePercent(Math.min(20, tradePercent + 1))}
-                                            disabled={tradePercent >= 20}
+                                            style={[styles.stepperButton, shareCount >= 2_000_000 && styles.stepperButtonDisabled]}
+                                            onPress={() => setShareCount(Math.min(2_000_000, shareCount + 10_000))}
+                                            disabled={shareCount >= 2_000_000}
                                         >
                                             <Text style={styles.stepperButtonText}>+</Text>
                                         </TouchableOpacity>
@@ -437,7 +444,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                 {/* Stepper UI */}
                                 <View style={styles.stepperContainer}>
-                                    <Text style={styles.stepperLabel}>Offer Premium</Text>
+                                    <Text style={styles.stepperLabel}>Total Cost (Premium)</Text>
                                     <View style={styles.stepperRow}>
                                         <TouchableOpacity
                                             style={[styles.stepperButton, offerPremium <= -20 && styles.stepperButtonDisabled]}
@@ -449,7 +456,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                         <View style={styles.stepperDisplay}>
                                             <Text style={styles.stepperValue}>
-                                                ${calculateOfferPrice().toFixed(2)}
+                                                ${Math.round(calculateOfferPrice()).toLocaleString()}
                                             </Text>
                                             <Text style={styles.stepperPremium}>
                                                 ({offerPremium >= 0 ? '+' : ''}{offerPremium}%)

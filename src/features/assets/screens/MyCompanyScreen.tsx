@@ -34,6 +34,12 @@ const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any)
   </Pressable>
 );
 
+const formatCompactNumber = (num: number) => {
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+  if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+  return num.toString();
+};
+
 const MyCompanyScreen = () => {
   // Navigation'a <any> veriyoruz ki TypeScript hata vermesin
   const navigation = useNavigation<any>();
@@ -59,7 +65,7 @@ const MyCompanyScreen = () => {
   }, [stats.companyValue, syncStockPrice]);
 
   // Initialize Board Members if empty
-  const { members, initializeGame } = useShareholderStore();
+  const { members, initializeGame, totalShares, playerShareCount } = useShareholderStore();
   useEffect(() => {
     if (!members || members.length === 0) {
       console.log('[MyCompanyScreen] Initializing board members...');
@@ -168,11 +174,31 @@ const MyCompanyScreen = () => {
               </View>
             }
           >
-            <StatColumn label="Valuation" value={formatCurrency(stats.companyValue)} />
-            <VerticalDivider />
-            <StatColumn label="Capital" value={formatCurrency(stats.companyCapital)} />
-            <VerticalDivider />
-            <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
+            {/* Row 1: Finances */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+              <StatColumn label="Valuation" value={formatCurrency(stats.companyValue)} />
+              <VerticalDivider />
+              <StatColumn label="Capital" value={formatCurrency(stats.companyCapital)} />
+              <VerticalDivider />
+              <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
+            </View>
+
+            {/* Divider */}
+            <View style={{ width: '100%', height: 1, backgroundColor: '#333', marginVertical: 16 }} />
+
+            {/* Row 2: Shares */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+              <StatColumn label="Outstanding" value={formatCompactNumber(totalShares || 10_000_000)} />
+              <VerticalDivider />
+              <StatColumn label="Your Shares" value={formatCompactNumber(playerShareCount || 0)} />
+              <VerticalDivider />
+              {/* Ownership % */}
+              <StatColumn
+                label="Ownership"
+                value={`${((playerShareCount || 0) / (totalShares || 10_000_000) * 100).toFixed(1)}%`}
+                colorType={stats.companyOwnership >= 51 ? 'success' : 'danger'}
+              />
+            </View>
           </DashboardCard>
 
           {/* DEPARTMENTS */}

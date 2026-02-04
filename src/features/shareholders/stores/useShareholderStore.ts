@@ -25,7 +25,7 @@ interface NetworkContact {
 interface BoardMember {
     id: string;
     name: string;
-    shares: number; // Percentage (e.g., 12.5)
+    shareCount: number; // Absolute share count (e.g., 1,250,000)
     trait: TraitType;
     trust: number; // 0-100
     isHostile: boolean; // True if trust < 20
@@ -55,26 +55,26 @@ interface SharkLoan {
 
 // Collateral seizure result
 interface SeizureResult {
-    seizedShares: number;
+    seizedShareCount: number; // Absolute share count seized
     lenderName: string;
     loanAmount: number;
-    playerSharesRemaining: number;
+    playerShareCountRemaining: number; // Absolute share count remaining
 }
 
 
 interface ShareholderState {
     // State
     members: BoardMember[];
-    playerShares: number; // Starts at 65.0
+    totalShares: number; // Total shares in company (e.g., 10,000,000)
+    playerShareCount: number; // Absolute share count owned by player (e.g., 6,500,000)
     boardMood: TraitType; // The dominant personality of the board
-    totalSharesCount: number; // Total volume (e.g. 1,000,000)
     sharkLoans: SharkLoan[]; // Active predatory loans
 
     // Actions
     initializeGame: () => void;
     recalculateBoardMood: () => void;
     evaluatePlayerAction: (actionType: 'DIVIDEND' | 'DILUTION' | 'ACQUISITION' | 'HOLD_CASH') => void;
-    appointDirectorFromNetwork: (networkContact: NetworkContact, shareAmount?: number) => { success: boolean; message: string };
+    appointDirectorFromNetwork: (networkContact: NetworkContact, shareCount?: number) => { success: boolean; message: string };
     calculateBuyoutPrice: (memberId: string, currentStockPrice: number) => BuyoutResult | null;
     takeSharkLoan: (lenderId: string, amount: number, deadlineTurn: number, addCashFn: (n: number) => void) => { success: boolean; message: string };
     repaySharkLoan: (loanId: string, spendCashFn: (amount: number) => boolean) => { success: boolean; message: string };
@@ -86,8 +86,12 @@ interface ShareholderState {
     calculateNegotiationChance: (memberId: string, offerPremium: number) => { success: boolean; reaction: 'insulted' | 'neutral' | 'happy' };
 
     // Trading Actions
-    buySharesFromMember: (memberId: string, percentAmount: number, offerPremium: number) => { success: boolean; message: string; sharesBought: number };
-    sellSharesToMember: (memberId: string, percentAmount: number, priceMultiplier: number) => { success: boolean; message: string; sharesSold: number };
+    negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number) => { success: boolean; message: string; sharesBought: number };
+    sellSharesToMember: (memberId: string, shareCount: number, priceMultiplier: number) => { success: boolean; message: string; sharesSold: number };
+
+    // Helper Selectors
+    getPlayerOwnershipPercent: () => number;
+    getMemberOwnershipPercent: (memberId: string) => number;
 }
 
 // ============================================================================
@@ -124,14 +128,20 @@ const convertPersonalityToTrait = (personalityId: string): TraitType => {
 };
 
 // ============================================================================
-// INITIAL NPC BOARD MEMBERS (35% Total)
+// CONSTANTS
+// ============================================================================
+
+const TOTAL_SHARES = 10_000_000; // 10 million shares total
+
+// ============================================================================
+// INITIAL NPC BOARD MEMBERS (3.5M shares = 35% Total)
 // ============================================================================
 
 const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-marcus-wolf',
         name: "Marcus 'The Wolf'",
-        shares: 12.0,
+        shareCount: 1_200_000, // 12% of company
         trait: 'Shark',
         trust: 50,
         isHostile: false,
@@ -140,7 +150,7 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-elena-vance',
         name: 'Elena Vance',
-        shares: 10.0,
+        shareCount: 1_000_000, // 10% of company
         trait: 'Conservative',
         trust: 65,
         isHostile: false,
@@ -149,7 +159,7 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-victor-k',
         name: 'Victor K.',
-        shares: 8.0,
+        shareCount: 800_000, // 8% of company
         trait: 'Snake',
         trust: 40,
         isHostile: false,
@@ -158,7 +168,7 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-sarah-jen',
         name: 'Sarah Jen',
-        shares: 5.0,
+        shareCount: 500_000, // 5% of company
         trait: 'Aggressive',
         trust: 55,
         isHostile: false,
@@ -177,9 +187,9 @@ export const useShareholderStore = create<ShareholderState>()(
             // STATE
             // ========================================================================
             members: [],
-            playerShares: 65.0,
+            totalShares: TOTAL_SHARES,
+            playerShareCount: 6_500_000, // 65% of 10M
             boardMood: 'Conservative', // Default mood
-            totalSharesCount: 1_000_000, // 1 million shares total
             sharkLoans: [], // No loans initially
 
             // ========================================================================
@@ -188,25 +198,37 @@ export const useShareholderStore = create<ShareholderState>()(
 
             /**
              * Initialize the game with default board members and player shares.
-             * Player starts with 65%, NPCs hold the remaining 35%.
+             * Player starts with 6.5M shares (65%), NPCs hold 3.5M (35%).
              */
             initializeGame: () => {
-                const playerShares = 65.0;
                 const members = INITIAL_BOARD_MEMBERS;
 
-                // Validation: Ensure total shares equal 100%
-                const totalNPCShares = members.reduce((sum, member) => sum + member.shares, 0);
-                const totalShares = playerShares + totalNPCShares;
+                // Calculate player shares
+                const totalMemberShares = members.reduce((sum, m) => sum + m.shareCount, 0);
+                const playerShareCount = TOTAL_SHARES - totalMemberShares;
 
-                if (Math.abs(totalShares - 100.0) > 0.01) {
-                    console.warn(
-                        `[Shareholder Store] Share distribution error: Total = ${totalShares}% (Expected 100%)`
-                    );
+                // Validation
+                if (playerShareCount < 0) {
+                    console.error('[Shareholder Store] ERROR: Member shares exceed total shares!');
+                    return;
                 }
 
+                const playerOwnershipPercent = (playerShareCount / TOTAL_SHARES) * 100;
+
+                console.log('[Shareholder Store] Initialized:', {
+                    totalShares: TOTAL_SHARES.toLocaleString(),
+                    playerShareCount: playerShareCount.toLocaleString(),
+                    playerOwnership: `${playerOwnershipPercent.toFixed(1)}%`,
+                    memberCount: members.length,
+                    totalMemberShares: totalMemberShares.toLocaleString(),
+                });
+
                 set({
-                    playerShares,
                     members,
+                    totalShares: TOTAL_SHARES,
+                    playerShareCount,
+                    boardMood: 'Conservative',
+                    sharkLoans: [],
                 });
 
                 // Calculate initial board mood
@@ -231,7 +253,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 };
 
                 members.forEach((member) => {
-                    traitTotals[member.trait] += member.shares;
+                    traitTotals[member.trait] += member.shareCount;
                 });
 
                 // Find the dominant trait (highest total shares)
@@ -336,26 +358,27 @@ export const useShareholderStore = create<ShareholderState>()(
              * Appoint a friend/partner from the Love/Network module to the Board of Directors.
              * Transfers shares from player to the new director.
              */
-            appointDirectorFromNetwork: (networkContact: NetworkContact, shareAmount: number = 1.0) => {
-                const { playerShares, members } = get();
+            appointDirectorFromNetwork: (networkContact: NetworkContact, shareCount: number = 500_000) => {
+                const { playerShareCount, members, totalShares } = get();
 
                 // ============================================================
                 // VALIDATION
                 // ============================================================
 
                 // Check if player has enough shares to give
-                if (playerShares < shareAmount) {
+                if (playerShareCount < shareCount) {
                     return {
                         success: false,
-                        message: `Insufficient shares. You have ${playerShares.toFixed(1)}%, need ${shareAmount.toFixed(1)}%.`,
+                        message: `Insufficient shares. You have ${playerShareCount.toLocaleString()}, need ${shareCount.toLocaleString()}.`,
                     };
                 }
 
-                // Check minimum share requirement (at least 1%)
-                if (shareAmount < 1.0) {
+                // Check minimum share requirement (at least 100k shares = 1%)
+                const MIN_SHARE_COUNT = totalShares * 0.01; // 100,000 shares
+                if (shareCount < MIN_SHARE_COUNT) {
                     return {
                         success: false,
-                        message: 'Minimum share allocation is 1.0%.',
+                        message: `Minimum share allocation is ${MIN_SHARE_COUNT.toLocaleString()} shares (1%).`,
                     };
                 }
 
@@ -375,7 +398,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 const newMember: BoardMember = {
                     id: `network-${networkContact.id}`,
                     name: networkContact.name,
-                    shares: shareAmount,
+                    shareCount: shareCount,
                     trait: convertPersonalityToTrait(networkContact.personality.id),
                     trust: 80, // Start high because they're your friend
                     isHostile: false,
@@ -387,27 +410,30 @@ export const useShareholderStore = create<ShareholderState>()(
                 // UPDATE STATE
                 // ============================================================
 
-                const newPlayerShares = playerShares - shareAmount;
+                const newPlayerShareCount = playerShareCount - shareCount;
                 const updatedMembers = [...members, newMember];
 
                 set({
-                    playerShares: newPlayerShares,
+                    playerShareCount: newPlayerShareCount,
                     members: updatedMembers,
                 });
 
                 // Recalculate board mood with new member
                 get().recalculateBoardMood();
 
+                const ownershipPercent = (shareCount / totalShares) * 100;
+
                 console.log('[Shareholder Store] New Director Appointed:', {
                     name: newMember.name,
-                    shares: newMember.shares,
+                    shareCount: newMember.shareCount.toLocaleString(),
+                    ownershipPercent: `${ownershipPercent.toFixed(2)}%`,
                     trait: newMember.trait,
-                    playerSharesRemaining: newPlayerShares,
+                    playerShareCountRemaining: newPlayerShareCount.toLocaleString(),
                 });
 
                 return {
                     success: true,
-                    message: `${networkContact.name} appointed to Board with ${shareAmount.toFixed(1)}% shares.`,
+                    message: `${networkContact.name} appointed to Board with ${shareCount.toLocaleString()} shares (${ownershipPercent.toFixed(1)}%).`,
                 };
             },
 
@@ -658,7 +684,7 @@ export const useShareholderStore = create<ShareholderState>()(
              * Transfers shares from player to lender with 1.5x penalty.
              */
             seizeCollateral: (loanId: string, currentStockPrice: number): SeizureResult | null => {
-                const { sharkLoans, members, playerShares } = get();
+                const { sharkLoans, members, playerShareCount, totalShares } = get();
 
                 const loan = sharkLoans.find((l) => l.id === loanId && l.isActive);
 
@@ -680,22 +706,22 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 // Formula: (Loan Amount / Stock Price) × 1.5 (Penalty Multiplier)
                 const PENALTY_MULTIPLIER = 1.5;
-                const sharesToSeize = (loan.amount / currentStockPrice) * PENALTY_MULTIPLIER;
+                const shareCountToSeize = Math.floor((loan.amount / currentStockPrice) * PENALTY_MULTIPLIER);
 
                 // Safety: Don't seize more than player has
-                const actualSeizedShares = Math.min(sharesToSeize, playerShares);
+                const actualSeizedShareCount = Math.min(shareCountToSeize, playerShareCount);
 
                 // ============================================================
                 // TRANSFER OWNERSHIP
                 // ============================================================
 
-                const newPlayerShares = Math.max(0, playerShares - actualSeizedShares);
+                const newPlayerShareCount = Math.max(0, playerShareCount - actualSeizedShareCount);
 
                 const updatedMembers = members.map((member) => {
                     if (member.id === loan.lenderId) {
                         return {
                             ...member,
-                            shares: member.shares + actualSeizedShares,
+                            shareCount: member.shareCount + actualSeizedShareCount,
                         };
                     }
                     return member;
@@ -707,7 +733,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 );
 
                 set({
-                    playerShares: newPlayerShares,
+                    playerShareCount: newPlayerShareCount,
                     members: updatedMembers,
                     sharkLoans: updatedLoans,
                 });
@@ -716,21 +742,24 @@ export const useShareholderStore = create<ShareholderState>()(
                 get().recalculateBoardMood();
 
                 const result: SeizureResult = {
-                    seizedShares: actualSeizedShares,
+                    seizedShareCount: actualSeizedShareCount,
                     lenderName: lender.name,
                     loanAmount: loan.amount,
-                    playerSharesRemaining: newPlayerShares,
+                    playerShareCountRemaining: newPlayerShareCount,
                 };
+
+                const percentSeized = (actualSeizedShareCount / totalShares) * 100;
 
                 console.log('[Shareholder Store] Collateral Seized:', {
                     loanId,
                     lender: lender.name,
                     loanAmount: loan.amount,
                     stockPrice: currentStockPrice,
-                    sharesToSeize,
-                    actualSeizedShares,
-                    playerSharesRemaining: newPlayerShares,
-                    lenderNewShares: lender.shares + actualSeizedShares,
+                    shareCountToSeize,
+                    actualSeizedShareCount: actualSeizedShareCount.toLocaleString(),
+                    percentSeized: `${percentSeized.toFixed(2)}%`,
+                    playerShareCountRemaining: newPlayerShareCount.toLocaleString(),
+                    lenderNewShareCount: (lender.shareCount + actualSeizedShareCount).toLocaleString(),
                 });
 
                 return result;
@@ -975,36 +1004,42 @@ export const useShareholderStore = create<ShareholderState>()(
             },
 
             /**
-             * Buy shares from a board member.
+             * Negotiate share purchase from a board member.
              * Includes negotiation, cash transfer, and positive price impact.
+             * ATOMIC TRANSFER: Deduct from member, add to player.
              */
-            buySharesFromMember: (memberId: string, percentAmount: number, offerPremium: number) => {
-                const { members, playerShares, totalSharesCount } = get();
+            negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number) => {
+                const { members, playerShareCount, totalShares } = get();
 
-                // Find the target member
-                const member = members.find((m) => m.id === memberId);
-
-                if (!member) {
+                // 1. Find the Seller
+                const memberIndex = members.findIndex((m) => m.id === memberId);
+                if (memberIndex === -1) {
                     return {
                         success: false,
                         message: 'Member not found.',
                         sharesBought: 0,
                     };
                 }
+                const member = members[memberIndex];
 
-                // Validation: Member must have enough shares
-                if (member.shares < percentAmount) {
+                // 2. STRICT VALIDATION & CAPPING
+                // If player tries to buy more than member has, cap it to member's max shares.
+                let actualBuyAmount = shareCount;
+                if (shareCount > member.shareCount) {
+                    actualBuyAmount = member.shareCount; // Take everything they have
+                }
+
+                if (actualBuyAmount <= 0) {
                     return {
                         success: false,
-                        message: `${member.name} only owns ${member.shares.toFixed(1)}% of shares.`,
+                        message: `${member.name} has no shares to sell.`,
                         sharesBought: 0,
                     };
                 }
 
-                // Calculate price
+                // Calculate price with ACTUAL amount
                 const stockPrice = useEquityStore.getState().stockPrice;
-                const sharesToBuy = (percentAmount / 100) * totalSharesCount;
-                const basePrice = stockPrice * sharesToBuy;
+                const basePrice = stockPrice * actualBuyAmount;
                 const premiumMultiplier = 1 + (offerPremium / 100);
                 const finalPrice = basePrice * premiumMultiplier;
 
@@ -1028,57 +1063,87 @@ export const useShareholderStore = create<ShareholderState>()(
                     };
                 }
 
-                // Execute transaction
+                // ------------------------------------------------------------
+                // EXECUTE ATOMIC TRANSFER
+                // ------------------------------------------------------------
+
+                // 3. Deduct Cash
                 spendMoney(finalPrice);
 
-                // Transfer shares
-                set((state) => ({
-                    members: state.members.map((m) =>
-                        m.id === memberId
-                            ? { ...m, shares: m.shares - percentAmount }
-                            : m
-                    ),
-                    playerShares: state.playerShares + percentAmount,
-                }));
+                set((state) => {
+                    const updatedMembers = [...state.members];
+                    // Re-find in current state to be safe, though unlikely to change in sync action
+                    const currentMemberIndex = updatedMembers.findIndex((m) => m.id === memberId);
+                    if (currentMemberIndex === -1) return state;
+
+                    const currentMember = updatedMembers[currentMemberIndex];
+                    const newMemberShareCount = currentMember.shareCount - actualBuyAmount;
+
+                    // 4. CHECK FOR REMOVAL (The Veto)
+                    if (newMemberShareCount <= 0) {
+                        // REMOVE from array
+                        updatedMembers.splice(currentMemberIndex, 1);
+                        console.log(`[Shareholder Store] ${currentMember.name} has left the board.`);
+                    } else {
+                        // Update count
+                        updatedMembers[currentMemberIndex] = {
+                            ...currentMember,
+                            shareCount: newMemberShareCount,
+                        };
+                    }
+
+                    return {
+                        members: updatedMembers,
+                        playerShareCount: state.playerShareCount + actualBuyAmount,
+                    };
+                });
 
                 // Trust impact (slight decrease if premium < 10%)
                 if (offerPremium < 10) {
-                    set((state) => ({
-                        members: state.members.map((m) =>
-                            m.id === memberId
-                                ? {
-                                    ...m,
-                                    trust: Math.max(0, m.trust - 5),
-                                    isHostile: m.trust - 5 < 20,
-                                }
-                                : m
-                        ),
-                    }));
+                    set((state) => {
+                        // Check if member still exists before updating trust
+                        const memberExists = state.members.some(m => m.id === memberId);
+                        if (!memberExists) return state;
+
+                        return {
+                            members: state.members.map((m) =>
+                                m.id === memberId
+                                    ? {
+                                        ...m,
+                                        trust: Math.max(0, m.trust - 5),
+                                        isHostile: m.trust - 5 < 20,
+                                    }
+                                    : m
+                            ),
+                        };
+                    });
                 }
 
                 // Recalculate board mood
                 get().recalculateBoardMood();
 
-                // Price impact (buying consolidates control → positive)
+                // Price impact
+                const percentTraded = (actualBuyAmount / totalShares) * 100;
                 const PRICE_IMPACT_SENSITIVITY = 0.05;
                 const currentValuation = useEquityStore.getState().getMarketCap();
-                const impactMultiplier = 1 + (percentAmount / 100 * PRICE_IMPACT_SENSITIVITY);
+                const impactMultiplier = 1 + (percentTraded / 100 * PRICE_IMPACT_SENSITIVITY);
                 const newValuation = currentValuation * impactMultiplier;
                 useEquityStore.getState().syncStockPrice(newValuation);
 
                 console.log('[Share Purchase]', {
                     buyer: 'Player',
                     seller: member.name,
-                    amount: `${percentAmount}%`,
+                    shareCount: actualBuyAmount.toLocaleString(),
+                    percentOfCompany: `${percentTraded.toFixed(2)}%`,
                     premium: `${offerPremium}%`,
                     cost: finalPrice,
-                    priceImpact: `+${(impactMultiplier - 1) * 100}%`,
+                    priceImpact: `+${((impactMultiplier - 1) * 100).toFixed(2)}%`,
                 });
 
                 return {
                     success: true,
-                    message: `Acquired ${percentAmount.toFixed(1)}% from ${member.name} for $${finalPrice.toLocaleString()}.`,
-                    sharesBought: percentAmount,
+                    message: `Acquired ${actualBuyAmount.toLocaleString()} shares from ${member.name}.`,
+                    sharesBought: actualBuyAmount,
                 };
             },
 
@@ -1086,8 +1151,8 @@ export const useShareholderStore = create<ShareholderState>()(
              * Sell shares to a board member.
              * Trait-based willingness, trust loss, and negative price impact.
              */
-            sellSharesToMember: (memberId: string, percentAmount: number, priceMultiplier: number) => {
-                const { members, playerShares, totalSharesCount } = get();
+            sellSharesToMember: (memberId: string, shareCount: number, priceMultiplier: number) => {
+                const { members, playerShareCount, totalShares } = get();
 
                 // Find the target member
                 const member = members.find((m) => m.id === memberId);
@@ -1101,7 +1166,8 @@ export const useShareholderStore = create<ShareholderState>()(
                 }
 
                 // Validation: Player must keep minimum 10% ownership
-                if (playerShares - percentAmount < 10) {
+                const minOwnershipShares = totalShares * 0.10;
+                if (playerShareCount - shareCount < minOwnershipShares) {
                     return {
                         success: false,
                         message: 'Cannot sell below 10% ownership. You must maintain control.',
@@ -1110,10 +1176,11 @@ export const useShareholderStore = create<ShareholderState>()(
                 }
 
                 // Validation: Maximum 20% per transaction
-                if (percentAmount > 20) {
+                const maxTransactionShares = totalShares * 0.20;
+                if (shareCount > maxTransactionShares) {
                     return {
                         success: false,
-                        message: 'Cannot sell more than 20% in a single transaction.',
+                        message: `Cannot sell more than ${maxTransactionShares.toLocaleString()} shares (20%) in a single transaction.`,
                         sharesSold: 0,
                     };
                 }
@@ -1143,7 +1210,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                         case 'Snake':
                             // Only buys if they see weakness
-                            return priceMultiplier <= 0.85 && playerShares < 40;
+                            return priceMultiplier <= 0.85 && get().getPlayerOwnershipPercent() < 40;
 
                         default:
                             return false;
@@ -1169,25 +1236,32 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 // Calculate price
                 const stockPrice = useEquityStore.getState().stockPrice;
-                const sharesToSell = (percentAmount / 100) * totalSharesCount;
-                const basePrice = stockPrice * sharesToSell;
+                const basePrice = stockPrice * shareCount;
                 const finalPrice = basePrice * priceMultiplier;
 
-                // Execute transaction
+                // ------------------------------------------------------------
+                // EXECUTE ATOMIC TRANSFER
+                // ------------------------------------------------------------
+
+                // 1. Add Cash
                 useStatsStore.getState().earnMoney(finalPrice);
 
-                // Transfer shares
-                set((state) => ({
-                    members: state.members.map((m) =>
+                set((state) => {
+                    const updatedMembers = state.members.map((m) =>
                         m.id === memberId
-                            ? { ...m, shares: m.shares + percentAmount }
+                            ? { ...m, shareCount: m.shareCount + shareCount } // ADD
                             : m
-                    ),
-                    playerShares: state.playerShares - percentAmount,
-                }));
+                    );
+
+                    return {
+                        members: updatedMembers,
+                        playerShareCount: state.playerShareCount - shareCount, // DEDUCT
+                    };
+                });
 
                 // Trust impact (selling seen as abandoning ship)
-                const trustLoss = Math.floor(percentAmount * 2); // 2 trust per 1% sold
+                const percentTraded = (shareCount / totalShares) * 100;
+                const trustLoss = Math.floor(percentTraded * 2); // 2 trust per 1% sold
                 set((state) => ({
                     members: state.members.map((m) =>
                         m.id === memberId
@@ -1206,25 +1280,44 @@ export const useShareholderStore = create<ShareholderState>()(
                 // Price impact (selling signals weakness → negative)
                 const PRICE_IMPACT_SENSITIVITY = 0.05;
                 const currentValuation = useEquityStore.getState().getMarketCap();
-                const impactMultiplier = 1 - (percentAmount / 100 * PRICE_IMPACT_SENSITIVITY);
+                const impactMultiplier = 1 - (percentTraded / 100 * PRICE_IMPACT_SENSITIVITY);
                 const newValuation = currentValuation * impactMultiplier;
                 useEquityStore.getState().syncStockPrice(newValuation);
 
                 console.log('[Share Sale]', {
                     seller: 'Player',
                     buyer: member.name,
-                    amount: `${percentAmount}%`,
+                    shareCount: shareCount.toLocaleString(),
+                    percentOfCompany: `${percentTraded.toFixed(2)}%`,
                     multiplier: priceMultiplier,
                     revenue: finalPrice,
                     trustLoss: -trustLoss,
-                    priceImpact: `${(impactMultiplier - 1) * 100}%`,
+                    priceImpact: `${((impactMultiplier - 1) * 100).toFixed(2)}%`,
                 });
 
                 return {
                     success: true,
-                    message: `Sold ${percentAmount.toFixed(1)}% to ${member.name} for $${finalPrice.toLocaleString()}.`,
-                    sharesSold: percentAmount,
+                    message: `Sold ${shareCount.toLocaleString()} shares to ${member.name} for $${finalPrice.toLocaleString()}.`,
+                    sharesSold: shareCount,
                 };
+            },
+
+            /**
+             * Get player's ownership percentage
+             */
+            getPlayerOwnershipPercent: () => {
+                const { playerShareCount, totalShares } = get();
+                return (playerShareCount / totalShares) * 100;
+            },
+
+            /**
+             * Get a member's ownership percentage
+             */
+            getMemberOwnershipPercent: (memberId: string) => {
+                const { members, totalShares } = get();
+                const member = members.find(m => m.id === memberId);
+                if (!member) return 0;
+                return (member.shareCount / totalShares) * 100;
             },
 
         }),
