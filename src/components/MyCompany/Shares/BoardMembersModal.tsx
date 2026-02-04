@@ -10,14 +10,16 @@ interface Props {
 }
 
 const BoardMembersModal = ({ visible, onClose }: Props) => {
-    const { members, playerShares, boardMood } = useShareholderStore();
+    const { members, playerShareCount, totalShares, boardMood } = useShareholderStore();
 
     // Profile modal state
     const [selectedMember, setSelectedMember] = useState<BoardMember | null>(null);
     const [isProfileVisible, setProfileVisible] = useState(false);
 
     // Calculate total opposition shares
-    const oppositionShares = members.reduce((sum, member) => sum + member.shares, 0);
+    const oppositionSharesCount = members.reduce((sum, member) => sum + member.shareCount, 0);
+    const oppositionSharesPercent = (oppositionSharesCount / totalShares) * 100;
+    const playerSharesPercent = (playerShareCount / totalShares) * 100;
 
     // Get mood icon and label
     const getMoodDisplay = () => {
@@ -80,8 +82,8 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                             style={[
                                 styles.powerBarYou,
                                 {
-                                    width: `${playerShares}%`,
-                                    backgroundColor: playerShares >= 50 ? '#FFD700' : '#90EE90',
+                                    width: `${playerSharesPercent}%`,
+                                    backgroundColor: playerSharesPercent >= 50 ? '#FFD700' : '#90EE90',
                                 }
                             ]}
                         />
@@ -89,15 +91,15 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                             style={[
                                 styles.powerBarOpposition,
                                 {
-                                    width: `${oppositionShares}%`,
-                                    backgroundColor: oppositionShares >= 50 ? '#FF3B30' : '#8A9BA8',
+                                    width: `${oppositionSharesPercent}%`,
+                                    backgroundColor: oppositionSharesPercent >= 50 ? '#FF3B30' : '#8A9BA8',
                                 }
                             ]}
                         />
                     </View>
                     <View style={styles.powerValues}>
-                        <Text style={styles.powerValueYou}>{playerShares.toFixed(1)}%</Text>
-                        <Text style={styles.powerValueOpposition}>{oppositionShares.toFixed(1)}%</Text>
+                        <Text style={styles.powerValueYou}>{playerSharesPercent.toFixed(1)}%</Text>
+                        <Text style={styles.powerValueOpposition}>{oppositionSharesPercent.toFixed(1)}%</Text>
                     </View>
 
                     {/* Mood Indicator */}
@@ -135,7 +137,7 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                                             {member.name}
                                         </Text>
                                         <Text style={styles.memberShares}>
-                                            {member.shares.toFixed(1)}%
+                                            {((member.shareCount / totalShares) * 100).toFixed(1)}%
                                         </Text>
                                     </View>
                                     {member.isHostile && (
