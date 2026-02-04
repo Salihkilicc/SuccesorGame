@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
+import ShareholderProfileModal from './ShareholderProfileModal';
 
 interface Props {
     visible: boolean;
@@ -10,6 +11,10 @@ interface Props {
 
 const BoardMembersModal = ({ visible, onClose }: Props) => {
     const { members, playerShares, boardMood } = useShareholderStore();
+
+    // Profile modal state
+    const [selectedMember, setSelectedMember] = useState<BoardMember | null>(null);
+    const [isProfileVisible, setProfileVisible] = useState(false);
 
     // Calculate total opposition shares
     const oppositionShares = members.reduce((sum, member) => sum + member.shares, 0);
@@ -109,7 +114,15 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                     <Text style={styles.sectionTitle}>THE TABLE</Text>
                     <View style={styles.membersGrid}>
                         {members.map((member) => (
-                            <View key={member.id} style={styles.memberCard}>
+                            <TouchableOpacity
+                                key={member.id}
+                                style={styles.memberCard}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    setSelectedMember(member);
+                                    setProfileVisible(true);
+                                }}
+                            >
                                 {/* Header */}
                                 <View style={styles.memberHeader}>
                                     <View style={styles.memberAvatar}>
@@ -159,7 +172,7 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                                 <View style={styles.originBadge}>
                                     <Text style={styles.originText}>{member.origin}</Text>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </View>
                 </View>
@@ -195,6 +208,13 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                     </Pressable>
                 </View>
             </ScrollView>
+
+            {/* Shareholder Profile Modal */}
+            <ShareholderProfileModal
+                visible={isProfileVisible}
+                member={selectedMember}
+                onClose={() => setProfileVisible(false)}
+            />
         </GameModal>
     );
 };

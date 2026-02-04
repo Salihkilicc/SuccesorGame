@@ -77,6 +77,11 @@ interface ShareholderState {
     takeSharkLoan: (lenderId: string, amount: number, deadlineTurn: number, addCashFn: (n: number) => void) => { success: boolean; message: string };
     repaySharkLoan: (loanId: string, spendCashFn: (amount: number) => boolean) => { success: boolean; message: string };
     seizeCollateral: (loanId: string, currentStockPrice: number) => SeizureResult | null;
+
+    // Interaction Actions
+    giftMember: (memberId: string, giftType: 'small' | 'large') => { success: boolean; message: string; trustChange: number };
+    askForAdvice: (memberId: string) => { text: string; quality: 'good' | 'bad' | 'neutral' };
+    calculateNegotiationChance: (memberId: string, offerPremium: number) => { success: boolean; reaction: 'insulted' | 'neutral' | 'happy' };
 }
 
 // ============================================================================
@@ -723,6 +728,244 @@ export const useShareholderStore = create<ShareholderState>()(
                 });
 
                 return result;
+            },
+
+            /**
+             * Gift a board member to increase trust.
+             * Small gifts cost $10k and give +5 trust.
+             * Large gifts cost $100k and give +15 trust.
+             */
+            giftMember: (memberId: string, giftType: 'small' | 'large') => {
+                const { members } = get();
+
+                // Find the target member
+                const member = members.find((m) => m.id === memberId);
+
+                if (!member) {
+                    return {
+                        success: false,
+                        message: 'Board member not found.',
+                        trustChange: 0,
+                    };
+                }
+
+                // Determine gift cost and trust increase
+                const giftCost = giftType === 'small' ? 10_000 : 100_000;
+                const trustIncrease = giftType === 'small' ? 5 : 15;
+
+                // Check if player has enough money
+                const { money, spendMoney } = require('../../../core/store/useStatsStore').useStatsStore.getState();
+
+                if (money < giftCost) {
+                    return {
+                        success: false,
+                        message: `Insufficient funds. Need $${giftCost.toLocaleString()}, have $${money.toLocaleString()}.`,
+                        trustChange: 0,
+                    };
+                }
+
+                // Deduct money
+                const paymentSuccess = spendMoney(giftCost);
+
+                if (!paymentSuccess) {
+                    return {
+                        success: false,
+                        message: 'Failed to process payment.',
+                        trustChange: 0,
+                    };
+                }
+
+                // Update member trust
+                const updatedMembers = members.map((m) => {
+                    if (m.id === memberId) {
+                        const newTrust = Math.min(100, m.trust + trustIncrease);
+                        return {
+                            ...m,
+                            trust: newTrust,
+                            isHostile: newTrust < 20, // Clear hostile flag if trust improves
+                        };
+                    }
+                    return m;
+                });
+
+                set({ members: updatedMembers });
+                get().recalculateBoardMood();
+
+                const giftName = giftType === 'small' ? 'Small Gift' : 'Large Gift';
+
+                console.log('[Shareholder Store] Gift Sent:', {
+                    member: member.name,
+                    giftType,
+                    cost: giftCost,
+                    trustIncrease,
+                    newTrust: Math.min(100, member.trust + trustIncrease),
+                });
+
+                return {
+                    success: true,
+                    message: `${giftName} sent to ${member.name}. Trust increased by ${trustIncrease}.`,
+                    trustChange: trustIncrease,
+                };
+            },
+
+            /**
+             * Ask a board member for advice.
+             * Quality and content depend on trust level and personality trait.
+             */
+            askForAdvice: (memberId: string) => {
+                const { members } = get();
+
+                // Find the target member
+                const member = members.find((m) => m.id === memberId);
+
+                if (!member) {
+                    return {
+                        text: 'Member not found.',
+                        quality: 'bad' as const,
+                    };
+                }
+
+                // ============================================================
+                // LOW TRUST (< 30): Dismissive/Hostile
+                // ============================================================
+                if (member.trust < 30) {
+                    const dismissiveResponses = [
+                        "I'm too busy for your questions.",
+                        'Figure it out yourself.',
+                        "Why should I help you? You've lost my trust.",
+                        'Ask someone who cares.',
+                        "I have nothing to say to you.",
+                    ];
+                    const randomIndex = Math.floor(Math.random() * dismissiveResponses.length);
+                    return {
+                        text: dismissiveResponses[randomIndex],
+                        quality: 'bad' as const,
+                    };
+                }
+
+                // ============================================================
+                // MID TRUST (30-70): Generic Advice
+                // ============================================================
+                if (member.trust >= 30 && member.trust <= 70) {
+                    const genericAdvice = [
+                        'Market looks volatile, keep some cash on hand.',
+                        'Diversify your portfolio to reduce risk.',
+                        'Watch the quarterly reports closely.',
+                        'Consider hedging against market downturns.',
+                        'Keep an eye on competitor movements.',
+                    ];
+                    const randomIndex = Math.floor(Math.random() * genericAdvice.length);
+                    return {
+                        text: genericAdvice[randomIndex],
+                        quality: 'neutral' as const,
+                    };
+                }
+
+                // ============================================================
+                // HIGH TRUST (> 70): Trait-Specific Strategic Advice
+                // ============================================================
+                let adviceText = '';
+
+                switch (member.trait) {
+                    case 'Shark':
+                        adviceText = 'Acquire competitors now while they are weak. Strike fast and consolidate power.';
+                        break;
+                    case 'Conservative':
+                        adviceText = 'Focus on steady dividends and build cash reserves. Stability wins in the long run.';
+                        break;
+                    case 'Aggressive':
+                        adviceText = 'Double down on expansion. Strike while the iron is hot and dominate the market.';
+                        break;
+                    case 'Visionary':
+                        adviceText = 'Invest heavily in R&D now. Future technology will dominate the next decade.';
+                        break;
+                    case 'Snake':
+                        adviceText = 'Watch your back. Someone on this board is plotting against you. Trust no one.';
+                        break;
+                    case 'Loyalist':
+                        adviceText = "I'll support whatever you decide. You have my complete trust and loyalty.";
+                        break;
+                    default:
+                        adviceText = 'Stay the course and trust your instincts.';
+                }
+
+                console.log('[Shareholder Store] Advice Given:', {
+                    member: member.name,
+                    trait: member.trait,
+                    trust: member.trust,
+                    advice: adviceText,
+                });
+
+                return {
+                    text: adviceText,
+                    quality: 'good' as const,
+                };
+            },
+
+            /**
+             * Calculate negotiation success chance for share buyout.
+             * Based on trust level and offer premium.
+             */
+            calculateNegotiationChance: (memberId: string, offerPremium: number) => {
+                const { members } = get();
+
+                // Find the target member
+                const member = members.find((m) => m.id === memberId);
+
+                if (!member) {
+                    return {
+                        success: false,
+                        reaction: 'insulted' as const,
+                    };
+                }
+
+                // ============================================================
+                // CALCULATE SUCCESS CHANCE
+                // ============================================================
+
+                let chance = member.trust; // Base chance = trust level (0-100)
+                let reaction: 'insulted' | 'neutral' | 'happy' = 'neutral';
+
+                // Negative premium = Insulting offer
+                if (offerPremium < 0) {
+                    chance = 0;
+                    reaction = 'insulted';
+                }
+                // Premium 0-20% = Neutral
+                else if (offerPremium >= 0 && offerPremium <= 20) {
+                    reaction = 'neutral';
+                    // Chance stays at base (trust level)
+                }
+                // Premium > 20% = Happy (generous offer)
+                else if (offerPremium > 20) {
+                    chance = Math.min(100, chance + 30); // +30% bonus
+                    reaction = 'happy';
+                }
+
+                // Clamp chance to 0-100
+                chance = Math.max(0, Math.min(100, chance));
+
+                // ============================================================
+                // RANDOM ROLL
+                // ============================================================
+
+                const roll = Math.random() * 100;
+                const success = roll <= chance;
+
+                console.log('[Shareholder Store] Negotiation Calculation:', {
+                    member: member.name,
+                    trust: member.trust,
+                    offerPremium: `${offerPremium}%`,
+                    chance: `${chance.toFixed(1)}%`,
+                    roll: roll.toFixed(1),
+                    success,
+                    reaction,
+                });
+
+                return {
+                    success,
+                    reaction,
+                };
             },
 
         }),
