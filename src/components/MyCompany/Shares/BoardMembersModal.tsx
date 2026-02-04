@@ -66,6 +66,13 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
         <GameModal visible={visible} onClose={onClose}>
             {/* Header */}
             <View style={styles.header}>
+                <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={onClose}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                    <Text style={styles.closeButtonText}>✕</Text>
+                </TouchableOpacity>
                 <Text style={styles.headerTitle}>BOARD CONTROL</Text>
                 <Text style={styles.headerSubtitle}>Power Dynamics</Text>
             </View>
@@ -230,6 +237,19 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
         borderBottomWidth: 2,
         borderBottomColor: '#2A2D35',
+        position: 'relative', // Enable absolute positioning for children
+    },
+    closeButton: {
+        position: 'absolute',
+        left: 0,
+        top: 4, // Align with title
+        zIndex: 10,
+        padding: 4,
+    },
+    closeButtonText: {
+        fontSize: 20,
+        color: '#8A9BA8',
+        fontWeight: '700',
     },
     headerTitle: {
         fontSize: 24,
