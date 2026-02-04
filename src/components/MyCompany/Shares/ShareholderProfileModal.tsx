@@ -22,6 +22,7 @@ interface ShareholderProfileModalProps {
 
 type TabType = 'relations' | 'trade';
 type AnimationStateType = 'idle' | 'loading' | 'success' | 'failure';
+type TradeModeType = 'buy' | 'sell';
 
 const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     visible,
@@ -32,7 +33,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // STATE
     // ============================================================================
     const [activeTab, setActiveTab] = useState<TabType>('relations');
+    const [tradeMode, setTradeMode] = useState<TradeModeType>('buy');
     const [offerPremium, setOfferPremium] = useState(0);
+    const [tradePercent, setTradePercent] = useState(1);
     const [animationState, setAnimationState] = useState<AnimationStateType>('idle');
     const [adviceText, setAdviceText] = useState<string | null>(null);
     const [adviceQuality, setAdviceQuality] = useState<'good' | 'bad' | 'neutral' | null>(null);
@@ -40,7 +43,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
     // STORES
     // ============================================================================
-    const { giftMember, askForAdvice, calculateNegotiationChance } = useShareholderStore();
+    const { giftMember, askForAdvice, calculateNegotiationChance, buySharesFromMember, sellSharesToMember, playerShares } = useShareholderStore();
     const { money } = useStatsStore();
 
     // ============================================================================
@@ -58,7 +61,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         if (visible) {
             // Reset state when modal opens
             setActiveTab('relations');
+            setTradeMode('buy');
             setOfferPremium(0);
+            setTradePercent(1);
             setAnimationState('idle');
             setAdviceText(null);
             setAdviceQuality(null);
@@ -141,8 +146,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
             setTimeout(() => resolve(), 1500);
         });
 
-        // Calculate negotiation result
-        const result = calculateNegotiationChance(member.id, offerPremium);
+        // Execute trade based on mode
+        let result: { success: boolean; message: string };
+
+        if (tradeMode === 'buy') {
+            result = buySharesFromMember(member.id, tradePercent, offerPremium);
+        } else {
+            // For sell mode, convert premium to multiplier
+            const priceMultiplier = 1 + (offerPremium / 100);
+            result = sellSharesToMember(member.id, tradePercent, priceMultiplier);
+        }
 
         // Show result
         setAnimationState(result.success ? 'success' : 'failure');
@@ -163,10 +176,17 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
             }),
         ]).start();
 
+        // Show alert with result message
+        if (!result.success) {
+            Alert.alert(tradeMode === 'buy' ? '❌ Purchase Failed' : '❌ Sale Failed', result.message);
+        }
+
         // Close modal after 2s
         setTimeout(() => {
-            onClose();
             setAnimationState('idle');
+            if (result.success) {
+                onClose();
+            }
         }, 2000);
     };
 
@@ -222,9 +242,14 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     if (!member) return null;
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.container}>
+                    {/* Handle Bar */}
+                    <View style={styles.handleBarContainer}>
+                        <View style={styles.handleBar} />
+                    </View>
+
                     {/* HEADER */}
                     <View style={styles.header}>
                         <View style={styles.avatarContainer}>
@@ -294,7 +319,11 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     </View>
 
                     {/* TAB CONTENT */}
-                    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                    <ScrollView
+                        style={styles.content}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.scrollContent}
+                    >
                         {activeTab === 'relations' ? (
                             <View style={styles.relationsTab}>
                                 {/* Ask for Advice */}
@@ -344,6 +373,68 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             </View>
                         ) : (
                             <View style={styles.tradeTab}>
+                                {/* Mode Switcher */}
+                                <View style={styles.modeSwitcher}>
+                                    <TouchableOpacity
+                                        style={[styles.modeButton, tradeMode === 'buy' && styles.modeButtonBuyActive]}
+                                        onPress={() => {
+                                            setTradeMode('buy');
+                                            setOfferPremium(0);
+                                        }}
+                                    >
+                                        <Text style={[styles.modeButtonText, tradeMode === 'buy' && styles.modeButtonTextActive]}>
+                                            BUY
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.modeButton, tradeMode === 'sell' && styles.modeButtonSellActive]}
+                                        onPress={() => {
+                                            setTradeMode('sell');
+                                            setOfferPremium(0);
+                                        }}
+                                    >
+                                        <Text style={[styles.modeButtonText, tradeMode === 'sell' && styles.modeButtonTextActive]}>
+                                            SELL
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Context Text */}
+                                <Text style={styles.tradeContext}>
+                                    {tradeMode === 'buy' ? 'Buy their shares' : 'Sell your shares to them'}
+                                </Text>
+
+                                {/* Amount Stepper */}
+                                <View style={styles.stepperContainer}>
+                                    <Text style={styles.stepperLabel}>Share Amount</Text>
+                                    <View style={styles.stepperRow}>
+                                        <TouchableOpacity
+                                            style={[styles.stepperButton, tradePercent <= 1 && styles.stepperButtonDisabled]}
+                                            onPress={() => setTradePercent(Math.max(1, tradePercent - 1))}
+                                            disabled={tradePercent <= 1}
+                                        >
+                                            <Text style={styles.stepperButtonText}>−</Text>
+                                        </TouchableOpacity>
+
+                                        <View style={styles.stepperDisplay}>
+                                            <Text style={styles.stepperValue}>
+                                                {tradePercent.toFixed(1)}%
+                                            </Text>
+                                            <Text style={styles.stepperPremium}>
+                                                of company
+                                            </Text>
+                                        </View>
+
+                                        <TouchableOpacity
+                                            style={[styles.stepperButton, tradePercent >= 20 && styles.stepperButtonDisabled]}
+                                            onPress={() => setTradePercent(Math.min(20, tradePercent + 1))}
+                                            disabled={tradePercent >= 20}
+                                        >
+                                            <Text style={styles.stepperButtonText}>+</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
                                 {/* Stepper UI */}
                                 <View style={styles.stepperContainer}>
                                     <Text style={styles.stepperLabel}>Offer Premium</Text>
@@ -396,13 +487,28 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     </View>
                                 </View>
 
+                                {/* Price Display */}
+                                <View style={styles.priceDisplay}>
+                                    <Text style={styles.priceLabel}>
+                                        {tradeMode === 'buy' ? 'You pay:' : 'You receive:'}
+                                    </Text>
+                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#30D158' }]}>
+                                        ${calculateOfferPrice().toLocaleString()}
+                                    </Text>
+                                </View>
+
                                 {/* Make Offer Button */}
                                 <TouchableOpacity
-                                    style={[styles.makeOfferButton, { backgroundColor: getReactionColor() }]}
+                                    style={[
+                                        styles.makeOfferButton,
+                                        { backgroundColor: tradeMode === 'buy' ? '#30D158' : '#FF453A' }
+                                    ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
                                 >
-                                    <Text style={styles.makeOfferButtonText}>Make Offer</Text>
+                                    <Text style={styles.makeOfferButtonText}>
+                                        {tradeMode === 'buy' ? 'MAKE OFFER' : 'DUMP SHARES'}
+                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         )}
@@ -423,19 +529,25 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         {animationState === 'loading' && (
                             <View style={styles.animationContent}>
                                 <ActivityIndicator size="large" color="#0A84FF" />
-                                <Text style={styles.animationText}>Negotiating...</Text>
+                                <Text style={styles.animationText}>
+                                    {tradeMode === 'buy' ? 'Negotiating...' : 'Processing...'}
+                                </Text>
                             </View>
                         )}
                         {animationState === 'success' && (
                             <View style={styles.animationContent}>
                                 <Text style={styles.animationIcon}>✅</Text>
-                                <Text style={styles.animationText}>OFFER ACCEPTED</Text>
+                                <Text style={styles.animationText}>
+                                    {tradeMode === 'buy' ? 'OFFER ACCEPTED' : 'SHARES SOLD'}
+                                </Text>
                             </View>
                         )}
                         {animationState === 'failure' && (
                             <View style={styles.animationContent}>
                                 <Text style={styles.animationIcon}>❌</Text>
-                                <Text style={styles.animationText}>OFFER REJECTED</Text>
+                                <Text style={styles.animationText}>
+                                    {tradeMode === 'buy' ? 'OFFER REJECTED' : 'SALE REJECTED'}
+                                </Text>
                             </View>
                         )}
                     </Animated.View>
@@ -454,24 +566,35 @@ export default ShareholderProfileModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        justifyContent: 'flex-end',
     },
     container: {
         width: '100%',
-        maxWidth: 500,
-        maxHeight: '90%',
+        height: '85%',
         backgroundColor: '#1C1C1E',
-        borderRadius: 24,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
         borderWidth: 1,
         borderColor: '#333',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.8,
-        shadowRadius: 20,
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 16,
         elevation: 20,
+        overflow: 'hidden',
+    },
+    handleBarContainer: {
+        width: '100%',
+        alignItems: 'center',
+        paddingTop: 12,
+        paddingBottom: 4,
+    },
+    handleBar: {
+        width: 48,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#444',
     },
     header: {
         padding: 24,
@@ -480,7 +603,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatarContainer: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     avatar: {
         width: 80,
@@ -488,37 +611,39 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: '#333',
     },
     avatarText: {
-        fontSize: 36,
+        fontSize: 40,
         fontWeight: '800',
         color: '#FFFFFF',
     },
     memberName: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '800',
         color: '#FFFFFF',
         marginBottom: 8,
+        letterSpacing: 0.5,
     },
     traitBadge: {
         backgroundColor: '#2C2C2E',
         paddingHorizontal: 16,
-        paddingVertical: 6,
-        borderRadius: 12,
+        paddingVertical: 8,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: '#444',
-        marginBottom: 16,
+        marginBottom: 20,
     },
     traitText: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#E5E5EA',
     },
     trustContainer: {
         width: '100%',
         marginTop: 8,
+        paddingHorizontal: 20,
     },
     trustLabelRow: {
         flexDirection: 'row',
@@ -526,35 +651,35 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     trustLabel: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '600',
         color: '#8E8E93',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        letterSpacing: 1,
     },
     trustValue: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '700',
         color: '#FFFFFF',
     },
     trustBarBg: {
         width: '100%',
-        height: 8,
+        height: 10,
         backgroundColor: '#2C2C2E',
-        borderRadius: 4,
+        borderRadius: 5,
         overflow: 'hidden',
     },
     trustBarFill: {
         height: '100%',
-        borderRadius: 4,
+        borderRadius: 5,
     },
     closeButton: {
         position: 'absolute',
         top: 16,
-        right: 16,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        right: 24,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#2C2C2E',
         alignItems: 'center',
         justifyContent: 'center',
@@ -562,19 +687,19 @@ const styles = StyleSheet.create({
         borderColor: '#444',
     },
     closeButtonText: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#FFFFFF',
-        fontWeight: '600',
+        fontWeight: 'bold',
     },
     tabSwitcher: {
         flexDirection: 'row',
-        padding: 16,
-        gap: 12,
+        padding: 20,
+        gap: 16,
     },
     tab: {
         flex: 1,
-        paddingVertical: 12,
-        borderRadius: 12,
+        paddingVertical: 14,
+        borderRadius: 14,
         backgroundColor: '#2C2C2E',
         alignItems: 'center',
         borderWidth: 1,
@@ -585,7 +710,7 @@ const styles = StyleSheet.create({
         borderColor: '#0A84FF',
     },
     tabText: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '700',
         color: '#8E8E93',
     },
@@ -594,61 +719,64 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        padding: 16,
+    },
+    scrollContent: {
+        padding: 24,
+        paddingBottom: 60, // Extra padding at bottom so content isn't cut off
     },
     relationsTab: {
-        gap: 12,
+        gap: 16,
     },
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#2C2C2E',
-        padding: 16,
-        borderRadius: 16,
+        padding: 20,
+        borderRadius: 20,
         borderWidth: 1,
         borderColor: '#444',
-        gap: 12,
+        gap: 16,
     },
     actionButtonIcon: {
-        fontSize: 28,
+        fontSize: 32,
     },
     actionButtonContent: {
         flex: 1,
     },
     actionButtonText: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '700',
         color: '#FFFFFF',
+        marginBottom: 4,
     },
     actionButtonSubtext: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#8E8E93',
-        marginTop: 2,
     },
     adviceBubble: {
-        padding: 16,
-        borderRadius: 16,
+        padding: 20,
+        borderRadius: 20,
         borderWidth: 2,
         marginTop: 8,
     },
     adviceText: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#FFFFFF',
-        lineHeight: 20,
+        lineHeight: 24,
         fontStyle: 'italic',
     },
     tradeTab: {
-        gap: 20,
+        gap: 32,
     },
     stepperContainer: {
-        gap: 12,
+        gap: 16,
     },
     stepperLabel: {
         fontSize: 14,
         fontWeight: '600',
         color: '#8E8E93',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        letterSpacing: 1,
     },
     stepperRow: {
         flexDirection: 'row',
@@ -656,9 +784,9 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     stepperButton: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         backgroundColor: '#0A84FF',
         alignItems: 'center',
         justifyContent: 'center',
@@ -671,69 +799,75 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     stepperButtonText: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '700',
         color: '#FFFFFF',
     },
     stepperDisplay: {
         flex: 1,
+        height: 56,
         backgroundColor: '#2C2C2E',
-        padding: 16,
         borderRadius: 16,
         borderWidth: 1,
         borderColor: '#444',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     stepperValue: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: '800',
         color: '#FFFFFF',
     },
     stepperPremium: {
-        fontSize: 14,
+        fontSize: 12,
         color: '#8E8E93',
-        marginTop: 4,
+        marginTop: 2,
     },
     reactionContainer: {
-        gap: 8,
+        gap: 12,
     },
     reactionLabelRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     reactionLabel: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '600',
         color: '#FFFFFF',
     },
     reactionChance: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '700',
         color: '#FFD700',
     },
     reactionBarBg: {
         width: '100%',
-        height: 12,
+        height: 16,
         backgroundColor: '#2C2C2E',
-        borderRadius: 6,
+        borderRadius: 8,
         overflow: 'hidden',
     },
     reactionBarFill: {
         height: '100%',
-        borderRadius: 6,
+        borderRadius: 8,
     },
     makeOfferButton: {
-        paddingVertical: 16,
-        borderRadius: 16,
+        paddingVertical: 20,
+        borderRadius: 20,
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
     },
     makeOfferButtonText: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 1.5,
     },
     animationOverlay: {
         position: 'absolute',
@@ -744,18 +878,81 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.95)',
         alignItems: 'center',
         justifyContent: 'center',
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
     },
     animationContent: {
         alignItems: 'center',
-        gap: 16,
+        gap: 24,
     },
     animationIcon: {
-        fontSize: 80,
+        fontSize: 96,
     },
     animationText: {
-        fontSize: 24,
-        fontWeight: '800',
+        fontSize: 28,
+        fontWeight: '900',
         color: '#FFFFFF',
         letterSpacing: 2,
+        textAlign: 'center',
+    },
+    // Mode Switcher Styles
+    modeSwitcher: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 20,
+    },
+    modeButton: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 14,
+        backgroundColor: '#2C2C2E',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#333',
+    },
+    modeButtonBuyActive: {
+        backgroundColor: 'rgba(48, 209, 88, 0.2)',
+        borderColor: '#30D158',
+    },
+    modeButtonSellActive: {
+        backgroundColor: 'rgba(255, 69, 58, 0.2)',
+        borderColor: '#FF453A',
+    },
+    modeButtonText: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#8E8E93',
+        letterSpacing: 1,
+    },
+    modeButtonTextActive: {
+        color: '#FFFFFF',
+    },
+    tradeContext: {
+        fontSize: 14,
+        color: '#8E8E93',
+        textAlign: 'center',
+        marginBottom: 20,
+        fontStyle: 'italic',
+    },
+    priceDisplay: {
+        backgroundColor: '#2C2C2E',
+        padding: 20,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#444',
+        marginBottom: 20,
+        alignItems: 'center',
+    },
+    priceLabel: {
+        fontSize: 14,
+        color: '#8E8E93',
+        marginBottom: 8,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    priceValue: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#0A84FF',
     },
 });

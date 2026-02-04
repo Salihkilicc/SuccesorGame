@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
+import { useEquityStore } from '../../finance/stores/useEquityStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 
 
@@ -82,6 +84,10 @@ interface ShareholderState {
     giftMember: (memberId: string, giftType: 'small' | 'large') => { success: boolean; message: string; trustChange: number };
     askForAdvice: (memberId: string) => { text: string; quality: 'good' | 'bad' | 'neutral' };
     calculateNegotiationChance: (memberId: string, offerPremium: number) => { success: boolean; reaction: 'insulted' | 'neutral' | 'happy' };
+
+    // Trading Actions
+    buySharesFromMember: (memberId: string, percentAmount: number, offerPremium: number) => { success: boolean; message: string; sharesBought: number };
+    sellSharesToMember: (memberId: string, percentAmount: number, priceMultiplier: number) => { success: boolean; message: string; sharesSold: number };
 }
 
 // ============================================================================
@@ -965,6 +971,259 @@ export const useShareholderStore = create<ShareholderState>()(
                 return {
                     success,
                     reaction,
+                };
+            },
+
+            /**
+             * Buy shares from a board member.
+             * Includes negotiation, cash transfer, and positive price impact.
+             */
+            buySharesFromMember: (memberId: string, percentAmount: number, offerPremium: number) => {
+                const { members, playerShares, totalSharesCount } = get();
+
+                // Find the target member
+                const member = members.find((m) => m.id === memberId);
+
+                if (!member) {
+                    return {
+                        success: false,
+                        message: 'Member not found.',
+                        sharesBought: 0,
+                    };
+                }
+
+                // Validation: Member must have enough shares
+                if (member.shares < percentAmount) {
+                    return {
+                        success: false,
+                        message: `${member.name} only owns ${member.shares.toFixed(1)}% of shares.`,
+                        sharesBought: 0,
+                    };
+                }
+
+                // Calculate price
+                const stockPrice = useEquityStore.getState().stockPrice;
+                const sharesToBuy = (percentAmount / 100) * totalSharesCount;
+                const basePrice = stockPrice * sharesToBuy;
+                const premiumMultiplier = 1 + (offerPremium / 100);
+                const finalPrice = basePrice * premiumMultiplier;
+
+                // Check if player has enough cash
+                const { money, spendMoney } = useStatsStore.getState();
+                if (money < finalPrice) {
+                    return {
+                        success: false,
+                        message: `Insufficient funds. Need $${finalPrice.toLocaleString()} but only have $${money.toLocaleString()}.`,
+                        sharesBought: 0,
+                    };
+                }
+
+                // Negotiation check
+                const negotiationResult = get().calculateNegotiationChance(memberId, offerPremium);
+                if (!negotiationResult.success) {
+                    return {
+                        success: false,
+                        message: `${member.name} rejected your offer. They seem ${negotiationResult.reaction}.`,
+                        sharesBought: 0,
+                    };
+                }
+
+                // Execute transaction
+                spendMoney(finalPrice);
+
+                // Transfer shares
+                set((state) => ({
+                    members: state.members.map((m) =>
+                        m.id === memberId
+                            ? { ...m, shares: m.shares - percentAmount }
+                            : m
+                    ),
+                    playerShares: state.playerShares + percentAmount,
+                }));
+
+                // Trust impact (slight decrease if premium < 10%)
+                if (offerPremium < 10) {
+                    set((state) => ({
+                        members: state.members.map((m) =>
+                            m.id === memberId
+                                ? {
+                                    ...m,
+                                    trust: Math.max(0, m.trust - 5),
+                                    isHostile: m.trust - 5 < 20,
+                                }
+                                : m
+                        ),
+                    }));
+                }
+
+                // Recalculate board mood
+                get().recalculateBoardMood();
+
+                // Price impact (buying consolidates control → positive)
+                const PRICE_IMPACT_SENSITIVITY = 0.05;
+                const currentValuation = useEquityStore.getState().getMarketCap();
+                const impactMultiplier = 1 + (percentAmount / 100 * PRICE_IMPACT_SENSITIVITY);
+                const newValuation = currentValuation * impactMultiplier;
+                useEquityStore.getState().syncStockPrice(newValuation);
+
+                console.log('[Share Purchase]', {
+                    buyer: 'Player',
+                    seller: member.name,
+                    amount: `${percentAmount}%`,
+                    premium: `${offerPremium}%`,
+                    cost: finalPrice,
+                    priceImpact: `+${(impactMultiplier - 1) * 100}%`,
+                });
+
+                return {
+                    success: true,
+                    message: `Acquired ${percentAmount.toFixed(1)}% from ${member.name} for $${finalPrice.toLocaleString()}.`,
+                    sharesBought: percentAmount,
+                };
+            },
+
+            /**
+             * Sell shares to a board member.
+             * Trait-based willingness, trust loss, and negative price impact.
+             */
+            sellSharesToMember: (memberId: string, percentAmount: number, priceMultiplier: number) => {
+                const { members, playerShares, totalSharesCount } = get();
+
+                // Find the target member
+                const member = members.find((m) => m.id === memberId);
+
+                if (!member) {
+                    return {
+                        success: false,
+                        message: 'Member not found.',
+                        sharesSold: 0,
+                    };
+                }
+
+                // Validation: Player must keep minimum 10% ownership
+                if (playerShares - percentAmount < 10) {
+                    return {
+                        success: false,
+                        message: 'Cannot sell below 10% ownership. You must maintain control.',
+                        sharesSold: 0,
+                    };
+                }
+
+                // Validation: Maximum 20% per transaction
+                if (percentAmount > 20) {
+                    return {
+                        success: false,
+                        message: 'Cannot sell more than 20% in a single transaction.',
+                        sharesSold: 0,
+                    };
+                }
+
+                // Check trait-based willingness
+                const isWillingToBuy = (() => {
+                    switch (member.trait) {
+                        case 'Shark':
+                            // Loves discounts, hates premiums
+                            return priceMultiplier <= 0.95;
+
+                        case 'Loyalist':
+                            // Helps player, accepts fair price
+                            return priceMultiplier <= 1.05 && member.trust >= 50;
+
+                        case 'Conservative':
+                            // Only buys at deep discount
+                            return priceMultiplier <= 0.80;
+
+                        case 'Visionary':
+                            // Buys if they believe in growth
+                            return priceMultiplier <= 1.0 && member.trust >= 60;
+
+                        case 'Aggressive':
+                            // Opportunistic, buys at discount
+                            return priceMultiplier <= 0.90;
+
+                        case 'Snake':
+                            // Only buys if they see weakness
+                            return priceMultiplier <= 0.85 && playerShares < 40;
+
+                        default:
+                            return false;
+                    }
+                })();
+
+                if (!isWillingToBuy) {
+                    const reasons: Record<TraitType, string> = {
+                        Shark: 'They want a better discount.',
+                        Loyalist: 'They need more trust or a fairer price.',
+                        Conservative: 'They demand a deep discount.',
+                        Visionary: 'They need more trust or a discount.',
+                        Aggressive: 'They want a discount.',
+                        Snake: 'They sense you\'re not desperate enough.',
+                    };
+
+                    return {
+                        success: false,
+                        message: `${member.name} refuses. ${reasons[member.trait]}`,
+                        sharesSold: 0,
+                    };
+                }
+
+                // Calculate price
+                const stockPrice = useEquityStore.getState().stockPrice;
+                const sharesToSell = (percentAmount / 100) * totalSharesCount;
+                const basePrice = stockPrice * sharesToSell;
+                const finalPrice = basePrice * priceMultiplier;
+
+                // Execute transaction
+                useStatsStore.getState().earnMoney(finalPrice);
+
+                // Transfer shares
+                set((state) => ({
+                    members: state.members.map((m) =>
+                        m.id === memberId
+                            ? { ...m, shares: m.shares + percentAmount }
+                            : m
+                    ),
+                    playerShares: state.playerShares - percentAmount,
+                }));
+
+                // Trust impact (selling seen as abandoning ship)
+                const trustLoss = Math.floor(percentAmount * 2); // 2 trust per 1% sold
+                set((state) => ({
+                    members: state.members.map((m) =>
+                        m.id === memberId
+                            ? {
+                                ...m,
+                                trust: Math.max(0, m.trust - trustLoss),
+                                isHostile: m.trust - trustLoss < 20,
+                            }
+                            : m
+                    ),
+                }));
+
+                // Recalculate board mood
+                get().recalculateBoardMood();
+
+                // Price impact (selling signals weakness → negative)
+                const PRICE_IMPACT_SENSITIVITY = 0.05;
+                const currentValuation = useEquityStore.getState().getMarketCap();
+                const impactMultiplier = 1 - (percentAmount / 100 * PRICE_IMPACT_SENSITIVITY);
+                const newValuation = currentValuation * impactMultiplier;
+                useEquityStore.getState().syncStockPrice(newValuation);
+
+                console.log('[Share Sale]', {
+                    seller: 'Player',
+                    buyer: member.name,
+                    amount: `${percentAmount}%`,
+                    multiplier: priceMultiplier,
+                    revenue: finalPrice,
+                    trustLoss: -trustLoss,
+                    priceImpact: `${(impactMultiplier - 1) * 100}%`,
+                });
+
+                return {
+                    success: true,
+                    message: `Sold ${percentAmount.toFixed(1)}% to ${member.name} for $${finalPrice.toLocaleString()}.`,
+                    sharesSold: percentAmount,
                 };
             },
 
