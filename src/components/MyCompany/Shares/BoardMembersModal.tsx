@@ -202,19 +202,7 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                         <Text style={styles.actionButtonText}>⚖️ CALL EMERGENCY VOTE</Text>
                     </Pressable>
 
-                    <Pressable
-                        style={({ pressed }) => [
-                            styles.actionButton,
-                            styles.directiveButton,
-                            pressed && styles.actionButtonPressed
-                        ]}
-                        onPress={() => {
-                            // TODO: Implement directive modal
-                            console.log('Issue Directive');
-                        }}
-                    >
-                        <Text style={styles.actionButtonText}>📋 ISSUE DIRECTIVE</Text>
-                    </Pressable>
+
                 </View>
             </ScrollView>
 
