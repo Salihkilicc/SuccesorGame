@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 
 // Veri Tipi
 export interface FinancialData {
@@ -46,6 +47,16 @@ type Props = {
 };
 
 const QuarterlyReportModal = ({ visible, onClose, reportData }: Props) => {
+  const { evaluateSubsidiaries } = useCorporateFinanceStore();
+
+  // Trigger Simulation on Quarter End (when modal opens)
+  React.useEffect(() => {
+    if (visible) {
+      console.log('[QuarterlyReport] Triggering Subsidiary Evaluation...');
+      evaluateSubsidiaries();
+    }
+  }, [visible, evaluateSubsidiaries]);
+
   // --- GÜVENLİK ---
   // Veri null gelse bile boş bir obje ver ki patlamasın.
   const data = reportData || {};

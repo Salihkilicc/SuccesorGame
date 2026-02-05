@@ -6,12 +6,12 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 
 /**
  * CORPORATE FINANCE STORE
- * Premium Private Banking System
  * Manages Debt, Credit Score, Leverage, and Subsidiaries
+ * Implements the Subsidiary System with Probability Growth Logic
  */
 
 // 1. Setup MMKV Storage
-export const storage = new MMKV({ id: 'finance-storage' });
+export const storage = new MMKV({ id: 'subsidiary-storage' });
 
 const zustandStorage: StateStorage = {
     setItem: (name, value) => {
@@ -26,6 +26,7 @@ const zustandStorage: StateStorage = {
     },
 };
 
+// 2. Define Interfaces
 export interface Loan {
     id: string;
     principal: number;
@@ -36,23 +37,23 @@ export interface Loan {
     originationDate: number;
 }
 
-// 2. Define Interfaces
 export interface SubsidiaryStrategy {
-    marketing: number;  // 0-10
-    rnd: number;        // 0-10
-    production: number; // 0-10
-    workforce: number;  // 0-10
-    // Constraint: Sum must be <= 10
+    marketing: number;
+    rnd: number;
+    production: number;
+    workforce: number;
+    // Constraint: Sum <= 10
 }
 
 export interface Subsidiary {
     id: string;
     name: string;
     sector: string;
-    valuation: number;      // Current Valuation
-    acquiredAt: number;     // Purchase Price
+    valuation: number;
+    acquiredAt: number;
     strategy: SubsidiaryStrategy;
-    history: number[];      // Last 4 quarters % change
+    lastChangePercent: number; // For UI display (e.g. +12.5%)
+    history: number[];
 }
 
 export interface CorporateFinanceState {
@@ -88,7 +89,7 @@ export interface CorporateFinanceState {
     acquireCompany: (company: any, price: number) => void;
     sellSubsidiary: (id: string) => void;
     updateSubsidiaryStrategy: (id: string, newStrategy: SubsidiaryStrategy) => void;
-    evaluateSubsidiaries: (marketEvents: string[]) => void;
+    evaluateSubsidiaries: () => void;
 
     // Capital Injection
     injectCapital: (amount: number) => { success: boolean; msg: string };
@@ -107,32 +108,26 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             totalDebt: 0,
             subsidiaries: [],
 
-            // 1. CREDIT SCORE ALGORITHM
+            // --- CREDIT SCORE & LOAN LOGIC (PRESERVED) ---
+
             refreshCreditScore: (valuation, cash) => {
                 const { totalDebt } = get();
-
                 // Base Score: 600
                 let score = 600;
-
                 // Valuation Bonus: +5 per $1M
                 score += (valuation / 1_000_000) * 5;
-
                 // Debt-to-Cash Penalty: -50 per ratio point
                 if (cash > 0) {
                     const debtToCash = totalDebt / cash;
                     score -= debtToCash * 50;
                 }
-
                 // Clamp between 300-850
                 score = Math.max(300, Math.min(850, score));
-
                 set({ creditScore: Math.round(score) });
             },
 
-            // 2. GET INTEREST RATE BASED ON SCORE
             getInterestRate: () => {
                 const { creditScore } = get();
-
                 if (creditScore >= 800) return 0.03; // 3%
                 if (creditScore >= 700) return 0.05; // 5%
                 if (creditScore >= 600) return 0.08; // 8%
@@ -140,7 +135,6 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 return 0.15; // 15%
             },
 
-            // 3. TAKE LOAN
             takeLoan: (amount, valuation, loanType, baseRate, addCashFn) => {
                 const { totalDebt, loans, refreshCreditScore } = get();
 
@@ -162,7 +156,6 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) /
                     (Math.pow(1 + monthlyRate, term) - 1);
 
-                // Create Loan Object
                 const newLoan: Loan = {
                     id: `LOAN_${Date.now()}`,
                     principal: amount,
@@ -173,19 +166,15 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     originationDate: Date.now()
                 };
 
-                // Add Cash
                 addCashFn(amount);
 
-                // Update State
                 set({
                     loans: [...loans, newLoan],
                     totalDebt: newDebt
                 });
 
-                // Recalculate Credit Score
-                refreshCreditScore(valuation, 0); // Cash will be updated externally
+                refreshCreditScore(valuation, 0);
 
-                // RISK PENALTY: If leverage > 50%, apply market multiplier penalty
                 if (leverage > RISK_THRESHOLD) {
                     useEquityStore.setState({ marketMultiplier: 0.9 });
                 }
@@ -196,43 +185,34 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 };
             },
 
-            // 4. REPAY LOAN
             repayLoan: (id, amount, spendCashFn) => {
                 const { loans, totalDebt } = get();
-
                 const loan = loans.find(l => l.id === id);
                 if (!loan) {
                     return { success: false, message: 'Loan not found' };
                 }
 
                 const actualPayment = Math.min(amount, loan.remaining);
-
-                // Spend Cash
                 spendCashFn(actualPayment);
 
-                // Update Loan
                 const updatedRemaining = loan.remaining - actualPayment;
 
                 if (updatedRemaining <= 0) {
-                    // Loan fully repaid - remove it
                     set({
                         loans: loans.filter(l => l.id !== id),
                         totalDebt: totalDebt - loan.remaining
                     });
-
                     return {
                         success: true,
                         message: `Loan fully repaid! Credit score boosted.`
                     };
                 } else {
-                    // Partial repayment
                     set({
                         loans: loans.map(l =>
                             l.id === id ? { ...l, remaining: updatedRemaining } : l
                         ),
                         totalDebt: totalDebt - actualPayment
                     });
-
                     return {
                         success: true,
                         message: `Paid $${actualPayment.toLocaleString()}. Remaining: $${updatedRemaining.toLocaleString()}`
@@ -240,57 +220,45 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 }
             },
 
-            // 5. PAY MONTHLY INTERESTS
             payMonthlyInterests: (spendCashFn) => {
                 const { loans } = get();
-
                 const totalPayment = loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
 
                 if (totalPayment > 0) {
                     spendCashFn(totalPayment);
                 }
-
-                return {
-                    totalPayment,
-                    success: true
-                };
+                return { totalPayment, success: true };
             },
 
-            // 6. GET BORROWING CAPACITY
             getBorrowingCapacity: (valuation) => {
                 const { totalDebt } = get();
                 const maxDebt = valuation * MAX_LEVERAGE;
                 return Math.max(0, maxDebt - totalDebt);
             },
 
-            // 7. GET CURRENT LEVERAGE
             getCurrentLeverage: (valuation) => {
                 const { totalDebt } = get();
                 if (valuation === 0) return 0;
                 return (totalDebt / valuation) * 100;
             },
 
-            // 8. GET MONTHLY INTEREST TOTAL
             getMonthlyInterestTotal: () => {
                 const { loans } = get();
                 return loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
             },
 
-            // 9. ACQUIRE COMPANY
+            // --- SUBSIDIARY SYSTEM (NEW LOGIC) ---
+
             acquireCompany: (company, price) => {
-                // Access Company Capital from StatsStore
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
 
-                // Validate Capital
                 if (companyCapital < price) {
                     console.warn('[FinanceStore] Insufficient capital to acquire company');
                     return;
                 }
 
-                // Deduct Capital
                 setCompanyCapital(companyCapital - price);
 
-                // Create Subsidiary Object
                 const newSubsidiary: Subsidiary = {
                     id: company.id || company.symbol || `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                     name: company.name || 'Unknown Subsidiary',
@@ -298,16 +266,15 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     valuation: price,
                     acquiredAt: price,
                     strategy: { marketing: 2, rnd: 3, production: 3, workforce: 2 }, // Default Strategy
+                    lastChangePercent: 0,
                     history: []
                 };
 
-                // Add to State
                 set((state) => ({
                     subsidiaries: [...state.subsidiaries, newSubsidiary]
                 }));
             },
 
-            // 10. SELL SUBSIDIARY
             sellSubsidiary: (id) => {
                 const { subsidiaries } = get();
                 const subsidiary = subsidiaries.find(s => s.id === id);
@@ -317,21 +284,16 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     return;
                 }
 
-                // Add Current Valuation to Company Capital
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
                 setCompanyCapital(companyCapital + subsidiary.valuation);
 
-                // Remove from State
                 set((state) => ({
                     subsidiaries: state.subsidiaries.filter(s => s.id !== id)
                 }));
             },
 
-            // 11. UPDATE STRATEGY
             updateSubsidiaryStrategy: (id, newStrategy) => {
-                // Validate Strategy Sum (Must be <= 10)
                 const sum = newStrategy.marketing + newStrategy.rnd + newStrategy.production + newStrategy.workforce;
-
                 if (sum > 10) {
                     console.warn('[FinanceStore] Strategy sum exceeds 10');
                     return;
@@ -344,59 +306,65 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 }));
             },
 
-            // 12. EVALUATE SUBSIDIARIES (Simulation Engine)
-            evaluateSubsidiaries: (marketEvents) => {
+            evaluateSubsidiaries: () => {
                 const { subsidiaries } = get();
-                // We need to access MarketStore to update public stock prices based on our private performance
-                // Using require to avoid circular dependency issues if any, ensuring loose coupling
-                const marketStore = require('../../../core/store/useMarketStore').useMarketStore.getState();
 
                 const updatedSubsidiaries = subsidiaries.map(sub => {
                     const { strategy, sector } = sub;
 
-                    // 1. Base Change: -2% to +2%
-                    let changePercent = (Math.random() * 0.04) - 0.02;
+                    // 1. Determine Strategy Quality
+                    // Good Criteria
+                    const isTechGood = sector === 'Technology' && strategy.rnd >= 4;
+                    const isIndGood = sector === 'Industrial' && strategy.production >= 4;
+                    const isRetailGood = sector === 'Retail' && strategy.marketing >= 4;
+                    const isFinGood = sector === 'Finance' && strategy.marketing >= 3 && strategy.rnd >= 3;
 
-                    // 2. Strategy vs Events Logic
+                    const meetsGoodCriteria = isTechGood || isIndGood || isRetailGood || isFinGood;
 
-                    // Tech Boom
-                    if (marketEvents.some(e => e.includes('Tech')) && sector === 'Technology' && strategy.rnd > 4) {
-                        changePercent += 0.10; // +10%
+                    // Bad Override
+                    const isWorkforceBad = strategy.workforce < 2;
+
+                    // Final Decision
+                    const isGoodStrategy = meetsGoodCriteria && !isWorkforceBad;
+
+                    // 2. Probability Logic
+                    const roll = Math.random() * 100;
+                    let changePercent = 0;
+
+                    if (isGoodStrategy) {
+                        if (roll < 5) {
+                            // 0-5 (5%): Super Growth (+15% to +20%)
+                            changePercent = (Math.random() * 0.05) + 0.15;
+                        } else if (roll < 65) {
+                            // 5-65 (60%): Steady Growth (+1% to +6%)
+                            changePercent = (Math.random() * 0.05) + 0.01;
+                        } else {
+                            // 65-100 (35%): Minor Drop (0% to -4%)
+                            // Assuming 0 to -4 means change is between -0.04 and 0.
+                            changePercent = -(Math.random() * 0.04);
+                        }
+                    } else {
+                        // BAD STRATEGY (or not good)
+                        if (roll < 8) {
+                            // 0-8 (8%): Crash (-15% to -20%)
+                            changePercent = -((Math.random() * 0.05) + 0.15);
+                        } else if (roll < 60) {
+                            // 8-60 (52%): Decline (0% to -6%)
+                            changePercent = -(Math.random() * 0.06);
+                        } else {
+                            // 60-100 (40%): Stagnation (0% to -2%)
+                            changePercent = -(Math.random() * 0.02);
+                        }
                     }
 
-                    // Recession Defense (Aggressive Marketing)
-                    if (marketEvents.some(e => e.includes('Recession')) && strategy.marketing > 5) {
-                        changePercent += 0.05; // +5%
-                    }
-
-                    // Labor Issues (Low Workforce Score)
-                    if (strategy.workforce < 2) {
-                        changePercent -= 0.05; // -5% Penalty
-                    }
-
-                    // Inefficiency (High Production, Low Marketing - Supply > Demand)
-                    if (strategy.production > 5 && strategy.marketing < 3) {
-                        changePercent -= 0.05; // -5% Penalty
-                    }
-
-                    // 3. Apply Result
+                    // 3. Update Subsidiary
                     const newValuation = sub.valuation * (1 + changePercent);
-
-                    // History Update (Keep last 4)
-                    const newHistory = [changePercent, ...sub.history].slice(0, 4);
-
-                    // 4. Sync Public Market Price
-                    // We calculate the implied price change and push it to MarketStore
-                    // Implied Stock Price = OldStockPrice * (1 + changePercent)
-                    const currentMarketPrice = marketStore.marketPrices[sub.id];
-                    if (currentMarketPrice) {
-                        const newStockPrice = currentMarketPrice * (1 + changePercent);
-                        marketStore.updateStockPrice(sub.id, newStockPrice);
-                    }
+                    const newHistory = [changePercent * 100, ...sub.history].slice(0, 4);
 
                     return {
                         ...sub,
                         valuation: newValuation,
+                        lastChangePercent: changePercent * 100, // Stored as percentage number (e.g. 12.5 for 12.5%)
                         history: newHistory
                     };
                 });
@@ -404,7 +372,8 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 set({ subsidiaries: updatedSubsidiaries });
             },
 
-            // 13. CAPITAL INJECTION
+            // --- CAPITAL INJECTION ---
+
             injectCapital: (amount) => {
                 const { money, subtractMoney, companyCapital, setCompanyCapital } = useStatsStore.getState();
 
@@ -412,7 +381,6 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     return { success: false, msg: 'Insufficient personal funds.' };
                 }
 
-                // Execute Transfer
                 subtractMoney(amount);
                 setCompanyCapital(companyCapital + amount);
 
@@ -432,7 +400,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             }
         }),
         {
-            name: 'finance-storage', // Matches MMKV ID
+            name: 'subsidiary-storage',
             storage: createJSONStorage(() => zustandStorage)
         }
     )

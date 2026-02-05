@@ -1,193 +1,172 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Modal,
-    View,
-    Text,
-    StyleSheet,
-    Pressable,
-    Alert,
-} from 'react-native';
-import { theme } from '../../../core/theme';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { theme } from '../../../core/theme';
 
-interface SubsidiaryDetailModalProps {
+type Props = {
     visible: boolean;
-    onClose: () => void;
     companyId: string | null;
-}
-
-const formatMoney = (value: number) => {
-    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-    return `$${value.toLocaleString()}`;
+    onClose: () => void;
 };
 
-export const SubsidiaryDetailModal = ({ visible, onClose, companyId }: SubsidiaryDetailModalProps) => {
-    const { subsidiaries, updateSubsidiaryStrategy, sellSubsidiary } = useCorporateFinanceStore();
-    const subsidiary = subsidiaries.find(s => s.id === companyId);
+export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) => {
+    const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
 
-    // Fallback strategy to prevent hooks error
-    const defaultStrategy: SubsidiaryStrategy = { marketing: 0, rnd: 0, production: 0, workforce: 0 };
-    const [strategy, setStrategy] = useState<SubsidiaryStrategy>(subsidiary?.strategy || defaultStrategy);
+    // Find the company
+    const company = subsidiaries.find(s => s.id === companyId);
 
-    // Reset local state when subsidiary changes
+    // Local state for strategy editing
+    const [strategy, setStrategy] = useState<SubsidiaryStrategy>({
+        marketing: 0,
+        rnd: 0,
+        production: 0,
+        workforce: 0
+    });
+
+    // Sync state when company changes
     useEffect(() => {
-        if (subsidiary) {
-            setStrategy(subsidiary.strategy);
+        if (company) {
+            setStrategy(company.strategy);
         }
-    }, [subsidiary]);
+    }, [company]);
 
-    // Fallback if not found or no ID
-    if (!subsidiary) return null;
+    if (!company) return null;
 
-    // Calculate Points used
     const totalPoints = strategy.marketing + strategy.rnd + strategy.production + strategy.workforce;
     const maxPoints = 10;
     const remainingPoints = maxPoints - totalPoints;
 
-    // Forecast Text
-    const getForecast = () => {
-        const stats = [
-            { name: 'Market Leader', val: strategy.marketing },
-            { name: 'Innovator', val: strategy.rnd },
-            { name: 'Mass Producer', val: strategy.production },
-            { name: 'Top Employer', val: strategy.workforce },
-        ];
-        // Sort desc
-        stats.sort((a, b) => b.val - a.val);
-
-        if (stats[0].val === stats[1].val) return "Balanced Growth";
-        return `Focus: ${stats[0].name}`;
-    };
-
-    const handleUpdate = (field: keyof SubsidiaryStrategy, delta: number) => {
+    const handleChange = (field: keyof SubsidiaryStrategy, change: number) => {
         const currentValue = strategy[field];
-        const newValue = currentValue + delta;
+        const newValue = currentValue + change;
 
-        // Constraints
-        if (newValue < 0) return; // Cannot go below 0
-        if (newValue > 10) return; // Individual max (logic limit)
-
-        // Check Total Sum constraint ONLY if increasing
-        if (delta > 0 && totalPoints >= maxPoints) return;
+        // Validations
+        if (newValue < 0) return; // Cannot be negative
+        if (change > 0 && totalPoints >= maxPoints) return; // Cannot exceed max 10
 
         setStrategy(prev => ({ ...prev, [field]: newValue }));
     };
 
     const handleSave = () => {
-        updateSubsidiaryStrategy(subsidiary.id, strategy);
-        Alert.alert('Strategy Updated', 'Instructions sent to the board.');
-        onClose();
+        if (companyId) {
+            updateSubsidiaryStrategy(companyId, strategy);
+            onClose();
+        }
     };
 
-    const handleSell = () => {
-        Alert.alert(
-            'Sell Subsidiary?',
-            `Are you sure you want to sell ${subsidiary.name} for ${formatMoney(subsidiary.valuation)}?\n\nThis action is irreversible.`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Sell Company',
-                    style: 'destructive',
-                    onPress: () => {
-                        sellSubsidiary(subsidiary.id);
-                        onClose();
-                    }
-                }
-            ]
-        );
-    };
-
-    const renderStepper = (label: string, field: keyof SubsidiaryStrategy) => {
-        const val = strategy[field];
-        const canInc = totalPoints < maxPoints;
-        const canDec = val > 0;
-
-        return (
-            <View style={styles.stepperRow}>
-                <Text style={styles.stepperLabel}>{label}</Text>
-                <View style={styles.stepperControls}>
-                    <Pressable
-                        style={[styles.stepBtn, !canDec && styles.stepBtnDisabled]}
-                        onPress={() => handleUpdate(field, -1)}
-                        disabled={!canDec}
-                    >
-                        <Text style={styles.stepBtnText}>-</Text>
-                    </Pressable>
-
-                    <Text style={styles.stepValue}>{val}</Text>
-
-                    <Pressable
-                        style={[styles.stepBtn, !canInc && styles.stepBtnDisabled]}
-                        onPress={() => handleUpdate(field, 1)}
-                        disabled={!canInc}
-                    >
-                        <Text style={styles.stepBtnText}>+</Text>
-                    </Pressable>
+    const renderStrategyRow = (label: string, field: keyof SubsidiaryStrategy, icon: string, description: string) => (
+        <View style={styles.strategyRow}>
+            <View style={styles.strategyInfo}>
+                <View style={styles.iconBox}>
+                    <Text style={{ fontSize: 20 }}>{icon}</Text>
+                </View>
+                <View>
+                    <Text style={styles.strategyLabel}>{label}</Text>
+                    <Text style={styles.strategyDesc}>{description}</Text>
                 </View>
             </View>
-        );
-    };
+
+            <View style={styles.controls}>
+                <TouchableOpacity
+                    style={[styles.controlBtn, strategy[field] === 0 && styles.disabledBtn]}
+                    onPress={() => handleChange(field, -1)}
+                    disabled={strategy[field] === 0}
+                >
+                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#555' : '#FFF'} />
+                </TouchableOpacity>
+
+                <View style={styles.valueBox}>
+                    <Text style={styles.valueText}>{strategy[field]}</Text>
+                </View>
+
+                <TouchableOpacity
+                    style={[styles.controlBtn, totalPoints >= maxPoints && styles.disabledBtn]}
+                    onPress={() => handleChange(field, 1)}
+                    disabled={totalPoints >= maxPoints}
+                >
+                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#555' : '#FFF'} />
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+
+    const isPositive = company.lastChangePercent >= 0;
 
     return (
-        <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+        <Modal
+            visible={visible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={onClose}
+        >
             <View style={styles.overlay}>
+                {/* Darkened Background instead of Blur for safety */}
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.85)' }]} />
+
                 <View style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
                         <View>
-                            <Text style={styles.companyName}>{subsidiary.name}</Text>
-                            <View style={styles.valuationBadge}>
-                                <Text style={styles.valuationText}>{formatMoney(subsidiary.valuation)}</Text>
-                                {/* Simple growth indicator based on acquired vs current */}
-                                {subsidiary.valuation >= subsidiary.acquiredAt ? (
-                                    <Text style={styles.growthText}>▲</Text>
-                                ) : (
-                                    <Text style={[styles.growthText, { color: theme.colors.danger }]}>▼</Text>
-                                )}
+                            <Text style={styles.companyName}>{company.name}</Text>
+                            <Text style={styles.sectorText}>{company.sector} Sector</Text>
+                        </View>
+                        <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                            <Ionicons name="close" size={24} color="#FFF" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <ScrollView contentContainerStyle={styles.content}>
+                        {/* KPI Dashboard */}
+                        <View style={styles.kpiContainer}>
+                            <View style={styles.kpiItem}>
+                                <Text style={styles.kpiLabel}>VALUATION</Text>
+                                <Text style={styles.kpiValue}>
+                                    ${(company.valuation / 1_000_000).toFixed(1)}M
+                                </Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.kpiItem}>
+                                <Text style={styles.kpiLabel}>LAST Q CHANGE</Text>
+                                <Text style={[styles.kpiValue, { color: isPositive ? '#30D158' : '#FF453A' }]}>
+                                    {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
+                                </Text>
                             </View>
                         </View>
-                        <Pressable onPress={onClose} style={styles.closeBtn}>
-                            <Text style={styles.closeText}>✕</Text>
-                        </Pressable>
-                    </View>
 
-                    {/* Allocation Section */}
-                    <View style={styles.allocationSection}>
-                        <View style={styles.allocHeader}>
-                            <Text style={styles.sectionTitle}>Strategy Allocation</Text>
-                            <Text style={[
-                                styles.pointsText,
-                                remainingPoints === 0 ? { color: theme.colors.success } : { color: theme.colors.textSecondary }
-                            ]}>
-                                Points Used: {totalPoints} / {maxPoints}
+                        {/* Strategy Section */}
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Corporate Strategy</Text>
+                            <View style={[styles.pointsBadge, remainingPoints === 0 && { backgroundColor: '#30D158' }]}>
+                                <Text style={[styles.pointsText, remainingPoints === 0 && { color: '#000' }]}>
+                                    {remainingPoints} Points Available
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.strategyList}>
+                            {renderStrategyRow('Marketing', 'marketing', '📢', 'Boosts sales & brand awareness')}
+                            {renderStrategyRow('R&D', 'rnd', '🔬', 'Drives innovation & tech growth')}
+                            {renderStrategyRow('Production', 'production', '🏭', 'Increases output & efficiency')}
+                            {renderStrategyRow('Workforce', 'workforce', '👥', 'Improves morale & stability')}
+                        </View>
+
+                        {/* Info Note */}
+                        <View style={styles.infoBox}>
+                            <Ionicons name="information-circle-outline" size={20} color="#8E8E93" />
+                            <Text style={styles.infoText}>
+                                Max 10 points total. High R&D benefits Tech companies. High Production benefits Industrial.
+                                Workforce below 2 causes instability.
                             </Text>
                         </View>
+                    </ScrollView>
 
-                        <View style={styles.progressBar}>
-                            <View style={[styles.progressFill, { width: `${(totalPoints / maxPoints) * 100}%` }]} />
-                        </View>
-
-                        <Text style={styles.forecastText}>{getForecast()}</Text>
-
-                        <View style={styles.stepperContainer}>
-                            {renderStepper('Marketing', 'marketing')}
-                            {renderStepper('R&D', 'rnd')}
-                            {renderStepper('Production', 'production')}
-                            {renderStepper('Workforce', 'workforce')}
-                        </View>
-                    </View>
-
-                    {/* Footer Actions */}
+                    {/* Footer */}
                     <View style={styles.footer}>
-                        <Pressable style={styles.actionSave} onPress={handleSave}>
-                            <Text style={styles.actionSaveText}>SAVE STRATEGY</Text>
-                        </Pressable>
-                        <Pressable style={styles.actionSell} onPress={handleSell}>
-                            <Text style={styles.actionSellText}>SELL COMPANY</Text>
-                        </Pressable>
+                        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+                            <Text style={styles.saveBtnText}>CONFIRM STRATEGY</Text>
+                        </TouchableOpacity>
                     </View>
-
                 </View>
             </View>
         </Modal>
@@ -197,185 +176,204 @@ export const SubsidiaryDetailModal = ({ visible, onClose, companyId }: Subsidiar
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
-        padding: theme.spacing.lg,
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
-        backgroundColor: '#1C1C1E', // Dark card
-        borderRadius: 16,
+        width: '90%',
+        maxWidth: 420,
+        height: '80%',
+        backgroundColor: '#1C1C1E',
+        borderRadius: 24,
+        overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        padding: 20,
-        gap: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+        elevation: 10,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.1)',
-        paddingBottom: 16,
+        borderBottomColor: '#2C2C2E',
+        backgroundColor: '#151517',
     },
     companyName: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#FFF',
+        letterSpacing: 0.5,
     },
-    valuationBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 6,
-        gap: 6,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-    },
-    valuationText: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: '#FFD60A', // Gold-ish
-    },
-    growthText: {
-        fontSize: 12,
-        color: '#30D158',
+    sectorText: {
+        fontSize: 13,
+        color: '#8E8E93',
+        fontWeight: '600',
+        textTransform: 'uppercase',
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 20,
-        width: 32,
-        height: 32,
+        backgroundColor: '#2C2C2E',
+        borderRadius: 50,
+    },
+    content: {
+        padding: 20,
+    },
+    kpiContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#252528',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    kpiItem: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
     },
-    closeText: {
-        fontSize: 14,
-        color: '#FFFFFF',
-        fontWeight: 'bold',
+    divider: {
+        width: 1,
+        backgroundColor: '#3A3A3C',
+        marginHorizontal: 10,
     },
-
-    // Allocation
-    allocationSection: {
-        gap: 12,
+    kpiLabel: {
+        fontSize: 11,
+        color: '#8E8E93',
+        fontWeight: '700',
+        marginBottom: 4,
     },
-    allocHeader: {
+    kpiValue: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#FFF',
+    },
+    sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 16,
     },
     sectionTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#FFF',
     },
-    pointsText: {
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    progressBar: {
-        height: 6,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 3,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: '100%',
-        backgroundColor: '#0A84FF', // Blue
-    },
-    forecastText: {
-        fontSize: 13,
-        color: '#8E8E93',
-        fontStyle: 'italic',
-        textAlign: 'center',
-        marginBottom: 8,
-    },
-
-    // Steppers
-    stepperContainer: {
-        gap: 12,
-    },
-    stepperRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        padding: 12,
+    pointsBadge: {
+        backgroundColor: '#333',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         borderRadius: 12,
-    },
-    stepperLabel: {
-        color: '#E5E5E7',
-        fontSize: 15,
-        fontWeight: '600',
-    },
-    stepperControls: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 16,
-        backgroundColor: '#000000', // Deep black for contrast
-        padding: 4,
-        borderRadius: 8,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
-    stepBtn: {
-        width: 32,
-        height: 32,
+    pointsText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#FFF',
+    },
+    strategyList: {
+        gap: 12,
+    },
+    strategyRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#252528',
+        padding: 12,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#2C2C2E',
+    },
+    strategyInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        flex: 1,
+    },
+    iconBox: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        backgroundColor: '#333',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 6,
-        backgroundColor: '#1C1C1E',
     },
-    stepBtnDisabled: {
+    strategyLabel: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#FFF',
+    },
+    strategyDesc: {
+        fontSize: 11,
+        color: '#8E8E93',
+    },
+    controls: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: '#151517',
+        padding: 4,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    controlBtn: {
+        width: 28,
+        height: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+        backgroundColor: '#2C2C2E',
+    },
+    disabledBtn: {
         opacity: 0.3,
     },
-    stepBtnText: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-        fontSize: 18,
-        lineHeight: 20,
-    },
-    stepValue: {
+    valueBox: {
         width: 24,
-        textAlign: 'center',
-        color: '#FFFFFF',
-        fontWeight: 'bold',
+        alignItems: 'center',
+    },
+    valueText: {
         fontSize: 16,
-    },
-
-    // Footer
-    footer: {
-        gap: 12,
-        marginTop: 8,
-    },
-    actionSave: {
-        backgroundColor: '#0A84FF',
-        padding: 16,
-        borderRadius: 12,
-        alignItems: 'center',
-        shadowColor: '#0A84FF',
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 2 },
-    },
-    actionSaveText: {
-        color: '#FFFFFF',
-        fontWeight: '800',
-        fontSize: 15,
-        letterSpacing: 0.5,
-    },
-    actionSell: {
-        padding: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#FF453A',
-    },
-    actionSellText: {
-        color: '#FF453A',
         fontWeight: '700',
-        fontSize: 14,
+        color: '#FFF',
+    },
+    infoBox: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(10, 132, 255, 0.1)',
+        padding: 12,
+        borderRadius: 12,
+        marginTop: 20,
+        gap: 10,
+    },
+    infoText: {
+        flex: 1,
+        color: '#0A84FF',
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    footer: {
+        padding: 20,
+        borderTopWidth: 1,
+        borderTopColor: '#2C2C2E',
+        backgroundColor: '#151517',
+    },
+    saveBtn: {
+        backgroundColor: '#FFFFFF',
+        height: 50,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    saveBtnText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
 });

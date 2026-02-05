@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, FlatList, TouchableOpacity, Pressable } from 'react-native';
-import { theme } from '../../../core/theme';
+import { Modal, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useCorporateFinanceStore, Subsidiary } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { SubsidiaryDetailModal } from './SubsidiaryDetailModal';
 
@@ -19,31 +18,47 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
         return `$${value.toLocaleString()}`;
     };
 
-    const renderItem = ({ item }: { item: Subsidiary }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <View style={styles.iconBox}>
-                    <Text style={styles.icon}>🏢</Text>
-                </View>
-                <View style={styles.cardInfo}>
-                    <Text style={styles.companyName}>{item.name}</Text>
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{item.sector}</Text>
+    const renderItem = ({ item }: { item: Subsidiary }) => {
+        const isPositive = item.lastChangePercent >= 0;
+        const emoji = isPositive ? (item.lastChangePercent > 10 ? '🚀' : '📈') : item.lastChangePercent < -10 ? '📉' : '🔻';
+        const color = isPositive ? '#30D158' : '#FF453A';
+
+        return (
+            <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                    <View style={styles.iconBox}>
+                        <Text style={styles.icon}>🏢</Text>
+                    </View>
+                    <View style={styles.cardInfo}>
+                        <Text style={styles.companyName}>{item.name}</Text>
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{item.sector}</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            <View style={styles.cardFooter}>
-                <Text style={styles.valuation}>{formatMoney(item.valuation)}</Text>
-                <TouchableOpacity
-                    style={styles.manageBtn}
-                    onPress={() => setSelectedCompanyId(item.id)}
-                >
-                    <Text style={styles.manageBtnText}>MANAGE</Text>
-                </TouchableOpacity>
+                {/* Performance Badge */}
+                <View style={[styles.perfBadge, { backgroundColor: isPositive ? 'rgba(48, 209, 88, 0.1)' : 'rgba(255, 69, 58, 0.1)' }]}>
+                    <Text style={[styles.perfText, { color }]}>
+                        Last Q: {isPositive ? '+' : ''}{item.lastChangePercent.toFixed(1)}% {emoji}
+                    </Text>
+                </View>
+
+                <View style={styles.cardFooter}>
+                    <View>
+                        <Text style={styles.label}>VALUATION</Text>
+                        <Text style={styles.valuation}>{formatMoney(item.valuation)}</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.manageBtn}
+                        onPress={() => setSelectedCompanyId(item.id)}
+                    >
+                        <Text style={styles.manageBtnText}>MANAGE</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
-    );
+        );
+    };
 
     return (
         <Modal
@@ -118,11 +133,11 @@ const styles = StyleSheet.create({
     },
     listContent: {
         padding: 16,
-        gap: 12,
+        gap: 16,
     },
     card: {
         backgroundColor: '#1C1C1E',
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 16,
         gap: 16,
         borderWidth: 1,
@@ -136,7 +151,7 @@ const styles = StyleSheet.create({
     iconBox: {
         width: 48,
         height: 48,
-        borderRadius: 8,
+        borderRadius: 12,
         backgroundColor: '#2C2C2E',
         alignItems: 'center',
         justifyContent: 'center',
@@ -148,21 +163,32 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     companyName: {
-        fontSize: 17,
+        fontSize: 18,
         fontWeight: '700',
         color: '#FFFFFF',
     },
     badge: {
         backgroundColor: '#3A3A3C',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 4,
+        paddingVertical: 4,
+        borderRadius: 6,
         alignSelf: 'flex-start',
     },
     badgeText: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#AEAEB2',
-        fontWeight: '600',
+        fontWeight: '700',
+        textTransform: 'uppercase',
+    },
+    perfBadge: {
+        borderRadius: 8,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    perfText: {
+        fontSize: 14,
+        fontWeight: '700',
     },
     cardFooter: {
         flexDirection: 'row',
@@ -172,21 +198,29 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#2C2C2E',
     },
-    valuation: {
-        fontSize: 16,
+    label: {
+        fontSize: 10,
+        color: '#8E8E93',
         fontWeight: '700',
-        color: '#30D158', // Green
+        letterSpacing: 0.5,
+        marginBottom: 2,
+    },
+    valuation: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#FFF',
     },
     manageBtn: {
         backgroundColor: '#FFFFFF',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 12,
     },
     manageBtnText: {
         color: '#000000',
         fontSize: 13,
         fontWeight: '800',
+        letterSpacing: 0.5,
     },
     emptyState: {
         alignItems: 'center',

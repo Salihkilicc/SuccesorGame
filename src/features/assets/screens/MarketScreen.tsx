@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEventStore } from '../../../core/store';
 import { useUserStore } from '../../../core/store/useUserStore';
 import { useMarketStore } from '../../../core/store/useMarketStore';
+import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { triggerEvent } from '../../../event/eventEngine';
 import { theme } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
@@ -58,7 +59,9 @@ const MarketScreen = () => {
   const [stockCategory, setStockCategory] = useState<StockCategory>('Technology');
   const [showPortfolio, setShowPortfolio] = useState(false);
   const { investmentsValue, handleLiquidation } = useAssetsLogic();
-  const subsidiaries = useUserStore(state => state.subsidiaries);
+
+  // Use Corporate Finance Store for subsidiaries
+  const { subsidiaries } = useCorporateFinanceStore();
 
   // Market Store for Dynamic Prices
   const marketPrices = useMarketStore(state => state.marketPrices);
@@ -73,7 +76,11 @@ const MarketScreen = () => {
 
     if (selectedTab === 'stocks') {
       const stockItems = INITIAL_MARKET_ITEMS.filter(item => isStock(item)) as StockItem[];
+      // Filter by Category
       items = stockItems.filter(s => s.category === stockCategory);
+
+      // Filter out owned subsidiaries
+      items = items.filter(item => !subsidiaries.some(sub => sub.id === item.id || sub.name === item.name));
     }
     else if (selectedTab === 'crypto') {
       items = INITIAL_MARKET_ITEMS.filter(item => isCrypto(item));
@@ -86,7 +93,7 @@ const MarketScreen = () => {
     }
 
     return items;
-  }, [selectedTab, stockCategory]);
+  }, [selectedTab, stockCategory, subsidiaries]);
 
   const formatMoney = (value: number) => {
     const absolute = Math.abs(value);
@@ -152,7 +159,8 @@ const MarketScreen = () => {
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 
           renderItem={({ item }) => {
-            const isAcquired = isStock(item) && subsidiaries.some(s => s.symbol === item.symbol);
+            // Check if acquired (redundant now if filtered, but kept for safety)
+            const isAcquired = isStock(item) && subsidiaries.some(s => s.id === item.id || s.name === item.name);
             const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
 
             // Get dynamic price if available, else static
@@ -248,30 +256,6 @@ const BackButton = ({ navigation }: { navigation: any }) => (
   </Pressable>
 );
 
-const MarketHeader = ({ selectedCategory, onSelectCategory }: { selectedCategory: Category, onSelectCategory: (c: Category) => void }) => (
-  <View style={styles.headerContainer}>
-    <MarketOverview trend="Bullish" volatility="Medium" />
-    <View style={styles.tabBar}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBarContent}>
-        {CATEGORIES.map(item => {
-          const isActive = item === selectedCategory;
-          return (
-            <Pressable
-              key={item}
-              style={[styles.tab, isActive && styles.tabActive]}
-              onPress={() => onSelectCategory(item)}>
-              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                {item}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    </View>
-    <Text style={styles.sectionTitle}>Stock List</Text>
-  </View>
-);
-
 const MarketEventFooter = () => {
   const { lastMarketEvent } = useEventStore();
   return (
@@ -303,6 +287,9 @@ const styles = StyleSheet.create({
   tabActive: { backgroundColor: theme.colors.accentSoft, borderColor: theme.colors.accent },
   tabLabel: { color: theme.colors.textSecondary, fontWeight: '700', fontSize: theme.typography.caption + 1 },
   tabLabelActive: { color: theme.colors.accent },
+  subTabsContainer: { marginTop: -8 }, // Visual tweak
+  subTab: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)' },
+  subTabActive: { backgroundColor: theme.colors.accent },
   sectionTitle: { fontSize: 14, fontWeight: '600', color: theme.colors.textPrimary, marginBottom: theme.spacing.sm, marginTop: theme.spacing.lg },
   eventCard: { marginTop: theme.spacing.md, backgroundColor: theme.colors.card, borderRadius: theme.radius.md, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.md },
   eventIcon: { fontSize: 16 },
