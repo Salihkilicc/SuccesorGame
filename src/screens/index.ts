@@ -3,7 +3,7 @@ export { default as LoveScreen } from '../features/love/screens/LoveScreen';
 export { default as AssetsScreen } from '../features/assets/screens/AssetsScreen';
 export { default as HomeScreen } from './Home/HomeScreen';
 export { default as MarketScreen } from '../features/assets/screens/MarketScreen';
-export { default as StockDetailScreen } from '../features/assets/screens/StockDetailScreen';
+
 export { default as MyCompanyScreen } from '../features/assets/screens/MyCompanyScreen';
 export { default as CasinoScreen } from '../features/casino/screens/CasinoScreen';
 export { default as SlotsGameScreen } from '../features/casino/screens/SlotsGameScreen';

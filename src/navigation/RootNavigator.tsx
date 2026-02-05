@@ -17,7 +17,6 @@ import {
   RouletteGameScreen,
   PokerGameScreen,
   BlackjackGameScreen,
-  StockDetailScreen,
   CasinoScreen,
   HomeScreen,
   ShoppingScreen,
@@ -32,6 +31,8 @@ import {
   FinancialReportScreen,
   BelongingsScreen,
 } from '../screens';
+
+import StockDetailScreen from '../features/assets/screens/StockDetailScreen';
 
 import { formatScreenTitle } from '../core/utils';
 import BottomStatsBar from '../components/common/BottomStatsBar';
