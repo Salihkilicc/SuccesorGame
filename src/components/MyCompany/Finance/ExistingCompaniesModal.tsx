@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import GameModal from '../../common/GameModal';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 type Props = {
     visible: boolean;
@@ -10,6 +12,7 @@ type Props = {
 };
 
 const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const { subsidiaries } = useCorporateFinanceStore();
     const [selectedSubsidiaryId, setSelectedSubsidiaryId] = useState<string | null>(null);
 
@@ -21,8 +24,17 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
         setSelectedSubsidiaryId(null);
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     return (
-        <GameModal visible={visible} onClose={onClose}>
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            fixedBottomContent={<BottomStatsBar onHomePress={handleHomePress} />}
+        >
             {/* List Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>MY EMPIRE</Text>
@@ -110,7 +122,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     listContent: {
-        paddingBottom: 24,
+        paddingBottom: 80, // Space for Bottom Bar
         gap: 16,
     },
     emptyState: {

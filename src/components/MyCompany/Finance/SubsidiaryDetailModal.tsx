@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import GameModal from '../../common/GameModal';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
-import { formatCurrency } from '../../../utils/formatCurrency'; // Assuming utility exists, else will use toLocaleString
+import { formatCurrency } from '../../../features/assets/hooks/NativeEconomy';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 type Props = {
     visible: boolean;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 const SubsidiaryDetailModal = ({ visible, onClose, subsidiaryId }: Props) => {
+    const navigation = useNavigation<any>();
     const { subsidiaries, updateSubsidiaryStrategy, sellSubsidiary } = useCorporateFinanceStore();
     const subsidiary = subsidiaries.find(s => s.id === subsidiaryId);
 
@@ -36,12 +39,7 @@ const SubsidiaryDetailModal = ({ visible, onClose, subsidiaryId }: Props) => {
 
     const handleConfirm = () => {
         if (remaining !== 0) {
-            Alert.alert('Incomplete Strategy', 'You must allocate exactly 10 points.'); // Or maybe allow less? Prompt implies "allocate exactly 10 Points" logic but "Constraint: Sum must be <= 10" in interface. User prompt says "remaining = 10 - totalPoints" and "Color it Red if 0, Green if > 0" implies remaining > 0 is good? Wait, "Color it Red if 0, Green if > 0" usually means green is available.
-            // Re-reading user request: "Remaining Points: X / 10". Color it Red if 0 (no points left), Green if > 0 (points available).
-            // "Disable [+] if remaining === 0". This implies we stop at 0 remaining.
-            // Does strictly strictly require exactly 10 used? "manage ... exactly 10 Points". "Constraint: Sum must be <= 10".
-            // I'll assume we can save if <= 10, but ideally we use them all. I won't block saving if < 10 but user probably wants to use all.
-            // Let's just save.
+            // Optional warning logic could go here
         }
         updateSubsidiaryStrategy(subsidiaryId, strategy);
         onClose();
@@ -78,82 +76,93 @@ const SubsidiaryDetailModal = ({ visible, onClose, subsidiaryId }: Props) => {
         });
     };
 
-    return (
-        <GameModal visible={visible} onClose={onClose}>
-            {/* HEADER */}
-            <View style={styles.header}>
-                <Text style={styles.companyName}>{subsidiary.name}</Text>
-                <Text style={styles.companyValuation}>
-                    Valuation: ${(subsidiary.valuation / 1_000_000).toFixed(2)}M
-                </Text>
-                <View style={styles.sectorBadge}>
-                    <Text style={styles.sectorText}>{subsidiary.sector}</Text>
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
+    // Helper for rendering stepper rows
+    const renderControl = (
+        label: string,
+        key: keyof SubsidiaryStrategy,
+        value: number,
+        remaining: number,
+        updateFn: (k: keyof SubsidiaryStrategy, d: number) => void
+    ) => (
+        <View style={styles.controlRow} key={key}>
+            <Text style={styles.controlLabel}>{label}</Text>
+            <View style={styles.stepperContainer}>
+                <TouchableOpacity
+                    style={[styles.stepperBtn, value === 0 && styles.stepperBtnDisabled]}
+                    onPress={() => updateFn(key, -1)}
+                    disabled={value === 0}
+                >
+                    <Text style={styles.stepperBtnText}>-</Text>
+                </TouchableOpacity>
+
+                <View style={styles.valueBox}>
+                    <Text style={styles.valueText}>{value}</Text>
                 </View>
-            </View>
 
-            {/* POINTS POOL */}
-            <View style={styles.pointsContainer}>
-                <Text style={styles.pointsLabel}>REMAINING POINTS</Text>
-                <Text style={[styles.pointsValue, { color: remaining > 0 ? theme.colors.success : theme.colors.error }]}>
-                    {remaining} / 10
-                </Text>
-            </View>
-
-            {/* CONTROLS */}
-            <View style={styles.controlsContainer}>
-                {renderControl('Marketing 📢', 'marketing', strategy.marketing, remaining, updatePoint)}
-                {renderControl('R&D 🔬', 'rnd', strategy.rnd, remaining, updatePoint)}
-                {renderControl('Production 🏭', 'production', strategy.production, remaining, updatePoint)}
-                {renderControl('Workforce 👷', 'workforce', strategy.workforce, remaining, updatePoint)}
-            </View>
-
-            {/* FOOTER */}
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.sellButton} onPress={handleSell}>
-                    <Text style={styles.sellButtonText}>Sell Company</Text>
+                <TouchableOpacity
+                    style={[styles.stepperBtn, remaining === 0 && styles.stepperBtnDisabled]}
+                    onPress={() => updateFn(key, 1)}
+                    disabled={remaining === 0}
+                >
+                    <Text style={styles.stepperBtnText}>+</Text>
                 </TouchableOpacity>
+            </View>
+        </View>
+    );
 
-                <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-                    <Text style={styles.confirmButtonText}>Confirm Strategy</Text>
-                </TouchableOpacity>
+    return (
+        <GameModal
+            visible={visible}
+            onClose={onClose}
+            fixedBottomContent={<BottomStatsBar onHomePress={handleHomePress} />}
+        >
+            <View>
+                {/* HEADER */}
+                <View style={styles.header}>
+                    <Text style={styles.companyName}>{subsidiary.name}</Text>
+                    <Text style={styles.companyValuation}>
+                        Valuation: ${(subsidiary.valuation / 1_000_000).toFixed(2)}M
+                    </Text>
+                    <View style={styles.sectorBadge}>
+                        <Text style={styles.sectorText}>{subsidiary.sector}</Text>
+                    </View>
+                </View>
+
+                {/* POINTS POOL */}
+                <View style={styles.pointsContainer}>
+                    <Text style={styles.pointsLabel}>REMAINING POINTS</Text>
+                    <Text style={[styles.pointsValue, { color: remaining > 0 ? theme.colors.success : theme.colors.error }]}>
+                        {remaining} / 10
+                    </Text>
+                </View>
+
+                {/* CONTROLS */}
+                <View style={styles.controlsContainer}>
+                    {renderControl('Marketing 📢', 'marketing', strategy.marketing, remaining, updatePoint)}
+                    {renderControl('R&D 🔬', 'rnd', strategy.rnd, remaining, updatePoint)}
+                    {renderControl('Production 🏭', 'production', strategy.production, remaining, updatePoint)}
+                    {renderControl('Workforce 👷', 'workforce', strategy.workforce, remaining, updatePoint)}
+                </View>
+
+                {/* FOOTER */}
+                <View style={styles.footer}>
+                    <TouchableOpacity style={styles.sellButton} onPress={handleSell}>
+                        <Text style={styles.sellButtonText}>Sell Company</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+                        <Text style={styles.confirmButtonText}>Confirm Strategy</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </GameModal>
     );
 };
-
-// Helper for rendering stepper rows
-const renderControl = (
-    label: string,
-    key: keyof SubsidiaryStrategy,
-    value: number,
-    remaining: number,
-    updateFn: (k: keyof SubsidiaryStrategy, d: number) => void
-) => (
-    <View style={styles.controlRow} key={key}>
-        <Text style={styles.controlLabel}>{label}</Text>
-        <View style={styles.stepperContainer}>
-            <TouchableOpacity
-                style={[styles.stepperBtn, value === 0 && styles.stepperBtnDisabled]}
-                onPress={() => updateFn(key, -1)}
-                disabled={value === 0}
-            >
-                <Text style={styles.stepperBtnText}>-</Text>
-            </TouchableOpacity>
-
-            <View style={styles.valueBox}>
-                <Text style={styles.valueText}>{value}</Text>
-            </View>
-
-            <TouchableOpacity
-                style={[styles.stepperBtn, remaining === 0 && styles.stepperBtnDisabled]}
-                onPress={() => updateFn(key, 1)}
-                disabled={remaining === 0}
-            >
-                <Text style={styles.stepperBtnText}>+</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-);
 
 const styles = StyleSheet.create({
     header: {

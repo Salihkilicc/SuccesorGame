@@ -11,11 +11,13 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
+import BottomStatsBar from '../../../components/common/BottomStatsBar';
 
 const { width } = Dimensions.get('window');
 
@@ -31,6 +33,7 @@ const formatMoney = (value: number) => {
 };
 
 export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) => {
+  const navigation = useNavigation<any>();
   const { marketPrices } = useMarketStore();
   const { subsidiaries, acquireCompany } = useCorporateFinanceStore();
   const { companyCapital } = useStatsStore();
@@ -121,8 +124,13 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
     );
   };
 
+  const handleHomePress = () => {
+    onClose();
+    navigation.navigate('Home');
+  };
+
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={styles.container}>
 
         {/* HEADER */}
@@ -171,6 +179,9 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
             </View>
           }
         />
+
+        {/* Persistent Bottom Bar */}
+        <BottomStatsBar onHomePress={handleHomePress} />
 
         {/* NEGOTIATION OVERLAY */}
         {selectedTarget && (
@@ -326,6 +337,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 12,
+    paddingBottom: 80, // Space for Bottom Bar
   },
   itemRow: {
     flexDirection: 'row',

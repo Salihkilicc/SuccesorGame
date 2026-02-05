@@ -18,6 +18,7 @@ type Props = {
 };
 
 const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt }: Props) => {
+    // Navigation removed as it was only used for BottomStatsBar
     const { companyValue, companyCapital } = useStatsStore();
     const {
         creditScore,
@@ -79,7 +80,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 {/* Spacer to balance the absolute close button if needed, but absolute works best */}
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg, paddingBottom: 24 }}>
 
                 {/* --- NAVIGATION GRID --- */}
                 <View style={styles.navGrid}>

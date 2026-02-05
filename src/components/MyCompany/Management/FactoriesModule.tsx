@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { FACTORY_CAPACITY, FACTORY_COST, useCompanyManagement } from '../useCompanyManagement';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 const ControlButton = ({ label, onPress, disabled, tone = 'default' }: any) => (
     <Pressable
@@ -29,10 +31,16 @@ interface FactoriesModalProps {
 }
 
 const FactoriesModule = ({ visible, onClose }: FactoriesModalProps) => {
+    const navigation = useNavigation<any>();
     const { factoryCount, updateFactories } = useCompanyManagement();
 
     const monthlyCost = factoryCount * FACTORY_COST;
     const capacity = factoryCount * FACTORY_CAPACITY;
+
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -88,6 +96,9 @@ const FactoriesModule = ({ visible, onClose }: FactoriesModalProps) => {
                         <Text style={styles.doneBtnText}>Done</Text>
                     </Pressable>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -107,6 +118,7 @@ const styles = StyleSheet.create({
         gap: theme.spacing.lg,
         borderWidth: 1,
         borderColor: theme.colors.border,
+        marginBottom: 80, // Space for bottom bar to not overlap if centered vertically
     },
     header: {
         flexDirection: 'row',

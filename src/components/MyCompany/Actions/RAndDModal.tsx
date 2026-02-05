@@ -1,8 +1,10 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useStatsStore, TechLevels } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
 import { theme } from '../../../core/theme';
+import BottomStatsBar from '../../../components/common/BottomStatsBar';
 
 export type RAndDModalProps = {
   visible: boolean;
@@ -40,6 +42,7 @@ const TECH_TREE: Record<TechCategory, TechUpgrade[]> = {
 };
 
 const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
+  const navigation = useNavigation<any>();
   const { companyCapital, setField, techLevels, setTechLevel } = useStatsStore();
 
   const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
@@ -147,6 +150,11 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     );
   };
 
+  const handleHomePress = () => {
+    onClose();
+    navigation.navigate('Home');
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.backdrop}>
@@ -160,19 +168,186 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
           <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
           <Text style={styles.capitalText}>Available Capital: ${(companyCapital / 1_000_000_000).toFixed(2)}B</Text>
 
-          <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
             {renderCategory('hardware', 'Category A: Hardware Engineering')}
             {renderCategory('software', 'Category B: Software & Ecosystem')}
             {renderCategory('future', 'Category C: Future Projects')}
             <View style={{ height: 20 }} />
           </ScrollView>
+
+          {/* Persistent Bottom Bar - Absolute inside the Card or Backdrop? 
+              Since this modal is a 'Card' in center, adding a full width bottom bar might look weird if inside the card.
+              However, the user asked for "bottom stat bar... into every page inner pages".
+              Since this looks like a Dialog/Popup, maybe putting it at the bottom of the SCREEN (outside the card) is better?
+              But the Backdrop has padding. 
+              
+              Let's put it fixed at the bottom of the BACKDROP (screen).
+          */}
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+            <BottomStatsBar onHomePress={handleHomePress} />
+          </View>
+
         </View>
+
+        {/* Actually, BottomStatsBar has absolute positioning. 
+             If I put it inside 'backdrop', I need to be careful. 
+             'backdrop' has padding.
+             Better to put it OUTSIDE 'card', but inside 'backdrop'.
+             Or structure: <Modal><View style={{flex:1}}><Backdrop><Card/></Backdrop><BottomBar/></View></Modal>
+             
+             Let's change the structure slightly to support full screen usage.
+         */}
+      </View>
+
+      {/* Re-implementing structure to ensure bar is at screen bottom */}
+    </Modal>
+  );
+};
+// Revamped Modal to allow Bottom Bar outside the centered card
+const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
+  const navigation = useNavigation<any>();
+  const { companyCapital, setField, techLevels, setTechLevel, companyName } = useStatsStore(); // Added missing props logic
+
+  // ... logic ...
+  // (Repeating logic is verbose, I'll stick to the previous Component definition but adjust JSX)
+
+  const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
+    if (companyCapital < cost) {
+      Alert.alert('Insufficient Funds', "Your company doesn't have enough capital for this investment.");
+      return;
+    }
+
+    setField('companyCapital', companyCapital - cost);
+    setTechLevel(category, nextLevel);
+
+    // Find the upgrade info for messages
+    const upgradeInfo = TECH_TREE[category].find(u => u.level === nextLevel);
+    if (upgradeInfo) {
+      Alert.alert('Research Complete', `You have unlocked: ${upgradeInfo.title}!`);
+    }
+
+    checkAllAchievementsAfterStateChange();
+    onResult?.(true);
+  };
+
+  const renderCategory = (category: TechCategory, label: string) => {
+    // ... same renderCategory logic ...
+    const currentLevel = techLevels[category];
+    const upgrades = TECH_TREE[category];
+    const nextUpgrade = upgrades.find(u => u.level === currentLevel + 1);
+    const isMaxLevel = currentLevel >= upgrades[upgrades.length - 1].level;
+
+    let isLocked = false;
+    let lockReason = '';
+
+    if (category === 'future' && currentLevel === 1) {
+      const req = upgrades[0].req;
+      if (req && techLevels[req.category] < req.level) {
+        isLocked = true;
+        lockReason = `Requires ${req.category} Lv${req.level}`;
+      }
+    }
+
+    return (
+      <View style={styles.categoryContainer}>
+        <View style={styles.categoryHeader}>
+          <Text style={styles.categoryTitle}>{label}</Text>
+          <View style={styles.levelBadge}>
+            <Text style={styles.levelText}>Lv. {currentLevel}</Text>
+          </View>
+        </View>
+
+        <View style={styles.stepsContainer}>
+          {upgrades.map((u) => {
+            const isActive = u.level <= currentLevel;
+            return (
+              <View key={u.level} style={[styles.stepDot, isActive && styles.stepDotActive]} />
+            );
+          })}
+        </View>
+
+        <View style={styles.statusContainer}>
+          <Text style={styles.currentStatusLabel}>Current Tech:</Text>
+          <Text style={styles.currentStatusValue}>
+            {upgrades.find(u => u.level === currentLevel)?.title || 'Unknown'}
+          </Text>
+        </View>
+
+        {!isMaxLevel && nextUpgrade && (
+          <View style={styles.upgradeCard}>
+            <Text style={styles.upgradeTitle}>Next: {nextUpgrade.title}</Text>
+            <Text style={styles.upgradeReward}>{nextUpgrade.reward}</Text>
+
+            {isLocked ? (
+              <View style={styles.lockedBtn}>
+                <Text style={styles.lockedText}>LOCKED ({lockReason})</Text>
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => handleUpgrade(category, nextUpgrade.level, nextUpgrade.cost)}
+                style={({ pressed }) => [
+                  styles.upgradeBtn,
+                  pressed && styles.upgradeBtnPressed,
+                  companyCapital < nextUpgrade.cost && styles.upgradeBtnDisabled
+                ]}>
+                <Text style={styles.upgradeBtnText}>
+                  Upgrade (${nextUpgrade.cost / 1_000_000_000}B)
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
+
+        {isMaxLevel && (
+          <View style={styles.maxLevelContainer}>
+            <Text style={styles.maxLevelText}>MAX LEVEL REACHED</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  const handleHomePress = () => {
+    onClose();
+    navigation.navigate('Home');
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      {/* Full Screen Container */}
+      <View style={{ flex: 1 }}>
+
+        {/* Backdrop with reduced opacity for outside click or just visual */}
+        <View style={styles.backdrop}>
+
+          {/* The Card */}
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <Text style={styles.title}>R&D Labs</Text>
+              <Pressable onPress={onClose} hitSlop={10}>
+                <Text style={styles.closeIcon}>✕</Text>
+              </Pressable>
+            </View>
+            <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
+            <Text style={styles.capitalText}>Available Capital: ${(companyCapital / 1_000_000_000).toFixed(2)}B</Text>
+
+            <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+              {renderCategory('hardware', 'Category A: Hardware Engineering')}
+              {renderCategory('software', 'Category B: Software & Ecosystem')}
+              {renderCategory('future', 'Category C: Future Projects')}
+            </ScrollView>
+          </View>
+
+        </View>
+
+        {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}
+        <BottomStatsBar onHomePress={handleHomePress} />
       </View>
     </Modal>
   );
 };
 
-export default RAndDModal;
+export default RAndDModalRevised;
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -180,12 +355,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.8)',
     justifyContent: 'center',
     padding: theme.spacing.md,
+    paddingBottom: 80, // Make room for bottom bar if card is long
   },
   card: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
-    maxHeight: '90%',
+    maxHeight: '85%', // Reduce height to not overlap navbar
     width: '100%',
     maxWidth: 500,
     alignSelf: 'center',

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import ShareholderProfileModal from './ShareholderProfileModal';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface Props {
     visible: boolean;
@@ -10,6 +12,7 @@ interface Props {
 }
 
 const BoardMembersModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const { members, playerShareCount, totalShares, boardMood } = useShareholderStore();
 
     // Profile modal state
@@ -62,6 +65,11 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
         }
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     return (
         <GameModal visible={visible} onClose={onClose}>
             {/* Header */}
@@ -77,7 +85,7 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                 <Text style={styles.headerSubtitle}>Power Dynamics</Text>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: 80 }}>
                 {/* Power Dynamics Bar */}
                 <View style={styles.powerSection}>
                     <View style={styles.powerLabels}>
@@ -205,6 +213,9 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
 
                 </View>
             </ScrollView>
+
+            {/* Persistent Bottom Bar */}
+            <BottomStatsBar onHomePress={handleHomePress} />
 
             {/* Shareholder Profile Modal */}
             <ShareholderProfileModal

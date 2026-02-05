@@ -4,9 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
+import BottomStatsBar from '../../../components/common/BottomStatsBar';
 
 const ProductsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const {
     activeProducts,
     lockedProducts,
@@ -15,6 +16,10 @@ const ProductsScreen = () => {
     maxCapacityUnits, // Destructured here
     actions
   } = useProductsLogic();
+
+  const handleHomePress = () => {
+    navigation.navigate('Home');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,6 +62,9 @@ const ProductsScreen = () => {
         {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}
       </ScrollView>
 
+      {/* Persistent Bottom Bar */}
+      <BottomStatsBar onHomePress={handleHomePress} />
+
       {/* MODALS */}
       {selectedProduct?.status === 'locked' && (
         <ProductLaunchModal
@@ -91,7 +99,7 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.colors.card, alignItems: 'center', justifyContent: 'center' },
   backText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
   title: { fontSize: 24, fontWeight: '800', color: '#fff' },
-  content: { paddingBottom: 40 },
+  content: { paddingBottom: 80 }, // Adjusted for BottomStatsBar
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginLeft: 20, marginBottom: 16, marginTop: 20 },
   activeList: {
     paddingHorizontal: 20,

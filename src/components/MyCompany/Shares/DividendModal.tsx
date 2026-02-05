@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useDividendLogic } from '../../../features/finance/hooks/useDividendLogic';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface Props {
     visible: boolean;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const DividendModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const {
         dividendPercentage,
         setDividendPercentage,
@@ -27,6 +30,11 @@ const DividendModal = ({ visible, onClose }: Props) => {
         setDividendPercentage(clampedValue);
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     return (
         <Modal
             visible={visible}
@@ -35,156 +43,161 @@ const DividendModal = ({ visible, onClose }: Props) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <View style={styles.card}>
-                    {/* Header */}
-                    <Text style={styles.title}>Distribute Dividends</Text>
-                    <Text style={styles.subtitle}>Reward shareholders with profits</Text>
+                <View style={styles.centeredView}>
+                    <View style={styles.card}>
+                        {/* Header */}
+                        <Text style={styles.title}>Distribute Dividends</Text>
+                        <Text style={styles.subtitle}>Reward shareholders with profits</Text>
 
-                    {/* Available Cash */}
-                    <View style={styles.cashCard}>
-                        <Text style={styles.cashLabel}>Available Company Cash</Text>
-                        <Text style={styles.cashValue}>
-                            ${(availableCash / 1_000_000).toFixed(2)}M
-                        </Text>
-                    </View>
+                        {/* Available Cash */}
+                        <View style={styles.cashCard}>
+                            <Text style={styles.cashLabel}>Available Company Cash</Text>
+                            <Text style={styles.cashValue}>
+                                ${(availableCash / 1_000_000).toFixed(2)}M
+                            </Text>
+                        </View>
 
-                    {/* Stepper Interface */}
-                    <View style={styles.stepperSection}>
-                        <Text style={styles.label}>Distribution Percentage</Text>
-                        <View style={styles.stepperContainer}>
-                            {/* Decrease Button */}
-                            <TouchableOpacity
-                                onPress={() => adjustPercent(-1)}
-                                style={styles.stepperBtn}
-                                activeOpacity={0.7}
-                                disabled={dividendPercentage <= 1}
-                            >
-                                <Text style={[
-                                    styles.stepperText,
-                                    dividendPercentage <= 1 && styles.stepperTextDisabled
-                                ]}>
-                                    −
-                                </Text>
-                            </TouchableOpacity>
+                        {/* Stepper Interface */}
+                        <View style={styles.stepperSection}>
+                            <Text style={styles.label}>Distribution Percentage</Text>
+                            <View style={styles.stepperContainer}>
+                                {/* Decrease Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(-1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={dividendPercentage <= 1}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        dividendPercentage <= 1 && styles.stepperTextDisabled
+                                    ]}>
+                                        −
+                                    </Text>
+                                </TouchableOpacity>
 
-                            {/* Display */}
-                            <View style={styles.valueContainer}>
-                                <Text style={styles.valueText}>{dividendPercentage}%</Text>
-                                <Text style={styles.labelSmall}>OF CASH RESERVES</Text>
+                                {/* Display */}
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{dividendPercentage}%</Text>
+                                    <Text style={styles.labelSmall}>OF CASH RESERVES</Text>
+                                </View>
+
+                                {/* Increase Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={dividendPercentage >= 50}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        dividendPercentage >= 50 && styles.stepperTextDisabled
+                                    ]}>
+                                        +
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
+                        </View>
 
-                            {/* Increase Button */}
+                        {/* Quick Presets */}
+                        <View style={styles.presetsRow}>
                             <TouchableOpacity
-                                onPress={() => adjustPercent(1)}
-                                style={styles.stepperBtn}
+                                style={styles.presetButton}
+                                onPress={() => setDividendPercentage(10)}
                                 activeOpacity={0.7}
-                                disabled={dividendPercentage >= 50}
                             >
-                                <Text style={[
-                                    styles.stepperText,
-                                    dividendPercentage >= 50 && styles.stepperTextDisabled
-                                ]}>
-                                    +
-                                </Text>
+                                <Text style={styles.presetButtonText}>10%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setDividendPercentage(25)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>25%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setDividendPercentage(50)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>50%</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
 
-                    {/* Quick Presets */}
-                    <View style={styles.presetsRow}>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDividendPercentage(10)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>10%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDividendPercentage(25)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>25%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDividendPercentage(50)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>50%</Text>
-                        </TouchableOpacity>
-                    </View>
+                        {/* Distribution Info Display */}
+                        <View style={styles.infoSection}>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>Total Payout</Text>
+                                <Text style={styles.infoValue}>
+                                    ${(distributionAmount / 1_000_000).toFixed(2)}M
+                                </Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>
+                                    Dividend Per Share
+                                </Text>
+                                <Text style={styles.infoValue}>
+                                    ${(distributionAmount / 1_000_000).toFixed(4)}
+                                </Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>Remaining Capital</Text>
+                                <Text style={[
+                                    styles.infoValue,
+                                    { color: isRisky ? '#FF453A' : '#FFFFFF' }
+                                ]}>
+                                    ${(remainingCapital / 1_000_000).toFixed(2)}M
+                                </Text>
+                            </View>
+                        </View>
 
-                    {/* Distribution Info Display */}
-                    <View style={styles.infoSection}>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoLabel}>Total Payout</Text>
-                            <Text style={styles.infoValue}>
-                                ${(distributionAmount / 1_000_000).toFixed(2)}M
+                        {/* You Receive Highlight */}
+                        <View style={styles.profitHighlight}>
+                            <Text style={styles.profitLabel}>💰 You Receive</Text>
+                            <Text style={styles.profitAmount}>
+                                ${(playerDividend / 1_000_000).toFixed(2)}M
                             </Text>
+                            <Text style={styles.profitNote}>
+                                Based on your {playerSharePercentage.toFixed(1)}% ownership
+                            </Text>
+                            <View style={styles.profitBadge}>
+                                <Text style={styles.profitBadgeText}>Added to personal wallet</Text>
+                            </View>
                         </View>
-                        <View style={styles.divider} />
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoLabel}>
-                                Dividend Per Share
-                            </Text>
-                            <Text style={styles.infoValue}>
-                                ${(distributionAmount / 1_000_000).toFixed(4)}
-                            </Text>
-                        </View>
-                        <View style={styles.divider} />
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoLabel}>Remaining Capital</Text>
-                            <Text style={[
-                                styles.infoValue,
-                                { color: isRisky ? '#FF453A' : '#FFFFFF' }
-                            ]}>
-                                ${(remainingCapital / 1_000_000).toFixed(2)}M
-                            </Text>
-                        </View>
-                    </View>
 
-                    {/* You Receive Highlight */}
-                    <View style={styles.profitHighlight}>
-                        <Text style={styles.profitLabel}>💰 You Receive</Text>
-                        <Text style={styles.profitAmount}>
-                            ${(playerDividend / 1_000_000).toFixed(2)}M
-                        </Text>
-                        <Text style={styles.profitNote}>
-                            Based on your {playerSharePercentage.toFixed(1)}% ownership
-                        </Text>
-                        <View style={styles.profitBadge}>
-                            <Text style={styles.profitBadgeText}>Added to personal wallet</Text>
-                        </View>
-                    </View>
+                        {/* Risk Warning */}
+                        {isRisky && (
+                            <View style={styles.warningBox}>
+                                <Text style={styles.warningText}>
+                                    ⚠️ High distribution risk - low capital reserves
+                                </Text>
+                            </View>
+                        )}
 
-                    {/* Risk Warning */}
-                    {isRisky && (
-                        <View style={styles.warningBox}>
-                            <Text style={styles.warningText}>
-                                ⚠️ High distribution risk - low capital reserves
-                            </Text>
+                        {/* Buttons */}
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={onClose}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.distributeButton}
+                                onPress={handleConfirm}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.distributeButtonText}>Distribute Profits</Text>
+                            </TouchableOpacity>
                         </View>
-                    )}
-
-                    {/* Buttons */}
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity
-                            style={styles.cancelButton}
-                            onPress={onClose}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.distributeButton}
-                            onPress={handleConfirm}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.distributeButtonText}>Distribute Profits</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -194,6 +207,10 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        // No padding here
+    },
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -204,6 +221,7 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '100%',
         maxWidth: 400,
+        marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 22,
@@ -324,6 +342,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         color: '#FFFFFF',
+        marginBottom: 0,
     },
     divider: {
         height: 1,

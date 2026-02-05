@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
+import BottomStatsBar from '../../../components/common/BottomStatsBar';
 
 type Props = {
     visible: boolean;
@@ -11,6 +13,7 @@ type Props = {
 };
 
 export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
 
     // Find the company
@@ -93,6 +96,11 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
 
     const isPositive = company.lastChangePercent >= 0;
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     return (
         <Modal
             visible={visible}
@@ -168,6 +176,9 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
                         </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -194,6 +205,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 20,
         elevation: 10,
+        marginBottom: 80, // Space for bottom bar if screen is small, though overlay centers it.
+        // Actually, if we center the container, let's make sure it doesn't overlap the bottom bar
+        // BottomStatsBar is absolute bottom: 0.
+        // Let's just adding paddingBottom to overlay or margin to container.
     },
     header: {
         flexDirection: 'row',

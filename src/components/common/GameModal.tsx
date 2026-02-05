@@ -10,7 +10,7 @@ type GameModalProps = {
     children: React.ReactNode;
 };
 
-const GameModal = ({ visible, onClose, title, subtitle, children }: GameModalProps) => {
+const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomContent }: GameModalProps & { fixedBottomContent?: React.ReactNode }) => {
     return (
         <Modal
             visible={visible}
@@ -21,15 +21,20 @@ const GameModal = ({ visible, onClose, title, subtitle, children }: GameModalPro
                 <TouchableWithoutFeedback onPress={onClose}>
                     <View style={styles.backdropLayer} />
                 </TouchableWithoutFeedback>
-                <View style={styles.container}>
-                    {(title || subtitle) && (
-                        <View style={styles.header}>
-                            {title && <Text style={styles.title}>{title}</Text>}
-                            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-                        </View>
-                    )}
-                    {children}
+
+                <View style={styles.contentWrapper}>
+                    <View style={styles.container}>
+                        {(title || subtitle) && (
+                            <View style={styles.header}>
+                                {title && <Text style={styles.title}>{title}</Text>}
+                                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                            </View>
+                        )}
+                        {children}
+                    </View>
                 </View>
+
+                {fixedBottomContent}
             </View>
         </Modal>
     );
@@ -39,6 +44,10 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.85)',
+        // padding removed to allow full screen absolute positioning
+    },
+    contentWrapper: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: theme.spacing.md,

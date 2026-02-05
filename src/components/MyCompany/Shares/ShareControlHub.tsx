@@ -10,10 +10,12 @@ import {
     TouchableOpacity,
     SafeAreaView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import InfoTooltipModal from './InfoTooltipModal';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface Props {
     visible: boolean;
@@ -25,6 +27,7 @@ interface Props {
 }
 
 const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
+    const navigation = useNavigation<any>();
     const {
         companyValue,
         companyDailyChange,
@@ -71,6 +74,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         );
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     const marketCap = stockPrice * totalShares;
     const playerOwnership = getPlayerOwnership();
 
@@ -91,7 +99,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         <View style={styles.headerSpacer} />
                     </View>
 
-                    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
                         {/* Stock Price Hero Card */}
                         <View style={styles.heroCard}>
                             <Text style={styles.heroLabel}>Current Stock Price</Text>
@@ -241,6 +249,9 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
                         <View style={{ height: 40 }} />
                     </ScrollView>
+
+                    {/* Persistent Bottom Bar */}
+                    <BottomStatsBar onHomePress={handleHomePress} />
                 </SafeAreaView>
             </Modal>
 

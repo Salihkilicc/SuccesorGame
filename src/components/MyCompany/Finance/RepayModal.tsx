@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 type Props = {
     visible: boolean;
@@ -10,6 +12,7 @@ type Props = {
 };
 
 const RepayModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const { companyCapital, update } = useStatsStore();
     const { loans, totalDebt, repayLoan } = useCorporateFinanceStore();
 
@@ -17,6 +20,11 @@ const RepayModal = ({ visible, onClose }: Props) => {
     const [repayAmount, setRepayAmount] = useState(0);
 
     const selectedLoan = loans.find(l => l.id === selectedLoanId);
+
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
 
     const handleRepay = (loanId: string, amount: number) => {
         const result = repayLoan(
@@ -44,13 +52,17 @@ const RepayModal = ({ visible, onClose }: Props) => {
         return (
             <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
                 <View style={styles.backdrop}>
-                    <View style={styles.container}>
-                        <Text style={styles.title}>Debt Free</Text>
-                        <Text style={styles.subtitle}>You have no corporate debt!</Text>
-                        <Pressable onPress={onClose} style={styles.confirmButton}>
-                            <Text style={styles.confirmText}>Great!</Text>
-                        </Pressable>
+                    <View style={styles.centeredView}>
+                        <View style={styles.container}>
+                            <Text style={styles.title}>Debt Free</Text>
+                            <Text style={styles.subtitle}>You have no corporate debt!</Text>
+                            <Pressable onPress={onClose} style={styles.confirmButton}>
+                                <Text style={styles.confirmText}>Great!</Text>
+                            </Pressable>
+                        </View>
                     </View>
+                    {/* Persistent Bottom Bar */}
+                    <BottomStatsBar onHomePress={handleHomePress} />
                 </View>
             </Modal>
         );
@@ -59,114 +71,119 @@ const RepayModal = ({ visible, onClose }: Props) => {
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Repay Debt</Text>
-                    <Text style={styles.subtitle}>
-                        Total Debt: ${(totalDebt / 1_000_000).toFixed(2)}M • Cash: ${(companyCapital / 1_000_000).toFixed(2)}M
-                    </Text>
+                <View style={styles.centeredView}>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Repay Debt</Text>
+                        <Text style={styles.subtitle}>
+                            Total Debt: ${(totalDebt / 1_000_000).toFixed(2)}M • Cash: ${(companyCapital / 1_000_000).toFixed(2)}M
+                        </Text>
 
-                    <ScrollView style={styles.loansScroll} showsVerticalScrollIndicator={false}>
-                        {loans.map((loan) => {
-                            const maxRepayable = Math.min(loan.remaining, companyCapital);
+                        <ScrollView style={styles.loansScroll} showsVerticalScrollIndicator={false}>
+                            {loans.map((loan) => {
+                                const maxRepayable = Math.min(loan.remaining, companyCapital);
 
-                            return (
-                                <View key={loan.id} style={styles.loanCard}>
-                                    <View style={styles.loanHeader}>
-                                        <View>
-                                            <Text style={styles.loanType}>{loan.type} Loan</Text>
-                                            <Text style={styles.loanRate}>{loan.interestRate}% APR</Text>
-                                        </View>
-                                        <View style={{ alignItems: 'flex-end' }}>
-                                            <Text style={styles.loanRemainingLabel}>Remaining</Text>
-                                            <Text style={styles.loanRemaining}>
-                                                ${(loan.remaining / 1_000_000).toFixed(2)}M
-                                            </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.loanDetails}>
-                                        <View style={styles.loanDetailItem}>
-                                            <Text style={styles.loanDetailLabel}>Monthly Payment</Text>
-                                            <Text style={styles.loanDetailValue}>
-                                                ${(loan.monthlyPayment / 1_000).toFixed(0)}K
-                                            </Text>
-                                        </View>
-                                        <View style={styles.loanDetailItem}>
-                                            <Text style={styles.loanDetailLabel}>Can Repay</Text>
-                                            <Text style={[styles.loanDetailValue, { color: '#90EE90' }]}>
-                                                ${(maxRepayable / 1_000_000).toFixed(2)}M
-                                            </Text>
-                                        </View>
-                                    </View>
-
-                                    {/* Repayment Options */}
-                                    <View style={styles.repayOptions}>
-                                        {/* Partial Repayment (50%) */}
-                                        {maxRepayable >= loan.remaining * 0.5 && (
-                                            <Pressable
-                                                style={({ pressed }) => [
-                                                    styles.repayButton,
-                                                    pressed && styles.repayButtonPressed
-                                                ]}
-                                                onPress={() => handleRepay(loan.id, loan.remaining * 0.5)}
-                                            >
-                                                <Text style={styles.repayButtonLabel}>Pay 50%</Text>
-                                                <Text style={styles.repayButtonValue}>
-                                                    ${(loan.remaining * 0.5 / 1_000_000).toFixed(2)}M
-                                                </Text>
-                                            </Pressable>
-                                        )}
-
-                                        {/* Full Repayment */}
-                                        {maxRepayable >= loan.remaining && (
-                                            <Pressable
-                                                style={({ pressed }) => [
-                                                    styles.repayButton,
-                                                    styles.repayButtonFull,
-                                                    pressed && styles.repayButtonPressed
-                                                ]}
-                                                onPress={() => handleRepay(loan.id, loan.remaining)}
-                                            >
-                                                <Text style={[styles.repayButtonLabel, { color: '#000' }]}>
-                                                    Pay Full
-                                                </Text>
-                                                <Text style={[styles.repayButtonValue, { color: '#000' }]}>
+                                return (
+                                    <View key={loan.id} style={styles.loanCard}>
+                                        <View style={styles.loanHeader}>
+                                            <View>
+                                                <Text style={styles.loanType}>{loan.type} Loan</Text>
+                                                <Text style={styles.loanRate}>{loan.interestRate}% APR</Text>
+                                            </View>
+                                            <View style={{ alignItems: 'flex-end' }}>
+                                                <Text style={styles.loanRemainingLabel}>Remaining</Text>
+                                                <Text style={styles.loanRemaining}>
                                                     ${(loan.remaining / 1_000_000).toFixed(2)}M
                                                 </Text>
-                                            </Pressable>
-                                        )}
+                                            </View>
+                                        </View>
 
-                                        {/* Max Possible (if less than full) */}
-                                        {maxRepayable > 0 && maxRepayable < loan.remaining && (
-                                            <Pressable
-                                                style={({ pressed }) => [
-                                                    styles.repayButton,
-                                                    pressed && styles.repayButtonPressed
-                                                ]}
-                                                onPress={() => handleRepay(loan.id, maxRepayable)}
-                                            >
-                                                <Text style={styles.repayButtonLabel}>Pay Max</Text>
-                                                <Text style={styles.repayButtonValue}>
+                                        <View style={styles.loanDetails}>
+                                            <View style={styles.loanDetailItem}>
+                                                <Text style={styles.loanDetailLabel}>Monthly Payment</Text>
+                                                <Text style={styles.loanDetailValue}>
+                                                    ${(loan.monthlyPayment / 1_000).toFixed(0)}K
+                                                </Text>
+                                            </View>
+                                            <View style={styles.loanDetailItem}>
+                                                <Text style={styles.loanDetailLabel}>Can Repay</Text>
+                                                <Text style={[styles.loanDetailValue, { color: '#90EE90' }]}>
                                                     ${(maxRepayable / 1_000_000).toFixed(2)}M
                                                 </Text>
-                                            </Pressable>
+                                            </View>
+                                        </View>
+
+                                        {/* Repayment Options */}
+                                        <View style={styles.repayOptions}>
+                                            {/* Partial Repayment (50%) */}
+                                            {maxRepayable >= loan.remaining * 0.5 && (
+                                                <Pressable
+                                                    style={({ pressed }) => [
+                                                        styles.repayButton,
+                                                        pressed && styles.repayButtonPressed
+                                                    ]}
+                                                    onPress={() => handleRepay(loan.id, loan.remaining * 0.5)}
+                                                >
+                                                    <Text style={styles.repayButtonLabel}>Pay 50%</Text>
+                                                    <Text style={styles.repayButtonValue}>
+                                                        ${(loan.remaining * 0.5 / 1_000_000).toFixed(2)}M
+                                                    </Text>
+                                                </Pressable>
+                                            )}
+
+                                            {/* Full Repayment */}
+                                            {maxRepayable >= loan.remaining && (
+                                                <Pressable
+                                                    style={({ pressed }) => [
+                                                        styles.repayButton,
+                                                        styles.repayButtonFull,
+                                                        pressed && styles.repayButtonPressed
+                                                    ]}
+                                                    onPress={() => handleRepay(loan.id, loan.remaining)}
+                                                >
+                                                    <Text style={[styles.repayButtonLabel, { color: '#000' }]}>
+                                                        Pay Full
+                                                    </Text>
+                                                    <Text style={[styles.repayButtonValue, { color: '#000' }]}>
+                                                        ${(loan.remaining / 1_000_000).toFixed(2)}M
+                                                    </Text>
+                                                </Pressable>
+                                            )}
+
+                                            {/* Max Possible (if less than full) */}
+                                            {maxRepayable > 0 && maxRepayable < loan.remaining && (
+                                                <Pressable
+                                                    style={({ pressed }) => [
+                                                        styles.repayButton,
+                                                        pressed && styles.repayButtonPressed
+                                                    ]}
+                                                    onPress={() => handleRepay(loan.id, maxRepayable)}
+                                                >
+                                                    <Text style={styles.repayButtonLabel}>Pay Max</Text>
+                                                    <Text style={styles.repayButtonValue}>
+                                                        ${(maxRepayable / 1_000_000).toFixed(2)}M
+                                                    </Text>
+                                                </Pressable>
+                                            )}
+                                        </View>
+
+                                        {maxRepayable === 0 && (
+                                            <Text style={styles.insufficientText}>
+                                                Insufficient cash to repay
+                                            </Text>
                                         )}
                                     </View>
+                                );
+                            })}
+                        </ScrollView>
 
-                                    {maxRepayable === 0 && (
-                                        <Text style={styles.insufficientText}>
-                                            Insufficient cash to repay
-                                        </Text>
-                                    )}
-                                </View>
-                            );
-                        })}
-                    </ScrollView>
-
-                    <Pressable onPress={onClose} style={styles.closeButton}>
-                        <Text style={styles.closeText}>Close</Text>
-                    </Pressable>
+                        <Pressable onPress={onClose} style={styles.closeButton}>
+                            <Text style={styles.closeText}>Close</Text>
+                        </Pressable>
+                    </View>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -178,6 +195,10 @@ const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.85)',
+        // No padding here
+    },
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -191,6 +212,7 @@ const styles = StyleSheet.create({
         padding: 24,
         borderWidth: 1,
         borderColor: '#2A2D35',
+        marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 24,

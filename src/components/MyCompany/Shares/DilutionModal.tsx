@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface Props {
     visible: boolean;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const DilutionModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const {
         dilutionPercentage,
         setDilutionPercentage,
@@ -25,13 +28,17 @@ const DilutionModal = ({ visible, onClose }: Props) => {
         setDilutionPercentage(clampedValue);
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     // VOLUME-WEIGHTED PRICE IMPACT PREDICTION
     // Match the store's formula: Impact = (Percent / 100) * DILUTION_SENSITIVITY
     const DILUTION_SENSITIVITY = 1.5;
     const predictedDrop = (dilutionPercentage / 100) * DILUTION_SENSITIVITY;
     const currentStockPrice = estimatedNewSharePrice / (1 - predictedDrop); // Reverse calculate current price
     const predictedPrice = currentStockPrice * (1 - predictedDrop);
-
 
     return (
         <Modal
@@ -41,145 +48,150 @@ const DilutionModal = ({ visible, onClose }: Props) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <View style={styles.card}>
-                    {/* Header */}
-                    <Text style={styles.title}>Issue Shares</Text>
-                    <Text style={styles.subtitle}>Raise capital by diluting ownership</Text>
+                <View style={styles.centeredView}>
+                    <View style={styles.card}>
+                        {/* Header */}
+                        <Text style={styles.title}>Issue Shares</Text>
+                        <Text style={styles.subtitle}>Raise capital by diluting ownership</Text>
 
-                    {/* Warning Banner */}
-                    <View style={styles.warningBanner}>
-                        <Text style={styles.warningBannerText}>
-                            ⚡ This will dilute your ownership and impact stock price
-                        </Text>
-                    </View>
+                        {/* Warning Banner */}
+                        <View style={styles.warningBanner}>
+                            <Text style={styles.warningBannerText}>
+                                ⚡ This will dilute your ownership and impact stock price
+                            </Text>
+                        </View>
 
-                    {/* Stepper Interface */}
-                    <View style={styles.stepperSection}>
-                        <Text style={styles.label}>Select Dilution Percentage</Text>
-                        <View style={styles.stepperContainer}>
-                            {/* Decrease Button */}
-                            <TouchableOpacity
-                                onPress={() => adjustPercent(-1)}
-                                style={styles.stepperBtn}
-                                activeOpacity={0.7}
-                                disabled={dilutionPercentage <= 1}
-                            >
-                                <Text style={[
-                                    styles.stepperText,
-                                    dilutionPercentage <= 1 && styles.stepperTextDisabled
-                                ]}>
-                                    −
-                                </Text>
-                            </TouchableOpacity>
+                        {/* Stepper Interface */}
+                        <View style={styles.stepperSection}>
+                            <Text style={styles.label}>Select Dilution Percentage</Text>
+                            <View style={styles.stepperContainer}>
+                                {/* Decrease Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(-1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={dilutionPercentage <= 1}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        dilutionPercentage <= 1 && styles.stepperTextDisabled
+                                    ]}>
+                                        −
+                                    </Text>
+                                </TouchableOpacity>
 
-                            {/* Display */}
-                            <View style={styles.valueContainer}>
-                                <Text style={styles.valueText}>{dilutionPercentage}%</Text>
-                                <Text style={styles.labelSmall}>EQUITY</Text>
+                                {/* Display */}
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{dilutionPercentage}%</Text>
+                                    <Text style={styles.labelSmall}>EQUITY</Text>
+                                </View>
+
+                                {/* Increase Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={dilutionPercentage >= 49}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        dilutionPercentage >= 49 && styles.stepperTextDisabled
+                                    ]}>
+                                        +
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
+                        </View>
 
-                            {/* Increase Button */}
+                        {/* Quick Presets */}
+                        <View style={styles.presetsRow}>
                             <TouchableOpacity
-                                onPress={() => adjustPercent(1)}
-                                style={styles.stepperBtn}
+                                style={styles.presetButton}
+                                onPress={() => setDilutionPercentage(5)}
                                 activeOpacity={0.7}
-                                disabled={dilutionPercentage >= 49}
                             >
-                                <Text style={[
-                                    styles.stepperText,
-                                    dilutionPercentage >= 49 && styles.stepperTextDisabled
-                                ]}>
-                                    +
-                                </Text>
+                                <Text style={styles.presetButtonText}>5%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setDilutionPercentage(10)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>10%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setDilutionPercentage(20)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>20%</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
 
-                    {/* Quick Presets */}
-                    <View style={styles.presetsRow}>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDilutionPercentage(5)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>5%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDilutionPercentage(10)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>10%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setDilutionPercentage(20)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>20%</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Impact Analysis */}
-                    <View style={styles.impactSection}>
-                        <View style={styles.impactRow}>
-                            <Text style={styles.impactLabel}>💵 Cash Raised</Text>
-                            <Text style={[styles.impactValue, { color: '#30D158' }]}>
-                                +${(capitalRaised / 1_000_000).toFixed(2)}M
-                            </Text>
-                        </View>
-                        <View style={styles.impactRow}>
-                            <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                            <Text style={[
-                                styles.impactValue,
-                                { color: newOwnership < 50 ? '#FF453A' : '#FF9F0A' }
-                            ]}>
-                                {currentOwnership.toFixed(1)}% → {newOwnership.toFixed(1)}%
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* Stock Price Warning */}
-                    <View style={styles.stockWarningBox}>
-                        <Text style={styles.stockWarningIcon}>📉</Text>
-                        <View style={styles.stockWarningContent}>
-                            <Text style={styles.stockWarningTitle}>Stock Price Impact</Text>
-                            <Text style={styles.stockWarningText}>
-                                Est. Price Drop: <Text style={{ color: '#FF453A', fontWeight: '700' }}>
-                                    -{(predictedDrop * 100).toFixed(1)}%
+                        {/* Impact Analysis */}
+                        <View style={styles.impactSection}>
+                            <View style={styles.impactRow}>
+                                <Text style={styles.impactLabel}>💵 Cash Raised</Text>
+                                <Text style={[styles.impactValue, { color: '#30D158' }]}>
+                                    +${(capitalRaised / 1_000_000).toFixed(2)}M
                                 </Text>
-                            </Text>
-                            <Text style={styles.stockWarningValue}>
-                                New Price: ${predictedPrice.toFixed(2)}
-                            </Text>
+                            </View>
+                            <View style={styles.impactRow}>
+                                <Text style={styles.impactLabel}>👤 Your Ownership</Text>
+                                <Text style={[
+                                    styles.impactValue,
+                                    { color: newOwnership < 50 ? '#FF453A' : '#FF9F0A' }
+                                ]}>
+                                    {currentOwnership.toFixed(1)}% → {newOwnership.toFixed(1)}%
+                                </Text>
+                            </View>
                         </View>
-                    </View>
 
-                    {/* Critical Warning */}
-                    {newOwnership < 50 && (
-                        <View style={styles.criticalBox}>
-                            <Text style={styles.criticalText}>⚠️ You will lose majority control</Text>
+                        {/* Stock Price Warning */}
+                        <View style={styles.stockWarningBox}>
+                            <Text style={styles.stockWarningIcon}>📉</Text>
+                            <View style={styles.stockWarningContent}>
+                                <Text style={styles.stockWarningTitle}>Stock Price Impact</Text>
+                                <Text style={styles.stockWarningText}>
+                                    Est. Price Drop: <Text style={{ color: '#FF453A', fontWeight: '700' }}>
+                                        -{(predictedDrop * 100).toFixed(1)}%
+                                    </Text>
+                                </Text>
+                                <Text style={styles.stockWarningValue}>
+                                    New Price: ${predictedPrice.toFixed(2)}
+                                </Text>
+                            </View>
                         </View>
-                    )}
 
-                    {/* Buttons */}
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity
-                            style={styles.cancelButton}
-                            onPress={onClose}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.authorizeButton}
-                            onPress={handleConfirm}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.authorizeButtonText}>Authorize Dilution</Text>
-                        </TouchableOpacity>
+                        {/* Critical Warning */}
+                        {newOwnership < 50 && (
+                            <View style={styles.criticalBox}>
+                                <Text style={styles.criticalText}>⚠️ You will lose majority control</Text>
+                            </View>
+                        )}
+
+                        {/* Buttons */}
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={onClose}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.authorizeButton}
+                                onPress={handleConfirm}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.authorizeButtonText}>Authorize Dilution</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -189,6 +201,10 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        // No padding here
+    },
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -199,6 +215,7 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '100%',
         maxWidth: 400,
+        marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 22,

@@ -10,10 +10,12 @@ import {
     Alert,
     ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -30,6 +32,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     member,
     onClose,
 }) => {
+    const navigation = useNavigation<any>();
     // ============================================================================
     // STATE
     // ============================================================================
@@ -75,6 +78,11 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
     // HANDLERS
     // ============================================================================
+
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
 
     const handleAskAdvice = () => {
         if (!member) return;
@@ -520,6 +528,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             </View>
                         )}
                     </ScrollView>
+
+                    {/* Persistent Bottom Bar */}
+                    <BottomStatsBar onHomePress={handleHomePress} />
                 </View>
 
                 {/* ANIMATION OVERLAY */}
@@ -729,7 +740,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 24,
-        paddingBottom: 60, // Extra padding at bottom so content isn't cut off
+        paddingBottom: 100, // Increased padding for BottomStatsBar
     },
     relationsTab: {
         gap: 16,

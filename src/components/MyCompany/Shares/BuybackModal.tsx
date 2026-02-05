@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useBuybackLogic } from './logic/useBuybackLogic';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface Props {
     visible: boolean;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const BuybackModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const {
         buybackPercentage,
         setBuybackPercentage,
@@ -27,6 +30,11 @@ const BuybackModal = ({ visible, onClose }: Props) => {
         setBuybackPercentage(clampedValue);
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     // VOLUME-WEIGHTED PRICE IMPACT PREDICTION
     // Match the store's formula: Impact = (Percent / 100) * BUYBACK_SENSITIVITY
     const BUYBACK_SENSITIVITY = 1.2;
@@ -42,160 +50,165 @@ const BuybackModal = ({ visible, onClose }: Props) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <View style={styles.card}>
-                    {/* Header */}
-                    <Text style={styles.title}>Share Buyback</Text>
-                    <Text style={styles.subtitle}>Retire shares to increase ownership</Text>
+                <View style={styles.centeredView}>
+                    <View style={styles.card}>
+                        {/* Header */}
+                        <Text style={styles.title}>Share Buyback</Text>
+                        <Text style={styles.subtitle}>Retire shares to increase ownership</Text>
 
-                    {/* Stepper Interface */}
-                    <View style={styles.stepperSection}>
-                        <Text style={styles.label}>Buyback Percentage</Text>
-                        <View style={styles.stepperContainer}>
-                            {/* Decrease Button */}
-                            <TouchableOpacity
-                                onPress={() => adjustPercent(-1)}
-                                style={styles.stepperBtn}
-                                activeOpacity={0.7}
-                                disabled={buybackPercentage <= 1}
-                            >
-                                <Text style={[
-                                    styles.stepperText,
-                                    buybackPercentage <= 1 && styles.stepperTextDisabled
-                                ]}>
-                                    −
-                                </Text>
-                            </TouchableOpacity>
+                        {/* Stepper Interface */}
+                        <View style={styles.stepperSection}>
+                            <Text style={styles.label}>Buyback Percentage</Text>
+                            <View style={styles.stepperContainer}>
+                                {/* Decrease Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(-1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={buybackPercentage <= 1}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        buybackPercentage <= 1 && styles.stepperTextDisabled
+                                    ]}>
+                                        −
+                                    </Text>
+                                </TouchableOpacity>
 
-                            {/* Display */}
-                            <View style={styles.valueContainer}>
-                                <Text style={styles.valueText}>{buybackPercentage}%</Text>
-                                <Text style={styles.labelSmall}>OF VALUATION</Text>
-                            </View>
+                                {/* Display */}
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{buybackPercentage}%</Text>
+                                    <Text style={styles.labelSmall}>OF VALUATION</Text>
+                                </View>
 
-                            {/* Increase Button */}
-                            <TouchableOpacity
-                                onPress={() => adjustPercent(1)}
-                                style={styles.stepperBtn}
-                                activeOpacity={0.7}
-                                disabled={buybackPercentage >= 100}
-                            >
-                                <Text style={[
-                                    styles.stepperText,
-                                    buybackPercentage >= 100 && styles.stepperTextDisabled
-                                ]}>
-                                    +
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* Quick Presets */}
-                    <View style={styles.presetsRow}>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setBuybackPercentage(1)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>1%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setBuybackPercentage(5)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>5%</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.presetButton}
-                            onPress={() => setBuybackPercentage(10)}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.presetButtonText}>10%</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Amount to Spend Display */}
-                    <View style={styles.amountCard}>
-                        <Text style={styles.amountLabel}>Amount to Spend</Text>
-                        <Text style={styles.amountValue}>
-                            ${(cost / 1_000_000).toFixed(2)}M
-                        </Text>
-                    </View>
-
-                    {/* Impact Analysis */}
-                    <View style={styles.impactSection}>
-                        <View style={styles.impactRow}>
-                            <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                            <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
-                                ${currentStockPrice.toFixed(2)} → ${estimatedNewStockPrice.toFixed(2)}
-                            </Text>
-                        </View>
-                        <View style={styles.impactRow}>
-                            <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <Text style={[styles.impactValue, { color: '#30D158' }]}>
-                                    +{(predictedImpact * 100).toFixed(1)}%
-                                </Text>
-                                <Text style={styles.impactSubValue}>
-                                    Target: ${predictedPrice.toFixed(2)}
-                                </Text>
+                                {/* Increase Button */}
+                                <TouchableOpacity
+                                    onPress={() => adjustPercent(1)}
+                                    style={styles.stepperBtn}
+                                    activeOpacity={0.7}
+                                    disabled={buybackPercentage >= 100}
+                                >
+                                    <Text style={[
+                                        styles.stepperText,
+                                        buybackPercentage >= 100 && styles.stepperTextDisabled
+                                    ]}>
+                                        +
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                        <View style={styles.impactRow}>
-                            <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                            <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
-                                {newOwnership.toFixed(2)}%
+
+                        {/* Quick Presets */}
+                        <View style={styles.presetsRow}>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setBuybackPercentage(1)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>1%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setBuybackPercentage(5)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>5%</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.presetButton}
+                                onPress={() => setBuybackPercentage(10)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetButtonText}>10%</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Amount to Spend Display */}
+                        <View style={styles.amountCard}>
+                            <Text style={styles.amountLabel}>Amount to Spend</Text>
+                            <Text style={styles.amountValue}>
+                                ${(cost / 1_000_000).toFixed(2)}M
                             </Text>
                         </View>
-                    </View>
 
-                    {/* Cost Summary */}
-                    <View style={styles.costSection}>
-                        <View style={styles.costRow}>
-                            <Text style={styles.costLabel}>Available Cash</Text>
-                            <Text style={[
-                                styles.costValue,
-                                { color: isAffordable ? '#30D158' : '#FF453A' }
-                            ]}>
-                                ${(companyCapital / 1_000_000).toFixed(2)}M
-                            </Text>
+                        {/* Impact Analysis */}
+                        <View style={styles.impactSection}>
+                            <View style={styles.impactRow}>
+                                <Text style={styles.impactLabel}>📈 Stock Price</Text>
+                                <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
+                                    ${currentStockPrice.toFixed(2)} → ${estimatedNewStockPrice.toFixed(2)}
+                                </Text>
+                            </View>
+                            <View style={styles.impactRow}>
+                                <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={[styles.impactValue, { color: '#30D158' }]}>
+                                        +{(predictedImpact * 100).toFixed(1)}%
+                                    </Text>
+                                    <Text style={styles.impactSubValue}>
+                                        Target: ${predictedPrice.toFixed(2)}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.impactRow}>
+                                <Text style={styles.impactLabel}>👤 Your Ownership</Text>
+                                <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
+                                    {newOwnership.toFixed(2)}%
+                                </Text>
+                            </View>
                         </View>
-                    </View>
 
-                    {/* Warning */}
-                    {!isAffordable && (
-                        <View style={styles.warningBox}>
-                            <Text style={styles.warningText}>⚠️ Insufficient capital</Text>
+                        {/* Cost Summary */}
+                        <View style={styles.costSection}>
+                            <View style={styles.costRow}>
+                                <Text style={styles.costLabel}>Available Cash</Text>
+                                <Text style={[
+                                    styles.costValue,
+                                    { color: isAffordable ? '#30D158' : '#FF453A' }
+                                ]}>
+                                    ${(companyCapital / 1_000_000).toFixed(2)}M
+                                </Text>
+                            </View>
                         </View>
-                    )}
 
-                    {/* Buttons */}
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity
-                            style={styles.cancelButton}
-                            onPress={onClose}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[
-                                styles.executeButton,
-                                !isAffordable && styles.executeButtonDisabled
-                            ]}
-                            onPress={handleConfirm}
-                            disabled={!isAffordable}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={[
-                                styles.executeButtonText,
-                                !isAffordable && styles.executeButtonTextDisabled
-                            ]}>
-                                Execute Buyback
-                            </Text>
-                        </TouchableOpacity>
+                        {/* Warning */}
+                        {!isAffordable && (
+                            <View style={styles.warningBox}>
+                                <Text style={styles.warningText}>⚠️ Insufficient capital</Text>
+                            </View>
+                        )}
+
+                        {/* Buttons */}
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={onClose}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
+                                    styles.executeButton,
+                                    !isAffordable && styles.executeButtonDisabled
+                                ]}
+                                onPress={handleConfirm}
+                                disabled={!isAffordable}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={[
+                                    styles.executeButtonText,
+                                    !isAffordable && styles.executeButtonTextDisabled
+                                ]}>
+                                    Execute Buyback
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -205,9 +218,13 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        // No padding here
+    },
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: 20, // Moved padding here
     },
     card: {
         backgroundColor: '#1C1C1E',
@@ -215,6 +232,7 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '100%',
         maxWidth: 400,
+        marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 22,

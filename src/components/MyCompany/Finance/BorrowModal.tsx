@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 type Props = {
     visible: boolean;
@@ -11,6 +13,7 @@ type Props = {
 };
 
 const BorrowModal = ({ visible, onClose }: Props) => {
+    const navigation = useNavigation<any>();
     const { companyValue, companyCapital, update } = useStatsStore();
     const {
         takeLoan,
@@ -71,6 +74,11 @@ const BorrowModal = ({ visible, onClose }: Props) => {
         }
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
     // Reset amount when modal opens
     useEffect(() => {
         if (visible) {
@@ -83,101 +91,106 @@ const BorrowModal = ({ visible, onClose }: Props) => {
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Request New Loan</Text>
-                    <Text style={styles.subtitle}>
-                        Credit Score: {creditScore} • {borrowingCapacity > 0 ? `$${(borrowingCapacity / 1_000_000).toFixed(1)}M Available` : 'No Capacity'}
-                    </Text>
-
-                    {/* Loan Type Selection */}
-                    <View style={styles.typeSelector}>
-                        <Pressable
-                            style={[styles.typeButton, selectedType === 'Bank' && styles.typeButtonActive]}
-                            onPress={() => setSelectedType('Bank')}
-                        >
-                            <Text style={styles.typeEmoji}>🏛️</Text>
-                            <Text style={[styles.typeLabel, selectedType === 'Bank' && styles.typeLabelActive]}>
-                                Bank
-                            </Text>
-                            <Text style={styles.typeRate}>{bankRate.toFixed(1)}%</Text>
-                        </Pressable>
-
-                        <Pressable
-                            style={[styles.typeButton, selectedType === 'Bonds' && styles.typeButtonActive]}
-                            onPress={() => setSelectedType('Bonds')}
-                        >
-                            <Text style={styles.typeEmoji}>📜</Text>
-                            <Text style={[styles.typeLabel, selectedType === 'Bonds' && styles.typeLabelActive]}>
-                                Bonds
-                            </Text>
-                            <Text style={styles.typeRate}>{bondsRate.toFixed(1)}%</Text>
-                        </Pressable>
-
-                        <Pressable
-                            style={[styles.typeButton, selectedType === 'Shark' && styles.typeButtonActive]}
-                            onPress={() => setSelectedType('Shark')}
-                        >
-                            <Text style={styles.typeEmoji}>🦈</Text>
-                            <Text style={[styles.typeLabel, selectedType === 'Shark' && styles.typeLabelActive]}>
-                                Shark
-                            </Text>
-                            <Text style={[styles.typeRate, { color: '#FF6B6B' }]}>{sharkRate}%</Text>
-                        </Pressable>
-                    </View>
-
-                    {/* Amount Selector */}
-                    <View style={styles.sliderContainer}>
-                        <PercentageSelector
-                            label="Loan Amount"
-                            value={amount}
-                            min={1_000_000}
-                            max={safeMax}
-                            onChange={setAmount}
-                            unit="$"
-                        />
-                    </View>
-
-                    {/* Live Preview */}
-                    <View style={styles.previewContainer}>
-                        <View style={styles.previewRow}>
-                            <Text style={styles.previewLabel}>Interest Rate</Text>
-                            <Text style={styles.previewValue}>{currentRate.toFixed(1)}% APR</Text>
-                        </View>
-                        <View style={styles.previewRow}>
-                            <Text style={styles.previewLabel}>Monthly Payment</Text>
-                            <Text style={[styles.previewValue, { color: '#FFD700' }]}>
-                                ${Math.round(monthlyPayment).toLocaleString()}
-                            </Text>
-                        </View>
-                        <View style={styles.previewRow}>
-                            <Text style={styles.previewLabel}>Term</Text>
-                            <Text style={styles.previewValue}>12 Months</Text>
-                        </View>
-                    </View>
-
-                    {/* Warning */}
-                    {amount > borrowingCapacity * 0.9 && (
-                        <Text style={styles.warningText}>
-                            ⚠️ Approaching maximum credit limit
+                <View style={styles.centeredView}>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Request New Loan</Text>
+                        <Text style={styles.subtitle}>
+                            Credit Score: {creditScore} • {borrowingCapacity > 0 ? `$${(borrowingCapacity / 1_000_000).toFixed(1)}M Available` : 'No Capacity'}
                         </Text>
-                    )}
 
-                    {/* Actions */}
-                    <View style={styles.actions}>
-                        <Pressable onPress={onClose} style={styles.cancelButton}>
-                            <Text style={styles.cancelText}>Cancel</Text>
-                        </Pressable>
-                        <Pressable
-                            onPress={handleConfirm}
-                            style={({ pressed }) => [
-                                styles.confirmButton,
-                                pressed && styles.confirmButtonPressed
-                            ]}
-                        >
-                            <Text style={styles.confirmText}>Sign Loan Agreement</Text>
-                        </Pressable>
+                        {/* Loan Type Selection */}
+                        <View style={styles.typeSelector}>
+                            <Pressable
+                                style={[styles.typeButton, selectedType === 'Bank' && styles.typeButtonActive]}
+                                onPress={() => setSelectedType('Bank')}
+                            >
+                                <Text style={styles.typeEmoji}>🏛️</Text>
+                                <Text style={[styles.typeLabel, selectedType === 'Bank' && styles.typeLabelActive]}>
+                                    Bank
+                                </Text>
+                                <Text style={styles.typeRate}>{bankRate.toFixed(1)}%</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={[styles.typeButton, selectedType === 'Bonds' && styles.typeButtonActive]}
+                                onPress={() => setSelectedType('Bonds')}
+                            >
+                                <Text style={styles.typeEmoji}>📜</Text>
+                                <Text style={[styles.typeLabel, selectedType === 'Bonds' && styles.typeLabelActive]}>
+                                    Bonds
+                                </Text>
+                                <Text style={styles.typeRate}>{bondsRate.toFixed(1)}%</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={[styles.typeButton, selectedType === 'Shark' && styles.typeButtonActive]}
+                                onPress={() => setSelectedType('Shark')}
+                            >
+                                <Text style={styles.typeEmoji}>🦈</Text>
+                                <Text style={[styles.typeLabel, selectedType === 'Shark' && styles.typeLabelActive]}>
+                                    Shark
+                                </Text>
+                                <Text style={[styles.typeRate, { color: '#FF6B6B' }]}>{sharkRate}%</Text>
+                            </Pressable>
+                        </View>
+
+                        {/* Amount Selector */}
+                        <View style={styles.sliderContainer}>
+                            <PercentageSelector
+                                label="Loan Amount"
+                                value={amount}
+                                min={1_000_000}
+                                max={safeMax}
+                                onChange={setAmount}
+                                unit="$"
+                            />
+                        </View>
+
+                        {/* Live Preview */}
+                        <View style={styles.previewContainer}>
+                            <View style={styles.previewRow}>
+                                <Text style={styles.previewLabel}>Interest Rate</Text>
+                                <Text style={styles.previewValue}>{currentRate.toFixed(1)}% APR</Text>
+                            </View>
+                            <View style={styles.previewRow}>
+                                <Text style={styles.previewLabel}>Monthly Payment</Text>
+                                <Text style={[styles.previewValue, { color: '#FFD700' }]}>
+                                    ${Math.round(monthlyPayment).toLocaleString()}
+                                </Text>
+                            </View>
+                            <View style={styles.previewRow}>
+                                <Text style={styles.previewLabel}>Term</Text>
+                                <Text style={styles.previewValue}>12 Months</Text>
+                            </View>
+                        </View>
+
+                        {/* Warning */}
+                        {amount > borrowingCapacity * 0.9 && (
+                            <Text style={styles.warningText}>
+                                ⚠️ Approaching maximum credit limit
+                            </Text>
+                        )}
+
+                        {/* Actions */}
+                        <View style={styles.actions}>
+                            <Pressable onPress={onClose} style={styles.cancelButton}>
+                                <Text style={styles.cancelText}>Cancel</Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={handleConfirm}
+                                style={({ pressed }) => [
+                                    styles.confirmButton,
+                                    pressed && styles.confirmButtonPressed
+                                ]}
+                            >
+                                <Text style={styles.confirmText}>Sign Loan Agreement</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
+
+                {/* Persistent Bottom Bar */}
+                <BottomStatsBar onHomePress={handleHomePress} />
             </View>
         </Modal>
     );
@@ -189,6 +202,10 @@ const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.85)',
+        // No padding here
+    },
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -201,6 +218,7 @@ const styles = StyleSheet.create({
         padding: 24,
         borderWidth: 1,
         borderColor: '#FFD700',
+        marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 24,

@@ -21,7 +21,7 @@ import GiftSelectionModal from '../../../../components/MyCompany/Shares/GiftSele
 import ShareNegotiationModal from '../../../../components/MyCompany/Shares/ShareNegotiationModal';
 import RAndDModal from '../../../../components/MyCompany/Actions/RAndDModal';
 import { AcquisitionModal } from '../../../../components/MyCompany/Actions/AcquisitionModal';
-import ExistingCompaniesModal from '../../../../components/MyCompany/Actions/ExistingCompaniesModal';
+import ExistingCompaniesModal from '../../../../components/MyCompany/Finance/ExistingCompaniesModal';
 
 // Tipler
 type CompanyModalsProps = {

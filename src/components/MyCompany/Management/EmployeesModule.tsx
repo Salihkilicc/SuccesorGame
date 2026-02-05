@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { COMPANY_EVENTS, useCompanyManagement } from '../useCompanyManagement';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
+import BottomStatsBar from '../../common/BottomStatsBar';
 
 interface EmployeesModalProps {
     visible: boolean;
@@ -12,6 +14,7 @@ interface EmployeesModalProps {
 }
 
 const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
+    const navigation = useNavigation<any>();
     const {
         employeeCount,
         factoryCount,
@@ -36,6 +39,11 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
         { id: 'retreat', name: 'Team Building Retreat', cost: 250_000, morale: 12, desc: 'Doğada yapılan aktiviteler takımı kaynaştırdı.' },
         { id: 'gala', name: 'Grand Gala', cost: 1_000_000, morale: 25, desc: 'Şehirdeki en lüks otelde unutulmaz bir gece.' },
     ];
+
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
 
     const renderTierBtn = (tier: 'low' | 'average' | 'above_average', label: string) => {
         const isActive = salaryTier === tier;
@@ -129,7 +137,7 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
             onClose={onClose}
             title="👥 Employees & Morale"
         >
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: 80 }}>
 
                 {/* Premium Morale Dashboard */}
                 <View style={styles.moraleDashboard}>
@@ -222,6 +230,9 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
                 </View>
 
             </ScrollView>
+
+            {/* Persistent Bottom Bar */}
+            <BottomStatsBar onHomePress={handleHomePress} />
 
             <GameModal
                 visible={eventsVisible}
