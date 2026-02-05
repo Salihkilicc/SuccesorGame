@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { Modal, View, Text, StyleSheet, FlatList, TouchableOpacity, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
-import { useStatsStore } from '../../../core/store';
-import { useUserStore } from '../../../core/store/useUserStore';
+import { useCorporateFinanceStore, Subsidiary } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { SubsidiaryDetailModal } from './SubsidiaryDetailModal';
 
 type Props = {
@@ -11,147 +10,80 @@ type Props = {
 };
 
 const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
-    const { subsidiaryStates } = useStatsStore();
-    const { subsidiaries } = useUserStore();
-    const [selectedSubsidiary, setSelectedSubsidiary] = useState<any>(null);
-    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const { subsidiaries } = useCorporateFinanceStore();
+    const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
-    const startups = Object.values(subsidiaryStates);
-    const hasAnyCompany = startups.length > 0 || subsidiaries.length > 0;
-
-    const handleOpenDetail = (subsidiary: any) => {
-        // Only open detail for Startups for now (as per existing logic), or implement simple alert for Acquired?
-        // Existing logic assumes 'subsidiary' structure. AcquiredCompany structure is different.
-        // For now, only startups open the detail modal.
-        if ('isLossMaking' in subsidiary) {
-            setSelectedSubsidiary(subsidiary);
-            setIsDetailModalOpen(true);
-        }
+    const formatMoney = (value: number) => {
+        if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+        if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+        return `$${value.toLocaleString()}`;
     };
 
-    const handleCloseDetail = () => {
-        setIsDetailModalOpen(false);
-        setSelectedSubsidiary(null);
-    };
+    const renderItem = ({ item }: { item: Subsidiary }) => (
+        <View style={styles.card}>
+            <View style={styles.cardHeader}>
+                <View style={styles.iconBox}>
+                    <Text style={styles.icon}>🏢</Text>
+                </View>
+                <View style={styles.cardInfo}>
+                    <Text style={styles.companyName}>{item.name}</Text>
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>{item.sector}</Text>
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.cardFooter}>
+                <Text style={styles.valuation}>{formatMoney(item.valuation)}</Text>
+                <TouchableOpacity
+                    style={styles.manageBtn}
+                    onPress={() => setSelectedCompanyId(item.id)}
+                >
+                    <Text style={styles.manageBtnText}>MANAGE</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 
     return (
-        <>
-            <Modal
-                visible={visible && !isDetailModalOpen}
-                animationType="fade"
-                presentationStyle="pageSheet"
-                onRequestClose={onClose}
-            >
-                <View style={styles.container}>
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitle}>My Empire</Text>
-                        <Pressable onPress={onClose} style={styles.closeBtn}>
-                            <Text style={styles.closeText}>Done</Text>
-                        </Pressable>
-                    </View>
-
-                    {/* Content */}
-                    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                        {!hasAnyCompany ? (
-                            <View style={styles.emptyState}>
-                                <Text style={styles.emptyIcon}>🏢</Text>
-                                <Text style={styles.emptyTitle}>No companies owned yet</Text>
-                                <Text style={styles.emptyDesc}>
-                                    Go to 'Acquire Company' to expand your empire.
-                                </Text>
-                            </View>
-                        ) : (
-                            <>
-                                {/* ACQUIRED SUBSIDIARIES SECTION */}
-                                {subsidiaries.length > 0 && (
-                                    <View style={styles.section}>
-                                        <Text style={styles.sectionTitle}>Acquired Market Entities</Text>
-                                        {subsidiaries.map(sub => (
-                                            <View key={sub.id} style={[styles.card, styles.acquiredCard]}>
-                                                <View style={styles.cardLeft}>
-                                                    <View style={[styles.logoBox, { borderColor: theme.colors.success }]}>
-                                                        <Text style={styles.logo}>👑</Text>
-                                                    </View>
-                                                    <View>
-                                                        <Text style={styles.companyName}>{sub.name} ({sub.symbol})</Text>
-                                                        <Text style={styles.companySector}>
-                                                            {sub.category} • Subsidiary
-                                                        </Text>
-                                                    </View>
-                                                </View>
-                                                <View style={styles.cardRight}>
-                                                    <Text style={styles.impactLabel}>Active Buff</Text>
-                                                    <Text style={[styles.impactValue, { color: theme.colors.success, fontSize: 13 }]}>
-                                                        {sub.acquisitionBuff.label}
-                                                    </Text>
-                                                </View>
-                                            </View>
-                                        ))}
-                                    </View>
-                                )}
-
-                                {/* STARTUPS SECTION */}
-                                {startups.length > 0 && (
-                                    <View style={styles.section}>
-                                        <Text style={styles.sectionTitle}>Founded Startups</Text>
-                                        {startups.map(sub => {
-                                            const isHealthy = !sub.isLossMaking;
-                                            const monthlyImpact = sub.currentProfit / 12;
-
-                                            return (
-                                                <Pressable
-                                                    key={sub.id}
-                                                    onPress={() => handleOpenDetail(sub)}
-                                                    style={({ pressed }) => [
-                                                        styles.card,
-                                                        pressed && styles.cardPressed,
-                                                        !isHealthy && styles.cardCritical,
-                                                    ]}
-                                                >
-                                                    <View style={styles.cardLeft}>
-                                                        <View style={[styles.logoBox, !isHealthy && { borderColor: theme.colors.danger }]}>
-                                                            <Text style={styles.logo}>🚀</Text>
-                                                        </View>
-                                                        <View>
-                                                            <Text style={styles.companyName}>{sub.name}</Text>
-                                                            <Text style={styles.companySector}>
-                                                                {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL LOSS'}
-                                                            </Text>
-                                                        </View>
-                                                    </View>
-
-                                                    <View style={styles.cardRight}>
-                                                        <Text style={styles.impactLabel}>Monthly Impact</Text>
-                                                        <Text
-                                                            style={[
-                                                                styles.impactValue,
-                                                                { color: isHealthy ? theme.colors.success : theme.colors.danger },
-                                                            ]}
-                                                        >
-                                                            {isHealthy ? '+' : ''}${(Math.abs(monthlyImpact) / 1e6).toFixed(1)}M
-                                                        </Text>
-                                                    </View>
-                                                </Pressable>
-                                            );
-                                        })}
-                                    </View>
-                                )}
-                            </>
-                        )}
-                    </ScrollView>
+        <Modal
+            visible={visible}
+            animationType="slide"
+            presentationStyle="pageSheet"
+            onRequestClose={onClose}
+        >
+            <View style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>My Empire</Text>
+                    <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                        <Text style={styles.closeText}>Close</Text>
+                    </TouchableOpacity>
                 </View>
-            </Modal>
 
-            {/* Detail Modal */}
-            {selectedSubsidiary && (
-                <SubsidiaryDetailModal
-                    visible={isDetailModalOpen}
-                    onClose={handleCloseDetail}
-                    subsidiary={selectedSubsidiary}
+                {/* List */}
+                <FlatList
+                    data={subsidiaries}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.listContent}
+                    ListEmptyComponent={
+                        <View style={styles.emptyState}>
+                            <Text style={styles.emptyEmoji}>📉</Text>
+                            <Text style={styles.emptyText}>You own no companies.</Text>
+                            <Text style={styles.emptySubText}>Go to Acquisitions to buy a subsidiary.</Text>
+                        </View>
+                    }
                 />
-            )}
-        </>
+
+                {/* Detail Modal */}
+                <SubsidiaryDetailModal
+                    visible={!!selectedCompanyId}
+                    companyId={selectedCompanyId}
+                    onClose={() => setSelectedCompanyId(null)}
+                />
+            </View>
+        </Modal>
     );
 };
 
@@ -160,131 +92,118 @@ export default ExistingCompaniesModal;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#05060A',
+        backgroundColor: '#121212', // Dark background
     },
     header: {
-        padding: 20,
-        paddingTop: 60,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
         borderBottomWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderBottomColor: '#2C2C2E',
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: theme.colors.textPrimary,
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#FFFFFF',
     },
     closeBtn: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+        padding: 8,
     },
     closeText: {
+        color: '#0A84FF',
         fontSize: 16,
         fontWeight: '600',
-        color: theme.colors.primary,
     },
-    content: {
+    listContent: {
         padding: 16,
         gap: 12,
+    },
+    card: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        padding: 16,
+        gap: 16,
+        borderWidth: 1,
+        borderColor: '#2C2C2E',
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        gap: 12,
+        alignItems: 'center',
+    },
+    iconBox: {
+        width: 48,
+        height: 48,
+        borderRadius: 8,
+        backgroundColor: '#2C2C2E',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    icon: {
+        fontSize: 24,
+    },
+    cardInfo: {
+        gap: 4,
+    },
+    companyName: {
+        fontSize: 17,
+        fontWeight: '700',
+        color: '#FFFFFF',
+    },
+    badge: {
+        backgroundColor: '#3A3A3C',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
+        alignSelf: 'flex-start',
+    },
+    badgeText: {
+        fontSize: 12,
+        color: '#AEAEB2',
+        fontWeight: '600',
+    },
+    cardFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#2C2C2E',
+    },
+    valuation: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#30D158', // Green
+    },
+    manageBtn: {
+        backgroundColor: '#FFFFFF',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
+    manageBtnText: {
+        color: '#000000',
+        fontSize: 13,
+        fontWeight: '800',
     },
     emptyState: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 100,
-        gap: 16,
-    },
-    emptyIcon: {
-        fontSize: 80,
-    },
-    emptyTitle: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    emptyDesc: {
-        fontSize: 15,
-        color: theme.colors.textSecondary,
-        textAlign: 'center',
-        maxWidth: 280,
-        lineHeight: 22,
-    },
-    card: {
-        backgroundColor: theme.colors.card,
-        borderRadius: 16,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    cardPressed: {
-        opacity: 0.7,
-        transform: [{ scale: 0.98 }],
-    },
-    cardCritical: {
-        borderColor: theme.colors.danger,
-        backgroundColor: theme.colors.danger + '08',
-    },
-    cardLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        paddingVertical: 60,
         gap: 12,
-        flex: 1,
     },
-    logoBox: {
-        width: 56,
-        height: 56,
-        borderRadius: 12,
-        backgroundColor: theme.colors.cardSoft,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: theme.colors.border,
+    emptyEmoji: {
+        fontSize: 48,
     },
-    logo: {
-        fontSize: 28,
-    },
-    companyName: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    companySector: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-        fontWeight: '600',
-        marginTop: 2,
-    },
-    cardRight: {
-        alignItems: 'flex-end',
-    },
-    impactLabel: {
-        fontSize: 11,
-        color: theme.colors.textMuted,
-        fontWeight: '600',
-        marginBottom: 4,
-    },
-    section: {
-        marginBottom: 20,
-        gap: 12
-    },
-    sectionTitle: {
-        color: theme.colors.textSecondary,
-        fontSize: theme.typography.caption,
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        marginBottom: 4,
-        marginLeft: 4
-    },
-    acquiredCard: {
-        borderColor: theme.colors.success + '40', // transparent success
-        backgroundColor: theme.colors.success + '10',
-    },
-    impactValue: {
+    emptyText: {
         fontSize: 18,
-        fontWeight: '900',
+        fontWeight: '700',
+        color: '#FFFFFF',
+    },
+    emptySubText: {
+        fontSize: 14,
+        color: '#8E8E93',
     },
 });

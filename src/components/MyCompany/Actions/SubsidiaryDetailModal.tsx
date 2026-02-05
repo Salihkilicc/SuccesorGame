@@ -8,13 +8,12 @@ import {
     Alert,
 } from 'react-native';
 import { theme } from '../../../core/theme';
-import { useCorporateFinanceStore, Subsidiary, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
-import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 
 interface SubsidiaryDetailModalProps {
     visible: boolean;
     onClose: () => void;
-    subsidiary: Subsidiary;
+    companyId: string | null;
 }
 
 const formatMoney = (value: number) => {
@@ -23,14 +22,23 @@ const formatMoney = (value: number) => {
     return `$${value.toLocaleString()}`;
 };
 
-export const SubsidiaryDetailModal = ({ visible, onClose, subsidiary }: SubsidiaryDetailModalProps) => {
-    const { updateSubsidiaryStrategy, sellSubsidiary } = useCorporateFinanceStore();
-    const [strategy, setStrategy] = useState<SubsidiaryStrategy>(subsidiary.strategy);
+export const SubsidiaryDetailModal = ({ visible, onClose, companyId }: SubsidiaryDetailModalProps) => {
+    const { subsidiaries, updateSubsidiaryStrategy, sellSubsidiary } = useCorporateFinanceStore();
+    const subsidiary = subsidiaries.find(s => s.id === companyId);
+
+    // Fallback strategy to prevent hooks error
+    const defaultStrategy: SubsidiaryStrategy = { marketing: 0, rnd: 0, production: 0, workforce: 0 };
+    const [strategy, setStrategy] = useState<SubsidiaryStrategy>(subsidiary?.strategy || defaultStrategy);
 
     // Reset local state when subsidiary changes
     useEffect(() => {
-        setStrategy(subsidiary.strategy);
+        if (subsidiary) {
+            setStrategy(subsidiary.strategy);
+        }
     }, [subsidiary]);
+
+    // Fallback if not found or no ID
+    if (!subsidiary) return null;
 
     // Calculate Points used
     const totalPoints = strategy.marketing + strategy.rnd + strategy.production + strategy.workforce;
@@ -75,7 +83,7 @@ export const SubsidiaryDetailModal = ({ visible, onClose, subsidiary }: Subsidia
     const handleSell = () => {
         Alert.alert(
             'Sell Subsidiary?',
-            `Are you sure you want to sell ${subsidiary.name} for ${formatMoney(subsidiary.currentValuation)}?\n\nThis action is irreversible.`,
+            `Are you sure you want to sell ${subsidiary.name} for ${formatMoney(subsidiary.valuation)}?\n\nThis action is irreversible.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
@@ -130,9 +138,9 @@ export const SubsidiaryDetailModal = ({ visible, onClose, subsidiary }: Subsidia
                         <View>
                             <Text style={styles.companyName}>{subsidiary.name}</Text>
                             <View style={styles.valuationBadge}>
-                                <Text style={styles.valuationText}>{formatMoney(subsidiary.currentValuation)}</Text>
+                                <Text style={styles.valuationText}>{formatMoney(subsidiary.valuation)}</Text>
                                 {/* Simple growth indicator based on acquired vs current */}
-                                {subsidiary.currentValuation >= subsidiary.acquiredAtValuation ? (
+                                {subsidiary.valuation >= subsidiary.acquiredAt ? (
                                     <Text style={styles.growthText}>▲</Text>
                                 ) : (
                                     <Text style={[styles.growthText, { color: theme.colors.danger }]}>▼</Text>
@@ -194,57 +202,64 @@ const styles = StyleSheet.create({
         padding: theme.spacing.lg,
     },
     container: {
-        backgroundColor: theme.colors.card, // Assuming dark theme card
-        borderRadius: theme.radius.lg,
+        backgroundColor: '#1C1C1E', // Dark card
+        borderRadius: 16,
         borderWidth: 1,
-        borderColor: theme.colors.border,
-        padding: theme.spacing.lg,
-        gap: theme.spacing.lg,
+        borderColor: 'rgba(255,255,255,0.1)',
+        padding: 20,
+        gap: 20,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-        paddingBottom: theme.spacing.md,
+        borderBottomColor: 'rgba(255,255,255,0.1)',
+        paddingBottom: 16,
     },
     companyName: {
-        fontSize: theme.typography.title,
+        fontSize: 20,
         fontWeight: '800',
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
     },
     valuationBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 4,
+        marginTop: 6,
         gap: 6,
         backgroundColor: 'rgba(255,255,255,0.05)',
         alignSelf: 'flex-start',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 4,
+        paddingVertical: 4,
+        borderRadius: 6,
     },
     valuationText: {
-        fontSize: theme.typography.body,
+        fontSize: 15,
         fontWeight: '700',
-        color: theme.colors.accent,
+        color: '#FFD60A', // Gold-ish
     },
     growthText: {
         fontSize: 12,
-        color: theme.colors.success,
+        color: '#30D158',
     },
     closeBtn: {
         padding: 8,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 20,
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     closeText: {
-        fontSize: 20,
-        color: theme.colors.textSecondary,
+        fontSize: 14,
+        color: '#FFFFFF',
+        fontWeight: 'bold',
     },
 
     // Allocation
     allocationSection: {
-        gap: theme.spacing.md,
+        gap: 12,
     },
     allocHeader: {
         flexDirection: 'row',
@@ -252,27 +267,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sectionTitle: {
-        fontSize: theme.typography.subtitle,
+        fontSize: 16,
         fontWeight: '700',
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
     },
     pointsText: {
-        fontSize: theme.typography.body,
+        fontSize: 14,
         fontWeight: '600',
     },
     progressBar: {
         height: 6,
-        backgroundColor: theme.colors.cardSoft,
+        backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 3,
         overflow: 'hidden',
     },
     progressFill: {
         height: '100%',
-        backgroundColor: theme.colors.accent,
+        backgroundColor: '#0A84FF', // Blue
     },
     forecastText: {
-        fontSize: theme.typography.caption,
-        color: theme.colors.textMuted,
+        fontSize: 13,
+        color: '#8E8E93',
         fontStyle: 'italic',
         textAlign: 'center',
         marginBottom: 8,
@@ -280,85 +295,87 @@ const styles = StyleSheet.create({
 
     // Steppers
     stepperContainer: {
-        gap: theme.spacing.sm,
+        gap: 12,
     },
     stepperRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: theme.colors.cardSoft,
-        padding: theme.spacing.sm + 4,
-        borderRadius: theme.radius.md,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 12,
+        borderRadius: 12,
     },
     stepperLabel: {
-        color: theme.colors.textSecondary,
-        fontSize: theme.typography.body,
+        color: '#E5E5E7',
+        fontSize: 15,
         fontWeight: '600',
     },
     stepperControls: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: theme.spacing.md,
-        backgroundColor: theme.colors.card, // Contrast inset
+        gap: 16,
+        backgroundColor: '#000000', // Deep black for contrast
         padding: 4,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: theme.colors.border,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     stepBtn: {
-        width: 28,
-        height: 28,
+        width: 32,
+        height: 32,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 6,
-        backgroundColor: theme.colors.cardSoft,
+        backgroundColor: '#1C1C1E',
     },
     stepBtnDisabled: {
         opacity: 0.3,
     },
     stepBtnText: {
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
         fontWeight: 'bold',
-        fontSize: 16,
-        lineHeight: 18,
+        fontSize: 18,
+        lineHeight: 20,
     },
     stepValue: {
         width: 24,
         textAlign: 'center',
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
         fontWeight: 'bold',
+        fontSize: 16,
     },
 
     // Footer
     footer: {
-        gap: theme.spacing.sm,
-        marginTop: theme.spacing.sm,
+        gap: 12,
+        marginTop: 8,
     },
     actionSave: {
-        backgroundColor: theme.colors.accent,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
+        backgroundColor: '#0A84FF',
+        padding: 16,
+        borderRadius: 12,
         alignItems: 'center',
-        shadowColor: theme.colors.accent,
+        shadowColor: '#0A84FF',
         shadowOpacity: 0.3,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 2 },
     },
     actionSaveText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontWeight: '800',
-        fontSize: theme.typography.body,
+        fontSize: 15,
+        letterSpacing: 0.5,
     },
     actionSell: {
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
+        padding: 14,
+        borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: theme.colors.danger,
+        borderColor: '#FF453A',
     },
     actionSellText: {
-        color: theme.colors.danger,
+        color: '#FF453A',
         fontWeight: '700',
-        fontSize: theme.typography.body,
+        fontSize: 14,
     },
 });
