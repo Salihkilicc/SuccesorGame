@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import {
+    Modal,
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    SafeAreaView
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import GameModal from '../../common/GameModal';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import BottomStatsBar from '../../common/BottomStatsBar';
@@ -14,15 +21,7 @@ type Props = {
 const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
     const navigation = useNavigation<any>();
     const { subsidiaries } = useCorporateFinanceStore();
-    const [selectedSubsidiaryId, setSelectedSubsidiaryId] = useState<string | null>(null);
-
-    const handleSelect = (id: string) => {
-        setSelectedSubsidiaryId(id);
-    };
-
-    const handleDetailClose = () => {
-        setSelectedSubsidiaryId(null);
-    };
+    const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
     const handleHomePress = () => {
         onClose();
@@ -30,199 +29,138 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <GameModal
-            visible={visible}
-            onClose={onClose}
-            fixedBottomContent={<BottomStatsBar onHomePress={handleHomePress} />}
-        >
-            {/* List Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>MY EMPIRE</Text>
-                <Text style={styles.headerSubtitle}>Subsidiary Portfolio</Text>
-            </View>
-
-            {subsidiaries.length === 0 ? (
-                // Empty State
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyIcon}>🏢</Text>
-                    <Text style={styles.emptyTitle}>No Acquisitions Yet</Text>
-                    <Text style={styles.emptySubtitle}>
-                        Your portfolio is empty. Go to the Stock Market to acquire companies.
-                    </Text>
+        <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
+            <SafeAreaView style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+                        <Text style={styles.backText}>← Back</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.title}>My Empire</Text>
+                    <View style={{ width: 50 }} />
                 </View>
-            ) : (
-                // Subsidiaries List
+
                 <FlatList
                     data={subsidiaries}
-                    keyExtractor={(item) => item.id}
-                    contentContainerStyle={styles.listContent}
+                    keyExtractor={item => item.id}
                     renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={styles.card}
-                            onPress={() => handleSelect(item.id)}
-                        >
-                            <View style={styles.cardHeader}>
-                                <Text style={styles.cardName}>{item.name}</Text>
-                                <View style={styles.sectorBadge}>
-                                    <Text style={styles.sectorText}>{item.sector}</Text>
-                                </View>
+                        <TouchableOpacity style={styles.row} onPress={() => setSelectedCompanyId(item.id)}>
+                            <View>
+                                <Text style={styles.name}>{item.name}</Text>
+                                <Text style={styles.sector}>{item.sector}</Text>
                             </View>
-
-                            <View style={styles.cardMetrics}>
-                                <View>
-                                    <Text style={styles.metricLabel}>VALUATION</Text>
-                                    <Text style={styles.metricValue}>
-                                        ${(item.valuation / 1_000_000).toFixed(2)}M
-                                    </Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.metricLabel}>PERFORMANCE</Text>
-                                    <View style={styles.strategyPreview}>
-                                        <Text style={styles.strategyDots}>
-                                            {'●'.repeat(Math.min(5, item.history.length > 0 ? 5 : 1))}
-                                        </Text>
-                                    </View>
-                                </View>
+                            <View style={{ alignItems: 'flex-end' }}>
+                                <Text style={styles.value}>${(item.valuation / 1_000_000).toFixed(1)}M</Text>
+                                <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#4ADE80' } : { color: '#FF453A' }]}>
+                                    {item.lastChangePercent > 0 ? '+' : ''}{item.lastChangePercent.toFixed(1)}%
+                                </Text>
                             </View>
-
-                            <Text style={styles.arrow}>→</Text>
                         </TouchableOpacity>
                     )}
+                    ItemSeparatorComponent={() => <View style={styles.separator} />}
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.empty}>No companies owned.</Text>
+                        </View>
+                    }
+                    contentContainerStyle={[
+                        styles.listContent,
+                        subsidiaries.length === 0 && styles.emptyList
+                    ]}
                 />
-            )}
 
-            {/* Nested Manager Modal */}
-            {selectedSubsidiaryId && (
-                <SubsidiaryDetailModal
-                    visible={!!selectedSubsidiaryId}
-                    onClose={handleDetailClose}
-                    subsidiaryId={selectedSubsidiaryId}
-                />
-            )}
-        </GameModal>
+                <BottomStatsBar onHomePress={handleHomePress} />
+
+                {/* Detail Modal Integration */}
+                {selectedCompanyId && (
+                    <SubsidiaryDetailModal
+                        visible={!!selectedCompanyId}
+                        subsidiaryId={selectedCompanyId}
+                        onClose={() => setSelectedCompanyId(null)}
+                    />
+                )}
+            </SafeAreaView>
+        </Modal>
     );
 };
 
+export default ExistingCompaniesModal;
+
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#121212',
+    },
     header: {
-        alignItems: 'center',
-        marginBottom: 24,
-        paddingVertical: 12,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: '#F0F0F0',
-        letterSpacing: 2,
-    },
-    headerSubtitle: {
-        fontSize: 14,
-        color: '#8A9BA8',
-        fontWeight: '600',
-        letterSpacing: 0.5,
-    },
-    listContent: {
-        paddingBottom: 80, // Space for Bottom Bar
-        gap: 16,
-    },
-    emptyState: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 40,
-        backgroundColor: '#1C1C1E',
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: '#2A2D35',
-        marginTop: 20,
-    },
-    emptyIcon: {
-        fontSize: 48,
-        marginBottom: 16,
-        opacity: 0.5,
-    },
-    emptyTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#E0E0E0',
-        marginBottom: 8,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        color: '#8A9BA8',
-        textAlign: 'center',
-        lineHeight: 20,
-    },
-    card: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 16,
-        padding: 20,
-        borderWidth: 1,
-        borderColor: '#2A2D35',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
-        position: 'relative',
-    },
-    cardHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#333',
     },
-    cardName: {
+    backBtn: {
+        paddingVertical: 8,
+        paddingRight: 16,
+    },
+    backText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    title: {
         fontSize: 18,
         fontWeight: '700',
         color: '#FFFFFF',
     },
-    sectorBadge: {
-        backgroundColor: '#2C2C2E',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#3A3A3C',
-    },
-    sectorText: {
-        fontSize: 10,
-        color: '#FFD700',
-        fontWeight: '700',
-        textTransform: 'uppercase',
-    },
-    cardMetrics: {
+    row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
-    },
-    metricLabel: {
-        fontSize: 10,
-        color: '#8A9BA8',
-        fontWeight: '700',
-        marginBottom: 4,
-        letterSpacing: 0.5,
-    },
-    metricValue: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: '#30D158',
-    },
-    strategyPreview: {
-        flexDirection: 'row',
         alignItems: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        backgroundColor: '#1C1C1E',
     },
-    strategyDots: {
-        fontSize: 12,
-        color: '#8A9BA8',
-    },
-    arrow: {
-        position: 'absolute',
-        right: 16,
-        bottom: 20,
-        fontSize: 20,
-        color: '#4ADE80',
+    name: {
+        fontSize: 16,
         fontWeight: '700',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    sector: {
+        fontSize: 12,
+        color: '#8E8E93',
+    },
+    value: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    change: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#333',
+        marginLeft: 16,
+    },
+    emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 100,
+    },
+    empty: {
+        color: '#8E8E93',
+        fontSize: 16,
+    },
+    listContent: {
+        paddingBottom: 100, // Space for BottomStatsBar
+    },
+    emptyList: {
+        flex: 1,
     }
 });
-
-export default ExistingCompaniesModal;
