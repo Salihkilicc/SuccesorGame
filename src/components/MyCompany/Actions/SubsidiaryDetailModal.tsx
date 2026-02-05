@@ -1,552 +1,364 @@
-import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+    Modal,
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    Alert,
+} from 'react-native';
 import { theme } from '../../../core/theme';
-import { SubsidiaryState } from '../../../core/store/useStatsStore';
-import { useStatsStore } from '../../../core/store';
+import { useCorporateFinanceStore, Subsidiary, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
-type Props = {
+interface SubsidiaryDetailModalProps {
     visible: boolean;
     onClose: () => void;
-    subsidiary: SubsidiaryState | null;
-};
+    subsidiary: Subsidiary;
+}
 
 const formatMoney = (value: number) => {
-    const absValue = Math.abs(value);
-    if (absValue >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
-    if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
     return `$${value.toLocaleString()}`;
 };
 
-const SubsidiaryDetailModal = ({ visible, onClose, subsidiary }: Props) => {
-    const { companyCapital, setField, subsidiaryStates, update } = useStatsStore();
-    const [isProcessing, setIsProcessing] = useState(false);
+export const SubsidiaryDetailModal = ({ visible, onClose, subsidiary }: SubsidiaryDetailModalProps) => {
+    const { updateSubsidiaryStrategy, sellSubsidiary } = useCorporateFinanceStore();
+    const [strategy, setStrategy] = useState<SubsidiaryStrategy>(subsidiary.strategy);
 
-    if (!subsidiary) return null;
+    // Reset local state when subsidiary changes
+    useEffect(() => {
+        setStrategy(subsidiary.strategy);
+    }, [subsidiary]);
 
-    const isHealthy = !subsidiary.isLossMaking;
-    const restructureCost = subsidiary.marketCap * 0.1;
-    const sellValue = subsidiary.marketCap * 0.5;
+    // Calculate Points used
+    const totalPoints = strategy.marketing + strategy.rnd + strategy.production + strategy.workforce;
+    const maxPoints = 10;
+    const remainingPoints = maxPoints - totalPoints;
 
-    const handleRestructure = () => {
-        if (companyCapital < restructureCost) {
-            Alert.alert('Insufficient Funds', `You need $${(restructureCost / 1e9).toFixed(2)}B to restructure this company.`);
-            return;
-        }
+    // Forecast Text
+    const getForecast = () => {
+        const stats = [
+            { name: 'Market Leader', val: strategy.marketing },
+            { name: 'Innovator', val: strategy.rnd },
+            { name: 'Mass Producer', val: strategy.production },
+            { name: 'Top Employer', val: strategy.workforce },
+        ];
+        // Sort desc
+        stats.sort((a, b) => b.val - a.val);
 
-        Alert.alert(
-            'Confirm Restructuring',
-            `Inject $${(restructureCost / 1e9).toFixed(2)}B to fix ${subsidiary.name}?\n\nThis will restore profitability immediately.`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Restructure',
-                    style: 'destructive',
-                    onPress: () => {
-                        setIsProcessing(true);
+        if (stats[0].val === stats[1].val) return "Balanced Growth";
+        return `Focus: ${stats[0].name}`;
+    };
 
-                        // Deduct cost
-                        setField('companyCapital', companyCapital - restructureCost);
+    const handleUpdate = (field: keyof SubsidiaryStrategy, delta: number) => {
+        const currentValue = strategy[field];
+        const newValue = currentValue + delta;
 
-                        // Fix subsidiary
-                        const updatedSub: SubsidiaryState = {
-                            ...subsidiary,
-                            isLossMaking: false,
-                            currentProfit: subsidiary.baseProfit,
-                        };
+        // Constraints
+        if (newValue < 0) return; // Cannot go below 0
+        if (newValue > 10) return; // Individual max (logic limit)
 
-                        update({
-                            subsidiaryStates: {
-                                ...subsidiaryStates,
-                                [subsidiary.id]: updatedSub,
-                            },
-                        });
+        // Check Total Sum constraint ONLY if increasing
+        if (delta > 0 && totalPoints >= maxPoints) return;
 
-                        setTimeout(() => {
-                            setIsProcessing(false);
-                            Alert.alert('Success!', `${subsidiary.name} has been restructured and is now profitable.`);
-                            onClose();
-                        }, 500);
-                    },
-                },
-            ]
-        );
+        setStrategy(prev => ({ ...prev, [field]: newValue }));
+    };
+
+    const handleSave = () => {
+        updateSubsidiaryStrategy(subsidiary.id, strategy);
+        Alert.alert('Strategy Updated', 'Instructions sent to the board.');
+        onClose();
     };
 
     const handleSell = () => {
         Alert.alert(
-            'Confirm Fire Sale',
-            `Sell ${subsidiary.name} for $${(sellValue / 1e9).toFixed(2)}B?\n\nThis is 50% of its market value. The company will be removed from your portfolio.`,
+            'Sell Subsidiary?',
+            `Are you sure you want to sell ${subsidiary.name} for ${formatMoney(subsidiary.currentValuation)}?\n\nThis action is irreversible.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
-                    text: 'Sell',
+                    text: 'Sell Company',
                     style: 'destructive',
                     onPress: () => {
-                        setIsProcessing(true);
-
-                        // Add cash
-                        setField('companyCapital', companyCapital + sellValue);
-
-                        // Remove subsidiary
-                        const { [subsidiary.id]: removed, ...remainingSubsidiaries } = subsidiaryStates;
-                        const remainingAcquisitions = useStatsStore.getState().acquisitions.filter(id => id !== subsidiary.id);
-
-                        update({
-                            acquisitions: remainingAcquisitions,
-                            subsidiaryStates: remainingSubsidiaries,
-                        });
-
-                        setTimeout(() => {
-                            setIsProcessing(false);
-                            Alert.alert('Sold', `${subsidiary.name} has been sold for $${(sellValue / 1e9).toFixed(2)}B.`);
-                            onClose();
-                        }, 500);
-                    },
-                },
+                        sellSubsidiary(subsidiary.id);
+                        onClose();
+                    }
+                }
             ]
         );
     };
 
-    const handleInvest = () => {
-        const investmentCost = subsidiary.marketCap * 0.1;
+    const renderStepper = (label: string, field: keyof SubsidiaryStrategy) => {
+        const val = strategy[field];
+        const canInc = totalPoints < maxPoints;
+        const canDec = val > 0;
 
-        if (companyCapital < investmentCost) {
-            Alert.alert('Insufficient Funds', `You need ${formatMoney(investmentCost)} to invest in this company.`);
-            return;
-        }
+        return (
+            <View style={styles.stepperRow}>
+                <Text style={styles.stepperLabel}>{label}</Text>
+                <View style={styles.stepperControls}>
+                    <Pressable
+                        style={[styles.stepBtn, !canDec && styles.stepBtnDisabled]}
+                        onPress={() => handleUpdate(field, -1)}
+                        disabled={!canDec}
+                    >
+                        <Text style={styles.stepBtnText}>-</Text>
+                    </Pressable>
 
-        Alert.alert(
-            'Confirm Investment',
-            `Invest ${formatMoney(investmentCost)} to boost ${subsidiary.name}'s annual profit by 3%?`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Invest',
-                    onPress: () => {
-                        setIsProcessing(true);
+                    <Text style={styles.stepValue}>{val}</Text>
 
-                        // Deduct investment cost
-                        setField('companyCapital', companyCapital - investmentCost);
-
-                        // Increase base profit by 3%
-                        const newBaseProfit = subsidiary.baseProfit * 1.03;
-                        const updatedSub: SubsidiaryState = {
-                            ...subsidiary,
-                            baseProfit: newBaseProfit,
-                            currentProfit: subsidiary.isLossMaking ? subsidiary.currentProfit : newBaseProfit,
-                        };
-
-                        update({
-                            subsidiaryStates: {
-                                ...subsidiaryStates,
-                                [subsidiary.id]: updatedSub,
-                            },
-                        });
-
-                        setTimeout(() => {
-                            setIsProcessing(false);
-                            Alert.alert('Investment Complete', `${subsidiary.name}'s profit has been increased by 3%!`);
-                            onClose();
-                        }, 500);
-                    },
-                },
-            ]
-        );
-    };
-
-    const calculateSalePrice = () => {
-        const initialProfit = subsidiary.baseProfit;
-        const currentProfit = subsidiary.currentProfit;
-
-        // Calculate profit change ratio
-        const profitChangeRatio = currentProfit / initialProfit;
-
-        // Sale price = Initial purchase price + (Initial price * profit change)
-        const salePrice = subsidiary.initialPurchasePrice + (subsidiary.initialPurchasePrice * (profitChangeRatio - 1));
-
-        return Math.max(0, salePrice); // Ensure non-negative
-    };
-
-    const handleSellCompany = () => {
-        const salePrice = calculateSalePrice();
-        const profitLoss = salePrice - subsidiary.initialPurchasePrice;
-        const isProfitable = profitLoss > 0;
-
-        Alert.alert(
-            'Confirm Sale',
-            `Sell ${subsidiary.name} for ${formatMoney(salePrice)}?\n\n` +
-            `Purchase Price: ${formatMoney(subsidiary.initialPurchasePrice)}\n` +
-            `${isProfitable ? 'Profit' : 'Loss'}: ${formatMoney(Math.abs(profitLoss))}`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Sell',
-                    style: isProfitable ? 'default' : 'destructive',
-                    onPress: () => {
-                        setIsProcessing(true);
-
-                        // Add sale proceeds
-                        setField('companyCapital', companyCapital + salePrice);
-
-                        // Remove subsidiary
-                        const { [subsidiary.id]: removed, ...remainingSubsidiaries } = subsidiaryStates;
-                        const remainingAcquisitions = useStatsStore.getState().acquisitions.filter(id => id !== subsidiary.id);
-
-                        update({
-                            acquisitions: remainingAcquisitions,
-                            subsidiaryStates: remainingSubsidiaries,
-                        });
-
-                        setTimeout(() => {
-                            setIsProcessing(false);
-                            Alert.alert(
-                                'Company Sold',
-                                `${subsidiary.name} sold for ${formatMoney(salePrice)}.\n` +
-                                `${isProfitable ? 'Profit' : 'Loss'}: ${formatMoney(Math.abs(profitLoss))}`
-                            );
-                            onClose();
-                        }, 500);
-                    },
-                },
-            ]
+                    <Pressable
+                        style={[styles.stepBtn, !canInc && styles.stepBtnDisabled]}
+                        onPress={() => handleUpdate(field, 1)}
+                        disabled={!canInc}
+                    >
+                        <Text style={styles.stepBtnText}>+</Text>
+                    </Pressable>
+                </View>
+            </View>
         );
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <Pressable style={styles.backdrop} onPress={onClose}>
-                <Pressable style={styles.container} onPress={e => e.stopPropagation()}>
+        <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+            <View style={styles.overlay}>
+                <View style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.title}>{subsidiary.name}</Text>
-                        <Pressable onPress={onClose}>
-                            <Text style={styles.closeText}>×</Text>
+                        <View>
+                            <Text style={styles.companyName}>{subsidiary.name}</Text>
+                            <View style={styles.valuationBadge}>
+                                <Text style={styles.valuationText}>{formatMoney(subsidiary.currentValuation)}</Text>
+                                {/* Simple growth indicator based on acquired vs current */}
+                                {subsidiary.currentValuation >= subsidiary.acquiredAtValuation ? (
+                                    <Text style={styles.growthText}>▲</Text>
+                                ) : (
+                                    <Text style={[styles.growthText, { color: theme.colors.danger }]}>▼</Text>
+                                )}
+                            </View>
+                        </View>
+                        <Pressable onPress={onClose} style={styles.closeBtn}>
+                            <Text style={styles.closeText}>✕</Text>
                         </Pressable>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
-                        {/* Status Indicator */}
-                        <View style={[styles.statusCard, isHealthy ? styles.statusHealthy : styles.statusCritical]}>
-                            <Text style={styles.statusLabel}>STATUS</Text>
-                            <Text style={[styles.statusValue, isHealthy ? styles.statusTextHealthy : styles.statusTextCritical]}>
-                                {isHealthy ? '🟢 Healthy' : '🔻 CRITICAL LOSS'}
+                    {/* Allocation Section */}
+                    <View style={styles.allocationSection}>
+                        <View style={styles.allocHeader}>
+                            <Text style={styles.sectionTitle}>Strategy Allocation</Text>
+                            <Text style={[
+                                styles.pointsText,
+                                remainingPoints === 0 ? { color: theme.colors.success } : { color: theme.colors.textSecondary }
+                            ]}>
+                                Points Used: {totalPoints} / {maxPoints}
                             </Text>
-                            {!isHealthy && (
-                                <Text style={styles.warningText}>
-                                    ⚠️ This company is draining {formatMoney(Math.abs(subsidiary.currentProfit))} from your cash reserves every month!
-                                </Text>
-                            )}
                         </View>
 
-                        {/* Financial Metrics */}
-                        <View style={styles.metricsCard}>
-                            <Text style={styles.sectionTitle}>FINANCIAL OVERVIEW</Text>
-                            <View style={styles.metricRow}>
-                                <Text style={styles.metricLabel}>Market Cap</Text>
-                                <Text style={styles.metricValue}>{formatMoney(subsidiary.marketCap)}</Text>
-                            </View>
-                            <View style={styles.metricRow}>
-                                <Text style={styles.metricLabel}>Purchase Price</Text>
-                                <Text style={styles.metricValue}>{formatMoney(subsidiary.initialPurchasePrice)}</Text>
-                            </View>
-                            <View style={styles.metricRow}>
-                                <Text style={styles.metricLabel}>Base Profit (Annual)</Text>
-                                <Text style={styles.metricValue}>{formatMoney(subsidiary.baseProfit)}</Text>
-                            </View>
-                            <View style={styles.metricRow}>
-                                <Text style={styles.metricLabel}>Current Profit (Monthly)</Text>
-                                <Text style={[styles.metricValue, subsidiary.currentProfit < 0 && { color: theme.colors.danger }]}>
-                                    {formatMoney(subsidiary.currentProfit / 12)}
-                                </Text>
-                            </View>
+                        <View style={styles.progressBar}>
+                            <View style={[styles.progressFill, { width: `${(totalPoints / maxPoints) * 100}%` }]} />
                         </View>
 
-                        {/* Investment Actions */}
-                        <View style={styles.investmentActions}>
-                            <Pressable
-                                style={({ pressed }) => [styles.investButton, pressed && styles.buttonPressed]}
-                                onPress={handleInvest}
-                                disabled={isProcessing}
-                            >
-                                <Text style={styles.investButtonText}>💰 Invest</Text>
-                                <Text style={styles.investButtonDesc}>Pay {formatMoney(subsidiary.marketCap * 0.1)} to boost profit by 3%</Text>
-                            </Pressable>
+                        <Text style={styles.forecastText}>{getForecast()}</Text>
 
-                            <Pressable
-                                style={({ pressed }) => [styles.sellButton, pressed && styles.buttonPressed]}
-                                onPress={handleSellCompany}
-                                disabled={isProcessing}
-                            >
-                                <Text style={styles.sellButtonText}>💸 Sell Company</Text>
-                                <Text style={styles.sellButtonDesc}>Receive {formatMoney(calculateSalePrice())}</Text>
-                            </Pressable>
+                        <View style={styles.stepperContainer}>
+                            {renderStepper('Marketing', 'marketing')}
+                            {renderStepper('R&D', 'rnd')}
+                            {renderStepper('Production', 'production')}
+                            {renderStepper('Workforce', 'workforce')}
                         </View>
+                    </View>
 
-                        {/* Action Buttons */}
-                        {!isHealthy && (
-                            <View style={styles.actionsCard}>
-                                <Text style={styles.sectionTitle}>MANAGEMENT OPTIONS</Text>
+                    {/* Footer Actions */}
+                    <View style={styles.footer}>
+                        <Pressable style={styles.actionSave} onPress={handleSave}>
+                            <Text style={styles.actionSaveText}>SAVE STRATEGY</Text>
+                        </Pressable>
+                        <Pressable style={styles.actionSell} onPress={handleSell}>
+                            <Text style={styles.actionSellText}>SELL COMPANY</Text>
+                        </Pressable>
+                    </View>
 
-                                {/* Restructure */}
-                                <Pressable
-                                    style={({ pressed }) => [styles.actionButton, styles.actionRestructure, pressed && styles.actionPressed]}
-                                    onPress={handleRestructure}
-                                    disabled={isProcessing}
-                                >
-                                    <View style={styles.actionHeader}>
-                                        <Text style={styles.actionIcon}>🛠️</Text>
-                                        <Text style={styles.actionTitle}>Restructure / Inject Capital</Text>
-                                    </View>
-                                    <Text style={styles.actionDesc}>
-                                        Cost: {formatMoney(restructureCost)} (10% of market cap)
-                                    </Text>
-                                    <Text style={styles.actionResult}>✅ 100% chance to restore profitability</Text>
-                                </Pressable>
-
-                                {/* Do Nothing */}
-                                <Pressable
-                                    style={({ pressed }) => [styles.actionButton, styles.actionWait, pressed && styles.actionPressed]}
-                                    onPress={onClose}
-                                    disabled={isProcessing}
-                                >
-                                    <View style={styles.actionHeader}>
-                                        <Text style={styles.actionIcon}>🤷</Text>
-                                        <Text style={styles.actionTitle}>Do Nothing (Wait it out)</Text>
-                                    </View>
-                                    <Text style={styles.actionDesc}>Wait and hope for a market recovery</Text>
-                                    <Text style={styles.actionResult}>💡 ~25% chance of recovery next month</Text>
-                                </Pressable>
-
-                                {/* Sell */}
-                                <Pressable
-                                    style={({ pressed }) => [styles.actionButton, styles.actionSell, pressed && styles.actionPressed]}
-                                    onPress={handleSell}
-                                    disabled={isProcessing}
-                                >
-                                    <View style={styles.actionHeader}>
-                                        <Text style={styles.actionIcon}>💸</Text>
-                                        <Text style={styles.actionTitle}>Sell Asset (Fire Sale)</Text>
-                                    </View>
-                                    <Text style={styles.actionDesc}>Sell at a loss to stop the bleeding</Text>
-                                    <Text style={styles.actionResult}>💰 Receive {formatMoney(sellValue)} (50% of value)</Text>
-                                </Pressable>
-                            </View>
-                        )}
-
-                        {isHealthy && (
-                            <View style={styles.healthyMessage}>
-                                <Text style={styles.healthyIcon}>✨</Text>
-                                <Text style={styles.healthyText}>
-                                    This company is performing well and contributing to your monthly revenue.
-                                </Text>
-                            </View>
-                        )}
-                    </ScrollView>
-                </Pressable>
-            </Pressable>
+                </View>
+            </View>
         </Modal>
     );
 };
 
-export default SubsidiaryDetailModal;
-
 const styles = StyleSheet.create({
-    backdrop: {
+    overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
-        padding: 20,
+        padding: theme.spacing.lg,
     },
     container: {
-        backgroundColor: theme.colors.card,
-        borderRadius: 24,
-        padding: 24,
-        maxHeight: '90%',
+        backgroundColor: theme.colors.card, // Assuming dark theme card
+        borderRadius: theme.radius.lg,
         borderWidth: 1,
         borderColor: theme.colors.border,
+        padding: theme.spacing.lg,
+        gap: theme.spacing.lg,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
+        alignItems: 'flex-start',
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border,
+        paddingBottom: theme.spacing.md,
     },
-    title: {
-        fontSize: 22,
-        fontWeight: '900',
+    companyName: {
+        fontSize: theme.typography.title,
+        fontWeight: '800',
         color: theme.colors.textPrimary,
     },
-    closeText: {
-        fontSize: 32,
-        fontWeight: '300',
-        color: theme.colors.textSecondary,
+    valuationBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+        gap: 6,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
     },
-    statusCard: {
-        padding: 20,
-        borderRadius: 16,
-        borderWidth: 2,
-        gap: 8,
-    },
-    statusHealthy: {
-        backgroundColor: theme.colors.success + '15',
-        borderColor: theme.colors.success,
-    },
-    statusCritical: {
-        backgroundColor: theme.colors.danger + '15',
-        borderColor: theme.colors.danger,
-    },
-    statusLabel: {
-        fontSize: 11,
+    valuationText: {
+        fontSize: theme.typography.body,
         fontWeight: '700',
-        color: theme.colors.textMuted,
-        letterSpacing: 1,
+        color: theme.colors.accent,
     },
-    statusValue: {
-        fontSize: 24,
-        fontWeight: '900',
-    },
-    statusTextHealthy: {
+    growthText: {
+        fontSize: 12,
         color: theme.colors.success,
     },
-    statusTextCritical: {
-        color: theme.colors.danger,
+    closeBtn: {
+        padding: 8,
     },
-    warningText: {
-        fontSize: 13,
-        color: theme.colors.danger,
-        fontWeight: '600',
-        marginTop: 8,
-        lineHeight: 18,
+    closeText: {
+        fontSize: 20,
+        color: theme.colors.textSecondary,
     },
-    metricsCard: {
-        backgroundColor: theme.colors.cardSoft,
-        padding: 16,
-        borderRadius: 16,
-        gap: 12,
+
+    // Allocation
+    allocationSection: {
+        gap: theme.spacing.md,
     },
-    sectionTitle: {
-        fontSize: 11,
-        fontWeight: '700',
-        color: theme.colors.textMuted,
-        letterSpacing: 1,
-        marginBottom: 4,
-    },
-    metricRow: {
+    allocHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    metricLabel: {
-        fontSize: 14,
-        color: theme.colors.textSecondary,
+    sectionTitle: {
+        fontSize: theme.typography.subtitle,
+        fontWeight: '700',
+        color: theme.colors.textPrimary,
+    },
+    pointsText: {
+        fontSize: theme.typography.body,
         fontWeight: '600',
     },
-    metricValue: {
-        fontSize: 16,
-        color: theme.colors.textPrimary,
-        fontWeight: '800',
-    },
-    actionsCard: {
-        gap: 12,
-    },
-    actionButton: {
-        padding: 16,
-        borderRadius: 16,
-        borderWidth: 2,
-        gap: 8,
-    },
-    actionRestructure: {
-        backgroundColor: theme.colors.primary + '10',
-        borderColor: theme.colors.primary,
-    },
-    actionWait: {
+    progressBar: {
+        height: 6,
         backgroundColor: theme.colors.cardSoft,
-        borderColor: theme.colors.border,
+        borderRadius: 3,
+        overflow: 'hidden',
     },
-    actionSell: {
-        backgroundColor: theme.colors.danger + '10',
-        borderColor: theme.colors.danger,
+    progressFill: {
+        height: '100%',
+        backgroundColor: theme.colors.accent,
     },
-    actionPressed: {
-        opacity: 0.7,
-    },
-    actionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    actionIcon: {
-        fontSize: 24,
-    },
-    actionTitle: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-    },
-    actionDesc: {
-        fontSize: 13,
-        color: theme.colors.textSecondary,
-        fontWeight: '600',
-    },
-    actionResult: {
-        fontSize: 12,
+    forecastText: {
+        fontSize: theme.typography.caption,
         color: theme.colors.textMuted,
         fontStyle: 'italic',
-    },
-    healthyMessage: {
-        alignItems: 'center',
-        padding: 24,
-        gap: 12,
-    },
-    healthyIcon: {
-        fontSize: 48,
-    },
-    healthyText: {
-        fontSize: 14,
-        color: theme.colors.textSecondary,
         textAlign: 'center',
-        lineHeight: 20,
+        marginBottom: 8,
     },
-    investmentActions: {
-        gap: 12,
+
+    // Steppers
+    stepperContainer: {
+        gap: theme.spacing.sm,
     },
-    investButton: {
-        backgroundColor: theme.colors.primary,
-        padding: 16,
-        borderRadius: 16,
+    stepperRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 4,
+        backgroundColor: theme.colors.cardSoft,
+        padding: theme.spacing.sm + 4,
+        borderRadius: theme.radius.md,
     },
-    sellButton: {
-        backgroundColor: theme.colors.danger + '20',
-        borderWidth: 2,
+    stepperLabel: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.body,
+        fontWeight: '600',
+    },
+    stepperControls: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.md,
+        backgroundColor: theme.colors.card, // Contrast inset
+        padding: 4,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    stepBtn: {
+        width: 28,
+        height: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 6,
+        backgroundColor: theme.colors.cardSoft,
+    },
+    stepBtnDisabled: {
+        opacity: 0.3,
+    },
+    stepBtnText: {
+        color: theme.colors.textPrimary,
+        fontWeight: 'bold',
+        fontSize: 16,
+        lineHeight: 18,
+    },
+    stepValue: {
+        width: 24,
+        textAlign: 'center',
+        color: theme.colors.textPrimary,
+        fontWeight: 'bold',
+    },
+
+    // Footer
+    footer: {
+        gap: theme.spacing.sm,
+        marginTop: theme.spacing.sm,
+    },
+    actionSave: {
+        backgroundColor: theme.colors.accent,
+        padding: theme.spacing.md,
+        borderRadius: theme.radius.md,
+        alignItems: 'center',
+        shadowColor: theme.colors.accent,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    actionSaveText: {
+        color: '#000',
+        fontWeight: '800',
+        fontSize: theme.typography.body,
+    },
+    actionSell: {
+        padding: theme.spacing.md,
+        borderRadius: theme.radius.md,
+        alignItems: 'center',
+        borderWidth: 1,
         borderColor: theme.colors.danger,
-        padding: 16,
-        borderRadius: 16,
-        alignItems: 'center',
-        gap: 4,
     },
-    buttonPressed: {
-        opacity: 0.7,
-    },
-    investButtonText: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#FFF',
-    },
-    investButtonDesc: {
-        fontSize: 12,
-        color: '#FFF',
-        opacity: 0.8,
-    },
-    sellButtonText: {
-        fontSize: 16,
-        fontWeight: '800',
+    actionSellText: {
         color: theme.colors.danger,
-    },
-    sellButtonDesc: {
-        fontSize: 12,
-        color: theme.colors.danger,
-        opacity: 0.8,
+        fontWeight: '700',
+        fontSize: theme.typography.body,
     },
 });

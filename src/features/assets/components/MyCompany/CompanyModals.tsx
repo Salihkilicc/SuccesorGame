@@ -20,7 +20,7 @@ import ShareholderProfileModal from '../../../../components/MyCompany/Shares/Sha
 import GiftSelectionModal from '../../../../components/MyCompany/Shares/GiftSelectionModal';
 import ShareNegotiationModal from '../../../../components/MyCompany/Shares/ShareNegotiationModal';
 import RAndDModal from '../../../../components/MyCompany/Actions/RAndDModal';
-import AcquireStartupModal from '../../../../components/MyCompany/Actions/AcquireStartupModal';
+import { AcquisitionModal } from '../../../../components/MyCompany/Actions/AcquisitionModal';
 import ExistingCompaniesModal from '../../../../components/MyCompany/Actions/ExistingCompaniesModal';
 
 // Tipler
@@ -128,23 +128,14 @@ export const CompanyModals = ({
       <BoardMembersModal
         visible={!!modals.boardMembers}
         onClose={() => toggleModal('boardMembers', false)}
-        onSelectMember={shareActions.onSelectMember}
       />
 
       {selectedShareholder && (
         <>
           <ShareholderProfileModal
             visible={!!modals.profile}
-            shareholder={selectedShareholder}
+            member={selectedShareholder}
             onClose={() => toggleModal('profile', false)}
-            onOpenGift={() => {
-              toggleModal('profile', false);
-              setTimeout(() => toggleModal('gift', true), 300);
-            }}
-            onOpenNegotiate={() => {
-              toggleModal('profile', false);
-              setTimeout(() => toggleModal('negotiate', true), 300);
-            }}
           />
 
           <GiftSelectionModal
@@ -162,7 +153,7 @@ export const CompanyModals = ({
       )}
 
       <RAndDModal visible={!!modals.rnd} onClose={() => toggleModal('rnd', false)} />
-      <AcquireStartupModal visible={!!modals.acquire} onClose={() => toggleModal('acquire', false)} />
+      <AcquisitionModal visible={!!modals.acquire} onClose={() => toggleModal('acquire', false)} />
       <ExistingCompaniesModal visible={!!modals.existingCompanies} onClose={() => toggleModal('existingCompanies', false)} />
     </>
   );

@@ -22,7 +22,7 @@ interface NetworkContact {
     };
 }
 
-interface BoardMember {
+export interface BoardMember {
     id: string;
     name: string;
     shareCount: number; // Absolute share count (e.g., 1,250,000)
@@ -1329,5 +1329,5 @@ export const useShareholderStore = create<ShareholderState>()(
 );
 
 // Export types for UI components
-export type { BoardMember, BuyoutResult, SharkLoan, SeizureResult };
+export type { BuyoutResult, SharkLoan, SeizureResult };
 

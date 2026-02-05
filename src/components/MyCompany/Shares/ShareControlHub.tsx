@@ -80,7 +80,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                 <SafeAreaView style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={onClose} style={styles.backButton}>
+                        <TouchableOpacity
+                            onPress={onClose}
+                            style={styles.backButton}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 20 }}
+                        >
                             <Text style={styles.backButtonText}>← Close</Text>
                         </TouchableOpacity>
                         <Text style={styles.headerTitle}>Equity Management</Text>
@@ -265,6 +269,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         paddingVertical: 8,
+        zIndex: 10, // Ensure it sits above the absolute title
     },
     backButtonText: {
         fontSize: 17,

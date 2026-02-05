@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
@@ -33,10 +33,10 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
         );
 
         if (result.success) {
-            alert(`✅ ${result.message}\n\n⚠️ WARNING: Failure to repay by turn ${deadlineTurn} will result in equity seizure!`);
+            Alert.alert('Deal Signed', `✅ ${result.message}\n\n⚠️ WARNING: Failure to repay by turn ${deadlineTurn} will result in equity seizure!`);
             onClose();
         } else {
-            alert(`❌ ${result.message}`);
+            Alert.alert('Deal Failed', `❌ ${result.message}`);
         }
     };
 

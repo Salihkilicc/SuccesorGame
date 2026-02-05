@@ -38,6 +38,7 @@ interface MarketState {
     updatePrices: () => void; // Quarter/Day End Update
     initializePrices: () => void;
     simulateQuarter: () => void; // NEW: Sophisticated quarterly simulation
+    updateStockPrice: (id: string, newPrice: number) => void;
 }
 
 export const initialMarketState = {
@@ -413,6 +414,15 @@ export const useMarketStore = create<MarketState>()(
                 });
 
                 console.log(`[MarketStore] 📈 Quarter ${nextQuarter} Simulated | Trend: ${marketTrend}`);
+            },
+
+            updateStockPrice: (id, newPrice) => {
+                set((state) => ({
+                    marketPrices: {
+                        ...state.marketPrices,
+                        [id]: newPrice
+                    }
+                }));
             },
         }),
         {

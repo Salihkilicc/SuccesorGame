@@ -74,6 +74,7 @@ type StatsStore = StatsState & {
 
   // Money Transaction Methods (Single Source of Truth)
   spendMoney: (amount: number) => boolean; // Returns true if successful, false if insufficient funds
+  subtractMoney: (amount: number) => void; // Force subtract (no return check)
   earnMoney: (amount: number) => void;
   setMoney: (amount: number) => void; // For forced updates (e.g., load game, cheats)
 
@@ -227,6 +228,12 @@ export const useStatsStore = create<StatsStore>()(
         }
         console.warn(`[StatsStore] Insufficient funds. Tried to spend $${amount.toLocaleString()}, but only have $${current.toLocaleString()}`);
         return false; // Insufficient funds
+      },
+
+      subtractMoney: (amount) => {
+        const current = get().money;
+        set({ money: current - amount });
+        console.log(`[StatsStore] Values subtracted: $${amount.toLocaleString()}`);
       },
 
       earnMoney: (amount) => {

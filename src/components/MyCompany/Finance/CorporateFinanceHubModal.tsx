@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
@@ -7,6 +7,7 @@ import { useShareholderStore } from '../../../features/shareholders/stores/useSh
 import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SharkDealModal from './SharkDealModal';
+import CapitalInjectionModal from './CapitalInjectionModal';
 
 type Props = {
     visible: boolean;
@@ -29,6 +30,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     const { members } = useShareholderStore();
     const [sharkDealModalVisible, setSharkDealModalVisible] = useState(false);
+    const [showInjection, setShowInjection] = useState(false);
 
     // Find Shark board members
     const sharkMember = members.find((m) => m.trait === 'Shark');
@@ -75,6 +77,20 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg }}>
+
+                {/* --- OWNER INJECTION SECTION --- */}
+                <TouchableOpacity style={styles.actionCard} onPress={() => setShowInjection(true)}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
+                        <Text style={{ fontSize: 24 }}>💸</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.cardTitle}>Owner Injection</Text>
+                        <Text style={styles.cardDesc}>Invest personal wealth into the company.</Text>
+                    </View>
+                    <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
+                </TouchableOpacity>
+                {/* --- END OWNER INJECTION --- */}
+                {/* --- END OWNER INJECTION --- */}
 
                 {/* HERO: Credit Score */}
                 <View style={styles.heroSection}>
@@ -208,6 +224,8 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     </View>
                 )}
 
+
+
                 {/* CTA BUTTONS */}
                 <View style={styles.ctaContainer}>
                     {totalDebt > 0 && (
@@ -243,6 +261,11 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     sharkMember={sharkMember}
                 />
             )}
+
+            <CapitalInjectionModal
+                visible={showInjection}
+                onClose={() => setShowInjection(false)}
+            />
         </GameModal>
     );
 };
@@ -388,14 +411,14 @@ const styles = StyleSheet.create({
     emptyState: {
         backgroundColor: '#1C1C1E',
         borderRadius: 16,
-        padding: 40,
+        padding: 20,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#2A2D35',
     },
     emptyStateIcon: {
-        fontSize: 48,
-        marginBottom: 12,
+        fontSize: 32,
+        marginBottom: 8,
     },
     emptyStateText: {
         fontSize: 18,
@@ -565,5 +588,94 @@ const styles = StyleSheet.create({
         color: '#FF6B6B',
         fontStyle: 'italic',
         textAlign: 'center',
+    },
+
+    // Injection Section
+    injectionSection: {
+        backgroundColor: '#1C1C1E',
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#2A2D35',
+    },
+    injectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 16,
+    },
+    injectionIconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(48, 209, 88, 0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    injectionIcon: {
+        fontSize: 20,
+    },
+    injectionTitle: {
+        color: '#FFF',
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    injectionSubtitle: {
+        color: '#8A9BA8',
+        fontSize: 12,
+    },
+    injectionButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    injectBtn: {
+        flex: 1,
+        backgroundColor: '#2C2C2E',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#3A3A3C',
+    },
+    injectBtnMax: {
+        backgroundColor: theme.colors.success,
+        borderColor: theme.colors.success,
+    },
+    injectBtnPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.98 }],
+    },
+    injectBtnText: {
+        color: '#FFF',
+        fontWeight: '700',
+        fontSize: 12,
+    },
+    actionCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#1C1C1E',
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#2A2D35',
+        gap: 16,
+    },
+    iconBox: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cardTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    cardDesc: {
+        fontSize: 12,
+        color: '#9CA3AF',
     },
 });

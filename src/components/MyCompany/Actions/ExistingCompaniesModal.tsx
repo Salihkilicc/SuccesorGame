@@ -3,7 +3,7 @@ import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-nati
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useUserStore } from '../../../core/store/useUserStore';
-import SubsidiaryDetailModal from './SubsidiaryDetailModal';
+import { SubsidiaryDetailModal } from './SubsidiaryDetailModal';
 
 type Props = {
     visible: boolean;
@@ -144,11 +144,13 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
             </Modal>
 
             {/* Detail Modal */}
-            <SubsidiaryDetailModal
-                visible={isDetailModalOpen}
-                onClose={handleCloseDetail}
-                subsidiary={selectedSubsidiary}
-            />
+            {selectedSubsidiary && (
+                <SubsidiaryDetailModal
+                    visible={isDetailModalOpen}
+                    onClose={handleCloseDetail}
+                    subsidiary={selectedSubsidiary}
+                />
+            )}
         </>
     );
 };
