@@ -8,6 +8,7 @@ import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
+import ExistingCompaniesModal from './ExistingCompaniesModal'; // [NEW]
 
 type Props = {
     visible: boolean;
@@ -25,12 +26,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
         getBorrowingCapacity,
         getCurrentLeverage,
         getMonthlyInterestTotal,
-        refreshCreditScore
+        refreshCreditScore,
+        subsidiaries // [NEW] Access to check count for badge
     } = useCorporateFinanceStore();
 
     const { members } = useShareholderStore();
     const [sharkDealModalVisible, setSharkDealModalVisible] = useState(false);
     const [showInjection, setShowInjection] = useState(false);
+    const [showEmpire, setShowEmpire] = useState(false); // [NEW]
 
     // Find Shark board members
     const sharkMember = members.find((m) => m.trait === 'Shark');
@@ -78,19 +81,34 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg }}>
 
-                {/* --- OWNER INJECTION SECTION --- */}
-                <TouchableOpacity style={styles.actionCard} onPress={() => setShowInjection(true)}>
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
-                        <Text style={{ fontSize: 24 }}>💸</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.cardTitle}>Owner Injection</Text>
-                        <Text style={styles.cardDesc}>Invest personal wealth into the company.</Text>
-                    </View>
-                    <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
-                </TouchableOpacity>
-                {/* --- END OWNER INJECTION --- */}
-                {/* --- END OWNER INJECTION --- */}
+                {/* --- NAVIGATION GRID --- */}
+                <View style={styles.navGrid}>
+
+                    {/* [NEW] MY EMPIRE BUTTON */}
+                    <TouchableOpacity style={[styles.navCard, { borderColor: '#FFD700' }]} onPress={() => setShowEmpire(true)}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(255, 215, 0, 0.2)' }]}>
+                            <Text style={{ fontSize: 24 }}>🏰</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.cardTitle}>My Empire</Text>
+                            <Text style={styles.cardDesc}>{subsidiaries.length} Subsidiaries</Text>
+                        </View>
+                        <Text style={{ color: '#FFD700', fontSize: 18 }}>→</Text>
+                    </TouchableOpacity>
+
+                    {/* OWNER INJECTION BUTTON */}
+                    <TouchableOpacity style={[styles.navCard, { borderColor: '#4ADE80' }]} onPress={() => setShowInjection(true)}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
+                            <Text style={{ fontSize: 24 }}>💸</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.cardTitle}>Injection</Text>
+                            <Text style={styles.cardDesc}>Personal investment</Text>
+                        </View>
+                        <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
+                    </TouchableOpacity>
+
+                </View>
 
                 {/* HERO: Credit Score */}
                 <View style={styles.heroSection}>
@@ -265,6 +283,11 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
             <CapitalInjectionModal
                 visible={showInjection}
                 onClose={() => setShowInjection(false)}
+            />
+
+            <ExistingCompaniesModal
+                visible={showEmpire}
+                onClose={() => setShowEmpire(false)}
             />
         </GameModal>
     );
@@ -590,92 +613,40 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Injection Section
-    injectionSection: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 16,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#2A2D35',
-    },
-    injectionHeader: {
+    // Navigation Grid for Top Buttons
+    navGrid: {
         flexDirection: 'row',
-        alignItems: 'center',
         gap: 12,
         marginBottom: 16,
     },
-    injectionIconBox: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(48, 209, 88, 0.15)',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    injectionIcon: {
-        fontSize: 20,
-    },
-    injectionTitle: {
-        color: '#FFF',
-        fontWeight: '700',
-        fontSize: 16,
-    },
-    injectionSubtitle: {
-        color: '#8A9BA8',
-        fontSize: 12,
-    },
-    injectionButtons: {
-        flexDirection: 'row',
-        gap: 8,
-    },
-    injectBtn: {
+    navCard: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
-        paddingVertical: 12,
-        borderRadius: 12,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#3A3A3C',
-    },
-    injectBtnMax: {
-        backgroundColor: theme.colors.success,
-        borderColor: theme.colors.success,
-    },
-    injectBtnPressed: {
-        opacity: 0.8,
-        transform: [{ scale: 0.98 }],
-    },
-    injectBtnText: {
-        color: '#FFF',
-        fontWeight: '700',
-        fontSize: 12,
-    },
-    actionCard: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#1C1C1E',
-        padding: 16,
+        padding: 12,
         borderRadius: 16,
-        marginBottom: 16,
         borderWidth: 1,
         borderColor: '#2A2D35',
-        gap: 16,
+        gap: 12,
     },
+
+    // Existing Action Card Styles used by navigation buttons
     iconBox: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#FFFFFF',
-        marginBottom: 4,
+        marginBottom: 2,
     },
     cardDesc: {
-        fontSize: 12,
+        fontSize: 10,
         color: '#9CA3AF',
     },
 });

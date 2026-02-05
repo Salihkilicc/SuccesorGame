@@ -7,11 +7,11 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 /**
  * CORPORATE FINANCE STORE
  * Premium Private Banking System
- * Manages Debt, Credit Score, and Leverage
+ * Manages Debt, Credit Score, Leverage, and Subsidiaries
  */
 
-// MMKV Storage Implementation
-const storage = new MMKV();
+// 1. Setup MMKV Storage
+export const storage = new MMKV({ id: 'finance-storage' });
 
 const zustandStorage: StateStorage = {
     setItem: (name, value) => {
@@ -36,22 +36,23 @@ export interface Loan {
     originationDate: number;
 }
 
+// 2. Define Interfaces
 export interface SubsidiaryStrategy {
-    marketing: number; // 0-10
-    rnd: number;       // 0-10
-    production: number;// 0-10
-    workforce: number; // 0-10
-    // Constraint: Sum of these must be exactly 10 (or max 10).
+    marketing: number;  // 0-10
+    rnd: number;        // 0-10
+    production: number; // 0-10
+    workforce: number;  // 0-10
+    // Constraint: Sum must be <= 10
 }
 
 export interface Subsidiary {
     id: string;
     name: string;
     sector: string;
-    acquiredAtValuation: number;
-    currentValuation: number;
+    valuation: number;      // Current Valuation
+    acquiredAt: number;     // Purchase Price
     strategy: SubsidiaryStrategy;
-    history: number[]; // Last 4 quarters % change
+    history: number[];      // Last 4 quarters % change
 }
 
 export interface CorporateFinanceState {
@@ -84,12 +85,11 @@ export interface CorporateFinanceState {
     getMonthlyInterestTotal: () => number;
 
     // Subsidiary Actions
-    acquireCompany: (stock: any, price: number) => void;
+    acquireCompany: (company: any, price: number) => void;
     sellSubsidiary: (id: string) => void;
     updateSubsidiaryStrategy: (id: string, newStrategy: SubsidiaryStrategy) => void;
     evaluateSubsidiaries: (marketEvents: string[]) => void;
 
-    // Capital Injection
     // Capital Injection
     injectCapital: (amount: number) => { success: boolean; msg: string };
 
@@ -277,7 +277,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             },
 
             // 9. ACQUIRE COMPANY
-            acquireCompany: (stock, price) => {
+            acquireCompany: (company, price) => {
                 // Access Company Capital from StatsStore
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
 
@@ -292,12 +292,12 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 // Create Subsidiary Object
                 const newSubsidiary: Subsidiary = {
-                    id: stock.id || stock.symbol || `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                    name: stock.name || 'Unknown Subsidiary',
-                    sector: stock.sector || 'Conglomerate',
-                    acquiredAtValuation: price,
-                    currentValuation: price,
-                    strategy: { marketing: 2, rnd: 2, production: 3, workforce: 3 },
+                    id: company.id || company.symbol || `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    name: company.name || 'Unknown Subsidiary',
+                    sector: company.sector || 'Conglomerate',
+                    valuation: price,
+                    acquiredAt: price,
+                    strategy: { marketing: 2, rnd: 3, production: 3, workforce: 2 }, // Default Strategy
                     history: []
                 };
 
@@ -319,7 +319,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 // Add Current Valuation to Company Capital
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
-                setCompanyCapital(companyCapital + subsidiary.currentValuation);
+                setCompanyCapital(companyCapital + subsidiary.valuation);
 
                 // Remove from State
                 set((state) => ({
@@ -333,8 +333,6 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 const sum = newStrategy.marketing + newStrategy.rnd + newStrategy.production + newStrategy.workforce;
 
                 if (sum > 10) {
-                    // In strict mode we might reject, but user req says "Constraint: Sum... must be exactly 10 (or max 10)"
-                    // We allow updating if it respects max 10.
                     console.warn('[FinanceStore] Strategy sum exceeds 10');
                     return;
                 }
@@ -382,7 +380,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     }
 
                     // 3. Apply Result
-                    const newValuation = sub.currentValuation * (1 + changePercent);
+                    const newValuation = sub.valuation * (1 + changePercent);
 
                     // History Update (Keep last 4)
                     const newHistory = [changePercent, ...sub.history].slice(0, 4);
@@ -398,7 +396,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                     return {
                         ...sub,
-                        currentValuation: newValuation,
+                        valuation: newValuation,
                         history: newHistory
                     };
                 });
@@ -434,7 +432,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             }
         }),
         {
-            name: 'succesor_corporate_finance_v1',
+            name: 'finance-storage', // Matches MMKV ID
             storage: createJSONStorage(() => zustandStorage)
         }
     )
