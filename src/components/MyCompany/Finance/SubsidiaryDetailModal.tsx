@@ -77,13 +77,34 @@ const SubsidiaryDetailModal = ({ visible, onClose, subsidiaryId }: Props) => {
     };
 
     // Advisor Logic
-    const getAdvisorHint = () => {
+    const getAdvisorReport = () => {
         const s = subsidiary.sector;
-        if (s === 'Technology') return 'Focus heavily on R&D for tech growth.';
-        if (s === 'Industrial') return 'Production capacity is key for heavy industry.';
-        if (s === 'Retail') return 'Marketing drives retail sales.';
-        if (s === 'Finance') return 'Balance Marketing and R&D for fintech products.';
-        return 'Maintain a balanced strategy.';
+        const { marketing, rnd, production, workforce } = strategy;
+
+        // 🚨 Critical Rule
+        if (workforce < 2) {
+            return "⚠️ HR DIRECTOR: 'Morale is critical. The union is threatening an immediate strike! We need to raise wages.'";
+        }
+
+        // 🏭 Sector Specific Rules
+        if (s === 'Technology' && rnd < 4) {
+            return "💡 CTO: 'Our tech stack is outdated. Competitors are launching faster. We need R&D funds.'";
+        }
+        if (s === 'Industrial' && production < 4) {
+            return "⚙️ OPS MANAGER: 'Machinery breakdowns are frequent. Production lines are stalling.'";
+        }
+        if ((s === 'Retail' || s === 'Consumer') && marketing < 4) {
+            return "📢 CMO: 'Brand awareness is dropping. Focus groups don't recognize our new products.'";
+        }
+        if ((s === 'Category' || s === 'Health' || s === 'Healthcare') && rnd < 4) {
+            return "🏥 SURGEON GENERAL: 'Clinical trials are delayed. We need more R&D to pass FDA approval.'";
+        }
+        if ((s === 'Finance' || s === 'Financial') && (marketing < 3 || rnd < 3)) {
+            return "📉 ANALYST: 'We are losing clients to fintech apps. We need better tech and branding.'";
+        }
+
+        // ✅ Good Strategy
+        return "📈 BOARD MEMO: 'Quarterly projections look solid. The current strategy is aligned with market trends.'";
     };
 
     const renderControl = (
@@ -138,9 +159,14 @@ const SubsidiaryDetailModal = ({ visible, onClose, subsidiaryId }: Props) => {
                             </Text>
                         </View>
 
-                        <View style={styles.advisorContainer}>
-                            <Text style={styles.advisorTitle}>💡 ADVISOR SAYS:</Text>
-                            <Text style={styles.advisorText}>{getAdvisorHint()}</Text>
+                        {/* Sector Badge */}
+                        <View style={styles.sectorBadge}>
+                            <Text style={styles.sectorText}>{subsidiary.sector.toUpperCase()}</Text>
+                        </View>
+
+                        <View style={styles.advisorCard}>
+                            <Text style={styles.advisorLabel}>EXECUTIVE SUMMARY</Text>
+                            <Text style={styles.advisorText}>{getAdvisorReport()}</Text>
                         </View>
                     </View>
 
@@ -240,23 +266,42 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
     },
-    advisorContainer: {
-        backgroundColor: '#1C1C1E',
-        padding: 16,
-        borderRadius: 12,
+    sectorBadge: {
+        marginTop: 8,
+        backgroundColor: '#333',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 16,
+        alignSelf: 'center',
         borderWidth: 1,
+        borderColor: '#555',
+    },
+    sectorText: {
+        color: '#DDD',
+        fontSize: 12,
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
+    advisorCard: {
+        padding: 15,
+        borderRadius: 8,
+        backgroundColor: '#222',
+        marginTop: 20,
+        marginBottom: 20,
         borderColor: '#333',
+        borderWidth: 1,
         width: '100%',
     },
-    advisorTitle: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#FFD700',
-        marginBottom: 6,
+    advisorLabel: {
+        color: '#555',
+        fontSize: 10,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        letterSpacing: 1,
     },
     advisorText: {
+        color: '#DDD',
         fontSize: 14,
-        color: '#CCCCCC',
         fontStyle: 'italic',
         lineHeight: 20,
     },

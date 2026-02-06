@@ -262,7 +262,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 const newSubsidiary: Subsidiary = {
                     id: company.id || company.symbol || `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                     name: company.name || 'Unknown Subsidiary',
-                    sector: company.sector || 'Conglomerate',
+                    sector: company.sector || company.category || 'Conglomerate',
                     valuation: price,
                     acquiredAt: price,
                     strategy: { marketing: 2, rnd: 3, production: 3, workforce: 2 }, // Default Strategy
