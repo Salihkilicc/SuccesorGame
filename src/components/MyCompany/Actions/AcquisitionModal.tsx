@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    paddingTop: 24,
+    paddingTop: 60, // Increased to prevent status bar overlap
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

@@ -376,46 +376,42 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             },
 
             attemptToSellCompany: (id, askingPrice) => {
-                const { subsidiaries } = get();
-                const subsidiary = subsidiaries.find(s => s.id === id);
+                const state = get();
+                const company = state.subsidiaries.find((s) => s.id === id);
 
-                if (!subsidiary) {
-                    return { success: false, msg: "Company not found" };
-                }
+                if (!company) return { success: false, msg: "Company not found." };
 
-                const currentValuation = subsidiary.valuation;
-                const markup = (askingPrice - currentValuation) / currentValuation;
+                // 1. Calculate Markup
+                const markup = (askingPrice - company.valuation) / company.valuation;
 
-                const baseChance = 0.80;
-                const penalty = markup * 2.0;
-                let successChance = baseChance - penalty;
+                // 2. Probability: Base 80%, -2% for every 1% markup
+                let successChance = 0.80 - (markup * 2.0);
 
-                // Clamp logic
+                // Clamp Chance (0 to 1)
                 if (successChance < 0) successChance = 0;
+                if (successChance > 1) successChance = 1;
 
-                const roll = Math.random();
+                console.log(`Sell Attempt: Ask $${askingPrice}, Chance ${(successChance * 100).toFixed(1)}%`);
 
-                if (roll <= successChance) {
-                    // Success
+                // 3. Roll Dice
+                if (Math.random() <= successChance) {
+                    // SUCCESS
                     const { companyCapital, setCompanyCapital } = useStatsStore.getState();
                     setCompanyCapital(companyCapital + askingPrice);
 
                     set((state) => ({
-                        subsidiaries: state.subsidiaries.filter(s => s.id !== id)
+                        subsidiaries: state.subsidiaries.filter((s) => s.id !== id),
                     }));
-
-                    return { success: true, price: askingPrice };
+                    return { success: true, price: askingPrice, msg: "Sold!" };
                 } else {
-                    // Failure
-                    const penaltyValuation = currentValuation * 0.95;
-
+                    // FAIL: -5% Valuation Penalty
+                    const newVal = Math.floor(company.valuation * 0.95);
                     set((state) => ({
-                        subsidiaries: state.subsidiaries.map(s =>
-                            s.id === id ? { ...s, valuation: penaltyValuation } : s
+                        subsidiaries: state.subsidiaries.map((s) =>
+                            s.id === id ? { ...s, valuation: newVal } : s
                         )
                     }));
-
-                    return { success: false, msg: "Buyers walked away. Valuation dropped 5%." };
+                    return { success: false, msg: "Buyers rejected. Valuation dropped 5%." };
                 }
             },
 

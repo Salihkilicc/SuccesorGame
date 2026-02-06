@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, Alert, ToastAndroid, Platform } from 'react-native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
-import { BlurView } from 'expo-blur';
 
 type Props = {
     visible: boolean;
@@ -74,89 +73,74 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <BlurView intensity={20} tint="dark" style={styles.blurContainer}>
-                    <View style={styles.container}>
-                        {/* Header */}
-                        <View style={styles.header}>
-                            <Text style={styles.headerTitle}>NEGOTIATE SALE</Text>
-                            <Text style={styles.headerSubtitle}>{company.name}</Text>
-                        </View>
+                <View style={styles.container}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.headerTitle}>NEGOTIATE SALE</Text>
+                        <Text style={styles.headerSubtitle}>{company.name}</Text>
+                    </View>
 
-                        {/* Valuation Display */}
-                        <View style={styles.valuationContainer}>
-                            <Text style={styles.label}>Current Valuation</Text>
-                            <Text style={styles.valuationValue}>{formatMoney(currentValuation)}</Text>
-                        </View>
+                    {/* Valuation Display */}
+                    <View style={styles.valuationContainer}>
+                        <Text style={styles.label}>Current Valuation</Text>
+                        <Text style={styles.valuationValue}>{formatMoney(currentValuation)}</Text>
+                    </View>
 
-                        {/* Asking Price Controls */}
-                        <View style={styles.priceSection}>
-                            <Text style={styles.sectionTitle}>ASKING PRICE</Text>
+                    {/* Asking Price Controls */}
+                    <View style={styles.priceSection}>
+                        <View style={styles.controlsRow}>
+                            <View style={styles.buttonGroup}>
+                                <Pressable
+                                    style={({ pressed }) => [styles.controlBtn, pressed && styles.btnPressed]}
+                                    onPress={() => handlePriceChange(-(currentValuation * 0.01))}
+                                >
+                                    <Text style={styles.controlBtnText}>- 1%</Text>
+                                </Pressable>
+                            </View>
+
                             <Text style={styles.askingPrice}>{formatMoney(askingPrice)}</Text>
 
-                            <View style={styles.controlsRow}>
-                                <View style={styles.buttonGroup}>
-                                    <Pressable
-                                        style={({ pressed }) => [styles.controlBtn, pressed && styles.btnPressed]}
-                                        onPress={() => handlePriceChange(-1_000_000)}
-                                    >
-                                        <Text style={styles.controlBtnText}>- $1M</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={({ pressed }) => [styles.controlBtn, pressed && styles.btnPressed]}
-                                        onPress={() => handlePriceChange(-100_000)}
-                                    >
-                                        <Text style={styles.controlBtnText}>- $100k</Text>
-                                    </Pressable>
-                                </View>
-
-                                <View style={styles.buttonGroup}>
-                                    <Pressable
-                                        style={({ pressed }) => [styles.controlBtn, styles.incrementBtn, pressed && styles.btnPressed]}
-                                        onPress={() => handlePriceChange(100_000)}
-                                    >
-                                        <Text style={styles.controlBtnText}>+ $100k</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={({ pressed }) => [styles.controlBtn, styles.incrementBtn, pressed && styles.btnPressed]}
-                                        onPress={() => handlePriceChange(1_000_000)}
-                                    >
-                                        <Text style={styles.controlBtnText}>+ $1M</Text>
-                                    </Pressable>
-                                </View>
+                            <View style={styles.buttonGroup}>
+                                <Pressable
+                                    style={({ pressed }) => [styles.controlBtn, styles.incrementBtn, pressed && styles.btnPressed]}
+                                    onPress={() => handlePriceChange(currentValuation * 0.01)}
+                                >
+                                    <Text style={styles.controlBtnText}>+ 1%</Text>
+                                </Pressable>
                             </View>
                         </View>
-
-                        {/* Probability Meter */}
-                        <View style={[styles.probabilityBox, { borderColor: chanceColor }]}>
-                            <Text style={[styles.probabilityLabel, { color: chanceColor }]}>
-                                PROBABILITY OF SALE
-                            </Text>
-                            <Text style={[styles.probabilityValue, { color: chanceColor }]}>
-                                {successChance.toFixed(0)}%
-                            </Text>
-                            <Text style={styles.markupText}>
-                                {markup > 0 ? `+${(markup * 100).toFixed(1)}% Markup` : 'Fair Value'}
-                            </Text>
-                        </View>
-
-                        {/* Actions */}
-                        <View style={styles.actionButtons}>
-                            <Pressable
-                                style={({ pressed }) => [styles.cancelBtn, pressed && styles.btnPressed]}
-                                onPress={onClose}
-                            >
-                                <Text style={styles.cancelBtnText}>CANCEL</Text>
-                            </Pressable>
-
-                            <Pressable
-                                style={({ pressed }) => [styles.submitBtn, pressed && styles.btnPressed]}
-                                onPress={handleSubmit}
-                            >
-                                <Text style={styles.submitBtnText}>SUBMIT OFFER</Text>
-                            </Pressable>
-                        </View>
                     </View>
-                </BlurView>
+
+                    {/* Probability Meter */}
+                    <View style={[styles.probabilityBox, { borderColor: chanceColor }]}>
+                        <Text style={[styles.probabilityLabel, { color: chanceColor }]}>
+                            PROBABILITY OF SALE
+                        </Text>
+                        <Text style={[styles.probabilityValue, { color: chanceColor }]}>
+                            {successChance.toFixed(0)}%
+                        </Text>
+                        <Text style={styles.markupText}>
+                            {markup > 0 ? `+${(markup * 100).toFixed(1)}% Markup` : 'Fair Value'}
+                        </Text>
+                    </View>
+
+                    {/* Actions */}
+                    <View style={styles.actionButtons}>
+                        <Pressable
+                            style={({ pressed }) => [styles.cancelBtn, pressed && styles.btnPressed]}
+                            onPress={onClose}
+                        >
+                            <Text style={styles.cancelBtnText}>CANCEL</Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={({ pressed }) => [styles.submitBtn, pressed && styles.btnPressed]}
+                            onPress={handleSubmit}
+                        >
+                            <Text style={styles.submitBtnText}>SUBMIT OFFER</Text>
+                        </Pressable>
+                    </View>
+                </View>
             </View>
         </Modal>
     );
@@ -167,13 +151,7 @@ export default SellCompanyModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    blurContainer: {
-        flex: 1,
-        width: '100%',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -240,16 +218,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     askingPrice: {
-        fontSize: 42,
+        fontSize: 32,
         fontWeight: '900',
         color: '#FFFFFF',
         textAlign: 'center',
-        marginBottom: 16,
+        marginHorizontal: 16,
         letterSpacing: -1,
     },
     controlsRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginBottom: 8,
     },
     buttonGroup: {
