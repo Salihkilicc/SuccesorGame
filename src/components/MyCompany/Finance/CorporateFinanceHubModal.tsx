@@ -8,7 +8,7 @@ import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
-import ExistingCompaniesModal from './ExistingCompaniesModal'; // [NEW]
+
 
 type Props = {
     visible: boolean;
@@ -34,7 +34,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
     const { members } = useShareholderStore();
     const [sharkDealModalVisible, setSharkDealModalVisible] = useState(false);
     const [showInjection, setShowInjection] = useState(false);
-    const [showEmpire, setShowEmpire] = useState(false); // [NEW]
+
 
     // Find Shark board members
     const sharkMember = members.find((m) => m.trait === 'Shark');
@@ -84,21 +84,8 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
                 {/* --- NAVIGATION GRID --- */}
                 <View style={styles.navGrid}>
-
-                    {/* [NEW] MY EMPIRE BUTTON */}
-                    <TouchableOpacity style={[styles.navCard, { borderColor: '#FFD700' }]} onPress={() => setShowEmpire(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(255, 215, 0, 0.2)' }]}>
-                            <Text style={{ fontSize: 24 }}>🏰</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.cardTitle}>My Empire</Text>
-                            <Text style={styles.cardDesc}>{subsidiaries.length} Subsidiaries</Text>
-                        </View>
-                        <Text style={{ color: '#FFD700', fontSize: 18 }}>→</Text>
-                    </TouchableOpacity>
-
                     {/* OWNER INJECTION BUTTON */}
-                    <TouchableOpacity style={[styles.navCard, { borderColor: '#4ADE80' }]} onPress={() => setShowInjection(true)}>
+                    <TouchableOpacity style={[styles.navCard, { borderColor: '#4ADE80', flex: 1 }]} onPress={() => setShowInjection(true)}>
                         <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
@@ -108,7 +95,6 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         </View>
                         <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
-
                 </View>
 
                 {/* HERO: Credit Score */}
@@ -286,10 +272,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 onClose={() => setShowInjection(false)}
             />
 
-            <ExistingCompaniesModal
-                visible={showEmpire}
-                onClose={() => setShowEmpire(false)}
-            />
+
         </GameModal>
     );
 };

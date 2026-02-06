@@ -95,6 +95,9 @@ export interface CorporateFinanceState {
     injectCapital: (amount: number) => { success: boolean; msg: string };
 
     reset: () => void;
+
+    // Negotiated Sale
+    attemptToSellCompany: (id: string, askingPrice: number) => { success: boolean; msg?: string; price?: number };
 }
 
 const MAX_LEVERAGE = 0.8; // 80% of Valuation
@@ -370,6 +373,50 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 });
 
                 set({ subsidiaries: updatedSubsidiaries });
+            },
+
+            attemptToSellCompany: (id, askingPrice) => {
+                const { subsidiaries } = get();
+                const subsidiary = subsidiaries.find(s => s.id === id);
+
+                if (!subsidiary) {
+                    return { success: false, msg: "Company not found" };
+                }
+
+                const currentValuation = subsidiary.valuation;
+                const markup = (askingPrice - currentValuation) / currentValuation;
+
+                const baseChance = 0.80;
+                const penalty = markup * 2.0;
+                let successChance = baseChance - penalty;
+
+                // Clamp logic
+                if (successChance < 0) successChance = 0;
+
+                const roll = Math.random();
+
+                if (roll <= successChance) {
+                    // Success
+                    const { companyCapital, setCompanyCapital } = useStatsStore.getState();
+                    setCompanyCapital(companyCapital + askingPrice);
+
+                    set((state) => ({
+                        subsidiaries: state.subsidiaries.filter(s => s.id !== id)
+                    }));
+
+                    return { success: true, price: askingPrice };
+                } else {
+                    // Failure
+                    const penaltyValuation = currentValuation * 0.95;
+
+                    set((state) => ({
+                        subsidiaries: state.subsidiaries.map(s =>
+                            s.id === id ? { ...s, valuation: penaltyValuation } : s
+                        )
+                    }));
+
+                    return { success: false, msg: "Buyers walked away. Valuation dropped 5%." };
+                }
             },
 
             // --- CAPITAL INJECTION ---

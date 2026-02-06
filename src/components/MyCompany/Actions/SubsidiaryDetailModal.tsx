@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
 import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import SellCompanyModal from './SellCompanyModal';
 
 type Props = {
     visible: boolean;
@@ -15,6 +16,7 @@ type Props = {
 export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) => {
     const navigation = useNavigation<any>();
     const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
+    const [isSellModalVisible, setSellModalVisible] = useState(false);
 
     // Find the company
     const company = subsidiaries.find(s => s.id === companyId);
@@ -58,8 +60,15 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
         }
     };
 
+    const handleHomePress = () => {
+        onClose();
+        navigation.navigate('Home');
+    };
+
+    const isPositive = company.lastChangePercent >= 0;
+
     const renderStrategyRow = (label: string, field: keyof SubsidiaryStrategy, icon: string, description: string) => (
-        <View style={styles.strategyRow}>
+        <View style={styles.strategyRow} key={field}>
             <View style={styles.strategyInfo}>
                 <View style={styles.iconBox}>
                     <Text style={{ fontSize: 20 }}>{icon}</Text>
@@ -93,13 +102,6 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
             </View>
         </View>
     );
-
-    const isPositive = company.lastChangePercent >= 0;
-
-    const handleHomePress = () => {
-        onClose();
-        navigation.navigate('Home');
-    };
 
     return (
         <Modal
@@ -171,6 +173,9 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
 
                     {/* Footer */}
                     <View style={styles.footer}>
+                        <TouchableOpacity style={styles.sellBtn} onPress={() => setSellModalVisible(true)}>
+                            <Text style={styles.sellBtnText}>SELL COMPANY</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
                             <Text style={styles.saveBtnText}>CONFIRM STRATEGY</Text>
                         </TouchableOpacity>
@@ -179,6 +184,13 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
 
                 {/* Bottom Bar */}
                 <BottomStatsBar onHomePress={handleHomePress} />
+
+                {/* Sell Modal */}
+                {company && <SellCompanyModal
+                    visible={isSellModalVisible}
+                    companyId={company.id}
+                    onClose={() => setSellModalVisible(false)}
+                />}
             </View>
         </Modal>
     );
@@ -205,10 +217,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 20,
         elevation: 10,
-        marginBottom: 80, // Space for bottom bar if screen is small, though overlay centers it.
-        // Actually, if we center the container, let's make sure it doesn't overlap the bottom bar
-        // BottomStatsBar is absolute bottom: 0.
-        // Let's just adding paddingBottom to overlay or margin to container.
+        marginBottom: 80,
     },
     header: {
         flexDirection: 'row',
@@ -377,6 +386,22 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#2C2C2E',
         backgroundColor: '#151517',
+        gap: 12,
+    },
+    sellBtn: {
+        backgroundColor: '#2C2C2E',
+        height: 50,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#FF3B30',
+    },
+    sellBtnText: {
+        color: '#FF3B30',
+        fontSize: 16,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
     saveBtn: {
         backgroundColor: '#FFFFFF',
