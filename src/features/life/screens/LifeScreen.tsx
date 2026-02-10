@@ -259,7 +259,7 @@ const LifeScreen = () => {
 
     // Store methods
     hasSouvenir,
-  } = useTravelSystem();
+  } = useTravelSystem(triggerEncounter);
 
   const {
     // Visibility & Nav

@@ -206,7 +206,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
 // Revamped Modal to allow Bottom Bar outside the centered card
 const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
   const navigation = useNavigation<any>();
-  const { companyCapital, setField, techLevels, setTechLevel, companyName } = useStatsStore(); // Added missing props logic
+  const { companyCapital, setField, techLevels, setTechLevel } = useStatsStore(); // Added missing props logic
 
   // ... logic ...
   // (Repeating logic is verbose, I'll stick to the previous Component definition but adjust JSX)

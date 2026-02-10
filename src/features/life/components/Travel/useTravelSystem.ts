@@ -14,7 +14,7 @@ interface ResultData {
     foundSouvenir: boolean;
 }
 
-export const useTravelSystem = () => {
+export const useTravelSystem = (triggerEncounter?: (context: string, countryId?: string) => boolean) => {
     // --- STORES ---
     const { money, update: updateStats } = useStatsStore();
     const { updateCore, core } = usePlayerStore();
@@ -100,6 +100,20 @@ export const useTravelSystem = () => {
         // Deduct money
         updateStats({ money: money - totalCost });
 
+        // Try to trigger encounter (60% chance for travel romance)
+        if (triggerEncounter) {
+            const hasEncounter = triggerEncounter('travel', selectedSpot.country);
+            if (hasEncounter) {
+                // Encounter modal will open automatically
+                // CRITICAL: Reset travel state to prevent invisible overlay
+                setCurrentView(null);
+                setSelectedSpot(null);
+                setResultData(null);
+                // Don't proceed to experience, let encounter handle flow
+                return;
+            }
+        }
+
         // Calculate enjoyment
         const enjoyment = calculateEnjoyment(travelClass);
         const narrative = getNarrative(selectedSpot, enjoyment);
@@ -119,7 +133,7 @@ export const useTravelSystem = () => {
         });
 
         setCurrentView('EXPERIENCE');
-    }, [selectedSpot, travelClass, bringPartner, money, updateStats, core, updateCore, hasSouvenir]);
+    }, [selectedSpot, travelClass, bringPartner, money, updateStats, core, updateCore, hasSouvenir, triggerEncounter]);
 
     const onExperienceComplete = useCallback(() => {
         if (!resultData || !selectedSpot) return;
