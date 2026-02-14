@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Modal,
   View,
-  Text,
+  Text, 
   StyleSheet,
   Pressable,
   FlatList,
