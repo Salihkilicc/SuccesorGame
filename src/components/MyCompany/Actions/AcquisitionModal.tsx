@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Pressable,
   FlatList, 
-  Alert,
+  Alert, 
   ScrollView,
   TouchableOpacity,
   Dimensions
