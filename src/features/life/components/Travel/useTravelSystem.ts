@@ -102,16 +102,9 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
 
         // Try to trigger encounter (60% chance for travel romance)
         if (triggerEncounter) {
-            const hasEncounter = triggerEncounter('travel', selectedSpot.country);
-            if (hasEncounter) {
-                // Encounter modal will open automatically
-                // CRITICAL: Reset travel state to prevent invisible overlay
-                setCurrentView(null);
-                setSelectedSpot(null);
-                setResultData(null);
-                // Don't proceed to experience, let encounter handle flow
-                return;
-            }
+            triggerEncounter('travel', selectedSpot.country);
+            // FIX: Do NOT return early. Allow the trip logic (experience) to run in the background.
+            // The EncounterModal will overlay the ExperienceModal.
         }
 
         // Calculate enjoyment
@@ -122,8 +115,12 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
         const happinessGain = Math.floor(enjoyment / 5); // 0-20 for economy, up to 20 for private
         updateCore('happiness', Math.min(100, core.happiness + happinessGain));
 
-        // Check for souvenir discovery
-        const foundSouvenir = enjoyment > 70 && !hasSouvenir(selectedSpot.souvenir.id);
+        // Check for souvenir discovery (Centralized Logic)
+        // Souvenir Probability
+        const chance = travelClass === 'PRIVATE' ? 0.70 : travelClass === 'BUSINESS' ? 0.33 : 0.25;
+
+        // Logic: specific souvenir ID ownership check AND probability check
+        const foundSouvenir = enjoyment > 50 && Math.random() < chance && !hasSouvenir(selectedSpot.souvenir.id);
 
         setResultData({
             enjoyment,
@@ -138,11 +135,9 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
     const onExperienceComplete = useCallback(() => {
         if (!resultData || !selectedSpot) return;
 
-        // Souvenir Probability
-        const chance = travelClass === 'PRIVATE' ? 0.70 : travelClass === 'BUSINESS' ? 0.33 : 0.25;
-
         // Check probability and specific souvenir ID ownership
-        if (Math.random() < chance && !hasSouvenir(selectedSpot.souvenir.id)) {
+        // FIX: Use the pre-calculated resultData.foundSouvenir to ensure button matches action.
+        if (resultData.foundSouvenir) {
             // Trigger mini-game
             setCurrentView('MINIGAME');
         } else {
@@ -151,7 +146,7 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
             setSelectedSpot(null);
             setResultData(null);
         }
-    }, [resultData, selectedSpot, travelClass, hasSouvenir]);
+    }, [resultData, selectedSpot]);
 
     const onMiniGameComplete = useCallback((success: boolean) => {
         if (success && selectedSpot) {
