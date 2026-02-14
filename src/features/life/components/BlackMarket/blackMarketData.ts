@@ -7,7 +7,7 @@
 
 // --- TYPES ---
 
-export type BlackMarketCategory = 'art' | 'antique' | 'jewelry' | 'weapon' | 'substance';
+export type BlackMarketCategory = 'art' | 'antique' | 'jewelry' | 'weapon' | 'substance' | 'art_antique';
 
 export type ReputationTier = 1 | 2 | 3 | 4;
 
@@ -291,6 +291,8 @@ export const getItemsByCategory = (category: BlackMarketCategory): BlackMarketIt
             return BLACK_MARKET_WEAPONS;
         case 'substance':
             return BLACK_MARKET_SUBSTANCES;
+        case 'art_antique': // NEW: Combined Category
+            return [...BLACK_MARKET_ARTS, ...BLACK_MARKET_ANTIQUES];
         default:
             return [];
     }

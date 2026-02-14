@@ -48,7 +48,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
     });
 
     const categories: { id: BlackMarketCategory, label: string, icon: string, color: string }[] = [
-        { id: 'art', label: 'Fine Arts & Antiques', icon: '🏛️', color: '#f59e0b' },
+        { id: 'art_antique', label: 'Fine Arts & Antiques', icon: '🏛️', color: '#f59e0b' },
         { id: 'weapon', label: 'Weapons & Defense', icon: '🔫', color: '#ef4444' },
         { id: 'jewelry', label: 'Jewelry & Gems', icon: '💎', color: '#06b6d4' },
         { id: 'substance', label: 'Prohibited Substances', icon: '🧪', color: '#a855f7' }

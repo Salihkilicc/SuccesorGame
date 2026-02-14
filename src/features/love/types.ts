@@ -27,6 +27,8 @@ export interface Partner {
     stats: {
         happiness: number;
         relationshipLevel: number; // 0-100 (Love)
+        looks: number; // 0-100
+        intellect: number; // 0-100
     };
     finances: {
         monthlyCost: number; // Calculated expense

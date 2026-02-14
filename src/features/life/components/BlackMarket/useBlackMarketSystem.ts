@@ -121,6 +121,17 @@ export const useBlackMarketSystem = () => {
 
         // Get random deal based on Street Rep
         const deal = getRandomDeal(category, streetRep);
+
+        if (!deal) {
+            // No items available for this reputation level
+            const Alert = require('react-native').Alert; // Lazy import to avoid cycle if any
+            Alert.alert(
+                '🔒 Access Denied',
+                `Your Street Rep (${streetRep.toFixed(1)}) is too low for this category. Come back when you're a bigger player.`
+            );
+            return;
+        }
+
         setCurrentDeal(deal);
         setActiveView('DEAL'); // Switch to Deal View
 

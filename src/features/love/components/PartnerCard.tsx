@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, Dimensions } from 'react-native';
 import type { PartnerProfile } from '../../../data/relationshipTypes';
 import type { Partner, SocialTier } from '../types';
 import { theme } from '../../../core/theme';
@@ -9,52 +9,39 @@ type PartnerCardProps = {
   usedToday: boolean;
 };
 
+// --- HELPERS ---
+
 const getLoveColor = (love: number) => {
-  if (love >= 80) return theme.colors.success;
-  if (love >= 50) return theme.colors.accent;
-  if (love >= 30) return theme.colors.warning;
-  return theme.colors.danger;
+  if (love >= 80) return '#ef4444'; // Red
+  if (love >= 50) return '#ec4899'; // Pink
+  if (love >= 30) return '#f59e0b'; // Amber
+  return '#64748b'; // Slate
 };
 
 const getTierColor = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY':
-      return '#FFD700'; // Gold
-    case 'CORPORATE_ELITE':
-      return '#1E3A8A'; // Dark Blue
-    case 'UNDERGROUND':
-      return '#7C2D12'; // Dark Red/Purple
-    case 'BLUE_COLLAR':
-      return '#64748B'; // Grey/Light Blue
-    case 'STUDENT_LIFE':
-      return '#0EA5E9'; // Sky Blue
-    case 'ARTISTIC':
-      return '#A855F7'; // Purple
-    default:
-      return theme.colors.textSecondary;
+    case 'HIGH_SOCIETY': return '#fbbf24'; // Gold
+    case 'CORPORATE_ELITE': return '#60a5fa'; // Blue
+    case 'UNDERGROUND': return '#ef4444'; // Red
+    case 'BLUE_COLLAR': return '#94a3b8'; // Slate
+    case 'STUDENT_LIFE': return '#22d3ee'; // Cyan
+    case 'ARTISTIC': return '#a855f7'; // Purple
+    default: return '#9ca3af';
   }
 };
 
 const getTierLabel = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY':
-      return 'High Society';
-    case 'CORPORATE_ELITE':
-      return 'Corporate Elite';
-    case 'UNDERGROUND':
-      return 'Underground';
-    case 'BLUE_COLLAR':
-      return 'Blue Collar';
-    case 'STUDENT_LIFE':
-      return 'Student';
-    case 'ARTISTIC':
-      return 'Artistic';
-    default:
-      return tier;
+    case 'HIGH_SOCIETY': return 'High Society';
+    case 'CORPORATE_ELITE': return 'Corporate Elite';
+    case 'UNDERGROUND': return 'Underground';
+    case 'BLUE_COLLAR': return 'Blue Collar';
+    case 'STUDENT_LIFE': return 'Student';
+    case 'ARTISTIC': return 'Artistic';
+    default: return tier;
   }
 };
 
-// Type guard to check if partner is new Deep Persona type
 const isDeepPersonaPartner = (partner: PartnerProfile | Partner): partner is Partner => {
   return 'job' in partner && 'personality' in partner && 'finances' in partner;
 };
@@ -68,74 +55,119 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+// --- COMPONENT ---
+
 const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   const isDeepPersona = isDeepPersonaPartner(partner);
 
-  // Get love/relationship level
-  const loveLevel = isDeepPersona
-    ? partner.stats.relationshipLevel
-    : (partner as PartnerProfile).love;
+  // Stats
+  const loveLevel = isDeepPersona ? partner.stats.relationshipLevel : (partner as PartnerProfile).love;
+  const looksLevel = isDeepPersona ? partner.stats.looks : 50; // Fallback
+  const smartsLevel = isDeepPersona ? partner.stats.intellect : 50; // Fallback
+
+  // Derived Info
+  const name = partner.name;
+  const initial = name[0] || '?';
+  const jobTitle = isDeepPersona ? partner.job.title : 'Unemployed';
+  const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
+  const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
+  const statusColor = (partner as PartnerProfile).isMarried ? '#a855f7' : '#ec4899';
 
   return (
-    <View style={styles.card}>
-      <View style={styles.photoPlaceholder}>
-        <Text style={styles.photoText}>{partner.name[0] ?? 'P'}</Text>
+    <View style={styles.container}>
+      {/* Top Half: Avatar & Overlay Info */}
+      <View style={styles.imageSection}>
+        {/* Placeholder Avatar - in real app would use <Image source={{ uri: ... }} /> */}
+        <View style={styles.avatarPlaceholder}>
+          <Text style={styles.avatarText}>{initial}</Text>
+        </View>
+
+        {/* Overlay Details */}
+        <View style={styles.overlay}>
+          <View>
+            <Text style={styles.overlayName}>{name}, {age}</Text>
+            <Text style={styles.overlayJob}>{jobTitle}</Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <Text style={styles.statusText}>{statusLabel}</Text>
+          </View>
+        </View>
+
+        {/* Tier Badge (Top Right) */}
+        {isDeepPersona && (
+          <View style={[styles.tierBadge, { borderColor: getTierColor(partner.job.tier) }]}>
+            <Text style={[styles.tierText, { color: getTierColor(partner.job.tier) }]}>
+              {getTierLabel(partner.job.tier)}
+            </Text>
+          </View>
+        )}
       </View>
-      <View style={styles.info}>
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>{partner.name}</Text>
-            {isDeepPersona && (
-              <Text style={styles.jobTitle}>{partner.job.title}</Text>
+
+      {/* Bottom Half: Stats & Actions */}
+      <View style={styles.contentSection}>
+
+        {/* Stats Grid */}
+        <View style={styles.statsGrid}>
+          {/* Love */}
+          <View style={styles.statRow}>
+            <Text style={styles.statIcon}>❤️</Text>
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBarFill, { width: `${loveLevel}%`, backgroundColor: getLoveColor(loveLevel) }]} />
+            </View>
+            <Text style={styles.statValue}>{Math.round(loveLevel)}%</Text>
+          </View>
+
+          {/* Looks (Only DeepPersona) */}
+          {isDeepPersona && (
+            <View style={styles.statRow}>
+              <Text style={styles.statIcon}>💎</Text>
+              <View style={styles.progressBarContainer}>
+                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#38bdf8' }]} />
+              </View>
+              <Text style={styles.statValue}>{Math.round(looksLevel)}</Text>
+            </View>
+          )}
+
+          {/* Smarts (Only DeepPersona) */}
+          {isDeepPersona && (
+            <View style={styles.statRow}>
+              <Text style={styles.statIcon}>🧠</Text>
+              <View style={styles.progressBarContainer}>
+                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#a855f7' }]} />
+              </View>
+              <Text style={styles.statValue}>{Math.round(smartsLevel)}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Personality & Finances */}
+        {isDeepPersona && (
+          <View style={styles.metaRow}>
+            <View style={styles.chip}>
+              <Text style={styles.chipText}>🧩 {partner.personality.label}</Text>
+            </View>
+            {partner.finances.monthlyCost > 0 && (
+              <View style={[styles.chip, styles.costChip]}>
+                <Text style={[styles.chipText, styles.costText]}>
+                  -{formatCurrency(partner.finances.monthlyCost)}/mo
+                </Text>
+              </View>
             )}
           </View>
-          <Text style={[styles.statusChip, {
-            color: (partner as PartnerProfile).isMarried ? theme.colors.primary : theme.colors.accent
-          }]}>
-            {(partner as PartnerProfile).isMarried ? '💍 Married' : '❤️ Dating'}
+        )}
+
+        {/* Action Button (Placeholder for Interaction) */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.actionButton,
+            pressed && styles.actionButtonPressed
+          ]}
+        >
+          <Text style={styles.actionButtonText}>
+            {usedToday ? 'Interacted' : 'Interact'}
           </Text>
-        </View>
+        </Pressable>
 
-        {/* Social Tier Badge */}
-        {isDeepPersona && (
-          <View style={styles.tierRow}>
-            <View style={[styles.tierBadge, {
-              backgroundColor: getTierColor(partner.job.tier) + '20',
-              borderColor: getTierColor(partner.job.tier),
-            }]}>
-              <Text style={[styles.tierText, { color: getTierColor(partner.job.tier) }]}>
-                {getTierLabel(partner.job.tier)}
-              </Text>
-            </View>
-            <Text style={styles.personalityText}>
-              {partner.personality.label}
-            </Text>
-          </View>
-        )}
-
-        <View style={styles.loveRow}>
-          <Text style={styles.meta}>Love: {Math.round(loveLevel)}%</Text>
-          <View style={styles.loveBar}>
-            <View style={[styles.loveFill, {
-              width: `${Math.min(100, loveLevel)}%`,
-              backgroundColor: getLoveColor(loveLevel)
-            }]} />
-          </View>
-        </View>
-
-        {/* Monthly Cost Display */}
-        {isDeepPersona && partner.finances.monthlyCost > 0 && (
-          <View style={styles.costRow}>
-            <Text style={styles.costLabel}>Monthly Upkeep:</Text>
-            <Text style={styles.costValue}>
-              🔻 {formatCurrency(partner.finances.monthlyCost)}/mo
-            </Text>
-          </View>
-        )}
-
-        <Text style={styles.status}>
-          Bugünkü etkileşim: {usedToday ? 'Kullanıldı' : 'Kullanılmadı'}
-        </Text>
       </View>
     </View>
   );
@@ -144,120 +176,166 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
 export default PartnerCard;
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    alignItems: 'flex-start',
-    gap: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  container: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#333',
+    // Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  photoPlaceholder: {
-    width: 72,
-    height: 72,
-    borderRadius: 999,
-    backgroundColor: theme.colors.card,
+  imageSection: {
+    height: 180,
+    backgroundColor: '#2D2D2D',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#383838', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
   },
-  photoText: {
-    fontSize: 22,
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
-    fontWeight: '800',
+  avatarText: {
+    fontSize: 80,
+    fontWeight: 'bold',
+    color: '#555',
   },
-  info: {
-    flex: 1,
-    gap: theme.spacing.sm,
-  },
-  headerRow: {
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: theme.spacing.sm,
+    alignItems: 'flex-end',
+    // Gradient simulation using background color with potential opacity if needed, 
+    // but here solid semi-transparent background works best without external libs.
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
-  name: {
-    fontSize: theme.typography.subtitle + 2,
+  overlayName: {
+    fontSize: 22,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
-  },
-  jobTitle: {
-    fontSize: theme.typography.caption + 1,
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  tierRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    flexWrap: 'wrap',
-  },
-  tierBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    borderWidth: 1,
-  },
-  tierText: {
-    fontSize: theme.typography.caption,
-    fontWeight: '700',
+    color: '#fff',
     letterSpacing: 0.5,
   },
-  personalityText: {
-    fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
-    fontStyle: 'italic',
+  overlayJob: {
+    fontSize: 14,
+    color: '#d1d5db',
+    fontWeight: '500',
+    marginTop: 2,
   },
-  meta: {
-    fontSize: theme.typography.body,
-    color: theme.colors.textSecondary,
-  },
-  status: {
-    fontSize: theme.typography.caption + 1,
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-  },
-  statusChip: {
-    fontSize: theme.typography.caption + 1,
-    fontWeight: '700',
-  },
-  loveRow: {
-    gap: theme.spacing.xs,
-  },
-  loveBar: {
-    height: 6,
-    backgroundColor: theme.colors.accentSoft,
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 999,
-    overflow: 'hidden',
   },
-  loveFill: {
-    height: '100%',
-    backgroundColor: theme.colors.accent,
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
-  costRow: {
+  tierBadge: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  tierText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  contentSection: {
+    padding: 16,
+    gap: 16,
+  },
+  statsGrid: {
+    gap: 10,
+  },
+  statRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FEE2E2',
+    gap: 10,
+  },
+  statIcon: {
+    fontSize: 16,
+    width: 20,
+    textAlign: 'center',
+  },
+  progressBarContainer: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#333',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  statValue: {
+    width: 35,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'right',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    backgroundColor: '#2D2D2D',
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 6,
-    borderLeftWidth: 3,
-    borderLeftColor: '#DC2626',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#404040',
   },
-  costLabel: {
-    fontSize: theme.typography.caption + 1,
-    color: '#7F1D1D',
+  chipText: {
+    fontSize: 12,
+    color: '#d1d5db',
+  },
+  costChip: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  costText: {
+    color: '#ef4444',
     fontWeight: '600',
   },
-  costValue: {
-    fontSize: theme.typography.body,
-    color: '#DC2626',
+  actionButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    borderRadius: 999,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  actionButtonPressed: {
+    backgroundColor: '#e5e5e5',
+    transform: [{ scale: 0.98 }],
+  },
+  actionButtonText: {
+    color: '#000',
+    fontSize: 14,
     fontWeight: '800',
+    letterSpacing: 0.5,
   },
 });
