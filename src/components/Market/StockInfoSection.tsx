@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatMoney } from '../../core/utils';
 
 type StockInfoSectionProps = {
   description?: string;
   targetPrice?: number; // Optional
+  valuation?: number;
 };
 
-const StockInfoSection = ({ description, targetPrice = 165 }: StockInfoSectionProps) => {
+const StockInfoSection = ({ description, targetPrice = 165, valuation }: StockInfoSectionProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Stock Info</Text>
       <Text style={styles.row}>🎯 Target Price: ${targetPrice}</Text>
+      {valuation !== undefined && (
+        <Text style={styles.row}>Company Valuation: {formatMoney(valuation)}</Text>
+      )}
       <Text style={styles.row}>
         {description || "Company Bio: Rising player in its sector with strong fundamentals."}
       </Text>

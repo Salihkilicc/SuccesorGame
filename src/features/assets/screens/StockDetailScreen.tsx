@@ -10,6 +10,7 @@ import StockInfoSection from '../../../components/Market/StockInfoSection';
 import BuySellPanel from '../../../components/Market/BuySellPanel';
 import SimpleLineChart from '../../../components/Market/SimpleLineChart';
 import { getFakeChartData } from '../data/chartData';
+import { INITIAL_MARKET_ITEMS } from '../data/marketData';
 
 const StockDetailScreen = () => {
     const route = useRoute<any>();
@@ -38,6 +39,10 @@ const StockDetailScreen = () => {
 
     // Get deterministic random chart data
     const chartData = getFakeChartData(symbol, isPositive, quarters);
+
+    // Find market item for additional info
+    const marketItem = INITIAL_MARKET_ITEMS.find(item => 'symbol' in item && item.symbol === symbol);
+    const valuation = marketItem && 'marketCap' in marketItem ? (marketItem as any).marketCap : undefined;
 
     return (
         <AppScreen
@@ -81,7 +86,10 @@ const StockDetailScreen = () => {
                     </View>
 
                     {/* Company Info */}
-                    <StockInfoSection />
+                    <StockInfoSection
+                        description={marketItem && 'description' in marketItem ? marketItem.description : undefined}
+                        valuation={valuation}
+                    />
 
                     {/* Trading Panel */}
                     <BuySellPanel

@@ -402,21 +402,7 @@ const LifeScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
-        {/* DEV BUTTON */}
-        <Pressable
-          onPress={() => earnMoney(1_000_000_000)}
-          style={({ pressed }) => ({
-            backgroundColor: '#8e44ad',
-            padding: 10,
-            alignItems: 'center',
-            marginHorizontal: 16,
-            marginTop: 10,
-            borderRadius: 8,
-            opacity: pressed ? 0.8 : 1
-          })}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>🐛 DEV: +$1B Cash</Text>
-        </Pressable>
+
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Lifestyle Actions</Text>
@@ -438,39 +424,9 @@ const LifeScreen = () => {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Today&apos;s Life Event</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardText}>
-              {lastLifeEvent ?? 'Bugün henüz özel bir sosyal olay yaşanmadı.'}
-            </Text>
-            <Pressable
-              onPress={() => {
-                void triggerEvent('life');
-              }}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                pressed && styles.secondaryButtonPressed,
-              ]}>
-              <Text style={styles.secondaryButtonText}>Random Life Event</Text>
-            </Pressable>
-          </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Encounters & Matches</Text>
-          <Text style={styles.placeholderText}>
-            Burada Tinder-style eşleşme pop-up&apos;ları tetiklenecek.
-          </Text>
-          <Pressable
-            onPress={() => openMatch()}
-            style={({ pressed }) => [
-              styles.secondaryButton,
-              pressed && styles.secondaryButtonPressed,
-            ]}>
-            <Text style={styles.secondaryButtonText}>Test Match Popup</Text>
-          </Pressable>
-        </View>
+
+
       </ScrollView>
 
       {/* MODALS */}

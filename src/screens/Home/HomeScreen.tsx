@@ -17,6 +17,7 @@ import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStor
 import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
+import { formatMoney } from '../../core/utils';
 import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -34,18 +35,7 @@ type HomeNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<RootTabParamList>
 >;
 
-const formatMoney = (value: number) => {
-  const absolute = Math.abs(value);
-  if (absolute >= 1_000_000) {
-    const formatted = (value / 1_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted} M`;
-  }
-  if (absolute >= 1_000) {
-    const formatted = (value / 1_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted} K`;
-  }
-  return `$${value.toLocaleString()} `;
-};
+
 
 const NewsItem = ({ text }: { text: string }) => (
   <View style={styles.newsItem}>

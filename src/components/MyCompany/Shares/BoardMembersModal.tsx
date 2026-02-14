@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import ShareholderProfileModal from './ShareholderProfileModal';
-import BottomStatsBar from '../../common/BottomStatsBar';
+
 
 interface Props {
     visible: boolean;
@@ -65,10 +65,7 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
         }
     };
 
-    const handleHomePress = () => {
-        onClose();
-        navigation.navigate('Home');
-    };
+
 
     return (
         <GameModal visible={visible} onClose={onClose}>
@@ -214,8 +211,8 @@ const BoardMembersModal = ({ visible, onClose }: Props) => {
                 </View>
             </ScrollView>
 
-            {/* Persistent Bottom Bar */}
-            <BottomStatsBar onHomePress={handleHomePress} />
+            {/* Persistent Bottom Bar - REMOVED */}
+
 
             {/* Shareholder Profile Modal */}
             <ShareholderProfileModal
