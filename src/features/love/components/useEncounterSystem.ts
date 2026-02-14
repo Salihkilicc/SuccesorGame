@@ -108,7 +108,7 @@ export const useEncounterSystem = () => {
     }, []);
 
     // --- 2. Trigger Encounter ---
-    const triggerEncounter = useCallback((context: string, countryId?: string): boolean => {
+    const triggerEncounter = useCallback((context: string, countryId?: string, autoShow: boolean = true): { candidate: PartnerProfile, scenario: EncounterScenario } | null => {
         // 0. Probability Check (Internal)
         let chance = 10; // Default 10% (Generic)
 
@@ -130,7 +130,7 @@ export const useEncounterSystem = () => {
         console.log(`[Encounter] Context: ${context}, Chance: ${chance}%, Roll: ${roll.toFixed(1)}`);
 
         if (roll > chance) {
-            return false;
+            return null;
         }
 
         // 1. Select Scenario List
@@ -150,11 +150,13 @@ export const useEncounterSystem = () => {
         const newCandidate = generateSmartCandidate(context, countryId);
 
         // 4. Update State
-        setCurrentScenario(scenario);
-        setCandidate(newCandidate);
-        setIsVisible(true);
+        if (autoShow) {
+            setCurrentScenario(scenario);
+            setCandidate(newCandidate);
+            setIsVisible(true);
+        }
 
-        return true; // Interaction Started!
+        return { candidate: newCandidate, scenario }; // Interaction Started!
     }, [generateSmartCandidate]);
 
     // --- 3. Handle Date Action ---

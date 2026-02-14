@@ -18,7 +18,7 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
     // --- STORES ---
     const { money, update: updateStats } = useStatsStore();
     const { updateCore, core } = usePlayerStore();
-    const { collectSouvenir, hasSouvenir } = useTravelStore();
+    const { collectSouvenir, hasSouvenir, setEncounter } = useTravelStore();
 
     // --- UI STATE ---
     const [currentView, setCurrentView] = useState<TravelView>(null);
@@ -102,9 +102,17 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
 
         // Try to trigger encounter (60% chance for travel romance)
         if (triggerEncounter) {
-            triggerEncounter('travel', selectedSpot.country);
-            // FIX: Do NOT return early. Allow the trip logic (experience) to run in the background.
-            // The EncounterModal will overlay the ExperienceModal.
+            // FIX: Pass autoShow=false so we can handle it manually in TravelHub
+            const encounterData = triggerEncounter('travel', selectedSpot.country, false);
+
+            if (encounterData && typeof encounterData === 'object') {
+                // Store in TravelStore to trigger Modal in TravelHub
+                setEncounter({
+                    candidate: encounterData.candidate,
+                    scenario: encounterData.scenario,
+                    context: 'travel'
+                });
+            }
         }
 
         // Calculate enjoyment
