@@ -39,7 +39,7 @@ const createDeck = (): Card[] => {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-export const usePokerLogic = (initialBet: number = 10000) => {
+export const usePokerLogic = (initialBet: number = 1000000) => {
   const { money, setField } = useStatsStore();
   const { reputation, updateReputation } = usePlayerStore();
   const casinoReputation = reputation.casino;
@@ -87,7 +87,7 @@ export const usePokerLogic = (initialBet: number = 10000) => {
   const setAnte = (amount: number) => {
     // Allow confirming a new bet size only if idle
     if (gamePhase === 'idle') {
-      const valid = clamp(amount, 10, 100000); // 10 min, 100k max
+      const valid = clamp(amount, 10, 100_000_000_000); // 10 min, 100B max
       setBaseBet(valid);
       setCurrentBet(valid); // Sync display
     }

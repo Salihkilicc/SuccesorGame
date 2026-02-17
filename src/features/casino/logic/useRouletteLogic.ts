@@ -10,7 +10,7 @@ export type ResultEntry = {
   color: 'red' | 'black' | 'green';
 };
 
-const CHIP_VALUES = [1000, 5000, 10000, 50000];
+const CHIP_VALUES = [100_000, 500_000, 1_000_000, 5_000_000];
 const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
 // Helper Fonksiyonlar

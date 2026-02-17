@@ -41,7 +41,7 @@ const createDeck = (): Card[] => {
 // Helper: Sayı Sınırlama
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-export const useBlackjackLogic = (initialBet: number = 5000) => {
+export const useBlackjackLogic = (initialBet: number = 500000) => {
     // Global Store
     const { money, setField } = useStatsStore();
     const { reputation, updateReputation } = usePlayerStore();
@@ -192,7 +192,7 @@ export const useBlackjackLogic = (initialBet: number = 5000) => {
 
         adjustBet: (delta: number) => {
             setResultPopup(null);
-            const next = clamp(bet + delta, 10, 100_000);
+            const next = clamp(bet + delta, 10, 100_000_000_000);
             setBet(next);
         },
 
