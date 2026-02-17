@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { VacationSpot } from './data/travelData';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import { useEncounterSystem } from '../../../love/components/useEncounterSystem';
+import { EncounterModal } from '../../../love/components/EncounterModal';
 
 type TravelExperienceModalProps = {
     visible: boolean;
@@ -38,6 +40,24 @@ const TravelExperienceModal = ({
     const [currentNarrative, setCurrentNarrative] = useState('');
     const [showCompletion, setShowCompletion] = useState(false);
 
+    // Encounter State
+    const {
+        triggerEncounter,
+        // We'll use local state to manage the specific encounter for this trip
+        // ensuring it doesn't conflict with global state if possible, though hooks are shared.
+        // Actually, triggerEncounter returns the candidate/scenario, so we can use local state if desired,
+        // BUT EncounterModal expects to be driven by props. available from useEncounterSystem?
+        // Let's use the hook's state to match LifeScreen pattern.
+        isVisible: isEncounterVisible,
+        candidate: encounterCandidate,
+        currentScenario: encounterScenario,
+        handleDate,
+        closeEncounter,
+    } = useEncounterSystem();
+
+    // We need a local flag to know if we are currently handling an encounter to pause the "Completion Screen"
+    // The "showCompletion" state will now only be set AFTER encounter is done (or if none happened).
+
     useEffect(() => {
         if (visible && spot && resultData) {
             // Reset state
@@ -45,13 +65,17 @@ const TravelExperienceModal = ({
             setShowCompletion(false);
             setCurrentNarrative('Preparing for departure...');
 
+            // Ensure any previous encounter is closed
+            closeEncounter();
+
             // Start animation
             Animated.timing(progress, {
                 toValue: 100,
                 duration: ANIMATION_DURATION,
                 useNativeDriver: false,
             }).start(() => {
-                setShowCompletion(true);
+                // Animation Complete -> Check for Encounter
+                handleTripProgressComplete();
             });
 
             // Update narrative based on progress
@@ -77,6 +101,28 @@ const TravelExperienceModal = ({
         }
     }, [visible, spot, resultData]);
 
+    const handleTripProgressComplete = () => {
+        if (!spot) return setShowCompletion(true);
+
+        // Try to trigger an encounter
+        // autoShow=true will set the hook's internal state to visible
+        const encounter = triggerEncounter('travel', spot.id, true);
+
+        if (encounter) {
+            console.log('[Travel] Encounter triggered:', encounter.candidate.name);
+            // Encounter modal will show automatically due to isEncounterVisible from hook
+        } else {
+            console.log('[Travel] No encounter, showing completion.');
+            setShowCompletion(true);
+        }
+    };
+
+    const handleEncounterComplete = () => {
+        console.log('[Travel] Interaction finished/ignored. Showing completion screen.');
+        closeEncounter();
+        setShowCompletion(true);
+    };
+
     if (!visible || !spot || !resultData) return null;
 
     const progressWidth = progress.interpolate({
@@ -97,7 +143,8 @@ const TravelExperienceModal = ({
             onRequestClose={() => { }}
         >
             <View style={[styles.container, { backgroundColor: spot.color }]}>
-                {!showCompletion ? (
+                {/* 1. TRAVEL PROGRESS SCREEN */}
+                {!showCompletion && !isEncounterVisible && (
                     <>
                         {/* Journey Header */}
                         <View style={styles.header}>
@@ -133,7 +180,31 @@ const TravelExperienceModal = ({
                             <Text style={styles.narrativeText}>{currentNarrative}</Text>
                         </View>
                     </>
-                ) : (
+                )}
+
+                {/* 2. ENCOUNTER MODAL - Interjected */}
+                <EncounterModal
+                    visible={isEncounterVisible}
+                    candidate={encounterCandidate}
+                    scenario={encounterScenario}
+                    context="travel"
+                    onIgnore={handleEncounterComplete}
+                    onHookup={() => {
+                        // Assuming hookup logic is handled elsewhere or we just close for now
+                        //Ideally hookup/date outcomes should be impactful, but for this specific request
+                        // we just need to handle the flow to completion.
+                        // Use hookup check logic if needed via another hook, or just proceed.
+                        handleEncounterComplete();
+                    }}
+                    onDate={() => {
+                        handleDate();
+                        handleEncounterComplete();
+                    }}
+                />
+
+
+                {/* 3. COMPLETION SCREEN (Only after progress AND encounter check) */}
+                {showCompletion && (
                     <>
                         {/* Completion Screen */}
                         <View style={styles.completionHeader}>
