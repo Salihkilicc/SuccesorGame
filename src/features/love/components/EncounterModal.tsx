@@ -24,6 +24,7 @@ interface EncounterModalProps {
     onIgnore: () => void;
     onHookup: () => void;
     onDate: () => void;
+    isEmbedded?: boolean;
 }
 
 // Helper functions for Deep Persona display
@@ -59,6 +60,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
     onIgnore,
     onHookup,
     onDate,
+    isEmbedded = false,
 }) => {
     const [fadeAnim] = useState(new Animated.Value(0));
 
@@ -80,6 +82,124 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
     const isDeepPersona = 'job' in candidate && 'personality' in candidate && 'finances' in candidate;
     const deepPartner = isDeepPersona ? (candidate as any) : null;
 
+    const content = (
+        <View style={styles.overlay}>
+            <StatusBar barStyle="light-content" />
+            <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+                <SafeAreaView style={styles.safeArea}>
+
+                    {/* Close Button */}
+                    <TouchableOpacity style={styles.closeButton} onPress={onIgnore}>
+                        <Text style={styles.closeText}>✕</Text>
+                    </TouchableOpacity>
+
+                    {/* Profile Card */}
+                    <View style={styles.profileCard}>
+
+                        {/* Avatar */}
+                        <View style={styles.avatarContainer}>
+                            <View style={styles.avatarCircle}>
+                                <Text style={styles.avatarText}>
+                                    {candidate.name?.charAt(0) || '?'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* Name & Age */}
+                        <Text style={styles.nameText}>
+                            {candidate.name || 'Unknown'}
+                            {deepPartner?.age && `, ${deepPartner.age}`}
+                        </Text>
+
+                        {/* Job Title */}
+                        {deepPartner?.job?.title && (
+                            <Text style={styles.jobTitle}>
+                                {deepPartner.job.title}
+                            </Text>
+                        )}
+
+                        {/* Tier Badge & Personality */}
+                        {deepPartner?.job?.tier && (
+                            <View style={styles.badgeRow}>
+                                <View style={[styles.tierBadge, {
+                                    backgroundColor: getTierBadgeColor(deepPartner.job.tier) + '20',
+                                    borderColor: getTierBadgeColor(deepPartner.job.tier),
+                                }]}>
+                                    <Text style={[styles.tierText, {
+                                        color: getTierBadgeColor(deepPartner.job.tier)
+                                    }]}>
+                                        {getTierLabel(deepPartner.job.tier)}
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Personality Trait */}
+                        {deepPartner?.personality?.label && (
+                            <View style={styles.traitRow}>
+                                <Text style={styles.traitLabel}>Trait:</Text>
+                                <Text style={styles.traitValue}>
+                                    {deepPartner.personality.label}
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* Monthly Cost */}
+                        {deepPartner?.finances?.monthlyCost > 0 && (
+                            <View style={styles.costContainer}>
+                                <Text style={styles.costIcon}>💰</Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.costLabel}>Monthly Upkeep</Text>
+                                    <Text style={styles.costValue}>
+                                        ${deepPartner.finances.monthlyCost.toLocaleString()}/mo
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+
+                        {/* Scenario Text */}
+                        <View style={styles.scenarioContainer}>
+                            <Text style={styles.scenarioText}>
+                                "{scenario.text}"
+                            </Text>
+                        </View>
+
+                        {/* Action Buttons */}
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={[styles.actionButton, styles.dateButton]}
+                                onPress={onDate}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.dateButtonText}>❤️ Date</Text>
+                                <Text style={styles.dateSubtext}>"{scenario.flirt}"</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.actionButton, styles.hookupButton]}
+                                onPress={onHookup}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.hookupButtonText}>🔥 Hookup</Text>
+                                <Text style={styles.hookupSubtext}>No strings attached</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                </SafeAreaView>
+            </Animated.View>
+        </View>
+    );
+
+    if (isEmbedded) {
+        return (
+            <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
+                {content}
+            </View>
+        );
+    }
+
     return (
         <Modal
             visible={visible}
@@ -87,113 +207,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
             animationType="fade"
             statusBarTranslucent={true}
         >
-            <View style={styles.overlay}>
-                <StatusBar barStyle="light-content" />
-                <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-                    <SafeAreaView style={styles.safeArea}>
-
-                        {/* Close Button */}
-                        <TouchableOpacity style={styles.closeButton} onPress={onIgnore}>
-                            <Text style={styles.closeText}>✕</Text>
-                        </TouchableOpacity>
-
-                        {/* Profile Card */}
-                        <View style={styles.profileCard}>
-
-                            {/* Avatar */}
-                            <View style={styles.avatarContainer}>
-                                <View style={styles.avatarCircle}>
-                                    <Text style={styles.avatarText}>
-                                        {candidate.name?.charAt(0) || '?'}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            {/* Name & Age */}
-                            <Text style={styles.nameText}>
-                                {candidate.name || 'Unknown'}
-                                {deepPartner?.age && `, ${deepPartner.age}`}
-                            </Text>
-
-                            {/* Job Title */}
-                            {deepPartner?.job?.title && (
-                                <Text style={styles.jobTitle}>
-                                    {deepPartner.job.title}
-                                </Text>
-                            )}
-
-                            {/* Tier Badge & Personality */}
-                            {deepPartner?.job?.tier && (
-                                <View style={styles.badgeRow}>
-                                    <View style={[styles.tierBadge, {
-                                        backgroundColor: getTierBadgeColor(deepPartner.job.tier) + '20',
-                                        borderColor: getTierBadgeColor(deepPartner.job.tier),
-                                    }]}>
-                                        <Text style={[styles.tierText, {
-                                            color: getTierBadgeColor(deepPartner.job.tier)
-                                        }]}>
-                                            {getTierLabel(deepPartner.job.tier)}
-                                        </Text>
-                                    </View>
-                                </View>
-                            )}
-
-                            {/* Personality Trait */}
-                            {deepPartner?.personality?.label && (
-                                <View style={styles.traitRow}>
-                                    <Text style={styles.traitLabel}>Trait:</Text>
-                                    <Text style={styles.traitValue}>
-                                        {deepPartner.personality.label}
-                                    </Text>
-                                </View>
-                            )}
-
-                            {/* Monthly Cost */}
-                            {deepPartner?.finances?.monthlyCost > 0 && (
-                                <View style={styles.costContainer}>
-                                    <Text style={styles.costIcon}>💰</Text>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={styles.costLabel}>Monthly Upkeep</Text>
-                                        <Text style={styles.costValue}>
-                                            ${deepPartner.finances.monthlyCost.toLocaleString()}/mo
-                                        </Text>
-                                    </View>
-                                </View>
-                            )}
-
-                            {/* Scenario Text */}
-                            <View style={styles.scenarioContainer}>
-                                <Text style={styles.scenarioText}>
-                                    "{scenario.text}"
-                                </Text>
-                            </View>
-
-                            {/* Action Buttons */}
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity
-                                    style={[styles.actionButton, styles.dateButton]}
-                                    onPress={onDate}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={styles.dateButtonText}>❤️ Date</Text>
-                                    <Text style={styles.dateSubtext}>"{scenario.flirt}"</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={[styles.actionButton, styles.hookupButton]}
-                                    onPress={onHookup}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={styles.hookupButtonText}>🔥 Hookup</Text>
-                                    <Text style={styles.hookupSubtext}>No strings attached</Text>
-                                </TouchableOpacity>
-                            </View>
-
-                        </View>
-
-                    </SafeAreaView>
-                </Animated.View>
-            </View>
+            {content}
         </Modal>
     );
 };
@@ -233,7 +247,7 @@ const styles = StyleSheet.create({
     // Profile Card
     profileCard: {
         backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.xl,
+        borderRadius: theme.radius.lg,
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,

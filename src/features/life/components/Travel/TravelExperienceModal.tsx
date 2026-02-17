@@ -120,12 +120,7 @@ const TravelExperienceModal = ({
     const handleEncounterComplete = () => {
         console.log('[Travel] Interaction finished/ignored. Closing encounter...');
         closeEncounter();
-
-        // Add delay to prevent modal animation conflict (freeze fix)
-        setTimeout(() => {
-            console.log('[Travel] Showing completion screen after delay.');
-            setShowCompletion(true);
-        }, 500);
+        setShowCompletion(true);
     };
 
     if (!visible || !spot || !resultData) return null;
@@ -193,6 +188,7 @@ const TravelExperienceModal = ({
                     candidate={encounterCandidate}
                     scenario={encounterScenario}
                     context="travel"
+                    isEmbedded={true}
                     onIgnore={handleEncounterComplete}
                     onHookup={() => {
                         // Assuming hookup logic is handled elsewhere or we just close for now

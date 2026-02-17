@@ -100,20 +100,12 @@ export const useTravelSystem = (triggerEncounter?: (context: string, countryId?:
         // Deduct money
         updateStats({ money: money - totalCost });
 
-        // Try to trigger encounter (60% chance for travel romance)
-        if (triggerEncounter) {
-            // FIX: Pass autoShow=false so we can handle it manually in TravelHub
-            const encounterData = triggerEncounter('travel', selectedSpot.country, false);
+        // Deduct money
+        updateStats({ money: money - totalCost });
 
-            if (encounterData && typeof encounterData === 'object') {
-                // Store in TravelStore to trigger Modal in TravelHub
-                setEncounter({
-                    candidate: encounterData.candidate,
-                    scenario: encounterData.scenario,
-                    context: 'travel'
-                });
-            }
-        }
+        // Encounter logic is now handled directly inside TravelExperienceModal (embedded)
+        // We do NOT trigger it here to avoid state leaks/phantom modals in TravelHub.
+
 
         // Calculate enjoyment
         const enjoyment = calculateEnjoyment(travelClass);
