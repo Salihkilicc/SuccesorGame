@@ -118,9 +118,14 @@ const TravelExperienceModal = ({
     };
 
     const handleEncounterComplete = () => {
-        console.log('[Travel] Interaction finished/ignored. Showing completion screen.');
+        console.log('[Travel] Interaction finished/ignored. Closing encounter...');
         closeEncounter();
-        setShowCompletion(true);
+
+        // Add delay to prevent modal animation conflict (freeze fix)
+        setTimeout(() => {
+            console.log('[Travel] Showing completion screen after delay.');
+            setShowCompletion(true);
+        }, 500);
     };
 
     if (!visible || !spot || !resultData) return null;
