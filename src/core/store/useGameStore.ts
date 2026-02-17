@@ -13,6 +13,7 @@ import { usePlayerStore } from './usePlayerStore';
 import { useProductStore } from './useProductStore';
 import { useStatsStore } from './useStatsStore';
 import { useUserStore } from './useUserStore';
+import * as AchievementChecker from '../../achievements/checker';
 
 const LOW_MORALE_REASONS = [
   "Factory strikes halted production for 3 days.",
@@ -375,9 +376,7 @@ export const useGameStore = create<GameStore>()(
         // 6. Yan Etkileri Tetikle (Eventler vs.)
         simulateNewMonth();
 
-        import('../../achievements/checker').then(mod => {
-          mod.checkAllAchievementsAfterStateChange();
-        });
+        AchievementChecker.checkAllAchievementsAfterStateChange();
 
         // 7. QUARTERLY MORALE LOGIC
         if (months >= 3) {

@@ -7,7 +7,7 @@ import { EDUCATION_DATA } from '../../education/data/educationData';
 import { EducationItem, EducationType } from '../../education/educationTypes';
 import { canEnroll } from '../../../logic/educationLogic';
 import { theme } from '../../../core/theme';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 

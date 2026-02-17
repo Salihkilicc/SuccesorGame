@@ -1,0 +1,12 @@
+Command line invocation:
+    "/Applications/Xcode copy 2.app/Contents/Developer/usr/bin/xcodebuild" -workspace Succesor.xcworkspace -scheme Succesor -configuration Debug -destination "platform=iOS Simulator,id=EC83D1C7-1E02-4426-80E7-C84D7F6AD098" build
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+2026-02-16 22:00:36.691 xcodebuild[77861:1029253] Writing error result bundle to /var/folders/_f/hjcz1b312n5bsyr92rn3yz680000gn/T/ResultBundle_2026-16-02_22-00-0036.xcresult
+xcodebuild: error: Unable to find a destination matching the provided destination specifier:
+		{ platform:iOS Simulator, id:EC83D1C7-1E02-4426-80E7-C84D7F6AD098 }
+
+	Ineligible destinations for the "Succesor" scheme:
+		{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device, error:iOS 18.1 is not installed. To use with Xcode, first download and install the platform }

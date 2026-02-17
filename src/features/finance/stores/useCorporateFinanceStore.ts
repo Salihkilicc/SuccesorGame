@@ -7,11 +7,23 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 /**
  * CORPORATE FINANCE STORE
  * Manages Debt, Credit Score, Leverage, and Subsidiaries
- * Implements the Subsidiary System with Probability Growth Logic
+ * Uses MMKV for synchronous storage to prevent async issues
  */
 
 // 1. Setup MMKV Storage
-export const storage = new MMKV({ id: 'subsidiary-storage' });
+let storage: MMKV;
+try {
+    storage = new MMKV({ id: 'subsidiary-storage' });
+} catch (e) {
+    console.warn('[WARN] MMKV Failed to Initialize (Data persistence disabled):', e);
+    // Fallback to prevent crash, though data won't persist
+    storage = {
+        set: () => { },
+        getString: () => null,
+        delete: () => { },
+    } as any;
+}
+export { storage };
 
 const zustandStorage: StateStorage = {
     setItem: (name, value) => {

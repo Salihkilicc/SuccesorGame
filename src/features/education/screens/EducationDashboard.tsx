@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { theme } from '../../../core/theme';
 import { useEducationStore } from '../../../core/store/useEducationStore';
 import { EDUCATION_DATA } from '../../education/data/educationData';
