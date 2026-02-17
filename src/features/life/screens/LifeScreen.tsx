@@ -8,7 +8,7 @@ import MatchPopup from '../../../components/Match/MatchPopup';
 import { useMatchSystem } from '../../../components/Match/useMatchSystem';
 import { triggerEvent } from '../../../event/eventEngine';
 import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../../navigation';
-import { useEventStore, useUserStore, useStatsStore, usePlayerStore } from '../../../core/store';
+import { useEventStore, useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
 import { theme } from '../../../core/theme';
 import AppScreen from '../../../components/layout/AppScreen';
 import { useHookupSystem } from '../components/useHookupSystem';
@@ -185,6 +185,12 @@ const LifeScreen = () => {
     getCheatingConsequence
   } = useEncounterSystem();
 
+  // FIX: Adapter for systems expecting boolean return
+  const triggerEncounterBool = useCallback((context: string, countryId?: string) => {
+    const result = triggerEncounter(context, countryId);
+    return !!result;
+  }, [triggerEncounter]);
+
   const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
 
   const {
@@ -225,7 +231,7 @@ const LifeScreen = () => {
     handleConclusionClose,
     handleHookupGameSuccess,
     handleHookupGameFail,
-  } = useNightOutSystem(triggerEncounter);
+  } = useNightOutSystem(triggerEncounterBool);
 
   // Gym System Hook
   const { actions } = useGymSystem();
@@ -259,7 +265,7 @@ const LifeScreen = () => {
 
     // Store methods
     hasSouvenir,
-  } = useTravelSystem(triggerEncounter);
+  } = useTravelSystem(triggerEncounterBool);
 
   const {
     // Visibility & Nav
@@ -421,6 +427,63 @@ const LifeScreen = () => {
                 />
               );
             })}
+          </View>
+        </View>
+
+        {/* --- DEVELOPER TOOLS (hidden/dev only) --- */}
+        <View style={[styles.section, { backgroundColor: '#fef2f2', borderColor: '#fecaca' }]}>
+          <Text style={[styles.sectionTitle, { color: '#dc2626' }]}>Developer Zone 🛠️</Text>
+          <View style={styles.actionsGrid}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                { backgroundColor: '#fee2e2', borderColor: '#fca5a5' },
+                pressed && { opacity: 0.8 }
+              ]}
+              onPress={() => {
+                Alert.alert(
+                  'RESET GAME 🔴',
+                  'Are you absolutely sure? This will wipe all progress and return to the start.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'RESET EVERYTHING',
+                      style: 'destructive',
+                      onPress: async () => {
+                        await useGameStore.getState().resetGame();
+                        // Force navigate to reset state if needed, but store reset usually triggers app reload or auth flow change
+                        // For now just alert
+                        Alert.alert('Game Reset', 'All data has been wiped. Please restart the app or navigate to Home.');
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <View style={styles.actionHeader}>
+                <Text style={styles.actionEmoji}>🔴</Text>
+                <Text style={[styles.actionLabel, { color: '#b91c1c' }]}>RESET GAME</Text>
+              </View>
+              <Text style={[styles.actionDescription, { color: '#ef4444' }]}>Wipe all data & restart</Text>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                { backgroundColor: '#dcfce7', borderColor: '#86efac' },
+                pressed && { opacity: 0.8 }
+              ]}
+              onPress={() => {
+                useStatsStore.getState().earnMoney(100_000_000);
+                Alert.alert('🤑 Rich Mode', '$100,000,000 added to your account!');
+              }}
+            >
+              <View style={styles.actionHeader}>
+                <Text style={styles.actionEmoji}>💰</Text>
+                <Text style={[styles.actionLabel, { color: '#15803d' }]}>ADD $100M</Text>
+              </View>
+              <Text style={[styles.actionDescription, { color: '#16a34a' }]}>Get rich instantly</Text>
+            </Pressable>
           </View>
         </View>
 
