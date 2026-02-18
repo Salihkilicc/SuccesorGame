@@ -59,6 +59,52 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
     // Relationship level starts at 30-50 range
     const relationshipLevel = Math.floor(Math.random() * 21) + 30;
 
+    // --- SMART BUFF ASSIGNMENT LOGIC ---
+    let buffType = job.buffType || 'STRESS_RELIEF';
+    // Calculate buff value based on Tier Cost (Higher tier = Better buff)
+    // Range: 1 - 15
+    const tierMultiplier = {
+        'HIGH_SOCIETY': 1.5,
+        'CORPORATE_ELITE': 1.3,
+        'UNDERGROUND': 1.2,
+        'ARTISTIC': 0.9,
+        'BLUE_COLLAR': 0.8,
+        'STUDENT_LIFE': 0.6
+    }[job.tier] || 1.0;
+
+    let buffValue = Math.floor((Math.random() * 5 + 5) * tierMultiplier); // Base 5-10 * Multiplier
+    buffValue = Math.max(1, Math.min(15, buffValue)); // Clamp to 1-15
+
+    // Dynamic Overrides based on Stats/Personality
+    // 1. Street Rep (Low Morality / High Risk)
+    if ((personality.morality < 40 || personality.riskAppetite > 70) && Math.random() > 0.5) {
+        buffType = 'STREET_CRED_BOOST';
+    }
+    // 2. Business Rep (High Ambition)
+    else if (personality.ambition > 70 && Math.random() > 0.5) {
+        buffType = 'BUSINESS_TRUST_BOOST';
+    }
+    // 3. High Society (Looks / Charm)
+    else if (personality.strategicSense > 70 && Math.random() > 0.5) { // Using strategicSense as proxy for social climbing
+        buffType = 'SOCIAL_STATUS_BOOST';
+    }
+    // 4. Casino VIP (High Risk)
+    else if (personality.riskAppetite > 80 && Math.random() > 0.7) {
+        buffType = 'CASINO_VIP_BOOST';
+    }
+    // 5. Luck (Rare)
+    else if (Math.random() < 0.05) { // 5% Chance
+        buffType = 'LUCK_BOOST';
+        buffValue = Math.min(5, Math.ceil(buffValue / 2)); // Luck shouldn't be too high
+    }
+
+    // Override Job if updated dynamic logic applied
+    const dynamicJob = {
+        ...job,
+        buffType,
+        buffValue
+    };
+
     // 6. Random gender
     const gender: 'male' | 'female' = Math.random() > 0.5 ? 'female' : 'male';
 
@@ -68,7 +114,7 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
         age,
         gender,
         avatar: '', // Placeholder
-        job,
+        job: dynamicJob, // ✅ Updated
         personality,
         stats: {
             happiness,

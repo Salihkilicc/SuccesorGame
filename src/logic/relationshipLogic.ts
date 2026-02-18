@@ -180,6 +180,142 @@ export interface Perk {
 export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
     const perks: Perk[] = [];
 
+    // --- NEW SYSTEM (Prioritize buffType) ---
+    if (partner.job && partner.job.buffType) {
+        const { buffType, buffValue = 0 } = partner.job;
+        const val = Math.round(buffValue);
+
+        switch (buffType) {
+            case 'STREET_CRED_BOOST':
+                perks.push({
+                    id: 'street_rep',
+                    icon: '🔫',
+                    title: 'Street Cred',
+                    desc: `+${val} Street Reputation`,
+                    color: '#c0392b' // Dark Red
+                });
+                break;
+            case 'BUSINESS_TRUST_BOOST':
+                perks.push({
+                    id: 'biz_trust',
+                    icon: '🤝',
+                    title: 'Business Trust',
+                    desc: `+${val} Business Reputation`,
+                    color: '#f1c40f' // Gold
+                });
+                break;
+            case 'SOCIAL_STATUS_BOOST':
+            case 'FAME_BOOST':
+            case 'REPUTATION_BOOST':
+                perks.push({
+                    id: 'social_status',
+                    icon: '🌟',
+                    title: 'Social Status',
+                    desc: `+${val} Social Reputation`,
+                    color: '#e91e63' // Pink
+                });
+                break;
+            case 'CASINO_VIP_BOOST':
+                perks.push({
+                    id: 'casino_vip',
+                    icon: '🎰',
+                    title: 'Casino VIP',
+                    desc: `+${val * 10} Casino Reputation`, // Scaled for UI consistency
+                    color: '#e74c3c' // Red
+                });
+                break;
+            case 'INTELLECT_GAIN':
+                perks.push({
+                    id: 'intellect',
+                    icon: '🧠',
+                    title: 'Intellect Boost',
+                    desc: `+${val} Intellect`,
+                    color: '#9b59b6' // Purple
+                });
+                break;
+            case 'CHARM_BOOST':
+                perks.push({
+                    id: 'charm',
+                    icon: '🌹',
+                    title: 'Charm Boost',
+                    desc: `+${val} Charm`,
+                    color: '#e91e63' // Pink
+                });
+                break;
+            case 'STRENGTH_BOOST':
+            case 'STRENGTH_TRAINING':
+            case 'GYM_GAINS':
+                perks.push({
+                    id: 'strength',
+                    icon: '💪',
+                    title: 'Strength Boost',
+                    desc: `+${val} Strength`,
+                    color: '#e67e22' // Orange
+                });
+                break;
+            case 'PROTECTION':
+                perks.push({
+                    id: 'protection',
+                    icon: '🛡️',
+                    title: 'Protection',
+                    desc: `+${val} Personal Security`,
+                    color: '#34495e' // Navy
+                });
+                break;
+            case 'LUCK_BOOST':
+                perks.push({
+                    id: 'luck',
+                    icon: '🍀',
+                    title: 'Lucky charm',
+                    desc: `+${val} Luck`,
+                    color: '#2ecc71' // Green
+                });
+                break;
+            case 'STRESS_RELIEF':
+                perks.push({
+                    id: 'stress_relief',
+                    icon: '🧘',
+                    title: 'Stress Relief',
+                    desc: `-${val} Stress / Turn`,
+                    color: '#3498db' // Blue
+                });
+                break;
+            case 'MEDICAL_DISCOUNT':
+                perks.push({
+                    id: 'med_discount',
+                    icon: '🏥',
+                    title: 'Medical Aid',
+                    desc: `Health Recovery Bonus`,
+                    color: '#2ecc71'
+                });
+                break;
+            case 'INVESTMENT_INSIGHT':
+                perks.push({
+                    id: 'invest_insight',
+                    icon: '📈',
+                    title: 'Insider Info',
+                    desc: `Better Investment Returns`,
+                    color: '#f1c40f'
+                });
+                break;
+            default:
+                // Fallback for unknown types
+                perks.push({
+                    id: 'generic_buff',
+                    icon: '✨',
+                    title: 'Partner Bonus',
+                    desc: `${buffType.replace(/_/g, ' ')}`,
+                    color: '#95a5a6'
+                });
+                break;
+        }
+
+        // Return early if we found a new buff type, ignoring legacy check
+        return perks;
+    }
+
+    // --- FALLBACK LEGACY LOGIC (If no buffType on job) ---
+
     // Safely extract job and social class (handling both Old Profile and Deep Persona structures)
     let jobTitle = '';
     let socialClass = 'MiddleClass'; // Default fallback

@@ -101,14 +101,24 @@ const DNAScreen = () => {
         reputation,
         security,
         skills,
-        hidden
+        hidden,
+        relationshipBuffs // ✅ Added
     } = usePlayerStore();
 
     // Black Market System Integration
     const { data: { suspicion } } = useBlackMarketSystem();
 
-    // Relationship Buffs
-    const { intellectBoost, strengthBoost, socialBoost } = useRelationshipBuffs();
+    // ⚡️ TRIGGER SYNC: This hook calculates buffs and updates the store
+    useRelationshipBuffs();
+
+    const attrBuffs = relationshipBuffs?.attributes || {};
+    const repBuffs = relationshipBuffs?.reputation || {};
+    // @ts-ignore - Security buff field is being added to store type
+    const secBuffs = relationshipBuffs?.security || {};
+
+    // Helper to calculate effective
+    const getEffective = (base: number | undefined, buff: number | undefined) => (base || 0) + (buff || 0);
+    const getBuffString = (val: number | undefined) => (val || 0) > 0 ? `+${val}` : undefined;
 
     // Gym 3.0 Integration
     const { data: gymData } = useGymSystem();
@@ -176,8 +186,20 @@ const DNAScreen = () => {
                 {/* 🛡️ SECURITY - Yeni Özellik */}
                 <View style={styles.card}>
                     <SectionHeader title="Security & Safety" icon="🛡️" />
-                    <ProgressBar label="Digital Shield" value={security?.digital} color="#3498db" icon="💻" />
-                    <ProgressBar label="Bodyguard / Armor" value={securityLevel} color="#e74c3c" icon="🥋" />
+                    <ProgressBar
+                        label="Digital Shield"
+                        value={getEffective(security?.digital, secBuffs.digital)}
+                        color="#3498db"
+                        icon="💻"
+                        buff={getBuffString(secBuffs.digital)}
+                    />
+                    <ProgressBar
+                        label="Bodyguard / Armor"
+                        value={getEffective(securityLevel, secBuffs.personal)} // Adding personal security buff here
+                        color="#e74c3c"
+                        icon="🥋"
+                        buff={getBuffString(secBuffs.personal)}
+                    />
                     <ProgressBar
                         label="Police Heat"
                         value={suspicion}
@@ -220,15 +242,34 @@ const DNAScreen = () => {
                 {/* 🃏 REPUTATION - Detaylı İtibar Ağı */}
                 <View style={styles.card}>
                     <SectionHeader title="Reputation Network" icon="🕸️" />
-                    <ProgressBar label="Casino (VIP)" value={reputation?.casino} max={1000} color="#E91E63" icon="🎰" />
-                    <ProgressBar label="Street (Cred)" value={reputation?.street} color="#c0392b" icon="🗡️" />
-                    <ProgressBar label="Business (Trust)" value={reputation?.business} color="#2980b9" icon="💼" />
+                    <ProgressBar
+                        label="Casino (VIP)"
+                        value={getEffective(reputation?.casino, repBuffs.casino)}
+                        max={1000}
+                        color="#E91E63"
+                        icon="🎰"
+                        buff={getBuffString(repBuffs.casino)}
+                    />
+                    <ProgressBar
+                        label="Street (Cred)"
+                        value={getEffective(reputation?.street, repBuffs.street)}
+                        color="#c0392b"
+                        icon="🗡️"
+                        buff={getBuffString(repBuffs.street)}
+                    />
+                    <ProgressBar
+                        label="Business (Trust)"
+                        value={getEffective(reputation?.business, repBuffs.business)}
+                        color="#2980b9"
+                        icon="💼"
+                        buff={getBuffString(repBuffs.business)}
+                    />
                     <ProgressBar
                         label="High Society"
-                        value={reputation?.social}
+                        value={getEffective(reputation?.social, repBuffs.social)}
                         color="#8e44ad"
                         icon="🥂"
-                        buff={socialBoost > 0 ? `+${socialBoost}` : undefined}
+                        buff={getBuffString(repBuffs.social)}
                     />
                 </View>
 
@@ -237,19 +278,31 @@ const DNAScreen = () => {
                     <SectionHeader title="Core Genetics" icon="🧬" />
                     <ProgressBar
                         label="Intellect"
-                        value={attributes?.intellect}
+                        value={getEffective(attributes?.intellect, attrBuffs.intellect)}
                         color="#9b59b6"
                         icon="🧠"
-                        buff={intellectBoost > 0 ? `+${intellectBoost}` : undefined}
+                        buff={getBuffString(attrBuffs.intellect)}
                     />
-                    <ProgressBar label="Charm" value={attributes?.charm} color="#e91e63" icon="👄" />
-                    <ProgressBar label="Looks" value={attributes?.looks} color="#f1c40f" icon="✨" />
+                    <ProgressBar
+                        label="Charm"
+                        value={getEffective(attributes?.charm, attrBuffs.charm)}
+                        color="#e91e63"
+                        icon="👄"
+                        buff={getBuffString(attrBuffs.charm)}
+                    />
+                    <ProgressBar
+                        label="Looks"
+                        value={getEffective(attributes?.looks, attrBuffs.looks)}
+                        color="#f1c40f"
+                        icon="✨"
+                        buff={getBuffString(attrBuffs.looks)}
+                    />
                     <ProgressBar
                         label="Strength"
-                        value={attributes?.strength}
+                        value={getEffective(attributes?.strength, attrBuffs.strength)}
                         color="#e74c3c"
                         icon="💪"
-                        buff={strengthBoost > 0 ? `+${strengthBoost}` : undefined}
+                        buff={getBuffString(attrBuffs.strength)}
                     />
                 </View>
 

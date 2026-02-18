@@ -1,46 +1,103 @@
+import { useEffect, useMemo } from 'react';
 import { useUserStore } from '../../../core/store/useUserStore';
+import { usePlayerStore } from '../../../core/store/usePlayerStore';
 
 export const useRelationshipBuffs = () => {
     const partner = useUserStore(state => state.partner);
+    const setRelationshipBuffs = usePlayerStore(state => state.setRelationshipBuffs);
 
-    // Visual Buffs (Percentages for UI)
-    let intellectBoost = 0; // e.g. 10 for +10%
-    let strengthBoost = 0;
-    let socialBoost = 0;
+    // Calculate Buffs from Partner Logic
+    const { attributes, reputation, security, hidden, core } = useMemo(() => {
+        const buffs = {
+            attributes: { intellect: 0, strength: 0, charm: 0, looks: 0 },
+            reputation: { social: 0, street: 0, business: 0, police: 0, casino: 0 },
+            security: { digital: 0, personal: 0 },
+            hidden: { luck: 0 },
+            core: { stress: 0 }
+        };
 
-    // Logic Buffs (Multipliers for calculation)
-    let medicalDiscount = 0; // 0.5 means 50% discount
+        if (!partner || !partner.job) return buffs;
 
-    if (partner && partner.job) {
         const { buffType, buffValue = 0 } = partner.job;
-
-        // Handle Multipliers (e.g., 1.1 in DB means +10%)
-        // We convert them to user-friendly percentages
+        const val = Math.round(buffValue); // Ensure integer
 
         switch (buffType) {
-            case 'INTELLECT_GAIN': // e.g. 1.1
-                intellectBoost = Math.round((buffValue - 1) * 100);
+            // --- REPUTATION ---
+            case 'STREET_CRED_BOOST':
+                buffs.reputation.street = val;
                 break;
-            case 'GYM_GAINS':      // e.g. 1.2
-            case 'STRENGTH_TRAINING':
-                strengthBoost = Math.round((buffValue - 1) * 100);
+            case 'BUSINESS_TRUST_BOOST':
+                buffs.reputation.business = val;
                 break;
-            case 'FAME_BOOST':     // e.g. 1.5
+            case 'SOCIAL_STATUS_BOOST':
+            case 'FAME_BOOST':
             case 'REPUTATION_BOOST':
-                socialBoost = Math.round((buffValue - 1) * 100);
+                buffs.reputation.social = val;
                 break;
-            case 'MEDICAL_DISCOUNT': // e.g. 0.5 (meaning 50% cost)
-                // If value is 0.5, discount is 50%
-                medicalDiscount = 1 - buffValue;
+            case 'CASINO_VIP_BOOST':
+                buffs.reputation.casino = val * 10; // Casino rep scale is 0-1000
+                break;
+
+            // --- ATTRIBUTES ---
+            case 'INTELLECT_GAIN':
+                buffs.attributes.intellect = val;
+                break;
+            case 'CHARM_BOOST':
+                buffs.attributes.charm = val;
+                break;
+            case 'STRENGTH_BOOST':
+            case 'STRENGTH_TRAINING':
+            case 'GYM_GAINS':
+                buffs.attributes.strength = val;
+                break;
+
+            // --- SECURITY ---
+            case 'PROTECTION':
+                buffs.security.personal = val;
+                break;
+
+            // --- SPECIAL ---
+            case 'LUCK_BOOST':
+                buffs.hidden.luck = val;
+                break;
+            case 'STRESS_RELIEF':
+                // Handled specially in logic, but good to track
+                // buffs.core.stress = -val; 
                 break;
         }
-    }
+
+        return buffs;
+    }, [partner]);
+
+    // --- SYNC WITH PLAYER STORE ---
+    useEffect(() => {
+        if (!partner) {
+            setRelationshipBuffs({
+                attributes: {},
+                reputation: {},
+                security: {}
+            });
+            return;
+        }
+
+        setRelationshipBuffs({
+            attributes,
+            reputation,
+            security
+        });
+
+    }, [partner, attributes, reputation, security, setRelationshipBuffs]);
 
     return {
-        intellectBoost, // Returns integer (e.g. 10)
-        strengthBoost,
-        socialBoost,
-        medicalDiscount,
+        // Derived for UI convenience (Legacy support + New)
+        intellectBoost: attributes.intellect,
+        strengthBoost: attributes.strength,
+        socialBoost: reputation.social,
+        streetBoost: reputation.street, // New
+        businessBoost: reputation.business, // New
+        casinoBoost: reputation.casino, // New
+        luckBoost: hidden.luck, // New
+
         hasPartner: !!partner,
         partnerName: partner?.name || '',
     };

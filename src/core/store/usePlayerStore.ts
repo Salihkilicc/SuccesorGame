@@ -40,6 +40,13 @@ export interface PlayerState {
         quarterlyDrugUsage: number;
     };
 
+    // Relationship Buffs (External Sources)
+    relationshipBuffs: {
+        attributes: Partial<Attributes>;
+        reputation: Partial<Reputation>;
+        security: Partial<SecurityState>; // ✅ Added
+    };
+
     // --- ACTIONS ---
 
     // 1. Generic Updaters
@@ -69,6 +76,9 @@ export interface PlayerState {
     // ⚠️ GERİ EKLENDİ: useGameStore bu fonksiyonu arıyor (Save/Load için kritik)
     setAll: (partial: Partial<PlayerState>) => void;
 
+    // Relationship Buffs
+    setRelationshipBuffs: (buffs: Partial<PlayerState['relationshipBuffs']>) => void;
+
     reset: () => void;
 }
 
@@ -83,6 +93,11 @@ const initialState = {
     quarterlyActions: { hasStudied: false, hasTrained: false, hasDated: false, hasSocialized: false },
     hidden: { luck: 10, security: 0 },
     blackMarket: { suspicion: 0, quarterlyDrugUsage: 0 },
+    relationshipBuffs: {
+        attributes: {},
+        reputation: {},
+        security: {} // ✅ Added
+    }
 };
 
 // --- STORE CREATION ---
@@ -162,10 +177,15 @@ export const usePlayerStore = create<PlayerState>()(
             // ⚠️ FIX: useGameStore için geri geldi
             setAll: (partial) => set((state) => ({ ...state, ...partial })),
 
+            // --- Relationship Buffs ---
+            setRelationshipBuffs: (buffs) => set((state) => ({
+                relationshipBuffs: { ...state.relationshipBuffs, ...buffs }
+            })),
+
             reset: () => set({ ...initialState })
         }),
         {
-            name: 'succesor_player_hub_v3', // Version bump for cleanup
+            name: 'succesor_player_hub_v4', // Version bump for schema change
             storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 core: state.core,
@@ -177,6 +197,7 @@ export const usePlayerStore = create<PlayerState>()(
                 quarterlyActions: state.quarterlyActions,
                 hidden: state.hidden,
                 blackMarket: state.blackMarket,
+                relationshipBuffs: state.relationshipBuffs, // Persist buffs
             }),
         }
     )
