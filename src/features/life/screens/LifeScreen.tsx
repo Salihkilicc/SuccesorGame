@@ -253,7 +253,44 @@ const LifeScreen = () => {
           </View>
 
           {/* Spacer for Bottom Bar */}
-          <View style={{ height: 140 }} />
+          <View style={{ height: 80 }} />
+
+          {/* DEBUG SECTION - Squeezed Horizontal Layout */}
+          <View style={styles.debugRow}>
+            <Pressable
+              style={[styles.debugButton, { backgroundColor: '#c0392b', flex: 1, marginRight: 8 }]}
+              onPress={() => {
+                Alert.alert(
+                  'Reset Game',
+                  'Are you sure you want to completely reset your progress?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Reset',
+                      style: 'destructive',
+                      onPress: async () => {
+                        await useGameStore.getState().resetGame();
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.debugButtonText}>🔄 Reset</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.debugButton, { backgroundColor: '#27ae60', flex: 2.5 }]}
+              onPress={() => {
+                useStatsStore.getState().earnMoney(100_000_000);
+                Alert.alert('Success', '$100M added to your balance!');
+              }}
+            >
+              <Text style={styles.debugButtonText}>💰 Add $100M Cash</Text>
+            </Pressable>
+          </View>
+
+          <View style={{ height: 60 }} />
         </ScrollView>
 
         {/* Universal Crystal Navigation Bar (Light Variant for Life) */}
@@ -497,6 +534,32 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+  },
+  debugRow: {
+    flexDirection: 'row',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  debugButton: {
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 44,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  debugButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 
 
