@@ -18,7 +18,7 @@ import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../co
 import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // Helper Component
 const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any) => (
@@ -161,7 +161,7 @@ const MyCompanyScreen = () => {
 
         <ScrollView
           style={{ backgroundColor: '#121212' }}
-          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 80, paddingTop: 0 }]}>
+          contentContainerStyle={[styles.content, { paddingBottom: 120, paddingTop: 0 }]}>
 
           {/* COMPANY STATS CARD */}
           <DashboardCard
@@ -304,8 +304,8 @@ const MyCompanyScreen = () => {
 
         </ScrollView>
 
-        {/* Bottom Bar */}
-        <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}
+        <CrystalNavBar activeTab="Company" variant="dark" />
 
         {/* --- MODAL MANAGER --- */}
         <CompanyModals

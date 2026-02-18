@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -35,7 +36,6 @@ import {
 import StockDetailScreen from '../features/assets/screens/StockDetailScreen';
 
 import { formatScreenTitle } from '../core/utils';
-import BottomStatsBar from '../components/common/BottomStatsBar';
 
 export type LifeStackParamList = {
   LifeHome: undefined;
@@ -95,9 +95,9 @@ export type RootTabParamList = {
 };
 
 export type RootStackParamList = {
-  Home: undefined;
-  MainTabs: NavigatorScreenParams<RootTabParamList>;
-  MyCompany: undefined;
+  Home: NavigatorScreenParams<SwipeTabParamList>; // Was undefined, now points to SwipeNavigator
+  // MainTabs: NavigatorScreenParams<RootTabParamList>; // Removed
+  // MyCompany: undefined; // Moved to SwipeNavigator
   Premium: undefined;
   Achievements: undefined;
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
@@ -239,6 +239,30 @@ const MainTabs = () => (
   </Tab.Navigator>
 );
 
+const SwipeTab = createMaterialTopTabNavigator();
+
+export type SwipeTabParamList = {
+  Life: undefined; // To be compatible with existing navigation types, we might need to adjust this
+  Home: undefined;
+  MyCompany: undefined;
+};
+
+const SwipeNavigator = () => (
+  <SwipeTab.Navigator
+    initialRouteName="Home"
+    tabBarPosition="top"
+    screenOptions={{
+      tabBarStyle: { display: 'none' },
+      swipeEnabled: true,
+      lazy: true,
+    }}
+  >
+    <SwipeTab.Screen name="Life" component={LifeScreen} />
+    <SwipeTab.Screen name="Home" component={HomeScreen} />
+    <SwipeTab.Screen name="MyCompany" component={MyCompanyScreen} />
+  </SwipeTab.Navigator>
+);
+
 const RootNavigator = () => {
   const [currentRouteName, setCurrentRouteName] = React.useState<string | undefined>();
 
@@ -252,9 +276,19 @@ const RootNavigator = () => {
         <RootStack.Navigator
           screenOptions={{ headerShown: false }}
           initialRouteName="Home">
-          <RootStack.Screen name="Home" component={HomeScreen} />
-          <RootStack.Screen name="MainTabs" component={MainTabs} />
-          <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
+          <RootStack.Screen name="Home" component={SwipeNavigator} />
+          {/* MainTabs removed as we are replaced by SwipeNavigator on 'Home' */}
+
+          {/* <RootStack.Screen name="MainTabs" component={MainTabs} /> */}
+
+          {/* Removed separate MyCompany as it is now in SwipeNavigator, but keeping it in RootStack might be needed if navigated to directly as a stack screen? 
+              User said: "RootStack -> SwipeNavigator (Home) -> Diğer detay sayfaları"
+              If MyCompany is in SwipeNavigator, we don't necessarily need it in RootStack unless we want it to be pushable over tabs. The user instructions imply swipe navigation is the main way.
+              However, keeping it in RootStack doesn't hurt if we don't navigate to it. 
+              But duplicate routes can be an issue if keys collide.
+              Let's comment out MyCompany in RootStack for now as it's in SwipeNavigator.
+          */}
+          {/* <RootStack.Screen name="MyCompany" component={MyCompanyScreen} /> */}
 
           {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
           <RootStack.Screen name="Products" component={ProductsScreen} />
@@ -276,15 +310,6 @@ const RootNavigator = () => {
           />
         </RootStack.Navigator>
 
-        {currentRouteName !== 'LifeHome' && (
-          <BottomStatsBar
-            onHomePress={() => {
-              if (rootNavigationRef.isReady()) {
-                rootNavigationRef.navigate('Home');
-              }
-            }}
-          />
-        )}
       </View>
     </NavigationContainer>
   );

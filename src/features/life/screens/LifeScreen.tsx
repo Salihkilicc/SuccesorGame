@@ -5,12 +5,13 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import { BlurView } from '@react-native-community/blur';
+
 
 // Components & Systems
 import { theme } from '../../../core/theme';
 import { useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
 import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../../navigation';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // --- Modals & Systems ---
 import MatchPopup from '../../../components/Match/MatchPopup';
@@ -226,9 +227,7 @@ const LifeScreen = () => {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>LIFE</Text>
-        </View>
+        <Text style={styles.headerTitle}>LIFE</Text>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
@@ -257,73 +256,13 @@ const LifeScreen = () => {
           <View style={{ height: 140 }} />
         </ScrollView>
 
-        {/* Dimming Overlay for Stats Mode */}
-        {isStatsMode && (
-          <Pressable
-            style={[StyleSheet.absoluteFill, { zIndex: 10 }]}
-            onPress={() => setIsStatsMode(false)}
-          >
-            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }} />
-          </Pressable>
-        )}
+        {/* Universal Crystal Navigation Bar (Light Variant for Life) */}
+        <CrystalNavBar activeTab="Life" variant="light" />
 
-        {/* Custom Crystal Bottom Bar */}
-        <View style={[styles.bottomBarContainer, { zIndex: 20 }]}>
-          <BlurView
-            style={styles.blurContainer}
-            blurType="light"
-            blurAmount={20}
-            reducedTransparencyFallbackColor="white"
-          >
-            <View style={styles.bottomBar}>
-              {!isStatsMode ? (
-                <>
-                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Home')}>
-                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>🏠</Text></View>
-                    <Text style={styles.bottomTabLabel}>Home</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(true)}>
-                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>📊</Text></View>
-                    <Text style={styles.bottomTabLabel}>Stats</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Contacts')}>
-                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>👥</Text></View>
-                    <Text style={styles.bottomTabLabel}>Contacts</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Profile')}>
-                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>👤</Text></View>
-                    <Text style={styles.bottomTabLabel}>Profile</Text>
-                  </Pressable>
-                </>
-              ) : (
-                <>
-                  {/* STATS MODE CONTENT - Same Layout, Different Data */}
-                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>💰</Text></View>
-                    <Text style={styles.bottomTabLabel}>${userMoney.toLocaleString()}</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.success }]}>❤️</Text></View>
-                    <Text style={styles.bottomTabLabel}>{playerCore.health}%</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.danger }]}>🧠</Text></View>
-                    <Text style={styles.bottomTabLabel}>{playerCore.stress}%</Text>
-                  </Pressable>
-                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.accent }]}>💎</Text></View>
-                    <Text style={styles.bottomTabLabel}>{playerAttributes.charm}%</Text>
-                  </Pressable>
-                </>
-              )}
-            </View>
-          </BlurView>
-        </View>
-
-      </SafeAreaView>
+      </SafeAreaView >
 
       {/* --- MODALS --- */}
-      <MatchPopup
+      < MatchPopup
         visible={visible}
         candidate={matchCandidate}
         onAccept={acceptMatch}
@@ -465,16 +404,18 @@ const LifeScreen = () => {
         onIgnore={closeEncounter}
       />
 
-      {cheatingConsequence && (
-        <BreakupModal
-          visible={!!cheatingConsequence}
-          onClose={() => setCheatingConsequence(null)}
-          partnerName={cheatingConsequence.partnerName}
-          settlementCost={cheatingConsequence.settlement}
-        />
-      )}
+      {
+        cheatingConsequence && (
+          <BreakupModal
+            visible={!!cheatingConsequence}
+            onClose={() => setCheatingConsequence(null)}
+            partnerName={cheatingConsequence.partnerName}
+            settlementCost={cheatingConsequence.settlement}
+          />
+        )
+      }
 
-    </View>
+    </View >
   );
 };
 
@@ -490,21 +431,19 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'ios' ? 40 : 60,
-    paddingBottom: 16,
-  },
   headerTitle: {
-    fontSize: 56, // Massive
+    fontSize: 74,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: -1.5,
+    paddingLeft: 34, // 10 original + 24 from header horizontal padding
+    paddingTop: Platform.OS === 'ios' ? 70 : 90,
+    paddingBottom: 16,
   },
   scrollContent: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 140,
+    paddingBottom: 100, // Reduced bottom padding
   },
   section: {
     marginBottom: 36,
@@ -559,6 +498,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+
 
   // Crystal Floating Dock
   bottomBarContainer: {

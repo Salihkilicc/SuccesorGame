@@ -18,10 +18,11 @@ import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
 import { formatMoney } from '../../core/utils';
-import type { RootStackParamList, RootTabParamList, AssetsStackParamList } from '../../navigation';
-import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 import type { CompositeNavigationProp } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
+import type { RootStackParamList, SwipeTabParamList } from '../../navigation';
+import CrystalNavBar from '../../navigation/components/CrystalNavBar';
+import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 // ADDED: Education System Import
 import { useEducationSystem } from '../../features/life/components/Education/store/useEducationSystem';
 import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
@@ -32,7 +33,7 @@ import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
-  BottomTabNavigationProp<RootTabParamList>
+  MaterialTopTabNavigationProp<SwipeTabParamList>
 >;
 
 
@@ -176,8 +177,8 @@ const HomeScreen = () => {
 
   const lifeBrief = lastLifeEvent ?? 'Nothing remarkable happened recently.';
 
-  const handleNavigateTabs = (screen: keyof RootTabParamList) => {
-    navigation.navigate('MainTabs', { screen } as any);
+  const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {
+    navigation.navigate(screen as any);
   };
 
   const handleNavigateStack = (screen: keyof RootStackParamList) => {
@@ -257,7 +258,7 @@ const HomeScreen = () => {
 
             <View style={styles.cardActions}>
               <Pressable
-                onPress={() => handleNavigateStack('MyCompany')}
+                onPress={() => handleNavigateTabs('MyCompany')} // UPDATED to use Tab navigation
                 style={({ pressed }) => [
                   styles.primaryCardButton,
                   pressed && styles.primaryCardButtonPressed,
@@ -302,13 +303,13 @@ const HomeScreen = () => {
             <Text style={styles.entrySubtitleDark}>Lifestyle & Events</Text>
           </Pressable>
           <Pressable
-            onPress={() => handleNavigateTabs('Assets')}
+            onPress={() => handleNavigateTabs('MyCompany')} // UPDATED: Assets -> MyCompany
             style={({ pressed }) => [styles.entryAssets, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleLight}>ASSETS</Text>
             <Text style={styles.entrySubtitleLight}>Market & Company</Text>
           </Pressable>
           <Pressable
-            onPress={() => handleNavigateTabs('Love')}
+            onPress={() => handleNavigateTabs('Life')} // UPDATED: Love -> Life (Temporary placaholder)
             style={({ pressed }) => [styles.entryLove, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleLight}>LOVE</Text>
             <Text style={styles.entrySubtitleLight}>Relationships & Drama</Text>
@@ -392,6 +393,9 @@ const HomeScreen = () => {
       {/* Education Exam Modal - Only show when report is closed */}
       {!reportVisible && <EducationExamModal />}
 
+      {/* Universal Crystal Navigation Bar (Dark Variant) */}
+      <CrystalNavBar activeTab="Home" variant="dark" />
+
     </SafeAreaView >
   );
 };
@@ -422,7 +426,7 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
-    paddingBottom: theme.spacing.xl * 2,
+    paddingBottom: 120, // Increased for CrystalNavBar
   },
   headerRow: {
     flexDirection: 'row',

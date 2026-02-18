@@ -1,4 +1,4 @@
-export {default as RootNavigator} from './RootNavigator';
+export { default as RootNavigator } from './RootNavigator';
 export type {
   RootTabParamList,
   LifeStackParamList,
@@ -6,4 +6,5 @@ export type {
   AssetsStackParamList,
   RootStackParamList,
   CasinoStackParamList,
+  SwipeTabParamList,
 } from './RootNavigator';
