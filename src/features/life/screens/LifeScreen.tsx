@@ -1,18 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { ScrollView, View, Text, Pressable, StyleSheet, SafeAreaView, Alert, Dimensions, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import LinearGradient from 'react-native-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
+
+// Components & Systems
+import { theme } from '../../../core/theme';
+import { useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
+import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../../navigation';
+
+// --- Modals & Systems ---
 import MatchPopup from '../../../components/Match/MatchPopup';
 import { useMatchSystem } from '../../../components/Match/useMatchSystem';
-import { triggerEvent } from '../../../event/eventEngine';
-import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../../navigation';
-import { useEventStore, useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
-import { theme } from '../../../core/theme';
-import AppScreen from '../../../components/layout/AppScreen';
 import { useHookupSystem } from '../components/useHookupSystem';
 import { HookupModal } from '../components/HookupModal';
+
 import { useNightOutSystem } from '../components/NightOut/useNightOutSystem';
 import NightOutSetupModal from '../components/NightOut/NightOutSetupModal';
 import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
@@ -20,8 +25,10 @@ import HookupGameModal from '../components/NightOut/HookupGameModal';
 import NightEndModal from '../components/NightOut/NightEndModal';
 import PregnancyRevealModal from '../components/NightOut/PregnancyRevealModal';
 import NightConclusionModal from '../components/NightOut/NightConclusionModal';
+
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import GymMasterModal from '../components/Gym/GymMasterModal';
+
 import { useTravelSystem } from '../components/Travel/useTravelSystem';
 import TravelHubModal from '../components/Travel/TravelHubModal';
 import TravelBookingModal from '../components/Travel/TravelBookingModal';
@@ -34,16 +41,17 @@ import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
 import SanctuaryResultModal from '../components/Sanctuary/modals/SanctuaryResultModal';
 
 import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
-import { Alert } from 'react-native';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 import { EncounterModal } from '../../love/components/EncounterModal';
 import BreakupModal from '../../love/components/BreakupModal';
 
-// --- NEW EDUCATION SYSTEM IMPORTS ---
 import { useEducationSystem } from '../components/Education/store/useEducationSystem';
 import { EducationMasterModal } from '../components/Education/modals/EducationMasterModal';
 import { EducationExamModal } from '../components/Education/modals/EducationExamModal';
 
+import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
+
+// Type Definitions
 type LifeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
   CompositeNavigationProp<
@@ -52,140 +60,56 @@ type LifeNavigationProp = CompositeNavigationProp<
   >
 >;
 
-type LifeActionType =
-  | 'nightOut'
-  | 'spa'
-  | 'gym'
-  | 'shopping'
-  | 'travel'
-  | 'casino'
-  | 'blackMarket'
-  | 'belongings'
-  | 'hookup'
-  | 'network'
-  | 'education'
-  | 'dna';
+// --- CONFIGURATION ---
 
-const ACTIONS: Array<{
-  key: LifeActionType;
-  label: string;
-  description: string;
-  emoji: string;
-}> = [
-    {
-      key: 'nightOut',
-      label: 'Night Out',
-      description: 'Celebrate with friends',
-      emoji: '🎉',
-    },
-    {
-      key: 'spa',
-      label: 'Spa & Relax',
-      description: 'Reset your mind and body',
-      emoji: '🧖',
-    },
-    {
-      key: 'gym',
-      label: 'Gym',
-      description: 'Train discipline and strength',
-      emoji: '🏋️',
-    },
-    {
-      key: 'shopping',
-      label: 'Shopping',
-      description: 'Upgrade your lifestyle',
-      emoji: '🛍',
-    },
-    {
-      key: 'travel',
-      label: 'Travel',
-      description: 'Change your scenery',
-      emoji: '✈️',
-    },
-    {
-      key: 'casino',
-      label: 'Casino',
-      description: 'High risk, high thrill',
-      emoji: '🎰',
-    },
-    {
-      key: 'blackMarket',
-      label: 'Black Market',
-      description: 'Shadow deals for rare items',
-      emoji: '🕶',
-    },
-    {
-      key: 'belongings',
-      label: 'Belongings',
-      description: 'Your secret vault',
-      emoji: '🗝️',
-    },
-    {
-      key: 'hookup',
-      label: 'Hookup',
-      description: 'Casual chemistry',
-      emoji: '🔥',
-    },
-    {
-      key: 'network',
-      label: 'Network',
-      description: 'Meet investors and mentors',
-      emoji: '🤝',
-    },
-    {
-      key: 'education',
-      label: 'Education',
-      description: 'Degrees & Certificates',
-      emoji: '🎓',
-    },
-    {
-      key: 'dna',
-      label: 'DNA / Stats',
-      description: 'View Genetics & Skills',
-      emoji: '🧬',
-    },
-  ];
+// Gradients for Icons
+const GRADIENTS = {
+  purplePink: ['#8E2DE2', '#4A00E0'],
+  tealCyan: ['#00b09b', '#96c93d'],
+  orangeYellow: ['#F2994A', '#F2C94C'],
+  pinkRed: ['#ec008c', '#fc6767'],
+  blueSky: ['#2980B9', '#6DD5FA'],
+  brownGold: ['#834d9b', '#d04ed6'], // Belongings
+  greenTeal: ['#11998e', '#38ef7d'],
+  bluePurple: ['#00c6ff', '#0072ff'],
+  redCasino: ['#e52d27', '#b31217'], // Casino Red
+  darkGrey: ['#232526', '#414345'],
+  hookupFire: ['#DA22FF', '#9733EE'],
+  networkBlue: ['#1A2980', '#26D0CE'],
+};
 
-import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
+const SECTION_LEISURE = [
+  { key: 'nightOut', label: 'Night Out', icon: '🍸', gradient: GRADIENTS.purplePink },
+  { key: 'spa', label: 'Spa & Relax', icon: '🧖‍♀️', gradient: GRADIENTS.tealCyan },
+  { key: 'gym', label: 'Gym', icon: '🏋️', gradient: GRADIENTS.orangeYellow },
+  { key: 'shopping', label: 'Shopping', icon: '🛍️', gradient: GRADIENTS.pinkRed },
+];
+
+const SECTION_LIFESTYLE = [
+  { key: 'travel', label: 'Travel', icon: '✈️', gradient: GRADIENTS.blueSky },
+  { key: 'belongings', label: 'Belongings', icon: '👜', gradient: GRADIENTS.brownGold },
+  { key: 'education', label: 'Education', icon: '🎓', gradient: GRADIENTS.greenTeal },
+  { key: 'dna', label: 'DNA / Stats', icon: '🧬', gradient: GRADIENTS.bluePurple },
+];
+
+const SECTION_UNDERWORLD = [
+  { key: 'casino', label: 'Casino', icon: '🎰', gradient: GRADIENTS.redCasino },
+  { key: 'blackMarket', label: 'Black Market', icon: '🕶️', gradient: GRADIENTS.darkGrey },
+  { key: 'hookup', label: 'Hookup', icon: '🔥', gradient: GRADIENTS.hookupFire },
+  { key: 'network', label: 'Network', icon: '🌐', gradient: GRADIENTS.networkBlue },
+];
 
 const LifeScreen = () => {
   const navigation = useNavigation<LifeNavigationProp>();
-  // Activate Passive Luxury Stat Sync
+
+  // Systems Logic
   useLuxurySystem();
 
-  const { lastLifeEvent } = useEventStore();
-  const {
-    visible,
-    matchCandidate,
-    openMatch,
-    closeMatch,
-    acceptMatch,
-    rejectMatch,
-  } = useMatchSystem();
+  // -- Store --
+  const { visible, matchCandidate, openMatch, closeMatch, acceptMatch, rejectMatch } = useMatchSystem();
+  const { isModalVisible, currentCandidate, matchStatus, startHookup, swipeRight, swipeLeft, nextCandidate, closeHookupModal } = useHookupSystem();
+  const { isVisible: isEncounterVisible, currentScenario: encounterScenario, candidate: encounterCandidate, triggerEncounter, handleDate, closeEncounter } = useEncounterSystem();
 
-  const {
-    isModalVisible,
-    currentCandidate,
-    matchStatus,
-    startHookup,
-    swipeRight,
-    swipeLeft,
-    nextCandidate,
-    closeHookupModal,
-  } = useHookupSystem();
-
-  // Encounter System Hook
-  const {
-    isVisible: isEncounterVisible,
-    currentScenario: encounterScenario,
-    candidate: encounterCandidate,
-    triggerEncounter,
-    handleDate,
-    closeEncounter,
-    getCheatingConsequence
-  } = useEncounterSystem();
-
-  // FIX: Adapter for systems expecting boolean return
   const triggerEncounterBool = useCallback((context: string, countryId?: string) => {
     const result = triggerEncounter(context, countryId);
     return !!result;
@@ -193,107 +117,40 @@ const LifeScreen = () => {
 
   const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
 
+  // Night Out System
   const {
-    setupModalVisible,
-    outcomeModalVisible,
-    outcomeType,
-    nightEndModalVisible,
-    pregnancyModalVisible,
-    conclusionModalVisible,
-    conclusionData,
-    hookupGameVisible,
-    currentScenario,
-    currentPartner,
-    // Multi-step flow state
-    step,
-    selectedRegion,
-    selectedClub,
-    travelCostAmount,
-    hasPrivateJet,
-    totalCost,
-    // Navigation & Hangar
-    goBack: goBackNightOut,
-    isHangarOpen,
-    setIsHangarOpen,
-
-    // Actions
-    setSetupModalVisible,
-    startNightOut,
-    selectRegion,
-    selectVenue,
-    selectTravelMethod,
-    confirmNightOut,
-    handleHookupAccept,
-    handleOutcomeClose,
-    handleNightEndDecision,
-    setPregnancyModalVisible,
-    setConclusionModalVisible,
-    handleConclusionClose,
-    handleHookupGameSuccess,
-    handleHookupGameFail,
+    setupModalVisible, outcomeModalVisible, outcomeType, nightEndModalVisible, pregnancyModalVisible, conclusionModalVisible, conclusionData, hookupGameVisible, currentScenario, currentPartner,
+    step, selectedRegion, selectedClub, travelCostAmount, hasPrivateJet, totalCost, goBack: goBackNightOut, isHangarOpen, setIsHangarOpen,
+    setSetupModalVisible, startNightOut, selectRegion, selectVenue, selectTravelMethod, confirmNightOut, handleHookupAccept, handleOutcomeClose, handleNightEndDecision, setPregnancyModalVisible, setConclusionModalVisible, handleConclusionClose, handleHookupGameSuccess, handleHookupGameFail,
   } = useNightOutSystem(triggerEncounterBool);
 
-  // Gym System Hook
-  const { actions } = useGymSystem();
-  const { openGym } = actions;
+  // Gym System
+  const { actions: { openGym } } = useGymSystem();
 
-  // --- EDUCATION SYSTEM HOOK ---
+  // Education System
   const { openEducation } = useEducationSystem();
 
+  // Travel System
   const {
-    // State
-    currentView,
-    selectedSpot,
-    travelClass,
-    bringPartner,
-    resultData: travelResultData,
-    vacationSpots,
-
-    // Actions
-    openTravel,
-    closeTravel,
-    setTravelClass,
-    setBringPartner,
-    openBooking,
-    startTrip,
-    onExperienceComplete,
-    onMiniGameComplete,
-    openCollection,
-    closeCollection,
-    closeBooking,
-    setCurrentView,
-
-    // Store methods
-    hasSouvenir,
+    currentView, selectedSpot, travelClass, bringPartner, resultData: travelResultData, vacationSpots,
+    openTravel, closeTravel, setTravelClass, setBringPartner, openBooking, startTrip, onExperienceComplete, onMiniGameComplete, openCollection, closeCollection, closeBooking, hasSouvenir,
   } = useTravelSystem(triggerEncounterBool);
 
+  // Sanctuary System
   const {
-    // Visibility & Nav
-    isHubVisible,
-    activeView,
-    openSanctuary,
-    closeSanctuary,
-    navigate,
-    goBack,
-
-    // Actions
-    performSurgery,
-    getFreshCut,
-    handleServicePurchase,
-    buyMembership,
-
-    // State
-    isVIPMember,
-    isResultVisible,
-    resultData,
-    activeBuffs,
-    usageTracker,
+    isHubVisible, activeView, openSanctuary, closeSanctuary, navigate: navSanctuary, goBack: goBackSanctuary,
+    performSurgery, getFreshCut, handleServicePurchase, buyMembership, isVIPMember, isResultVisible, resultData, activeBuffs, usageTracker
   } = useSanctuarySystem();
 
-  // Black Market State
+  // Black Market
   const [isBlackMarketVisible, setBlackMarketVisible] = useState(false);
+  const [isStatsMode, setIsStatsMode] = useState(false);
 
-  // Handle encounter date with cheating consequence check
+  // Stats Data
+  const userMoney = useStatsStore(state => state.money);
+  const { core: playerCore, attributes: playerAttributes } = usePlayerStore();
+
+  // Handle Encounter Date
   const handleEncounterDate = useCallback(() => {
     const result = handleDate();
     if (result.wasCaught) {
@@ -301,198 +158,171 @@ const LifeScreen = () => {
     }
   }, [handleDate]);
 
-  const handleGoHome = () => {
-    const rootNav = navigation.getParent()?.getParent();
-    if (rootNav) {
-      rootNav.navigate('Home' as never);
-      return;
-    }
-    if (navigation.canGoBack()) {
-      navigation.goBack();
+  // -- Navigation Handlers --
+
+  const handleAction = (key: string) => {
+    switch (key) {
+      // Leisure
+      case 'nightOut': startNightOut(); break;
+      case 'spa': openSanctuary(); break;
+      case 'gym': openGym(); break; // Removed random encounter logic
+      case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' } as any); break;
+
+      // Lifestyle
+      case 'travel': openTravel(); break;
+      case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' } as any); break;
+      case 'education': openEducation(); break;
+      case 'dna': navigation.navigate('DNA'); break;
+
+      // Underworld
+      case 'casino': navigation.navigate('Casino'); break;
+      case 'blackMarket': setBlackMarketVisible(true); break;
+      case 'hookup': startHookup(); break;
+      case 'network': Alert.alert('Network', 'Networking events are coming soon!'); break;
+
+      default: break;
     }
   };
 
-  const handleTravelHome = () => {
-    closeTravel();
-    // Navigate home similar to Night Out
-    const rootNav = navigation.getParent()?.getParent();
-    if (rootNav) {
-      rootNav.navigate('Home' as never);
-      return;
-    }
-    navigation.navigate('Home' as never);
-  };
-
-  const { core, attributes, reputation, blackMarket, updateCore, updateAttribute } = usePlayerStore();
-  const { money, earnMoney } = useStatsStore();
-  const { health, stress, happiness } = core;
-
-  const handleAction = (type: LifeActionType) => {
-    switch (type) {
-      case 'nightOut':
-        console.log('[Life] Action triggered: Night Out');
-        startNightOut();
+  const handleBottomNav = (tab: string) => {
+    switch (tab) {
+      case 'Home':
+        navigation.navigate('Home' as never);
         break;
-
-      case 'spa':
-        console.log('[Life] Action triggered: Spa & Relax -> Sanctuary');
-        openSanctuary();
+      case 'Stats':
+        navigation.navigate('FinancialReport' as never);
         break;
-
-      case 'dna':
+      case 'Contacts':
+        navigation.navigate('Love', { screen: 'LoveHome' } as any);
+        break;
+      case 'Profile':
         navigation.navigate('DNA');
         break;
-
-      case 'gym':
-        if (Math.random() < 0.05) {
-          if (triggerEncounter('gym')) {
-            console.log('[Life] Gym Encounter Triggered!');
-            return;
-          }
-        }
-        openGym();
-        break;
-
-      case 'shopping':
-        console.log('[Life] Navigating to Shopping');
-        navigation.navigate('Assets', { screen: 'Shopping' } as any);
-        break;
-
-      case 'travel':
-        console.log('[Life] Action triggered: Travel');
-        openTravel();
-        break;
-
-      case 'casino':
-        console.log('[Life] Navigating to Casino');
-        navigation.navigate('Casino');
-        break;
-      case 'blackMarket':
-        console.log('[Life] Action triggered: Black Market');
-        setBlackMarketVisible(true);
-        break;
-      case 'belongings':
-        console.log('[Life] Action triggered: Belongings');
-        // Navigate to new Portfolio Screen
-        navigation.navigate('Assets', { screen: 'Belongings' } as any);
-        break;
-      case 'hookup':
-        console.log('[Life] Action triggered: Hookup');
-        startHookup();
-        break;
-      case 'network':
-        console.log('[Life] Action triggered: Network (placeholder)');
-        break;
-      case 'education':
-        console.log('[Life] Opening Education Hub');
-        openEducation();
-        break;
-      default:
-        break;
     }
   };
 
+  const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
+    <Pressable key={item.key} style={styles.appIconContainer} onPress={() => handleAction(item.key)}>
+      <LinearGradient
+        colors={item.gradient}
+        style={styles.appIcon}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Text style={styles.appIconEmoji}>{item.icon}</Text>
+      </LinearGradient>
+      <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
+    </Pressable>
+  );
+
   return (
-    <AppScreen
-      title="LIFE"
-      subtitle="Downtown District"
-      compact
-      leftNode={
-        <Pressable
-          onPress={handleGoHome}
-          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
-          <Text style={styles.backIcon}>←</Text>
-        </Pressable>
-      }>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
+      {/* PREMIUM BACKGROUND - Grey Blue Green subtle gradient */}
+      <LinearGradient
+        colors={['#1c1c1e', '#2c3e50', '#202020']} // Dark, Blue-ish Grey, almost Black
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
 
-
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Lifestyle Actions</Text>
-          <View style={styles.actionsGrid}>
-            {ACTIONS.map(action => {
-              const isBlackMarket = action.key === 'blackMarket';
-              const isSuspicious = isBlackMarket && (blackMarket?.suspicion || 0) > 50;
-
-              return (
-                <LifeActionButton
-                  key={action.key}
-                  emoji={isSuspicious ? '🚨' : action.emoji}
-                  label={action.label}
-                  description={isSuspicious ? '⚠️ High heat!' : action.description}
-                  onPress={() => handleAction(action.key)}
-                />
-              );
-            })}
-          </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>LIFE</Text>
         </View>
 
-        {/* --- DEVELOPER TOOLS (hidden/dev only) --- */}
-        <View style={[styles.section, { backgroundColor: '#fef2f2', borderColor: '#fecaca' }]}>
-          <Text style={[styles.sectionTitle, { color: '#dc2626' }]}>Developer Zone 🛠️</Text>
-          <View style={styles.actionsGrid}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionButton,
-                { backgroundColor: '#fee2e2', borderColor: '#fca5a5' },
-                pressed && { opacity: 0.8 }
-              ]}
-              onPress={() => {
-                Alert.alert(
-                  'RESET GAME 🔴',
-                  'Are you absolutely sure? This will wipe all progress and return to the start.',
-                  [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'RESET EVERYTHING',
-                      style: 'destructive',
-                      onPress: async () => {
-                        await useGameStore.getState().resetGame();
-                        // Force navigate to reset state if needed, but store reset usually triggers app reload or auth flow change
-                        // For now just alert
-                        Alert.alert('Game Reset', 'All data has been wiped. Please restart the app or navigate to Home.');
-                      }
-                    }
-                  ]
-                );
-              }}
-            >
-              <View style={styles.actionHeader}>
-                <Text style={styles.actionEmoji}>🔴</Text>
-                <Text style={[styles.actionLabel, { color: '#b91c1c' }]}>RESET GAME</Text>
-              </View>
-              <Text style={[styles.actionDescription, { color: '#ef4444' }]}>Wipe all data & restart</Text>
-            </Pressable>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionButton,
-                { backgroundColor: '#dcfce7', borderColor: '#86efac' },
-                pressed && { opacity: 0.8 }
-              ]}
-              onPress={() => {
-                useStatsStore.getState().earnMoney(100_000_000);
-                Alert.alert('🤑 Rich Mode', '$100,000,000 added to your account!');
-              }}
-            >
-              <View style={styles.actionHeader}>
-                <Text style={styles.actionEmoji}>💰</Text>
-                <Text style={[styles.actionLabel, { color: '#15803d' }]}>ADD $100M</Text>
-              </View>
-              <Text style={[styles.actionDescription, { color: '#16a34a' }]}>Get rich instantly</Text>
-            </Pressable>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Leisure</Text>
+            <View style={styles.grid}>
+              {SECTION_LEISURE.map(renderAppIcon)}
+            </View>
           </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Lifestyle</Text>
+            <View style={styles.grid}>
+              {SECTION_LIFESTYLE.map(renderAppIcon)}
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Underworld</Text>
+            <View style={styles.grid}>
+              {SECTION_UNDERWORLD.map(renderAppIcon)}
+            </View>
+          </View>
+
+          {/* Spacer for Bottom Bar */}
+          <View style={{ height: 140 }} />
+        </ScrollView>
+
+        {/* Dimming Overlay for Stats Mode */}
+        {isStatsMode && (
+          <Pressable
+            style={[StyleSheet.absoluteFill, { zIndex: 10 }]}
+            onPress={() => setIsStatsMode(false)}
+          >
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }} />
+          </Pressable>
+        )}
+
+        {/* Custom Crystal Bottom Bar */}
+        <View style={[styles.bottomBarContainer, { zIndex: 20 }]}>
+          <BlurView
+            style={styles.blurContainer}
+            blurType="light"
+            blurAmount={20}
+            reducedTransparencyFallbackColor="white"
+          >
+            <View style={styles.bottomBar}>
+              {!isStatsMode ? (
+                <>
+                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Home')}>
+                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>🏠</Text></View>
+                    <Text style={styles.bottomTabLabel}>Home</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(true)}>
+                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>📊</Text></View>
+                    <Text style={styles.bottomTabLabel}>Stats</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Contacts')}>
+                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>👥</Text></View>
+                    <Text style={styles.bottomTabLabel}>Contacts</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => handleBottomNav('Profile')}>
+                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>👤</Text></View>
+                    <Text style={styles.bottomTabLabel}>Profile</Text>
+                  </Pressable>
+                </>
+              ) : (
+                <>
+                  {/* STATS MODE CONTENT - Same Layout, Different Data */}
+                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
+                    <View style={styles.bottomTabIconContainer}><Text style={styles.bottomTabIcon}>💰</Text></View>
+                    <Text style={styles.bottomTabLabel}>${userMoney.toLocaleString()}</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
+                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.success }]}>❤️</Text></View>
+                    <Text style={styles.bottomTabLabel}>{playerCore.health}%</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
+                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.danger }]}>🧠</Text></View>
+                    <Text style={styles.bottomTabLabel}>{playerCore.stress}%</Text>
+                  </Pressable>
+                  <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
+                    <View style={styles.bottomTabIconContainer}><Text style={[styles.bottomTabIcon, { color: theme.colors.accent }]}>💎</Text></View>
+                    <Text style={styles.bottomTabLabel}>{playerAttributes.charm}%</Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </BlurView>
         </View>
 
+      </SafeAreaView>
 
-
-
-      </ScrollView>
-
-      {/* MODALS */}
+      {/* --- MODALS --- */}
       <MatchPopup
         visible={visible}
         candidate={matchCandidate}
@@ -510,7 +340,6 @@ const LifeScreen = () => {
         onClose={closeHookupModal}
       />
 
-      {/* Night Out Modals */}
       <NightOutSetupModal
         visible={setupModalVisible}
         onClose={() => setSetupModalVisible(false)}
@@ -555,21 +384,17 @@ const LifeScreen = () => {
         onClose={() => setPregnancyModalVisible(false)}
       />
 
-      {/* Gym System (Layered Master Modal) */}
       <GymMasterModal />
-
-      {/* EDUCATION SYSTEM (Layered Master Modal) */}
       <EducationMasterModal />
       <EducationExamModal />
 
-      {/* Travel Modals */}
       <TravelHubModal
         visible={currentView === 'HUB'}
         vacationSpots={vacationSpots}
         onSelectSpot={openBooking}
         onClose={closeTravel}
         onOpenCollection={openCollection}
-        onHomePress={handleTravelHome}
+        onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
       />
       <TravelBookingModal
         visible={currentView === 'BOOKING'}
@@ -580,36 +405,34 @@ const LifeScreen = () => {
         onTogglePartner={setBringPartner}
         onConfirm={startTrip}
         onClose={closeBooking}
-        onHomePress={handleTravelHome}
+        onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
       />
       <TravelExperienceModal
         visible={currentView === 'EXPERIENCE'}
         spot={selectedSpot}
         resultData={travelResultData}
         onComplete={onExperienceComplete}
-        onHomePress={handleTravelHome}
+        onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
       />
       <SouvenirMiniGame
         visible={currentView === 'MINIGAME'}
         souvenir={selectedSpot?.souvenir || null}
         onComplete={onMiniGameComplete}
-        onHomePress={handleTravelHome}
+        onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
       />
       <SouvenirCollectionModal
         visible={currentView === 'COLLECTION'}
         collectedIds={vacationSpots.filter(spot => hasSouvenir(spot.souvenir.id)).map(spot => spot.souvenir.id)}
         onClose={closeCollection}
-        onHomePress={handleTravelHome}
+        onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
       />
 
-      {/* The Wellness Sanctuary Modals */}
-      {/* The Wellness Sanctuary Master System */}
       <SanctuaryMasterModal
         isHubVisible={isHubVisible}
         activeView={activeView}
         closeSanctuary={closeSanctuary}
-        navigate={navigate}
-        goBack={goBack}
+        navigate={navSanctuary}
+        goBack={goBackSanctuary}
         isVIPMember={isVIPMember}
         buyMembership={buyMembership}
         performSurgery={performSurgery}
@@ -618,23 +441,17 @@ const LifeScreen = () => {
         activeBuffs={activeBuffs}
         usageTracker={usageTracker}
       />
-
-      {/* RESULT MODAL */}
       <SanctuaryResultModal
         visible={isResultVisible}
         resultData={resultData}
         onClose={closeSanctuary}
       />
 
-      {/* BLACK MARKET MASTER MODAL */}
       <BlackMarketMasterModal
         visible={isBlackMarketVisible}
         onClose={() => setBlackMarketVisible(false)}
       />
 
-
-
-      {/* ENCOUNTER MODAL (CINEMATIC) */}
       <EncounterModal
         visible={isEncounterVisible}
         candidate={encounterCandidate}
@@ -648,7 +465,6 @@ const LifeScreen = () => {
         onIgnore={closeEncounter}
       />
 
-      {/* BREAKUP MODAL (HIGHEST PRIORITY) */}
       {cheatingConsequence && (
         <BreakupModal
           visible={!!cheatingConsequence}
@@ -658,149 +474,146 @@ const LifeScreen = () => {
         />
       )}
 
-    </AppScreen>
+    </View>
   );
 };
 
-type LifeActionButtonProps = {
-  emoji: string;
-  label: string;
-  description: string;
-  onPress: () => void;
-};
-
-const LifeActionButton = ({
-  emoji,
-  label,
-  description,
-  onPress,
-}: LifeActionButtonProps) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => [
-      styles.actionButton,
-      pressed && styles.actionButtonPressed,
-    ]}>
-    <View style={styles.actionHeader}>
-      <Text style={styles.actionEmoji}>{emoji}</Text>
-      <Text style={styles.actionLabel}>{label}</Text>
-    </View>
-    <Text style={styles.actionDescription}>{description}</Text>
-  </Pressable>
-);
-
 export default LifeScreen;
 
+// --- STYLES ---
+
 const styles = StyleSheet.create({
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.card,
+  container: {
+    flex: 1,
+    // Background is handled by LinearGradient
   },
-  backButtonPressed: {
-    backgroundColor: theme.colors.cardSoft,
-    transform: [{ scale: 0.97 }],
+  safeArea: {
+    flex: 1,
   },
-  backIcon: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 40 : 60,
+    paddingBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 56, // Massive
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: -1.5,
   },
   scrollContent: {
-    paddingBottom: 40,
-    gap: theme.spacing.md,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 140,
   },
   section: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.md,
+    marginBottom: 36,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F0F0F0',
+    marginBottom: 20,
+    letterSpacing: 0.5,
   },
-  actionsGrid: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: theme.spacing.md,
+    rowGap: 24,
   },
-  actionButton: {
-    width: '48%',
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  appIconContainer: {
+    width: '23%',
+    alignItems: 'center',
   },
-  actionButtonPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.98 }],
+  appIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    // iOS-style icon shadow/depth
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
+
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
   },
-  actionHeader: {
+  appIconEmoji: {
+    fontSize: 32,
+  },
+  appIconLabel: {
+    color: '#EEEEEE',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    letterSpacing: 0.2,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+
+  // Crystal Floating Dock
+  bottomBarContainer: {
+    position: 'absolute',
+    bottom: 34,
+    left: 20,
+    right: 20,
+    borderRadius: 35,
+    overflow: 'hidden', // Ensures blur stays inside
+    // Shadow for the dock itself
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 15,
+  },
+  blurContainer: {
+    borderRadius: 35,
+  },
+  bottomBar: {
     flexDirection: 'row',
+    width: '100%',
+    paddingVertical: 18,
+    justifyContent: 'space-around',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Slight tint on top of blur
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderRadius: 35,
   },
-  actionEmoji: {
-    fontSize: 18,
-  },
-  actionLabel: {
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  actionDescription: {
-    fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
-    lineHeight: 16,
-  },
-  card: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.md,
-  },
-  cardText: {
-    fontSize: theme.typography.body,
-    color: theme.colors.textSecondary,
-    lineHeight: 20,
-  },
-  placeholderText: {
-    fontSize: theme.typography.caption,
-    color: theme.colors.textMuted,
-    lineHeight: 18,
-  },
-  secondaryButton: {
-    backgroundColor: theme.colors.accentSoft,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
+  bottomTab: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    justifyContent: 'center',
+    flex: 1,
   },
-  secondaryButtonPressed: {
-    backgroundColor: theme.colors.card,
-    transform: [{ scale: 0.98 }],
+  bottomTabIconContainer: {
+    marginBottom: 4,
   },
-  secondaryButtonText: {
-    color: theme.colors.accent,
+  bottomTabIcon: {
+    fontSize: 24, // Slightly larger icons
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0,0,0,0.3)', // Depth
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  bottomTabLabel: {
+    color: '#FFFFFF',
+    fontSize: 10,
     fontWeight: '700',
-    fontSize: theme.typography.body,
+    letterSpacing: 0.3,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });

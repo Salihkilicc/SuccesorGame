@@ -239,44 +239,55 @@ const MainTabs = () => (
   </Tab.Navigator>
 );
 
-const RootNavigator = () => (
-  <NavigationContainer ref={rootNavigationRef}>
-    <View style={{ flex: 1 }}>
-      <RootStack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialRouteName="Home">
-        <RootStack.Screen name="Home" component={HomeScreen} />
-        <RootStack.Screen name="MainTabs" component={MainTabs} />
-        <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
+const RootNavigator = () => {
+  const [currentRouteName, setCurrentRouteName] = React.useState<string | undefined>();
 
-        {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
-        <RootStack.Screen name="Products" component={ProductsScreen} />
-        {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
-        <RootStack.Screen name="Research" component={ResearchScreen} />
-        <RootStack.Screen
-          name="TechTree"
-          component={TechTreeScreen}
-          options={{ title: 'Innovation Tech Tree' }}
-        />
+  return (
+    <NavigationContainer
+      ref={rootNavigationRef}
+      onStateChange={() => {
+        setCurrentRouteName(rootNavigationRef.getCurrentRoute()?.name);
+      }}>
+      <View style={{ flex: 1 }}>
+        <RootStack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName="Home">
+          <RootStack.Screen name="Home" component={HomeScreen} />
+          <RootStack.Screen name="MainTabs" component={MainTabs} />
+          <RootStack.Screen name="MyCompany" component={MyCompanyScreen} />
 
-        {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
-        {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
-        <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
-        <RootStack.Screen
-          name="FinancialReport"
-          component={FinancialReportScreen}
-          options={{ title: 'Quarterly Financial Report' }}
-        />
-      </RootStack.Navigator>
-      <BottomStatsBar
-        onHomePress={() => {
-          if (rootNavigationRef.isReady()) {
-            rootNavigationRef.navigate('Home');
-          }
-        }}
-      />
-    </View>
-  </NavigationContainer>
-);
+          {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
+          <RootStack.Screen name="Products" component={ProductsScreen} />
+          {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
+          <RootStack.Screen name="Research" component={ResearchScreen} />
+          <RootStack.Screen
+            name="TechTree"
+            component={TechTreeScreen}
+            options={{ title: 'Innovation Tech Tree' }}
+          />
+
+          {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
+          {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
+          <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
+          <RootStack.Screen
+            name="FinancialReport"
+            component={FinancialReportScreen}
+            options={{ title: 'Quarterly Financial Report' }}
+          />
+        </RootStack.Navigator>
+
+        {currentRouteName !== 'LifeHome' && (
+          <BottomStatsBar
+            onHomePress={() => {
+              if (rootNavigationRef.isReady()) {
+                rootNavigationRef.navigate('Home');
+              }
+            }}
+          />
+        )}
+      </View>
+    </NavigationContainer>
+  );
+};
 
 export default RootNavigator;
