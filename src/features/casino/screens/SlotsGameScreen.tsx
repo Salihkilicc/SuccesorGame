@@ -38,6 +38,7 @@ const SlotsGameScreen = () => {
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
     if (showResult && lastResult?.type === 'win') {
       winScale.setValue(0);
       winOpacity.setValue(0);
@@ -54,10 +55,17 @@ const SlotsGameScreen = () => {
           useNativeDriver: true
         })
       ]).start();
+
+      // Auto dismiss after 3 seconds
+      timer = setTimeout(() => {
+        actions.hideResult();
+      }, 3000);
+
     } else {
       winScale.setValue(0);
       winOpacity.setValue(0);
     }
+    return () => clearTimeout(timer);
   }, [showResult, lastResult]);
 
   // Transpose Grid: The logic returns [Row][Col], but Reels need [Col][Row]
@@ -77,15 +85,17 @@ const SlotsGameScreen = () => {
       {/* GameResultPopup removed as requested */}
 
       {/* BIG WIN OVERLAY */}
+      {/* BIG WIN OVERLAY */}
       {showResult && lastResult?.type === 'win' && (
-        <View style={styles.winOverlay} pointerEvents="none">
+        <Pressable style={styles.winOverlay} onPress={actions.hideResult}>
           <Animated.Text style={[styles.bigWinText, { transform: [{ scale: winScale }], opacity: winOpacity }]}>
             BIG WIN!
           </Animated.Text>
           <Animated.Text style={[styles.winAmount, { transform: [{ scale: winScale }], opacity: winOpacity }]}>
             +${lastResult.amount.toLocaleString()}
           </Animated.Text>
-        </View>
+          <Text style={styles.tapToCloseText}>Tap screen to continue</Text>
+        </Pressable>
       )}
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -283,7 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 64,
     fontWeight: '900',
     textShadowColor: '#d97706',
-    textShadowOffset: { width: 0, height: 4 },
+    textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 20,
     transform: [{ rotate: '-5deg' }]
   },
@@ -295,5 +305,12 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,1)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
+  },
+  tapToCloseText: {
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 20,
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center'
   }
 });

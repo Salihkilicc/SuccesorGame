@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Platform } from 'react-native';
-// import { BlurView } from '@react-native-community/blur'; // Removed due to missing package
-// Assuming we don't have BlurView installed or configured, I'll use View.
 import { CASINO_LOCATIONS, LocationId, CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
 

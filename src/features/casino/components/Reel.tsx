@@ -21,14 +21,16 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index }: ReelPro
     const translateY = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
+        const totalHeight = SYMBOL_HEIGHT * stripSymbols.length;
+
         if (isSpinning) {
-            // Spin Loop
-            translateY.setValue(0);
+            // Spin Loop (Top to Bottom: -H -> 0)
+            translateY.setValue(-totalHeight);
 
             Animated.loop(
                 Animated.timing(translateY, {
-                    toValue: -SYMBOL_HEIGHT * stripSymbols.length,
-                    duration: 500 + (stripSymbols.length * 20), // Adjust speed based on length
+                    toValue: 0,
+                    duration: 500 + (stripSymbols.length * 20),
                     easing: Easing.linear,
                     useNativeDriver: true,
                 })
@@ -36,28 +38,15 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index }: ReelPro
 
         } else {
             // Stop logic
-            // We want to stop after the delay
-            // Since we can't easily "cancel and land" in standard animated loops without some math,
-            // we will stop the loop and then animate to the target.
-
-            // Wait for delay
             setTimeout(() => {
-                // Stop the loop
-                translateY.stopAnimation((currentValue) => {
-                    // Calculate nearest slot or just reset and land?
-                    // For smoothness, let's reset to 0 (top) and slide to the target index.
-
+                translateY.stopAnimation(() => {
                     const symbolIndex = stripSymbols.indexOf(finalSymbol);
                     const targetIndex = symbolIndex !== -1 ? symbolIndex : 0;
 
-                    // If symbol not found, we might land on wrong image. 
-                    // But now stripSymbols matches logic, so it should be found.
-
-                    // Instant reset to top (virtual wrap) - in a real app we'd calc the offset
-                    translateY.setValue(0);
+                    // Reset to -H (top of the "previous" set) and slide down to target
+                    translateY.setValue(-totalHeight);
 
                     Animated.sequence([
-                        // Smooth landing with no bounce
                         Animated.timing(translateY, {
                             toValue: -targetIndex * SYMBOL_HEIGHT,
                             duration: 400,

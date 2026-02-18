@@ -119,25 +119,3 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     chips: [100000000, 1000000000, 10000000000, 50000000000],
   },
 ];
-
-export const SLOT_VARIANTS = [
-  {
-    id: 'street_fighter' as const,
-    title: 'Street Fighter Slots',
-    icon: '🎮',
-    note: 'Volatility: Medium',
-  },
-  {
-    id: 'poseidon' as const,
-    title: "Poseidon's Fortune",
-    icon: '🌊',
-    note: 'Volatility: Medium-High',
-  },
-];
-
-export const HIGH_ROLLER_SLOT = {
-  id: 'high_roller' as const,
-  title: 'High Roller Deluxe',
-  icon: '💎',
-  note: 'Volatility: High',
-};

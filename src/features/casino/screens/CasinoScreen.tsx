@@ -1,4 +1,3 @@
-// src/features/casino/screens/CasinoScreen.tsx
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -105,8 +104,14 @@ export default CasinoScreen;
 
 // Styles
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111827' }, // Dark bg
-  content: { paddingBottom: 40, paddingTop: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: '#111827'
+  },
+  content: {
+    paddingBottom: 40,
+    paddingTop: 20
+  },
 
   // Headers
   sectionHeader: {

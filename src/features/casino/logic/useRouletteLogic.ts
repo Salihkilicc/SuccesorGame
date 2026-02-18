@@ -1,6 +1,7 @@
+// src/features/casino/logic/useRouletteLogic.ts
 import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
-import { useStatsStore, usePlayerStore } from '../../../core/store'; // Store yolunu kontrol et
+import { useStatsStore, usePlayerStore } from '../../../core/store';
 
 // --- TİPLER VE SABİTLER ---
 export type BetType = 'RED' | 'BLACK' | 'EVEN' | 'ODD' | 'LOW' | 'HIGH';
