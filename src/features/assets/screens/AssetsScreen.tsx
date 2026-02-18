@@ -10,6 +10,7 @@ import {
     ActionTile,
     BreakdownSection
 } from '../components/AssetsUI';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
@@ -103,6 +104,8 @@ const AssetsScreen = () => {
 
 
             </ScrollView>
+
+            <CrystalNavBar activeTab="Company" variant="dark" />
         </AppScreen>
     );
 };

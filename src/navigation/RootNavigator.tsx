@@ -105,6 +105,7 @@ export type RootStackParamList = {
   Research: undefined;
   TechTree: undefined;
   FinancialReport: undefined;
+  Assets: NavigatorScreenParams<AssetsStackParamList>;
 };
 
 const LifeStackNavigator = () => (
@@ -305,6 +306,7 @@ const RootNavigator = () => {
           {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
           {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
           <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
+          <RootStack.Screen name="Assets" component={AssetsStackNavigator} />
           <RootStack.Screen
             name="FinancialReport"
             component={FinancialReportScreen}

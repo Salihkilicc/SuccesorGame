@@ -303,7 +303,7 @@ const HomeScreen = () => {
             <Text style={styles.entrySubtitleDark}>Lifestyle & Events</Text>
           </Pressable>
           <Pressable
-            onPress={() => handleNavigateTabs('MyCompany')} // UPDATED: Assets -> MyCompany
+            onPress={() => handleNavigateStack('Assets')}
             style={({ pressed }) => [styles.entryAssets, pressed && styles.entryPressed]}>
             <Text style={styles.entryTitleLight}>ASSETS</Text>
             <Text style={styles.entrySubtitleLight}>Market & Company</Text>

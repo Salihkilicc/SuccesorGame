@@ -18,6 +18,7 @@ import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
 import PortfolioModal from '../../../components/Market/PortfolioModal';
 import MarketTicker from '../../../components/Market/MarketTicker';
 import { CategoryTabs, TabKey, TabOption } from '../components/CategoryTabs';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // Veriler ve Tipler
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
@@ -203,6 +204,7 @@ const MarketScreen = () => {
         />
       </View>
       <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
+      <CrystalNavBar activeTab="Company" variant="dark" />
     </AppScreen>
   );
 };
