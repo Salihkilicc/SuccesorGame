@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import {
     Modal,
     View,
@@ -6,12 +7,10 @@ import {
     StyleSheet,
     Pressable,
     Animated,
-    Dimensions,
 } from 'react-native';
 import { VacationSpot } from './data/travelData';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
-import { useEncounterSystem } from '../../../love/components/useEncounterSystem';
 import { EncounterModal } from '../../../love/components/EncounterModal';
+import { useTravelExperienceLogic } from './hooks/useTravelExperienceLogic';
 
 type TravelExperienceModalProps = {
     visible: boolean;
@@ -26,9 +25,6 @@ type TravelExperienceModalProps = {
     onHomePress: () => void;
 };
 
-const { width } = Dimensions.get('window');
-const ANIMATION_DURATION = 3000;
-
 const TravelExperienceModal = ({
     visible,
     spot,
@@ -36,104 +32,20 @@ const TravelExperienceModal = ({
     onComplete,
     onHomePress,
 }: TravelExperienceModalProps) => {
-    const [progress] = useState(new Animated.Value(0));
-    const [currentNarrative, setCurrentNarrative] = useState('');
-    const [showCompletion, setShowCompletion] = useState(false);
 
-    // Encounter State
     const {
-        triggerEncounter,
-        // We'll use local state to manage the specific encounter for this trip
-        // ensuring it doesn't conflict with global state if possible, though hooks are shared.
-        // Actually, triggerEncounter returns the candidate/scenario, so we can use local state if desired,
-        // BUT EncounterModal expects to be driven by props. available from useEncounterSystem?
-        // Let's use the hook's state to match LifeScreen pattern.
-        isVisible: isEncounterVisible,
-        candidate: encounterCandidate,
-        currentScenario: encounterScenario,
+        currentNarrative,
+        showCompletion,
+        isEncounterVisible,
+        encounterCandidate,
+        encounterScenario,
+        progressWidth,
+        iconPosition,
+        handleEncounterComplete,
         handleDate,
-        closeEncounter,
-    } = useEncounterSystem();
-
-    // We need a local flag to know if we are currently handling an encounter to pause the "Completion Screen"
-    // The "showCompletion" state will now only be set AFTER encounter is done (or if none happened).
-
-    useEffect(() => {
-        if (visible && spot && resultData) {
-            // Reset state
-            progress.setValue(0);
-            setShowCompletion(false);
-            setCurrentNarrative('Preparing for departure...');
-
-            // Ensure any previous encounter is closed
-            closeEncounter();
-
-            // Start animation
-            Animated.timing(progress, {
-                toValue: 100,
-                duration: ANIMATION_DURATION,
-                useNativeDriver: false,
-            }).start(() => {
-                // Animation Complete -> Check for Encounter
-                handleTripProgressComplete();
-            });
-
-            // Update narrative based on progress
-            const narrativeTimer1 = setTimeout(() => {
-                const lowNarrative = spot.narratives.low[Math.floor(Math.random() * spot.narratives.low.length)];
-                setCurrentNarrative(lowNarrative);
-            }, ANIMATION_DURATION * 0.2);
-
-            const narrativeTimer2 = setTimeout(() => {
-                const midNarrative = spot.narratives.mid[Math.floor(Math.random() * spot.narratives.mid.length)];
-                setCurrentNarrative(midNarrative);
-            }, ANIMATION_DURATION * 0.5);
-
-            const narrativeTimer3 = setTimeout(() => {
-                setCurrentNarrative(resultData.narrative);
-            }, ANIMATION_DURATION * 0.8);
-
-            return () => {
-                clearTimeout(narrativeTimer1);
-                clearTimeout(narrativeTimer2);
-                clearTimeout(narrativeTimer3);
-            };
-        }
-    }, [visible, spot, resultData]);
-
-    const handleTripProgressComplete = () => {
-        if (!spot) return setShowCompletion(true);
-
-        // Try to trigger an encounter
-        // autoShow=true will set the hook's internal state to visible
-        const encounter = triggerEncounter('travel', spot.id, true);
-
-        if (encounter) {
-            console.log('[Travel] Encounter triggered:', encounter.candidate.name);
-            // Encounter modal will show automatically due to isEncounterVisible from hook
-        } else {
-            console.log('[Travel] No encounter, showing completion.');
-            setShowCompletion(true);
-        }
-    };
-
-    const handleEncounterComplete = () => {
-        console.log('[Travel] Interaction finished/ignored. Closing encounter...');
-        closeEncounter();
-        setShowCompletion(true);
-    };
+    } = useTravelExperienceLogic({ visible, spot, resultData });
 
     if (!visible || !spot || !resultData) return null;
-
-    const progressWidth = progress.interpolate({
-        inputRange: [0, 100],
-        outputRange: ['0%', '100%'],
-    });
-
-    const iconPosition = progress.interpolate({
-        inputRange: [0, 100],
-        outputRange: [0, width - 120],
-    });
 
     return (
         <Modal
