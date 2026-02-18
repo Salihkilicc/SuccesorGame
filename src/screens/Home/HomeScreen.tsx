@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
   entryLife: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   entryAssets: {
     flex: 1.15,
     backgroundColor: '#101010',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#d4af37',
@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
   entryLove: {
     flex: 1,
     backgroundColor: '#FF4B8B',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#ffb3d6',
@@ -654,23 +654,23 @@ const styles = StyleSheet.create({
   },
   entryTitleDark: {
     color: '#111',
-    fontSize: theme.typography.subtitle + 2,
+    fontSize: (theme.typography.subtitle + 2) * 0.9,
     fontWeight: '800',
   },
   entrySubtitleDark: {
     color: '#444',
-    marginTop: 4,
-    fontSize: theme.typography.caption + 1,
+    marginTop: 4 * 0.9,
+    fontSize: (theme.typography.caption + 1) * 0.9,
   },
   entryTitleLight: {
     color: '#fff',
-    fontSize: theme.typography.subtitle + 2,
+    fontSize: (theme.typography.subtitle + 2) * 0.9,
     fontWeight: '800',
   },
   entrySubtitleLight: {
     color: '#f8f8f8',
-    marginTop: 4,
-    fontSize: theme.typography.caption + 1,
+    marginTop: 4 * 0.9,
+    fontSize: (theme.typography.caption + 1) * 0.9,
   },
   entryPressed: {
     opacity: 0.9,
