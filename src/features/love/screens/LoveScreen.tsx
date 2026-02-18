@@ -11,6 +11,7 @@ import { EncounterModal } from '../components/EncounterModal';
 import BreakupModal from '../components/BreakupModal';
 import { useEncounterSystem } from '../components/useEncounterSystem';
 import { applyPartnerBuffs, getPartnerPerks } from '../../../logic/relationshipLogic';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 type LoveScreenProp = NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>;
 
@@ -76,13 +77,7 @@ const LoveScreen = () => {
 
 
   const handleBack = () => {
-    // Navigate directly to HomeScreen as requested
-    const parent = navigation.getParent();
-    if (parent) {
-      parent.navigate('Home' as never);
-    } else {
-      navigation.navigate('Home' as never);
-    }
+    navigation.navigate('Home' as never);
   };
 
   const closeModal = () => {
@@ -974,6 +969,8 @@ const LoveScreen = () => {
         />
       )}
 
+      {/* Universal Crystal Navigation Bar (Active: Love, Light Variant) */}
+      <CrystalNavBar activeTab="Love" variant="light" />
 
     </SafeAreaView>
   );

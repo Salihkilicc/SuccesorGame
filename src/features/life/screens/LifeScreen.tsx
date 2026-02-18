@@ -194,7 +194,7 @@ const LifeScreen = () => {
         navigation.navigate('FinancialReport' as never);
         break;
       case 'Contacts':
-        navigation.navigate('Love', { screen: 'LoveHome' } as any);
+        navigation.navigate('Love' as never);
         break;
       case 'Profile':
         navigation.navigate('DNA');

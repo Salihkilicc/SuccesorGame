@@ -152,7 +152,7 @@ const MyCompanyScreen = () => {
       <View style={[styles.safeArea, { paddingTop: insets.top, backgroundColor: '#121212' }]}>
         {/* FIXED HEADER */}
         <View style={[styles.header, { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm }]}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
+          <Pressable onPress={() => navigation.navigate('Home')} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
           <View>
             <Text style={styles.title}>Command Center</Text>
             <Text style={styles.subtitle}>Manage your company operations</Text>

@@ -242,8 +242,9 @@ const MainTabs = () => (
 const SwipeTab = createMaterialTopTabNavigator();
 
 export type SwipeTabParamList = {
-  Life: undefined; // To be compatible with existing navigation types, we might need to adjust this
+  Life: undefined;
   Home: undefined;
+  Love: undefined;
   MyCompany: undefined;
 };
 
@@ -259,6 +260,7 @@ const SwipeNavigator = () => (
   >
     <SwipeTab.Screen name="Life" component={LifeScreen} />
     <SwipeTab.Screen name="Home" component={HomeScreen} />
+    <SwipeTab.Screen name="Love" component={LoveScreen} />
     <SwipeTab.Screen name="MyCompany" component={MyCompanyScreen} />
   </SwipeTab.Navigator>
 );

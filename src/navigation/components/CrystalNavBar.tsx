@@ -8,7 +8,7 @@ import { useStatsStore, usePlayerStore } from '../../core/store';
 const { width } = Dimensions.get('window');
 
 interface CrystalNavBarProps {
-    activeTab: 'Life' | 'Home' | 'Company';
+    activeTab: 'Life' | 'Home' | 'Company' | 'Love';
     variant: 'light' | 'dark';
 }
 
@@ -25,7 +25,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
         if (screen === 'Company') {
             navigation.navigate('MyCompany');
         } else if (screen === 'Contacts') {
-            navigation.navigate('Love', { screen: 'LoveHome' });
+            navigation.navigate('Love');
         } else if (screen === 'Profile') {
             navigation.navigate('DNA');
         } else {
