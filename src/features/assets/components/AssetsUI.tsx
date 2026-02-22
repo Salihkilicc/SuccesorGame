@@ -66,12 +66,12 @@ export const ActionTile = ({ title, body, onPress, variant = 'market' }: any) =>
 export const BreakdownSection = ({ title, items, isIncome }: { title: string, items: any[], isIncome?: boolean }) => {
     if (!items || items.length === 0) return null;
     return (
-        <View style={{ gap: theme.spacing.sm, marginTop: theme.spacing.lg }}>
+        <View style={{ gap: theme.spacing.xs, marginTop: theme.spacing.lg }}>
             <Text style={styles.sectionHeader}>{title}</Text>
             {items.map((item, index) => (
                 <View key={index} style={styles.breakdownRow}>
                     <Text style={styles.breakdownLabel}>{item.label}</Text>
-                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : theme.colors.textPrimary }]}>
+                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : '#F0F0F0' }]}>
                         {isIncome ? '+' : '-'}${item.amount.toLocaleString()}
                     </Text>
                 </View>
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
     cardSoft: { backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.xs },
     cardTitle: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body },
     cardBody: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, lineHeight: 18 },
-    summaryLabel: { color: theme.colors.textMuted, fontSize: theme.typography.caption, letterSpacing: 0.4, textTransform: 'uppercase' },
-    summaryValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '800' },
+    summaryLabel: { color: '#888888', fontSize: 12, letterSpacing: 0.4, textTransform: 'uppercase', marginBottom: 2 },
+    summaryValue: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', letterSpacing: 0.5 },
     categoryCard: { flex: 1, backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.xs, minHeight: 110 },
     categoryCardPressed: { transform: [{ scale: 0.98 }], backgroundColor: theme.colors.card },
     categoryLabel: { color: theme.colors.textMuted, fontSize: theme.typography.caption, letterSpacing: 0.4 },
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
     actionBody: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 18 },
     actionTilePressed: { transform: [{ scale: 0.98 }], opacity: 0.94 },
     tileCta: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.subtitle, alignSelf: 'flex-end' },
-    sectionHeader: { fontSize: theme.typography.body, fontWeight: '700', color: theme.colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
-    breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border },
-    breakdownLabel: { fontSize: theme.typography.body, color: theme.colors.textPrimary },
-    breakdownValue: { fontSize: theme.typography.body, fontWeight: '700' },
+    sectionHeader: { fontSize: 13, fontWeight: '700', color: '#888888', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
+    breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255, 255, 255, 0.05)' },
+    breakdownLabel: { fontSize: 14, color: '#CCCCCC' },
+    breakdownValue: { fontSize: 14, fontWeight: '700' },
 });
