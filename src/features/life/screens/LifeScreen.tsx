@@ -87,10 +87,23 @@ const SECTION_LEISURE = [
 ];
 
 const SECTION_LIFESTYLE = [
-  { key: 'travel', label: 'Travel', icon: '✈️', gradient: GRADIENTS.blueSky },
-  { key: 'belongings', label: 'Belongings', icon: '👜', gradient: GRADIENTS.brownGold },
+  // Core System & Daily
+  { key: 'calendar', label: 'Calendar', icon: '📅', gradient: GRADIENTS.orangeYellow },
+  { key: 'health', label: 'Health', icon: '❤️', gradient: GRADIENTS.pinkRed },
+  { key: 'contacts', label: 'Contacts', icon: '👥', gradient: GRADIENTS.purplePink },
+  { key: 'mail', label: 'Mail', icon: '✉️', gradient: GRADIENTS.blueSky },
+
+  // Organization & Productivity
+  { key: 'notes', label: 'Notes', icon: '📝', gradient: GRADIENTS.tealCyan },
+  { key: 'weather', label: 'Weather', icon: '🌤️', gradient: GRADIENTS.bluePurple },
   { key: 'education', label: 'Education', icon: '🎓', gradient: GRADIENTS.greenTeal },
+  { key: 'travel', label: 'Travel', icon: '✈️', gradient: GRADIENTS.blueSky },
+
+  // Personal Assets & Data
+  { key: 'belongings', label: 'Belongings', icon: '👜', gradient: GRADIENTS.brownGold },
+  { key: 'myCompany', label: 'My Company', icon: '🏢', gradient: GRADIENTS.networkBlue },
   { key: 'dna', label: 'DNA / Stats', icon: '🧬', gradient: GRADIENTS.bluePurple },
+  { key: 'settings', label: 'Settings', icon: '⚙️', gradient: GRADIENTS.darkGrey },
 ];
 
 const SECTION_UNDERWORLD = [
@@ -98,6 +111,7 @@ const SECTION_UNDERWORLD = [
   { key: 'blackMarket', label: 'Black Market', icon: '🕶️', gradient: GRADIENTS.darkGrey },
   { key: 'hookup', label: 'Hookup', icon: '🔥', gradient: GRADIENTS.hookupFire },
   { key: 'network', label: 'Network', icon: '🌐', gradient: GRADIENTS.networkBlue },
+  { key: 'stockMarket', label: 'Stock Market', icon: '📈', gradient: GRADIENTS.greenTeal },
 ];
 
 const LifeScreen = () => {
@@ -172,14 +186,23 @@ const LifeScreen = () => {
       // Lifestyle
       case 'travel': openTravel(); break;
       case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' } as any); break;
+      case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' } as any); break;
       case 'education': openEducation(); break;
       case 'dna': navigation.navigate('DNA'); break;
+      case 'contacts': handleBottomNav('Contacts'); break;
+      case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
+      case 'health': Alert.alert('Health', 'Health app is coming soon!'); break;
+      case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
+      case 'notes': Alert.alert('Notes', 'Notes app is coming soon!'); break;
+      case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
+      case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
 
       // Underworld
       case 'casino': navigation.navigate('Casino'); break;
       case 'blackMarket': setBlackMarketVisible(true); break;
       case 'hookup': startHookup(); break;
       case 'network': Alert.alert('Network', 'Networking events are coming soon!'); break;
+      case 'stockMarket': navigation.navigate('Assets', { screen: 'Market' } as any); break;
 
       default: break;
     }

@@ -58,6 +58,9 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
     const happiness = Math.floor(Math.random() * 41) + 50;
     // Relationship level starts at 30-50 range
     const relationshipLevel = Math.floor(Math.random() * 21) + 30;
+    // Looks and Intellect ranges
+    const looks = Math.floor(Math.random() * 61) + 40; // 40-100
+    const intellect = Math.floor(Math.random() * 61) + 40; // 40-100
 
     // --- SMART BUFF ASSIGNMENT LOGIC ---
     let buffType = job.buffType || 'STRESS_RELIEF';
@@ -77,19 +80,19 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
 
     // Dynamic Overrides based on Stats/Personality
     // 1. Street Rep (Low Morality / High Risk)
-    if ((personality.morality < 40 || personality.riskAppetite > 70) && Math.random() > 0.5) {
+    if ((personality.id === 'gold_digger' || personality.id === 'party') && Math.random() > 0.5) {
         buffType = 'STREET_CRED_BOOST';
     }
     // 2. Business Rep (High Ambition)
-    else if (personality.ambition > 70 && Math.random() > 0.5) {
+    else if (personality.id === 'ambitious' && Math.random() > 0.5) {
         buffType = 'BUSINESS_TRUST_BOOST';
     }
     // 3. High Society (Looks / Charm)
-    else if (personality.strategicSense > 70 && Math.random() > 0.5) { // Using strategicSense as proxy for social climbing
+    else if (looks > 70 && Math.random() > 0.5) { // Using looks as proxy for social climbing
         buffType = 'SOCIAL_STATUS_BOOST';
     }
     // 4. Casino VIP (High Risk)
-    else if (personality.riskAppetite > 80 && Math.random() > 0.7) {
+    else if (personality.id === 'party' && Math.random() > 0.7) {
         buffType = 'CASINO_VIP_BOOST';
     }
     // 5. Luck (Rare)
@@ -119,6 +122,8 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
         stats: {
             happiness,
             relationshipLevel,
+            looks,
+            intellect,
         },
         finances: {
             monthlyCost,
