@@ -1,16 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, SafeAreaView, Alert, Platform } from 'react-native';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Components & Systems
 import { theme } from '../../../core/theme';
 import { useUserStore, useStatsStore, usePlayerStore } from '../../../core/store';
-import type { RootStackParamList, RootTabParamList, SwipeTabParamList } from '../../../navigation';
+import type { RootStackParamList } from '../../../navigation';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+
+// Type Definitions
+type UnderworldNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
@@ -18,14 +20,6 @@ import { EncounterModal } from '../../love/components/EncounterModal';
 import BreakupModal from '../../love/components/BreakupModal';
 import { useHookupSystem } from '../components/useHookupSystem';
 import { HookupModal } from '../components/HookupModal';
-
-type UnderworldNavigationProp = CompositeNavigationProp<
-    NativeStackNavigationProp<RootStackParamList, 'Home'>,
-    CompositeNavigationProp<
-        BottomTabNavigationProp<RootTabParamList, 'Life'>,
-        NativeStackNavigationProp<RootStackParamList>
-    >
->;
 
 const GRADIENTS = {
     purplePink: ['#8E2DE2', '#4A00E0'],
@@ -69,13 +63,13 @@ const UnderworldScreen = () => {
 
     const handleAction = (key: string) => {
         switch (key) {
-            case 'contacts': navigation.navigate('Love' as never); break;
+            case 'contacts': navigation.navigate('Love'); break;
             case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
             case 'casino': navigation.navigate('Casino'); break;
             case 'blackMarket': setBlackMarketVisible(true); break;
             case 'hookup': startHookup(); break;
             case 'network': Alert.alert('Network', 'Networking events are coming soon!'); break;
-            case 'stockMarket': navigation.navigate('Assets', { screen: 'Market' } as any); break;
+            case 'stockMarket': navigation.navigate('Assets', { screen: 'Market' }); break;
             default: break;
         }
     };

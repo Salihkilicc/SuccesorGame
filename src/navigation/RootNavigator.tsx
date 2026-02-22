@@ -97,9 +97,7 @@ export type RootTabParamList = {
 };
 
 export type RootStackParamList = {
-  Home: NavigatorScreenParams<SwipeTabParamList>; // Was undefined, now points to SwipeNavigator
-  // MainTabs: NavigatorScreenParams<RootTabParamList>; // Removed
-  // MyCompany: undefined; // Moved to SwipeNavigator
+  Home: NavigatorScreenParams<SwipeTabParamList> | undefined;
   Premium: undefined;
   Achievements: undefined;
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
@@ -109,6 +107,7 @@ export type RootStackParamList = {
   FinancialReport: undefined;
   Assets: NavigatorScreenParams<AssetsStackParamList>;
   Love: undefined;
+  DNA: undefined;
 };
 
 const LifeStackNavigator = () => (

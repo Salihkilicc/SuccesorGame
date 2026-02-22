@@ -1,18 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, SafeAreaView, Alert, Dimensions, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import type { CompositeNavigationProp } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
 // Components & Systems
 import { theme } from '../../../core/theme';
 import { useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
-import type { LifeStackParamList, RootStackParamList, RootTabParamList } from '../../../navigation';
+import type { RootStackParamList } from '../../../navigation';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+
+// Type Definitions
+type LifeNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // --- Modals & Systems ---
 import MatchPopup from '../../../components/Match/MatchPopup';
@@ -44,15 +44,6 @@ import { EducationMasterModal } from '../components/Education/modals/EducationMa
 import { EducationExamModal } from '../components/Education/modals/EducationExamModal';
 
 import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
-
-// Type Definitions
-type LifeNavigationProp = CompositeNavigationProp<
-  NativeStackNavigationProp<LifeStackParamList, 'LifeHome'>,
-  CompositeNavigationProp<
-    BottomTabNavigationProp<RootTabParamList, 'Life'>,
-    NativeStackNavigationProp<RootStackParamList>
-  >
->;
 
 // --- CONFIGURATION ---
 
@@ -143,12 +134,12 @@ const LifeScreen = () => {
       case 'nightOut': startNightOut(); break;
       case 'spa': openSanctuary(); break;
       case 'gym': openGym(); break; // Removed random encounter logic
-      case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' } as any); break;
+      case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' }); break;
 
       // Lifestyle
       case 'travel': openTravel(); break;
-      case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' } as any); break;
-      case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' } as any); break;
+      case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' }); break;
+      case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' }); break;
       case 'education': openEducation(); break;
       case 'dna': navigation.navigate('DNA'); break;
       case 'contacts': handleBottomNav('Contacts'); break;
@@ -166,13 +157,13 @@ const LifeScreen = () => {
   const handleBottomNav = (tab: string) => {
     switch (tab) {
       case 'Home':
-        navigation.navigate('Home' as never);
+        navigation.navigate('Home', undefined);
         break;
       case 'Stats':
-        navigation.navigate('FinancialReport' as never);
+        navigation.navigate('FinancialReport');
         break;
       case 'Contacts':
-        navigation.navigate('Love' as never);
+        navigation.navigate('Love');
         break;
       case 'Profile':
         navigation.navigate('DNA');
