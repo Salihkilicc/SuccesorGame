@@ -264,7 +264,7 @@ const HomeScreen = () => {
 
         <View style={styles.widgetsContainer}>
           {/* Overview Widget */}
-          <View style={[styles.widgetColumn, { flex: 1.5 }]}>
+          <View style={[styles.widgetColumn, { flex: 1 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
               <Text style={styles.sectionTitle}>Overview</Text>
               <TouchableOpacity onPress={() => handleNavigateStack('Assets')} style={{ flexDirection: 'row', alignItems: 'baseline' }}>
@@ -296,7 +296,7 @@ const HomeScreen = () => {
           </View>
 
           {/* Status Widget */}
-          <View style={[styles.widgetColumn, { flex: 1 }]}>
+          <View style={[styles.widgetColumn, { flex: 3 }]}>
             <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
             <View style={[styles.statusCard, styles.widgetCard]}>
               <View style={styles.widgetStatusRow}>
