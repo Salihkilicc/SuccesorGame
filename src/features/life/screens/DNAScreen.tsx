@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { theme } from '../../../core/theme';
 import { useRelationshipBuffs } from '../../love/hooks/useRelationshipBuffs';
@@ -17,11 +19,9 @@ const formatCurrency = (value: number) => {
     return `$${value}`;
 };
 
-// İkon kütüphanesi yoksa veya hata verirse bunları emoji olarak kullanabilirsin.
-// Şimdilik Emoji kullanıyoruz ki ekstra paket yüklemeden çalışsın.
-
-const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon, buff }: { label: string, value: number, max?: number, color?: string, icon?: string, buff?: string }) => {
-    // Değerlerin undefined gelme ihtimaline karşı koruma
+const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon, buff }: {
+    label: string, value: number, max?: number, color?: string, icon?: string, buff?: string
+}) => {
     const safeValue = value || 0;
     const percentage = Math.min(100, Math.max(0, (safeValue / max) * 100));
 
@@ -37,7 +37,7 @@ const ProgressBar = ({ label, value, max = 100, color = '#3498db', icon, buff }:
                 )}
             </View>
             <View style={styles.progressContainer}>
-                <View style={[styles.progressBar, { width: `${percentage}%`, backgroundColor: color }]} />
+                <View style={[styles.progressBar, { width: `${percentage}%` as any, backgroundColor: color }]} />
             </View>
             <Text style={styles.statValue}>{safeValue}/{max}</Text>
         </View>
@@ -54,27 +54,21 @@ const SectionHeader = ({ title, icon }: { title: string, icon: string }) => (
 const LuxuryBar = () => {
     const { netWorth, maxWealth, percentage, buffAmount } = useLuxurySystem();
     const isBuffActive = buffAmount > 0;
-    const buffColor = isBuffActive ? '#FFD700' : '#444'; // Gold or Gray
-    const buffTextColor = isBuffActive ? '#000' : '#888';
+    const buffColor = isBuffActive ? '#D4AF37' : 'rgba(255,255,255,0.08)';
+    const buffTextColor = isBuffActive ? '#000' : '#555';
 
     return (
         <View style={[styles.card, styles.luxuryCard]}>
             <SectionHeader title="LUXURY LIFESTYLE" icon="💎" />
-
             <View style={styles.luxuryContent}>
-                {/* Progress Bar Row */}
                 <View style={styles.luxuryProgressRow}>
                     <Text style={styles.luxuryValue}>{formatCurrency(netWorth)}</Text>
                     <View style={styles.luxuryProgressBarBg}>
-                        <View style={[styles.luxuryProgressBarFill, { width: `${percentage}%` }]} />
+                        <View style={[styles.luxuryProgressBarFill, { width: `${percentage}%` as any }]} />
                     </View>
                     <Text style={styles.luxuryTarget}>{formatCurrency(maxWealth)}</Text>
                 </View>
-
-                {/* Percentage Label */}
                 <Text style={styles.luxuryPercentage}>{percentage.toFixed(1)}% to Empire Status</Text>
-
-                {/* Buff Badges */}
                 <View style={styles.buffRow}>
                     <View style={[styles.luxuryBuffBadge, { backgroundColor: buffColor }]}>
                         <Text style={[styles.luxuryBuffText, { color: buffTextColor }]}>High Society: +{buffAmount}</Text>
@@ -94,7 +88,6 @@ const LuxuryBar = () => {
 const DNAScreen = () => {
     const navigation = useNavigation();
 
-    // Store'dan verileri çekiyoruz
     const {
         attributes,
         personality,
@@ -102,25 +95,20 @@ const DNAScreen = () => {
         security,
         skills,
         hidden,
-        relationshipBuffs // ✅ Added
+        relationshipBuffs
     } = usePlayerStore();
 
-    // Black Market System Integration
     const { data: { suspicion } } = useBlackMarketSystem();
-
-    // ⚡️ TRIGGER SYNC: This hook calculates buffs and updates the store
     useRelationshipBuffs();
 
     const attrBuffs = relationshipBuffs?.attributes || {};
     const repBuffs = relationshipBuffs?.reputation || {};
-    // @ts-ignore - Security buff field is being added to store type
+    // @ts-ignore
     const secBuffs = relationshipBuffs?.security || {};
 
-    // Helper to calculate effective
     const getEffective = (base: number | undefined, buff: number | undefined) => (base || 0) + (buff || 0);
     const getBuffString = (val: number | undefined) => (val || 0) > 0 ? `+${val}` : undefined;
 
-    // Gym 3.0 Integration
     const { data: gymData } = useGymSystem();
     const { stats, martialArts } = gymData;
     const selectedArt = martialArts.style;
@@ -128,17 +116,14 @@ const DNAScreen = () => {
     const beltRank = martialArts.rank;
     const { bodyType, fatigue } = stats;
 
-    // Security Level based on belt rank (0-5 = 0-50%)
     const securityLevel = beltRank * 10;
 
-    // Display text for martial arts
     const martialArtsDisplay = selectedArt
         ? `${selectedArt.charAt(0).toUpperCase() + selectedArt.slice(1)} - ${beltTitle}`
         : 'None';
 
     const handleBack = () => navigation.goBack();
 
-    // Kuşak rengine göre yazı rengini ayarlayan yardımcı fonksiyon
     const getBeltTextColor = (belt: string) => {
         const lowerBelt = belt?.toLowerCase() || 'white';
         if (['white', 'yellow'].includes(lowerBelt)) return '#000';
@@ -147,7 +132,6 @@ const DNAScreen = () => {
 
     const getBeltBgColor = (belt: string) => {
         const lowerBelt = belt?.toLowerCase() || 'white';
-        // Özel renk haritası
         const colors: Record<string, string> = {
             white: '#f5f5f5',
             yellow: '#f1c40f',
@@ -156,235 +140,192 @@ const DNAScreen = () => {
             blue: '#3498db',
             purple: '#9b59b6',
             brown: '#795548',
-            black: '#000000'
+            black: '#1a1a1a'
         };
-        return colors[lowerBelt] || '#ccc';
+        return colors[lowerBelt] || '#333';
     };
 
-    // Dynamic Color for Police Heat
     const getHeatColor = (val: number) => {
-        if (val > 80) return '#ef4444'; // Red
-        if (val < 30) return '#3b82f6'; // Blue (Safe/Cool)
-        return '#f39c12'; // Orange/Yellow
+        if (val > 80) return '#ef4444';
+        if (val < 30) return '#3b82f6';
+        return '#f39c12';
     };
 
     return (
-        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Pressable onPress={handleBack} style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}>
-                    <Text style={styles.backIcon}>←</Text>
-                    <Text style={styles.headerTitle}>DNA & Stats Dashboard</Text>
-                </Pressable>
-            </View>
+        <View style={styles.container}>
+            {/* Premium background gradient */}
+            <LinearGradient
+                colors={['#0a0a0c', '#000000', '#050505']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-                {/* 💎 LUXURY STATS - New Feature */}
-                <LuxuryBar />
-
-                {/* 🛡️ SECURITY - Yeni Özellik */}
-                <View style={styles.card}>
-                    <SectionHeader title="Security & Safety" icon="🛡️" />
-                    <ProgressBar
-                        label="Digital Shield"
-                        value={getEffective(security?.digital, secBuffs.digital)}
-                        color="#3498db"
-                        icon="💻"
-                        buff={getBuffString(secBuffs.digital)}
-                    />
-                    <ProgressBar
-                        label="Bodyguard / Armor"
-                        value={getEffective(securityLevel, secBuffs.personal)} // Adding personal security buff here
-                        color="#e74c3c"
-                        icon="🥋"
-                        buff={getBuffString(secBuffs.personal)}
-                    />
-                    <ProgressBar
-                        label="Police Heat"
-                        value={suspicion}
-                        color={getHeatColor(suspicion)}
-                        icon="🚨"
-                    />
-                </View>
-
-                {/* 🥋 SKILLS - Gym 3.0 Integration */}
-                <View style={styles.card}>
-                    <SectionHeader title="Combat Mastery" icon="👊" />
-                    <View style={styles.skillRow}>
-                        <View>
-                            <Text style={styles.skillName}>Self Defense</Text>
-                            <Text style={styles.skillDetail}>
-                                {martialArtsDisplay}
-                            </Text>
-                            <Text style={styles.skillDetail}>
-                                Security Boost: <Text style={{ fontWeight: 'bold', color: '#2ecc71' }}>+{securityLevel}%</Text>
-                            </Text>
-                            <Text style={styles.skillDetail}>
-                                Body Type: <Text style={{ fontWeight: 'bold', color: '#f39c12' }}>{bodyType}</Text>
-                            </Text>
-                        </View>
-                        <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(beltTitle) }]} >
-                            <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>
-                                {beltTitle}
-                            </Text>
-                        </View>
+            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Pressable onPress={handleBack} style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}>
+                        <MaterialCommunityIcons name="arrow-left" size={22} color="#D4AF37" />
+                    </Pressable>
+                    <View style={styles.headerTextBlock}>
+                        <Text style={styles.headerTitle}>DNA & STATS</Text>
+                        <View style={styles.headerAccent} />
                     </View>
-                    <ProgressBar
-                        label="Fatigue Level"
-                        value={fatigue}
-                        max={100}
-                        color={fatigue > 80 ? '#e74c3c' : '#2ecc71'}
-                        icon="⚡"
-                    />
                 </View>
 
-                {/* 🃏 REPUTATION - Detaylı İtibar Ağı */}
-                <View style={styles.card}>
-                    <SectionHeader title="Reputation Network" icon="🕸️" />
-                    <ProgressBar
-                        label="Casino (VIP)"
-                        value={getEffective(reputation?.casino, repBuffs.casino)}
-                        max={1000}
-                        color="#E91E63"
-                        icon="🎰"
-                        buff={getBuffString(repBuffs.casino)}
-                    />
-                    <ProgressBar
-                        label="Street (Cred)"
-                        value={getEffective(reputation?.street, repBuffs.street)}
-                        color="#c0392b"
-                        icon="🗡️"
-                        buff={getBuffString(repBuffs.street)}
-                    />
-                    <ProgressBar
-                        label="Business (Trust)"
-                        value={getEffective(reputation?.business, repBuffs.business)}
-                        color="#2980b9"
-                        icon="💼"
-                        buff={getBuffString(repBuffs.business)}
-                    />
-                    <ProgressBar
-                        label="High Society"
-                        value={getEffective(reputation?.social, repBuffs.social)}
-                        color="#8e44ad"
-                        icon="🥂"
-                        buff={getBuffString(repBuffs.social)}
-                    />
-                </View>
+                <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* 🧬 GENETICS - Temel Özellikler */}
-                <View style={styles.card}>
-                    <SectionHeader title="Core Genetics" icon="🧬" />
-                    <ProgressBar
-                        label="Intellect"
-                        value={getEffective(attributes?.intellect, attrBuffs.intellect)}
-                        color="#9b59b6"
-                        icon="🧠"
-                        buff={getBuffString(attrBuffs.intellect)}
-                    />
-                    <ProgressBar
-                        label="Charm"
-                        value={getEffective(attributes?.charm, attrBuffs.charm)}
-                        color="#e91e63"
-                        icon="👄"
-                        buff={getBuffString(attrBuffs.charm)}
-                    />
-                    <ProgressBar
-                        label="Looks"
-                        value={getEffective(attributes?.looks, attrBuffs.looks)}
-                        color="#f1c40f"
-                        icon="✨"
-                        buff={getBuffString(attrBuffs.looks)}
-                    />
-                    <ProgressBar
-                        label="Strength"
-                        value={getEffective(attributes?.strength, attrBuffs.strength)}
-                        color="#e74c3c"
-                        icon="💪"
-                        buff={getBuffString(attrBuffs.strength)}
-                    />
-                </View>
+                    {/* 💎 LUXURY */}
+                    <LuxuryBar />
 
-                {/* 🧠 PERSONALITY - Karakter */}
-                <View style={styles.card}>
-                    <SectionHeader title="Personality Traits" icon="🎭" />
-                    <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
-                    <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
-                    <ProgressBar label="Strategic Sense" value={personality?.strategicSense ?? 50} color="#3498db" icon="♟️" />
-                    <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
-                    <ProgressBar label="Luck" value={hidden?.luck} color="#10b981" icon="🍀" />
-                </View>
+                    {/* 🛡️ SECURITY */}
+                    <View style={styles.card}>
+                        <SectionHeader title="Security & Safety" icon="🛡️" />
+                        <ProgressBar label="Digital Shield" value={getEffective(security?.digital, secBuffs.digital)} color="#3498db" icon="💻" buff={getBuffString(secBuffs.digital)} />
+                        <ProgressBar label="Bodyguard / Armor" value={getEffective(securityLevel, secBuffs.personal)} color="#e74c3c" icon="🥋" buff={getBuffString(secBuffs.personal)} />
+                        <ProgressBar label="Police Heat" value={suspicion} color={getHeatColor(suspicion)} icon="🚨" />
+                    </View>
 
-            </ScrollView>
-        </SafeAreaView>
+                    {/* 👊 COMBAT */}
+                    <View style={styles.card}>
+                        <SectionHeader title="Combat Mastery" icon="👊" />
+                        <View style={styles.skillRow}>
+                            <View>
+                                <Text style={styles.skillName}>Self Defense</Text>
+                                <Text style={styles.skillDetail}>{martialArtsDisplay}</Text>
+                                <Text style={styles.skillDetail}>
+                                    Security Boost: <Text style={{ fontWeight: 'bold', color: '#2ecc71' }}>+{securityLevel}%</Text>
+                                </Text>
+                                <Text style={styles.skillDetail}>
+                                    Body Type: <Text style={{ fontWeight: 'bold', color: '#D4AF37' }}>{bodyType}</Text>
+                                </Text>
+                            </View>
+                            <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(beltTitle) }]}>
+                                <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>{beltTitle}</Text>
+                            </View>
+                        </View>
+                        <ProgressBar label="Fatigue Level" value={fatigue} max={100} color={fatigue > 80 ? '#e74c3c' : '#2ecc71'} icon="⚡" />
+                    </View>
+
+                    {/* 🕸️ REPUTATION */}
+                    <View style={styles.card}>
+                        <SectionHeader title="Reputation Network" icon="🕸️" />
+                        <ProgressBar label="Casino (VIP)" value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E91E63" icon="🎰" buff={getBuffString(repBuffs.casino)} />
+                        <ProgressBar label="Street (Cred)" value={getEffective(reputation?.street, repBuffs.street)} color="#c0392b" icon="🗡️" buff={getBuffString(repBuffs.street)} />
+                        <ProgressBar label="Business (Trust)" value={getEffective(reputation?.business, repBuffs.business)} color="#2980b9" icon="💼" buff={getBuffString(repBuffs.business)} />
+                        <ProgressBar label="High Society" value={getEffective(reputation?.social, repBuffs.social)} color="#8e44ad" icon="🥂" buff={getBuffString(repBuffs.social)} />
+                    </View>
+
+                    {/* 🧬 GENETICS */}
+                    <View style={styles.card}>
+                        <SectionHeader title="Core Genetics" icon="🧬" />
+                        <ProgressBar label="Intellect" value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#9b59b6" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
+                        <ProgressBar label="Charm" value={getEffective(attributes?.charm, attrBuffs.charm)} color="#e91e63" icon="👄" buff={getBuffString(attrBuffs.charm)} />
+                        <ProgressBar label="Looks" value={getEffective(attributes?.looks, attrBuffs.looks)} color="#f1c40f" icon="✨" buff={getBuffString(attrBuffs.looks)} />
+                        <ProgressBar label="Strength" value={getEffective(attributes?.strength, attrBuffs.strength)} color="#e74c3c" icon="💪" buff={getBuffString(attrBuffs.strength)} />
+                    </View>
+
+                    {/* 🎭 PERSONALITY */}
+                    <View style={styles.card}>
+                        <SectionHeader title="Personality Traits" icon="🎭" />
+                        <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
+                        <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
+                        <ProgressBar label="Strategic Sense" value={personality?.strategicSense ?? 50} color="#3498db" icon="♟️" />
+                        <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
+                        <ProgressBar label="Luck" value={hidden?.luck} color="#10b981" icon="🍀" />
+                    </View>
+
+                    <View style={{ height: 40 }} />
+                </ScrollView>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#121212', // Dark Mode uyumlu arka plan
+        backgroundColor: '#000000',
+    },
+    safeArea: {
+        flex: 1,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        borderBottomWidth: 1,
-        borderBottomColor: '#333',
-        backgroundColor: '#1e1e1e',
+        paddingHorizontal: 24,
+        paddingTop: Platform.OS === 'ios' ? 8 : 20,
+        paddingBottom: 20,
+        gap: 16,
     },
     backButton: {
-        flexDirection: 'row',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(212, 175, 55, 0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(212, 175, 55, 0.25)',
         alignItems: 'center',
+        justifyContent: 'center',
     },
-    backIcon: {
-        fontSize: 22,
-        color: '#fff',
-        marginRight: 10,
+    headerTextBlock: {
+        flex: 1,
     },
     headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#fff',
-        letterSpacing: 0.5,
+        fontSize: 28,
+        fontWeight: '300',
+        color: '#E5E5E5',
+        letterSpacing: 6,
+        textTransform: 'uppercase',
+    },
+    headerAccent: {
+        width: 36,
+        height: 2,
+        backgroundColor: '#D4AF37',
+        marginTop: 8,
+        borderRadius: 2,
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
+        elevation: 4,
     },
     content: {
-        padding: 16,
+        paddingHorizontal: 20,
+        paddingTop: 8,
         paddingBottom: 40,
-        gap: 16
+        gap: 16,
     },
     card: {
-        backgroundColor: '#1e1e1e',
-        borderRadius: 16,
-        padding: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+        borderRadius: 20,
+        padding: 20,
         borderWidth: 1,
-        borderColor: '#333',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
+        borderColor: 'rgba(255, 255, 255, 0.08)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
         elevation: 8,
     },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
-        paddingBottom: 10,
+        marginBottom: 18,
+        paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255, 255, 255, 0.07)',
     },
     sectionIcon: {
-        fontSize: 22,
+        fontSize: 20,
         marginRight: 10,
     },
     sectionTitle: {
-        fontSize: 14,
-        fontWeight: '800', // Extra Bold
-        color: '#aaa',
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#666666',
         textTransform: 'uppercase',
-        letterSpacing: 1.2,
+        letterSpacing: 3,
     },
     statRow: {
         flexDirection: 'row',
@@ -394,46 +335,46 @@ const styles = StyleSheet.create({
     statLabelContainer: {
         flexDirection: 'row',
         width: 140,
-        alignItems: 'center'
+        alignItems: 'center',
     },
     statLabel: {
-        color: '#ccc',
-        fontSize: 14,
+        color: '#AAAAAA',
+        fontSize: 13,
         fontWeight: '500',
     },
     buffBadge: {
-        backgroundColor: '#1B5E20', // Dark Green
+        backgroundColor: 'rgba(46, 204, 113, 0.15)',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 8,
         marginLeft: 6,
-        justifyContent: 'center',
-        alignItems: 'center'
+        borderWidth: 1,
+        borderColor: 'rgba(46, 204, 113, 0.3)',
     },
     buffText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
-        color: '#4CAF50', // Bright Green Text
+        color: '#2ecc71',
     },
     progressContainer: {
         flex: 1,
-        height: 8, // Daha ince ve modern bar
-        backgroundColor: '#333',
-        borderRadius: 4,
+        height: 6,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderRadius: 3,
         marginRight: 12,
         overflow: 'hidden',
     },
     progressBar: {
         height: '100%',
-        borderRadius: 4,
+        borderRadius: 3,
     },
     statValue: {
-        width: 50, // Sabit genişlik hizalama için
+        width: 52,
         textAlign: 'right',
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: 'bold',
-        fontVariant: ['tabular-nums'], // Sayıların hizalı durması için
+        color: '#888888',
+        fontSize: 11,
+        fontWeight: '600',
+        fontVariant: ['tabular-nums'],
     },
     skillRow: {
         flexDirection: 'row',
@@ -443,94 +384,103 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     skillName: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
+        color: '#E0E0E0',
+        fontWeight: '700',
+        fontSize: 15,
         marginBottom: 4,
+        letterSpacing: 0.5,
     },
     skillDetail: {
-        color: '#888',
-        fontSize: 13,
+        color: '#666666',
+        fontSize: 12,
+        marginBottom: 2,
     },
     beltBadge: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         paddingVertical: 6,
         borderRadius: 20,
         minWidth: 80,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)'
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     beltText: {
-        fontSize: 12,
-        fontWeight: 'bold',
+        fontSize: 11,
+        fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        letterSpacing: 1,
     },
-    // Luxury Specific Styles
     luxuryCard: {
-        borderColor: '#FFD700', // Gold Border
+        borderColor: 'rgba(212, 175, 55, 0.35)',
         borderWidth: 1,
+        backgroundColor: 'rgba(212, 175, 55, 0.04)',
     },
     luxuryContent: {
-        gap: 8,
+        gap: 10,
     },
     luxuryProgressRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
     },
     luxuryValue: {
-        color: '#FFD700',
+        color: '#D4AF37',
         fontWeight: '700',
         fontSize: 12,
         width: 60,
     },
     luxuryTarget: {
-        color: '#666',
-        fontWeight: '700',
+        color: '#555',
+        fontWeight: '600',
         fontSize: 12,
         width: 60,
         textAlign: 'right',
     },
     luxuryProgressBarBg: {
         flex: 1,
-        height: 12,
-        backgroundColor: '#222',
-        borderRadius: 6,
+        height: 10,
+        backgroundColor: 'rgba(212, 175, 55, 0.08)',
+        borderRadius: 5,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(212, 175, 55, 0.2)',
     },
     luxuryProgressBarFill: {
         height: '100%',
-        backgroundColor: '#FFD700',
-        borderRadius: 6,
+        backgroundColor: '#D4AF37',
+        borderRadius: 5,
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
     },
     luxuryPercentage: {
-        color: '#888',
+        color: '#555',
         fontSize: 11,
         textAlign: 'center',
-        marginTop: 4,
+        letterSpacing: 1,
     },
     buffRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 8,
-        marginTop: 8,
+        marginTop: 10,
         flexWrap: 'wrap',
     },
     luxuryBuffBadge: {
         paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingVertical: 5,
         borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(212, 175, 55, 0.2)',
     },
     luxuryBuffText: {
         fontSize: 10,
         fontWeight: '800',
         textTransform: 'uppercase',
-    }
+        letterSpacing: 0.5,
+    },
 });
 
 export default DNAScreen;

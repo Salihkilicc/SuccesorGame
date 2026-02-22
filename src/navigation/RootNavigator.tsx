@@ -24,7 +24,7 @@ import {
   ShopDetailScreen,
   ProductsScreen,
   TechTreeScreen,
-  EducationScreen, // Kept for safety if used elsewhere, but route updated
+  EducationScreen,
   EducationDashboard,
   EducationBrowseScreen,
   DNAScreen,
@@ -310,6 +310,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
           <RootStack.Screen name="Assets" component={AssetsStackNavigator} />
           <RootStack.Screen name="Love" component={LoveScreen} />
+          <RootStack.Screen name="DNA" component={DNAScreen} />
           <RootStack.Screen
             name="FinancialReport"
             component={FinancialReportScreen}
