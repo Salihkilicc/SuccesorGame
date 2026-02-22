@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
@@ -51,12 +52,13 @@ const GRADIENTS = {
 };
 
 const HOMESCREEN_APPS = [
-  { key: 'calendar', label: 'Calendar', icon: '📅', gradient: GRADIENTS.orangeYellow },
-  { key: 'health', label: 'Health', icon: '❤️', gradient: GRADIENTS.pinkRed },
-  { key: 'mail', label: 'Mail', icon: '✉️', gradient: GRADIENTS.blueSky },
-  { key: 'settings', label: 'Settings', icon: '⚙️', gradient: GRADIENTS.darkGrey },
-  { key: 'myCompany', label: 'My Company', icon: '🏢', gradient: GRADIENTS.networkBlue },
-  { key: 'news', label: 'News', icon: '📰', gradient: GRADIENTS.tealCyan },
+  { key: 'calendar', label: 'Calendar', icon: 'calendar', gradient: GRADIENTS.orangeYellow },
+  { key: 'health', label: 'Health', icon: 'heart', gradient: GRADIENTS.pinkRed },
+  { key: 'mail', label: 'Mail', icon: 'email', gradient: GRADIENTS.blueSky },
+  { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey },
+  { key: 'myCompany', label: 'My Company', icon: 'office-building', gradient: GRADIENTS.networkBlue },
+  { key: 'news', label: 'News', icon: 'newspaper', gradient: GRADIENTS.tealCyan },
+  { key: 'contacts', label: 'Contacts', icon: 'account-group', gradient: GRADIENTS.bluePurple },
 ];
 
 const NewsItem = ({ text }: { text: string }) => (
@@ -214,198 +216,209 @@ const HomeScreen = () => {
       case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
       case 'myCompany': handleNavigateTabs('MyCompany'); break;
       case 'news': setShowNews(true); break;
+      case 'contacts': handleNavigateStack('Love' as any); break;
     }
   };
 
   const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
-    <Pressable key={item.key} style={styles.appIconContainer} onPress={() => handleAppAction(item.key)}>
+    <Pressable key={item.key} style={({ pressed }) => [styles.appCard, pressed && styles.appCardPressed]} onPress={() => handleAppAction(item.key)}>
       <LinearGradient
         colors={item.gradient}
-        style={styles.appIcon}
+        style={styles.appCardInner}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.appIconEmoji}>{item.icon}</Text>
+        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1, gap: theme.spacing.xs }}>
-            <View style={styles.nameRow}>
-              <Text style={styles.name}>{displayName}</Text>
-              <Text style={styles.gender}>{genderSymbol}</Text>
-            </View>
-            <Text style={styles.bio}>{displayBio}</Text>
-            <View style={styles.ageRow}>
-              <View style={styles.ageGroup}>
-                <Text style={styles.ageLabel}>Age</Text>
-                <Text style={styles.ageValue}>{age}</Text>
-                <Text style={styles.monthBadge}>Month {currentMonth}</Text>
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      <LinearGradient
+        colors={['#0a0a0c', '#000000', '#050505']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1, gap: theme.spacing.xs }}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{displayName}</Text>
+                <Text style={styles.gender}>{genderSymbol}</Text>
               </View>
-              <Pressable
-                onPress={handleAdvanceTime}
-                style={({ pressed }) => [
-                  styles.nextMonthButton,
-                  pressed && styles.nextMonthButtonPressed,
-                ]}>
-                <Text style={styles.nextMonthText}>Next Quarter &gt;&gt;</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.widgetsContainer}>
-          {/* Overview Widget */}
-          <View style={[styles.widgetColumn, { flex: 1 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
-              <Text style={styles.sectionTitle}>Overview</Text>
-              <TouchableOpacity onPress={() => handleNavigateStack('Assets')} style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={{ fontSize: 16, color: theme.colors.textSecondary, marginRight: 2 }}>⤢</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={[styles.card, styles.widgetCard]}>
-              <View style={styles.widgetRowBetween}>
-                <Text style={styles.widgetLabel}>Net Worth</Text>
-                <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
-              </View>
-              <View style={styles.widgetRowBetween}>
-                <Text style={styles.widgetLabel}>Cash</Text>
-                <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(cash)}</Text>
-              </View>
-              <View style={styles.widgetRowBetween}>
-                <Text style={styles.widgetLabel}>Income</Text>
-                <Text style={[styles.widgetValue, { color: theme.colors.success }]} numberOfLines={1} adjustsFontSizeToFit>
-                  {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
-                </Text>
-              </View>
-              <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
-                <Text style={styles.widgetLabel}>Expenses</Text>
-                <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
-                  {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Status Widget */}
-          <View style={[styles.widgetColumn, { flex: 3 }]}>
-            <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
-            <View style={[styles.statusCard, styles.widgetCard]}>
-              <View style={styles.widgetStatusRow}>
-                <Text style={styles.statusLabel}>Love</Text>
-                <Text style={styles.widgetStatusText} numberOfLines={1}>{partnerBrief}</Text>
-              </View>
-              <View style={styles.widgetStatusRow}>
-                <Text style={styles.statusLabel}>Assets</Text>
-                <Text style={styles.widgetStatusText} numberOfLines={1}>{assetsBrief}</Text>
-              </View>
-              <View style={[styles.widgetStatusRow, { marginBottom: 0 }]}>
-                <Text style={styles.statusLabel}>Life</Text>
-                <Text style={styles.widgetStatusText} numberOfLines={1}>{lifeBrief}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.appsSection}>
-          <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>Applications</Text>
-          <View style={styles.appsGrid}>
-            {HOMESCREEN_APPS.map(renderAppIcon)}
-          </View>
-        </View>
-
-      </ScrollView>
-
-      {
-        drawerOpen ? (
-          <View style={styles.drawerOverlay}>
-            <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
-            <View style={styles.drawer}>
-              <View style={styles.drawerHeader}>
-                <Text style={styles.drawerTitle}>Settings</Text>
-                <Pressable onPress={() => setDrawerOpen(false)}>
-                  <Text style={styles.drawerClose}>✕</Text>
+              <Text style={styles.bio}>{displayBio}</Text>
+              <View style={styles.ageRow}>
+                <View style={styles.ageGroup}>
+                  <Text style={styles.ageLabel}>Age</Text>
+                  <Text style={styles.ageValue}>{age}</Text>
+                  <Text style={styles.monthBadge}>Month {currentMonth}</Text>
+                </View>
+                <Pressable
+                  onPress={handleAdvanceTime}
+                  style={({ pressed }) => [
+                    styles.nextMonthButton,
+                    pressed && styles.nextMonthButtonPressed,
+                  ]}>
+                  <Text style={styles.nextMonthText}>Next Quarter &gt;&gt;</Text>
                 </Pressable>
               </View>
-              <DrawerItem label="Privacy Policy" onPress={() => console.log('Privacy Policy')} />
-              <DrawerItem label="Terms & Conditions" onPress={() => console.log('Terms')} />
-              <DrawerItem
-                label="Notifications"
-                onPress={() => setNotificationsEnabled(prev => !prev)}
-                rightNode={
-                  <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
-                }
-              />
-              <DrawerItem
-                label="Language"
-                onPress={() => setLanguage(prev => (prev === 'EN' ? 'TR' : 'EN'))}
-                rightNode={<Text style={styles.drawerMeta}>{language}</Text>}
-              />
-              <DrawerItem
-                label="Be Premium"
-                onPress={() => {
-                  setDrawerOpen(false);
-                  handleNavigateStack('Premium');
-                }}
-              />
             </View>
           </View>
-        ) : null
-      }
 
-      <QuarterlyReportModal
-        visible={reportVisible}
-        onClose={() => setReportVisible(false)}
-        reportData={lastReportData}
-      />
-      <Modal transparent visible={showNews} animationType="fade" onRequestClose={() => setShowNews(false)}>
-        <View style={styles.newsOverlay}>
-          <View style={styles.newsModal}>
-            <View style={styles.newsHeader}>
-              <Text style={styles.newsTitle}>News</Text>
-              <TouchableOpacity onPress={() => setShowNews(false)}>
-                <Text style={styles.newsClose}>Close</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <NewsItem text="Markets rally on tech earnings." />
-              <NewsItem text="Luxury real estate market shows signs of cooling." />
-              <NewsItem text="Casino regulators tighten VIP controls." />
-              <NewsItem text="Private equity eyes distressed assets this quarter." />
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* --- GAME OVER OVERLAY --- */}
-      {
-        isGameOver && (
-          <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
-            <Text style={styles.gameOverText}>GAME OVER</Text>
-            <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
-
-            <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-              <Text style={styles.restartButtonText}>NEW GAME</Text>
+          <View style={styles.widgetsContainer}>
+            {/* Overview Widget */}
+            <TouchableOpacity
+              style={[styles.widgetColumn, { flex: 1.25 }]}
+              activeOpacity={0.8}
+              onPress={() => handleNavigateStack('Assets')}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
+                <Text style={styles.sectionTitle}>Overview</Text>
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#888888" />
+              </View>
+              <View style={[styles.card, styles.widgetCard]}>
+                <View style={styles.widgetRowBetween}>
+                  <Text style={styles.widgetLabel}>Net Worth</Text>
+                  <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
+                </View>
+                <View style={styles.widgetRowBetween}>
+                  <Text style={styles.widgetLabel}>Cash</Text>
+                  <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(cash)}</Text>
+                </View>
+                <View style={styles.widgetRowBetween}>
+                  <Text style={styles.widgetLabel}>Income</Text>
+                  <Text style={[styles.widgetValue, { color: theme.colors.success }]} numberOfLines={1} adjustsFontSizeToFit>
+                    {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
+                  </Text>
+                </View>
+                <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
+                  <Text style={styles.widgetLabel}>Expenses</Text>
+                  <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
+                    {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity>
-          </Animated.View>
-        )
-      }
 
-      {/* Education Exam Modal - Only show when report is closed */}
-      {!reportVisible && <EducationExamModal />}
+            {/* Status Widget */}
+            <View style={[styles.widgetColumn, { flex: 2 }]}>
+              <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
+              <View style={[styles.statusCard, styles.widgetCard]}>
+                <View style={styles.widgetStatusRow}>
+                  <Text style={styles.statusLabel}>Love</Text>
+                  <Text style={styles.widgetStatusText} numberOfLines={1}>{partnerBrief}</Text>
+                </View>
+                <View style={styles.widgetStatusRow}>
+                  <Text style={styles.statusLabel}>Assets</Text>
+                  <Text style={styles.widgetStatusText} numberOfLines={1}>{assetsBrief}</Text>
+                </View>
+                <View style={[styles.widgetStatusRow, { marginBottom: 0 }]}>
+                  <Text style={styles.statusLabel}>Life</Text>
+                  <Text style={styles.widgetStatusText} numberOfLines={1}>{lifeBrief}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
 
-      {/* Universal Crystal Navigation Bar (Dark Variant) */}
-      <CrystalNavBar activeTab="Home" variant="dark" />
+          <View style={styles.appsSection}>
+            <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>Applications</Text>
+            <View style={styles.appsGrid}>
+              {HOMESCREEN_APPS.map(renderAppIcon)}
+            </View>
+          </View>
 
-    </SafeAreaView >
+        </ScrollView>
+
+        {
+          drawerOpen ? (
+            <View style={styles.drawerOverlay}>
+              <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
+              <View style={styles.drawer}>
+                <View style={styles.drawerHeader}>
+                  <Text style={styles.drawerTitle}>Settings</Text>
+                  <Pressable onPress={() => setDrawerOpen(false)}>
+                    <Text style={styles.drawerClose}>✕</Text>
+                  </Pressable>
+                </View>
+                <DrawerItem label="Privacy Policy" onPress={() => console.log('Privacy Policy')} />
+                <DrawerItem label="Terms & Conditions" onPress={() => console.log('Terms')} />
+                <DrawerItem
+                  label="Notifications"
+                  onPress={() => setNotificationsEnabled(prev => !prev)}
+                  rightNode={
+                    <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
+                  }
+                />
+                <DrawerItem
+                  label="Language"
+                  onPress={() => setLanguage(prev => (prev === 'EN' ? 'TR' : 'EN'))}
+                  rightNode={<Text style={styles.drawerMeta}>{language}</Text>}
+                />
+                <DrawerItem
+                  label="Be Premium"
+                  onPress={() => {
+                    setDrawerOpen(false);
+                    handleNavigateStack('Premium');
+                  }}
+                />
+              </View>
+            </View>
+          ) : null
+        }
+
+        <QuarterlyReportModal
+          visible={reportVisible}
+          onClose={() => setReportVisible(false)}
+          reportData={lastReportData}
+        />
+        <Modal transparent visible={showNews} animationType="fade" onRequestClose={() => setShowNews(false)}>
+          <View style={styles.newsOverlay}>
+            <View style={styles.newsModal}>
+              <View style={styles.newsHeader}>
+                <Text style={styles.newsTitle}>News</Text>
+                <TouchableOpacity onPress={() => setShowNews(false)}>
+                  <Text style={styles.newsClose}>Close</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <NewsItem text="Markets rally on tech earnings." />
+                <NewsItem text="Luxury real estate market shows signs of cooling." />
+                <NewsItem text="Casino regulators tighten VIP controls." />
+                <NewsItem text="Private equity eyes distressed assets this quarter." />
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* --- GAME OVER OVERLAY --- */}
+        {
+          isGameOver && (
+            <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
+              <Text style={styles.gameOverText}>GAME OVER</Text>
+              <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
+
+              <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+                <Text style={styles.restartButtonText}>NEW GAME</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )
+        }
+
+        {/* Education Exam Modal - Only show when report is closed */}
+        {!reportVisible && <EducationExamModal />}
+
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}
+        <CrystalNavBar activeTab="Home" variant="dark" />
+
+      </SafeAreaView >
+    </View>
   );
 };
 
@@ -427,7 +440,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    // Background is handled by AbsoluteFill LinearGradient
   },
   container: {
     flex: 1,
@@ -442,6 +455,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: theme.spacing.md,
+    marginBottom: 8,
   },
   nameRow: {
     flexDirection: 'row',
@@ -451,7 +465,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: theme.typography.title,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
+    color: '#F0F0F0',
+    letterSpacing: 0.5,
   },
   gender: {
     fontSize: theme.typography.subtitle,
@@ -468,7 +483,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: theme.colors.textSecondary,
+    color: '#AAAAAA',
     fontSize: theme.typography.body,
   },
   ageRow: {
@@ -544,9 +559,10 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#E5E5E5',
+    letterSpacing: 0.5,
   },
   widgetsContainer: {
     flexDirection: 'row',
@@ -582,37 +598,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    gap: '2%',
-    rowGap: 24,
+    gap: 16,
+    paddingHorizontal: 4,
   },
-  appIconContainer: {
-    width: '23%',
+  appCard: {
+    width: '21%',
+    aspectRatio: 0.75, // Matching Apple ratio
+    marginBottom: 8,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  appIcon: {
-    width: 64,
-    height: 64,
+  appCardPressed: {
+    transform: [{ scale: 0.92 }],
+    opacity: 0.85,
+  },
+  appCardInner: {
+    width: '100%',
+    aspectRatio: 1,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 6,
+    marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  appIconEmoji: {
-    fontSize: 28,
+  appIconVector: {
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
   },
   appIconLabel: {
-    color: theme.colors.textPrimary,
+    color: '#E0E0E0',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
     textAlign: 'center',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
   widgetStatusRow: {
     marginBottom: theme.spacing.sm,
@@ -623,12 +647,17 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   card: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: '#161618',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     gap: theme.spacing.sm,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 4,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -636,11 +665,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   label: {
-    color: theme.colors.textSecondary,
+    color: '#888888',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
@@ -686,12 +715,17 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: theme.colors.cardSoft,
+    backgroundColor: '#131315',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
     gap: theme.spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 4,
   },
   statusRow: {
     gap: theme.spacing.xs,
@@ -703,7 +737,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   statusText: {
-    color: theme.colors.textPrimary,
+    color: '#E5E5E5',
     fontSize: theme.typography.body,
   },
   entryRow: {

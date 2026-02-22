@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 import { useStatsStore, usePlayerStore } from '../../core/store';
 
@@ -40,18 +41,18 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
     const getIconStyle = (tabName: string) => {
         const isActive = activeTab === tabName;
         return {
-            color: isActive ? (isLight ? '#FFFFFF' : theme.colors.primary) : (isLight ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.4)'),
-            fontSize: 24,
-            textShadowColor: isLight ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.5)',
-            textShadowOffset: { width: 0, height: 1 },
-            textShadowRadius: 2,
+            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
+            fontSize: 26,
+            textShadowColor: 'rgba(0,0,0,0.5)',
+            textShadowOffset: { width: 0, height: 2 },
+            textShadowRadius: 3,
         };
     };
 
     const getLabelStyle = (tabName: string) => {
         const isActive = activeTab === tabName;
         return {
-            color: isActive ? (isLight ? '#FFFFFF' : theme.colors.primary) : (isLight ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.4)'),
+            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
             fontSize: 10,
             fontWeight: '700' as '700',
             letterSpacing: 0.3,
@@ -111,44 +112,44 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
                         {!isStatsMode ? (
                             <>
                                 <Pressable style={styles.bottomTab} onPress={() => navigateTo('Home')}>
-                                    <Text style={getIconStyle('Home')}>🏠</Text>
+                                    <MaterialCommunityIcons name="home-outline" style={getIconStyle('Home')} />
                                     <Text style={getLabelStyle('Home')}>Home</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(true)}>
-                                    <Text style={getIconStyle('')}>📊</Text>
+                                    <MaterialCommunityIcons name="chart-bar" style={getIconStyle('')} />
                                     <Text style={getLabelStyle('')}>Stats</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => navigateTo('Contacts')}>
-                                    <Text style={getIconStyle('Love')}>👥</Text>
+                                    <MaterialCommunityIcons name="account-group-outline" style={getIconStyle('Love')} />
                                     <Text style={getLabelStyle('Love')}>Contacts</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => navigateTo('Profile')}>
-                                    <Text style={getIconStyle('DNA')}>👤</Text>
+                                    <MaterialCommunityIcons name="dna" style={getIconStyle('DNA')} />
                                     <Text style={getLabelStyle('DNA')}>Profile</Text>
                                 </Pressable>
                             </>
                         ) : (
                             <>
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                                    <Text style={styles.statsIcon}>💰</Text>
+                                    <MaterialCommunityIcons name="cash" style={styles.statsIcon} />
                                     <Text style={styles.statsLabel}>${userMoney.toLocaleString()}</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                                    <Text style={[styles.statsIcon, { color: theme.colors.success }]}>❤️</Text>
+                                    <MaterialCommunityIcons name="heart-pulse" style={[styles.statsIcon, { color: theme.colors.success }]} />
                                     <Text style={styles.statsLabel}>{playerCore.health}%</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                                    <Text style={[styles.statsIcon, { color: theme.colors.danger }]}>🧠</Text>
+                                    <MaterialCommunityIcons name="brain" style={[styles.statsIcon, { color: theme.colors.danger }]} />
                                     <Text style={styles.statsLabel}>{playerCore.stress}%</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                                    <Text style={[styles.statsIcon, { color: theme.colors.accent }]}>💎</Text>
+                                    <MaterialCommunityIcons name="diamond-stone" style={[styles.statsIcon, { color: theme.colors.accent }]} />
                                     <Text style={styles.statsLabel}>{playerAttributes.charm}%</Text>
                                 </Pressable>
                             </>
@@ -207,35 +208,30 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.5)',
     },
     blurContainer: {
-        borderRadius: 35,
+        borderRadius: 24,
         overflow: 'hidden',
-        // Moved shadow to blur container itself
         shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 10,
-        },
-        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.5,
         shadowRadius: 20,
         elevation: 15,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(19, 19, 21, 0.4)', // Slightly dark base
     },
     bottomBar: {
         flexDirection: 'row',
         width: '100%',
-        paddingVertical: 18,
-        paddingHorizontal: 10,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
         justifyContent: 'space-around',
         alignItems: 'center',
-        borderRadius: 35,
-        borderWidth: 1,
     },
     lightContainer: {
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: 'transparent',
     },
     darkContainer: {
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'transparent',
     },
     bottomTab: {
         alignItems: 'center',

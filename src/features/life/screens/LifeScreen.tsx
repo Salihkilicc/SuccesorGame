@@ -5,6 +5,7 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 // Components & Systems
@@ -72,21 +73,21 @@ const GRADIENTS = {
 };
 
 const SECTION_LEISURE = [
-  { key: 'nightOut', label: 'Night Out', icon: '🍸', gradient: GRADIENTS.purplePink },
-  { key: 'spa', label: 'Spa & Relax', icon: '🧖‍♀️', gradient: GRADIENTS.tealCyan },
-  { key: 'gym', label: 'Gym', icon: '🏋️', gradient: GRADIENTS.orangeYellow },
-  { key: 'shopping', label: 'Shopping', icon: '🛍️', gradient: GRADIENTS.pinkRed },
+  { key: 'nightOut', label: 'Night Out', icon: 'glass-cocktail', gradient: GRADIENTS.purplePink },
+  { key: 'spa', label: 'Spa & Relax', icon: 'spa', gradient: GRADIENTS.tealCyan },
+  { key: 'gym', label: 'Gym', icon: 'dumbbell', gradient: GRADIENTS.orangeYellow },
+  { key: 'shopping', label: 'Shopping', icon: 'shopping', gradient: GRADIENTS.pinkRed },
 ];
 
 const SECTION_LIFESTYLE = [
   // Organization & Productivity
-  { key: 'notes', label: 'Notes', icon: '📝', gradient: GRADIENTS.tealCyan },
-  { key: 'education', label: 'Education', icon: '🎓', gradient: GRADIENTS.greenTeal },
-  { key: 'travel', label: 'Travel', icon: '✈️', gradient: GRADIENTS.blueSky },
+  { key: 'notes', label: 'Notes', icon: 'notebook', gradient: GRADIENTS.tealCyan },
+  { key: 'education', label: 'Education', icon: 'school', gradient: GRADIENTS.greenTeal },
+  { key: 'travel', label: 'Travel', icon: 'airplane', gradient: GRADIENTS.blueSky },
 
   // Personal Assets & Data
-  { key: 'belongings', label: 'Belongings', icon: '👜', gradient: GRADIENTS.brownGold },
-  { key: 'dna', label: 'DNA / Stats', icon: '🧬', gradient: GRADIENTS.bluePurple },
+  { key: 'belongings', label: 'Belongings', icon: 'briefcase', gradient: GRADIENTS.brownGold },
+  { key: 'dna', label: 'DNA / Stats', icon: 'dna', gradient: GRADIENTS.bluePurple },
 ];
 
 const LifeScreen = () => {
@@ -180,14 +181,14 @@ const LifeScreen = () => {
   };
 
   const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
-    <Pressable key={item.key} style={styles.appIconContainer} onPress={() => handleAction(item.key)}>
+    <Pressable key={item.key} style={({ pressed }) => [styles.appCard, pressed && styles.appCardPressed]} onPress={() => handleAction(item.key)}>
       <LinearGradient
         colors={item.gradient}
-        style={styles.appIcon}
+        style={styles.appCardInner}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.appIconEmoji}>{item.icon}</Text>
+        <MaterialCommunityIcons name={item.icon} size={42} color="#FFFFFF" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
@@ -195,16 +196,19 @@ const LifeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* PREMIUM BACKGROUND - Grey Blue Green subtle gradient */}
+      {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
       <LinearGradient
-        colors={['#1c1c1e', '#2c3e50', '#202020']} // Dark, Blue-ish Grey, almost Black
+        colors={['#0a0a0c', '#000000', '#050505']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.headerTitle}>LIFE</Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>LIFESTYLE</Text>
+          <View style={styles.headerAccent} />
+        </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
@@ -216,19 +220,19 @@ const LifeScreen = () => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Lifestyle</Text>
+            <Text style={styles.sectionTitle}>Essentials</Text>
             <View style={styles.grid}>
               {SECTION_LIFESTYLE.map(renderAppIcon)}
             </View>
           </View>
 
           {/* Spacer for Bottom Bar */}
-          <View style={{ height: 80 }} />
+          <View style={{ height: 40 }} />
 
-          {/* DEBUG SECTION - Squeezed Horizontal Layout */}
+          {/* DEBUG SECTION - Redesigned for premium look */}
           <View style={styles.debugRow}>
             <Pressable
-              style={[styles.debugButton, { backgroundColor: '#c0392b', flex: 1, marginRight: 8 }]}
+              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(192, 57, 43, 0.15)', borderColor: 'rgba(192, 57, 43, 0.3)', flex: 1, marginRight: 12 }, pressed && { opacity: 0.7 }]}
               onPress={() => {
                 Alert.alert(
                   'Reset Game',
@@ -246,27 +250,27 @@ const LifeScreen = () => {
                 );
               }}
             >
-              <Text style={styles.debugButtonText}>🔄 Reset</Text>
+              <Text style={[styles.debugButtonText, { color: '#e74c3c' }]}>Reset</Text>
             </Pressable>
 
             <Pressable
-              style={[styles.debugButton, { backgroundColor: '#27ae60', flex: 2.5 }]}
+              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(39, 174, 96, 0.15)', borderColor: 'rgba(39, 174, 96, 0.3)', flex: 2 }, pressed && { opacity: 0.7 }]}
               onPress={() => {
                 useStatsStore.getState().earnMoney(100_000_000);
                 Alert.alert('Success', '$100M added to your balance!');
               }}
             >
-              <Text style={styles.debugButtonText}>💰 Add $100M Cash</Text>
+              <Text style={[styles.debugButtonText, { color: '#2ecc71' }]}>Add $100M</Text>
             </Pressable>
           </View>
 
-          <View style={{ height: 60 }} />
+          <View style={{ height: 100 }} />
         </ScrollView>
 
-        {/* Universal Crystal Navigation Bar (Light Variant for Life) */}
-        <CrystalNavBar activeTab="Life" variant="light" />
+        {/* Universal Crystal Navigation Bar */}
+        <CrystalNavBar activeTab="Life" variant="dark" />
 
-      </SafeAreaView >
+      </SafeAreaView>
 
       {/* --- MODALS --- */}
       < MatchPopup
@@ -395,103 +399,114 @@ export default LifeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Background is handled by LinearGradient
+    backgroundColor: '#000000',
   },
   safeArea: {
     flex: 1,
   },
+  headerContainer: {
+    paddingHorizontal: 28,
+    paddingTop: Platform.OS === 'ios' ? 60 : 80,
+    paddingBottom: 24,
+  },
   headerTitle: {
-    fontSize: 74,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: -1.5,
-    paddingLeft: 34, // 10 original + 24 from header horizontal padding
-    paddingTop: Platform.OS === 'ios' ? 70 : 90,
-    paddingBottom: 16,
+    fontSize: 36,
+    fontWeight: '300',
+    color: '#E5E5E5',
+    letterSpacing: 8,
+    textTransform: 'uppercase',
+  },
+  headerAccent: {
+    width: 44,
+    height: 2,
+    backgroundColor: '#D4AF37', // Gold accent
+    marginTop: 14,
+    borderRadius: 2,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 4,
   },
   scrollContent: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 100, // Reduced bottom padding
+    paddingBottom: 140, // Enough space for Bottom Bar
   },
   section: {
-    marginBottom: 36,
+    marginBottom: 40,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#F0F0F0',
+    color: '#777777',
     marginBottom: 20,
-    letterSpacing: 0.5,
+    letterSpacing: 4,
+    textTransform: 'uppercase',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 24,
+    gap: 18,
+    justifyContent: 'flex-start',
+    paddingHorizontal: 8,
   },
-  appIconContainer: {
-    width: '23%',
+  appCard: {
+    width: '21%', // 4 columns roughly ((100 - (18 * 3))/4)
+    aspectRatio: 0.75, // Taller to fit label
+    marginBottom: 8,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  appIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
+  appCardPressed: {
+    transform: [{ scale: 0.92 }],
+    opacity: 0.85,
+  },
+  appCardInner: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 18, // iOS App Icon curvature
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
-    // iOS-style icon shadow/depth
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 8,
-
+    marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  appIconEmoji: {
-    fontSize: 32,
+  appIconVector: {
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#EEEEEE',
+    color: '#E0E0E0',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
     textAlign: 'center',
-    letterSpacing: 0.2,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    letterSpacing: 0.3,
   },
   debugRow: {
     flexDirection: 'row',
     marginTop: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 4,
     width: '100%',
     alignItems: 'center',
-    marginBottom: 10,
   },
   debugButton: {
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 14,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 44,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    borderWidth: 1,
   },
   debugButtonText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
 
 

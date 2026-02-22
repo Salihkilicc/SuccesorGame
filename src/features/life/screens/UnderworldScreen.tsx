@@ -4,6 +4,7 @@ import { useNavigation, CompositeNavigationProp } from '@react-navigation/native
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Components & Systems
 import { theme } from '../../../core/theme';
@@ -37,16 +38,16 @@ const GRADIENTS = {
 };
 
 const SECTION_ESSENTIALS = [
-    { key: 'contacts', label: 'Contacts', icon: '👥', gradient: GRADIENTS.purplePink },
-    { key: 'weather', label: 'Weather', icon: '🌤️', gradient: GRADIENTS.bluePurple },
+    { key: 'contacts', label: 'Contacts', icon: 'account-multiple', gradient: GRADIENTS.purplePink },
+    { key: 'weather', label: 'Weather', icon: 'weather-partly-cloudy', gradient: GRADIENTS.bluePurple },
 ];
 
 const SECTION_UNDERWORLD = [
-    { key: 'casino', label: 'Casino', icon: '🎰', gradient: GRADIENTS.redCasino },
-    { key: 'blackMarket', label: 'Black Market', icon: '🕶️', gradient: GRADIENTS.darkGrey },
-    { key: 'hookup', label: 'Hookup', icon: '🔥', gradient: GRADIENTS.hookupFire },
-    { key: 'network', label: 'Network', icon: '🌐', gradient: GRADIENTS.networkBlue },
-    { key: 'stockMarket', label: 'Stock Market', icon: '📈', gradient: GRADIENTS.greenTeal },
+    { key: 'casino', label: 'Casino', icon: 'slot-machine', gradient: GRADIENTS.redCasino },
+    { key: 'blackMarket', label: 'Black Market', icon: 'incognito', gradient: GRADIENTS.darkGrey },
+    { key: 'hookup', label: 'Hookup', icon: 'fire', gradient: GRADIENTS.hookupFire },
+    { key: 'network', label: 'Network', icon: 'lan', gradient: GRADIENTS.networkBlue },
+    { key: 'stockMarket', label: 'Stock Market', icon: 'chart-line', gradient: GRADIENTS.greenTeal },
 ];
 
 const UnderworldScreen = () => {
@@ -80,14 +81,14 @@ const UnderworldScreen = () => {
     };
 
     const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
-        <Pressable key={item.key} style={styles.appIconContainer} onPress={() => handleAction(item.key)}>
+        <Pressable key={item.key} style={({ pressed }) => [styles.appCard, pressed && styles.appCardPressed]} onPress={() => handleAction(item.key)}>
             <LinearGradient
                 colors={item.gradient}
-                style={styles.appIcon}
+                style={styles.appCardInner}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
-                <Text style={styles.appIconEmoji}>{item.icon}</Text>
+                <MaterialCommunityIcons name={item.icon} size={42} color="#FFFFFF" style={styles.appIconVector} />
             </LinearGradient>
             <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
         </Pressable>
@@ -95,15 +96,19 @@ const UnderworldScreen = () => {
 
     return (
         <View style={styles.container}>
+            {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
             <LinearGradient
-                colors={['#1c1c1e', '#2c3e50', '#202020']}
+                colors={['#0a0a0c', '#000000', '#050505']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
             />
 
             <SafeAreaView style={styles.safeArea}>
-                <Text style={styles.headerTitle}>CITY</Text>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.headerTitle}>CITY</Text>
+                    <View style={styles.headerAccent} />
+                </View>
 
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <View style={styles.section}>
@@ -122,7 +127,7 @@ const UnderworldScreen = () => {
                     <View style={{ height: 100 }} />
                 </ScrollView>
 
-                <CrystalNavBar activeTab="Home" variant="light" />
+                <CrystalNavBar activeTab="Home" variant="dark" />
             </SafeAreaView>
 
             {/* --- MODALS --- */}
@@ -171,71 +176,93 @@ export default UnderworldScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000000',
     },
     safeArea: {
         flex: 1,
     },
+    headerContainer: {
+        paddingHorizontal: 28,
+        paddingTop: Platform.OS === 'ios' ? 60 : 80,
+        paddingBottom: 24,
+    },
     headerTitle: {
-        fontSize: 74,
-        fontWeight: '900',
-        color: '#FFFFFF',
-        letterSpacing: -1.5,
-        paddingLeft: 34,
-        paddingTop: Platform.OS === 'ios' ? 70 : 90,
-        paddingBottom: 16,
+        fontSize: 36,
+        fontWeight: '300',
+        color: '#E5E5E5',
+        letterSpacing: 8,
+        textTransform: 'uppercase',
+    },
+    headerAccent: {
+        width: 44,
+        height: 2,
+        backgroundColor: '#D4AF37',
+        marginTop: 14,
+        borderRadius: 2,
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 6,
+        elevation: 4,
     },
     scrollContent: {
         paddingHorizontal: 24,
         paddingTop: 16,
-        paddingBottom: 100,
+        paddingBottom: 140, // Increased for bottom layout consistency
     },
     section: {
-        marginBottom: 36,
+        marginBottom: 40,
     },
     sectionTitle: {
-        fontSize: 22,
+        fontSize: 12,
         fontWeight: '700',
-        color: '#F0F0F0',
+        color: '#777777',
         marginBottom: 20,
-        letterSpacing: 0.5,
+        letterSpacing: 4,
+        textTransform: 'uppercase',
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
+        gap: 18,
         justifyContent: 'flex-start',
-        gap: '2.5%',
-        rowGap: 24,
+        paddingHorizontal: 8,
     },
-    appIconContainer: {
-        width: '23%',
+    appCard: {
+        width: '21%',
+        aspectRatio: 0.75, // Matching Apple ratio
+        marginBottom: 8,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
     },
-    appIcon: {
-        width: 68,
-        height: 68,
+    appCardPressed: {
+        transform: [{ scale: 0.92 }],
+        opacity: 0.85,
+    },
+    appCardInner: {
+        width: '100%',
+        aspectRatio: 1,
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 6,
-        elevation: 8,
+        marginBottom: 6,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
+        borderColor: 'rgba(255, 255, 255, 0.15)',
     },
-    appIconEmoji: {
-        fontSize: 32,
+    appIconVector: {
+        textShadowColor: 'rgba(0,0,0,0.3)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 3,
     },
     appIconLabel: {
-        color: '#EEEEEE',
+        color: '#E0E0E0',
         fontSize: 11,
-        fontWeight: '600',
+        fontWeight: '500',
         textAlign: 'center',
-        letterSpacing: 0.2,
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
+        letterSpacing: 0.3,
     },
 });
