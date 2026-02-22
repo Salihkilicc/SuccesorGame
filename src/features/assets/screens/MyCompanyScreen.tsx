@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, Text, Pressable, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useProductStore } from '../../../core/store/useProductStore';
@@ -44,7 +46,6 @@ const formatCompactNumber = (num: number) => {
 const MyCompanyScreen = () => {
   // Navigation'a <any> veriyoruz ki TypeScript hata vermesin
   const navigation = useNavigation<any>();
-  const insets = useSafeAreaInsets();
 
   // Logic Hook
   const { handlePurchaseFactory, handleHireEmployees, costs, limits } = useCompanyLogic();
@@ -147,20 +148,30 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
       <StatusBar barStyle="light-content" />
-      <View style={[styles.safeArea, { paddingTop: insets.top, backgroundColor: '#121212' }]}>
+      <LinearGradient
+        colors={['#0a0a0c', '#000000', '#050505']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* FIXED HEADER */}
-        <View style={[styles.header, { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.sm }]}>
-          <Pressable onPress={() => navigation.navigate('Home')} style={styles.backBtn}><Text style={styles.backTxt}>←</Text></Pressable>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => navigation.navigate('Home')}
+            style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          >
+            <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+          </Pressable>
           <View>
-            <Text style={styles.title}>Command Center</Text>
+            <Text style={styles.title}>COMMAND CENTER</Text>
             <Text style={styles.subtitle}>Manage your company operations</Text>
           </View>
         </View>
 
         <ScrollView
-          style={{ backgroundColor: '#121212' }}
           contentContainerStyle={[styles.content, { paddingBottom: 120, paddingTop: 0 }]}>
 
           {/* COMPANY STATS CARD */}
@@ -329,54 +340,60 @@ const MyCompanyScreen = () => {
             handleLaunchIPO,
           }}
         />
-      </View>
-    </>
+      </SafeAreaView>
+    </View>
   );
 };
 
 export default MyCompanyScreen;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#121212' }, // Deep Black
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, backgroundColor: '#121212' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8, backgroundColor: '#121212' },
+  safeArea: { flex: 1 },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#333',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 8,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  backTxt: { fontSize: 20, color: '#FFFFFF' },
-  title: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
-  subtitle: { color: '#8E8E93', fontSize: 14 },
+  backBtnPressed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    transform: [{ scale: 0.95 }],
+  },
+  title: { fontSize: 20, fontWeight: '900', color: '#FFFFFF', letterSpacing: 2 },
+  subtitle: { color: '#888888', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {
     flexBasis: '48%',
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: 'rgba(22, 22, 24, 0.8)',
+    borderRadius: 20,
+    padding: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     gap: 8,
     minHeight: 120,
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
-    shadowRadius: 5,
+    shadowRadius: 12,
     elevation: 8,
   },
-  deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
-  deptSub: { fontSize: 12, color: '#8E8E93', textAlign: 'center' },
+  deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
+  deptSub: { fontSize: 12, color: '#888888', textAlign: 'center' },
   sharePrice: { fontSize: 18, fontWeight: '700', color: '#FFD700' }, // Gold for money
 });

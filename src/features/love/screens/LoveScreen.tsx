@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, Pressable, StyleSheet, Image, Alert } from 'react-native';
+import { ScrollView, View, Text, Pressable, StyleSheet, Image, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserStore, useStatsStore } from '../../../core/store';
 import type { LoveStackParamList } from '../../../navigation';
 import { theme } from '../../../core/theme';
@@ -708,271 +710,283 @@ const LoveScreen = () => {
 
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {/* 1. Ultra-Slim Header */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={handleBack}
-          style={({ pressed }) => [
-            styles.headerLeft,
-            pressed && { opacity: 0.7 },
-          ]}>
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.headerTitle}>Relationships & Love</Text>
-        </Pressable>
-        {/* Optional Right Node */}
-        <View style={styles.headerRight}>
-          <Text style={styles.balanceText}>
-            ${money.toLocaleString()}
-          </Text>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-        {/* 2. Partner Section (Hero) */}
-        {partner ? (
-          <Pressable style={styles.partnerCard} onPress={() => setModalType('partner')}>
-            <View style={styles.partnerPhotoContainer}>
-              {partner.photo ? (
-                <Image source={{ uri: partner.photo }} style={styles.partnerPhoto} />
-              ) : (
-                <Text style={{ fontSize: 32 }}>👤</Text>
-              )}
-            </View>
-            <View style={styles.partnerInfo}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.partnerName}>{partner.name}</Text>
-                <View style={styles.partnerBadge}>
-                  <Text style={styles.partnerBadgeText}>{getPartnerBadge(partner.love)}</Text>
-                </View>
-              </View>
-
-              <View style={styles.partnerStats}>
-                <Text style={styles.partnerStatLabel}>Love: {partner.love}%</Text>
-                <View style={styles.partnerBarTrack}>
-                  <View style={[styles.partnerBarFill, { width: `${partner.love}%` }]} />
-                </View>
-
-                {/* ACTIVE PERKS DISPLAY */}
-                <View style={{ marginTop: 12 }}>
-                  <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginBottom: 6, fontWeight: '600', letterSpacing: 0.5 }}>
-                    ACTIVE PERKS
-                  </Text>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ gap: 8 }}
-                  >
-                    {getPartnerPerks(partner).length > 0 ? (
-                      getPartnerPerks(partner).map(perk => (
-                        <View key={perk.id} style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          backgroundColor: `${perk.color}15`, // 15 = ~8% opacity
-                          paddingVertical: 10,
-                          paddingHorizontal: 12,
-                          borderRadius: 12,
-                          borderLeftWidth: 3,
-                          borderLeftColor: perk.color,
-                          minWidth: 160,
-                          maxWidth: 240
-                        }}>
-                          <Text style={{ fontSize: 24, marginRight: 10 }}>{perk.icon}</Text>
-                          <View style={{ flex: 1 }}>
-                            <Text style={{
-                              color: perk.color,
-                              fontSize: 13,
-                              fontWeight: 'bold',
-                              marginBottom: 2
-                            }}>
-                              {perk.title}
-                            </Text>
-                            <Text style={{
-                              color: theme.colors.textSecondary,
-                              fontSize: 11,
-                              lineHeight: 14
-                            }}>
-                              {perk.desc}
-                            </Text>
-                          </View>
-                        </View>
-                      ))
-                    ) : (
-                      <View style={{
-                        padding: 12,
-                        backgroundColor: 'rgba(255,255,255,0.03)',
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: 'rgba(255,255,255,0.05)',
-                        width: '100%'
-                      }}>
-                        <Text style={{ color: theme.colors.textMuted, fontSize: 12, fontStyle: 'italic' }}>
-                          Your partner has no active perks at the moment.
-                        </Text>
-                      </View>
-                    )}
-                  </ScrollView>
-                </View>
-              </View>
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      <StatusBar barStyle="light-content" />
+      <LinearGradient
+        colors={['#0a0a0c', '#000000', '#050505']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        {/* 1. Ultra-Slim Header */}
+        <View style={styles.header}>
+          <Pressable
+            onPress={handleBack}
+            style={({ pressed }) => [
+              styles.headerLeft,
+              pressed && { opacity: 0.7 },
+            ]}>
+            <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+            <View>
+              <Text style={styles.headerTitle}>CONTACTS</Text>
+              <Text style={styles.headerSubtitle}>Relationships & Love</Text>
             </View>
           </Pressable>
-        ) : (
-          <View style={styles.partnerCard}>
-            <View style={[styles.partnerPhotoContainer, { borderColor: theme.colors.textMuted, borderWidth: 1 }]}>
-              <Text style={styles.noPartnerIcon}>?</Text>
-            </View>
-            <View style={styles.partnerInfo}>
-              <Text style={[styles.partnerName, { color: theme.colors.textMuted }]}>No Partner</Text>
-              <Text style={{ color: theme.colors.textMuted, fontSize: 12 }}>Maybe it's time to meet someone?</Text>
-            </View>
+          {/* Optional Right Node */}
+          <View style={styles.headerRight}>
+            <Text style={styles.balanceText}>
+              ${money.toLocaleString()}
+            </Text>
           </View>
-        )}
+        </View>
 
-        {/* 3. Family Section */}
-        <View>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Family</Text>
-            <Text style={styles.sectionCount}>{family.length} Members</Text>
-          </View>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-          {family.map(member => (
-            <Pressable key={member.id} style={styles.listItem} onPress={() => { setSelectedItem(member); setModalType('family'); }}>
-              <View style={styles.listPhotoContainer}>
-                {member.photo ? (
-                  <Image source={{ uri: member.photo }} style={styles.listPhoto} />
+          {/* 2. Partner Section (Hero) */}
+          {partner ? (
+            <Pressable style={styles.partnerCard} onPress={() => setModalType('partner')}>
+              <View style={styles.partnerPhotoContainer}>
+                {partner.photo ? (
+                  <Image source={{ uri: partner.photo }} style={styles.partnerPhoto} />
                 ) : (
-                  <Text style={styles.listInitial}>{member.name[0]}</Text>
+                  <Text style={{ fontSize: 32 }}>👤</Text>
                 )}
               </View>
-              <View style={styles.listContent}>
-                <View style={styles.listNameRow}>
-                  <Text style={styles.listName}>{member.name}</Text>
-                  <Text style={styles.listRole}>({member.relation})</Text>
+              <View style={styles.partnerInfo}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={styles.partnerName}>{partner.name}</Text>
+                  <View style={styles.partnerBadge}>
+                    <Text style={styles.partnerBadgeText}>{getPartnerBadge(partner.love)}</Text>
+                  </View>
                 </View>
-                <View style={styles.listBarTrack}>
-                  <View style={[styles.listBarFill, { width: `${member.relationship}%` }]} />
+
+                <View style={styles.partnerStats}>
+                  <Text style={styles.partnerStatLabel}>Love: {partner.love}%</Text>
+                  <View style={styles.partnerBarTrack}>
+                    <View style={[styles.partnerBarFill, { width: `${partner.love}%` }]} />
+                  </View>
+
+                  {/* ACTIVE PERKS DISPLAY */}
+                  <View style={{ marginTop: 12 }}>
+                    <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginBottom: 6, fontWeight: '600', letterSpacing: 0.5 }}>
+                      ACTIVE PERKS
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8 }}
+                    >
+                      {getPartnerPerks(partner).length > 0 ? (
+                        getPartnerPerks(partner).map(perk => (
+                          <View key={perk.id} style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: `${perk.color}15`, // 15 = ~8% opacity
+                            paddingVertical: 10,
+                            paddingHorizontal: 12,
+                            borderRadius: 12,
+                            borderLeftWidth: 3,
+                            borderLeftColor: perk.color,
+                            minWidth: 160,
+                            maxWidth: 240
+                          }}>
+                            <Text style={{ fontSize: 24, marginRight: 10 }}>{perk.icon}</Text>
+                            <View style={{ flex: 1 }}>
+                              <Text style={{
+                                color: perk.color,
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                marginBottom: 2
+                              }}>
+                                {perk.title}
+                              </Text>
+                              <Text style={{
+                                color: theme.colors.textSecondary,
+                                fontSize: 11,
+                                lineHeight: 14
+                              }}>
+                                {perk.desc}
+                              </Text>
+                            </View>
+                          </View>
+                        ))
+                      ) : (
+                        <View style={{
+                          padding: 12,
+                          backgroundColor: 'rgba(255,255,255,0.03)',
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: 'rgba(255,255,255,0.05)',
+                          width: '100%'
+                        }}>
+                          <Text style={{ color: theme.colors.textMuted, fontSize: 12, fontStyle: 'italic' }}>
+                            Your partner has no active perks at the moment.
+                          </Text>
+                        </View>
+                      )}
+                    </ScrollView>
+                  </View>
                 </View>
               </View>
             </Pressable>
-          ))}
-        </View>
+          ) : (
+            <View style={styles.partnerCard}>
+              <View style={[styles.partnerPhotoContainer, { borderColor: theme.colors.textMuted, borderWidth: 1 }]}>
+                <Text style={styles.noPartnerIcon}>?</Text>
+              </View>
+              <View style={styles.partnerInfo}>
+                <Text style={[styles.partnerName, { color: theme.colors.textMuted }]}>No Partner</Text>
+                <Text style={{ color: theme.colors.textMuted, fontSize: 12 }}>Maybe it's time to meet someone?</Text>
+              </View>
+            </View>
+          )}
 
-        {/* 4. Friends Section */}
-        {friends && friends.length > 0 && (
+          {/* 3. Family Section */}
           <View>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Friends</Text>
-              <Text style={styles.sectionCount}>{friends.length} Friends</Text>
+              <Text style={styles.sectionTitle}>Family</Text>
+              <Text style={styles.sectionCount}>{family.length} Members</Text>
             </View>
 
-            {friends.map(friend => (
-              <Pressable key={friend.id} style={styles.listItem} onPress={() => { setSelectedItem(friend); setModalType('friend'); }}>
+            {family.map(member => (
+              <Pressable key={member.id} style={styles.listItem} onPress={() => { setSelectedItem(member); setModalType('family'); }}>
                 <View style={styles.listPhotoContainer}>
-                  {friend.photo ? (
-                    <Image source={{ uri: friend.photo }} style={styles.listPhoto} />
+                  {member.photo ? (
+                    <Image source={{ uri: member.photo }} style={styles.listPhoto} />
                   ) : (
-                    <Text style={styles.listInitial}>{friend.name[0]}</Text>
+                    <Text style={styles.listInitial}>{member.name[0]}</Text>
                   )}
                 </View>
                 <View style={styles.listContent}>
                   <View style={styles.listNameRow}>
-                    <Text style={styles.listName}>{friend.name}</Text>
+                    <Text style={styles.listName}>{member.name}</Text>
+                    <Text style={styles.listRole}>({member.relation})</Text>
                   </View>
                   <View style={styles.listBarTrack}>
-                    <View style={[styles.listBarFill, { width: `${friend.relationship}%`, backgroundColor: theme.colors.accent }]} />
+                    <View style={[styles.listBarFill, { width: `${member.relationship}%` }]} />
                   </View>
                 </View>
               </Pressable>
             ))}
           </View>
-        )}
 
-        {/* 5. Exes Section */}
-        <View>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Exes / Past</Text>
-            <Text style={styles.sectionCount}>{exes.length}</Text>
-          </View>
+          {/* 4. Friends Section */}
+          {friends && friends.length > 0 && (
+            <View>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Friends</Text>
+                <Text style={styles.sectionCount}>{friends.length} Friends</Text>
+              </View>
 
-          {exes.length > 0 ? (
-            exes.map(ex => (
-              <Pressable key={ex.id} style={styles.listItem} onPress={() => { setSelectedItem(ex); setModalType('ex'); }}>
-                <View style={styles.listPhotoContainer}>
-                  {ex.photo ? (
-                    <Image source={{ uri: ex.photo }} style={styles.listPhoto} />
-                  ) : (
-                    <Text style={styles.listInitial}>{ex.name[0]}</Text>
-                  )}
-                </View>
-                <View style={styles.listContent}>
-                  <View style={styles.listNameRow}>
-                    <Text style={styles.listName}>{ex.name}</Text>
+              {friends.map(friend => (
+                <Pressable key={friend.id} style={styles.listItem} onPress={() => { setSelectedItem(friend); setModalType('friend'); }}>
+                  <View style={styles.listPhotoContainer}>
+                    {friend.photo ? (
+                      <Image source={{ uri: friend.photo }} style={styles.listPhoto} />
+                    ) : (
+                      <Text style={styles.listInitial}>{friend.name[0]}</Text>
+                    )}
                   </View>
-                  <View style={styles.listBarTrack}>
-                    <View style={[styles.listBarFill, { width: `${ex.love}%`, backgroundColor: theme.colors.textMuted }]} />
+                  <View style={styles.listContent}>
+                    <View style={styles.listNameRow}>
+                      <Text style={styles.listName}>{friend.name}</Text>
+                    </View>
+                    <View style={styles.listBarTrack}>
+                      <View style={[styles.listBarFill, { width: `${friend.relationship}%`, backgroundColor: theme.colors.accent }]} />
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            ))
-          ) : (
-            <Text style={styles.emptyText}>No past relationships recorded.</Text>
+                </Pressable>
+              ))}
+            </View>
           )}
-        </View>
 
-      </ScrollView>
+          {/* 5. Exes Section */}
+          <View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Exes / Past</Text>
+              <Text style={styles.sectionCount}>{exes.length}</Text>
+            </View>
 
-      {/* INTERACTIONS MODAL */}
-      <InteractionModal
-        visible={!!modalType}
-        onClose={closeModal}
-        title={
-          modalType === 'partner' ? partner?.name :
-            (modalType === 'family' || modalType === 'friend') ? selectedItem?.name :
-              modalType === 'ex' ? `Ex: ${selectedItem?.name}` : ''
-        }>
-
-        {feedback && (
-          <View style={styles.feedbackContainer}>
-            <Text style={styles.feedbackText}>{feedback}</Text>
+            {exes.length > 0 ? (
+              exes.map(ex => (
+                <Pressable key={ex.id} style={styles.listItem} onPress={() => { setSelectedItem(ex); setModalType('ex'); }}>
+                  <View style={styles.listPhotoContainer}>
+                    {ex.photo ? (
+                      <Image source={{ uri: ex.photo }} style={styles.listPhoto} />
+                    ) : (
+                      <Text style={styles.listInitial}>{ex.name[0]}</Text>
+                    )}
+                  </View>
+                  <View style={styles.listContent}>
+                    <View style={styles.listNameRow}>
+                      <Text style={styles.listName}>{ex.name}</Text>
+                    </View>
+                    <View style={styles.listBarTrack}>
+                      <View style={[styles.listBarFill, { width: `${ex.love}%`, backgroundColor: theme.colors.textMuted }]} />
+                    </View>
+                  </View>
+                </Pressable>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No past relationships recorded.</Text>
+            )}
           </View>
+
+        </ScrollView>
+
+        {/* INTERACTIONS MODAL */}
+        <InteractionModal
+          visible={!!modalType}
+          onClose={closeModal}
+          title={
+            modalType === 'partner' ? partner?.name :
+              (modalType === 'family' || modalType === 'friend') ? selectedItem?.name :
+                modalType === 'ex' ? `Ex: ${selectedItem?.name}` : ''
+          }>
+
+          {feedback && (
+            <View style={styles.feedbackContainer}>
+              <Text style={styles.feedbackText}>{feedback}</Text>
+            </View>
+          )}
+
+          {modalType === 'partner' && renderPartnerModalContent()}
+          {(modalType === 'family' || modalType === 'friend') && renderGenericModalContent(modalType || 'family')}
+          {modalType === 'ex' && renderExModalContent()}
+
+        </InteractionModal>
+
+        {/* ENCOUNTER MODAL (CINEMATIC) */}
+        <EncounterModal
+          visible={isEncounterVisible}
+          candidate={encounterCandidate}
+          scenario={currentScenario}
+          context={currentScenario?.id.split('_')[0] || 'Unknown'}
+          onDate={handleDate}
+          onHookup={() => {
+            Alert.alert("Fling", "You had a great night! (Stress -10)");
+            // TODO: Implement hookup logic (stress reduction, etc.)
+            closeEncounter();
+          }}
+          onIgnore={closeEncounter}
+        />
+
+        {/* BREAKUP MODAL (HIGHEST PRIORITY) */}
+        {cheatingConsequence && (
+          <BreakupModal
+            visible={!!cheatingConsequence}
+            onClose={clearConsequence}
+            partnerName={cheatingConsequence.partnerName}
+            settlementCost={cheatingConsequence.settlement}
+          />
         )}
 
-        {modalType === 'partner' && renderPartnerModalContent()}
-        {(modalType === 'family' || modalType === 'friend') && renderGenericModalContent(modalType || 'family')}
-        {modalType === 'ex' && renderExModalContent()}
+        {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}
+        <CrystalNavBar activeTab="Love" variant="dark" />
 
-      </InteractionModal>
-
-      {/* ENCOUNTER MODAL (CINEMATIC) */}
-      <EncounterModal
-        visible={isEncounterVisible}
-        candidate={encounterCandidate}
-        scenario={currentScenario}
-        context={currentScenario?.id.split('_')[0] || 'Unknown'}
-        onDate={handleDate}
-        onHookup={() => {
-          Alert.alert("Fling", "You had a great night! (Stress -10)");
-          // TODO: Implement hookup logic (stress reduction, etc.)
-          closeEncounter();
-        }}
-        onIgnore={closeEncounter}
-      />
-
-      {/* BREAKUP MODAL (HIGHEST PRIORITY) */}
-      {cheatingConsequence && (
-        <BreakupModal
-          visible={!!cheatingConsequence}
-          onClose={clearConsequence}
-          partnerName={cheatingConsequence.partnerName}
-          settlementCost={cheatingConsequence.settlement}
-        />
-      )}
-
-      {/* Universal Crystal Navigation Bar (Active: Love, Light Variant) */}
-      <CrystalNavBar activeTab="Love" variant="light" />
-
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -982,57 +996,63 @@ export default LoveScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.card,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  backIcon: {
-    color: theme.colors.textPrimary,
-    fontSize: 22,
-    fontWeight: '300',
+    gap: 8,
   },
   headerTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
-    fontWeight: '700',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 2,
   },
-
+  headerSubtitle: {
+    color: '#888888',
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginTop: 2,
+  },
   headerRight: {},
   balanceText: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   content: {
-    padding: theme.spacing.lg,
-    gap: theme.spacing.xl,
-    paddingBottom: theme.spacing.xl * 2,
+    padding: 20,
+    gap: 24,
+    paddingBottom: 120,
   },
 
   // Partner Hero Card
   partnerCard: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
+    backgroundColor: '#161618',
+    borderRadius: 24,
+    padding: 24,
     borderWidth: 1,
-    borderColor: theme.colors.accentSoft,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.md,
+    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
+    elevation: 10,
   },
   partnerPhotoContainer: {
     width: 72,
@@ -1099,35 +1119,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
     paddingBottom: 8,
   },
   sectionTitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
+    color: '#888888',
+    fontSize: 13,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
+    letterSpacing: 1.5,
   },
   sectionCount: {
-    color: theme.colors.textMuted,
-    fontSize: 12,
+    color: '#555555',
+    fontSize: 11,
+    fontWeight: '600',
   },
 
   // Generic List item (Family & Exes)
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.card,
-    padding: theme.spacing.md,
-    borderRadius: theme.radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    gap: 16,
+    marginBottom: 12,
   },
   listPhotoContainer: {
     width: 48,
