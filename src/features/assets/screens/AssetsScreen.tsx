@@ -5,9 +5,7 @@ import { theme } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
 import AppScreen from '../../../components/layout/AppScreen';
 import {
-    StatPill,
     SummaryRow,
-    ActionTile,
     BreakdownSection
 } from '../components/AssetsUI';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
@@ -37,27 +35,6 @@ const AssetsScreen = () => {
         <AppScreen title="ASSETS" subtitle="Wealth Management" leftNode={backButton} compact>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* RISK & STRATEGY - Connected to Player Store */}
-                <View style={styles.riskRow}>
-                    <StatPill label="Risk Appetite" value={`${personality?.riskAppetite ?? 50}%`} />
-                    <StatPill label="Strategic Sense" value={`${personality?.strategicSense ?? 50}%`} />
-                </View>
-
-                {/* ACTIONS (Moved to Top) */}
-                <View style={styles.actionRow}>
-                    <ActionTile
-                        title="Market"
-                        body="Scan the latest sectors and move quickly on opportunities."
-                        variant="market"
-                        onPress={() => navigation.navigate('Market')}
-                    />
-                    <ActionTile
-                        title="My Company"
-                        body="Review valuation, ownership, and make strategic moves."
-                        variant="company"
-                        onPress={() => navigation.navigate('MyCompany')}
-                    />
-                </View>
 
                 {/* QUARTERLY FINANCIAL OVERVIEW */}
                 <View style={styles.summaryCard}>
@@ -112,12 +89,10 @@ const AssetsScreen = () => {
 
 const styles = StyleSheet.create({
     content: { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.md, gap: theme.spacing.md, paddingBottom: 120 }, // Increased paddingBottom
-    riskRow: { flexDirection: 'row', gap: theme.spacing.sm, marginBottom: -4 }, // Slight adjustment
     summaryCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
     sectionTitle: { fontSize: theme.typography.subtitle, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: theme.spacing.md },
     summaryRow: { flexDirection: 'row', gap: theme.spacing.lg },
     summaryCol: { flex: 1, gap: theme.spacing.sm },
-    actionRow: { flexDirection: 'row', gap: theme.spacing.md },
     backButton: { width: 32, height: 32, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.card },
     backButtonPressed: { backgroundColor: theme.colors.cardSoft, transform: [{ scale: 0.97 }] },
     backIcon: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },

@@ -196,7 +196,6 @@ const HomeScreen = () => {
             <View style={styles.nameRow}>
               <Text style={styles.name}>{displayName}</Text>
               <Text style={styles.gender}>{genderSymbol}</Text>
-              {hasPremium ? <Text style={styles.premiumTag}>PREMIUM</Text> : null}
             </View>
             <Text style={styles.bio}>{displayBio}</Text>
             <View style={styles.ageRow}>
@@ -215,16 +214,16 @@ const HomeScreen = () => {
               </Pressable>
             </View>
           </View>
-
-          <Pressable
-            onPress={() => setDrawerOpen(true)}
-            style={({ pressed }) => [styles.hamburgerButton, pressed && styles.hamburgerPressed]}>
-            <Text style={styles.hamburgerText}>☰</Text>
-          </Pressable>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Overview</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: theme.spacing.xs }}>
+            <Text style={styles.sectionTitle}>Overview</Text>
+            <TouchableOpacity onPress={() => handleNavigateStack('Assets')} style={{ flexDirection: 'row', alignItems: 'baseline', marginLeft: theme.spacing.sm }}>
+              <Text style={{ fontSize: 18, color: theme.colors.textSecondary, marginRight: 4 }}>⤢</Text>
+              <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>expand</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.card}>
             <View style={styles.rowBetween}>
               <Text style={styles.label}>Net Worth</Text>
@@ -295,26 +294,6 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        <View style={styles.entryRow}>
-          <Pressable
-            onPress={() => handleNavigateTabs('Life')}
-            style={({ pressed }) => [styles.entryLife, pressed && styles.entryPressed]}>
-            <Text style={styles.entryTitleDark}>LIFE</Text>
-            <Text style={styles.entrySubtitleDark}>Lifestyle & Events</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => handleNavigateStack('Assets')}
-            style={({ pressed }) => [styles.entryAssets, pressed && styles.entryPressed]}>
-            <Text style={styles.entryTitleLight}>ASSETS</Text>
-            <Text style={styles.entrySubtitleLight}>Market & Company</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => handleNavigateTabs('Love')}
-            style={({ pressed }) => [styles.entryLove, pressed && styles.entryPressed]}>
-            <Text style={styles.entryTitleLight}>LOVE</Text>
-            <Text style={styles.entrySubtitleLight}>Relationships & Drama</Text>
-          </Pressable>
-        </View>
       </ScrollView>
 
       {

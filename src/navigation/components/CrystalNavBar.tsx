@@ -60,6 +60,20 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
         };
     };
 
+    // The order of tabs in SwipeNavigator is: Life, Home, Love, MyCompany.
+    // We map activeTab to an index for the pagination dots.
+    const getDotIndex = () => {
+        switch (activeTab) {
+            case 'Life': return 0;
+            case 'Home': return 1;
+            case 'Love': return 2;
+            case 'Company': return 3;
+            default: return 1; // Default to Home
+        }
+    };
+    const activeDotIndex = getDotIndex();
+    const dots = [0, 1, 2, 3];
+
     return (
         <>
             {/* Dimming Overlay */}
@@ -73,6 +87,20 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
             )}
 
             <View style={[styles.bottomBarContainer, { zIndex: 1000 }]}>
+                {/* Pagination Dots */}
+                <View style={styles.paginationContainer}>
+                    {dots.map((dot, index) => (
+                        <View
+                            key={index}
+                            style={[
+                                styles.dot,
+                                activeDotIndex === index ? styles.activeDot : styles.inactiveDot,
+                                isLight ? styles.lightDot : styles.darkDot
+                            ]}
+                        />
+                    ))}
+                </View>
+
                 <BlurView
                     style={styles.blurContainer}
                     blurType={blurType}
@@ -146,9 +174,42 @@ const styles = StyleSheet.create({
         bottom: 34,
         left: 15,
         right: 15,
+        // Removed overflow: hidden so dots above it are visible if we place them inside
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8, // Space between dots and bar
+    },
+    dot: {
+        height: 6,
+        borderRadius: 3,
+        marginHorizontal: 4,
+        // Added subtle shadow for dots
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 1,
+        elevation: 2,
+    },
+    activeDot: {
+        width: 18, // Elongated active dot (iOS style)
+    },
+    inactiveDot: {
+        width: 6,  // Circular inactive dot
+    },
+    lightDot: {
+        backgroundColor: '#FFFFFF',
+        opacity: 0.9,
+    },
+    darkDot: {
+        backgroundColor: 'rgba(255,255,255,0.5)',
+    },
+    blurContainer: {
         borderRadius: 35,
         overflow: 'hidden',
-        // Shadow
+        // Moved shadow to blur container itself
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -157,9 +218,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 20,
         elevation: 15,
-    },
-    blurContainer: {
-        borderRadius: 35,
     },
     bottomBar: {
         flexDirection: 'row',
