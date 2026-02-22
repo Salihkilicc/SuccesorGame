@@ -33,6 +33,8 @@ import {
   BelongingsScreen,
 } from '../screens';
 
+import UnderworldScreen from '../features/life/screens/UnderworldScreen';
+
 import StockDetailScreen from '../features/assets/screens/StockDetailScreen';
 
 import { formatScreenTitle } from '../core/utils';
@@ -245,7 +247,7 @@ const SwipeTab = createMaterialTopTabNavigator();
 export type SwipeTabParamList = {
   Life: undefined;
   Home: undefined;
-  Love: undefined;
+  Underworld: undefined;
   MyCompany: undefined;
 };
 
@@ -261,7 +263,7 @@ const SwipeNavigator = () => (
   >
     <SwipeTab.Screen name="Life" component={LifeScreen} />
     <SwipeTab.Screen name="Home" component={HomeScreen} />
-    <SwipeTab.Screen name="Love" component={LoveScreen} />
+    <SwipeTab.Screen name="Underworld" component={UnderworldScreen} />
     <SwipeTab.Screen name="MyCompany" component={MyCompanyScreen} />
   </SwipeTab.Navigator>
 );

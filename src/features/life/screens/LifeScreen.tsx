@@ -16,9 +16,6 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 // --- Modals & Systems ---
 import MatchPopup from '../../../components/Match/MatchPopup';
 import { useMatchSystem } from '../../../components/Match/useMatchSystem';
-import { useHookupSystem } from '../components/useHookupSystem';
-import { HookupModal } from '../components/HookupModal';
-
 import { useNightOutSystem } from '../components/NightOut/useNightOutSystem';
 import NightOutSetupModal from '../components/NightOut/NightOutSetupModal';
 import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
@@ -40,11 +37,6 @@ import SouvenirCollectionModal from '../components/Travel/SouvenirCollectionModa
 import { useSanctuarySystem } from '../components/Sanctuary/store/useSanctuarySystem';
 import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
 import SanctuaryResultModal from '../components/Sanctuary/modals/SanctuaryResultModal';
-
-import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
-import { useEncounterSystem } from '../../love/components/useEncounterSystem';
-import { EncounterModal } from '../../love/components/EncounterModal';
-import BreakupModal from '../../love/components/BreakupModal';
 
 import { useEducationSystem } from '../components/Education/store/useEducationSystem';
 import { EducationMasterModal } from '../components/Education/modals/EducationMasterModal';
@@ -87,31 +79,14 @@ const SECTION_LEISURE = [
 ];
 
 const SECTION_LIFESTYLE = [
-  // Core System & Daily
-  { key: 'calendar', label: 'Calendar', icon: '📅', gradient: GRADIENTS.orangeYellow },
-  { key: 'health', label: 'Health', icon: '❤️', gradient: GRADIENTS.pinkRed },
-  { key: 'contacts', label: 'Contacts', icon: '👥', gradient: GRADIENTS.purplePink },
-  { key: 'mail', label: 'Mail', icon: '✉️', gradient: GRADIENTS.blueSky },
-
   // Organization & Productivity
   { key: 'notes', label: 'Notes', icon: '📝', gradient: GRADIENTS.tealCyan },
-  { key: 'weather', label: 'Weather', icon: '🌤️', gradient: GRADIENTS.bluePurple },
   { key: 'education', label: 'Education', icon: '🎓', gradient: GRADIENTS.greenTeal },
   { key: 'travel', label: 'Travel', icon: '✈️', gradient: GRADIENTS.blueSky },
 
   // Personal Assets & Data
   { key: 'belongings', label: 'Belongings', icon: '👜', gradient: GRADIENTS.brownGold },
-  { key: 'myCompany', label: 'My Company', icon: '🏢', gradient: GRADIENTS.networkBlue },
   { key: 'dna', label: 'DNA / Stats', icon: '🧬', gradient: GRADIENTS.bluePurple },
-  { key: 'settings', label: 'Settings', icon: '⚙️', gradient: GRADIENTS.darkGrey },
-];
-
-const SECTION_UNDERWORLD = [
-  { key: 'casino', label: 'Casino', icon: '🎰', gradient: GRADIENTS.redCasino },
-  { key: 'blackMarket', label: 'Black Market', icon: '🕶️', gradient: GRADIENTS.darkGrey },
-  { key: 'hookup', label: 'Hookup', icon: '🔥', gradient: GRADIENTS.hookupFire },
-  { key: 'network', label: 'Network', icon: '🌐', gradient: GRADIENTS.networkBlue },
-  { key: 'stockMarket', label: 'Stock Market', icon: '📈', gradient: GRADIENTS.greenTeal },
 ];
 
 const LifeScreen = () => {
@@ -122,15 +97,13 @@ const LifeScreen = () => {
 
   // -- Store --
   const { visible, matchCandidate, openMatch, closeMatch, acceptMatch, rejectMatch } = useMatchSystem();
-  const { isModalVisible, currentCandidate, matchStatus, startHookup, swipeRight, swipeLeft, nextCandidate, closeHookupModal } = useHookupSystem();
-  const { isVisible: isEncounterVisible, currentScenario: encounterScenario, candidate: encounterCandidate, triggerEncounter, handleDate, closeEncounter } = useEncounterSystem();
 
+  // Helper function for encounters triggered from within LifeScreen components (like Travel/NightOut)
   const triggerEncounterBool = useCallback((context: string, countryId?: string) => {
-    const result = triggerEncounter(context, countryId);
-    return !!result;
-  }, [triggerEncounter]);
-
-  const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
+    // Encounters are now handled on the Underworld screen, so we might need a global encounter system OR we just return false for now to avoid errors on this screen
+    // TODO: move encounter trigger logic out of here if we don't want encounters to pop up over life screen.
+    return false;
+  }, []);
 
   // Night Out System
   const {
@@ -157,21 +130,9 @@ const LifeScreen = () => {
     performSurgery, getFreshCut, handleServicePurchase, buyMembership, isVIPMember, isResultVisible, resultData, activeBuffs, usageTracker
   } = useSanctuarySystem();
 
-  // Black Market
-  const [isBlackMarketVisible, setBlackMarketVisible] = useState(false);
-  const [isStatsMode, setIsStatsMode] = useState(false);
-
   // Stats Data
   const userMoney = useStatsStore(state => state.money);
   const { core: playerCore, attributes: playerAttributes } = usePlayerStore();
-
-  // Handle Encounter Date
-  const handleEncounterDate = useCallback(() => {
-    const result = handleDate();
-    if (result.wasCaught) {
-      setCheatingConsequence({ settlement: result.settlement, partnerName: 'Your Partner' });
-    }
-  }, [handleDate]);
 
   // -- Navigation Handlers --
 
@@ -196,13 +157,6 @@ const LifeScreen = () => {
       case 'notes': Alert.alert('Notes', 'Notes app is coming soon!'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
       case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
-
-      // Underworld
-      case 'casino': navigation.navigate('Casino'); break;
-      case 'blackMarket': setBlackMarketVisible(true); break;
-      case 'hookup': startHookup(); break;
-      case 'network': Alert.alert('Network', 'Networking events are coming soon!'); break;
-      case 'stockMarket': navigation.navigate('Assets', { screen: 'Market' } as any); break;
 
       default: break;
     }
@@ -268,13 +222,6 @@ const LifeScreen = () => {
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Underworld</Text>
-            <View style={styles.grid}>
-              {SECTION_UNDERWORLD.map(renderAppIcon)}
-            </View>
-          </View>
-
           {/* Spacer for Bottom Bar */}
           <View style={{ height: 80 }} />
 
@@ -328,15 +275,6 @@ const LifeScreen = () => {
         onAccept={acceptMatch}
         onReject={rejectMatch}
         onClose={closeMatch}
-      />
-      <HookupModal
-        visible={isModalVisible}
-        candidate={currentCandidate}
-        matchStatus={matchStatus}
-        onSwipeRight={swipeRight}
-        onSwipeLeft={swipeLeft}
-        nextCandidate={nextCandidate}
-        onClose={closeHookupModal}
       />
 
       <NightOutSetupModal
@@ -445,35 +383,6 @@ const LifeScreen = () => {
         resultData={resultData}
         onClose={closeSanctuary}
       />
-
-      <BlackMarketMasterModal
-        visible={isBlackMarketVisible}
-        onClose={() => setBlackMarketVisible(false)}
-      />
-
-      <EncounterModal
-        visible={isEncounterVisible}
-        candidate={encounterCandidate}
-        scenario={encounterScenario}
-        context={encounterScenario?.id.split('_')[0] || 'Unknown'}
-        onDate={handleEncounterDate}
-        onHookup={() => {
-          Alert.alert("Fling", "You had a great night! (Stress -10)");
-          closeEncounter();
-        }}
-        onIgnore={closeEncounter}
-      />
-
-      {
-        cheatingConsequence && (
-          <BreakupModal
-            visible={!!cheatingConsequence}
-            onClose={() => setCheatingConsequence(null)}
-            partnerName={cheatingConsequence.partnerName}
-            settlementCost={cheatingConsequence.settlement}
-          />
-        )
-      }
 
     </View >
   );

@@ -11,6 +11,7 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
@@ -37,6 +38,26 @@ type HomeNavProp = CompositeNavigationProp<
 >;
 
 
+
+const GRADIENTS = {
+  purplePink: ['#8E2DE2', '#4A00E0'],
+  pinkRed: ['#ec008c', '#fc6767'],
+  orangeYellow: ['#F2994A', '#F2C94C'],
+  blueSky: ['#2980B9', '#6DD5FA'],
+  bluePurple: ['#00c6ff', '#0072ff'],
+  darkGrey: ['#232526', '#414345'],
+  networkBlue: ['#1A2980', '#26D0CE'],
+  tealCyan: ['#00b09b', '#96c93d'],
+};
+
+const HOMESCREEN_APPS = [
+  { key: 'calendar', label: 'Calendar', icon: '📅', gradient: GRADIENTS.orangeYellow },
+  { key: 'health', label: 'Health', icon: '❤️', gradient: GRADIENTS.pinkRed },
+  { key: 'mail', label: 'Mail', icon: '✉️', gradient: GRADIENTS.blueSky },
+  { key: 'settings', label: 'Settings', icon: '⚙️', gradient: GRADIENTS.darkGrey },
+  { key: 'myCompany', label: 'My Company', icon: '🏢', gradient: GRADIENTS.networkBlue },
+  { key: 'news', label: 'News', icon: '📰', gradient: GRADIENTS.tealCyan },
+];
 
 const NewsItem = ({ text }: { text: string }) => (
   <View style={styles.newsItem}>
@@ -185,6 +206,31 @@ const HomeScreen = () => {
     navigation.navigate(screen as never);
   };
 
+  const handleAppAction = (key: string) => {
+    switch (key) {
+      case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
+      case 'health': Alert.alert('Health', 'Health app is coming soon!'); break;
+      case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
+      case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
+      case 'myCompany': handleNavigateTabs('MyCompany'); break;
+      case 'news': setShowNews(true); break;
+    }
+  };
+
+  const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
+    <Pressable key={item.key} style={styles.appIconContainer} onPress={() => handleAppAction(item.key)}>
+      <LinearGradient
+        colors={item.gradient}
+        style={styles.appIcon}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Text style={styles.appIconEmoji}>{item.icon}</Text>
+      </LinearGradient>
+      <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
+    </Pressable>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
@@ -216,81 +262,63 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: theme.spacing.xs }}>
-            <Text style={styles.sectionTitle}>Overview</Text>
-            <TouchableOpacity onPress={() => handleNavigateStack('Assets')} style={{ flexDirection: 'row', alignItems: 'baseline', marginLeft: theme.spacing.sm }}>
-              <Text style={{ fontSize: 18, color: theme.colors.textSecondary, marginRight: 4 }}>⤢</Text>
-              <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>expand</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.label}>Net Worth</Text>
-              <View style={{ alignItems: 'flex-end' }}>
-                <Text style={styles.value}>{formatMoney(realNetWorth)}</Text>
-                <Text style={{ fontSize: 10, color: theme.colors.textSecondary }}>
-                  (Equity: {formatMoney(equityValue)})
+        <View style={styles.widgetsContainer}>
+          {/* Overview Widget */}
+          <View style={[styles.widgetColumn, { flex: 1.5 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
+              <Text style={styles.sectionTitle}>Overview</Text>
+              <TouchableOpacity onPress={() => handleNavigateStack('Assets')} style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                <Text style={{ fontSize: 16, color: theme.colors.textSecondary, marginRight: 2 }}>⤢</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.card, styles.widgetCard]}>
+              <View style={styles.widgetRowBetween}>
+                <Text style={styles.widgetLabel}>Net Worth</Text>
+                <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
+              </View>
+              <View style={styles.widgetRowBetween}>
+                <Text style={styles.widgetLabel}>Cash</Text>
+                <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(cash)}</Text>
+              </View>
+              <View style={styles.widgetRowBetween}>
+                <Text style={styles.widgetLabel}>Income</Text>
+                <Text style={[styles.widgetValue, { color: theme.colors.success }]} numberOfLines={1} adjustsFontSizeToFit>
+                  {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
+                </Text>
+              </View>
+              <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
+                <Text style={styles.widgetLabel}>Expenses</Text>
+                <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
+                  {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
                 </Text>
               </View>
             </View>
-            <View style={styles.rowBetween}>
-              <Text style={styles.label}>Cash</Text>
-              <Text style={styles.value}>{formatMoney(cash)}</Text>
-            </View>
-            <View style={styles.rowBetween}>
-              <Text style={styles.label}>Investments</Text>
-              <Text style={styles.value}>{formatMoney(investmentsValue)}</Text>
-            </View>
-            <View style={styles.rowBetween}>
-              <Text style={styles.label}>Income (Quarterly)</Text>
-              <Text style={[styles.value, { color: theme.colors.success }]}>
-                {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
-              </Text>
-            </View>
-            <View style={styles.rowBetween}>
-              <Text style={styles.label}>Expenses (Quarterly)</Text>
-              <Text style={[styles.value, { color: theme.colors.danger }]}>
-                {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
-              </Text>
-            </View>
+          </View>
 
-            <View style={styles.cardActions}>
-              <Pressable
-                onPress={() => handleNavigateTabs('MyCompany')} // UPDATED to use Tab navigation
-                style={({ pressed }) => [
-                  styles.primaryCardButton,
-                  pressed && styles.primaryCardButtonPressed,
-                ]}>
-                <Text style={styles.primaryCardButtonText}>MY COMPANY</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setShowNews(true)}
-                style={({ pressed }) => [
-                  styles.secondaryCardButton,
-                  pressed && styles.secondaryCardButtonPressed,
-                ]}>
-                <Text style={styles.secondaryCardButtonText}>NEWS</Text>
-              </Pressable>
+          {/* Status Widget */}
+          <View style={[styles.widgetColumn, { flex: 1 }]}>
+            <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
+            <View style={[styles.statusCard, styles.widgetCard]}>
+              <View style={styles.widgetStatusRow}>
+                <Text style={styles.statusLabel}>Love</Text>
+                <Text style={styles.widgetStatusText} numberOfLines={1}>{partnerBrief}</Text>
+              </View>
+              <View style={styles.widgetStatusRow}>
+                <Text style={styles.statusLabel}>Assets</Text>
+                <Text style={styles.widgetStatusText} numberOfLines={1}>{assetsBrief}</Text>
+              </View>
+              <View style={[styles.widgetStatusRow, { marginBottom: 0 }]}>
+                <Text style={styles.statusLabel}>Life</Text>
+                <Text style={styles.widgetStatusText} numberOfLines={1}>{lifeBrief}</Text>
+              </View>
             </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Status</Text>
-          <View style={styles.statusCard}>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Love</Text>
-              <Text style={styles.statusText}>{partnerBrief}</Text>
-            </View>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Assets</Text>
-              <Text style={styles.statusText}>{assetsBrief}</Text>
-            </View>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Life</Text>
-              <Text style={styles.statusText}>{lifeBrief}</Text>
-            </View>
+        <View style={styles.appsSection}>
+          <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>Applications</Text>
+          <View style={styles.appsGrid}>
+            {HOMESCREEN_APPS.map(renderAppIcon)}
           </View>
         </View>
 
@@ -358,16 +386,18 @@ const HomeScreen = () => {
       </Modal>
 
       {/* --- GAME OVER OVERLAY --- */}
-      {isGameOver && (
-        <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
-          <Text style={styles.gameOverText}>GAME OVER</Text>
-          <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
+      {
+        isGameOver && (
+          <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
+            <Text style={styles.gameOverText}>GAME OVER</Text>
+            <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
 
-          <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-            <Text style={styles.restartButtonText}>NEW GAME</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
+            <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+              <Text style={styles.restartButtonText}>NEW GAME</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )
+      }
 
       {/* Education Exam Modal - Only show when report is closed */}
       {!reportVisible && <EducationExamModal />}
@@ -517,6 +547,80 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: theme.colors.textPrimary,
+  },
+  widgetsContainer: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    alignItems: 'stretch',
+  },
+  widgetColumn: {
+    flex: 1,
+  },
+  widgetCard: {
+    flex: 1,
+    padding: theme.spacing.md,
+    justifyContent: 'space-between',
+  },
+  widgetRowBetween: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.sm,
+  },
+  widgetLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.caption,
+  },
+  widgetValue: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.caption + 2,
+    fontWeight: '700',
+  },
+  appsSection: {
+    marginTop: theme.spacing.lg,
+  },
+  appsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    gap: '2%',
+    rowGap: 24,
+  },
+  appIconContainer: {
+    width: '23%',
+    alignItems: 'center',
+  },
+  appIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  appIconEmoji: {
+    fontSize: 28,
+  },
+  appIconLabel: {
+    color: theme.colors.textPrimary,
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    letterSpacing: 0.2,
+  },
+  widgetStatusRow: {
+    marginBottom: theme.spacing.sm,
+  },
+  widgetStatusText: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.caption + 1,
+    marginTop: 2,
   },
   card: {
     backgroundColor: theme.colors.card,

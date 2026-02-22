@@ -1,4 +1,5 @@
 export { default as LifeScreen } from '../features/life/screens/LifeScreen';
+export { default as UnderworldScreen } from '../features/life/screens/UnderworldScreen';
 export { default as LoveScreen } from '../features/love/screens/LoveScreen';
 export { default as AssetsScreen } from '../features/assets/screens/AssetsScreen';
 export { default as HomeScreen } from './Home/HomeScreen';
