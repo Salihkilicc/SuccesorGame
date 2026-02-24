@@ -79,18 +79,16 @@ export default NightEndModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        justifyContent: 'flex-end',
+        backgroundColor: '#000000',
     },
     container: {
-        backgroundColor: '#121212',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#0a0a0c',
         padding: 24,
         paddingBottom: 40,
         alignItems: 'center',
-        borderTopWidth: 1,
-        borderColor: '#333'
+        justifyContent: 'center',
     },
     title: {
         color: '#FFF',

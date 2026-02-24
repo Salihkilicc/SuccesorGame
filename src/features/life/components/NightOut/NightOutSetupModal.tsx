@@ -7,6 +7,8 @@ import {
     StyleSheet,
     Dimensions,
     Pressable,
+    SafeAreaView,
+    Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../../core/theme';
@@ -99,12 +101,19 @@ const NightOutSetupModal = ({
                     backgroundColor="#1a0b2e"
                 >
                     <View style={styles.backdrop}>
-                        <View style={styles.card}>
+                        <SafeAreaView style={styles.card}>
                             {/* Header with Progress & Back Button */}
                             <View style={styles.header}>
                                 <View style={styles.headerLeft}>
                                     <Pressable
-                                        onPress={goBack}
+                                        onPress={() => {
+                                            if (step === 'region_select') {
+                                                onClose();
+                                                navigation.navigate('Life');
+                                            } else {
+                                                goBack();
+                                            }
+                                        }}
                                         style={({ pressed }) => ({
                                             padding: 8,
                                             opacity: pressed ? 0.7 : 1
@@ -160,12 +169,11 @@ const NightOutSetupModal = ({
                                     />
                                 )}
                             </View>
-                        </View>
+                        </SafeAreaView>
 
                         {/* Bottom Stats Footer */}
                         <BottomStatsBar onHomePress={() => {
                             onClose();
-                            // @ts-ignore - Simple navigation
                             navigation.navigate('Home');
                         }} />
                     </View>
@@ -180,21 +188,15 @@ export default NightOutSetupModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
+        backgroundColor: '#000000',
     },
     card: {
-        width: Math.min(440, width - 32),
-        height: '85%',
-        backgroundColor: '#0a0a0a',
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: '#333',
-        padding: 24,
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#0a0a0c',
+        paddingHorizontal: 24,
+        paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,
-        overflow: 'hidden',
     },
     header: {
         flexDirection: 'row',

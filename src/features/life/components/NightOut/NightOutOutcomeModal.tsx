@@ -74,17 +74,15 @@ export default NightOutOutcomeModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
+        backgroundColor: '#000000',
     },
     card: {
-        width: Math.min(350, width - 32),
-        backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#0a0a0c',
         padding: 24,
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 16,
     },
     emojiIcon: {

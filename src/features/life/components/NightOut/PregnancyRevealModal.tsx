@@ -55,24 +55,15 @@ export default PregnancyRevealModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
+        backgroundColor: '#000000',
     },
     card: {
-        width: Math.min(320, width - 32),
-        backgroundColor: '#1E1E1E',
-        borderRadius: 20,
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#0a0a0c',
         padding: 32,
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#333',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 20,
-        elevation: 10
+        justifyContent: 'center',
     },
     iconContainer: {
         width: 80,

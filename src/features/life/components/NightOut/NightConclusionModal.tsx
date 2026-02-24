@@ -111,18 +111,15 @@ export default NightConclusionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20
+        backgroundColor: '#000000',
     },
     container: {
+        flex: 1,
         width: '100%',
-        maxWidth: 400,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#0a0a0c',
         padding: 32,
-        borderRadius: 20,
         alignItems: 'center',
+        justifyContent: 'center',
     },
     header: {
         flexDirection: 'row',
