@@ -5,7 +5,7 @@ import BrowserHeader from './BrowserHeader';
 import LuxeNetFooter from './LuxeNetFooter';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 
 const { width, height } = Dimensions.get('window');
@@ -72,6 +72,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                     canGoBack={true}
                     onBack={onClose}
                     onCartPress={() => { }} // Already in cart
+                    onBelongingsPress={() => { }} // Cart modal does not navigate to belongings directly
                 />
 
                 {cart.length === 0 ? (
@@ -188,7 +189,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                 )}
 
                 {/* Info / Stats Bar */}
-                <BottomStatsBar onHomePress={onHomePress} />
+                <CrystalNavBar activeTab="Life" variant="dark" />
 
 
             </SafeAreaView>

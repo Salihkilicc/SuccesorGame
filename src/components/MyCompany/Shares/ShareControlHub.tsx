@@ -15,7 +15,7 @@ import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import InfoTooltipModal from './InfoTooltipModal';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 interface Props {
     visible: boolean;
@@ -251,7 +251,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                     </ScrollView>
 
                     {/* Persistent Bottom Bar */}
-                    <BottomStatsBar onHomePress={handleHomePress} />
+                    <CrystalNavBar activeTab="Company" variant="dark" />
                 </SafeAreaView>
             </Modal>
 

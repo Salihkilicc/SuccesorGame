@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const ProductsScreen = () => {
   const navigation = useNavigation<any>();
@@ -63,7 +63,7 @@ const ProductsScreen = () => {
       </ScrollView>
 
       {/* Persistent Bottom Bar */}
-      <BottomStatsBar onHomePress={handleHomePress} />
+      <CrystalNavBar activeTab="Company" variant="dark" />
 
       {/* MODALS */}
       {selectedProduct?.status === 'locked' && (

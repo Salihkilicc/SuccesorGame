@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useUserStore } from '../../../core/store/useUserStore';
 import { useAssetStore } from '../store/useAssetStore';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import CartModal from '../components/CartModal';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -323,7 +323,7 @@ const ShoppingScreen = () => {
                 </View>
 
                 {/* Footer */}
-                <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
+                <CrystalNavBar activeTab="Life" variant="dark" />
 
                 {/* Cart Modal */}
                 <CartModal

@@ -119,6 +119,7 @@ export type RootStackParamList = {
   Travel: undefined;
   BlackMarket: undefined;
   Education: undefined;
+  EducationBrowse: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -334,6 +335,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="Travel" component={TravelScreen} />
           <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} />
           <RootStack.Screen name="Education" component={EducationDashboard} />
+          <RootStack.Screen name="EducationBrowse" component={EducationBrowseScreen} />
         </RootStack.Navigator>
 
       </View>

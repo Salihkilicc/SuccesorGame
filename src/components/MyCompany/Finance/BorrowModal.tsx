@@ -5,7 +5,7 @@ import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 type Props = {
     visible: boolean;
@@ -190,7 +190,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                 </View>
 
                 {/* Persistent Bottom Bar */}
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
             </View>
         </Modal>
     );

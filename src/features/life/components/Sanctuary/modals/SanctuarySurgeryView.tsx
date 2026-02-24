@@ -21,7 +21,7 @@ import GameModal from '../../../../../components/common/GameModal'; // Wait, I s
 // CORRECT IMPLEMENTATION FOR SanctuarySurgeryView (View-based):
 import { SafeAreaView } from 'react-native';
 import GameButton from '../../../../../components/common/GameButton';
-import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 import { useRelationshipBuffs } from '../../../../love/hooks/useRelationshipBuffs';
 import { DOCTORS, Doctor } from '../data/sanctuaryData';
 
@@ -37,9 +37,9 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
     const [stage, setStage] = useState<'selection' | 'warning' | 'processing'>('selection');
 
-    // Get relationship buffs
-    const { medicalDiscount, partnerName } = useRelationshipBuffs();
-    const hasDiscount = medicalDiscount > 0;
+    // Get relationship buffs (medicalDiscount is not implemented yet)
+    const { partnerName } = useRelationshipBuffs();
+    const hasDiscount = false;
 
     // Reset state on close
     useEffect(() => {
@@ -51,8 +51,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
 
     // Calculate discounted price
     const getDiscountedPrice = (originalPrice: number) => {
-        if (!hasDiscount) return originalPrice;
-        return Math.floor(originalPrice * (1 - medicalDiscount));
+        return originalPrice;
     };
 
     const handleSelect = (doctor: Doctor) => {
@@ -94,17 +93,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                 <ScrollView contentContainerStyle={styles.scrollContent}>
 
                     {/* DISCOUNT BANNER */}
-                    {hasDiscount && stage === 'selection' && (
-                        <View style={styles.discountBanner}>
-                            <Text style={styles.discountIcon}>💝</Text>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.discountTitle}>Partner Perk Active!</Text>
-                                <Text style={styles.discountText}>
-                                    {partnerName} secured you a {Math.round(medicalDiscount * 100)}% medical discount
-                                </Text>
-                            </View>
-                        </View>
-                    )}
+                    {/* Discount banner removed as relationship discounts are not yet implemented */}
 
                     {/* SELECTION STAGE */}
                     {stage === 'selection' && (
@@ -243,10 +232,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={onGoHome} />
-            </View>
+            {/* Universal Crystal Navigation Bar */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

@@ -10,6 +10,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { canEnroll } from '../../../logic/educationLogic';
 import EducationHeader from '../../../components/Education/EducationHeader';
 import { EducationType } from '../../education/educationTypes';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const EducationBrowseScreen = () => {
     const navigation = useNavigation();
@@ -155,6 +156,8 @@ const EducationBrowseScreen = () => {
                     );
                 })}
             </ScrollView>
+
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };
@@ -189,6 +192,7 @@ const styles = StyleSheet.create({
     },
     listContent: {
         padding: 16,
+        paddingBottom: 100,
     },
     card: {
         backgroundColor: theme.colors.card,

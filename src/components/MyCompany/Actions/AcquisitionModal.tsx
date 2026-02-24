@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react';
 import {
   Modal,
   View,
-  Text, 
+  Text,
   StyleSheet,
   Pressable,
-  FlatList, 
-  Alert, 
+  FlatList,
+  Alert,
   ScrollView,
   TouchableOpacity,
   Dimensions
@@ -17,7 +17,7 @@ import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -181,7 +181,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         />
 
         {/* Persistent Bottom Bar */}
-        <BottomStatsBar onHomePress={handleHomePress} />
+        <CrystalNavBar activeTab="Company" variant="dark" />
 
         {/* NEGOTIATION OVERLAY */}
         {selectedTarget && (

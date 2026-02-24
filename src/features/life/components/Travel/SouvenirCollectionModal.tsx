@@ -9,7 +9,7 @@ import {
     SafeAreaView,
 } from 'react-native';
 import { VACATION_SPOTS } from './data/travelData';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 type SouvenirCollectionModalProps = {
     visible: boolean;
@@ -120,10 +120,9 @@ const SouvenirCollectionModal = ({
 
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={onHomePress} />
-        </Modal >
+            {/* Universal Crystal Navigation Bar */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
+        </Modal>
     );
 };
 

@@ -23,7 +23,7 @@ import {
     PhDType
 } from '../data/educationData';
 import { theme } from '../../../../../core/theme';
-import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 
 // ========================================
 // TYPES & CONSTANTS
@@ -436,11 +436,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={() => {
-                closeEducation();
-                // @ts-ignore - Simple navigation
-                navigation.navigate('Home');
-            }} />
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

@@ -15,7 +15,7 @@ import { useShareholderStore } from '../../../features/shareholders/stores/useSh
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -530,7 +530,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     </ScrollView>
 
                     {/* Persistent Bottom Bar */}
-                    <BottomStatsBar onHomePress={handleHomePress} />
+                    <CrystalNavBar activeTab="Company" variant="dark" />
                 </View>
 
                 {/* ANIMATION OVERLAY */}

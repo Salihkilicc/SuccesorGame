@@ -12,7 +12,7 @@ import {
 import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
 import { SHOP_DATA } from '../data/shoppingRegistry';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
@@ -200,7 +200,7 @@ const ShoppingBrowseView = ({
             </ScrollView>
 
             {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={onHomePress} />
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </SafeAreaView>
     );
 };

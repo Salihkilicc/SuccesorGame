@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { theme } from '../../../../core/theme';
 import { VacationSpot } from './data/travelData';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -80,6 +80,7 @@ const TravelHubModal = ({
                 </ScrollView>
 
             </SafeAreaView>
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

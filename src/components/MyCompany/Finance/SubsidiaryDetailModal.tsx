@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import SellCompanyModal from '../Actions/SellCompanyModal';
 
 type Props = {
@@ -188,7 +188,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                 </View>
 
                 {/* Bottom Bar */}
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
 
                 {/* Sell Modal */}
                 {company && <SellCompanyModal

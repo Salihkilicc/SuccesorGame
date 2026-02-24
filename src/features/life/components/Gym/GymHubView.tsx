@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useGymSystem } from './useGymSystem';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 /**
  * GYM HUB VIEW
@@ -152,12 +152,8 @@ const GymHubView = () => {
                 </View>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={() => {
-                closeGym();
-                navigation.navigate('Home');
-            }} />
+            {/* Universal Crystal Navigation Bar */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };
@@ -178,6 +174,7 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: '#0a0a0c', // Dark premium background
         padding: 24,
+        paddingBottom: 100, // Safe space for CrystalNavBar
         alignItems: 'center',
         // Removed borders and shadows
     },

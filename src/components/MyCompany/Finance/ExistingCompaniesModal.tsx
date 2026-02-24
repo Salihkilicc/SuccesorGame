@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 type Props = {
     visible: boolean;
@@ -69,7 +69,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                     ]}
                 />
 
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
 
                 {/* Detail Modal Integration */}
                 {selectedCompanyId && (

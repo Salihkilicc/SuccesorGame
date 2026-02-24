@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../../core/theme';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { VENUES, Venue, RegionCode } from './data/nightOutVenues';
@@ -172,10 +172,7 @@ const NightOutSetupModal = ({
                         </SafeAreaView>
 
                         {/* Bottom Stats Footer */}
-                        <BottomStatsBar onHomePress={() => {
-                            onClose();
-                            navigation.navigate('Home');
-                        }} />
+                        <CrystalNavBar activeTab="Life" variant="dark" />
                     </View>
                 </AppLaunchLoader>
             )}

@@ -6,7 +6,7 @@ import { COMPANY_EVENTS, useCompanyManagement } from '../useCompanyManagement';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 interface EmployeesModalProps {
     visible: boolean;
@@ -232,7 +232,7 @@ const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
             </ScrollView>
 
             {/* Persistent Bottom Bar */}
-            <BottomStatsBar onHomePress={handleHomePress} />
+            <CrystalNavBar activeTab="Company" variant="dark" />
 
             <GameModal
                 visible={eventsVisible}

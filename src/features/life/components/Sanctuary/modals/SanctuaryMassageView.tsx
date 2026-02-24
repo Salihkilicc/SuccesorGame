@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import GameButton from '../../../../../components/common/GameButton';
-import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 
 import { useStatsStore } from '../../../../../core/store/useStatsStore';
 import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
@@ -104,10 +104,8 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={onGoHome} />
-            </View>
+            {/* Universal Crystal Navigation Bar */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };
@@ -193,6 +191,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
+        paddingBottom: 100,
         gap: theme.spacing.md,
     },
     optionCard: {

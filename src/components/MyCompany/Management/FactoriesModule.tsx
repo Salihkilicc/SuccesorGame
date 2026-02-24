@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { FACTORY_CAPACITY, FACTORY_COST, useCompanyManagement } from '../useCompanyManagement';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const ControlButton = ({ label, onPress, disabled, tone = 'default' }: any) => (
     <Pressable
@@ -98,7 +98,7 @@ const FactoriesModule = ({ visible, onClose }: FactoriesModalProps) => {
                 </View>
 
                 {/* Persistent Bottom Bar */}
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
             </View>
         </Modal>
     );

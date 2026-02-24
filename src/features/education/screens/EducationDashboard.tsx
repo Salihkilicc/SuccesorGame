@@ -9,6 +9,7 @@ import EducationHeader from '../../../components/Education/EducationHeader';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const EducationDashboard = () => {
     const navigation = useNavigation<any>();
@@ -196,6 +197,7 @@ const EducationDashboard = () => {
                         ))
                     )}
                 </ScrollView>
+                <CrystalNavBar activeTab="Life" variant="dark" />
             </View>
         </AppLaunchLoader>
     );
@@ -208,6 +210,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 16,
+        paddingBottom: 100,
     },
     sectionTitle: {
         fontSize: 16,

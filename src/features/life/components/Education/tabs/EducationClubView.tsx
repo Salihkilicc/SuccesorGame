@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { CLUB_DATA, ClubType } from '../data/educationData';
-import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 
 // ========================================
 // TYPES
@@ -162,11 +162,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={() => {
-                closeEducation();
-                // @ts-ignore - Simple navigation
-                navigation.navigate('Home');
-            }} />
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

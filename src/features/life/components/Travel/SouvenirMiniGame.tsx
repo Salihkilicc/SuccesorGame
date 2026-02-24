@@ -8,7 +8,7 @@ import {
     Animated,
 } from 'react-native';
 import { Souvenir } from './data/travelData';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 type SouvenirMiniGameProps = {
     visible: boolean;
@@ -127,8 +127,8 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
                     )}
                 </View>
 
-                {/* Bottom Stats Bar */}
-                <BottomStatsBar onHomePress={onHomePress} />
+                {/* Universal Crystal Navigation Bar */}
+                <CrystalNavBar activeTab="Life" variant="dark" />
             </View>
         </Modal>
     );

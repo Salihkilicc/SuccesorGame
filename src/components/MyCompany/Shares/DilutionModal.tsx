@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 interface Props {
     visible: boolean;
@@ -191,7 +191,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                 </View>
 
                 {/* Persistent Bottom Bar */}
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
             </View>
         </Modal>
     );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 // Icons
 const ICONS = {
@@ -109,10 +109,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <View style={styles.bottomBarContainer}>
-                <BottomStatsBar onHomePress={onGoHome} />
-            </View>
+            {/* Universal Crystal Navigation Bar */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

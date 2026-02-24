@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
-import BottomStatsBar from '../../common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 type Props = {
     visible: boolean;
@@ -62,7 +62,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                         </View>
                     </View>
                     {/* Persistent Bottom Bar */}
-                    <BottomStatsBar onHomePress={handleHomePress} />
+                    <CrystalNavBar activeTab="Company" variant="dark" />
                 </View>
             </Modal>
         );
@@ -183,7 +183,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                 </View>
 
                 {/* Persistent Bottom Bar */}
-                <BottomStatsBar onHomePress={handleHomePress} />
+                <CrystalNavBar activeTab="Company" variant="dark" />
             </View>
         </Modal>
     );

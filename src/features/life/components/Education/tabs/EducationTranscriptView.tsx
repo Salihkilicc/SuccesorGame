@@ -10,7 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, DegreeType, MASTERS_DATA, MastersType } from '../data/educationData';
-import BottomStatsBar from '../../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 
 // ========================================
 // TYPES
@@ -96,11 +96,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
             </SafeAreaView>
 
             {/* Bottom Stats Bar */}
-            <BottomStatsBar onHomePress={() => {
-                closeEducation();
-                // @ts-ignore - Simple navigation
-                navigation.navigate('Home');
-            }} />
+            <CrystalNavBar activeTab="Life" variant="dark" />
         </View>
     );
 };

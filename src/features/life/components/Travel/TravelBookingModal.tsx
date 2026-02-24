@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { theme } from '../../../../core/theme';
 import { VacationSpot, TravelClass } from './data/travelData';
-import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 type TravelBookingModalProps = {
     visible: boolean;
@@ -158,8 +158,8 @@ const TravelBookingModal = ({
                         <Text style={styles.closeText}>CANCEL FLIGHT</Text>
                     </Pressable>
                 </View>
-                {/* Bottom Stats Bar */}
-                <BottomStatsBar onHomePress={onHomePress} />
+                {/* Universal Crystal Navigation Bar */}
+                <CrystalNavBar activeTab="Life" variant="dark" />
             </View>
         </Modal>
     );

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useAssetPortfolio } from '../hooks/useAssetPortfolio';
 import AssetCard from '../components/AssetCard';
-import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -170,7 +170,7 @@ const BelongingsScreen = () => {
                 </SafeAreaView>
 
                 {/* 4. Footer Stats */}
-                <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
+                <CrystalNavBar activeTab="Life" variant="dark" />
             </View>
         </AppLaunchLoader>
     );
