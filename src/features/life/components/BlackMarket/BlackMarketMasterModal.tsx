@@ -6,6 +6,8 @@ import { BlackMarketDealView } from './BlackMarketDealView';
 import { PoliceChaseGame } from './PoliceChaseGame';
 import { BlackMarketCategory } from './blackMarketData';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /**
  * BLACK MARKET MASTER MODAL
@@ -75,39 +77,47 @@ export const BlackMarketMasterModal: React.FC<BlackMarketMasterModalProps> = ({ 
 
     return (
         <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose}>
-            <SafeAreaView style={styles.container}>
+            {visible && (
+                <AppLaunchLoader
+                    appName="Black Market"
+                    appIcon={<MaterialCommunityIcons name="incognito" size={64} color="#FFFFFF" />}
+                    backgroundColor="#000000"
+                >
+                    <SafeAreaView style={styles.container}>
 
-                {/* Layer 1: Hub View */}
-                {/* Always visible as background, but accessible only if activeView !== RAID */}
-                <BlackMarketHubView
-                    onOpenCategory={actions.openCategory}
-                    onClose={onClose}
-                />
-
-                {/* Layer 2: Deal Overlay */}
-                {activeView === 'DEAL' && currentDeal && (
-                    <View style={StyleSheet.absoluteFill}>
-                        <BlackMarketDealView
-                            deal={currentDeal}
-                            onBuy={handleBuy}
-                            onPass={actions.passItem}
-                            onConsume={handleConsume}
-                            isDrug={currentDeal.isDrug || false}
+                        {/* Layer 1: Hub View */}
+                        {/* Always visible as background, but accessible only if activeView !== RAID */}
+                        <BlackMarketHubView
+                            onOpenCategory={actions.openCategory}
+                            onClose={onClose}
                         />
-                    </View>
-                )}
 
-                {/* Layer 3: Police Game Overlay */}
-                {activeView === 'RAID' && (
-                    <View style={[StyleSheet.absoluteFill, { zIndex: 999 }]}>
-                        <PoliceChaseGame
-                            onComplete={handlePoliceGameComplete}
-                            onClose={actions.closeRaid} // Fallback
-                        />
-                    </View>
-                )}
+                        {/* Layer 2: Deal Overlay */}
+                        {activeView === 'DEAL' && currentDeal && (
+                            <View style={StyleSheet.absoluteFill}>
+                                <BlackMarketDealView
+                                    deal={currentDeal}
+                                    onBuy={handleBuy}
+                                    onPass={actions.passItem}
+                                    onConsume={handleConsume}
+                                    isDrug={currentDeal.isDrug || false}
+                                />
+                            </View>
+                        )}
 
-            </SafeAreaView>
+                        {/* Layer 3: Police Game Overlay */}
+                        {activeView === 'RAID' && (
+                            <View style={[StyleSheet.absoluteFill, { zIndex: 999 }]}>
+                                <PoliceChaseGame
+                                    onComplete={handlePoliceGameComplete}
+                                    onClose={actions.closeRaid} // Fallback
+                                />
+                            </View>
+                        )}
+
+                    </SafeAreaView>
+                </AppLaunchLoader>
+            )}
         </Modal>
     );
 };

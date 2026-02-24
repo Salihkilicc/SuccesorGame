@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Modal, StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import Views
 import SanctuaryHubView from './SanctuaryHubView';
@@ -119,22 +121,30 @@ const SanctuaryMasterModal = ({
             onRequestClose={closeSanctuary}
             statusBarTranslucent={true}
         >
-            {/* LAYER 1: Hub (Always Rendered) */}
-            <View style={styles.baseLayer}>
-                <SanctuaryHubView
-                    closeSanctuary={closeSanctuary}
-                    navigate={navigate}
-                    isVIPMember={isVIPMember}
-                    buyMembership={buyMembership}
-                    onGoHome={handleGoHome}
-                />
-            </View>
+            {isHubVisible && (
+                <AppLaunchLoader
+                    appName="Sanctuary"
+                    appIcon={<MaterialCommunityIcons name="spa" size={64} color="#FFFFFF" />}
+                    backgroundColor="#0f171e"
+                >
+                    {/* LAYER 1: Hub (Always Rendered) */}
+                    <View style={styles.baseLayer}>
+                        <SanctuaryHubView
+                            closeSanctuary={closeSanctuary}
+                            navigate={navigate}
+                            isVIPMember={isVIPMember}
+                            buyMembership={buyMembership}
+                            onGoHome={handleGoHome}
+                        />
+                    </View>
 
-            {/* LAYER 2: Overlay (Conditionally Rendered) */}
-            {activeView !== 'HUB' && (
-                <View style={styles.overlayLayer}>
-                    {renderOverlay()}
-                </View>
+                    {/* LAYER 2: Overlay (Conditionally Rendered) */}
+                    {activeView !== 'HUB' && (
+                        <View style={styles.overlayLayer}>
+                            {renderOverlay()}
+                        </View>
+                    )}
+                </AppLaunchLoader>
             )}
         </Modal>
     );

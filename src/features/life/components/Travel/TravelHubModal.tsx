@@ -12,6 +12,8 @@ import {
 import { theme } from '../../../../core/theme';
 import { VacationSpot } from './data/travelData';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type TravelHubModalProps = {
     visible: boolean;
@@ -42,48 +44,56 @@ const TravelHubModal = ({
             animationType="slide"
             presentationStyle="fullScreen"
         >
-            <View style={styles.backdrop}>
-                <SafeAreaView style={styles.container}>
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <Pressable onPress={onClose} style={styles.headerButton}>
-                            <Text style={styles.headerButtonText}>CLOSE</Text>
-                        </Pressable>
-                        <Text style={styles.headerTitle}>WORLD TRAVEL</Text>
-                        <Pressable onPress={onOpenCollection} style={styles.headerButton}>
-                            <Text style={styles.headerIcon}>🎒</Text>
-                        </Pressable>
+            {visible && (
+                <AppLaunchLoader
+                    appName="Travel"
+                    appIcon={<MaterialCommunityIcons name="airplane" size={64} color="#FFFFFF" />}
+                    backgroundColor="#002D62"
+                >
+                    <View style={styles.backdrop}>
+                        <SafeAreaView style={styles.container}>
+                            {/* Header */}
+                            <View style={styles.header}>
+                                <Pressable onPress={onClose} style={styles.headerButton}>
+                                    <Text style={styles.headerButtonText}>CLOSE</Text>
+                                </Pressable>
+                                <Text style={styles.headerTitle}>WORLD TRAVEL</Text>
+                                <Pressable onPress={onOpenCollection} style={styles.headerButton}>
+                                    <Text style={styles.headerIcon}>🎒</Text>
+                                </Pressable>
+                            </View>
+
+                            {/* Grid */}
+                            <ScrollView contentContainerStyle={styles.gridContainer}>
+                                {vacationSpots.map((spot) => (
+                                    <Pressable
+                                        key={spot.id}
+                                        style={[styles.card, { backgroundColor: spot.color + '20', borderColor: spot.color }]}
+                                        onPress={() => onSelectSpot(spot)}
+                                    >
+                                        <View style={[styles.emojiContainer, { backgroundColor: spot.color + '30' }]}>
+                                            <Text style={styles.emoji}>{spot.emoji}</Text>
+                                        </View>
+
+                                        <View style={styles.cardFooter}>
+                                            <Text style={[styles.spotName, { color: spot.color }]}>{spot.name}</Text>
+                                            <Text style={styles.spotCost}>From ${spot.baseCost.toLocaleString()}</Text>
+                                        </View>
+
+                                        {/* Type Badge */}
+                                        <View style={styles.typeBadge}>
+                                            <Text style={styles.typeText}>{spot.type}</Text>
+                                        </View>
+                                    </Pressable>
+                                ))}
+                            </ScrollView>
+
+                            {/* Bottom Stats Bar */}
+                            <BottomStatsBar onHomePress={onHomePress} />
+                        </SafeAreaView>
                     </View>
-
-                    {/* Grid */}
-                    <ScrollView contentContainerStyle={styles.gridContainer}>
-                        {vacationSpots.map((spot) => (
-                            <Pressable
-                                key={spot.id}
-                                style={[styles.card, { backgroundColor: spot.color + '20', borderColor: spot.color }]}
-                                onPress={() => onSelectSpot(spot)}
-                            >
-                                <View style={[styles.emojiContainer, { backgroundColor: spot.color + '30' }]}>
-                                    <Text style={styles.emoji}>{spot.emoji}</Text>
-                                </View>
-
-                                <View style={styles.cardFooter}>
-                                    <Text style={[styles.spotName, { color: spot.color }]}>{spot.name}</Text>
-                                    <Text style={styles.spotCost}>From ${spot.baseCost.toLocaleString()}</Text>
-                                </View>
-
-                                {/* Type Badge */}
-                                <View style={styles.typeBadge}>
-                                    <Text style={styles.typeText}>{spot.type}</Text>
-                                </View>
-                            </Pressable>
-                        ))}
-                    </ScrollView>
-
-                    {/* Bottom Stats Bar */}
-                    <BottomStatsBar onHomePress={onHomePress} />
-                </SafeAreaView>
-            </View>
+                </AppLaunchLoader>
+            )}
         </Modal>
     );
 };

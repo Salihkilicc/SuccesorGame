@@ -8,6 +8,8 @@ import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import CasinoLocationModal from '../components/CasinoLocationModal';
 import { GameRoomCard } from '../components/GameRoomCard';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CasinoScreen = () => {
   const navigation = useNavigation<any>();
@@ -37,66 +39,72 @@ const CasinoScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <AppLaunchLoader
+      appName="Casino"
+      appIcon={<MaterialCommunityIcons name="cards-playing-outline" size={64} color="#FFFFFF" />}
+      backgroundColor="#111827"
+    >
+      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
 
-      {/* 1. HEADER */}
-      <CasinoHeader
-        onBack={() => navigation.goBack()}
-        location={currentLocation}
-        reputation={casinoReputation}
-        cash={money}
-        onLocationPress={() => setLocationModalVisible(true)}
-      />
+        {/* 1. HEADER */}
+        <CasinoHeader
+          onBack={() => navigation.goBack()}
+          location={currentLocation}
+          reputation={casinoReputation}
+          cash={money}
+          onLocationPress={() => setLocationModalVisible(true)}
+        />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 2. GAME LOBBY */}
-        <View style={styles.gameSection}>
-          <Text style={styles.sectionHeader}>HIGH ROLLER SUITE</Text>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          {/* 2. GAME LOBBY */}
+          <View style={styles.gameSection}>
+            <Text style={styles.sectionHeader}>HIGH ROLLER SUITE</Text>
 
-          {/* BLACKJACK */}
-          <GameRoomCard
-            title="Blackjack"
-            subtitle="High Stakes Tables"
-            image={require('../assets/blackjack_thumb.png')}
-            onPress={() => handleGamePress('BlackjackGame', { title: 'Blackjack 21' })}
-          />
+            {/* BLACKJACK */}
+            <GameRoomCard
+              title="Blackjack"
+              subtitle="High Stakes Tables"
+              image={require('../assets/blackjack_thumb.png')}
+              onPress={() => handleGamePress('BlackjackGame', { title: 'Blackjack 21' })}
+            />
 
-          {/* ROULETTE */}
-          <GameRoomCard
-            title="Roulette"
-            subtitle="European & American"
-            image={require('../assets/roulette_thumb.png')}
-            onPress={() => handleGamePress('RouletteGame', { title: 'European Roulette' })}
-          />
+            {/* ROULETTE */}
+            <GameRoomCard
+              title="Roulette"
+              subtitle="European & American"
+              image={require('../assets/roulette_thumb.png')}
+              onPress={() => handleGamePress('RouletteGame', { title: 'European Roulette' })}
+            />
 
-          {/* SLOTS */}
-          <GameRoomCard
-            title="Slots"
-            subtitle="Progressive Jackpots"
-            image={require('../assets/slots_thumb.png')}
-            onPress={() => handleGamePress('SlotsGame', { title: 'Slots' })}
-          />
+            {/* SLOTS */}
+            <GameRoomCard
+              title="Slots"
+              subtitle="Progressive Jackpots"
+              image={require('../assets/slots_thumb.png')}
+              onPress={() => handleGamePress('SlotsGame', { title: 'Slots' })}
+            />
 
-          {/* POKER */}
-          <GameRoomCard
-            title="Poker"
-            subtitle="Texas Hold'em"
-            image={require('../assets/poker_thumb.png')}
-            onPress={() => handleGamePress('PokerGame', { title: "Texas Hold'em" })}
-          />
-        </View>
-      </ScrollView>
+            {/* POKER */}
+            <GameRoomCard
+              title="Poker"
+              subtitle="Texas Hold'em"
+              image={require('../assets/poker_thumb.png')}
+              onPress={() => handleGamePress('PokerGame', { title: "Texas Hold'em" })}
+            />
+          </View>
+        </ScrollView>
 
-      {/* 3. MODALS */}
-      <CasinoLocationModal
-        visible={locationModalVisible}
-        onClose={() => setLocationModalVisible(false)}
-        currentLocationId={currentLocationId}
-        unlockedLocations={unlockedLocations}
-        onSelectLocation={setCurrentLocationId}
-      />
+        {/* 3. MODALS */}
+        <CasinoLocationModal
+          visible={locationModalVisible}
+          onClose={() => setLocationModalVisible(false)}
+          currentLocationId={currentLocationId}
+          unlockedLocations={unlockedLocations}
+          onSelectLocation={setCurrentLocationId}
+        />
 
-    </SafeAreaView>
+      </SafeAreaView>
+    </AppLaunchLoader>
   );
 };
 

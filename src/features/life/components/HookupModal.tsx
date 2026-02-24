@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { HookupCandidate } from './hookupData';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width, height } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
@@ -127,150 +129,158 @@ export function HookupModal({
             transparent
             onRequestClose={onClose}
         >
-            <View style={styles.backdrop}>
+            {visible && (
+                <AppLaunchLoader
+                    appName="Hookup"
+                    appIcon={<MaterialCommunityIcons name="fire" size={64} color="#FFFFFF" />}
+                    backgroundColor="#000000"
+                >
+                    <View style={styles.backdrop}>
 
-                {/* SWIPE CARD */}
-                {candidate && (
-                    <Animated.View
-                        style={[
-                            styles.card,
-                            {
-                                backgroundColor: theme.colors.card,
-                                transform: [{ translateX }, { rotate }]
-                            }
-                        ]}
-                    >
-                        {/* Top Half - Profile Image */}
-                        <View style={[styles.imageSection, { backgroundColor: candidate.imageColor }]}>
-                            <Text style={styles.avatarEmoji}>{avatarEmoji}</Text>
+                        {/* SWIPE CARD */}
+                        {candidate && (
+                            <Animated.View
+                                style={[
+                                    styles.card,
+                                    {
+                                        backgroundColor: theme.colors.card,
+                                        transform: [{ translateX }, { rotate }]
+                                    }
+                                ]}
+                            >
+                                {/* Top Half - Profile Image */}
+                                <View style={[styles.imageSection, { backgroundColor: candidate.imageColor }]}>
+                                    <Text style={styles.avatarEmoji}>{avatarEmoji}</Text>
 
-                            {/* Swipe Feedback Overlay - LIKE */}
-                            <Animated.View style={[styles.swipeFeedback, styles.likeFeedback, { opacity: likeOpacity }]}>
-                                <Text style={styles.likeText}>LIKE</Text>
-                            </Animated.View>
+                                    {/* Swipe Feedback Overlay - LIKE */}
+                                    <Animated.View style={[styles.swipeFeedback, styles.likeFeedback, { opacity: likeOpacity }]}>
+                                        <Text style={styles.likeText}>LIKE</Text>
+                                    </Animated.View>
 
-                            {/* Swipe Feedback Overlay - NOPE */}
-                            <Animated.View style={[styles.swipeFeedback, styles.nopeFeedback, { opacity: nopeOpacity }]}>
-                                <Text style={styles.nopeText}>NOPE</Text>
-                            </Animated.View>
-                        </View>
+                                    {/* Swipe Feedback Overlay - NOPE */}
+                                    <Animated.View style={[styles.swipeFeedback, styles.nopeFeedback, { opacity: nopeOpacity }]}>
+                                        <Text style={styles.nopeText}>NOPE</Text>
+                                    </Animated.View>
+                                </View>
 
-                        {/* Bottom Half - Info */}
-                        <View style={styles.infoSection}>
-                            <ScrollView showsVerticalScrollIndicator={false}>
+                                {/* Bottom Half - Info */}
+                                <View style={styles.infoSection}>
+                                    <ScrollView showsVerticalScrollIndicator={false}>
 
-                                {/* Header: Name, Age, Distance */}
-                                <View style={styles.headerRow}>
-                                    <View>
-                                        <View style={styles.nameRow}>
-                                            <Text style={styles.name}>{candidate.name}</Text>
-                                            <Text style={styles.age}>{candidate.age}</Text>
+                                        {/* Header: Name, Age, Distance */}
+                                        <View style={styles.headerRow}>
+                                            <View>
+                                                <View style={styles.nameRow}>
+                                                    <Text style={styles.name}>{candidate.name}</Text>
+                                                    <Text style={styles.age}>{candidate.age}</Text>
+                                                </View>
+                                                <Text style={styles.jobText}>{candidate.job}</Text>
+                                            </View>
+                                            <View style={styles.distanceBadge}>
+                                                <Text style={styles.distanceText}>📍 {candidate.distance}m</Text>
+                                            </View>
                                         </View>
-                                        <Text style={styles.jobText}>{candidate.job}</Text>
-                                    </View>
-                                    <View style={styles.distanceBadge}>
-                                        <Text style={styles.distanceText}>📍 {candidate.distance}m</Text>
-                                    </View>
-                                </View>
 
-                                <View style={styles.divider} />
+                                        <View style={styles.divider} />
 
-                                {/* Interests Chips */}
-                                <Text style={styles.sectionTitle}>PASSIONS</Text>
-                                <View style={styles.chipsContainer}>
-                                    {candidate.interests.map((interest, index) => (
-                                        <View key={index} style={styles.chip}>
-                                            <Text style={styles.chipText}>{interest}</Text>
+                                        {/* Interests Chips */}
+                                        <Text style={styles.sectionTitle}>PASSIONS</Text>
+                                        <View style={styles.chipsContainer}>
+                                            {candidate.interests.map((interest, index) => (
+                                                <View key={index} style={styles.chip}>
+                                                    <Text style={styles.chipText}>{interest}</Text>
+                                                </View>
+                                            ))}
                                         </View>
-                                    ))}
+
+                                        <View style={styles.divider} />
+
+                                        {/* Bio */}
+                                        <Text style={styles.sectionTitle}>ABOUT ME</Text>
+                                        <Text style={styles.bioText}>{candidate.bio}</Text>
+
+                                        {/* Padding for Scroll */}
+                                        <View style={{ height: 20 }} />
+                                    </ScrollView>
                                 </View>
 
-                                <View style={styles.divider} />
+                            </Animated.View>
+                        )}
 
-                                {/* Bio */}
-                                <Text style={styles.sectionTitle}>ABOUT ME</Text>
-                                <Text style={styles.bioText}>{candidate.bio}</Text>
+                        {/* CONTROLS (Only visible if IDLE) */}
+                        {matchStatus === 'IDLE' && (
+                            <View style={styles.buttonsContainer}>
+                                <TouchableOpacity
+                                    style={[styles.actionButton, styles.passButton]}
+                                    onPress={handlePass}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={styles.buttonIcon}>❌</Text>
+                                </TouchableOpacity>
 
-                                {/* Padding for Scroll */}
-                                <View style={{ height: 20 }} />
-                            </ScrollView>
-                        </View>
+                                <TouchableOpacity style={styles.smallButton} onPress={onClose}>
+                                    <Text style={styles.smallButtonText}>Close</Text>
+                                </TouchableOpacity>
 
-                    </Animated.View>
-                )}
+                                <TouchableOpacity
+                                    style={[styles.actionButton, styles.likeButton]}
+                                    onPress={handleLike}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={styles.buttonIcon}>💚</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
 
-                {/* CONTROLS (Only visible if IDLE) */}
-                {matchStatus === 'IDLE' && (
-                    <View style={styles.buttonsContainer}>
-                        <TouchableOpacity
-                            style={[styles.actionButton, styles.passButton]}
-                            onPress={handlePass}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={styles.buttonIcon}>❌</Text>
-                        </TouchableOpacity>
+                        {/* --- OVERLAYS --- */}
 
-                        <TouchableOpacity style={styles.smallButton} onPress={onClose}>
-                            <Text style={styles.smallButtonText}>Close</Text>
-                        </TouchableOpacity>
+                        {/* MATCHED OVERLAY */}
+                        {matchStatus === 'MATCHED' && candidate && (
+                            <View style={styles.overlayContainer}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#22C55E' }]}>
+                                    <Text style={styles.overlayTitle}>IT'S A MATCH! 💕</Text>
+                                    <Text style={styles.overlaySubtitle}>
+                                        You and {candidate.name} passed the vibe check.
+                                    </Text>
 
-                        <TouchableOpacity
-                            style={[styles.actionButton, styles.likeButton]}
-                            onPress={handleLike}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={styles.buttonIcon}>💚</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                                    <View style={styles.overlayAvatarRow}>
+                                        <View style={[styles.smallAvatar, { backgroundColor: '#333' }]}>
+                                            <Text style={{ fontSize: 40 }}>😎</Text>
+                                        </View>
+                                        <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
+                                            <Text style={{ fontSize: 40 }}>{avatarEmoji}</Text>
+                                        </View>
+                                    </View>
 
-                {/* --- OVERLAYS --- */}
+                                    <TouchableOpacity
+                                        style={styles.keepPlayingBtn}
+                                        onPress={handleNext}
+                                    >
+                                        <Text style={styles.keepPlayingText}>Keep Swiping</Text>
+                                    </TouchableOpacity>
 
-                {/* MATCHED OVERLAY */}
-                {matchStatus === 'MATCHED' && candidate && (
-                    <View style={styles.overlayContainer}>
-                        <View style={[styles.overlayCard, { backgroundColor: '#22C55E' }]}>
-                            <Text style={styles.overlayTitle}>IT'S A MATCH! 💕</Text>
-                            <Text style={styles.overlaySubtitle}>
-                                You and {candidate.name} passed the vibe check.
-                            </Text>
-
-                            <View style={styles.overlayAvatarRow}>
-                                <View style={[styles.smallAvatar, { backgroundColor: '#333' }]}>
-                                    <Text style={{ fontSize: 40 }}>😎</Text>
-                                </View>
-                                <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
-                                    <Text style={{ fontSize: 40 }}>{avatarEmoji}</Text>
+                                    <TouchableOpacity onPress={onClose} style={{ marginTop: 15 }}>
+                                        <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Close</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
+                        )}
 
-                            <TouchableOpacity
-                                style={styles.keepPlayingBtn}
-                                onPress={handleNext}
-                            >
-                                <Text style={styles.keepPlayingText}>Keep Swiping</Text>
-                            </TouchableOpacity>
+                        {/* GHOSTED OVERLAY */}
+                        {matchStatus === 'NO_MATCH' && candidate && (
+                            <View style={styles.overlayContainer}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#EF4444' }]}>
+                                    <Text style={styles.overlayTitle}>GHOSTED 👻</Text>
+                                    <Text style={styles.overlaySubtitle}>
+                                        {candidate.name} wasn't interested...
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
 
-                            <TouchableOpacity onPress={onClose} style={{ marginTop: 15 }}>
-                                <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Close</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
-                )}
-
-                {/* GHOSTED OVERLAY */}
-                {matchStatus === 'NO_MATCH' && candidate && (
-                    <View style={styles.overlayContainer}>
-                        <View style={[styles.overlayCard, { backgroundColor: '#EF4444' }]}>
-                            <Text style={styles.overlayTitle}>GHOSTED 👻</Text>
-                            <Text style={styles.overlaySubtitle}>
-                                {candidate.name} wasn't interested...
-                            </Text>
-                        </View>
-                    </View>
-                )}
-
-            </View>
+                </AppLaunchLoader>
+            )}
         </Modal>
     );
 }

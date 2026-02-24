@@ -7,6 +7,8 @@ import { EducationTranscriptView } from '../tabs/EducationTranscriptView';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
 import { Alert } from 'react-native';
+import AppLaunchLoader from '../../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // ========================================
 // TYPES
@@ -77,9 +79,17 @@ export const EducationMasterModal: React.FC = () => {
                 animationType="fade"
                 onRequestClose={closeEducation}
             >
-                <View style={styles.container}>
-                    {renderView()}
-                </View>
+                {isVisible && (
+                    <AppLaunchLoader
+                        appName="Education"
+                        appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
+                        backgroundColor="#1e1e1e"
+                    >
+                        <View style={styles.container}>
+                            {renderView()}
+                        </View>
+                    </AppLaunchLoader>
+                )}
             </Modal>
         </>
     );

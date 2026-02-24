@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Modal, StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useGymSystem } from './useGymSystem';
+import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import all Gym Views
 import GymHubView from './GymHubView';
@@ -66,16 +68,24 @@ const GymMasterModal = () => {
             onRequestClose={closeGym}
             statusBarTranslucent={true}
         >
-            {/* LAYER 1: Hub (Always Rendered) */}
-            <View style={styles.baseLayer}>
-                <GymHubView />
-            </View>
+            {isVisible && (
+                <AppLaunchLoader
+                    appName="Gym"
+                    appIcon={<MaterialCommunityIcons name="dumbbell" size={64} color="#FFFFFF" />}
+                    backgroundColor="#1a1a1a"
+                >
+                    {/* LAYER 1: Hub (Always Rendered) */}
+                    <View style={styles.baseLayer}>
+                        <GymHubView />
+                    </View>
 
-            {/* LAYER 2: Overlay (Conditionally Rendered) */}
-            {activeView !== 'HUB' && (
-                <View style={styles.overlayLayer}>
-                    {renderOverlay()}
-                </View>
+                    {/* LAYER 2: Overlay (Conditionally Rendered) */}
+                    {activeView !== 'HUB' && (
+                        <View style={styles.overlayLayer}>
+                            {renderOverlay()}
+                        </View>
+                    )}
+                </AppLaunchLoader>
             )}
         </Modal>
     );

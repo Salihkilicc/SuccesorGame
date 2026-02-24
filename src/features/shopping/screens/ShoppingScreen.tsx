@@ -16,6 +16,8 @@ import AdBannerCarousel from '../components/AdBannerCarousel';
 import ShopPreviewCard from '../components/ShopPreviewCard';
 import LuxeNetFooter from '../components/LuxeNetFooter';
 import { useShoppingWithInventory } from '../hooks/useShopping';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
@@ -296,46 +298,52 @@ const ShoppingScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+        <AppLaunchLoader
+            appName="LuxeNet"
+            appIcon={<MaterialCommunityIcons name="shopping" size={64} color="#FFFFFF" />}
+            backgroundColor="#1a1a1a"
+        >
+            <SafeAreaView style={styles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
 
-            {/* Persistent Browser Header */}
-            <BrowserHeader
-                currentUrl={currentUrl}
-                canGoBack={true} // Always enabled (Hub -> LifeScreen)
-                onBack={handleBack}
-                onCartPress={() => setShowCart(true)}
-                onBelongingsPress={handleGoToBelongings}
-            />
+                {/* Persistent Browser Header */}
+                <BrowserHeader
+                    currentUrl={currentUrl}
+                    canGoBack={true} // Always enabled (Hub -> LifeScreen)
+                    onBack={handleBack}
+                    onCartPress={() => setShowCart(true)}
+                    onBelongingsPress={handleGoToBelongings}
+                />
 
-            {/* Dynamic Content */}
-            <View style={styles.contentArea}>
-                {currentView === 'HUB' && renderHub()}
-                {currentView === 'CATEGORY_LIST' && renderCategoryList()}
-                {currentView === 'SHOP_DETAIL' && renderShopDetail()}
-            </View>
+                {/* Dynamic Content */}
+                <View style={styles.contentArea}>
+                    {currentView === 'HUB' && renderHub()}
+                    {currentView === 'CATEGORY_LIST' && renderCategoryList()}
+                    {currentView === 'SHOP_DETAIL' && renderShopDetail()}
+                </View>
 
-            {/* Footer */}
-            <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
+                {/* Footer */}
+                <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
 
-            {/* Cart Modal */}
-            <CartModal
-                visible={showCart}
-                onClose={() => setShowCart(false)}
-                onProceedToCheckout={handleCheckoutStart}
-                onHomePress={() => {
-                    setShowCart(false);
-                    navigation.navigate('Home');
-                }}
-            />
+                {/* Cart Modal */}
+                <CartModal
+                    visible={showCart}
+                    onClose={() => setShowCart(false)}
+                    onProceedToCheckout={handleCheckoutStart}
+                    onHomePress={() => {
+                        setShowCart(false);
+                        navigation.navigate('Home');
+                    }}
+                />
 
-            {/* Payment Processor */}
-            <PaymentProcessingModal
-                visible={isProcessing}
-                amount={orderTotal}
-                onComplete={handlePaymentComplete}
-            />
-        </SafeAreaView>
+                {/* Payment Processor */}
+                <PaymentProcessingModal
+                    visible={isProcessing}
+                    amount={orderTotal}
+                    onComplete={handlePaymentComplete}
+                />
+            </SafeAreaView>
+        </AppLaunchLoader>
     );
 };
 

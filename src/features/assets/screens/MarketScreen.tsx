@@ -19,6 +19,8 @@ import PortfolioModal from '../../../components/Market/PortfolioModal';
 import MarketTicker from '../../../components/Market/MarketTicker';
 import { CategoryTabs, TabKey, TabOption } from '../components/CategoryTabs';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Veriler ve Tipler
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
@@ -110,102 +112,108 @@ const MarketScreen = () => {
   };
 
   return (
-    <AppScreen
-      title="MARKET"
-      subtitle="Financial Instruments"
-      leftNode={<BackButton navigation={navigation} />}
-      compact
+    <AppLaunchLoader
+      appName="Market"
+      appIcon={<MaterialCommunityIcons name="finance" size={64} color="#FFFFFF" />}
+      backgroundColor="#111827"
     >
-      <View style={{ flex: 1 }}>
-        {/* Ticker immediately below header - STICKY */}
-        <MarketTicker items={INITIAL_MARKET_ITEMS} />
+      <AppScreen
+        title="MARKET"
+        subtitle="Financial Instruments"
+        leftNode={<BackButton navigation={navigation} />}
+        compact
+      >
+        <View style={{ flex: 1 }}>
+          {/* Ticker immediately below header - STICKY */}
+          <MarketTicker items={INITIAL_MARKET_ITEMS} />
 
-        <FlatList
-          data={displayedItems}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContent}
+          <FlatList
+            data={displayedItems}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.listContent}
 
-          ListHeaderComponent={
-            <>
-              <PortfolioCard
-                investmentsValue={investmentsValue}
-                handleLiquidation={handleLiquidation}
-                formatMoney={formatMoney}
-                onSeeInvestments={() => setShowPortfolio(true)}
-              />
-              <MarketOverview trend="Bullish" volatility="Medium" />
-              <View style={{ height: 16 }} />
+            ListHeaderComponent={
+              <>
+                <PortfolioCard
+                  investmentsValue={investmentsValue}
+                  handleLiquidation={handleLiquidation}
+                  formatMoney={formatMoney}
+                  onSeeInvestments={() => setShowPortfolio(true)}
+                />
+                <MarketOverview trend="Bullish" volatility="Medium" />
+                <View style={{ height: 16 }} />
 
-              {/* ROW 1: Main Tabs */}
-              <CategoryTabs
-                tabs={MAIN_TABS}
-                selectedTab={selectedTab}
-                onSelectTab={setSelectedTab}
-              />
-
-              {/* ROW 2: Sub-Category Tabs (Conditional for Stocks) */}
-              {selectedTab === 'stocks' && (
+                {/* ROW 1: Main Tabs */}
                 <CategoryTabs
-                  tabs={STOCK_SUB_TABS}
-                  selectedTab={stockCategory}
-                  onSelectTab={setStockCategory}
-                  containerStyle={styles.subTabsContainer}
-                  tabStyle={styles.subTab}
-                  activeTabStyle={styles.subTabActive}
+                  tabs={MAIN_TABS}
+                  selectedTab={selectedTab}
+                  onSelectTab={setSelectedTab}
                 />
-              )}
-            </>
-          }
-          ListFooterComponent={<MarketEventFooter />}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 
-          renderItem={({ item }) => {
-            // Check if acquired (redundant now if filtered, but kept for safety)
-            const isAcquired = isStock(item) && subsidiaries.some(s => s.id === item.id || s.name === item.name);
-            const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
-
-            // Get dynamic price if available, else static
-            const currentPrice = marketPrices[item.id] || (('price' in item) ? item.price : ('faceValue' in item) ? item.faceValue : 0);
-
-            let metaText = '';
-            const riskLevel = item.risk;
-
-            if (isBond(item)) {
-              metaText = `Yield: ${(item.couponRate * 100).toFixed(2)}% | ${(item as any).duration} Yr`;
-            } else if (isCrypto(item)) {
-              metaText = `Vol: ${item.volatility}`;
-            } else if (isFund(item)) {
-              metaText = `Exp: ${(item.expenseRatio * 100).toFixed(2)}%`;
-            } else if (isStock(item)) {
-              metaText = item.description || '';
+                {/* ROW 2: Sub-Category Tabs (Conditional for Stocks) */}
+                {selectedTab === 'stocks' && (
+                  <CategoryTabs
+                    tabs={STOCK_SUB_TABS}
+                    selectedTab={stockCategory}
+                    onSelectTab={setStockCategory}
+                    containerStyle={styles.subTabsContainer}
+                    tabStyle={styles.subTab}
+                    activeTabStyle={styles.subTabActive}
+                  />
+                )}
+              </>
             }
+            ListFooterComponent={<MarketEventFooter />}
+            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 
-            return (
-              <Pressable
-                onPress={() => navigation.navigate('StockDetail', {
-                  symbol: (item as any).symbol || item.name,
-                  price: currentPrice,
-                  change: (item as any).change || 0,
-                  category: (item as any).category || selectedTab,
-                })
-                }>
-                <StockItemSkeleton
-                  symbol={(item as any).symbol || 'BOND'}
-                  name={displayName}
-                  price={currentPrice}
-                  change={(item as any).change || 0}
-                  riskTag={riskLevel}
-                  meta={metaText}
-                />
-              </Pressable>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-      <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
-      <CrystalNavBar activeTab="Company" variant="dark" />
-    </AppScreen>
+            renderItem={({ item }) => {
+              // Check if acquired (redundant now if filtered, but kept for safety)
+              const isAcquired = isStock(item) && subsidiaries.some(s => s.id === item.id || s.name === item.name);
+              const displayName = isAcquired ? `🔐 ${item.name}` : item.name;
+
+              // Get dynamic price if available, else static
+              const currentPrice = marketPrices[item.id] || (('price' in item) ? item.price : ('faceValue' in item) ? item.faceValue : 0);
+
+              let metaText = '';
+              const riskLevel = item.risk;
+
+              if (isBond(item)) {
+                metaText = `Yield: ${(item.couponRate * 100).toFixed(2)}% | ${(item as any).duration} Yr`;
+              } else if (isCrypto(item)) {
+                metaText = `Vol: ${item.volatility}`;
+              } else if (isFund(item)) {
+                metaText = `Exp: ${(item.expenseRatio * 100).toFixed(2)}%`;
+              } else if (isStock(item)) {
+                metaText = item.description || '';
+              }
+
+              return (
+                <Pressable
+                  onPress={() => navigation.navigate('StockDetail', {
+                    symbol: (item as any).symbol || item.name,
+                    price: currentPrice,
+                    change: (item as any).change || 0,
+                    category: (item as any).category || selectedTab,
+                  })
+                  }>
+                  <StockItemSkeleton
+                    symbol={(item as any).symbol || 'BOND'}
+                    name={displayName}
+                    price={currentPrice}
+                    change={(item as any).change || 0}
+                    riskTag={riskLevel}
+                    meta={metaText}
+                  />
+                </Pressable>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+        <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
+        <CrystalNavBar activeTab="Company" variant="dark" />
+      </AppScreen>
+    </AppLaunchLoader>
   );
 };
 

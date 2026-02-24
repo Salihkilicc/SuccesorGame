@@ -5,6 +5,8 @@ import { theme } from '../../../core/theme';
 import { useAssetPortfolio } from '../hooks/useAssetPortfolio';
 import AssetCard from '../components/AssetCard';
 import BottomStatsBar from '../../../components/common/BottomStatsBar';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 const GAP = 12;
@@ -56,115 +58,121 @@ const BelongingsScreen = () => {
     ];
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#050505" />
-            <SafeAreaView style={{ flex: 1 }}>
+        <AppLaunchLoader
+            appName="Belongings"
+            appIcon={<MaterialCommunityIcons name="treasure-chest" size={64} color="#FFFFFF" />}
+            backgroundColor="#050505"
+        >
+            <View style={styles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#050505" />
+                <SafeAreaView style={{ flex: 1 }}>
 
-                {/* 1. Header (Black Card Style) */}
-                <View style={styles.header}>
-                    <View style={styles.headerTop}>
-                        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                            <Text style={styles.backButtonText}>← BACK</Text>
-                        </Pressable>
-                        <Text style={styles.headerTitle}>PORTFOLIO DASHBOARD</Text>
-                        <View style={{ width: 60 }} />
-                    </View>
+                    {/* 1. Header (Black Card Style) */}
+                    <View style={styles.header}>
+                        <View style={styles.headerTop}>
+                            <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+                                <Text style={styles.backButtonText}>← BACK</Text>
+                            </Pressable>
+                            <Text style={styles.headerTitle}>PORTFOLIO DASHBOARD</Text>
+                            <View style={{ width: 60 }} />
+                        </View>
 
-                    {/* Net Worth Card (Centered, Aspect Ratio 1.58) */}
-                    <View style={styles.cardWrapper}>
-                        <View style={styles.cardContainer}>
-                            {/* Card Texture Overlay (Simulated) */}
-                            <View style={styles.cardTexture} />
+                        {/* Net Worth Card (Centered, Aspect Ratio 1.58) */}
+                        <View style={styles.cardWrapper}>
+                            <View style={styles.cardContainer}>
+                                {/* Card Texture Overlay (Simulated) */}
+                                <View style={styles.cardTexture} />
 
-                            <View style={styles.cardContent}>
-                                <View style={styles.cardTopRow}>
-                                    <View>
-                                        <Text style={styles.cardBankName}>LUXENET</Text>
-                                        <Text style={styles.cardLabelSmall}>EMPIRE RESERVE</Text>
+                                <View style={styles.cardContent}>
+                                    <View style={styles.cardTopRow}>
+                                        <View>
+                                            <Text style={styles.cardBankName}>LUXENET</Text>
+                                            <Text style={styles.cardLabelSmall}>EMPIRE RESERVE</Text>
+                                        </View>
+                                        <Text style={styles.cardLabelSmall}>2026</Text>
                                     </View>
-                                    <Text style={styles.cardLabelSmall}>2026</Text>
-                                </View>
 
-                                <View style={styles.cardCenter}>
-                                    <View style={styles.chipGraphic}>
-                                        <View style={styles.chipLine1} />
-                                        <View style={styles.chipLine2} />
+                                    <View style={styles.cardCenter}>
+                                        <View style={styles.chipGraphic}>
+                                            <View style={styles.chipLine1} />
+                                            <View style={styles.chipLine2} />
+                                        </View>
+                                        <View>
+                                            <Text style={styles.netWorthValue}>{formatCurrencyMain(netWorth)}</Text>
+                                            <Text style={styles.netWorthLabel}>TOTAL NET WORTH</Text>
+                                        </View>
                                     </View>
-                                    <View>
-                                        <Text style={styles.netWorthValue}>{formatCurrencyMain(netWorth)}</Text>
-                                        <Text style={styles.netWorthLabel}>TOTAL NET WORTH</Text>
-                                    </View>
-                                </View>
 
-                                <View style={styles.cardBottomRow}>
-                                    <Text style={styles.memberName}>MEMBER SINCE 2024</Text>
-                                    <View style={styles.badgeContainer}>
-                                        <Text style={styles.badgeText}>ELITE</Text>
+                                    <View style={styles.cardBottomRow}>
+                                        <Text style={styles.memberName}>MEMBER SINCE 2024</Text>
+                                        <View style={styles.badgeContainer}>
+                                            <Text style={styles.badgeText}>ELITE</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
                         </View>
                     </View>
-                </View>
 
-                {/* 2. Filter Bar */}
-                <View style={styles.filterContainer}>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.filterContent}
-                    >
-                        {FILTERS.map((f) => (
-                            <FilterChip
-                                key={f.value}
-                                label={f.label}
-                                active={selectedCategory === f.value}
-                                onPress={() => setSelectedCategory(f.value)}
-                            />
-                        ))}
-                    </ScrollView>
-                </View>
+                    {/* 2. Filter Bar */}
+                    <View style={styles.filterContainer}>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.filterContent}
+                        >
+                            {FILTERS.map((f) => (
+                                <FilterChip
+                                    key={f.value}
+                                    label={f.label}
+                                    active={selectedCategory === f.value}
+                                    onPress={() => setSelectedCategory(f.value)}
+                                />
+                            ))}
+                        </ScrollView>
+                    </View>
 
-                {/* 3. Asset Grid */}
-                <FlatList
-                    key={2} // Force strict grid mode
-                    data={filteredItems}
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: 'space-between', gap: GAP }}
-                    keyExtractor={(item, index) => `${item.id}_${index}`}
-                    contentContainerStyle={styles.listContent}
-                    renderItem={({ item }) => (
-                        <View style={{ width: (width - 40 - GAP) / 2 }}>
-                            <AssetCard
-                                item={item}
-                                variant="grid"
-                                onSell={sellAsset}
-                                onRepair={repairAsset}
-                                onPropose={() => {
-                                    Alert.alert('Propose', 'Features coming soon!');
-                                }}
-                            />
-                        </View>
-                    )}
-                    ListEmptyComponent={
-                        <View style={styles.emptyState}>
-                            <Text style={styles.emptyEmoji}>🏛️</Text>
-                            <Text style={styles.emptyTitle}>NO ASSETS FOUND</Text>
-                            <Text style={styles.emptyText}>Visit LuxeNet to acquire items.</Text>
-                            <Pressable
-                                style={styles.shopAction}
-                                onPress={() => navigation.navigate('Shopping')}
-                            >
-                                <Text style={styles.shopActionText}>OPEN CATALOG</Text>
-                            </Pressable>
-                        </View>
-                    }
-                />
-            </SafeAreaView>
+                    {/* 3. Asset Grid */}
+                    <FlatList
+                        key={2} // Force strict grid mode
+                        data={filteredItems}
+                        numColumns={2}
+                        columnWrapperStyle={{ justifyContent: 'space-between', gap: GAP }}
+                        keyExtractor={(item, index) => `${item.id}_${index}`}
+                        contentContainerStyle={styles.listContent}
+                        renderItem={({ item }) => (
+                            <View style={{ width: (width - 40 - GAP) / 2 }}>
+                                <AssetCard
+                                    item={item}
+                                    variant="grid"
+                                    onSell={sellAsset}
+                                    onRepair={repairAsset}
+                                    onPropose={() => {
+                                        Alert.alert('Propose', 'Features coming soon!');
+                                    }}
+                                />
+                            </View>
+                        )}
+                        ListEmptyComponent={
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyEmoji}>🏛️</Text>
+                                <Text style={styles.emptyTitle}>NO ASSETS FOUND</Text>
+                                <Text style={styles.emptyText}>Visit LuxeNet to acquire items.</Text>
+                                <Pressable
+                                    style={styles.shopAction}
+                                    onPress={() => navigation.navigate('Shopping')}
+                                >
+                                    <Text style={styles.shopActionText}>OPEN CATALOG</Text>
+                                </Pressable>
+                            </View>
+                        }
+                    />
+                </SafeAreaView>
 
-            {/* 4. Footer Stats */}
-            <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
-        </View>
+                {/* 4. Footer Stats */}
+                <BottomStatsBar onHomePress={() => navigation.navigate('Home')} />
+            </View>
+        </AppLaunchLoader>
     );
 };
 

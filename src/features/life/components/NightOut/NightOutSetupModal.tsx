@@ -11,6 +11,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../../core/theme';
 import BottomStatsBar from '../../../../components/common/BottomStatsBar';
+import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { VENUES, Venue, RegionCode } from './data/nightOutVenues';
 import { SetupStep, TravelMethod } from './useNightOutSystem';
 
@@ -90,77 +92,85 @@ const NightOutSetupModal = ({
             transparent
             animationType="fade"
             onRequestClose={onClose}>
-            <View style={styles.backdrop}>
-                <View style={styles.card}>
-                    {/* Header with Progress & Back Button */}
-                    <View style={styles.header}>
-                        <View style={styles.headerLeft}>
-                            <Pressable
-                                onPress={goBack}
-                                style={({ pressed }) => ({
-                                    padding: 8,
-                                    opacity: pressed ? 0.7 : 1
-                                })}>
-                                <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>←</Text>
-                            </Pressable>
+            {visible && (
+                <AppLaunchLoader
+                    appName="Night Out"
+                    appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
+                    backgroundColor="#1a0b2e"
+                >
+                    <View style={styles.backdrop}>
+                        <View style={styles.card}>
+                            {/* Header with Progress & Back Button */}
+                            <View style={styles.header}>
+                                <View style={styles.headerLeft}>
+                                    <Pressable
+                                        onPress={goBack}
+                                        style={({ pressed }) => ({
+                                            padding: 8,
+                                            opacity: pressed ? 0.7 : 1
+                                        })}>
+                                        <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>←</Text>
+                                    </Pressable>
+                                </View>
+                                <View style={styles.headerCenter}>
+                                    <Text style={styles.title}>NIGHT OUT</Text>
+                                    <Text style={styles.progress}>
+                                        Step {getStepNumber()} of {getTotalSteps()}
+                                    </Text>
+                                </View>
+                                <View style={styles.headerRight} />
+                            </View>
+
+                            {/* Step Content */}
+                            <View style={styles.content}>
+                                {step === 'region_select' && (
+                                    <RegionSelectView
+                                        selectedRegion={selectedRegion}
+                                        onSelectRegion={selectRegion}
+                                    />
+                                )}
+
+                                {step === 'venue_select' && selectedRegion && (
+                                    <VenueSelectView
+                                        region={selectedRegion}
+                                        venues={filteredVenues}
+                                        selectedVenue={selectedClub}
+                                        onSelectVenue={selectVenue}
+                                        onBack={goBack}
+                                    />
+                                )}
+
+                                {step === 'travel_select' && (
+                                    <TravelMethodView
+                                        hasPrivateJet={hasPrivateJet}
+                                        onSelectMethod={selectTravelMethod}
+                                        onBack={goBack}
+                                        isHangarOpen={isHangarOpen}
+                                        setIsHangarOpen={setIsHangarOpen}
+                                    />
+                                )}
+
+                                {step === 'completed' && selectedClub && (
+                                    <ConfirmationView
+                                        venue={selectedClub}
+                                        travelCost={travelCostAmount}
+                                        totalCost={totalCost}
+                                        onConfirm={confirmNightOut}
+                                        onCancel={onClose}
+                                    />
+                                )}
+                            </View>
                         </View>
-                        <View style={styles.headerCenter}>
-                            <Text style={styles.title}>NIGHT OUT</Text>
-                            <Text style={styles.progress}>
-                                Step {getStepNumber()} of {getTotalSteps()}
-                            </Text>
-                        </View>
-                        <View style={styles.headerRight} />
+
+                        {/* Bottom Stats Footer */}
+                        <BottomStatsBar onHomePress={() => {
+                            onClose();
+                            // @ts-ignore - Simple navigation
+                            navigation.navigate('Home');
+                        }} />
                     </View>
-
-                    {/* Step Content */}
-                    <View style={styles.content}>
-                        {step === 'region_select' && (
-                            <RegionSelectView
-                                selectedRegion={selectedRegion}
-                                onSelectRegion={selectRegion}
-                            />
-                        )}
-
-                        {step === 'venue_select' && selectedRegion && (
-                            <VenueSelectView
-                                region={selectedRegion}
-                                venues={filteredVenues}
-                                selectedVenue={selectedClub}
-                                onSelectVenue={selectVenue}
-                                onBack={goBack}
-                            />
-                        )}
-
-                        {step === 'travel_select' && (
-                            <TravelMethodView
-                                hasPrivateJet={hasPrivateJet}
-                                onSelectMethod={selectTravelMethod}
-                                onBack={goBack}
-                                isHangarOpen={isHangarOpen}
-                                setIsHangarOpen={setIsHangarOpen}
-                            />
-                        )}
-
-                        {step === 'completed' && selectedClub && (
-                            <ConfirmationView
-                                venue={selectedClub}
-                                travelCost={travelCostAmount}
-                                totalCost={totalCost}
-                                onConfirm={confirmNightOut}
-                                onCancel={onClose}
-                            />
-                        )}
-                    </View>
-                </View>
-
-                {/* Bottom Stats Footer */}
-                <BottomStatsBar onHomePress={() => {
-                    onClose();
-                    // @ts-ignore - Simple navigation
-                    navigation.navigate('Home');
-                }} />
-            </View>
+                </AppLaunchLoader>
+            )}
         </Modal>
     );
 };
