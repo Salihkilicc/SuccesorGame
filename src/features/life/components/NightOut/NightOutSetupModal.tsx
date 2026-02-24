@@ -91,8 +91,8 @@ const NightOutSetupModal = ({
     return (
         <Modal
             visible={visible}
-            transparent
-            animationType="fade"
+            transparent={false}
+            animationType="none"
             onRequestClose={onClose}>
             {visible && (
                 <AppLaunchLoader

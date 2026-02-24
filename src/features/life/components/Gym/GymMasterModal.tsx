@@ -63,8 +63,8 @@ const GymMasterModal = () => {
     return (
         <Modal
             visible={isVisible}
-            transparent={true}
-            animationType="fade"
+            transparent={false}
+            animationType="none"
             onRequestClose={closeGym}
             statusBarTranslucent={true}
         >

@@ -116,8 +116,8 @@ const SanctuaryMasterModal = ({
     return (
         <Modal
             visible={isHubVisible}
-            transparent={true}
-            animationType="fade"
+            transparent={false}
+            animationType="none"
             onRequestClose={closeSanctuary}
             statusBarTranslucent={true}
         >

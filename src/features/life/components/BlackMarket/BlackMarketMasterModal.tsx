@@ -76,7 +76,7 @@ export const BlackMarketMasterModal: React.FC<BlackMarketMasterModalProps> = ({ 
     };
 
     return (
-        <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose}>
+        <Modal visible={visible} animationType="none" transparent={false} onRequestClose={onClose}>
             {visible && (
                 <AppLaunchLoader
                     appName="Black Market"

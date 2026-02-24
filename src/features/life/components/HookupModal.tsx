@@ -125,8 +125,8 @@ export function HookupModal({
     return (
         <Modal
             visible={visible}
-            animationType="fade"
-            transparent
+            animationType="none"
+            transparent={false}
             onRequestClose={onClose}
         >
             {visible && (

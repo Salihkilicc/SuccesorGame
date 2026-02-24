@@ -75,8 +75,8 @@ export const EducationMasterModal: React.FC = () => {
         <>
             <Modal
                 visible={isVisible}
-                transparent={true}
-                animationType="fade"
+                transparent={false}
+                animationType="none"
                 onRequestClose={closeEducation}
             >
                 {isVisible && (
