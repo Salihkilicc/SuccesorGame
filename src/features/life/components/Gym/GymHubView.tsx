@@ -64,8 +64,8 @@ const GymHubView = () => {
                 <View style={styles.glassCard}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={closeGym} style={styles.closeBtn}>
-                            <Text style={styles.closeIcon}>✕</Text>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
+                            <Text style={styles.closeIcon}>←</Text>
                         </TouchableOpacity>
                         <View style={styles.titleContainer}>
                             <Text style={styles.title}>GYM</Text>

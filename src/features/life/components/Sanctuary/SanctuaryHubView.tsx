@@ -8,7 +8,7 @@ const ICONS = {
     GROOMING: '✂️',
     SURGERY: '💉',
     MEMBERSHIP: '👑',
-    CLOSE: '✕',
+    CLOSE: '←',
 };
 
 type SanctuaryHubViewProps = {
@@ -36,7 +36,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={closeSanctuary} style={styles.closeBtn}>
+                    <TouchableOpacity onPress={() => onGoHome()} style={styles.closeBtn}>
                         <Text style={styles.closeIcon}>{ICONS.CLOSE}</Text>
                     </TouchableOpacity>
                     <View style={styles.titleContainer}>

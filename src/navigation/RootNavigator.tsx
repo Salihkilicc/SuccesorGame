@@ -39,6 +39,12 @@ import StockDetailScreen from '../features/assets/screens/StockDetailScreen';
 
 import { formatScreenTitle } from '../core/utils';
 
+// Import New Full Screens
+import GymScreen from '../features/life/screens/GymScreen';
+import SanctuaryScreen from '../features/life/screens/SanctuaryScreen';
+import TravelScreen from '../features/life/screens/TravelScreen';
+import BlackMarketScreen from '../features/life/screens/BlackMarketScreen';
+
 export type LifeStackParamList = {
   LifeHome: undefined;
   Profile: undefined;
@@ -108,6 +114,11 @@ export type RootStackParamList = {
   Assets: NavigatorScreenParams<AssetsStackParamList>;
   Love: undefined;
   DNA: undefined;
+  Gym: undefined;
+  Sanctuary: undefined;
+  Travel: undefined;
+  BlackMarket: undefined;
+  Education: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -316,6 +327,13 @@ const RootNavigator = () => {
             component={FinancialReportScreen}
             options={{ title: 'Quarterly Financial Report' }}
           />
+
+          {/* New Modals translated to Screens */}
+          <RootStack.Screen name="Gym" component={GymScreen} />
+          <RootStack.Screen name="Sanctuary" component={SanctuaryScreen} />
+          <RootStack.Screen name="Travel" component={TravelScreen} />
+          <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} />
+          <RootStack.Screen name="Education" component={EducationDashboard} />
         </RootStack.Navigator>
 
       </View>

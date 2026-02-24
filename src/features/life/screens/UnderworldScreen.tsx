@@ -15,7 +15,6 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 // Type Definitions
 type UnderworldNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-import { BlackMarketMasterModal } from '../components/BlackMarket/BlackMarketMasterModal';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 import { EncounterModal } from '../../love/components/EncounterModal';
 import BreakupModal from '../../love/components/BreakupModal';
@@ -53,8 +52,6 @@ const UnderworldScreen = () => {
     const { isVisible: isEncounterVisible, currentScenario: encounterScenario, candidate: encounterCandidate, handleDate, closeEncounter } = useEncounterSystem();
     const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
 
-    const [isBlackMarketVisible, setBlackMarketVisible] = useState(false);
-
     const handleEncounterDate = useCallback(() => {
         const result = handleDate();
         if (result.wasCaught) {
@@ -67,7 +64,7 @@ const UnderworldScreen = () => {
             case 'contacts': navigation.navigate('Love'); break;
             case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
             case 'casino': navigation.navigate('Casino'); break;
-            case 'blackMarket': setBlackMarketVisible(true); break;
+            case 'blackMarket': navigation.navigate('BlackMarket'); break;
             case 'hookup': startHookup(); break;
             case 'network': Alert.alert('Network', 'Networking events are coming soon!'); break;
             case 'stockMarket': navigation.navigate('Assets', { screen: 'Market' }); break;
@@ -90,85 +87,74 @@ const UnderworldScreen = () => {
     );
 
     return (
-        <AppLaunchLoader
-            appName="Underworld"
-            appIcon={<MaterialCommunityIcons name="city-variant-outline" size={64} color="#FFFFFF" />}
-            backgroundColor="#000000"
-        >
-            <View style={styles.container}>
-                {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
-                <LinearGradient
-                    colors={['#0a0a0c', '#000000', '#050505']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFill}
-                />
+        <View style={styles.container}>
+            {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
+            <LinearGradient
+                colors={['#0a0a0c', '#000000', '#050505']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
 
-                <SafeAreaView style={styles.safeArea}>
-                    <View style={styles.headerContainer}>
-                        <Text style={styles.headerTitle}>CITY</Text>
-                        <View style={styles.headerAccent} />
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.headerTitle}>CITY</Text>
+                    <View style={styles.headerAccent} />
+                </View>
+
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Essentials</Text>
+                        <View style={styles.grid}>
+                            {SECTION_ESSENTIALS.map(renderAppIcon)}
+                        </View>
                     </View>
 
-                    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Essentials</Text>
-                            <View style={styles.grid}>
-                                {SECTION_ESSENTIALS.map(renderAppIcon)}
-                            </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Underworld</Text>
+                        <View style={styles.grid}>
+                            {SECTION_UNDERWORLD.map(renderAppIcon)}
                         </View>
+                    </View>
+                    <View style={{ height: 100 }} />
+                </ScrollView>
 
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Underworld</Text>
-                            <View style={styles.grid}>
-                                {SECTION_UNDERWORLD.map(renderAppIcon)}
-                            </View>
-                        </View>
-                        <View style={{ height: 100 }} />
-                    </ScrollView>
+                <CrystalNavBar activeTab="Home" variant="dark" />
+            </SafeAreaView>
 
-                    <CrystalNavBar activeTab="Home" variant="dark" />
-                </SafeAreaView>
+            {/* --- MODALS --- */}
+            <HookupModal
+                visible={isModalVisible}
+                candidate={currentCandidate}
+                matchStatus={matchStatus}
+                onSwipeRight={swipeRight}
+                onSwipeLeft={swipeLeft}
+                nextCandidate={nextCandidate}
+                onClose={closeHookupModal}
+            />
 
-                {/* --- MODALS --- */}
-                <HookupModal
-                    visible={isModalVisible}
-                    candidate={currentCandidate}
-                    matchStatus={matchStatus}
-                    onSwipeRight={swipeRight}
-                    onSwipeLeft={swipeLeft}
-                    nextCandidate={nextCandidate}
-                    onClose={closeHookupModal}
+            <EncounterModal
+                visible={isEncounterVisible}
+                candidate={encounterCandidate}
+                scenario={encounterScenario}
+                context={encounterScenario?.id.split('_')[0] || 'Unknown'}
+                onDate={handleEncounterDate}
+                onHookup={() => {
+                    Alert.alert("Fling", "You had a great night! (Stress -10)");
+                    closeEncounter();
+                }}
+                onIgnore={closeEncounter}
+            />
+
+            {cheatingConsequence && (
+                <BreakupModal
+                    visible={!!cheatingConsequence}
+                    onClose={() => setCheatingConsequence(null)}
+                    partnerName={cheatingConsequence.partnerName}
+                    settlementCost={cheatingConsequence.settlement}
                 />
-
-                <BlackMarketMasterModal
-                    visible={isBlackMarketVisible}
-                    onClose={() => setBlackMarketVisible(false)}
-                />
-
-                <EncounterModal
-                    visible={isEncounterVisible}
-                    candidate={encounterCandidate}
-                    scenario={encounterScenario}
-                    context={encounterScenario?.id.split('_')[0] || 'Unknown'}
-                    onDate={handleEncounterDate}
-                    onHookup={() => {
-                        Alert.alert("Fling", "You had a great night! (Stress -10)");
-                        closeEncounter();
-                    }}
-                    onIgnore={closeEncounter}
-                />
-
-                {cheatingConsequence && (
-                    <BreakupModal
-                        visible={!!cheatingConsequence}
-                        onClose={() => setCheatingConsequence(null)}
-                        partnerName={cheatingConsequence.partnerName}
-                        settlementCost={cheatingConsequence.settlement}
-                    />
-                )}
-            </View>
-        </AppLaunchLoader>
+            )}
+        </View>
     );
 };
 

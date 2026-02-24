@@ -7,6 +7,8 @@ import { useEducationStore } from '../../../core/store/useEducationStore';
 import { EDUCATION_DATA } from '../../education/data/educationData';
 import EducationHeader from '../../../components/Education/EducationHeader';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const EducationDashboard = () => {
     const navigation = useNavigation<any>();
@@ -150,46 +152,52 @@ const EducationDashboard = () => {
     // (No helper needed, we filter inline below)
 
     return (
-        <View style={styles.container}>
-            <EducationHeader
-                title="Education"
-                rightAction={{
-                    label: "Browse",
-                    onPress: () => navigation.navigate('EducationBrowse')
-                }}
-            />
+        <AppLaunchLoader
+            appName="University"
+            appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
+            backgroundColor="#2d3748"
+        >
+            <View style={styles.container}>
+                <EducationHeader
+                    title="Education"
+                    rightAction={{
+                        label: "Browse",
+                        onPress: () => navigation.navigate('EducationBrowse')
+                    }}
+                />
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {/* Academic Track */}
-                <Text style={styles.sectionTitle}>🎓 Academic Track</Text>
-                {renderAcademicTrack()}
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    {/* Academic Track */}
+                    <Text style={styles.sectionTitle}>🎓 Academic Track</Text>
+                    {renderAcademicTrack()}
 
-                {/* Certificate Track */}
-                <Text style={[styles.sectionTitle, { marginTop: 24 }]}>📜 Certificate Track</Text>
-                {renderCertificateTrack()}
+                    {/* Certificate Track */}
+                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>📜 Certificate Track</Text>
+                    {renderCertificateTrack()}
 
-                {/* Curriculum Vitae (History) */}
-                <Text style={[styles.sectionTitle, { marginTop: 24 }]}>My Curriculum Vitae</Text>
-                {completedEducations.length === 0 ? (
-                    <Text style={styles.emptyText}>There is no education history.</Text>
-                ) : (
-                    EDUCATION_DATA.filter(item => completedEducations.includes(item.id)).map((prog, index) => (
-                        <View key={index} style={styles.historyCard}>
-                            <View style={styles.historyIcon}>
-                                <Text style={{ fontSize: 20 }}>
-                                    {prog.type === 'certificate' ? '📜' : '🎓'}
-                                </Text>
+                    {/* Curriculum Vitae (History) */}
+                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>My Curriculum Vitae</Text>
+                    {completedEducations.length === 0 ? (
+                        <Text style={styles.emptyText}>There is no education history.</Text>
+                    ) : (
+                        EDUCATION_DATA.filter(item => completedEducations.includes(item.id)).map((prog, index) => (
+                            <View key={index} style={styles.historyCard}>
+                                <View style={styles.historyIcon}>
+                                    <Text style={{ fontSize: 20 }}>
+                                        {prog.type === 'certificate' ? '📜' : '🎓'}
+                                    </Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.historyTitle}>{prog.title}</Text>
+                                    <Text style={styles.historySubtitle}>{prog.field} • {prog.type.toUpperCase()}</Text>
+                                </View>
+                                <Ionicons name="checkmark-circle" size={20} color={theme.colors.success} />
                             </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.historyTitle}>{prog.title}</Text>
-                                <Text style={styles.historySubtitle}>{prog.field} • {prog.type.toUpperCase()}</Text>
-                            </View>
-                            <Ionicons name="checkmark-circle" size={20} color={theme.colors.success} />
-                        </View>
-                    ))
-                )}
-            </ScrollView>
-        </View>
+                        ))
+                    )}
+                </ScrollView>
+            </View>
+        </AppLaunchLoader>
     );
 };
 

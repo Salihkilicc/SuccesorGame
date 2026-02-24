@@ -30,15 +30,8 @@ import { useGymSystem } from '../components/Gym/useGymSystem';
 import GymMasterModal from '../components/Gym/GymMasterModal';
 
 import { useTravelSystem } from '../components/Travel/useTravelSystem';
-import TravelHubModal from '../components/Travel/TravelHubModal';
-import TravelBookingModal from '../components/Travel/TravelBookingModal';
-import TravelExperienceModal from '../components/Travel/TravelExperienceModal';
-import SouvenirMiniGame from '../components/Travel/SouvenirMiniGame';
-import SouvenirCollectionModal from '../components/Travel/SouvenirCollectionModal';
 
 import { useSanctuarySystem } from '../components/Sanctuary/store/useSanctuarySystem';
-import SanctuaryMasterModal from '../components/Sanctuary/SanctuaryMasterModal';
-import SanctuaryResultModal from '../components/Sanctuary/modals/SanctuaryResultModal';
 
 import { useEducationSystem } from '../components/Education/store/useEducationSystem';
 import { EducationMasterModal } from '../components/Education/modals/EducationMasterModal';
@@ -133,15 +126,15 @@ const LifeScreen = () => {
     switch (key) {
       // Leisure
       case 'nightOut': startNightOut(); break;
-      case 'spa': openSanctuary(); break;
-      case 'gym': openGym(); break; // Removed random encounter logic
+      case 'spa': navigation.navigate('Sanctuary'); break;
+      case 'gym': navigation.navigate('Gym'); break; // Screen navigation
       case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' }); break;
 
       // Lifestyle
-      case 'travel': openTravel(); break;
+      case 'travel': navigation.navigate('Travel'); break;
       case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' }); break;
       case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' }); break;
-      case 'education': openEducation(); break;
+      case 'education': navigation.navigate('Education' as any); break;
       case 'dna': navigation.navigate('DNA'); break;
       case 'contacts': handleBottomNav('Contacts'); break;
       case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
@@ -187,206 +180,136 @@ const LifeScreen = () => {
   );
 
   return (
-    <AppLaunchLoader
-      appName="Life"
-      appIcon={<MaterialCommunityIcons name="account" size={64} color="#FFFFFF" />}
-      backgroundColor="#000000"
-    >
-      <View style={styles.container}>
-        {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
-        <LinearGradient
-          colors={['#0a0a0c', '#000000', '#050505']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+    <View style={styles.container}>
+      {/* ULTRA PREMIUM BACKGROUND - Deep Dark Luxury Palette */}
+      <LinearGradient
+        colors={['#0a0a0c', '#000000', '#050505']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
 
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>LIFESTYLE</Text>
-            <View style={styles.headerAccent} />
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>LIFESTYLE</Text>
+          <View style={styles.headerAccent} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Leisure</Text>
+            <View style={styles.grid}>
+              {SECTION_LEISURE.map(renderAppIcon)}
+            </View>
           </View>
 
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Leisure</Text>
-              <View style={styles.grid}>
-                {SECTION_LEISURE.map(renderAppIcon)}
-              </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Essentials</Text>
+            <View style={styles.grid}>
+              {SECTION_LIFESTYLE.map(renderAppIcon)}
             </View>
+          </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Essentials</Text>
-              <View style={styles.grid}>
-                {SECTION_LIFESTYLE.map(renderAppIcon)}
-              </View>
-            </View>
+          {/* Spacer for Bottom Bar */}
+          <View style={{ height: 40 }} />
 
-            {/* Spacer for Bottom Bar */}
-            <View style={{ height: 40 }} />
-
-            {/* DEBUG SECTION - Redesigned for premium look */}
-            <View style={styles.debugRow}>
-              <Pressable
-                style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(192, 57, 43, 0.15)', borderColor: 'rgba(192, 57, 43, 0.3)', flex: 1, marginRight: 12 }, pressed && { opacity: 0.7 }]}
-                onPress={() => {
-                  Alert.alert(
-                    'Reset Game',
-                    'Are you sure you want to completely reset your progress?',
-                    [
-                      { text: 'Cancel', style: 'cancel' },
-                      {
-                        text: 'Reset',
-                        style: 'destructive',
-                        onPress: async () => {
-                          await useGameStore.getState().resetGame();
-                        }
+          {/* DEBUG SECTION - Redesigned for premium look */}
+          <View style={styles.debugRow}>
+            <Pressable
+              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(192, 57, 43, 0.15)', borderColor: 'rgba(192, 57, 43, 0.3)', flex: 1, marginRight: 12 }, pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                Alert.alert(
+                  'Reset Game',
+                  'Are you sure you want to completely reset your progress?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Reset',
+                      style: 'destructive',
+                      onPress: async () => {
+                        await useGameStore.getState().resetGame();
                       }
-                    ]
-                  );
-                }}
-              >
-                <Text style={[styles.debugButtonText, { color: '#e74c3c' }]}>Reset</Text>
-              </Pressable>
+                    }
+                  ]
+                );
+              }}
+            >
+              <Text style={[styles.debugButtonText, { color: '#e74c3c' }]}>Reset</Text>
+            </Pressable>
 
-              <Pressable
-                style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(39, 174, 96, 0.15)', borderColor: 'rgba(39, 174, 96, 0.3)', flex: 2 }, pressed && { opacity: 0.7 }]}
-                onPress={() => {
-                  useStatsStore.getState().earnMoney(100_000_000);
-                  Alert.alert('Success', '$100M added to your balance!');
-                }}
-              >
-                <Text style={[styles.debugButtonText, { color: '#2ecc71' }]}>Add $100M</Text>
-              </Pressable>
-            </View>
+            <Pressable
+              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(39, 174, 96, 0.15)', borderColor: 'rgba(39, 174, 96, 0.3)', flex: 2 }, pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                useStatsStore.getState().earnMoney(100_000_000);
+                Alert.alert('Success', '$100M added to your balance!');
+              }}
+            >
+              <Text style={[styles.debugButtonText, { color: '#2ecc71' }]}>Add $100M</Text>
+            </Pressable>
+          </View>
 
-            <View style={{ height: 100 }} />
-          </ScrollView>
+          <View style={{ height: 100 }} />
+        </ScrollView>
 
-          {/* Universal Crystal Navigation Bar */}
-          <CrystalNavBar activeTab="Life" variant="dark" />
+        {/* Universal Crystal Navigation Bar */}
+        <CrystalNavBar activeTab="Life" variant="dark" />
 
-        </SafeAreaView>
+      </SafeAreaView>
 
-        {/* --- MODALS --- */}
-        < MatchPopup
-          visible={visible}
-          candidate={matchCandidate}
-          onAccept={acceptMatch}
-          onReject={rejectMatch}
-          onClose={closeMatch}
-        />
+      {/* --- MODALS --- */}
+      < MatchPopup
+        visible={visible}
+        candidate={matchCandidate}
+        onAccept={acceptMatch}
+        onReject={rejectMatch}
+        onClose={closeMatch}
+      />
 
-        <NightOutSetupModal
-          visible={setupModalVisible}
-          onClose={() => setSetupModalVisible(false)}
-          step={step}
-          selectedRegion={selectedRegion}
-          selectedClub={selectedClub}
-          travelCostAmount={travelCostAmount}
-          hasPrivateJet={hasPrivateJet}
-          totalCost={totalCost}
-          selectRegion={selectRegion}
-          selectVenue={selectVenue}
-          selectTravelMethod={selectTravelMethod}
-          confirmNightOut={confirmNightOut}
-          goBack={goBackNightOut}
-          isHangarOpen={isHangarOpen}
-          setIsHangarOpen={setIsHangarOpen}
-        />
-        <NightOutOutcomeModal
-          visible={outcomeModalVisible}
-          type={outcomeType}
-          onClose={handleOutcomeClose}
-          onHookupAccept={handleHookupAccept}
-        />
-        <HookupGameModal
-          visible={hookupGameVisible}
-          scenario={currentScenario}
-          partner={currentPartner}
-          onSuccess={handleHookupGameSuccess}
-          onFail={handleHookupGameFail}
-        />
-        <NightEndModal
-          visible={nightEndModalVisible}
-          onDecision={handleNightEndDecision}
-        />
-        <NightConclusionModal
-          visible={conclusionModalVisible}
-          data={conclusionData}
-          onClose={handleConclusionClose}
-        />
-        <PregnancyRevealModal
-          visible={pregnancyModalVisible}
-          onClose={() => setPregnancyModalVisible(false)}
-        />
-
-        <GymMasterModal />
-        <EducationMasterModal />
-        <EducationExamModal />
-
-        <TravelHubModal
-          visible={currentView === 'HUB'}
-          vacationSpots={vacationSpots}
-          onSelectSpot={openBooking}
-          onClose={closeTravel}
-          onOpenCollection={openCollection}
-          onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
-        />
-        <TravelBookingModal
-          visible={currentView === 'BOOKING'}
-          spot={selectedSpot}
-          travelClass={travelClass}
-          bringPartner={bringPartner}
-          onSelectClass={setTravelClass}
-          onTogglePartner={setBringPartner}
-          onConfirm={startTrip}
-          onClose={closeBooking}
-          onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
-        />
-        <TravelExperienceModal
-          visible={currentView === 'EXPERIENCE'}
-          spot={selectedSpot}
-          resultData={travelResultData}
-          onComplete={onExperienceComplete}
-          onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
-        />
-        <SouvenirMiniGame
-          visible={currentView === 'MINIGAME'}
-          souvenir={selectedSpot?.souvenir || null}
-          onComplete={onMiniGameComplete}
-          onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
-        />
-        <SouvenirCollectionModal
-          visible={currentView === 'COLLECTION'}
-          collectedIds={vacationSpots.filter(spot => hasSouvenir(spot.souvenir.id)).map(spot => spot.souvenir.id)}
-          onClose={closeCollection}
-          onHomePress={() => { closeTravel(); handleBottomNav('Home'); }}
-        />
-
-        <SanctuaryMasterModal
-          isHubVisible={isHubVisible}
-          activeView={activeView}
-          closeSanctuary={closeSanctuary}
-          navigate={navSanctuary}
-          goBack={goBackSanctuary}
-          isVIPMember={isVIPMember}
-          buyMembership={buyMembership}
-          performSurgery={performSurgery}
-          getFreshCut={getFreshCut}
-          handleServicePurchase={handleServicePurchase}
-          activeBuffs={activeBuffs}
-          usageTracker={usageTracker}
-        />
-        <SanctuaryResultModal
-          visible={isResultVisible}
-          resultData={resultData}
-          onClose={closeSanctuary}
-        />
-
-      </View >
-    </AppLaunchLoader>
+      <NightOutSetupModal
+        visible={setupModalVisible}
+        onClose={() => setSetupModalVisible(false)}
+        step={step}
+        selectedRegion={selectedRegion}
+        selectedClub={selectedClub}
+        travelCostAmount={travelCostAmount}
+        hasPrivateJet={hasPrivateJet}
+        totalCost={totalCost}
+        selectRegion={selectRegion}
+        selectVenue={selectVenue}
+        selectTravelMethod={selectTravelMethod}
+        confirmNightOut={confirmNightOut}
+        goBack={goBackNightOut}
+        isHangarOpen={isHangarOpen}
+        setIsHangarOpen={setIsHangarOpen}
+      />
+      <NightOutOutcomeModal
+        visible={outcomeModalVisible}
+        type={outcomeType}
+        onClose={handleOutcomeClose}
+        onHookupAccept={handleHookupAccept}
+      />
+      <HookupGameModal
+        visible={hookupGameVisible}
+        scenario={currentScenario}
+        partner={currentPartner}
+        onSuccess={handleHookupGameSuccess}
+        onFail={handleHookupGameFail}
+      />
+      <NightEndModal
+        visible={nightEndModalVisible}
+        onDecision={handleNightEndDecision}
+      />
+      <NightConclusionModal
+        visible={conclusionModalVisible}
+        data={conclusionData}
+        onClose={handleConclusionClose}
+      />
+      <PregnancyRevealModal
+        visible={pregnancyModalVisible}
+        onClose={() => setPregnancyModalVisible(false)}
+      />
+    </View >
   );
 };
 
