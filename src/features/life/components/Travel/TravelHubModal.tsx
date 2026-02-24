@@ -38,63 +38,49 @@ const TravelHubModal = ({
     onHomePress
 }: TravelHubModalProps) => {
 
+    if (!visible) return null;
+
     return (
-        <Modal
-            visible={visible}
-            animationType="slide"
-            presentationStyle="fullScreen"
-        >
-            {visible && (
-                <AppLaunchLoader
-                    appName="Travel"
-                    appIcon={<MaterialCommunityIcons name="airplane" size={64} color="#FFFFFF" />}
-                    backgroundColor="#002D62"
-                >
-                    <View style={styles.backdrop}>
-                        <SafeAreaView style={styles.container}>
-                            {/* Header */}
-                            <View style={styles.header}>
-                                <Pressable onPress={onClose} style={styles.headerButton}>
-                                    <Text style={styles.headerButtonText}>CLOSE</Text>
-                                </Pressable>
-                                <Text style={styles.headerTitle}>WORLD TRAVEL</Text>
-                                <Pressable onPress={onOpenCollection} style={styles.headerButton}>
-                                    <Text style={styles.headerIcon}>🎒</Text>
-                                </Pressable>
+        <View style={styles.backdrop}>
+            <SafeAreaView style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Pressable onPress={onClose} style={styles.headerButton}>
+                        <Text style={styles.headerButtonText}>CLOSE</Text>
+                    </Pressable>
+                    <Text style={styles.headerTitle}>WORLD TRAVEL</Text>
+                    <Pressable onPress={onOpenCollection} style={styles.headerButton}>
+                        <Text style={styles.headerIcon}>🎒</Text>
+                    </Pressable>
+                </View>
+
+                {/* Grid */}
+                <ScrollView contentContainerStyle={styles.gridContainer}>
+                    {vacationSpots.map((spot) => (
+                        <Pressable
+                            key={spot.id}
+                            style={[styles.card, { backgroundColor: spot.color + '20', borderColor: spot.color }]}
+                            onPress={() => onSelectSpot(spot)}
+                        >
+                            <View style={[styles.emojiContainer, { backgroundColor: spot.color + '30' }]}>
+                                <Text style={styles.emoji}>{spot.emoji}</Text>
                             </View>
 
-                            {/* Grid */}
-                            <ScrollView contentContainerStyle={styles.gridContainer}>
-                                {vacationSpots.map((spot) => (
-                                    <Pressable
-                                        key={spot.id}
-                                        style={[styles.card, { backgroundColor: spot.color + '20', borderColor: spot.color }]}
-                                        onPress={() => onSelectSpot(spot)}
-                                    >
-                                        <View style={[styles.emojiContainer, { backgroundColor: spot.color + '30' }]}>
-                                            <Text style={styles.emoji}>{spot.emoji}</Text>
-                                        </View>
+                            <View style={styles.cardFooter}>
+                                <Text style={[styles.spotName, { color: spot.color }]}>{spot.name}</Text>
+                                <Text style={styles.spotCost}>From ${spot.baseCost.toLocaleString()}</Text>
+                            </View>
 
-                                        <View style={styles.cardFooter}>
-                                            <Text style={[styles.spotName, { color: spot.color }]}>{spot.name}</Text>
-                                            <Text style={styles.spotCost}>From ${spot.baseCost.toLocaleString()}</Text>
-                                        </View>
+                            {/* Type Badge */}
+                            <View style={styles.typeBadge}>
+                                <Text style={styles.typeText}>{spot.type}</Text>
+                            </View>
+                        </Pressable>
+                    ))}
+                </ScrollView>
 
-                                        {/* Type Badge */}
-                                        <View style={styles.typeBadge}>
-                                            <Text style={styles.typeText}>{spot.type}</Text>
-                                        </View>
-                                    </Pressable>
-                                ))}
-                            </ScrollView>
-
-                            {/* Bottom Stats Bar */}
-                            <BottomStatsBar onHomePress={onHomePress} />
-                        </SafeAreaView>
-                    </View>
-                </AppLaunchLoader>
-            )}
-        </Modal>
+            </SafeAreaView>
+        </View>
     );
 };
 
