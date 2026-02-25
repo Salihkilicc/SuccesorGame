@@ -17,6 +17,18 @@ interface CategoryTabsProps<T extends string> {
     activeTabStyle?: any;
 }
 
+// Tab icon mapping for the main category tabs
+const TAB_ICONS: Record<string, string> = {
+    stocks: '📈',
+    crypto: '₿',
+    bonds: '🏛️',
+    funds: '💼',
+    Technology: '💻',
+    Health: '⚕️',
+    Industrial: '🏭',
+    Finance: '🏦',
+};
+
 export function CategoryTabs<T extends string>({
     tabs,
     selectedTab,
@@ -27,15 +39,22 @@ export function CategoryTabs<T extends string>({
 }: CategoryTabsProps<T>) {
     return (
         <View style={[styles.container, containerStyle]}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+            >
                 {tabs.map((tab) => {
                     const isActive = selectedTab === tab.key;
+                    const icon = TAB_ICONS[tab.key];
                     return (
                         <TouchableOpacity
                             key={tab.key}
                             style={[styles.tab, tabStyle, isActive && [styles.activeTab, activeTabStyle]]}
                             onPress={() => onSelectTab(tab.key)}
+                            activeOpacity={0.75}
                         >
+                            {icon ? <Text style={styles.tabIcon}>{icon}</Text> : null}
                             <Text style={[styles.tabText, isActive && styles.activeTabText]}>
                                 {tab.label}
                             </Text>
@@ -49,34 +68,51 @@ export function CategoryTabs<T extends string>({
 
 const styles = StyleSheet.create({
     container: {
-        height: 50,
-        backgroundColor: '#1E1E1E', // Dark background
-        marginBottom: 8,
+        height: 54,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: 14,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.07)',
+        overflow: 'hidden',
     },
     scrollContent: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 10,
         alignItems: 'center',
+        gap: 6,
     },
     tab: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
         paddingVertical: 8,
         paddingHorizontal: 16,
-        borderRadius: 20,
-        marginRight: 8,
-        backgroundColor: '#333',
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.05)',
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     activeTab: {
-        backgroundColor: '#FFD700', // Gold accent
-        borderColor: '#FFD700',
+        backgroundColor: 'rgba(212,175,55,0.18)',
+        borderColor: '#D4AF37',
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    tabIcon: {
+        fontSize: 13,
     },
     tabText: {
-        color: '#CCC',
-        fontSize: 14,
-        fontWeight: '600',
+        color: '#A0A0A0',
+        fontSize: 13,
+        fontWeight: '700',
+        letterSpacing: 0.3,
     },
     activeTabText: {
-        color: '#000',
-        fontWeight: 'bold',
+        color: '#D4AF37',
+        fontWeight: '800',
     },
 });
+

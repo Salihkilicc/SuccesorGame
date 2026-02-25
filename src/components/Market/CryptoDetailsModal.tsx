@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { CryptoAsset } from './marketTypes';
+import type { SimpleCryptoAsset } from './marketTypes';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -19,9 +19,9 @@ const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
 
 type Props = {
   visible: boolean;
-  asset?: CryptoAsset | null;
+  asset?: SimpleCryptoAsset | null;
   onClose: () => void;
-  onBuy: (asset: CryptoAsset, amount: number) => void;
+  onBuy: (asset: SimpleCryptoAsset, amount: number) => void;
 };
 
 const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {

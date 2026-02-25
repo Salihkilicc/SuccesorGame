@@ -108,23 +108,24 @@ export default BuySellPanel;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   title: {
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   ownedText: {
     fontSize: theme.typography.caption,
-    color: theme.colors.accent,
+    color: '#D4AF37',
     fontWeight: '600',
-    marginTop: -8, // Pull closer to title
+    marginTop: -8,
   },
   qtyRow: {
     flexDirection: 'row',
@@ -135,30 +136,30 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 999,
-    backgroundColor: theme.colors.cardSoft,
+    backgroundColor: 'rgba(255,255,255,0.07)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   qtyButtonPressed: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: 'rgba(255,255,255,0.12)',
   },
   qtyButtonText: {
     fontSize: 20,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
   },
   qtyValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     minWidth: 32,
     textAlign: 'center',
   },
   helper: {
     fontSize: theme.typography.caption + 1,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
   },
   actions: {
     flexDirection: 'row',
@@ -174,22 +175,22 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   sellButton: {
-    backgroundColor: theme.colors.danger,
+    backgroundColor: '#FF3B30',
   },
   buyButton: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: '#00E676',
   },
   sellText: {
     fontSize: theme.typography.body,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
   buyText: {
     fontSize: theme.typography.body,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+    fontWeight: '800',
+    color: '#000000',
   },
 });

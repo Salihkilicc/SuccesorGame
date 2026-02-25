@@ -1,46 +1,12 @@
 export type CategoryKey = 'bonds' | 'crypto' | 'stocks' | 'funds';
 
-export type BondCategory = 'Government' | 'Corporate' | 'Municipal';
 export type FundCategory = 'Index' | 'Sector' | 'Commodity';
 
 export type RiskLevel = 'Very Low' | 'Low' | 'Medium' | 'Medium-High' | 'High' | 'Extreme';
 
-export interface BondItem {
-  id: string;
-  name: string;
-  faceValue: number;
-  couponRate: number; // Annual interest rate (e.g. 0.05 for 5%)
-  duration: number; // Years to maturity
-  risk: RiskLevel;
-  issuerType: BondCategory;
-  creditRating: 'AAA' | 'AA' | 'A' | 'B' | 'CCC';
-  maturityDate: number | string;
-}
+// ─── Types used by MarketScreen / marketData.ts (acquisition system) ────────
 
-export interface CryptoAsset {
-  id: string;
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  volatility: 'Low' | 'Medium' | 'High' | 'Extreme';
-  marketCap: number; // Circulating Supply Value
-  risk: RiskLevel;
-  description?: string;
-}
-
-export interface FundItem {
-  id: string;
-  name: string;
-  symbol?: string;
-  price: number;
-  change: number;
-  expenseRatio: number; // e.g. 0.005 for 0.5%
-  category: FundCategory;
-  risk: RiskLevel;
-  description?: string;
-  topHoldings: string[];
-}
+export type AcquisitionCategory = 'Technology' | 'Industrial' | 'Finance' | 'Health';
 
 export interface AcquisitionBuff {
   type: 'R_AND_D_SPEED' | 'PRODUCTION_COST' | 'LOAN_INTEREST' | 'MARKETING_BOOST';
@@ -54,15 +20,52 @@ export interface StockItem {
   name: string;
   price: number;
   change: number;
-  category: 'Technology' | 'Industrial' | 'Finance' | 'Health';
+  category: AcquisitionCategory;
   risk: RiskLevel;
   description?: string;
-  marketCap: number; // Company Valuation
+  marketCap: number;
 
-  // ACQUISITION FIELDS
-  acquisitionCost: number; // Cost to buy 100% ownership
+  // Acquisition fields
+  acquisitionCost: number;
   acquisitionBuff: AcquisitionBuff;
-  isAcquired: boolean; // Default false
+  isAcquired: boolean;
+}
+
+export interface CryptoAsset {
+  id: string;
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  volatility: 'Low' | 'Medium' | 'High' | 'Extreme';
+  marketCap: number;
+  risk: RiskLevel;
+  description?: string;
+}
+
+export interface BondItem {
+  id: string;
+  name: string;
+  faceValue: number;
+  couponRate: number;
+  duration: number;
+  risk: RiskLevel;
+  issuerType: 'Government' | 'Corporate' | 'Municipal';
+  creditRating: 'AAA' | 'AA' | 'A' | 'B' | 'CCC';
+  maturityDate: number | string;
+}
+
+export interface FundItem {
+  id: string;
+  name: string;
+  symbol?: string;
+  price: number;
+  change: number;
+  expenseRatio: number;
+  category: FundCategory;
+  risk: RiskLevel;
+  description?: string;
+  topHoldings: string[];
 }
 
 export type MarketItem = StockItem | BondItem | FundItem | CryptoAsset;
@@ -74,3 +77,43 @@ export interface HoldingItem {
   averageCost: number;
   type: 'stock' | 'crypto' | 'bond' | 'fund';
 }
+
+// ─── Simpler types used by BondsList / CryptoList / StocksList components ───
+
+export type BondCategory = 'government' | 'local' | 'corporate';
+
+export interface SimpleBondItem {
+  id: string;
+  name: string;
+  coupon: number;
+  years: number;
+  risk: RiskLevel;
+  category: BondCategory;
+}
+
+export interface SimpleCryptoAsset {
+  id: string;
+  name: string;
+  cost: number;
+  trend: string;
+  change: number;
+  risk: RiskLevel;
+  marketCap: number;
+}
+
+export type StockSector =
+  | 'Technology' | 'Materials' | 'Industrials' | 'Healthcare'
+  | 'Financial' | 'Energy' | 'Consumer' | 'Communication';
+
+export interface SimpleStockItem {
+  id: string;
+  symbol: string;
+  company: string;
+  price: number;
+  dailyChange: number;
+  yearlyChange: number;
+  sector: StockSector;
+  risk: RiskLevel;
+  marketCap: number;
+}
+

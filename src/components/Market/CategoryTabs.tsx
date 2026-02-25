@@ -42,32 +42,32 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
     padding: theme.spacing.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: theme.spacing.sm,
-    borderRadius: theme.radius.sm,
+    borderRadius: 8,
   },
   tabActive: {
-    backgroundColor: theme.colors.accentSoft,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.accent,
+    backgroundColor: 'rgba(212,175,55,0.15)',
+    borderWidth: 1,
+    borderColor: '#D4AF37',
   },
   tabPressed: {
     transform: [{ scale: 0.98 }],
   },
   label: {
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
     fontWeight: '700',
     fontSize: theme.typography.body,
   },
   labelActive: {
-    color: theme.colors.accent,
+    color: '#D4AF37',
   },
 });

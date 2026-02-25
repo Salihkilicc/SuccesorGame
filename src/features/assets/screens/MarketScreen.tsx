@@ -115,7 +115,7 @@ const MarketScreen = () => {
     <AppLaunchLoader
       appName="Market"
       appIcon={<MaterialCommunityIcons name="finance" size={64} color="#FFFFFF" />}
-      backgroundColor="#111827"
+      backgroundColor="#000000"
     >
       <AppScreen
         title="MARKET"
@@ -141,26 +141,28 @@ const MarketScreen = () => {
                   onSeeInvestments={() => setShowPortfolio(true)}
                 />
                 <MarketOverview trend="Bullish" volatility="Medium" />
-                <View style={{ height: 16 }} />
+                {/* TAB SECTION: Premium glass container */}
+                <View style={styles.tabSection}>
+                  <View style={styles.tabSectionAccent} />
+                  <Text style={styles.tabSectionLabel}>BROWSE MARKET</Text>
 
-                {/* ROW 1: Main Tabs */}
-                <CategoryTabs
-                  tabs={MAIN_TABS}
-                  selectedTab={selectedTab}
-                  onSelectTab={setSelectedTab}
-                />
-
-                {/* ROW 2: Sub-Category Tabs (Conditional for Stocks) */}
-                {selectedTab === 'stocks' && (
+                  {/* ROW 1: Main Tabs */}
                   <CategoryTabs
-                    tabs={STOCK_SUB_TABS}
-                    selectedTab={stockCategory}
-                    onSelectTab={setStockCategory}
-                    containerStyle={styles.subTabsContainer}
-                    tabStyle={styles.subTab}
-                    activeTabStyle={styles.subTabActive}
+                    tabs={MAIN_TABS}
+                    selectedTab={selectedTab}
+                    onSelectTab={setSelectedTab}
                   />
-                )}
+
+                  {/* ROW 2: Sub-Category Tabs (Conditional for Stocks) */}
+                  {selectedTab === 'stocks' && (
+                    <CategoryTabs
+                      tabs={STOCK_SUB_TABS}
+                      selectedTab={stockCategory}
+                      onSelectTab={setStockCategory}
+                      containerStyle={styles.subTabsContainer}
+                    />
+                  )}
+                </View>
               </>
             }
             ListFooterComponent={<MarketEventFooter />}
@@ -293,32 +295,57 @@ const styles = StyleSheet.create({
   headerContainer: { gap: theme.spacing.md, marginBottom: theme.spacing.sm },
   tabBar: { backgroundColor: 'transparent' },
   tabBarContent: { paddingVertical: theme.spacing.sm, paddingHorizontal: theme.spacing.sm, gap: theme.spacing.sm },
-  tab: { paddingVertical: theme.spacing.xs, paddingHorizontal: theme.spacing.md, borderRadius: 999, backgroundColor: 'transparent', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  tabActive: { backgroundColor: theme.colors.accentSoft, borderColor: theme.colors.accent },
-  tabLabel: { color: theme.colors.textSecondary, fontWeight: '700', fontSize: theme.typography.caption + 1 },
-  tabLabelActive: { color: theme.colors.accent },
-  subTabsContainer: { marginTop: -8 }, // Visual tweak
+  tab: { paddingVertical: theme.spacing.xs, paddingHorizontal: theme.spacing.md, borderRadius: 999, backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  tabActive: { backgroundColor: 'rgba(212,175,55,0.15)', borderColor: '#D4AF37' },
+  tabLabel: { color: '#A0A0A0', fontWeight: '700', fontSize: theme.typography.caption + 1 },
+  tabLabelActive: { color: '#D4AF37' },
+  subTabsContainer: { marginTop: 0, height: 48 },
   subTab: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)' },
-  subTabActive: { backgroundColor: theme.colors.accent },
-  sectionTitle: { fontSize: 14, fontWeight: '600', color: theme.colors.textPrimary, marginBottom: theme.spacing.sm, marginTop: theme.spacing.lg },
-  eventCard: { marginTop: theme.spacing.md, backgroundColor: theme.colors.card, borderRadius: theme.radius.md, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.md },
+  subTabActive: { backgroundColor: 'rgba(212,175,55,0.2)', borderWidth: 1, borderColor: '#D4AF37' },
+  tabSection: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    padding: 14,
+    gap: 10,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  tabSectionAccent: {
+    height: 2,
+    width: 40,
+    backgroundColor: '#D4AF37',
+    borderRadius: 999,
+    marginBottom: 2,
+  },
+  tabSectionLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#D4AF37',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 2,
+  },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#FFFFFF', marginBottom: theme.spacing.sm, marginTop: theme.spacing.lg, letterSpacing: 0.5 },
+  eventCard: { marginTop: theme.spacing.md, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: theme.spacing.md },
   eventIcon: { fontSize: 16 },
-  eventText: { fontSize: theme.typography.caption + 1, color: theme.colors.textSecondary, lineHeight: 18 },
-  secondaryButton: { backgroundColor: theme.colors.accentSoft, paddingVertical: theme.spacing.md, borderRadius: theme.radius.sm, alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-  secondaryButtonPressed: { backgroundColor: theme.colors.card, transform: [{ scale: 0.98 }] },
-  secondaryButtonText: { color: theme.colors.accent, fontWeight: '700', fontSize: theme.typography.body },
-  backButton: { width: 36, height: 36, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.card },
-  backButtonPressed: { backgroundColor: theme.colors.cardSoft, transform: [{ scale: 0.97 }] },
-  backIcon: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
-  portfolioCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.md, marginBottom: theme.spacing.md },
+  eventText: { fontSize: theme.typography.caption + 1, color: '#A0A0A0', lineHeight: 18 },
+  secondaryButton: { backgroundColor: 'rgba(212,175,55,0.12)', paddingVertical: theme.spacing.md, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#D4AF37' },
+  secondaryButtonPressed: { backgroundColor: 'rgba(212,175,55,0.2)', transform: [{ scale: 0.98 }] },
+  secondaryButtonText: { color: '#D4AF37', fontWeight: '700', fontSize: theme.typography.body },
+  backButton: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)' },
+  backButtonPressed: { backgroundColor: 'rgba(255,255,255,0.1)', transform: [{ scale: 0.97 }] },
+  backIcon: { color: '#FFFFFF', fontSize: theme.typography.subtitle, fontWeight: '700' },
+  portfolioCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: theme.spacing.md, marginBottom: theme.spacing.md },
   portfolioHeader: { gap: theme.spacing.xs },
-  portfolioLabel: { fontSize: theme.typography.caption, color: theme.colors.textSecondary, fontWeight: '600' },
-  portfolioValue: { fontSize: theme.typography.title, color: theme.colors.textPrimary, fontWeight: '700' },
+  portfolioLabel: { fontSize: theme.typography.caption, color: '#A0A0A0', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
+  portfolioValue: { fontSize: theme.typography.title, color: '#FFFFFF', fontWeight: '800' },
   portfolioActions: { flexDirection: 'row', gap: theme.spacing.sm },
-  seeInvestmentsButton: { flex: 1, backgroundColor: theme.colors.accentSoft, borderWidth: 1.5, borderColor: theme.colors.accent, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
-  seeInvestmentsButtonPressed: { backgroundColor: theme.colors.accent + '20', transform: [{ scale: 0.98 }] },
-  seeInvestmentsButtonText: { color: theme.colors.accent, fontWeight: '700', fontSize: theme.typography.body },
-  liquidateButton: { flex: 1, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: theme.colors.danger, borderRadius: theme.radius.md, paddingVertical: theme.spacing.sm, alignItems: 'center' },
-  liquidateButtonPressed: { backgroundColor: theme.colors.danger + '10', transform: [{ scale: 0.98 }] },
-  liquidateButtonText: { color: theme.colors.danger, fontWeight: '700', fontSize: theme.typography.body },
+  seeInvestmentsButton: { flex: 1, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1.5, borderColor: '#D4AF37', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  seeInvestmentsButtonPressed: { backgroundColor: 'rgba(212,175,55,0.22)', transform: [{ scale: 0.98 }] },
+  seeInvestmentsButtonText: { color: '#D4AF37', fontWeight: '800', fontSize: theme.typography.body },
+  liquidateButton: { flex: 1, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#FF3B30', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  liquidateButtonPressed: { backgroundColor: 'rgba(255,59,48,0.1)', transform: [{ scale: 0.98 }] },
+  liquidateButtonText: { color: '#FF3B30', fontWeight: '700', fontSize: theme.typography.body },
 });

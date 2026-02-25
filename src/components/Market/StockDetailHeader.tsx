@@ -61,12 +61,12 @@ export default StockDetailHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
     padding: theme.spacing.lg,
     gap: theme.spacing.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   row: {
     flexDirection: 'row',
@@ -76,35 +76,36 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: theme.typography.title - 2,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   chip: {
-    backgroundColor: theme.colors.accentSoft,
+    backgroundColor: 'rgba(212,175,55,0.12)',
     borderRadius: 999,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.accent,
+    borderWidth: 1,
+    borderColor: 'rgba(212,175,55,0.4)',
   },
   chipText: {
-    color: theme.colors.accent,
+    color: '#D4AF37',
     fontWeight: '700',
     fontSize: theme.typography.caption + 1,
   },
   price: {
     fontSize: theme.typography.subtitle + 6,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
   },
   change: {
     fontSize: theme.typography.subtitle,
     fontWeight: '700',
   },
   up: {
-    color: theme.colors.success,
+    color: '#00E676',
   },
   down: {
-    color: theme.colors.danger,
+    color: '#FF3B30',
   },
   metaRow: {
     flexDirection: 'row',
@@ -113,11 +114,11 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
   },
   divider: {
     height: 1,
-    backgroundColor: theme.colors.border,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     marginTop: theme.spacing.sm,
   },
 });

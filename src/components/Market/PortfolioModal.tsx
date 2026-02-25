@@ -146,13 +146,13 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: theme.colors.background,
-    borderTopLeftRadius: theme.radius.lg,
-    borderTopRightRadius: theme.radius.lg,
+    backgroundColor: '#0a0a0c',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     maxHeight: '85%',
     paddingBottom: theme.spacing.lg,
   },
@@ -161,30 +161,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: theme.spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   title: {
     fontSize: theme.typography.title,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
   },
   totalValue: {
     fontSize: theme.typography.body,
-    color: theme.colors.textSecondary,
+    color: '#D4AF37',
     marginTop: theme.spacing.xs,
+    fontWeight: '600',
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.cardSoft,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeButtonText: {
     fontSize: 18,
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
   },
   listContent: {
     padding: theme.spacing.lg,
@@ -192,11 +194,11 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 14,
     padding: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   itemLeft: {
     flex: 1,
@@ -204,21 +206,21 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: theme.typography.body,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
+    color: '#D4AF37',
     fontWeight: '700',
   },
   itemQuantity: {
     fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
   },
   itemCostInfo: {
     fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
     fontWeight: '500',
   },
   itemRight: {
@@ -228,17 +230,17 @@ const styles = StyleSheet.create({
   itemValue: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
   },
   itemPL: {
     fontSize: theme.typography.caption,
     fontWeight: '600',
   },
   profit: {
-    color: theme.colors.success,
+    color: '#00E676',
   },
   loss: {
-    color: theme.colors.danger,
+    color: '#FF3B30',
   },
   actions: {
     flexDirection: 'row',
@@ -246,32 +248,32 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   buyButton: {
-    backgroundColor: theme.colors.success + '20',
+    backgroundColor: 'rgba(0,230,118,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.success,
+    borderColor: '#00E676',
   },
   sellButton: {
-    backgroundColor: theme.colors.danger + '20',
+    backgroundColor: 'rgba(255,59,48,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.danger,
+    borderColor: '#FF3B30',
   },
   buttonPressed: {
     opacity: 0.7,
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: theme.colors.success,
+    color: '#00E676',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
   sellButtonText: {
-    color: theme.colors.danger,
+    color: '#FF3B30',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
@@ -286,11 +288,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: theme.typography.subtitle,
     fontWeight: '600',
-    color: theme.colors.textSecondary,
+    color: '#FFFFFF',
   },
   emptySubtext: {
     fontSize: theme.typography.caption,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
   },
 });
 

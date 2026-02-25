@@ -48,11 +48,11 @@ export default MarketOverview;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     gap: theme.spacing.sm,
   },
   headerRow: {
@@ -64,9 +64,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: theme.typography.subtitle,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   row: {
     flexDirection: 'row',
@@ -74,19 +75,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
-  positive: { color: theme.colors.success },
-  negative: { color: theme.colors.danger },
-  warning: { color: theme.colors.warning },
+  positive: { color: '#00E676' },
+  negative: { color: '#FF3B30' },
+  warning: { color: '#FFB300' },
   helper: {
-    color: theme.colors.textMuted,
+    color: 'rgba(160,160,160,0.6)',
     fontSize: theme.typography.caption,
   },
 });

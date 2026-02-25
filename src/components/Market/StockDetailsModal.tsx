@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { StockItem } from './marketTypes';
+import type { SimpleStockItem } from './marketTypes';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -19,9 +19,9 @@ const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
 
 type Props = {
   visible: boolean;
-  stock?: StockItem | null;
+  stock?: SimpleStockItem | null;
   onClose: () => void;
-  onBuy: (stock: StockItem, shares: number) => void;
+  onBuy: (stock: SimpleStockItem, shares: number) => void;
 };
 
 const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {

@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { StockItem } from './marketTypes';
+import type { SimpleStockItem } from './marketTypes';
 
 type Props = {
-  onSelect: (stock: StockItem) => void;
+  onSelect: (stock: SimpleStockItem) => void;
 };
 
 const SECTORS = [
@@ -18,7 +18,7 @@ const SECTORS = [
   'Communication',
 ];
 
-export const STOCKS: StockItem[] = [
+export const STOCKS: SimpleStockItem[] = [
   { id: 'NOVA', symbol: 'NOVA', company: 'Nova Devices', price: 188.3, dailyChange: 1.2, yearlyChange: 21.3, sector: 'Technology', risk: 'Low', marketCap: 180 },
   { id: 'ZENT', symbol: 'ZENT', company: 'Zentrix Chips', price: 468.2, dailyChange: 2.4, yearlyChange: 85.1, sector: 'Technology', risk: 'Medium', marketCap: 520 },
   { id: 'METX', symbol: 'METX', company: 'Metaflux Networks', price: 312.6, dailyChange: 0.8, yearlyChange: 46.2, sector: 'Technology', risk: 'Medium', marketCap: 260 },

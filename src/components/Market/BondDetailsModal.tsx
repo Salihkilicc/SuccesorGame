@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { BondItem } from './marketTypes';
+import type { SimpleBondItem } from './marketTypes';
 
 type Props = {
   visible: boolean;
-  bond?: BondItem | null;
+  bond?: SimpleBondItem | null;
   onClose: () => void;
-  onBuy: (bond: BondItem, amount: number) => void;
+  onBuy: (bond: SimpleBondItem, amount: number) => void;
 };
 
 const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {

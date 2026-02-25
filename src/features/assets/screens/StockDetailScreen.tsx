@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { theme } from '../../../core/theme';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppScreen from '../../../components/layout/AppScreen';
 import StockInfoSection from '../../../components/Market/StockInfoSection';
 import BuySellPanel from '../../../components/Market/BuySellPanel';
@@ -31,7 +32,7 @@ const StockDetailScreen = () => {
     const currentChange = initialChange;
 
     const isPositive = currentChange >= 0;
-    const changeColor = isPositive ? theme.colors.success : theme.colors.danger;
+    const changeColor = isPositive ? '#00E676' : '#FF3B30';
 
     // Get current quarter for random chart selection
     const currentMonth = useGameStore(state => state.currentMonth);
@@ -49,9 +50,12 @@ const StockDetailScreen = () => {
             title={symbol}
             subtitle={name || "Stock Details"}
             leftNode={
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Text style={styles.backText}>Back</Text>
-                </TouchableOpacity>
+                <Pressable
+                    onPress={() => navigation.goBack()}
+                    style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+                >
+                    <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+                </Pressable>
             }
         >
             <View style={{ flex: 1 }}>
@@ -107,12 +111,18 @@ const StockDetailScreen = () => {
 
 const styles = StyleSheet.create({
     backBtn: {
-        padding: 4,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
-    backText: {
-        color: theme.colors.accent, // Using accent color usually indicates interactive elements
-        fontSize: 16,
-        fontWeight: '600',
+    backBtnPressed: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        transform: [{ scale: 0.95 }],
     },
     scrollContent: {
         padding: theme.spacing.lg,
@@ -124,41 +134,43 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: theme.spacing.lg,
-        backgroundColor: theme.colors.card, // Ensure this isn't transparent if bg is dark
-        borderRadius: theme.radius.lg,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.border,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     symbolText: {
         fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
+        fontWeight: '900',
+        color: '#FFFFFF',
+        letterSpacing: 0.5,
     },
     categoryText: {
         fontSize: 12,
-        color: theme.colors.textSecondary,
+        color: '#D4AF37',
+        fontWeight: '600',
         marginTop: 4,
     },
     priceText: {
         fontSize: 24,
         fontWeight: '700',
-        color: theme.colors.textPrimary,
+        color: '#FFFFFF',
     },
     changeText: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
         marginTop: 4,
     },
     chartContainer: {
         height: 180,
-        backgroundColor: theme.colors.cardSoft,
-        borderRadius: theme.radius.md,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: 14,
         padding: theme.spacing.md,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.border,
-        overflow: 'hidden', // Ensure chart stays inside
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.07)',
+        overflow: 'hidden',
     },
 });
 

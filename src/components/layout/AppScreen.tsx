@@ -1,7 +1,6 @@
 import React from 'react';
 import { StatusBar, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { theme } from '../../core/theme';
 
 type Props = {
   title: string;
@@ -15,17 +14,14 @@ type Props = {
 const AppScreen = ({ title, subtitle, leftNode, rightNode, children, compact = false }: Props) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
-      <View style={[
-        styles.header,
-        compact && styles.headerCompact
-      ]}>
-        {leftNode ? <View style={styles.sideNode}>{leftNode}</View> : <View style={styles.sideNode} />}
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      <View style={[styles.header, compact && styles.headerCompact]}>
+        {leftNode ? <View style={styles.sideNode}>{leftNode}</View> : null}
         <View style={styles.titleGroup}>
           <Text style={styles.title}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
-        {rightNode ? <View style={styles.sideNode}>{rightNode}</View> : <View style={styles.sideNode} />}
+        {rightNode ? <View style={styles.rightNode}>{rightNode}</View> : null}
       </View>
       <View style={styles.content}>{children}</View>
     </SafeAreaView>
@@ -37,50 +33,51 @@ export default AppScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#000000',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(10,10,12,0.98)',
   },
   headerCompact: {
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.xs,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   sideNode: {
-    width: 48,
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
   titleGroup: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.xs / 2,
   },
   title: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.title,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: 2,
   },
   subtitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.body,
-    marginTop: theme.spacing.xs,
+    color: '#A0A0A0',
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginTop: 2,
   },
   rightNode: {
-    marginLeft: theme.spacing.md,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
   },
 });
+

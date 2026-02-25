@@ -86,9 +86,9 @@ const MarketTicker = ({ items }: { items: any[] }) => {
 const styles = StyleSheet.create({
     wrapper: {
         height: 36,
-        backgroundColor: '#000000',
+        backgroundColor: 'rgba(0,0,0,0.95)',
         borderBottomWidth: 1,
-        borderBottomColor: '#222',
+        borderBottomColor: 'rgba(212,175,55,0.18)',
         justifyContent: 'center',
     },
     listContent: {
@@ -102,13 +102,14 @@ const styles = StyleSheet.create({
         width: 150,
     },
     symbol: {
-        color: '#ccc',
-        fontWeight: 'bold',
+        color: '#D4AF37',
+        fontWeight: '800',
         marginRight: 5,
         fontSize: 11,
+        letterSpacing: 0.4,
     },
     price: {
-        color: 'white',
+        color: '#FFFFFF',
         marginRight: 5,
         fontSize: 11,
     },
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     separator: {
-        color: '#333',
+        color: 'rgba(255,255,255,0.15)',
         marginLeft: 10,
         fontSize: 11,
     },

@@ -1,4 +1,4 @@
-import { StockItem } from '../components/Market/marketTypes';
+import { SimpleStockItem } from '../components/Market/marketTypes';
 import { AcquisitionTarget, Category } from './AcquisitionData';
 
 /**
@@ -77,7 +77,7 @@ const getLogoForSector = (sector: string): string => {
 /**
  * Enriches stock market data with acquisition-specific fields
  */
-export const enrichStockData = (stocks: StockItem[]): AcquisitionTarget[] => {
+export const enrichStockData = (stocks: SimpleStockItem[]): AcquisitionTarget[] => {
     return stocks.map(stock => {
         const category = SECTOR_TO_CATEGORY_MAP[stock.sector] || 'Technology';
         const config = SYNERGY_CONFIG[category];

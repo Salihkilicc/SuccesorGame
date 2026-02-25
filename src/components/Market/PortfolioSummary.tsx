@@ -56,11 +56,11 @@ const formatMoney = (value: number) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
     padding: theme.spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     gap: theme.spacing.md,
   },
   row: {
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   label: {
-    color: theme.colors.textMuted,
+    color: '#A0A0A0',
     fontSize: theme.typography.caption,
     letterSpacing: 0.4,
   },
   value: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
   },
@@ -82,23 +82,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.accentSoft,
-    borderRadius: theme.radius.md,
+    backgroundColor: 'rgba(212,175,55,0.12)',
+    borderRadius: 12,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.accent,
+    borderWidth: 1,
+    borderColor: '#D4AF37',
   },
   buttonPressed: {
     transform: [{ scale: 0.99 }],
   },
   buttonText: {
-    color: theme.colors.accent,
+    color: '#D4AF37',
     fontWeight: '800',
     fontSize: theme.typography.body,
   },
   buttonArrow: {
-    color: theme.colors.accent,
+    color: '#D4AF37',
     fontSize: theme.typography.subtitle,
   },
 });

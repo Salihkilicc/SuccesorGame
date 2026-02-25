@@ -56,12 +56,12 @@ export default StockItemSkeleton;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 14,
     padding: theme.spacing.md,
     gap: theme.spacing.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   row: {
     flexDirection: 'row',
@@ -72,17 +72,16 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: theme.colors.textPrimary,
-    letterSpacing: 0.3,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   name: {
     fontSize: theme.typography.caption + 1,
-    color: theme.colors.textSecondary,
+    color: '#A0A0A0',
     marginTop: 2,
   },
   riskTag: {
-    backgroundColor: theme.colors.danger,
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: 999,
@@ -91,7 +90,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: theme.typography.subtitle,
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   change: {
@@ -99,13 +98,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: theme.colors.success,
+    color: '#00E676',
   },
   changeDown: {
-    color: theme.colors.danger,
+    color: '#FF3B30',
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: theme.colors.textMuted,
+    color: '#A0A0A0',
   },
 });

@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { BondCategory, BondItem } from './marketTypes';
+import type { BondCategory, SimpleBondItem } from './marketTypes';
 
 type Props = {
-  onSelect: (bond: BondItem) => void;
+  onSelect: (bond: SimpleBondItem) => void;
 };
 
-const BONDS: BondItem[] = [
+const BONDS: SimpleBondItem[] = [
   { id: 'gov-1', name: 'Saudi Gov 10y', years: 10, coupon: 4.4, risk: 'Low', category: 'government' },
   { id: 'gov-2', name: 'British 7y', years: 7, coupon: 3.2, risk: 'Low', category: 'government' },
   { id: 'gov-3', name: 'German 6y', years: 6, coupon: 2.8, risk: 'Very Low', category: 'government' },

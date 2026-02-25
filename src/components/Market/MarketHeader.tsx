@@ -1,56 +1,67 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, Pressable, StyleSheet, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { theme } from '../../core/theme';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const MarketHeader = ({ title, subtitle }: { title: string; subtitle?: string }) => {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="chevron-back" size={28} color={theme.colors.textPrimary} />
-                </TouchableOpacity>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>{title}</Text>
-                    {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-                </View>
+        <View style={styles.container}>
+            <StatusBar barStyle="light-content" />
+            <Pressable
+                onPress={() => navigation.goBack()}
+                style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+            >
+                <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+            </Pressable>
+            <View>
+                <Text style={styles.title}>{title}</Text>
+                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 
+export default MarketHeader;
+
 const styles = StyleSheet.create({
-    safeArea: {
-        backgroundColor: theme.colors.card,
-    },
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        backgroundColor: theme.colors.card,
+        gap: 16,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        backgroundColor: 'rgba(10,10,12,0.98)',
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-        zIndex: 10,
+        borderBottomColor: 'rgba(255,255,255,0.05)',
     },
     backBtn: {
-        marginRight: 16,
-    },
-    titleContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    backBtnPressed: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        transform: [{ scale: 0.95 }],
     },
     title: {
-        color: theme.colors.textPrimary,
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#FFFFFF',
+        letterSpacing: 2,
     },
     subtitle: {
-        color: theme.colors.textSecondary,
-        fontSize: 12,
+        color: '#A0A0A0',
+        fontSize: 11,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 1.2,
+        marginTop: 2,
     },
 });
-
-export default MarketHeader;

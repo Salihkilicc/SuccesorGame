@@ -1,10 +1,10 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
-import type { CryptoAsset } from './marketTypes';
+import type { SimpleCryptoAsset } from './marketTypes';
 
 type Props = {
-  onSelect: (asset: CryptoAsset) => void;
+  onSelect: (asset: SimpleCryptoAsset) => void;
 };
 
 const capSlowdown = (marketCap: number) => {
@@ -21,7 +21,7 @@ const adjustedChange = (baseChange: number, marketCap: number) =>
 
 const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
 
-const CRYPTOS: CryptoAsset[] = [
+const CRYPTOS: SimpleCryptoAsset[] = [
   { id: 'Bitron', name: 'Bitron', cost: 120, trend: 'High Trend', change: 6, risk: 'High', marketCap: 180 },
   { id: 'Etheriq', name: 'Etheriq', cost: 450, trend: 'High Trend', change: 8, risk: 'High', marketCap: 220 },
   { id: 'Solara', name: 'Solara', cost: 22, trend: 'High Trend', change: 3, risk: 'High', marketCap: 35 },

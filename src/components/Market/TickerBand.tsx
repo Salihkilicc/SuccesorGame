@@ -65,10 +65,10 @@ export default TickerBand;
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: theme.colors.cardSoft,
-    borderRadius: theme.radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
     height: 34,
   },
   inner: {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   symbol: {
-    color: theme.colors.textPrimary,
+    color: '#D4AF37',
     fontWeight: '800',
     fontSize: theme.typography.body,
     letterSpacing: 0.4,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption + 1,
   },
   separator: {
-    color: theme.colors.textMuted,
+    color: 'rgba(255,255,255,0.15)',
     paddingHorizontal: theme.spacing.xs,
   },
 });
