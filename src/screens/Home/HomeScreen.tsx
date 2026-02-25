@@ -247,29 +247,64 @@ const HomeScreen = () => {
           style={styles.container}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}>
-          <View style={styles.headerRow}>
-            <View style={{ flex: 1, gap: theme.spacing.xs }}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.gender}>{genderSymbol}</Text>
-              </View>
-              <Text style={styles.bio}>{displayBio}</Text>
-              <View style={styles.ageRow}>
-                <View style={styles.ageGroup}>
-                  <Text style={styles.ageLabel}>Age</Text>
-                  <Text style={styles.ageValue}>{age}</Text>
-                  <Text style={styles.monthBadge}>Month {currentMonth}</Text>
+          {/* ── Premium Player Header ── */}
+          <View style={styles.headerCard}>
+            {/* Top Row: Avatar + Name/Bio + Age/Month chips */}
+            <View style={styles.headerTopRow}>
+              {/* Avatar */}
+              <LinearGradient
+                colors={['#C5A059', '#8C6C3A', '#4F3A15']}
+                style={styles.avatarCircle}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.avatarInitial}>
+                  {displayName.charAt(0).toUpperCase()}
+                </Text>
+              </LinearGradient>
+
+              {/* Name + Bio */}
+              <View style={styles.headerNameBlock}>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name}>{displayName}</Text>
+                  <Text style={styles.gender}>{genderSymbol}</Text>
                 </View>
-                <Pressable
-                  onPress={handleAdvanceTime}
-                  style={({ pressed }) => [
-                    styles.nextMonthButton,
-                    pressed && styles.nextMonthButtonPressed,
-                  ]}>
-                  <Text style={styles.nextMonthText}>Next Quarter &gt;&gt;</Text>
-                </Pressable>
+                <Text style={styles.bio} numberOfLines={1}>{displayBio}</Text>
+              </View>
+
+              {/* Age / Month chips — right-aligned, same row as name */}
+              <View style={styles.ageChips}>
+                <View style={styles.ageChip}>
+                  <Text style={styles.ageChipLabel}>AGE</Text>
+                  <Text style={styles.ageChipValue}>{age}</Text>
+                </View>
+                <View style={styles.ageChipDivider} />
+                <View style={styles.ageChip}>
+                  <Text style={styles.ageChipLabel}>MTH</Text>
+                  <Text style={styles.ageChipValue}>{currentMonth}</Text>
+                </View>
               </View>
             </View>
+
+            {/* Bottom Row: Full-width Next Quarter Button */}
+            <Pressable
+              onPress={handleAdvanceTime}
+              style={({ pressed }) => [
+                styles.nextMonthButton,
+                pressed && styles.nextMonthButtonPressed,
+              ]}
+            >
+              <LinearGradient
+                colors={['#C5A059', '#8C6C3A', '#4F3A15']}
+                style={StyleSheet.absoluteFillObject}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              />
+              <View style={styles.nextMonthContent}>
+                <Text style={styles.nextMonthText}>ADVANCE TO NEXT QUARTER</Text>
+                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#FFFFFF" />
+              </View>
+            </Pressable>
           </View>
 
           <View style={styles.widgetsContainer}>
@@ -448,29 +483,66 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
-    paddingBottom: 120, // Increased for CrystalNavBar
+    paddingBottom: 160, // Increased to ensure scroll reaches bottom safely
   },
-  headerRow: {
+  // ── Premium Header Card ──
+  headerCard: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    padding: 14,
+    gap: 12,
+    marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  headerTopRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: theme.spacing.md,
-    marginBottom: 8,
+    alignItems: 'center',
+    gap: 10,
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center' }, // legacy stub
+  headerLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 }, // legacy stub
+  headerRight: { alignItems: 'flex-end' }, // legacy stub
+  avatarCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#8C6C3A', // Dark gold shadow
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  avatarInitial: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFF',
+  },
+  headerNameBlock: {
+    flex: 1,
+    gap: 2,
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
+    gap: 5,
   },
   name: {
-    fontSize: theme.typography.title,
+    fontSize: 17,
     fontWeight: '800',
-    color: '#F0F0F0',
-    letterSpacing: 0.5,
+    color: '#F5F5F5',
+    letterSpacing: 0.2,
   },
   gender: {
-    fontSize: theme.typography.subtitle,
-    color: theme.colors.textSecondary,
+    fontSize: 13,
+    color: '#9D8EC7',
   },
   premiumTag: {
     marginLeft: theme.spacing.xs,
@@ -483,60 +555,79 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#AAAAAA',
-    fontSize: theme.typography.body,
+    color: '#5A5A72',
+    fontSize: 11,
+    letterSpacing: 0.1,
   },
-  ageRow: {
+  ageChips: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.md,
-    marginTop: theme.spacing.xs,
+    backgroundColor: 'rgba(124,58,237,0.12)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(124,58,237,0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    gap: 8,
   },
-  ageGroup: {
-    flexDirection: 'row',
+  ageChip: {
     alignItems: 'center',
-    gap: theme.spacing.sm,
   },
-  ageLabel: {
-    color: theme.colors.textMuted,
-    fontSize: theme.typography.caption,
-    letterSpacing: 0.4,
-  },
-  ageValue: {
-    color: theme.colors.textPrimary,
-    fontSize: theme.typography.subtitle,
+  ageChipLabel: {
+    fontSize: 8,
     fontWeight: '700',
+    color: '#9D8EC7',
+    letterSpacing: 1,
   },
-  monthBadge: {
-    color: theme.colors.accent,
-    backgroundColor: theme.colors.accentSoft,
-    alignSelf: 'center',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.radius.sm,
-    fontWeight: '700',
-    fontSize: theme.typography.caption,
+  ageChipValue: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#EDE9FE',
   },
+  ageChipDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: 'rgba(124,58,237,0.3)',
+  },
+  // --- Legacy stubs ---
+  ageRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
+  ageGroup: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
+  ageLabel: { color: theme.colors.textMuted, fontSize: theme.typography.caption },
+  ageValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
+  monthBadge: { color: theme.colors.accent, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
   nextMonthButton: {
-    backgroundColor: theme.colors.accent,
-    paddingVertical: theme.spacing.sm * 1.3,
-    paddingHorizontal: theme.spacing.lg * 1.3,
-    borderRadius: theme.radius.lg,
-    marginLeft: theme.spacing.sm,
-    shadowColor: theme.colors.accent,
+    shadowColor: '#8C6C3A', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.8, // Increased opacity for better glow
+    shadowRadius: 12,
+    elevation: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+    width: '100%',
+    marginTop: 6,
+  },
+  nextMonthContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    gap: 8,
   },
   nextMonthButtonPressed: {
     opacity: 0.85,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.96 }],
   },
   nextMonthText: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: theme.typography.caption + 2,
+    fontSize: 14,
+    letterSpacing: 4,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    textShadowColor: 'rgba(255, 230, 150, 0.4)', // Softer glow
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   hamburgerButton: {
     width: 42,
