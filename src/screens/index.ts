@@ -17,9 +17,6 @@ export { default as ShopDetailScreen } from '../features/shopping/screens/ShopDe
 export { default as BelongingsScreen } from '../features/shopping/screens/BelongingsScreen';
 export { default as ProductsScreen } from '../features/products/screens/ProductsScreen';
 export { default as TechTreeScreen } from '../features/products/screens/TechTreeScreen';
-export { default as EducationScreen } from '../features/life/screens/EducationScreen';
-export { default as EducationDashboard } from '../features/education/screens/EducationDashboard';
-export { default as EducationBrowseScreen } from '../features/education/screens/EducationBrowseScreen';
 export { default as DNAScreen } from '../features/life/screens/DNAScreen';
 export { default as ResearchScreen } from '../features/assets/screens/ResearchScreen';
 export { default as FinancialReportScreen } from '../features/assets/screens/FinancialReportScreen';

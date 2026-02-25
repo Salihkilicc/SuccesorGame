@@ -24,9 +24,6 @@ import {
   ShopDetailScreen,
   ProductsScreen,
   TechTreeScreen,
-  EducationScreen,
-  EducationDashboard,
-  EducationBrowseScreen,
   DNAScreen,
   ResearchScreen,
   FinancialReportScreen,
@@ -49,8 +46,6 @@ export type LifeStackParamList = {
   LifeHome: undefined;
   Profile: undefined;
   Achievements: undefined;
-  Education: undefined;
-  EducationBrowse: undefined;
   DNA: undefined;
 };
 
@@ -118,8 +113,6 @@ export type RootStackParamList = {
   Sanctuary: undefined;
   Travel: undefined;
   BlackMarket: undefined;
-  Education: undefined;
-  EducationBrowse: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -128,8 +121,6 @@ const LifeStackNavigator = () => (
     {/* TODO: Restore these screens or create new ones */}
     {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
     {/* <LifeStack.Screen name="Achievements" component={AchievementsScreen} /> */}
-    <LifeStack.Screen name="Education" component={EducationDashboard} />
-    <LifeStack.Screen name="EducationBrowse" component={EducationBrowseScreen} />
     <LifeStack.Screen name="DNA" component={DNAScreen} />
   </LifeStack.Navigator>
 );
@@ -334,8 +325,6 @@ const RootNavigator = () => {
           <RootStack.Screen name="Sanctuary" component={SanctuaryScreen} />
           <RootStack.Screen name="Travel" component={TravelScreen} />
           <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} />
-          <RootStack.Screen name="Education" component={EducationDashboard} />
-          <RootStack.Screen name="EducationBrowse" component={EducationBrowseScreen} />
         </RootStack.Navigator>
 
       </View>

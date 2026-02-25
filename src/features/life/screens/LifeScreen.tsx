@@ -134,7 +134,7 @@ const LifeScreen = () => {
       case 'travel': navigation.navigate('Travel'); break;
       case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' }); break;
       case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' }); break;
-      case 'education': navigation.navigate('Education' as any); break;
+      case 'education': openEducation(); break;
       case 'dna': navigation.navigate('DNA'); break;
       case 'contacts': handleBottomNav('Contacts'); break;
       case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
@@ -309,6 +309,8 @@ const LifeScreen = () => {
         visible={pregnancyModalVisible}
         onClose={() => setPregnancyModalVisible(false)}
       />
+      <EducationMasterModal />
+      <EducationExamModal />
     </View >
   );
 };
