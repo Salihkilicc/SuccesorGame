@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     sectionHeader: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#666',
+        color: '#4CC9F0',
         marginBottom: 8,
         marginTop: 12,
         letterSpacing: 1,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     travelSection: {
         marginTop: 10,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: '#C8B6FF',
         paddingTop: 10,
     },
     charterBox: {
@@ -85,12 +85,12 @@ const styles = StyleSheet.create({
         borderColor: '#555',
     },
     charterTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 15,
     },
     charterSub: {
-        color: '#888',
+        color: '#4CC9F0',
         fontSize: 12,
         marginVertical: 4,
     },
@@ -106,19 +106,19 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: '#C8B6FF',
     },
     optionButtonSelected: {
-        borderColor: theme.colors.primary,
+        borderColor: '#C8B6FF',
         backgroundColor: '#2A1F10', // subtle gold tint
     },
     optionText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '600',
         fontSize: 16,
     },
     optionTextSelected: {
-        color: theme.colors.primary,
+        color: '#C8B6FF',
     },
     optionSubText: {
         color: '#AAA',

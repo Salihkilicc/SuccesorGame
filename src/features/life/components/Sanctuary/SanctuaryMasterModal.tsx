@@ -125,7 +125,7 @@ const SanctuaryMasterModal = ({
                 <AppLaunchLoader
                     appName="Sanctuary"
                     appIcon={<MaterialCommunityIcons name="spa" size={64} color="#FFFFFF" />}
-                    backgroundColor="#0f171e"
+                    backgroundColor="#4CA771"
                 >
                     {/* LAYER 1: Hub (Always Rendered) */}
                     <View style={styles.baseLayer}>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     overlayLayer: {
         ...StyleSheet.absoluteFillObject,
         zIndex: 10,
-        backgroundColor: '#111827', // Dark background for smooth fade
+        backgroundColor: '#4CA771', // Dark background for smooth fade
     },
 });
 

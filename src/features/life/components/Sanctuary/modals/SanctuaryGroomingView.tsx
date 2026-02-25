@@ -164,7 +164,7 @@ export default SanctuaryGroomingView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#4CA771',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -185,19 +185,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
-        backgroundColor: '#FFFFFF',
+        borderBottomColor: '#C4A484',
+        backgroundColor: '#4CA771',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#133323',
         alignItems: 'center',
         justifyContent: 'center',
     },
     backIcon: {
-        color: '#374151',
+        color: '#F4EBD0',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -205,18 +205,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#111827',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#6B7280',
+        color: '#F4EBD0',
         fontSize: 12,
     },
     priceTag: {
         textAlign: 'center',
-        color: '#C5A065',
+        color: '#C4A484',
         fontWeight: '600',
         marginBottom: theme.spacing.lg,
     },
@@ -225,11 +225,11 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     specialServiceCard: {
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#133323',
         borderRadius: theme.radius.md,
         padding: 16,
         borderWidth: 2,
-        borderColor: '#10b981',
+        borderColor: '#C4A484',
         marginBottom: theme.spacing.md,
     },
     specialServiceHeader: {
@@ -242,17 +242,17 @@ const styles = StyleSheet.create({
         fontSize: 32,
     },
     specialServiceTitle: {
-        color: '#111827',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
     },
     specialServiceDesc: {
-        color: '#4B5563',
+        color: '#F4EBD0',
         fontSize: 12,
         marginTop: 2,
     },
     specialServicePrice: {
-        color: '#10b981',
+        color: '#66BB6A',
         fontSize: 18,
         fontWeight: '700',
     },
@@ -265,16 +265,16 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     benefitText: {
-        color: '#047857', // Darker green
+        color: '#FFFFFF', // Darker green
         fontSize: 12,
         fontWeight: '700',
     },
     specialServiceCardActive: {
         backgroundColor: '#10b98130',
-        borderColor: '#10b981',
+        borderColor: '#C4A484',
     },
     activeBuffBadge: {
-        backgroundColor: '#10b981',
+        backgroundcolor: '#66BB6A',
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 8,
@@ -289,13 +289,13 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#E5E7EB',
+        backgroundColor: '#C4A484',
         marginVertical: 20,
     },
     sectionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#374151',
+        color: '#F4EBD0',
         marginBottom: 12,
         marginTop: 8,
     },
@@ -309,17 +309,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#133323',
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: '#C4A484',
     },
     gridItemSelected: {
-        backgroundColor: '#111827',
-        borderColor: '#111827',
+        backgroundColor: '#4CA771',
+        borderColor: '#C4A484',
     },
     gridItemText: {
         fontSize: 14,
-        color: '#374151',
+        color: '#F4EBD0',
         fontWeight: '600',
     },
     gridItemTextSelected: {

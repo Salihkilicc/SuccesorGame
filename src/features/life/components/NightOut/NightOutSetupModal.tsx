@@ -98,7 +98,7 @@ const NightOutSetupModal = ({
                 <AppLaunchLoader
                     appName="Night Out"
                     appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
-                    backgroundColor="#1a0b2e"
+                    backgroundColor="#1A1A2E"
                 >
                     <View style={styles.backdrop}>
                         <SafeAreaView style={styles.card}>
@@ -118,7 +118,7 @@ const NightOutSetupModal = ({
                                             padding: 8,
                                             opacity: pressed ? 0.7 : 1
                                         })}>
-                                        <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>←</Text>
+                                        <Text style={{ fontSize: 24, color: '#FFFFFF', fontWeight: 'bold' }}>←</Text>
                                     </Pressable>
                                 </View>
                                 <View style={styles.headerCenter}>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0a0a0c',
+        backgroundColor: '#1A1A2E',
         paddingHorizontal: 24,
         paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         paddingBottom: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: '#C8B6FF',
     },
     headerLeft: {
         width: 40,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '900',
-        color: theme.colors.primary,
+        color: '#C8B6FF',
         textAlign: 'center',
         marginBottom: 4,
         letterSpacing: 2,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     },
     progress: {
         fontSize: 12,
-        color: '#666',
+        color: '#4CC9F0',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

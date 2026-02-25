@@ -64,7 +64,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>Stress -25</Text>
-                                <Text style={[styles.statGain, { color: '#FF4444' }]}>⚠️ Multiple Risks</Text>
+                                <Text style={[styles.statGain, { color: '#FF9E00' }]}>⚠️ Multiple Risks</Text>
                             </View>
                         </Pressable>
                     </View>
@@ -84,14 +84,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0a0a0c',
+        backgroundColor: '#1A1A2E',
         padding: 24,
         paddingBottom: 40,
         alignItems: 'center',
         justifyContent: 'center',
     },
     title: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '800',
         marginBottom: 24,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     optionTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 8,

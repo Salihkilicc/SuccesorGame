@@ -30,7 +30,7 @@ const { width } = Dimensions.get('window');
 const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalProps) => {
     if (!visible || !data) return null;
 
-    const themeColor = data.themeColor || '#fff';
+    const themeColor = data.themeColor || '#FFFFFF';
     const isVibeCheck = typeof data.enjoymentScore === 'number';
 
     return (
@@ -81,7 +81,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
                             isVibeCheck && {
                                 fontSize: 18,
                                 opacity: Math.max(0.6, (data.enjoymentScore || 0) / 100),
-                                color: (data.enjoymentScore || 0) > 80 ? '#fff' : '#ccc'
+                                color: (data.enjoymentScore || 0) > 80 ? '#FFFFFF' : '#ccc'
                             }
                         ]}>
                             {data.text}
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0a0a0c',
+        backgroundColor: '#1A1A2E',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#333',
+        backgroundColor: '#1A1A2E',
         borderRadius: 4,
         overflow: 'hidden',
         width: '100%'
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     narrativeText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 22,
         textAlign: 'center',
         fontStyle: 'italic',
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         lineHeight: 32,
     },
     wildText: {
-        color: '#ff4444',
+        color: '#FF9E00',
         fontWeight: '600'
     },
     minimalStatsRow: {
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     closeButtonText: {
-        color: '#666',
+        color: '#4CC9F0',
         fontSize: 14,
         textTransform: 'uppercase',
         letterSpacing: 2

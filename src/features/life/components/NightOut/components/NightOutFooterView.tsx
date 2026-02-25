@@ -39,25 +39,25 @@ const styles = StyleSheet.create({
     footer: {
         marginTop: 20,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: '#C8B6FF',
         paddingTop: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     totalLabel: {
-        color: '#888',
+        color: '#4CC9F0',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
     },
     totalValue: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '700',
     },
     confirmButton: {
-        backgroundColor: theme.colors.primary,
+        backgroundColor: '#C8B6FF',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmButtonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 14,
     },
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     closeText: {
-        color: '#666',
+        color: '#4CC9F0',
         fontSize: 14
     }
 });

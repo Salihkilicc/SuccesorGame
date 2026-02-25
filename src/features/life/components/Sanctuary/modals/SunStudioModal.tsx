@@ -106,12 +106,12 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     card: {
-        backgroundColor: '#2D3748',
+        backgroundColor: '#133323',
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#4A5568',
+        borderColor: '#C4A484',
     },
     cardPressed: {
         backgroundColor: '#353F4F',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     cardPrice: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     },
     cardDesc: {
         fontSize: 13,
-        color: '#CBD5E0',
+        color: '#F4EBD0',
         textAlign: 'center',
         marginBottom: 8,
     },

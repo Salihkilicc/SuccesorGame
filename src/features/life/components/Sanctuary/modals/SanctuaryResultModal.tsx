@@ -86,7 +86,7 @@ export default SanctuaryResultModal;
 const styles = StyleSheet.create({
     message: {
         fontSize: 15,
-        color: '#A0AEC0',
+        color: '#F4EBD0',
         textAlign: 'center',
         marginBottom: theme.spacing.xl,
         lineHeight: 22,
@@ -101,23 +101,23 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     barLabel: {
-        color: '#CBD5E0',
+        color: '#F4EBD0',
         fontSize: 13,
         fontWeight: '600',
     },
     barValue: {
-        color: '#C5A065',
+        color: '#C4A484',
         fontWeight: '700',
     },
     barTrack: {
         height: 12,
-        backgroundColor: '#2D3748',
+        backgroundColor: '#133323',
         borderRadius: 6,
         overflow: 'hidden',
     },
     barFill: {
         height: '100%',
-        backgroundColor: '#48BB78', // Green for enjoyment
+        backgroundcolor: '#66BB6A', // Green for enjoyment
     },
     statsContainer: {
         flexDirection: 'row',
@@ -127,17 +127,17 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     statTag: {
-        backgroundColor: '#2D3748',
+        backgroundColor: '#133323',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#4A5568',
+        borderColor: '#C4A484',
     },
     statText: {
         fontSize: 13,
         fontWeight: '600',
     },
-    positive: { color: '#48BB78' },
+    positive: { color: '#66BB6A' },
     negative: { color: '#F56565' },
 });

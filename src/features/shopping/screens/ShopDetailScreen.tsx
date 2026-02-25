@@ -21,7 +21,13 @@ const ShopDetailScreen = () => {
         closeEncounter
     } = useEncounterSystem();
 
-    const { shop, money, handleBuy, checkIfOwned, formatMoney, getDiscountedPrice, discountPercent } = useShopLogic(shopId, triggerEncounter);
+    const { shop, money, handleBuy, checkIfOwned, formatMoney, getDiscountedPrice, discountPercent } = useShopLogic(
+        shopId,
+        (type: string) => {
+            const hasEncounter = triggerEncounter(type);
+            return !!hasEncounter;
+        }
+    );
 
     if (!shop) {
         return (

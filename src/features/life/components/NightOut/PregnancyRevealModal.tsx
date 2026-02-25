@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0a0a0c',
+        backgroundColor: '#1A1A2E',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -69,18 +69,18 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#2A2A2A',
+        backgroundColor: '#1A1A2E',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#444'
+        borderColor: '#C8B6FF'
     },
     icon: {
         fontSize: 40
     },
     title: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '700',
         marginBottom: 12,
@@ -94,14 +94,14 @@ const styles = StyleSheet.create({
         lineHeight: 22
     },
     subtext: {
-        color: '#666',
+        color: '#4CC9F0',
         fontSize: 13,
         textAlign: 'center',
         marginBottom: 32,
         fontStyle: 'italic'
     },
     button: {
-        backgroundColor: theme.colors.primary,
+        backgroundColor: '#C8B6FF',
         paddingVertical: 14,
         paddingHorizontal: 32,
         borderRadius: 10,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 16
     }

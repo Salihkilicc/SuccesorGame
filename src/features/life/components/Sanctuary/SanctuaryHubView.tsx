@@ -78,7 +78,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Massage */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('MASSAGE')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#E0F2FE' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.MASSAGE}</Text>
                             </View>
                             <Text style={styles.cardTitle}>Royal Massage</Text>
@@ -87,7 +87,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Grooming */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('GROOMING')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#DCFCE7' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.GROOMING}</Text>
                             </View>
                             <Text style={styles.cardTitle}>Grooming Lounge</Text>
@@ -96,7 +96,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Surgery */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('SURGERY')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#FAE8FF' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.SURGERY}</Text>
                             </View>
                             <Text style={styles.cardTitle}>Plastic Surgery</Text>
@@ -118,11 +118,11 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9FAFB',
+        backgroundColor: '#4CA771',
     },
     backdrop: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#F3F4F6', // Light gray background
+        backgroundColor: '#4CA771', // Light gray background
     },
     safeArea: {
         flex: 1,
@@ -133,21 +133,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#0F172A',
         borderBottomWidth: 1,
-        borderBottomColor: '#E5E7EB',
+        borderBottomColor: '#C4A484',
     },
     closeBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#133323',
         alignItems: 'center',
         justifyContent: 'center',
     },
     closeIcon: {
         fontSize: 18,
-        color: '#374151',
+        color: '#F4EBD0',
     },
     titleContainer: {
         alignItems: 'center',
@@ -155,12 +155,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#111827',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
     subtitle: {
         fontSize: 12,
-        color: '#6B7280',
+        color: '#F4EBD0',
         marginTop: 2,
     },
     content: {
@@ -174,19 +174,19 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 20,
         marginBottom: 24,
-        shadowColor: '#000',
+        shadowColor: '#0F172A',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
         elevation: 5,
     },
     vipActive: {
-        backgroundColor: '#1E1E1E', // Dark luxury
+        backgroundColor: '#133323', // Dark luxury
         borderWidth: 1,
-        borderColor: '#F59E0B',
+        borderColor: '#66BB6A',
     },
     vipInactive: {
-        backgroundColor: '#1F2937',
+        backgroundColor: '#0F172A',
     },
     vipContent: {
         flex: 1,
@@ -194,12 +194,12 @@ const styles = StyleSheet.create({
     vipTitle: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#F59E0B', // Gold
+        color: '#66BB6A', // Gold -> Light Green
         marginBottom: 4,
     },
     vipDesc: {
         fontSize: 12,
-        color: '#D1D5DB',
+        color: '#F4EBD0',
         marginTop: 2,
     },
     vipIcon: {
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     priceText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 12,
     },
@@ -223,17 +223,17 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     card: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#0F172A',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#0F172A',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: '#C4A484',
     },
     iconContainer: {
         width: 60,
@@ -249,12 +249,12 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#111827',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     cardDesc: {
         fontSize: 13,
-        color: '#6B7280',
+        color: '#F4EBD0',
     },
     bottomBarContainer: {
         position: 'absolute',

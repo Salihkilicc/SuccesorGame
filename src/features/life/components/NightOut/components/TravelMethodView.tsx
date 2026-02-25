@@ -24,7 +24,7 @@ const TravelMethodView = ({
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, { color: theme.colors.primary }]}>PRIVATE HANGAR</Text>
+                    <Text style={[styles.title, { color: '#C8B6FF' }]}>PRIVATE HANGAR</Text>
                     <Text style={styles.subtitle}>Select your aircraft</Text>
                 </View>
 
@@ -74,7 +74,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
-                        <View style={[styles.badge, { backgroundColor: '#ff4444' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
                             <Text style={styles.badgeText}>Rep -1 📉</Text>
                         </View>
                     </View>
@@ -90,7 +90,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🛫</Text>
-                        <View style={[styles.badge, { backgroundColor: '#666' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#C8B6FF' }]}>
                             <Text style={styles.badgeText}>Rep 0</Text>
                         </View>
                     </View>
@@ -103,16 +103,16 @@ const TravelMethodView = ({
                 {/* 3. Royal Charter */}
                 <Pressable
                     onPress={() => onSelectMethod('luxury')}
-                    style={({ pressed }) => [styles.card, { borderColor: '#FFD700' }, pressed && styles.pressed]}>
+                    style={({ pressed }) => [styles.card, { borderColor: '#FF9E00' }, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
-                        <View style={[styles.badge, { backgroundColor: '#FFD700' }]}>
-                            <Text style={[styles.badgeText, { color: '#000' }]}>Rep +1 📈</Text>
+                        <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
+                            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>Rep +1 📈</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>Royal{'\n'}Charter</Text>
-                        <Text style={[styles.cardPrice, { color: '#FFD700' }]}>$50k</Text>
+                        <Text style={[styles.cardPrice, { color: '#FF9E00' }]}>$50k</Text>
                     </View>
                 </Pressable>
 
@@ -124,7 +124,7 @@ const TravelMethodView = ({
                         <Text style={styles.cardEmoji}>🛩️</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={[styles.cardTitle, { color: theme.colors.primary }]}>MY{'\n'}HANGAR</Text>
+                        <Text style={[styles.cardTitle, { color: '#C8B6FF' }]}>MY{'\n'}HANGAR</Text>
                         <Text style={styles.hangarAction}>Use Own Jet →</Text>
                     </View>
                 </Pressable>
@@ -153,20 +153,20 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     backButtonText: {
-        color: '#888',
+        color: '#4CC9F0',
         fontSize: 14,
         fontWeight: '600',
     },
     title: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#fff',
+        color: '#FFFFFF',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },
     subtitle: {
         fontSize: 12,
-        color: '#666',
+        color: '#4CC9F0',
         marginTop: 2,
     },
     scrollView: {
@@ -182,16 +182,16 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#1A1A2E',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: '#C8B6FF',
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#1a1a20',
-        borderColor: theme.colors.primary,
+        backgroundColor: '#1A1A2E',
+        borderColor: '#C8B6FF',
         borderStyle: 'dashed',
     },
     cardHeader: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     cardContent: {
         gap: 4,
@@ -218,18 +218,18 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#fff',
+        color: '#FFFFFF',
         lineHeight: 20,
     },
     cardPrice: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     hangarAction: {
         fontSize: 12,
         fontWeight: '600',
-        color: theme.colors.primary,
+        color: '#C8B6FF',
     },
     pressed: {
         opacity: 0.8,
@@ -239,17 +239,17 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#1A1A2E',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: theme.colors.primary,
+        borderColor: '#C8B6FF',
     },
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#2a2a2a',
+        backgroundColor: '#1A1A2E',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -261,12 +261,12 @@ const styles = StyleSheet.create({
     jetListName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#fff',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     jetListDesc: {
         fontSize: 12,
-        color: '#888',
+        color: '#4CC9F0',
     },
     jetListCost: {
         alignItems: 'flex-end',
@@ -274,12 +274,12 @@ const styles = StyleSheet.create({
     costText: {
         fontSize: 16,
         fontWeight: '700',
-        color: theme.colors.primary,
+        color: '#C8B6FF',
     },
     fuelText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#666',
+        color: '#4CC9F0',
     },
     emptyState: {
         alignItems: 'center',
@@ -294,12 +294,12 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#fff',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     emptyText: {
         fontSize: 14,
-        color: '#888',
+        color: '#4CC9F0',
         textAlign: 'center',
         lineHeight: 20,
     },

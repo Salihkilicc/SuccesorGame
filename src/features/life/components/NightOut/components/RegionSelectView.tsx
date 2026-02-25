@@ -69,14 +69,14 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 8,
         letterSpacing: 0.5,
     },
     subheader: {
         fontSize: 14,
-        color: '#888',
+        color: '#4CC9F0',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -88,18 +88,18 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '45%',
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#1A1A2E',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#333',
+        borderColor: '#C8B6FF',
         minHeight: 160, // Increased height for large cards
         justifyContent: 'center',
     },
     cardSelected: {
-        borderColor: theme.colors.primary,
-        backgroundColor: '#252525',
+        borderColor: '#C8B6FF',
+        backgroundColor: '#1A1A2E',
     },
     cardLocal: {
         borderColor: '#3498db', // Blue for USA Local
@@ -115,16 +115,16 @@ const styles = StyleSheet.create({
     regionName: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#fff',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 4,
     },
     textSelected: {
-        color: theme.colors.primary,
+        color: '#C8B6FF',
     },
     venueCount: {
         fontSize: 12,
-        color: '#666',
+        color: '#4CC9F0',
         marginTop: 4,
     },
     localBadge: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     localBadgeText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#fff',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
 });

@@ -111,20 +111,20 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#232730',
+        backgroundColor: '#0F172A', // Dark Navy
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#2E3540',
+        borderColor: '#133323', // Deep Forest Green
     },
     dangerCard: {
-        borderColor: '#552222',
-        backgroundColor: '#2A1A1A',
+        borderColor: '#C4A484', // Bamboo
+        backgroundColor: '#133323',
     },
     vipCard: {
         borderWidth: 2,
-        borderColor: '#C5A065',
-        backgroundColor: '#2A2520',
+        borderColor: '#66BB6A', // Light Green
+        backgroundColor: '#4CA771', // Dark Pine
     },
     cardPressed: {
         opacity: 0.8,
@@ -140,44 +140,44 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#E0E0E0',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     dangerText: {
-        color: '#FF6B6B',
+        color: '#F4EBD0',
     },
     vipText: {
-        color: '#C5A065',
+        color: '#66BB6A',
     },
     cardSubtitle: {
         fontSize: 12,
-        color: '#8A9BA8',
+        color: '#C4A484',
     },
     chevron: {
         fontSize: 18,
-        color: theme.colors.textMuted,
+        color: '#C4A484',
     },
     vipActiveBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#C5A06520',
+        backgroundColor: '#133323',
         borderRadius: theme.radius.md,
         padding: 12,
         borderWidth: 2,
-        borderColor: '#C5A065',
+        borderColor: '#66BB6A',
         gap: 10,
     },
     vipActiveIcon: {
         fontSize: 28,
     },
     vipActiveTitle: {
-        color: '#C5A065',
+        color: '#66BB6A',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 2,
     },
     vipActiveText: {
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         fontSize: 12,
     },
 });

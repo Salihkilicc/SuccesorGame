@@ -109,7 +109,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
 
                                 // Risk/Reward labels
                                 const getRiskLabel = () => {
-                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#48BB78' };
+                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#66BB6A' };
                                     if (successPercent >= 80) return { text: '⚠️ Low Risk', color: '#ECC94B' };
                                     return { text: '⚠️ High Risk', color: '#E53E3E' };
                                 };
@@ -200,16 +200,16 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 )}
                                 Do you wish to proceed with <Text style={{ fontWeight: 'bold' }}>{selectedDoctor?.name}</Text> for{' '}
                                 {hasDiscount && (
-                                    <Text style={{ color: '#718096', textDecorationLine: 'line-through' }}>
+                                    <Text style={{ color: '#F4EBD0', textDecorationLine: 'line-through' }}>
                                         ${selectedDoctor?.cost.toLocaleString()}
                                     </Text>
                                 )}
                                 {hasDiscount && ' '}
-                                <Text style={{ color: '#C5A065', fontWeight: 'bold' }}>
+                                <Text style={{ color: '#C4A484', fontWeight: 'bold' }}>
                                     ${selectedDoctor ? getDiscountedPrice(selectedDoctor.cost).toLocaleString() : '0'}
                                 </Text>
                                 {hasDiscount && (
-                                    <Text style={{ color: '#48BB78', fontSize: 12 }}>
+                                    <Text style={{ color: '#66BB6A', fontSize: 12 }}>
                                         {' '}(Partner Discount!)
                                     </Text>
                                 )}?
@@ -243,7 +243,7 @@ export default SanctuarySurgeryView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#111827', // Dark theme matching current modal style
+        backgroundColor: '#4CA771', // Dark theme matching current modal style
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -264,19 +264,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#2D3748',
-        backgroundColor: '#1A202C',
+        borderBottomColor: '#C4A484',
+        backgroundColor: '#0F172A',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#2D3748',
+        backgroundColor: '#133323',
         alignItems: 'center',
         justifyContent: 'center',
     },
     backIcon: {
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#A0AEC0',
+        color: '#F4EBD0',
         fontSize: 12,
     },
     scrollContent: {
@@ -305,20 +305,20 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#48BB78',
+        borderColor: '#C4A484',
         gap: 10,
     },
     discountIcon: {
         fontSize: 24,
     },
     discountTitle: {
-        color: '#48BB78',
+        color: '#66BB6A',
         fontWeight: '700',
         fontSize: 14,
         marginBottom: 2,
     },
     discountText: {
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     listContent: {
@@ -327,20 +327,20 @@ const styles = StyleSheet.create({
     },
     doctorCard: {
         padding: 16,
-        backgroundColor: '#2D3748',
+        backgroundColor: '#133323',
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#4A5568',
+        borderColor: '#C4A484',
         gap: 10,
         position: 'relative',
     },
     doctorCardPressed: {
         backgroundColor: '#232730',
-        borderColor: '#C5A065',
+        borderColor: '#C4A484',
     },
     doctorCardDisabled: {
         opacity: 0.5,
-        borderColor: '#2D3748',
+        borderColor: '#C4A484',
     },
     riskBadge: {
         position: 'absolute',
@@ -364,29 +364,29 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     doctorName: {
-        color: '#F7FAFC',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 16,
     },
     disabledText: {
-        color: '#718096',
+        color: '#F4EBD0',
     },
     priceContainer: {
         alignItems: 'flex-end',
         gap: 2,
     },
     originalPrice: {
-        color: '#718096',
+        color: '#F4EBD0',
         fontSize: 12,
         textDecorationLine: 'line-through',
     },
     doctorCost: {
-        color: '#C5A065',
+        color: '#C4A484',
         fontWeight: '700',
         fontSize: 16,
     },
     discountedPrice: {
-        color: '#48BB78',
+        color: '#66BB6A',
     },
     successRateContainer: {
         flexDirection: 'row',
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     successRateLabel: {
-        color: '#CBD5E0',
+        color: '#F4EBD0',
         fontSize: 13,
     },
     successRateBadge: {
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     outcomeLabel: {
-        color: '#A0AEC0',
+        color: '#F4EBD0',
         fontSize: 12,
         fontWeight: '600',
     },
@@ -465,13 +465,13 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     processingText: {
-        color: '#C5A065',
+        color: '#C4A484',
         fontSize: 18,
         fontWeight: '600',
         marginTop: 10,
     },
     processingSubText: {
-        color: '#718096',
+        color: '#F4EBD0',
         fontSize: 14,
     },
 });

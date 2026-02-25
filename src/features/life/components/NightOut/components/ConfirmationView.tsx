@@ -84,13 +84,13 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 24,
         letterSpacing: 0.5,
     },
     venueCard: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#1A1A2E',
         borderRadius: 20,
         padding: 24,
         borderWidth: 2,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: '#C8B6FF',
     },
     venueEmoji: {
         fontSize: 48,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     },
     venueLocation: {
         fontSize: 14,
-        color: '#888',
+        color: '#4CC9F0',
     },
     breakdown: {
         gap: 12,
@@ -135,23 +135,23 @@ const styles = StyleSheet.create({
     breakdownValue: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     totalRow: {
         marginTop: 8,
         paddingTop: 16,
         borderTopWidth: 2,
-        borderTopColor: '#333',
+        borderTopColor: '#C8B6FF',
     },
     totalLabel: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     totalValue: {
         fontSize: 24,
         fontWeight: '900',
-        color: theme.colors.primary,
+        color: '#C8B6FF',
     },
     actions: {
         gap: 12,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     confirmButtonText: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#000',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -173,12 +173,12 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: '#C8B6FF',
     },
     cancelButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#888',
+        color: '#4CC9F0',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
