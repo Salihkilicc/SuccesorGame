@@ -34,22 +34,22 @@ const LuxeNetFooter: React.FC<LuxeNetFooterProps> = ({ style }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#0A1128',
         paddingVertical: 30,
         paddingHorizontal: 20,
         alignItems: 'center',
         marginTop: 40,
         borderTopWidth: 1,
-        borderTopColor: '#3A3A3A',
+        borderTopColor: '#3E2723',
     },
     divider: {
         height: 1,
-        backgroundColor: '#444',
+        backgroundColor: '#3E2723',
         width: '60%',
         marginBottom: 20,
     },
     slogan: {
-        color: '#BDC3C7',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         fontSize: 14,
         marginBottom: 20,
@@ -63,23 +63,23 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     linkText: {
-        color: '#95A5A6',
+        color: '#3A86FF',
         fontSize: 12,
         fontWeight: '500',
     },
     separator: {
-        color: '#555',
+        color: '#FFFFFF',
         fontSize: 12,
         marginHorizontal: 5,
     },
     copyright: {
-        color: '#7F8C8D',
+        color: '#FFFFFF',
         fontSize: 10,
         textAlign: 'center',
         marginBottom: 5,
     },
     version: {
-        color: '#555',
+        color: '#FFFFFF',
         fontSize: 9,
     },
 });

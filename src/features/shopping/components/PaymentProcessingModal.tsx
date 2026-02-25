@@ -30,7 +30,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
                 { time: 4000, text: 'Transaction Approved.' }
             ];
 
-            const timeouts: NodeJS.Timeout[] = [];
+            const timeouts: ReturnType<typeof setTimeout>[] = [];
 
             // Schedule text updates
             sequence.forEach(({ time, text }) => {
@@ -75,7 +75,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
             <View style={styles.container}>
                 {!showSuccess ? (
                     <View style={styles.content}>
-                        <ActivityIndicator size="large" color="#D4AF37" style={styles.spinner} />
+                        <ActivityIndicator size="large" color="#FF3366" style={styles.spinner} />
                         <Text style={styles.statusText}>{statusText}</Text>
                         <Text style={styles.amountText}>-${amount.toLocaleString()}</Text>
 
@@ -100,7 +100,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000', // Pure black
+        backgroundColor: '#0A1128', // Pure black
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     amountText: {
-        color: '#E74C3C', // Red for debit
+        color: '#E60000', // Red for debit
         fontSize: 32,
         fontWeight: '700',
         marginBottom: 60,
@@ -129,13 +129,13 @@ const styles = StyleSheet.create({
     securityBadge: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#111',
+        backgroundColor: '#0A1128',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#222',
+        borderColor: '#3E2723',
     },
     securityText: {
-        color: '#555',
+        color: '#3A86FF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -146,24 +146,24 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: 'rgba(39, 174, 96, 0.2)',
+        backgroundColor: 'rgba(58, 134, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 30,
         borderWidth: 2,
-        borderColor: '#27AE60',
+        borderColor: '#3A86FF',
     },
     checkmarkIcon: {
         fontSize: 60,
     },
     successText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 28,
         fontWeight: '700',
         marginBottom: 10,
     },
     subtitleText: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 16,
     },
 });

@@ -24,13 +24,13 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
 
     // 1. Determine Visuals based on Category/Value
     const isPremium = item.price > 10000000; // > $10M = Gold Border
-    const borderColor = isPremium ? '#FFD700' : '#333';
+    const borderColor = isPremium ? '#7209B7' : '#3E2723';
     const emoji = getEmoji(item.category);
 
     // 2. Condition Color Logic
-    let conditionColor = '#27AE60'; // Green
-    if (item.condition < 50) conditionColor = '#C0392B'; // Red
-    else if (item.condition < 80) conditionColor = '#F1C40F'; // Yellow
+    let conditionColor = '#3A86FF'; // Blue
+    if (item.condition < 50) conditionColor = '#E60000'; // Red
+    else if (item.condition < 80) conditionColor = '#FF3366'; // Pink
 
     // 3. Action Logic
     let ActionButton = null;
@@ -41,7 +41,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onSell(item)}
             >
-                <Text style={[styles.actionText, { color: '#E74C3C' }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
+                <Text style={[styles.actionText, { color: '#E60000' }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
             </Pressable>
         );
     } else if (item.category === 'REAL_ESTATE') {
@@ -51,7 +51,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                     style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                     onPress={() => onRepair(item)}
                 >
-                    <Text style={[styles.actionText, { color: '#F1C40F' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
+                    <Text style={[styles.actionText, { color: '#3A86FF' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
                 </Pressable>
             );
         } else {
@@ -63,8 +63,8 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 )
             } else {
                 ActionButton = (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(39, 174, 96, 0.2)', borderColor: '#27AE60' }]}>
-                        <Text style={[styles.badgeText, { color: '#2ECC71' }]}>PERFECT</Text>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(58, 134, 255, 0.2)', borderColor: '#3A86FF' }]}>
+                        <Text style={[styles.badgeText, { color: '#3A86FF' }]}>PERFECT</Text>
                     </View>
                 );
             }
@@ -76,7 +76,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onPropose && onPropose(item)}
             >
-                <Text style={[styles.actionText, { color: '#E67E22' }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
+                <Text style={[styles.actionText, { color: '#FF3366' }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
             </Pressable>
         );
     }
@@ -170,12 +170,12 @@ const getEmoji = (category: string) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'rgba(30, 30, 30, 0.9)',
+        backgroundColor: '#0A1128',
         borderRadius: 16,
         borderWidth: 1,
         padding: 16,
         marginBottom: 16,
-        shadowColor: "#000",
+        shadowColor: "#0A1128",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 4.65,
@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
     },
     // Grid Tile specific styles
     containerTile: {
-        backgroundColor: '#1E1E1E', // Darker background
+        backgroundColor: '#0A1128', // Darker background
         borderRadius: 12,
         borderWidth: 1,
         height: 130, // Much more compact
         padding: 10,
         overflow: 'hidden',
         justifyContent: 'space-between',
-        shadowColor: "#000",
+        shadowColor: "#0A1128",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 3,
@@ -208,13 +208,13 @@ const styles = StyleSheet.create({
         marginBottom: 6, // Space for condition strip
     },
     tileTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
         marginBottom: 2,
     },
     tilePrice: {
-        color: '#BBB',
+        color: '#FFFFFF',
         fontSize: 11,
         fontFamily: 'monospace', // Tech feel
         fontWeight: '500',
@@ -231,9 +231,9 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#2A2A2A',
+        backgroundColor: '#0A1128',
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: '#3E2723',
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 0,
@@ -266,13 +266,13 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     marketValueLabel: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 10,
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     marketValue: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
     },
@@ -280,13 +280,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     title: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 4,
     },
     subtitle: {
-        color: '#666',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '500',
         textTransform: 'uppercase',
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     },
     conditionBarBg: {
         height: 4,
-        backgroundColor: '#333',
+        backgroundColor: '#3E2723',
         borderRadius: 3,
         marginBottom: 4,
         overflow: 'hidden',

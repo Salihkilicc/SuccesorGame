@@ -94,7 +94,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                                 {/* Row Layout */}
                                 <View style={styles.itemRow}>
                                     {/* Thumbnail (Left) */}
-                                    <View style={[styles.itemThumbnail, { backgroundColor: item.brandColor ? `${item.brandColor}20` : '#333' }]}>
+                                    <View style={[styles.itemThumbnail, { backgroundColor: item.brandColor ? `${item.brandColor}20` : '#0A1128' }]}>
                                         <Text style={styles.itemEmoji}>
                                             {item.category === 'VEHICLE' ? '🏎️' :
                                                 item.category === 'WATCH' ? '⌚' :
@@ -160,7 +160,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             </View>
                         </View>
 
-                        <LuxeNetFooter style={{ backgroundColor: 'transparent', marginTop: 10, borderTopColor: '#222' }} />
+                        <LuxeNetFooter style={{ backgroundColor: 'transparent', marginTop: 10, borderTopColor: '#3E2723' }} />
                     </ScrollView>
                 )}
 
@@ -176,7 +176,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             style={({ pressed }) => [
                                 styles.checkoutButton,
                                 pressed && { opacity: 0.9 },
-                                !canAfford && { backgroundColor: '#555' }
+                                !canAfford && { backgroundColor: '#3E2723' }
                             ]}
                             onPress={handleProceedToCheckout}
                         >
@@ -200,7 +200,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#111', // Dark background like ShoppingScreen
+        backgroundColor: '#0A1128', // Dark background like ShoppingScreen
     },
     header: {
         flexDirection: 'row',
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#222',
-        backgroundColor: '#1a1a1a',
+        borderBottomColor: '#3E2723',
+        backgroundColor: '#0A1128',
     },
     headerTitle: {
         color: '#FFF',
@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
 
     // Cart Item
     cartItemCard: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#0A1128',
         marginBottom: 12,
         padding: 16,
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#222',
+        borderColor: '#3E2723',
     },
     itemRow: {
         flexDirection: 'row',
@@ -247,10 +247,12 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 8,
-        backgroundColor: '#2C2C2C',
+        backgroundColor: '#0A1128',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
+        borderWidth: 1,
+        borderColor: '#3E2723',
     },
     itemEmoji: {
         fontSize: 48,
@@ -267,13 +269,13 @@ const styles = StyleSheet.create({
         lineHeight: 22,
     },
     itemPrice: {
-        color: '#B33939', // Amazon-ish red for price/deal, or Gold
+        color: '#E60000', // Amazon-ish red for price/deal, or Gold
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 6,
     },
     inStockText: {
-        color: '#27AE60',
+        color: '#3A86FF',
         fontSize: 12,
         fontWeight: '600',
         marginBottom: 2,
@@ -298,30 +300,30 @@ const styles = StyleSheet.create({
     actionButton: {
         paddingVertical: 6,
         paddingHorizontal: 12,
-        backgroundColor: '#252525',
+        backgroundColor: '#0A1128',
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: '#3E2723',
     },
     actionText: {
-        color: '#CCC',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '500',
     },
     divider: {
         width: 1,
         height: 16,
-        backgroundColor: '#333',
+        backgroundColor: '#3E2723',
     },
 
     // Order Summary
     summaryCard: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#0A1128',
         marginTop: 12,
         padding: 16,
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#222',
+        borderColor: '#3E2723',
     },
     summaryTitle: {
         color: '#FFF',
@@ -349,24 +351,24 @@ const styles = StyleSheet.create({
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: '#3E2723',
     },
     totalLabel: {
-        color: '#B33939', // Red for total
+        color: '#E60000', // Red for total
         fontSize: 20,
         fontWeight: '700',
     },
     totalValue: {
-        color: '#B33939',
+        color: '#E60000',
         fontSize: 20,
         fontWeight: '700',
     },
 
     // Checkout Footer (Above Stats Bar)
     checkoutFooter: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#0A1128',
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: '#3E2723',
         padding: 16,
         paddingBottom: 68, // Exact spacing requested
     },
@@ -382,12 +384,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     footerTotalValue: {
-        color: '#B33939',
+        color: '#E60000',
         fontSize: 22,
         fontWeight: '700',
     },
     checkoutButton: {
-        backgroundColor: '#F1C40F', // Amazon Yellow/Gold
+        backgroundColor: '#E60000', // Amazon Yellow/Gold
         paddingVertical: 14,
         borderRadius: 8,
         alignItems: 'center',
@@ -401,12 +403,12 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     checkoutButtonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
     },
     checkoutSubtext: {
-        color: '#333',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '500',
     },
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
         marginBottom: 32,
     },
     continueButton: {
-        backgroundColor: '#333',
+        backgroundColor: '#3E2723',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 20,

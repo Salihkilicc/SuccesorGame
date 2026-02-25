@@ -84,11 +84,11 @@ const ShopDetailScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background },
+    container: { flex: 1, backgroundColor: '#0A1128' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    errorText: { color: theme.colors.danger, fontSize: 16, marginBottom: 20 },
-    goBackBtn: { padding: 10, backgroundColor: theme.colors.card, borderRadius: 8 },
-    goBackText: { color: theme.colors.textPrimary },
+    errorText: { color: '#E60000', fontSize: 16, marginBottom: 20 },
+    goBackBtn: { padding: 10, backgroundColor: '#0A1128', borderRadius: 8, borderWidth: 1, borderColor: '#3E2723' },
+    goBackText: { color: '#FFFFFF' },
     listContent: { padding: theme.spacing.lg },
 });
 

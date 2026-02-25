@@ -31,10 +31,10 @@ type BrandConfig = {
 };
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
-    Velocity: { name: 'Velocity Motors', color: '#E74C3C', emoji: '🏎️' },
-    Dynasty8: { name: 'Dynasty 8', color: '#2C3E50', emoji: '🏠' },
-    Luxe: { name: 'Luxe Vault', color: '#F1C40F', emoji: '💎' },
-    Elitas: { name: 'Elitas Travel', color: '#3498DB', emoji: '✈️' },
+    Velocity: { name: 'Velocity Motors', color: '#E60000', emoji: '🏎️' },
+    Dynasty8: { name: 'Dynasty 8', color: '#3A86FF', emoji: '🏠' },
+    Luxe: { name: 'Luxe Vault', color: '#7209B7', emoji: '💎' },
+    Elitas: { name: 'Elitas Travel', color: '#FF3366', emoji: '✈️' },
 };
 
 const ShoppingBrowseView = ({
@@ -83,7 +83,7 @@ const ShoppingBrowseView = ({
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#0A0A0A" />
+            <StatusBar barStyle="light-content" backgroundColor="#0A1128" />
 
             {/* Header */}
             <View style={[styles.header, { backgroundColor: brandConfig.color }]}>
@@ -177,10 +177,10 @@ const ShoppingBrowseView = ({
                                             styles.addButton,
                                             {
                                                 backgroundColor: owned
-                                                    ? '#555'
+                                                    ? '#3E2723'
                                                     : inCart
-                                                        ? '#27AE60'
-                                                        : brandConfig.color,
+                                                        ? '#3A86FF'
+                                                        : '#E60000',
                                             },
                                             pressed && !owned && !inCart && styles.addButtonPressed,
                                         ]}
@@ -210,7 +210,7 @@ export default ShoppingBrowseView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A0A0A',
+        backgroundColor: '#0A1128',
     },
 
     // Header
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: theme.colors.danger,
+        backgroundColor: '#E60000',
         borderRadius: 10,
         minWidth: 20,
         height: 20,
@@ -310,11 +310,11 @@ const styles = StyleSheet.create({
     },
     card: {
         width: CARD_WIDTH,
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#0A1128',
         borderRadius: 16,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#2A2A2A',
+        borderColor: '#3E2723',
         gap: theme.spacing.sm,
     },
     itemIcon: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
     },
     itemPrice: {
-        color: '#27AE60',
+        color: '#E60000',
         fontSize: 16,
         fontWeight: '700',
         marginTop: 2,

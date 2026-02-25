@@ -68,7 +68,7 @@ const ShopPreviewCard = ({ shopId, name, emoji, description, color, onVisit }: S
                             pressed && styles.itemPressed
                         ]}
                     >
-                        <View style={[styles.itemImage, { backgroundColor: '#2A2A2A' }]}>
+                        <View style={[styles.itemImage, { backgroundColor: '#0A1128' }]}>
                             <Text style={styles.itemEmoji}>
                                 {item.category === 'VEHICLE' ? '🏎️' :
                                     item.category === 'WATCH' ? '⌚' :
@@ -92,11 +92,11 @@ export default ShopPreviewCard;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#0A1128',
         borderRadius: 20,
         marginBottom: theme.spacing.lg,
         borderWidth: 1,
-        borderColor: '#2A2A2A',
+        borderColor: '#3E2723',
         overflow: 'hidden',
     },
     header: {
@@ -105,10 +105,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: theme.spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: '#2A2A2A',
+        borderBottomColor: '#3E2723',
     },
     headerPressed: {
-        backgroundColor: '#252525',
+        backgroundColor: '#0A1128',
     },
     headerLeft: {
         flexDirection: 'row',
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
     shopName: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         letterSpacing: -0.5,
     },
     description: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 13,
     },
     visitButton: {
@@ -172,12 +172,12 @@ const styles = StyleSheet.create({
         gap: 2,
     },
     itemName: {
-        color: '#CCC',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '600',
     },
     itemPrice: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '700',
     },
