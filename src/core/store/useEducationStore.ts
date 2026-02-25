@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EducationItem, StatImpact } from '../../features/education/educationTypes';
 import { canEnroll, advanceEducation, applyGraduationBuffs } from '../../logic/educationLogic';
 import { useStatsStore } from './useStatsStore';
@@ -322,7 +322,7 @@ export const useEducationStore = create<EducationState>()(
         }),
         {
             name: 'succesor_education_v3', // Version bump for bug fixes
-            storage: createJSONStorage(() => zustandStorage),
+            storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 activeAcademic: state.activeAcademic,
                 activeCertificate: state.activeCertificate,

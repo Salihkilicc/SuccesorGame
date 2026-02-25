@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     CoreStats,
     Attributes,
@@ -186,7 +186,7 @@ export const usePlayerStore = create<PlayerState>()(
         }),
         {
             name: 'succesor_player_hub_v4', // Version bump for schema change
-            storage: createJSONStorage(() => zustandStorage),
+            storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 core: state.core,
                 attributes: state.attributes,

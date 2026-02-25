@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '../types';
 import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../../features/products/data/unlockableProductsData';
 
@@ -393,7 +393,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
         }),
         {
             name: 'succesor_products_v3', // Bump version for new schema
-            storage: createJSONStorage(() => zustandStorage),
+            storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 products: state.products,
             }),

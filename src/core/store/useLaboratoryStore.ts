@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RESEARCHER_ECONOMICS, getFacilityByTier, getNextTier } from '../../features/laboratory/data/laboratoryData';
 
 interface LaboratoryState {
@@ -117,7 +117,7 @@ export const useLaboratoryStore = create<LaboratoryState & LaboratoryActions>()(
         }),
         {
             name: 'succesor_laboratory',
-            storage: createJSONStorage(() => zustandStorage),
+            storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 currentTier: state.currentTier,
                 researcherCount: state.researcherCount,

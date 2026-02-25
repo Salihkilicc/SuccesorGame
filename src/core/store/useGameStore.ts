@@ -5,7 +5,7 @@ import { simulateNewMonth } from '../../event/eventEngine';
 import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyEngine';
 import { applyPartnerBuffs } from '../../logic/relationshipLogic';
 import { calculateStatDecay } from '../../logic/statsLogic';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEventStore } from './useEventStore';
 import { useLaboratoryStore } from './useLaboratoryStore';
 import { useMarketStore } from './useMarketStore';
@@ -69,6 +69,7 @@ export type EconomyResult = {
 };
 
 export type GameState = {
+  _hasHydrated: boolean;
   currentMonth: number;
   age: number;
   actionsUsedThisMonth: number;
@@ -82,6 +83,7 @@ export type GameState = {
 };
 
 type GameStore = GameState & {
+  setHasHydrated: (state: boolean) => void;
   setField: <K extends keyof GameState>(key: K, value: GameState[K]) => void;
   resetMonthlyState: () => void;
   advanceMonth: (months?: number) => Promise<EconomyResult>;
@@ -93,6 +95,7 @@ type GameStore = GameState & {
 };
 
 export const initialGameState: GameState = {
+  _hasHydrated: false,
   currentMonth: 1,
   age: 25, // Beta Start Age
   actionsUsedThisMonth: 0,
@@ -108,6 +111,7 @@ export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...initialGameState,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
       setField: (key, value) => set(state => ({ ...state, [key]: value })),
       resetMonthlyState: () => {
         const { resetCycleFlags } = useEventStore.getState();
@@ -627,19 +631,19 @@ export const useGameStore = create<GameStore>()(
 
 
 
-        await zustandStorage.removeItem('succesor_stats_v1');
-        await zustandStorage.removeItem('succesor_user_v1');
-        await zustandStorage.removeItem('succesor_game_v1');
-        await zustandStorage.removeItem('succesor_game_v2');
-        await zustandStorage.removeItem('succesor_products_v3'); // Remove Product Persist
-        await zustandStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
+        await AsyncStorage.removeItem('succesor_stats_v1');
+        await AsyncStorage.removeItem('succesor_user_v1');
+        await AsyncStorage.removeItem('succesor_game_v1');
+        await AsyncStorage.removeItem('succesor_game_v2');
+        await AsyncStorage.removeItem('succesor_products_v3'); // Remove Product Persist
+        await AsyncStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
 
 
       },
     }),
     {
       name: 'succesor_game_v2',
-      storage: createJSONStorage(() => zustandStorage),
+      storage: createJSONStorage(() => AsyncStorage),
       partialize: state => ({
         currentMonth: state.currentMonth,
         age: state.age,
@@ -649,6 +653,11 @@ export const useGameStore = create<GameStore>()(
         lastQuarterProfit: state.lastQuarterProfit,
         bonusDistributedThisQuarter: state.bonusDistributedThisQuarter,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+        }
+      },
     },
   ),
 );

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PartnerProfile, ExPartnerProfile, MarriageProposalResult } from '../types';
 import { useStatsStore } from './useStatsStore';
 
@@ -436,7 +436,7 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'succesor_user_v3',
-      storage: createJSONStorage(() => zustandStorage),
+      storage: createJSONStorage(() => AsyncStorage),
       partialize: state => ({
         name: state.name,
         bio: state.bio,

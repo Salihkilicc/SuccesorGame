@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProductStore } from './useProductStore';
 
 export type StatKey =
@@ -60,6 +60,7 @@ export interface SubsidiaryState {
 export type Acquisitions = string[];
 
 export type StatsState = Record<StatKey, number> & {
+  _hasHydrated: boolean;
   shareholders: Shareholder[];
   salaryTier: 'low' | 'average' | 'above_average';
   techLevels: TechLevels;
@@ -69,6 +70,7 @@ export type StatsState = Record<StatKey, number> & {
 };
 
 type StatsStore = StatsState & {
+  setHasHydrated: (state: boolean) => void;
   update: (partial: Partial<StatsState>) => void;
   setField: <K extends StatKey>(key: K, value: number) => void;
 
@@ -116,6 +118,7 @@ const FACTORY_COST_MONTHLY = 50_000;
 const BASE_SHARES = 10_000_000;
 
 export const initialStatsState: StatsState = {
+  _hasHydrated: false,
   money: 250_000, // Player Personal Cash (Lowered for challenge)
   netWorth: 20_250_000, // Approx
   monthlyIncome: 15_000, // Moderate CEO Salary
@@ -215,6 +218,9 @@ export const useStatsStore = create<StatsStore>()(
   persist(
     (set, get) => ({
       ...initialStatsState,
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+
       update: partial => set(state => ({ ...state, ...partial })),
       setField: (key, value) => set(state => ({ ...state, [key]: value })),
 
@@ -558,7 +564,7 @@ export const useStatsStore = create<StatsStore>()(
     }),
     {
       name: 'succesor_stats_v1',
-      storage: createJSONStorage(() => zustandStorage),
+      storage: createJSONStorage(() => AsyncStorage),
       partialize: state => ({
         money: state.money,
         netWorth: state.netWorth,
@@ -583,18 +589,11 @@ export const useStatsStore = create<StatsStore>()(
         techLevels: state.techLevels,
         acquisitions: state.acquisitions,
         isPublic: state.isPublic,
-        stockSplitCount: state.stockSplitCount,
       }),
-      onRehydrateStorage: (state) => {
-        console.log('[StatsStore] Storage hydration starting...');
-        return (state, error) => {
-          if (error) {
-            console.error('[StatsStore] An error happened during hydration:', error);
-          } else {
-            console.log('[StatsStore] Hydration finished successfully!');
-            console.log('[StatsStore] Rehydrated Money:', state?.money);
-          }
-        };
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+        }
       },
     },
   ),

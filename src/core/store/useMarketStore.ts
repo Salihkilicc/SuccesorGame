@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { zustandStorage } from '../../storage/persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 import { HoldingItem, MarketItem, StockItem, BondItem, FundItem, CryptoAsset } from '../../components/Market/marketTypes';
 
@@ -427,7 +427,7 @@ export const useMarketStore = create<MarketState>()(
         }),
         {
             name: 'succesor_market_v6',
-            storage: createJSONStorage(() => zustandStorage),
+            storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 holdings: state.holdings,
                 marketPrices: state.marketPrices,
