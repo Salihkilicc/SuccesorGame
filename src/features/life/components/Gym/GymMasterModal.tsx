@@ -72,7 +72,7 @@ const GymMasterModal = () => {
                 <AppLaunchLoader
                     appName="Gym"
                     appIcon={<MaterialCommunityIcons name="dumbbell" size={64} color="#FFFFFF" />}
-                    backgroundColor="#1a1a1a"
+                    backgroundColor="#000000"
                 >
                     {/* LAYER 1: Hub (Always Rendered) */}
                     <View style={styles.baseLayer}>

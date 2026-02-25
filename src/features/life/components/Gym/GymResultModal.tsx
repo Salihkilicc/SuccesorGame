@@ -66,7 +66,7 @@ export default GymResultModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: '#000000',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20
@@ -74,17 +74,17 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 320,
-        backgroundColor: theme.colors.card,
+        backgroundColor: '#0D1321',
         borderRadius: theme.radius.lg,
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: theme.colors.border
+        borderColor: '#C0C0C0'
     },
     title: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
         marginBottom: 20
     },
     statsContainer: {
@@ -96,34 +96,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderBottomWidth: 1,
-        borderBottomColor: '#222',
+        borderBottomColor: '#C0C0C0',
         paddingBottom: 8
     },
     statLabel: {
-        color: '#AAA',
+        color: '#C0C0C0',
         fontSize: 16
     },
     statValue: {
         fontSize: 16,
         fontWeight: '700'
     },
-    green: { color: theme.colors.success },
-    red: { color: theme.colors.error },
+    green: { color: '#FF6F00' },
+    red: { color: '#C0C0C0' },
     message: {
-        color: '#FFF',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 24,
         fontStyle: 'italic',
         opacity: 0.8
     },
     button: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: '#FF6F00',
         paddingVertical: 12,
         paddingHorizontal: 32,
         borderRadius: 8
     },
     buttonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontWeight: '700'
     }
 });

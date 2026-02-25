@@ -42,17 +42,17 @@ const GymResultView = ({ lastResult, onClose }: GymResultViewProps) => {
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    resultTitle: { fontSize: 28, fontWeight: '900', color: theme.colors.success, textAlign: 'center', marginTop: 40 },
-    resultMessage: { color: '#CCC', textAlign: 'center', marginTop: 10, fontSize: 16 },
+    resultTitle: { fontSize: 28, fontWeight: '900', color: '#FF6F00', textAlign: 'center', marginTop: 40 },
+    resultMessage: { color: '#C0C0C0', textAlign: 'center', marginTop: 10, fontSize: 16 },
     enjoymentBar: { marginTop: 30, alignItems: 'center' },
-    enjoymentLabel: { color: '#666', fontSize: 12, marginBottom: 8 },
-    barBg: { width: '80%', height: 10, backgroundColor: '#222', borderRadius: 5, overflow: 'hidden' },
-    barFill: { height: '100%', backgroundColor: theme.colors.success },
-    enjoymentValue: { color: '#FFF', marginTop: 5 },
-    promotionBadge: { marginTop: 20, backgroundColor: 'rgba(212, 175, 55, 0.2)', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.primary },
-    promotionText: { color: theme.colors.primary, fontWeight: '800', textAlign: 'center' },
-    doneBtn: { backgroundColor: theme.colors.primary, padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
-    doneText: { color: '#000', fontWeight: '800', fontSize: 16 },
+    enjoymentLabel: { color: '#C0C0C0', fontSize: 12, marginBottom: 8 },
+    barBg: { width: '80%', height: 10, backgroundColor: '#000000', borderRadius: 5, overflow: 'hidden' },
+    barFill: { height: '100%', backgroundColor: '#FF6F00' },
+    enjoymentValue: { color: '#FFFFFF', marginTop: 5 },
+    promotionBadge: { marginTop: 20, backgroundColor: '#0D1321', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#FF6F00' },
+    promotionText: { color: '#FF6F00', fontWeight: '800', textAlign: 'center' },
+    doneBtn: { backgroundColor: '#FF6F00', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
+    doneText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
 });
 
 export default GymResultView;

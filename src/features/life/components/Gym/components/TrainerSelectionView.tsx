@@ -45,20 +45,20 @@ const TrainerSelectionView = ({ trainerId, onHireTrainer, onBack }: TrainerSelec
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFF', textAlign: 'center', marginBottom: 10 },
+    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
     list: { gap: 12 },
-    trainerCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#111', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#333' },
-    activeCard: { borderColor: theme.colors.success, backgroundColor: 'rgba(82, 196, 26, 0.1)' },
-    iconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#222', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+    trainerCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#000000', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#C0C0C0' },
+    activeCard: { borderColor: '#FF6F00', backgroundColor: '#0D1321' },
+    iconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#0D1321', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
     trainerIcon: { fontSize: 20 },
     trainerInfo: { flex: 1 },
-    trainerName: { color: '#FFF', fontWeight: '700', fontSize: 16 },
-    trainerRole: { color: '#888', fontSize: 12 },
-    trainerBonus: { color: theme.colors.success, fontSize: 12, marginTop: 2 },
-    trainerPrice: { color: theme.colors.primary, fontWeight: '700', fontSize: 16 },
-    activeText: { color: theme.colors.success },
+    trainerName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+    trainerRole: { color: '#C0C0C0', fontSize: 12 },
+    trainerBonus: { color: '#FF6F00', fontSize: 12, marginTop: 2 },
+    trainerPrice: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+    activeText: { color: '#FF6F00' },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#666', fontSize: 14 },
+    backText: { color: '#C0C0C0', fontSize: 14 },
 });
 
 export default TrainerSelectionView;

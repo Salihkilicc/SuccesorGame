@@ -101,30 +101,30 @@ export default GymSupplementModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
+        backgroundColor: '#000000',
         justifyContent: 'center',
         padding: 20
     },
     container: {
-        backgroundColor: '#0F0F0F',
+        backgroundColor: '#0D1321',
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#333'
+        borderColor: '#C0C0C0'
     },
     warningContainer: {
-        borderColor: theme.colors.error,
-        backgroundColor: '#1A0505'
+        borderColor: '#FF6F00',
+        backgroundColor: '#000000'
     },
     title: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
         textAlign: 'center'
     },
     subtitle: {
         textAlign: 'center',
-        color: '#666',
+        color: '#C0C0C0',
         marginBottom: 30
     },
     grid: {
@@ -134,31 +134,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#222',
+        backgroundColor: '#000000',
         borderRadius: 8
     },
-    itemText: { color: '#EEE', fontWeight: '700' },
-    itemPrice: { color: theme.colors.success },
+    itemText: { color: '#FFFFFF', fontWeight: '700' },
+    itemPrice: { color: '#FF6F00' },
     dangerItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: 'rgba(255, 77, 79, 0.1)',
-        borderColor: theme.colors.error,
+        backgroundColor: '#0D1321',
+        borderColor: '#FF6F00',
         borderWidth: 1,
         borderRadius: 8,
         marginTop: 20
     },
-    dangerText: { color: theme.colors.error, fontWeight: '900' },
-    dangerPrice: { color: theme.colors.error, fontWeight: '700' },
+    dangerText: { color: '#FF6F00', fontWeight: '900' },
+    dangerPrice: { color: '#FF6F00', fontWeight: '700' },
     closeBtn: { marginTop: 20, alignItems: 'center', padding: 10 },
-    closeText: { color: '#666', textDecorationLine: 'underline' },
+    closeText: { color: '#C0C0C0', textDecorationLine: 'underline' },
     warningBox: { alignItems: 'center' },
-    warningTitle: { color: theme.colors.error, fontSize: 22, fontWeight: '900', marginBottom: 20 },
-    warningBody: { color: '#DDD', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
+    warningTitle: { color: '#FF6F00', fontSize: 22, fontWeight: '900', marginBottom: 20 },
+    warningBody: { color: '#C0C0C0', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
     warningActions: { flexDirection: 'row', gap: 20 },
-    cancelBtn: { padding: 12, borderWidth: 1, borderColor: '#666', borderRadius: 8 },
-    cancelText: { color: '#AAA' },
-    injectBtn: { padding: 12, backgroundColor: theme.colors.error, borderRadius: 8 },
-    injectText: { color: '#FFF', fontWeight: '900' }
+    cancelBtn: { padding: 12, borderWidth: 1, borderColor: '#C0C0C0', borderRadius: 8 },
+    cancelText: { color: '#C0C0C0' },
+    injectBtn: { padding: 12, backgroundColor: '#FF6F00', borderRadius: 8 },
+    injectText: { color: '#FFFFFF', fontWeight: '900' }
 });

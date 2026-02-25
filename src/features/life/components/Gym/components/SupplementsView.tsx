@@ -35,15 +35,15 @@ const SupplementsView = ({ onBack }: SupplementsViewProps) => {
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFF', textAlign: 'center', marginBottom: 10 },
-    subSubtitle: { color: '#666', textAlign: 'center', marginBottom: 20 },
+    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
+    subSubtitle: { color: '#C0C0C0', textAlign: 'center', marginBottom: 20 },
     list: { gap: 12 },
-    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#111', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#333' },
+    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#000000', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#C0C0C0' },
     supplementIcon: { fontSize: 24, marginRight: 12 },
-    supplementName: { color: '#FFF', fontWeight: '700' },
-    supplementEffect: { color: theme.colors.success, fontSize: 12 },
+    supplementName: { color: '#FFFFFF', fontWeight: '700' },
+    supplementEffect: { color: '#FF6F00', fontSize: 12 },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#666', fontSize: 14 },
+    backText: { color: '#C0C0C0', fontSize: 14 },
 });
 
 export default SupplementsView;

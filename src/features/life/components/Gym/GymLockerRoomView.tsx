@@ -85,7 +85,7 @@ const GymLockerRoomView = () => {
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>HEALTH</Text>
-                            <Text style={[styles.statValue, { color: health < 50 ? '#EF4444' : '#10B981' }]}>
+                            <Text style={[styles.statValue, { color: health < 50 ? '#FF6F00' : '#FF6F00' }]}>
                                 {health.toFixed(0)}
                             </Text>
                         </View>
@@ -150,7 +150,7 @@ const GymLockerRoomView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: '#000000',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#0D1321',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#000',
@@ -178,41 +178,41 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#0D1321',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#374151', fontWeight: '700' },
+    backText: { fontSize: 14, color: '#C0C0C0', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#111827',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     subtitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#6B7280',
+        color: '#C0C0C0',
         marginTop: 4,
     },
     statsCard: {
-        backgroundColor: '#F9FAFB',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: '#C0C0C0',
     },
     statRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 8 },
-    statLabel: { fontSize: 12, fontWeight: '700', color: '#6B7280', letterSpacing: 0.5 },
-    statValue: { fontSize: 14, fontWeight: '900', color: '#111827' },
+    divider: { height: 1, backgroundColor: '#C0C0C0', marginVertical: 8 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: '#C0C0C0', letterSpacing: 0.5 },
+    statValue: { fontSize: 14, fontWeight: '900', color: '#FFFFFF' },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -223,42 +223,42 @@ const styles = StyleSheet.create({
     supplementCard: {
         width: '47%',
         marginBottom: 12,
-        backgroundColor: '#EFF6FF',
+        backgroundColor: '#0D1321',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#2563EB',
+        borderColor: '#FF6F00',
         minHeight: 140,
         justifyContent: 'center',
     },
     supplementCardUsed: {
-        backgroundColor: '#F3F4F6',
-        borderColor: '#D1D5DB',
+        backgroundColor: '#000000',
+        borderColor: '#C0C0C0',
         opacity: 0.6,
     },
     supplementCardDanger: {
-        backgroundColor: '#FEF2F2',
-        borderColor: '#EF4444',
+        backgroundColor: '#0D1321',
+        borderColor: '#FF6F00',
     },
     supplementIcon: { fontSize: 36, marginBottom: 8 },
     usedIcon: { opacity: 0.4 },
     supplementLabel: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#1F2937',
+        color: '#FFFFFF',
         marginBottom: 4,
         textAlign: 'center',
     },
     supplementDesc: {
         fontSize: 10,
-        color: '#6B7280',
+        color: '#C0C0C0',
         textAlign: 'center',
         marginBottom: 8,
     },
-    usedText: { color: '#9CA3AF' },
+    usedText: { color: '#C0C0C0' },
     usedBadge: {
-        backgroundColor: '#FCD34D',
+        backgroundColor: '#FF6F00',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
@@ -267,24 +267,24 @@ const styles = StyleSheet.create({
     usedBadgeText: {
         fontSize: 9,
         fontWeight: '700',
-        color: '#92400E',
+        color: '#FFFFFF',
     },
     priceText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#2563EB',
+        color: '#FF6F00',
         marginTop: 4,
     },
     infoFooter: {
-        backgroundColor: '#FEF2F2',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#FCA5A5',
+        borderColor: '#FF6F00',
     },
     infoText: {
         fontSize: 12,
-        color: '#991B1B',
+        color: '#C0C0C0',
         textAlign: 'center',
         lineHeight: 16,
     },

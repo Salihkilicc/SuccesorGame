@@ -71,18 +71,18 @@ const FitnessConfigView = ({
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFF', textAlign: 'center', marginBottom: 10 },
-    configLabel: { color: '#666', fontSize: 12, fontWeight: '700', marginBottom: 12, letterSpacing: 1, textAlign: 'center' },
+    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
+    configLabel: { color: '#C0C0C0', fontSize: 12, fontWeight: '700', marginBottom: 12, letterSpacing: 1, textAlign: 'center' },
     optionsList: { gap: 10, marginBottom: 24 },
-    optionBtn: { padding: 16, backgroundColor: '#111', borderRadius: 8, borderWidth: 1, borderColor: '#333' },
-    optionActive: { borderColor: theme.colors.primary, backgroundColor: 'rgba(212, 175, 55, 0.1)' },
-    optionText: { color: '#888', fontWeight: '600', textAlign: 'center' },
-    optionTextActive: { color: theme.colors.primary, fontWeight: '700' },
-    startBtn: { backgroundColor: theme.colors.success, padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-    startText: { color: '#000', fontWeight: '800', fontSize: 16 },
-    disabledBtn: { backgroundColor: '#333' },
+    optionBtn: { padding: 16, backgroundColor: '#0D1321', borderRadius: 8, borderWidth: 1, borderColor: '#C0C0C0' },
+    optionActive: { borderColor: '#FF6F00', backgroundColor: '#000000' },
+    optionText: { color: '#C0C0C0', fontWeight: '600', textAlign: 'center' },
+    optionTextActive: { color: '#FF6F00', fontWeight: '700' },
+    startBtn: { backgroundColor: '#FF6F00', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+    startText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
+    disabledBtn: { backgroundColor: '#0D1321' },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#666', fontSize: 14 },
+    backText: { color: '#C0C0C0', fontSize: 14 },
 });
 
 export default FitnessConfigView;
