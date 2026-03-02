@@ -112,7 +112,7 @@ const MyCompanyScreen = () => {
       `Company Valuation: $${(stats.companyValue / 1_000_000).toFixed(1)}M\n\n` +
       `Are you ready to go public?`,
       [
-        {  text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Launch IPO',
           style: 'default',
