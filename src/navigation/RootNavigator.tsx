@@ -116,7 +116,7 @@ export type RootStackParamList = {
 };
 
 const LifeStackNavigator = () => (
-  <LifeStack.Navigator screenOptions={{ headerShown: false }}>
+  <LifeStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
     {/* TODO: Restore these screens or create new ones */}
     {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
@@ -126,7 +126,7 @@ const LifeStackNavigator = () => (
 );
 
 const LoveStackNavigator = () => (
-  <LoveStack.Navigator screenOptions={{ headerShown: false }}>
+  <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
   </LoveStack.Navigator>
 );
@@ -140,7 +140,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const AssetsStackNavigator = () => (
-  <AssetsStack.Navigator screenOptions={{ headerShown: false }}>
+  <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
     <AssetsStack.Screen
       name="AssetsHome"
       component={AssetsScreen}
@@ -186,7 +186,7 @@ const AssetsStackNavigator = () => (
 );
 
 const CasinoStackNavigator = () => (
-  <CasinoStack.Navigator screenOptions={{ headerShown: false }}>
+  <CasinoStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
     <CasinoStack.Screen
       name="CasinoLobby"
       component={CasinoScreen}
@@ -282,7 +282,7 @@ const RootNavigator = () => {
       }}>
       <View style={{ flex: 1 }}>
         <RootStack.Navigator
-          screenOptions={{ headerShown: false }}
+          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}
           initialRouteName="Home">
           <RootStack.Screen name="Home" component={SwipeNavigator} />
           {/* MainTabs removed as we are replaced by SwipeNavigator on 'Home' */}
