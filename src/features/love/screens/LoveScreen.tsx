@@ -682,19 +682,27 @@ const LoveScreen = () => {
     return (
       <View style={styles.grid}>
         {[
-          { label: '🎁 Gift', action: 'Gift' },
-          { label: '💬 Compliment', action: 'Compliment' },
-          { label: '💔 Break Up', action: 'Break Up', danger: true },
-          { label: '🏃 Elope', action: 'Elope' },
-          { label: '💊 Birth Control', action: 'Birth Control' },
-          { label: '🗣️ Counseling', action: 'Counseling' },
-          { label: '🤬 Insult', action: 'Insult', danger: true },
+          { label: 'Gift', desc: 'Show your love', emoji: '🎁', action: 'Gift', color: '#F59E0B' },
+          { label: 'Compliment', desc: 'Lift her spirits', emoji: '💬', action: 'Compliment', color: '#38BDF8' },
+          { label: 'Break Up', desc: 'End things here', emoji: '💔', action: 'Break Up', danger: true, color: '#EF4444' },
+          { label: 'Elope', desc: 'Secret wedding', emoji: '🏃', action: 'Elope', color: '#A855F7' },
+          { label: 'Birth Control', desc: 'Plan ahead', emoji: '💊', action: 'Birth Control', color: '#22C55E' },
+          { label: 'Counseling', desc: 'Save the bond', emoji: '🗣️', action: 'Counseling', color: '#6366F1' },
+          { label: 'Insult', desc: 'Risky move', emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
         ].map((btn) => (
           <Pressable
             key={btn.action}
-            style={[styles.gridButton, btn.danger && { borderColor: theme.colors.danger }]}
+            style={({ pressed }) => [
+              styles.gridTile,
+              btn.danger && styles.gridTileDanger,
+              pressed && styles.gridTilePressed,
+            ]}
             onPress={() => handlePartnerAction(btn.action)}>
-            <Text style={[styles.gridButtonText, btn.danger && { color: theme.colors.danger }]}>{btn.label}</Text>
+            <View style={[styles.gridTileIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '55' }]}>
+              <Text style={styles.gridTileEmoji}>{btn.emoji}</Text>
+            </View>
+            <Text style={[styles.gridTileLabel, btn.danger && { color: '#EF4444' }]}>{btn.label}</Text>
+            <Text style={styles.gridTileDesc}>{btn.desc}</Text>
           </Pressable>
         ))}
 
@@ -741,8 +749,9 @@ const LoveScreen = () => {
 
         {/* Special Propose Button - Only if not married */}
         {!partner.isMarried && (
-          <Pressable style={[styles.actionButton, { backgroundColor: theme.colors.cardSoft, borderWidth: 1, borderColor: theme.colors.accent }]} onPress={() => handlePartnerAction('Propose')}>
-            <Text style={[styles.actionButtonText, { color: theme.colors.accent }]}>💍 Propose</Text>
+          <Pressable style={styles.proposeTile} onPress={() => handlePartnerAction('Propose')}>
+            <Text style={{ fontSize: 22 }}>💍</Text>
+            <Text style={styles.proposeTileText}>Propose</Text>
           </Pressable>
         )}
       </View>
@@ -767,18 +776,29 @@ const LoveScreen = () => {
       );
     }
     return (
-      <View style={{ gap: 12 }}>
+      <View style={styles.actionList}>
         {[
-          { label: '☕ Spend Time Together', action: 'Spend Time' },
-          { label: '💬 Compliment', action: 'Compliment' },
-          { label: '🎁 Gift', action: 'Gift' },
-          { label: '🤬 Insult', action: 'Insult', danger: true },
+          { label: 'Spend Time Together', desc: 'Quality time boosts bond', emoji: '☕', action: 'Spend Time', color: '#F59E0B' },
+          { label: 'Compliment', desc: 'Positive words go far', emoji: '💬', action: 'Compliment', color: '#38BDF8' },
+          { label: 'Send a Gift', desc: 'Money talks', emoji: '🎁', action: 'Gift', color: '#22C55E' },
+          { label: 'Insult', desc: 'This will hurt', emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
         ].map(btn => (
           <Pressable
             key={btn.action}
-            style={[styles.actionButton, btn.danger && { borderColor: theme.colors.danger, backgroundColor: 'rgba(255,0,0,0.1)' }]}
+            style={({ pressed }) => [
+              styles.actionRow,
+              btn.danger && styles.actionRowDanger,
+              pressed && styles.actionRowPressed,
+            ]}
             onPress={() => handleGenericAction(btn.action, type)}>
-            <Text style={[styles.actionButtonText, btn.danger && { color: theme.colors.danger }]}>{btn.label}</Text>
+            <View style={[styles.actionRowIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '44' }]}>
+              <Text style={{ fontSize: 20 }}>{btn.emoji}</Text>
+            </View>
+            <View style={styles.actionRowText}>
+              <Text style={[styles.actionRowLabel, btn.danger && { color: '#EF4444' }]}>{btn.label}</Text>
+              <Text style={styles.actionRowDesc}>{btn.desc}</Text>
+            </View>
+            <Text style={[styles.actionRowChevron, btn.danger && { color: '#EF4444' }]}>›</Text>
           </Pressable>
         ))}
       </View>
@@ -804,18 +824,28 @@ const LoveScreen = () => {
     }
 
     return (
-      <View style={{ gap: 12 }}>
+      <View style={styles.actionList}>
         {[
-          { label: '📱 Text Her', action: 'Text Her' },
-          { label: '✈️ Go Vacation (Coming Soon)', action: 'Go Vacation' },
-          { label: '👁️ Stalk Her', action: 'Stalk Her' },
-          { label: '🔥 Start Dating Again', action: 'Start Dating Again' },
+          { label: 'Text Her', desc: 'Send a message', emoji: '📱', action: 'Text Her', color: '#38BDF8' },
+          { label: 'Go on Vacation', desc: 'Coming soon', emoji: '✈️', action: 'Go Vacation', color: '#6366F1' },
+          { label: 'Stalk Her', desc: 'Check her socials', emoji: '👁️', action: 'Stalk Her', color: '#A855F7' },
+          { label: 'Start Dating Again', desc: 'Rekindle the flame', emoji: '🔥', action: 'Start Dating Again', color: '#F59E0B' },
         ].map(btn => (
           <Pressable
             key={btn.action}
-            style={styles.actionButton}
+            style={({ pressed }) => [
+              styles.actionRow,
+              pressed && styles.actionRowPressed,
+            ]}
             onPress={() => handleExAction(btn.action)}>
-            <Text style={styles.actionButtonText}>{btn.label}</Text>
+            <View style={[styles.actionRowIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '44' }]}>
+              <Text style={{ fontSize: 20 }}>{btn.emoji}</Text>
+            </View>
+            <View style={styles.actionRowText}>
+              <Text style={styles.actionRowLabel}>{btn.label}</Text>
+              <Text style={styles.actionRowDesc}>{btn.desc}</Text>
+            </View>
+            <Text style={styles.actionRowChevron}>›</Text>
           </Pressable>
         ))}
       </View>
@@ -1060,8 +1090,9 @@ const LoveScreen = () => {
           }>
 
           {feedback && (
-            <View style={styles.feedbackContainer}>
-              <Text style={styles.feedbackText}>{feedback}</Text>
+            <View style={styles.feedbackBanner}>
+              <Text style={styles.feedbackIcon}>💡</Text>
+              <Text style={styles.feedbackBannerText}>{feedback}</Text>
             </View>
           )}
 
@@ -1351,39 +1382,139 @@ const styles = StyleSheet.create({
   },
 
   // MODAL SPECIFIC
+  // ── Partner action grid tiles ──
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
   },
-  gridButton: {
-    flexBasis: '48%', // Approx 2 columns
-    backgroundColor: theme.colors.card,
-    padding: 16,
-    borderRadius: 12,
+  gridTile: {
+    flexBasis: '48%',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
     alignItems: 'center',
+    gap: 8,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  gridButtonText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '600',
+  gridTileDanger: {
+    backgroundColor: 'rgba(239,68,68,0.06)',
+    borderColor: 'rgba(239,68,68,0.25)',
+  },
+  gridTilePressed: {
+    opacity: 0.75,
+    transform: [{ scale: 0.97 }],
+  },
+  gridTileIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  gridTileEmoji: {
+    fontSize: 22,
+  },
+  gridTileLabel: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  gridTileDesc: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 10,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+
+  // ── Full-width list rows (family, exes, generic actions) ──
+  actionList: {
+    gap: 8,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+  },
+  actionRowDanger: {
+    backgroundColor: 'rgba(239,68,68,0.06)',
+    borderColor: 'rgba(239,68,68,0.2)',
+  },
+  actionRowPressed: {
+    opacity: 0.72,
+  },
+  actionRowIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  actionRowText: {
+    flex: 1,
+    gap: 2,
+  },
+  actionRowLabel: {
+    color: '#FFFFFF',
     fontSize: 14,
+    fontWeight: '700',
   },
+  actionRowDesc: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  actionRowChevron: {
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 22,
+    fontWeight: '300',
+  },
+
+  // ── Legacy actionButton (still used in gift list, propose submenu, etc.) ──
   actionButton: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: 'rgba(255,255,255,0.04)',
     padding: 16,
     borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   actionButtonText: {
     color: theme.colors.textPrimary,
     fontWeight: '600',
     fontSize: 15,
+  },
+
+  // ── Propose tile (full-width, accent border) ──
+  proposeTile: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 16,
+    borderRadius: 14,
+    backgroundColor: 'rgba(250,204,21,0.07)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(250,204,21,0.4)',
+  },
+  proposeTileText: {
+    color: '#FACC15',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   priceText: {
     color: theme.colors.accent,
@@ -1396,20 +1527,31 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textAlign: 'center',
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  feedbackContainer: {
-    backgroundColor: theme.colors.accentSoft,
-    padding: 12,
-    borderRadius: 8,
+
+  // ── Feedback Banner (replaces feedbackContainer) ──
+  feedbackBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(99,102,241,0.12)',
     borderWidth: 1,
-    borderColor: theme.colors.accent,
-    marginBottom: 8,
+    borderColor: 'rgba(99,102,241,0.35)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 4,
   },
-  feedbackText: {
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
+  feedbackIcon: {
+    fontSize: 18,
+  },
+  feedbackBannerText: {
+    flex: 1,
+    color: '#C7D2FE',
+    fontSize: 13,
     fontWeight: '600',
-    fontSize: 14,
+    lineHeight: 18,
   },
 
   // Proposal Specific
