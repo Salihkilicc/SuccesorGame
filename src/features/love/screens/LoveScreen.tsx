@@ -139,13 +139,17 @@ const LoveScreen = () => {
     const score = Math.floor(Math.random() * 91) + 10; // 10–100
     setSatisfaction(score);
 
-    // Pregnancy check: only if satisfaction > 30 AND 10% chance
-    if (score > 30 && Math.random() <= 0.10) {
-      // Open naming modal instead of auto-creating with a random name
+    // Pregnancy check: 10% chance every time Make Love is used
+    if (Math.random() <= 0.10) {
       const gender: 'Male' | 'Female' = Math.random() > 0.5 ? 'Male' : 'Female';
       setPendingChildGender(gender);
       setChildName('');
-      setIsNamingChild(true);
+      // iOS can't stack two Modals simultaneously.
+      // Close the InteractionModal first, then open the naming modal.
+      closeModal();
+      setTimeout(() => {
+        setIsNamingChild(true);
+      }, 350);
     }
   };
 
@@ -1194,57 +1198,57 @@ const LoveScreen = () => {
                 {'Congratulations! You just had a ' + (pendingChildGender === 'Female' ? 'baby girl' : 'baby boy') + '.\nWhat will you name them?'}
               </Text>
 
-            {/* Input */}
-            <TextInput
-              style={styles.namingInput}
-              placeholderTextColor="rgba(255,255,255,0.3)"
-              placeholder="Enter a name..."
-              value={childName}
-              onChangeText={setChildName}
-              autoFocus
-              maxLength={20}
-            />
+              {/* Input */}
+              <TextInput
+                style={styles.namingInput}
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholder="Enter a name..."
+                value={childName}
+                onChangeText={setChildName}
+                autoFocus
+                maxLength={20}
+              />
 
-            {/* Confirm */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.namingConfirm,
-                (!childName.trim()) && styles.namingConfirmDisabled,
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={() => {
-                if (!childName.trim()) return;
-                addContact({
-                  id: `npc_child_${Date.now()}`,
-                  name: childName.trim(),
-                  type: 'Child',
-                  age: 0,
-                  gender: pendingChildGender,
-                  relationship: 100,
-                  looks: Math.floor(Math.random() * 31) + 60,
-                  smarts: Math.floor(Math.random() * 31) + 60,
-                  isDeceased: false,
-                });
-                setIsNamingChild(false);
-                setChildName('');
-              }}
-              disabled={!childName.trim()}
-            >
-              <Text style={styles.namingConfirmText}>Confirm Name</Text>
-            </Pressable>
+              {/* Confirm */}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.namingConfirm,
+                  (!childName.trim()) && styles.namingConfirmDisabled,
+                  pressed && { opacity: 0.8 },
+                ]}
+                onPress={() => {
+                  if (!childName.trim()) return;
+                  addContact({
+                    id: `npc_child_${Date.now()}`,
+                    name: childName.trim(),
+                    type: 'Child',
+                    age: 0,
+                    gender: pendingChildGender,
+                    relationship: 100,
+                    looks: Math.floor(Math.random() * 31) + 60,
+                    smarts: Math.floor(Math.random() * 31) + 60,
+                    isDeceased: false,
+                  });
+                  setIsNamingChild(false);
+                  setChildName('');
+                }}
+                disabled={!childName.trim()}
+              >
+                <Text style={styles.namingConfirmText}>Confirm Name</Text>
+              </Pressable>
 
-            {/* Dismiss (skip naming) */}
-            <Pressable
-              style={styles.namingSkip}
-              onPress={() => { setIsNamingChild(false); setChildName(''); }}
-            >
-              <Text style={styles.namingSkipText}>Skip</Text>
-            </Pressable>
+              {/* Dismiss (skip naming) */}
+              <Pressable
+                style={styles.namingSkip}
+                onPress={() => { setIsNamingChild(false); setChildName(''); }}
+              >
+                <Text style={styles.namingSkipText}>Skip</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-    </SafeAreaView>
+      </SafeAreaView>
     </View >
   );
 };
