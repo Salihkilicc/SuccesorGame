@@ -6,7 +6,17 @@ import {
   NavigationContainer,
   NavigatorScreenParams,
   createNavigationContainerRef,
+  DarkTheme,
 } from '@react-navigation/native';
+
+const AppDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#000000',
+    card: '#000000',
+  },
+};
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   AssetsScreen,
@@ -262,6 +272,7 @@ const SwipeNavigator = () => (
       tabBarStyle: { display: 'none' },
       swipeEnabled: true,
       lazy: true,
+      sceneStyle: { backgroundColor: '#000000' },
     }}
   >
     <SwipeTab.Screen name="Life" component={LifeScreen} />
@@ -277,6 +288,7 @@ const RootNavigator = () => {
   return (
     <NavigationContainer
       ref={rootNavigationRef}
+      theme={AppDarkTheme}
       onStateChange={() => {
         setCurrentRouteName(rootNavigationRef.getCurrentRoute()?.name);
       }}>
