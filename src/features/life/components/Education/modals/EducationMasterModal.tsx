@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { EducationHubView } from '../EducationHubView';
 import { EducationClubView } from '../tabs/EducationClubView';
 import { EducationEnrollmentView } from '../tabs/EducationEnrollmentView';
 import { EducationTranscriptView } from '../tabs/EducationTranscriptView';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
-import { Alert } from 'react-native';
-import AppLaunchLoader from '../../../../../components/common/AppLaunchLoader';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // ========================================
 // TYPES
@@ -72,26 +69,9 @@ export const EducationMasterModal: React.FC = () => {
     };
 
     return (
-        <>
-            <Modal
-                visible={isVisible}
-                transparent={false}
-                animationType="none"
-                onRequestClose={closeEducation}
-            >
-                {isVisible && (
-                    <AppLaunchLoader
-                        appName="Education"
-                        appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
-                        backgroundColor="#1e1e1e"
-                    >
-                        <View style={styles.container}>
-                            {renderView()}
-                        </View>
-                    </AppLaunchLoader>
-                )}
-            </Modal>
-        </>
+        <View style={styles.container}>
+            {renderView()}
+        </View>
     );
 };
 

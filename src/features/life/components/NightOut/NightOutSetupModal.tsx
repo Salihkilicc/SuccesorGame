@@ -1,7 +1,6 @@
 
 import React, { useMemo } from 'react';
 import {
-    Modal,
     View,
     Text,
     StyleSheet,
@@ -13,8 +12,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../../core/theme';
 import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
-import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { VENUES, Venue, RegionCode } from './data/nightOutVenues';
 import { SetupStep, TravelMethod } from './useNightOutSystem';
 
@@ -89,94 +86,79 @@ const NightOutSetupModal = ({
     };
 
     return (
-        <Modal
-            visible={visible}
-            transparent={false}
-            animationType="none"
-            onRequestClose={onClose}>
-            {visible && (
-                <AppLaunchLoader
-                    appName="Night Out"
-                    appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
-                    backgroundColor="#1A1A2E"
-                >
-                    <View style={styles.backdrop}>
-                        <SafeAreaView style={styles.card}>
-                            {/* Header with Progress & Back Button */}
-                            <View style={styles.header}>
-                                <View style={styles.headerLeft}>
-                                    <Pressable
-                                        onPress={() => {
-                                            if (step === 'region_select') {
-                                                onClose();
-                                                navigation.navigate('Life');
-                                            } else {
-                                                goBack();
-                                            }
-                                        }}
-                                        style={({ pressed }) => ({
-                                            padding: 8,
-                                            opacity: pressed ? 0.7 : 1
-                                        })}>
-                                        <Text style={{ fontSize: 24, color: '#FFFFFF', fontWeight: 'bold' }}>←</Text>
-                                    </Pressable>
-                                </View>
-                                <View style={styles.headerCenter}>
-                                    <Text style={styles.title}>NIGHT OUT</Text>
-                                    <Text style={styles.progress}>
-                                        Step {getStepNumber()} of {getTotalSteps()}
-                                    </Text>
-                                </View>
-                                <View style={styles.headerRight} />
-                            </View>
-
-                            {/* Step Content */}
-                            <View style={styles.content}>
-                                {step === 'region_select' && (
-                                    <RegionSelectView
-                                        selectedRegion={selectedRegion}
-                                        onSelectRegion={selectRegion}
-                                    />
-                                )}
-
-                                {step === 'venue_select' && selectedRegion && (
-                                    <VenueSelectView
-                                        region={selectedRegion}
-                                        venues={filteredVenues}
-                                        selectedVenue={selectedClub}
-                                        onSelectVenue={selectVenue}
-                                        onBack={goBack}
-                                    />
-                                )}
-
-                                {step === 'travel_select' && (
-                                    <TravelMethodView
-                                        hasPrivateJet={hasPrivateJet}
-                                        onSelectMethod={selectTravelMethod}
-                                        onBack={goBack}
-                                        isHangarOpen={isHangarOpen}
-                                        setIsHangarOpen={setIsHangarOpen}
-                                    />
-                                )}
-
-                                {step === 'completed' && selectedClub && (
-                                    <ConfirmationView
-                                        venue={selectedClub}
-                                        travelCost={travelCostAmount}
-                                        totalCost={totalCost}
-                                        onConfirm={confirmNightOut}
-                                        onCancel={onClose}
-                                    />
-                                )}
-                            </View>
-                        </SafeAreaView>
-
-                        {/* Bottom Stats Footer */}
-                        <CrystalNavBar activeTab="Life" variant="dark" />
+        <View style={styles.backdrop}>
+            <SafeAreaView style={styles.card}>
+                {/* Header with Progress & Back Button */}
+                <View style={styles.header}>
+                    <View style={styles.headerLeft}>
+                        <Pressable
+                            onPress={() => {
+                                if (step === 'region_select') {
+                                    onClose();
+                                } else {
+                                    goBack();
+                                }
+                            }}
+                            style={({ pressed }) => ({
+                                padding: 8,
+                                opacity: pressed ? 0.7 : 1
+                            })}>
+                            <Text style={{ fontSize: 24, color: '#FFFFFF', fontWeight: 'bold' }}>←</Text>
+                        </Pressable>
                     </View>
-                </AppLaunchLoader>
-            )}
-        </Modal>
+                    <View style={styles.headerCenter}>
+                        <Text style={styles.title}>NIGHT OUT</Text>
+                        <Text style={styles.progress}>
+                            Step {getStepNumber()} of {getTotalSteps()}
+                        </Text>
+                    </View>
+                    <View style={styles.headerRight} />
+                </View>
+
+                {/* Step Content */}
+                <View style={styles.content}>
+                    {step === 'region_select' && (
+                        <RegionSelectView
+                            selectedRegion={selectedRegion}
+                            onSelectRegion={selectRegion}
+                        />
+                    )}
+
+                    {step === 'venue_select' && selectedRegion && (
+                        <VenueSelectView
+                            region={selectedRegion}
+                            venues={filteredVenues}
+                            selectedVenue={selectedClub}
+                            onSelectVenue={selectVenue}
+                            onBack={goBack}
+                        />
+                    )}
+
+                    {step === 'travel_select' && (
+                        <TravelMethodView
+                            hasPrivateJet={hasPrivateJet}
+                            onSelectMethod={selectTravelMethod}
+                            onBack={goBack}
+                            isHangarOpen={isHangarOpen}
+                            setIsHangarOpen={setIsHangarOpen}
+                        />
+                    )}
+
+                    {step === 'completed' && selectedClub && (
+                        <ConfirmationView
+                            venue={selectedClub}
+                            travelCost={travelCostAmount}
+                            totalCost={totalCost}
+                            onConfirm={confirmNightOut}
+                            onCancel={onClose}
+                        />
+                    )}
+                </View>
+            </SafeAreaView>
+
+            {/* Bottom Stats Footer */}
+            <CrystalNavBar activeTab="Life" variant="dark" />
+        </View>
     );
 };
 

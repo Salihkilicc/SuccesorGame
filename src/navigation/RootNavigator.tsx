@@ -51,6 +51,8 @@ import GymScreen from '../features/life/screens/GymScreen';
 import SanctuaryScreen from '../features/life/screens/SanctuaryScreen';
 import TravelScreen from '../features/life/screens/TravelScreen';
 import BlackMarketScreen from '../features/life/screens/BlackMarketScreen';
+import NightOutScreen from '../features/life/screens/NightOutScreen';
+import EducationScreen from '../features/life/screens/EducationScreen';
 
 export type LifeStackParamList = {
   LifeHome: undefined;
@@ -123,6 +125,8 @@ export type RootStackParamList = {
   Sanctuary: undefined;
   Travel: undefined;
   BlackMarket: undefined;
+  NightOut: undefined;
+  Education: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -337,6 +341,8 @@ const RootNavigator = () => {
           <RootStack.Screen name="Sanctuary" component={SanctuaryScreen} />
           <RootStack.Screen name="Travel" component={TravelScreen} />
           <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} />
+          <RootStack.Screen name="NightOut" component={NightOutScreen} />
+          <RootStack.Screen name="Education" component={EducationScreen} />
         </RootStack.Navigator>
 
       </View>

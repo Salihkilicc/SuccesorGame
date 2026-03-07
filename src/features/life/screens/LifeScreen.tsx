@@ -82,25 +82,8 @@ const LifeScreen = () => {
   // -- Store --
   const { visible, matchCandidate, openMatch, closeMatch, acceptMatch, rejectMatch } = useMatchSystem();
 
-  // Helper function for encounters triggered from within LifeScreen components (like Travel/NightOut)
-  const triggerEncounterBool = useCallback((context: string, countryId?: string) => {
-    // Encounters are now handled on the Underworld screen, so we might need a global encounter system OR we just return false for now to avoid errors on this screen
-    // TODO: move encounter trigger logic out of here if we don't want encounters to pop up over life screen.
-    return false;
-  }, []);
-
-  // Night Out System
-  const {
-    setupModalVisible, outcomeModalVisible, outcomeType, nightEndModalVisible, pregnancyModalVisible, conclusionModalVisible, conclusionData, hookupGameVisible, currentScenario, currentPartner,
-    step, selectedRegion, selectedClub, travelCostAmount, hasPrivateJet, totalCost, goBack: goBackNightOut, isHangarOpen, setIsHangarOpen,
-    setSetupModalVisible, startNightOut, selectRegion, selectVenue, selectTravelMethod, confirmNightOut, handleHookupAccept, handleOutcomeClose, handleNightEndDecision, setPregnancyModalVisible, setConclusionModalVisible, handleConclusionClose, handleHookupGameSuccess, handleHookupGameFail,
-  } = useNightOutSystem(triggerEncounterBool);
-
   // Gym System
   const { actions: { openGym } } = useGymSystem();
-
-  // Education System
-  const { openEducation } = useEducationSystem();
 
   // Sanctuary System
   const {
@@ -117,7 +100,7 @@ const LifeScreen = () => {
   const handleAction = (key: string) => {
     switch (key) {
       // Leisure
-      case 'nightOut': startNightOut(); break;
+      case 'nightOut': navigation.navigate('NightOut' as never); break;
       case 'spa': navigation.navigate('Sanctuary'); break;
       case 'gym': navigation.navigate('Gym'); break; // Screen navigation
       case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' }); break;
@@ -126,7 +109,7 @@ const LifeScreen = () => {
       case 'travel': navigation.navigate('Travel'); break;
       case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' }); break;
       case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' }); break;
-      case 'education': openEducation(); break;
+      case 'education': navigation.navigate('Education' as never); break;
       case 'dna': navigation.navigate('DNA'); break;
       case 'contacts': handleBottomNav('Contacts'); break;
       case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
@@ -257,52 +240,6 @@ const LifeScreen = () => {
         onReject={rejectMatch}
         onClose={closeMatch}
       />
-
-      <NightOutSetupModal
-        visible={setupModalVisible}
-        onClose={() => setSetupModalVisible(false)}
-        step={step}
-        selectedRegion={selectedRegion}
-        selectedClub={selectedClub}
-        travelCostAmount={travelCostAmount}
-        hasPrivateJet={hasPrivateJet}
-        totalCost={totalCost}
-        selectRegion={selectRegion}
-        selectVenue={selectVenue}
-        selectTravelMethod={selectTravelMethod}
-        confirmNightOut={confirmNightOut}
-        goBack={goBackNightOut}
-        isHangarOpen={isHangarOpen}
-        setIsHangarOpen={setIsHangarOpen}
-      />
-      <NightOutOutcomeModal
-        visible={outcomeModalVisible}
-        type={outcomeType}
-        onClose={handleOutcomeClose}
-        onHookupAccept={handleHookupAccept}
-      />
-      <HookupGameModal
-        visible={hookupGameVisible}
-        scenario={currentScenario}
-        partner={currentPartner}
-        onSuccess={handleHookupGameSuccess}
-        onFail={handleHookupGameFail}
-      />
-      <NightEndModal
-        visible={nightEndModalVisible}
-        onDecision={handleNightEndDecision}
-      />
-      <NightConclusionModal
-        visible={conclusionModalVisible}
-        data={conclusionData}
-        onClose={handleConclusionClose}
-      />
-      <PregnancyRevealModal
-        visible={pregnancyModalVisible}
-        onClose={() => setPregnancyModalVisible(false)}
-      />
-      <EducationMasterModal />
-      <EducationExamModal />
     </View >
   );
 };
