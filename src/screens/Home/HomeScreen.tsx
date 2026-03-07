@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -236,11 +237,17 @@ const HomeScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      <ImageBackground
+        source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
       <LinearGradient
-        colors={['#0a0a0c', '#000000', '#050505']}
+        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
       />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ScrollView
