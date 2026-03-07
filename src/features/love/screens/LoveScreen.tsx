@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserStore, useStatsStore } from '../../../core/store';
+import { useRelationshipStore } from '../../../core/store/useRelationshipStore';
 import type { LoveStackParamList } from '../../../navigation';
 import { theme } from '../../../core/theme';
 import InteractionModal from '../components/InteractionModal';
@@ -68,6 +69,8 @@ const LoveScreen = () => {
     clearConsequence
   } = useEncounterSystem();
 
+  const { contacts, addContact, updateContact } = useRelationshipStore();
+
   const [modalType, setModalType] = useState<ModalType>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null); // FamilyMember, Friend, or ExPartner
   const [submenu, setSubmenu] = useState<SubmenuType>(null);
@@ -75,6 +78,7 @@ const LoveScreen = () => {
   const [selectedLocationIndex, setSelectedLocationIndex] = useState(0);
   const [proposalStep, setProposalStep] = useState(0); // 0: None, 1: Picker, 2: Prenup, 3: Result
   const [proposalResult, setProposalResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [satisfaction, setSatisfaction] = useState<number | null>(null);
   // Removed local cheatingConsequence state to use hook's state
 
 
@@ -93,6 +97,64 @@ const LoveScreen = () => {
     if (!partner) return;
     const newLove = Math.max(0, Math.min(100, partner.love + amount));
     setUserField('partner', { ...partner, love: newLove });
+  };
+
+  // --- Make Love ---
+  const handleMakeLove = () => {
+    if (!partner) return;
+
+    // Find or treat the partner's NPC record (keyed by partner.id)
+    const partnerNPC = contacts.find(c => c.id === partner.id);
+
+    // Quarterly limit check
+    if (partnerNPC?.madeLoveThisQuarter) {
+      Alert.alert('Not Now', 'You need to wait until the next quarter.');
+      return;
+    }
+
+    // Mark as used this quarter (upsert into store)
+    if (partnerNPC) {
+      updateContact(partner.id, { madeLoveThisQuarter: true });
+    } else {
+      // First time — create an NPC entry for this partner
+      addContact({
+        id: partner.id,
+        name: partner.name,
+        type: 'Partner',
+        age: partner.stats?.age ?? 25,
+        gender: 'Female', // PartnerProfile has no top-level gender; default reasonable value
+        relationship: partner.love ?? 80,
+        looks: partner.stats?.looks ?? 50,
+        smarts: partner.stats?.intelligence ?? 50,
+        isDeceased: false,
+        madeLoveThisQuarter: true,
+      });
+    }
+
+    // Generate satisfaction score
+    const score = Math.floor(Math.random() * 91) + 10; // 10–100
+    setSatisfaction(score);
+
+    // Pregnancy check: only if satisfaction > 30 AND 10% chance
+    if (score > 30 && Math.random() <= 0.10) {
+      const babyNames = [
+        'Liam', 'Noah', 'Emma', 'Olivia', 'Sophia',
+        'James', 'Lucas', 'Ava', 'Mia', 'Ethan',
+      ];
+      const babyName = babyNames[Math.floor(Math.random() * babyNames.length)];
+      addContact({
+        id: `npc_child_${Date.now()}`,
+        name: babyName,
+        type: 'Child',
+        age: 0,
+        gender: Math.random() > 0.5 ? 'Male' : 'Female',
+        relationship: 100,
+        looks: Math.floor(Math.random() * 31) + 60,   // 60-90
+        smarts: Math.floor(Math.random() * 31) + 60,  // 60-90
+        isDeceased: false,
+      });
+      Alert.alert('Miracle!', 'Congratulations, you just had a baby!');
+    }
   };
 
   // --- Partner Actions ---
@@ -606,6 +668,17 @@ const LoveScreen = () => {
       );
     }
 
+    // Determine if the partner is already 'used' this quarter
+    const partnerNPC = contacts.find(c => c.id === partner.id);
+    const alreadyMadeLove = !!partnerNPC?.madeLoveThisQuarter;
+
+    // Satisfaction bar colour: 0-30 red, 31-60 amber, 61-100 emerald/purple
+    const getSatisfactionColor = (v: number) => {
+      if (v <= 30) return '#EF4444';
+      if (v <= 60) return '#F59E0B';
+      return '#A855F7';
+    };
+
     return (
       <View style={styles.grid}>
         {[
@@ -624,6 +697,47 @@ const LoveScreen = () => {
             <Text style={[styles.gridButtonText, btn.danger && { color: theme.colors.danger }]}>{btn.label}</Text>
           </Pressable>
         ))}
+
+        {/* Make Love Button — full-width, only for Partners */}
+        <Pressable
+          style={[
+            styles.makeLoveButton,
+            alreadyMadeLove && styles.makeLoveButtonDisabled,
+          ]}
+          onPress={handleMakeLove}
+          disabled={alreadyMadeLove}
+        >
+          <Text style={styles.makeLoveEmoji}>💗</Text>
+          <Text style={styles.makeLoveLabel}>
+            {alreadyMadeLove ? 'Make Love (Quarterly limit)' : 'Make Love'}
+          </Text>
+          {alreadyMadeLove && (
+            <Text style={styles.makeLoveSubtext}>Available next quarter</Text>
+          )}
+        </Pressable>
+
+        {/* Satisfaction Bar — shown after an interaction */}
+        {satisfaction !== null && (
+          <View style={styles.satisfactionContainer}>
+            <View style={styles.satisfactionHeader}>
+              <Text style={styles.satisfactionLabel}>Satisfaction</Text>
+              <Text style={[styles.satisfactionValue, { color: getSatisfactionColor(satisfaction) }]}>
+                {satisfaction}%
+              </Text>
+            </View>
+            <View style={styles.satisfactionTrack}>
+              <View
+                style={[
+                  styles.satisfactionFill,
+                  {
+                    width: `${satisfaction}%` as any,
+                    backgroundColor: getSatisfactionColor(satisfaction),
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        )}
 
         {/* Special Propose Button - Only if not married */}
         {!partner.isMarried && (
@@ -1350,5 +1464,73 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 12,
     fontWeight: '700',
-  }
+  },
+
+  // ── Make Love Button ──────────────────────────────
+  makeLoveButton: {
+    width: '100%',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: 'rgba(168, 85, 247, 0.12)',
+    borderWidth: 1.5,
+    borderColor: '#A855F7',
+  },
+  makeLoveButtonDisabled: {
+    opacity: 0.4,
+    borderColor: 'rgba(168, 85, 247, 0.3)',
+  },
+  makeLoveEmoji: {
+    fontSize: 20,
+  },
+  makeLoveLabel: {
+    fontSize: 15,
+    fontWeight: '700' as const,
+    color: '#A855F7',
+  },
+  makeLoveSubtext: {
+    fontSize: 11,
+    color: 'rgba(168, 85, 247, 0.6)',
+    fontStyle: 'italic' as const,
+  },
+
+  // ── Satisfaction Bar ──────────────────────────────
+  satisfactionContainer: {
+    width: '100%',
+    gap: 6,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+  },
+  satisfactionHeader: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+  },
+  satisfactionLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase' as const,
+  },
+  satisfactionValue: {
+    fontSize: 14,
+    fontWeight: '800' as const,
+  },
+  satisfactionTrack: {
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden' as const,
+  },
+  satisfactionFill: {
+    height: 6,
+    borderRadius: 999,
+  },
 });
