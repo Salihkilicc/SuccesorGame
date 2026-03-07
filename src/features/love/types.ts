@@ -36,3 +36,33 @@ export interface Partner {
     isMarried: boolean;
     hasPrenup: boolean;
 }
+
+// ─────────────────────────────────────────────
+//  NPC & İlişki Sistemi (Aşama 1)
+// ─────────────────────────────────────────────
+
+export type RelationType =
+    | 'Mother'
+    | 'Father'
+    | 'Sibling'
+    | 'Child'
+    | 'Friend'
+    | 'Partner'
+    | 'Ex';
+
+export interface NPC {
+    id: string;
+    name: string;
+    type: RelationType;
+    age: number;
+    gender: 'Male' | 'Female';
+    /** Yakınlık derecesi: 0-100 */
+    relationship: number;
+    /** Görünüm puanı: 0-100 */
+    looks: number;
+    /** Zeka puanı: 0-100 */
+    smarts: number;
+    isDeceased: boolean;
+    /** Partner için çeyreklik cinsellik limit kontrolü */
+    madeLoveThisQuarter?: boolean;
+}
