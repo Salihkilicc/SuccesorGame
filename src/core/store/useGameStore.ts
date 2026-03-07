@@ -11,6 +11,7 @@ import { useLaboratoryStore } from './useLaboratoryStore';
 import { useMarketStore } from './useMarketStore';
 import { usePlayerStore } from './usePlayerStore';
 import { useProductStore } from './useProductStore';
+import { useRelationshipStore } from './useRelationshipStore';
 import { useStatsStore } from './useStatsStore';
 import { useUserStore } from './useUserStore';
 import * as AchievementChecker from '../../achievements/checker';
@@ -349,6 +350,8 @@ export const useGameStore = create<GameStore>()(
         while (newMonth > 12) {
           newMonth -= 12;
           newAge += 1;
+          // NPC HOOK: yaşlan tüm NPC'leri (Anne, Baba, Çocuk vs.)
+          useRelationshipStore.getState().ageUpNPCs();
         }
 
         set(state => ({
@@ -404,6 +407,9 @@ export const useGameStore = create<GameStore>()(
             lastQuarterProfit: netProfit,
             bonusDistributedThisQuarter: false,
           }));
+
+          // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
+          useRelationshipStore.getState().advanceQuarterForNPCs();
 
 
           // 7a. MARKET SIMULATION (NEW)
@@ -637,7 +643,10 @@ export const useGameStore = create<GameStore>()(
         await AsyncStorage.removeItem('succesor_game_v2');
         await AsyncStorage.removeItem('succesor_products_v3'); // Remove Product Persist
         await AsyncStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
+        await AsyncStorage.removeItem('relationship-storage'); // Remove NPC Persist
 
+        // NPC HOOK: yeni oyunda anne ve babayı oluştur
+        useRelationshipStore.getState().generateParents();
 
       },
     }),
