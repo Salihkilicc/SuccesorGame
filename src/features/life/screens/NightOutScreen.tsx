@@ -12,6 +12,9 @@ import NightEndModal from '../components/NightOut/NightEndModal';
 import PregnancyRevealModal from '../components/NightOut/PregnancyRevealModal';
 import NightConclusionModal from '../components/NightOut/NightConclusionModal';
 
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 type NightOutNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const NightOutScreen = () => {
@@ -62,55 +65,61 @@ const NightOutScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Main Setup Flow — shown as full screen */}
-            <NightOutSetupModal
-                visible={true}
-                onClose={handleClose}
-                step={step}
-                selectedRegion={selectedRegion}
-                selectedClub={selectedClub}
-                travelCostAmount={travelCostAmount}
-                hasPrivateJet={hasPrivateJet}
-                totalCost={totalCost}
-                selectRegion={selectRegion}
-                selectVenue={selectVenue}
-                selectTravelMethod={selectTravelMethod}
-                confirmNightOut={confirmNightOut}
-                goBack={goBackNightOut}
-                isHangarOpen={isHangarOpen}
-                setIsHangarOpen={setIsHangarOpen}
-            />
+            <AppLaunchLoader
+                appName="Night Out"
+                appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
+                backgroundColor="#1A1A2E"
+            >
+                {/* Main Setup Flow — shown as full screen */}
+                <NightOutSetupModal
+                    visible={true}
+                    onClose={handleClose}
+                    step={step}
+                    selectedRegion={selectedRegion}
+                    selectedClub={selectedClub}
+                    travelCostAmount={travelCostAmount}
+                    hasPrivateJet={hasPrivateJet}
+                    totalCost={totalCost}
+                    selectRegion={selectRegion}
+                    selectVenue={selectVenue}
+                    selectTravelMethod={selectTravelMethod}
+                    confirmNightOut={confirmNightOut}
+                    goBack={goBackNightOut}
+                    isHangarOpen={isHangarOpen}
+                    setIsHangarOpen={setIsHangarOpen}
+                />
 
-            {/* Outcome & Chained Modals — appear on top of the screen */}
-            <NightOutOutcomeModal
-                visible={outcomeModalVisible}
-                type={outcomeType}
-                onClose={handleOutcomeClose}
-                onHookupAccept={handleHookupAccept}
-            />
-            <HookupGameModal
-                visible={hookupGameVisible}
-                scenario={currentScenario}
-                partner={currentPartner}
-                onSuccess={handleHookupGameSuccess}
-                onFail={handleHookupGameFail}
-            />
-            <NightEndModal
-                visible={nightEndModalVisible}
-                onDecision={handleNightEndDecision}
-            />
-            <NightConclusionModal
-                visible={conclusionModalVisible}
-                data={conclusionData}
-                onClose={() => {
-                    handleConclusionClose();
-                    navigation.goBack();
-                }}
-            />
-            <PregnancyRevealModal
-                visible={pregnancyModalVisible}
-                onClose={() => setPregnancyModalVisible(false)}
-            />
+                {/* Outcome & Chained Modals — appear on top of the screen */}
+                <NightOutOutcomeModal
+                    visible={outcomeModalVisible}
+                    type={outcomeType}
+                    onClose={handleOutcomeClose}
+                    onHookupAccept={handleHookupAccept}
+                />
+                <HookupGameModal
+                    visible={hookupGameVisible}
+                    scenario={currentScenario}
+                    partner={currentPartner}
+                    onSuccess={handleHookupGameSuccess}
+                    onFail={handleHookupGameFail}
+                />
+                <NightEndModal
+                    visible={nightEndModalVisible}
+                    onDecision={handleNightEndDecision}
+                />
+                <NightConclusionModal
+                    visible={conclusionModalVisible}
+                    data={conclusionData}
+                    onClose={() => {
+                        handleConclusionClose();
+                        navigation.goBack();
+                    }}
+                />
+                <PregnancyRevealModal
+                    visible={pregnancyModalVisible}
+                    onClose={() => setPregnancyModalVisible(false)}
+                />
+            </AppLaunchLoader>
         </View>
     );
 };

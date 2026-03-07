@@ -28,7 +28,7 @@ interface EducationHubViewProps {
 // ========================================
 
 export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, onStudy }) => {
-    const { activeDegree, activeCertificate, salaryMultiplier, dropProgram, closeEducation } = useEducationSystem();
+    const { activeDegree, activeCertificate, salaryMultiplier, dropProgram } = useEducationSystem();
     const hasStudied = usePlayerStore((state) => state.quarterlyActions.hasStudied);
     const navigation = useNavigation<any>();
 
@@ -211,7 +211,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                 <SafeAreaView style={styles.safeArea}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={closeEducation} style={styles.closeBtn}>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
                             <Text style={styles.closeIcon}>✕</Text>
                         </TouchableOpacity>
 

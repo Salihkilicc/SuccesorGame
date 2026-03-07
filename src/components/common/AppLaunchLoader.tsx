@@ -14,7 +14,7 @@ const AppLaunchLoader: React.FC<AppLaunchLoaderProps> = ({
     backgroundColor,
     children,
 }) => {
-    const [isLoading, setIsLoading] = useState(true);
+    const [isComplete, setIsComplete] = useState(false);
     const fadeAnim = useState(new Animated.Value(1))[0];
 
     useEffect(() => {
@@ -27,32 +27,39 @@ const AppLaunchLoader: React.FC<AppLaunchLoaderProps> = ({
                 duration: 300,
                 useNativeDriver: true,
             }).start(() => {
-                setIsLoading(false);
+                setIsComplete(true);
             });
         }, delay);
 
         return () => clearTimeout(timer);
-    }, []);
-
-    if (!isLoading) {
-        return <>{children}</>;
-    }
+    }, [fadeAnim]);
 
     return (
         <View style={styles.container}>
-            <Animated.View style={[styles.splashScreen, { backgroundColor, opacity: fadeAnim }]}>
-                <View style={styles.contentContainer}>
-                    <View style={styles.iconContainer}>{appIcon}</View>
-                    <Text style={styles.appName}>{appName}</Text>
-                </View>
-                <ActivityIndicator size="large" color="#FFFFFF" style={styles.loader} />
-            </Animated.View>
+            {/* Mount children immediately in the background so there's no flash when loader disappears */}
+            <View style={styles.childContainer}>
+                {children}
+            </View>
+
+            {/* Overlay */}
+            {!isComplete && (
+                <Animated.View style={[styles.splashScreen, { backgroundColor, opacity: fadeAnim }]}>
+                    <View style={styles.contentContainer}>
+                        <View style={styles.iconContainer}>{appIcon}</View>
+                        <Text style={styles.appName}>{appName}</Text>
+                    </View>
+                    <ActivityIndicator size="large" color="#FFFFFF" style={styles.loader} />
+                </Animated.View>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+    },
+    childContainer: {
         flex: 1,
     },
     splashScreen: {

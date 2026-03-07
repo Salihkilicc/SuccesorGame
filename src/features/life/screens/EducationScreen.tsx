@@ -3,12 +3,20 @@ import { View, StyleSheet } from 'react-native';
 
 import { EducationMasterModal } from '../components/Education/modals/EducationMasterModal';
 import { EducationExamModal } from '../components/Education/modals/EducationExamModal';
+import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const EducationScreen = () => {
     return (
         <View style={styles.container}>
-            <EducationMasterModal />
-            <EducationExamModal />
+            <AppLaunchLoader
+                appName="Education"
+                appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
+                backgroundColor="#1e1e1e"
+            >
+                <EducationMasterModal />
+                <EducationExamModal />
+            </AppLaunchLoader>
         </View>
     );
 };
