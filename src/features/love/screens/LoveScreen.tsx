@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, Pressable, StyleSheet, Image, Alert, StatusBar } from 'react-native';
+import { ScrollView, View, Text, Pressable, StyleSheet, Image, Alert, StatusBar, TextInput, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -79,6 +79,10 @@ const LoveScreen = () => {
   const [proposalStep, setProposalStep] = useState(0); // 0: None, 1: Picker, 2: Prenup, 3: Result
   const [proposalResult, setProposalResult] = useState<{ success: boolean; message: string } | null>(null);
   const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  // --- Baby Naming Modal state ---
+  const [isNamingChild, setIsNamingChild] = useState(false);
+  const [pendingChildGender, setPendingChildGender] = useState<'Male' | 'Female'>('Male');
+  const [childName, setChildName] = useState('');
   // Removed local cheatingConsequence state to use hook's state
 
 
@@ -137,23 +141,11 @@ const LoveScreen = () => {
 
     // Pregnancy check: only if satisfaction > 30 AND 10% chance
     if (score > 30 && Math.random() <= 0.10) {
-      const babyNames = [
-        'Liam', 'Noah', 'Emma', 'Olivia', 'Sophia',
-        'James', 'Lucas', 'Ava', 'Mia', 'Ethan',
-      ];
-      const babyName = babyNames[Math.floor(Math.random() * babyNames.length)];
-      addContact({
-        id: `npc_child_${Date.now()}`,
-        name: babyName,
-        type: 'Child',
-        age: 0,
-        gender: Math.random() > 0.5 ? 'Male' : 'Female',
-        relationship: 100,
-        looks: Math.floor(Math.random() * 31) + 60,   // 60-90
-        smarts: Math.floor(Math.random() * 31) + 60,  // 60-90
-        isDeceased: false,
-      });
-      Alert.alert('Miracle!', 'Congratulations, you just had a baby!');
+      // Open naming modal instead of auto-creating with a random name
+      const gender: 'Male' | 'Female' = Math.random() > 0.5 ? 'Male' : 'Female';
+      setPendingChildGender(gender);
+      setChildName('');
+      setIsNamingChild(true);
     }
   };
 
@@ -706,22 +698,26 @@ const LoveScreen = () => {
           </Pressable>
         ))}
 
-        {/* Make Love Button — full-width, only for Partners */}
+        {/* Make Love Button ─ same gridTile as all other partner actions */}
         <Pressable
-          style={[
-            styles.makeLoveButton,
-            alreadyMadeLove && styles.makeLoveButtonDisabled,
+          key="makeLove"
+          style={({ pressed }) => [
+            styles.gridTile,
+            alreadyMadeLove && styles.gridTileDanger,
+            pressed && styles.gridTilePressed,
           ]}
           onPress={handleMakeLove}
           disabled={alreadyMadeLove}
         >
-          <Text style={styles.makeLoveEmoji}>💗</Text>
-          <Text style={styles.makeLoveLabel}>
-            {alreadyMadeLove ? 'Make Love (Quarterly limit)' : 'Make Love'}
+          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#EF4444' + '22' : '#EC4899' + '22', borderColor: alreadyMadeLove ? '#EF4444' + '55' : '#EC4899' + '55' }]}>
+            <Text style={styles.gridTileEmoji}>💗</Text>
+          </View>
+          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#EF4444' }]}>
+            {alreadyMadeLove ? 'Make Love' : 'Make Love'}
           </Text>
-          {alreadyMadeLove && (
-            <Text style={styles.makeLoveSubtext}>Available next quarter</Text>
-          )}
+          <Text style={styles.gridTileDesc}>
+            {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
+          </Text>
         </Pressable>
 
         {/* Satisfaction Bar — shown after an interaction */}
@@ -747,11 +743,21 @@ const LoveScreen = () => {
           </View>
         )}
 
-        {/* Special Propose Button - Only if not married */}
+        {/* Propose button ─ same gridTile as all other partner actions */}
         {!partner.isMarried && (
-          <Pressable style={styles.proposeTile} onPress={() => handlePartnerAction('Propose')}>
-            <Text style={{ fontSize: 22 }}>💍</Text>
-            <Text style={styles.proposeTileText}>Propose</Text>
+          <Pressable
+            key="propose"
+            style={({ pressed }) => [
+              styles.gridTile,
+              pressed && styles.gridTilePressed,
+            ]}
+            onPress={() => handlePartnerAction('Propose')}
+          >
+            <View style={[styles.gridTileIcon, { backgroundColor: '#FACC15' + '22', borderColor: '#FACC15' + '55' }]}>
+              <Text style={styles.gridTileEmoji}>💍</Text>
+            </View>
+            <Text style={styles.gridTileLabel}>Propose</Text>
+            <Text style={styles.gridTileDesc}>Pop the question</Text>
           </Pressable>
         )}
       </View>
@@ -987,33 +993,75 @@ const LoveScreen = () => {
           )}
 
           {/* 3. Family Section */}
-          <View>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Family</Text>
-              <Text style={styles.sectionCount}>{family.length} Members</Text>
-            </View>
+          {(() => {
+            // Merge legacy useUserStore family with NPC contacts that are family types
+            const npcFamily = contacts.filter(
+              c => !c.isDeceased && ['Mother', 'Father', 'Sibling', 'Child'].includes(c.type)
+            );
+            const totalCount = family.length + npcFamily.length;
+            return (
+              <View>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Family</Text>
+                  <Text style={styles.sectionCount}>{totalCount} Members</Text>
+                </View>
 
-            {family.map(member => (
-              <Pressable key={member.id} style={styles.listItem} onPress={() => { setSelectedItem(member); setModalType('family'); }}>
-                <View style={styles.listPhotoContainer}>
-                  {member.photo ? (
-                    <Image source={{ uri: member.photo }} style={styles.listPhoto} />
-                  ) : (
-                    <Text style={styles.listInitial}>{member.name[0]}</Text>
-                  )}
-                </View>
-                <View style={styles.listContent}>
-                  <View style={styles.listNameRow}>
-                    <Text style={styles.listName}>{member.name}</Text>
-                    <Text style={styles.listRole}>({member.relation})</Text>
+                {/* Legacy family from useUserStore */}
+                {family.map(member => (
+                  <Pressable key={member.id} style={styles.listItem} onPress={() => { setSelectedItem(member); setModalType('family'); }}>
+                    <View style={styles.listPhotoContainer}>
+                      {member.photo ? (
+                        <Image source={{ uri: member.photo }} style={styles.listPhoto} />
+                      ) : (
+                        <Text style={styles.listInitial}>{member.name[0]}</Text>
+                      )}
+                    </View>
+                    <View style={styles.listContent}>
+                      <View style={styles.listNameRow}>
+                        <Text style={styles.listName}>{member.name}</Text>
+                        <Text style={styles.listRole}>({member.relation})</Text>
+                      </View>
+                      <View style={styles.listBarTrack}>
+                        <View style={[styles.listBarFill, { width: `${member.relationship}%` }]} />
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
+
+                {/* NPC family contacts (Mother, Father, Sibling, Child) from useRelationshipStore */}
+                {npcFamily.map(npc => (
+                  <View key={npc.id} style={styles.listItem}>
+                    <View style={[styles.listPhotoContainer, {
+                      backgroundColor:
+                        npc.type === 'Child' ? 'rgba(250,204,21,0.12)' :
+                          npc.type === 'Mother' ? 'rgba(236,72,153,0.12)' :
+                            'rgba(99,102,241,0.12)',
+                    }]}>
+                      <Text style={styles.listInitial}>
+                        {npc.type === 'Child' ? '👶' : npc.type === 'Mother' ? '👩' : '👨'}
+                      </Text>
+                    </View>
+                    <View style={styles.listContent}>
+                      <View style={styles.listNameRow}>
+                        <Text style={styles.listName}>{npc.name}</Text>
+                        <Text style={styles.listRole}>({npc.type}, Age {npc.age})</Text>
+                      </View>
+                      <View style={styles.listBarTrack}>
+                        <View style={[styles.listBarFill, {
+                          width: `${npc.relationship}%`,
+                          backgroundColor: npc.type === 'Child' ? '#FACC15' : npc.type === 'Mother' ? '#EC4899' : '#6366F1',
+                        }]} />
+                      </View>
+                    </View>
                   </View>
-                  <View style={styles.listBarTrack}>
-                    <View style={[styles.listBarFill, { width: `${member.relationship}%` }]} />
-                  </View>
-                </View>
-              </Pressable>
-            ))}
-          </View>
+                ))}
+
+                {totalCount === 0 && (
+                  <Text style={styles.emptyText}>No family members yet.</Text>
+                )}
+              </View>
+            );
+          })()}
 
           {/* 4. Friends Section */}
           {friends && friends.length > 0 && (
@@ -1130,8 +1178,74 @@ const LoveScreen = () => {
         {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}
         <CrystalNavBar activeTab="Love" variant="dark" />
 
-      </SafeAreaView>
-    </View>
+        {/* BABY NAMING MODAL */}
+        <Modal
+          visible={isNamingChild}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setIsNamingChild(false)}
+        >
+          <View style={styles.namingOverlay}>
+            <View style={styles.namingCard}>
+              {/* Header */}
+              <Text style={styles.namingHeadEmoji}>👶</Text>
+              <Text style={styles.namingTitle}>A New Life</Text>
+              <Text style={styles.namingSubtitle}>
+                {'Congratulations! You just had a ' + (pendingChildGender === 'Female' ? 'baby girl' : 'baby boy') + '.\nWhat will you name them?'}
+              </Text>
+
+            {/* Input */}
+            <TextInput
+              style={styles.namingInput}
+              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholder="Enter a name..."
+              value={childName}
+              onChangeText={setChildName}
+              autoFocus
+              maxLength={20}
+            />
+
+            {/* Confirm */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.namingConfirm,
+                (!childName.trim()) && styles.namingConfirmDisabled,
+                pressed && { opacity: 0.8 },
+              ]}
+              onPress={() => {
+                if (!childName.trim()) return;
+                addContact({
+                  id: `npc_child_${Date.now()}`,
+                  name: childName.trim(),
+                  type: 'Child',
+                  age: 0,
+                  gender: pendingChildGender,
+                  relationship: 100,
+                  looks: Math.floor(Math.random() * 31) + 60,
+                  smarts: Math.floor(Math.random() * 31) + 60,
+                  isDeceased: false,
+                });
+                setIsNamingChild(false);
+                setChildName('');
+              }}
+              disabled={!childName.trim()}
+            >
+              <Text style={styles.namingConfirmText}>Confirm Name</Text>
+            </Pressable>
+
+            {/* Dismiss (skip naming) */}
+            <Pressable
+              style={styles.namingSkip}
+              onPress={() => { setIsNamingChild(false); setChildName(''); }}
+            >
+              <Text style={styles.namingSkipText}>Skip</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+    </SafeAreaView>
+    </View >
   );
 };
 
@@ -1674,5 +1788,83 @@ const styles = StyleSheet.create({
   satisfactionFill: {
     height: 6,
     borderRadius: 999,
+  },
+
+  // ── Baby Naming Modal ─────────────────────────
+  namingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  namingCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: '#101014',
+    borderRadius: 24,
+    padding: 28,
+    alignItems: 'center',
+    gap: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(250,204,21,0.3)',
+    shadowColor: '#FACC15',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  namingHeadEmoji: {
+    fontSize: 52,
+  },
+  namingTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  namingSubtitle: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  namingInput: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(250,204,21,0.35)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  namingConfirm: {
+    width: '100%',
+    backgroundColor: '#FACC15',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  namingConfirmDisabled: {
+    opacity: 0.35,
+  },
+  namingConfirmText: {
+    color: '#000000',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  namingSkip: {
+    paddingVertical: 10,
+  },
+  namingSkipText: {
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 13,
+    fontWeight: '500',
   },
 });
