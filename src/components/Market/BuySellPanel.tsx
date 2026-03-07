@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { useStatsStore, useMarketStore } from '../../core/store';
 import { theme } from '../../core/theme';
 
@@ -64,7 +64,17 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
           ]}>
           <Text style={styles.qtyButtonText}>-</Text>
         </Pressable>
-        <Text style={styles.qtyValue}>{qty}</Text>
+        <TextInput
+          style={styles.qtyValue}
+          value={String(qty)}
+          onChangeText={(text) => {
+            const parsed = parseInt(text, 10);
+            setQty(isNaN(parsed) || parsed < 1 ? 1 : parsed);
+          }}
+          keyboardType="number-pad"
+          returnKeyType="done"
+          selectTextOnFocus
+        />
         <Pressable
           onPress={() => adjustQty(1)}
           style={({ pressed }) => [

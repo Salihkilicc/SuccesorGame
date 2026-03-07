@@ -29,8 +29,6 @@ import NightConclusionModal from '../components/NightOut/NightConclusionModal';
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import GymMasterModal from '../components/Gym/GymMasterModal';
 
-import { useTravelSystem } from '../components/Travel/useTravelSystem';
-
 import { useSanctuarySystem } from '../components/Sanctuary/store/useSanctuarySystem';
 
 import { useEducationSystem } from '../components/Education/store/useEducationSystem';
@@ -103,12 +101,6 @@ const LifeScreen = () => {
 
   // Education System
   const { openEducation } = useEducationSystem();
-
-  // Travel System
-  const {
-    currentView, selectedSpot, travelClass, bringPartner, resultData: travelResultData, vacationSpots,
-    openTravel, closeTravel, setTravelClass, setBringPartner, openBooking, startTrip, onExperienceComplete, onMiniGameComplete, openCollection, closeCollection, closeBooking, hasSouvenir,
-  } = useTravelSystem(triggerEncounterBool);
 
   // Sanctuary System
   const {

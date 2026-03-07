@@ -628,27 +628,30 @@ export const useGameStore = create<GameStore>()(
       },
 
       resetGame: async () => {
+        // Store'ları initialState'e döndür
         useStatsStore.getState().reset();
+        useStatsStore.getState().setHasHydrated(true); // UI donmasın
+
         useUserStore.getState().reset();
         useEventStore.getState().reset();
-        useProductStore.getState().reset(); // Reset Products
+        useProductStore.getState().reset();
 
-        set(() => ({ ...initialGameState }));
+        // GameStore'u initialState'e döndür, ama _hasHydrated: true tut
+        set(() => ({ ...initialGameState, _hasHydrated: true }));
 
-
-
+        // AsyncStorage'ı temizle (persist middleware bir sonraki yazımda güncel initialState'i kaydeder)
         await AsyncStorage.removeItem('succesor_stats_v1');
         await AsyncStorage.removeItem('succesor_user_v1');
         await AsyncStorage.removeItem('succesor_game_v1');
         await AsyncStorage.removeItem('succesor_game_v2');
-        await AsyncStorage.removeItem('succesor_products_v3'); // Remove Product Persist
-        await AsyncStorage.removeItem('succesor_laboratory_v1'); // Remove Laboratory Persist if exists
-        await AsyncStorage.removeItem('relationship-storage'); // Remove NPC Persist
+        await AsyncStorage.removeItem('succesor_products_v3');
+        await AsyncStorage.removeItem('succesor_laboratory_v1');
+        await AsyncStorage.removeItem('relationship-storage');
 
         // NPC HOOK: yeni oyunda anne ve babayı oluştur
         useRelationshipStore.getState().generateParents();
-
       },
+
     }),
     {
       name: 'succesor_game_v2',

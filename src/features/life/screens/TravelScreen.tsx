@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
@@ -24,13 +24,29 @@ const TravelScreen = () => {
         openTravel, closeTravel, setTravelClass, setBringPartner, openBooking, startTrip, onExperienceComplete, onMiniGameComplete, openCollection, closeCollection, closeBooking, hasSouvenir,
     } = useTravelSystem(dummyTrigger);
 
+    // currentView'in önce non-null bir değer aldığını takip et
+    const hasSeenActiveViewRef = useRef(false);
+
     useEffect(() => {
         if (isFocused) {
             openTravel();
         } else {
             closeTravel();
+            hasSeenActiveViewRef.current = false;
         }
     }, [isFocused, openTravel, closeTravel]);
+
+    // currentView non-null olduysa kaydet; null'a dönünce geri git
+    useEffect(() => {
+        if (currentView !== null) {
+            // Bir travel view'i gerçekten görüldü
+            hasSeenActiveViewRef.current = true;
+        } else if (hasSeenActiveViewRef.current) {
+            // Travel tamamlandı → geri dön
+            hasSeenActiveViewRef.current = false;
+            navigation.goBack();
+        }
+    }, [currentView, navigation]);
 
     const handleHomePress = () => {
         closeTravel();
