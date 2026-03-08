@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
   nextMonthText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 14,
+    fontSize: 11.3,
     letterSpacing: 4,
     textTransform: 'uppercase',
     textAlign: 'center',
