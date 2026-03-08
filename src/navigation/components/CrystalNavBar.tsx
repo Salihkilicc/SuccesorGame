@@ -29,7 +29,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         } else if (screen === 'Contacts') {
             navigation.navigate('Love');
         } else if (screen === 'Profile') {
-            navigation.navigate('DNA');
+            navigation.navigate('Profile');
         } else {
             navigation.navigate(screen);
         }
