@@ -248,6 +248,11 @@ const HomeScreen = () => {
           style={styles.container}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}>
+          {/* ── Brand Logo ── */}
+          <View style={styles.brandContainer}>
+            <Text style={styles.brandText}>SUCCESSOR</Text>
+          </View>
+
           {/* ── Premium Player Header ── */}
           <View style={styles.headerCard}>
             {/* Top Row: Avatar + Name/Bio + Age/Month chips */}
@@ -1018,5 +1023,21 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: '800',
     fontSize: 16,
+  },
+  brandContainer: {
+    marginTop: 8,
+    marginBottom: 4,
+    paddingHorizontal: 4,
+    alignItems: 'flex-start',
+  },
+  brandText: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    letterSpacing: 6,
+    textShadowColor: 'rgba(255, 255, 255, 0.7)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+    textTransform: 'uppercase',
   },
 });
