@@ -198,41 +198,6 @@ const LifeScreen = () => {
           {/* Spacer for Bottom Bar */}
           <View style={{ height: 40 }} />
 
-          {/* DEBUG SECTION - Redesigned for premium look */}
-          <View style={styles.debugRow}>
-            <Pressable
-              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(192, 57, 43, 0.15)', borderColor: 'rgba(192, 57, 43, 0.3)', flex: 1, marginRight: 12 }, pressed && { opacity: 0.7 }]}
-              onPress={() => {
-                Alert.alert(
-                  'Reset Game',
-                  'Are you sure you want to completely reset your progress?',
-                  [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'Reset',
-                      style: 'destructive',
-                      onPress: async () => {
-                        await useGameStore.getState().resetGame();
-                      }
-                    }
-                  ]
-                );
-              }}
-            >
-              <Text style={[styles.debugButtonText, { color: '#e74c3c' }]}>Reset</Text>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [styles.debugButton, { backgroundColor: 'rgba(39, 174, 96, 0.15)', borderColor: 'rgba(39, 174, 96, 0.3)', flex: 2 }, pressed && { opacity: 0.7 }]}
-              onPress={() => {
-                useStatsStore.getState().earnMoney(100_000_000);
-                Alert.alert('Success', '$100M added to your balance!');
-              }}
-            >
-              <Text style={[styles.debugButtonText, { color: '#2ecc71' }]}>Add $100M</Text>
-            </Pressable>
-          </View>
-
           <View style={{ height: 100 }} />
         </ScrollView>
 
@@ -349,27 +314,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.3,
   },
-  debugRow: {
-    flexDirection: 'row',
-    marginTop: 10,
-    paddingHorizontal: 4,
-    width: '100%',
-    alignItems: 'center',
-  },
-  debugButton: {
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  debugButtonText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-
 
   // Crystal Floating Dock
   bottomBarContainer: {

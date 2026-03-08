@@ -20,6 +20,7 @@ import { EncounterModal } from '../../love/components/EncounterModal';
 import BreakupModal from '../../love/components/BreakupModal';
 import { useHookupSystem } from '../components/useHookupSystem';
 import { HookupModal } from '../components/HookupModal';
+import GodModeModal from '../../../components/GodModeModal';
 
 const GRADIENTS = {
     purplePink: ['#8E2DE2', '#4A00E0'],
@@ -37,6 +38,7 @@ const SECTION_ESSENTIALS = [
     { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey },
     { key: 'themes', label: 'Themes', icon: 'palette', gradient: GRADIENTS.networkBlue },
     { key: 'godMode', label: 'God Mode', icon: 'flash', gradient: GRADIENTS.hookupFire },
+    { key: 'stockMarket', label: 'Stock Market', icon: 'chart-line', gradient: GRADIENTS.greenTeal },
 ];
 
 const SECTION_UNDERWORLD = [
@@ -44,7 +46,6 @@ const SECTION_UNDERWORLD = [
     { key: 'blackMarket', label: 'Black Market', icon: 'incognito', gradient: GRADIENTS.darkGrey },
     { key: 'hookup', label: 'Hookup', icon: 'fire', gradient: GRADIENTS.hookupFire },
     { key: 'network', label: 'Network', icon: 'lan', gradient: GRADIENTS.networkBlue },
-    { key: 'stockMarket', label: 'Stock Market', icon: 'chart-line', gradient: GRADIENTS.greenTeal },
 ];
 
 const UnderworldScreen = () => {
@@ -54,6 +55,7 @@ const UnderworldScreen = () => {
     const { isModalVisible, currentCandidate, matchStatus, startHookup, swipeRight, swipeLeft, nextCandidate, closeHookupModal } = useHookupSystem();
     const { isVisible: isEncounterVisible, currentScenario: encounterScenario, candidate: encounterCandidate, handleDate, closeEncounter } = useEncounterSystem();
     const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
+    const [isGodModeVisible, setIsGodModeVisible] = useState(false);
 
     const handleEncounterDate = useCallback(() => {
         const result = handleDate();
@@ -68,7 +70,7 @@ const UnderworldScreen = () => {
             case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
             case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
             case 'themes': Alert.alert('Themes', 'Coming Soon'); break;
-            case 'godMode': Alert.alert('God Mode', 'Coming Soon'); break;
+            case 'godMode': setIsGodModeVisible(true); break;
             case 'casino': navigation.navigate('Casino'); break;
             case 'blackMarket': navigation.navigate('BlackMarket'); break;
             case 'hookup': startHookup(); break;
@@ -166,6 +168,11 @@ const UnderworldScreen = () => {
                     settlementCost={cheatingConsequence.settlement}
                 />
             )}
+
+            <GodModeModal
+                visible={isGodModeVisible}
+                onClose={() => setIsGodModeVisible(false)}
+            />
         </View>
     );
 };
