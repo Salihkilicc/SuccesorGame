@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     scrollContent: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         paddingTop: 16,
         paddingBottom: 140, // Increased for bottom layout consistency
     },
