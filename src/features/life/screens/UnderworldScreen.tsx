@@ -67,7 +67,7 @@ const UnderworldScreen = () => {
     const handleAction = (key: string) => {
         switch (key) {
             case 'contacts': navigation.navigate('Love'); break;
-            case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
+            case 'weather': navigation.navigate('Weather'); break;
             case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
             case 'themes': Alert.alert('Themes', 'Coming Soon'); break;
             case 'godMode': setIsGodModeVisible(true); break;
