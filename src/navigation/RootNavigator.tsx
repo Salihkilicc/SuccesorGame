@@ -55,6 +55,7 @@ import NightOutScreen from '../features/life/screens/NightOutScreen';
 import EducationScreen from '../features/life/screens/EducationScreen';
 import WeatherScreen from '../features/life/screens/WeatherScreen';
 import CalendarScreen from '../features/life/screens/CalendarScreen';
+import NotesScreen from '../features/os/screens/NotesScreen';
 
 export type LifeStackParamList = {
   LifeHome: undefined;
@@ -131,6 +132,7 @@ export type RootStackParamList = {
   Education: undefined;
   Weather: undefined;
   Calendar: undefined;
+  Notes: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -349,6 +351,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="Education" component={EducationScreen} />
           <RootStack.Screen name="Weather" component={WeatherScreen} />
           <RootStack.Screen name="Calendar" component={CalendarScreen} />
+          <RootStack.Screen name="Notes" component={NotesScreen} />
         </RootStack.Navigator>
 
       </View>
