@@ -71,6 +71,8 @@ const SECTION_LIFESTYLE = [
   // Personal Assets & Data
   { key: 'belongings', label: 'Belongings', icon: 'briefcase', gradient: GRADIENTS.brownGold },
   { key: 'dna', label: 'DNA / Stats', icon: 'dna', gradient: GRADIENTS.bluePurple },
+  { key: 'health', label: 'Health', icon: 'heart', gradient: GRADIENTS.pinkRed },
+  { key: 'appStore', label: 'App Store', icon: 'store', gradient: GRADIENTS.networkBlue },
 ];
 
 const LifeScreen = () => {
@@ -114,6 +116,7 @@ const LifeScreen = () => {
       case 'contacts': handleBottomNav('Contacts'); break;
       case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
       case 'health': Alert.alert('Health', 'Health app is coming soon!'); break;
+      case 'appStore': Alert.alert('App Store', 'Coming Soon'); break;
       case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
       case 'notes': Alert.alert('Notes', 'Notes app is coming soon!'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
@@ -148,7 +151,7 @@ const LifeScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <MaterialCommunityIcons name={item.icon} size={42} color="#FFFFFF" style={styles.appIconVector} />
+        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
@@ -305,13 +308,13 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 18,
     justifyContent: 'flex-start',
-    paddingHorizontal: 8,
+    gap: 16,
+    paddingHorizontal: 4,
   },
   appCard: {
-    width: '21%', // 4 columns roughly ((100 - (18 * 3))/4)
-    aspectRatio: 0.75, // Taller to fit label
+    width: '21%',
+    aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
     shadowColor: '#000',
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
   appCardInner: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: 18, // iOS App Icon curvature
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,

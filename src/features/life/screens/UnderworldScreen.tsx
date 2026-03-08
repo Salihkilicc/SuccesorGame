@@ -34,6 +34,9 @@ const GRADIENTS = {
 const SECTION_ESSENTIALS = [
     { key: 'contacts', label: 'Contacts', icon: 'account-multiple', gradient: GRADIENTS.purplePink },
     { key: 'weather', label: 'Weather', icon: 'weather-partly-cloudy', gradient: GRADIENTS.bluePurple },
+    { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey },
+    { key: 'themes', label: 'Themes', icon: 'palette', gradient: GRADIENTS.networkBlue },
+    { key: 'godMode', label: 'God Mode', icon: 'flash', gradient: GRADIENTS.hookupFire },
 ];
 
 const SECTION_UNDERWORLD = [
@@ -63,6 +66,9 @@ const UnderworldScreen = () => {
         switch (key) {
             case 'contacts': navigation.navigate('Love'); break;
             case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
+            case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
+            case 'themes': Alert.alert('Themes', 'Coming Soon'); break;
+            case 'godMode': Alert.alert('God Mode', 'Coming Soon'); break;
             case 'casino': navigation.navigate('Casino'); break;
             case 'blackMarket': navigation.navigate('BlackMarket'); break;
             case 'hookup': startHookup(); break;
@@ -80,7 +86,7 @@ const UnderworldScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
-                <MaterialCommunityIcons name={item.icon} size={42} color="#FFFFFF" style={styles.appIconVector} />
+                <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
             </LinearGradient>
             <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
         </Pressable>
@@ -217,9 +223,9 @@ const styles = StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 18,
         justifyContent: 'flex-start',
-        paddingHorizontal: 8,
+        gap: 16,
+        paddingHorizontal: 4,
     },
     appCard: {
         width: '21%',
@@ -239,7 +245,7 @@ const styles = StyleSheet.create({
     appCardInner: {
         width: '100%',
         aspectRatio: 1,
-        borderRadius: 18,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 6,

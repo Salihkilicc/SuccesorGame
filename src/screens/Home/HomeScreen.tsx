@@ -54,12 +54,9 @@ const GRADIENTS = {
 
 const HOMESCREEN_APPS = [
   { key: 'calendar', label: 'Calendar', icon: 'calendar', gradient: GRADIENTS.orangeYellow },
-  { key: 'health', label: 'Health', icon: 'heart', gradient: GRADIENTS.pinkRed },
   { key: 'mail', label: 'Mail', icon: 'email', gradient: GRADIENTS.blueSky },
-  { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey },
   { key: 'myCompany', label: 'My Company', icon: 'office-building', gradient: GRADIENTS.networkBlue },
   { key: 'news', label: 'News', icon: 'newspaper', gradient: GRADIENTS.tealCyan },
-  { key: 'contacts', label: 'Contacts', icon: 'account-group', gradient: GRADIENTS.bluePurple },
 ];
 
 const NewsItem = ({ text }: { text: string }) => (
@@ -212,12 +209,9 @@ const HomeScreen = () => {
   const handleAppAction = (key: string) => {
     switch (key) {
       case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
-      case 'health': Alert.alert('Health', 'Health app is coming soon!'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
-      case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
       case 'myCompany': handleNavigateTabs('MyCompany'); break;
       case 'news': setShowNews(true); break;
-      case 'contacts': handleNavigateStack('Love' as any); break;
     }
   };
 
