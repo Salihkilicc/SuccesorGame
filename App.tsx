@@ -16,7 +16,9 @@ const App = () => {
     // Sadece HER ŞEY yüklendiğinde splash screen'i gizle
     if (isFullyHydrated) {
       const hideSplash = async () => {
-        await BootSplash.hide({ fade: true });
+        setTimeout(async () => {
+          await BootSplash.hide({ fade: true });
+        }, 2000);
       };
       hideSplash();
     }

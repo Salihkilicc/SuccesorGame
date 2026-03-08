@@ -294,11 +294,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    paddingTop: 40,
   },
   card: {
     width: '100%',
     maxWidth: 420,
-    maxHeight: '95%',
+    maxHeight: '85%',
     backgroundColor: '#121212', // Deep Black
     borderRadius: 20,
     borderWidth: 1,

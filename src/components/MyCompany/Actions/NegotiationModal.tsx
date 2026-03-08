@@ -16,7 +16,10 @@ type Props = {
 };
 
 // Helpers
-const formatMoney = (val: number) => `$${(val / 1e9).toFixed(2)}B`;
+const formatMoney = (val: number) => {
+    if (val >= 1e12) return `$${(val / 1e12).toFixed(2)}T`;
+    return `$${(val / 1e9).toFixed(2)}B`;
+};
 
 const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
     const { companyCapital, shareholders, addAcquisition, setField } = useStatsStore();
@@ -110,7 +113,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 } else if (offer < askingPrice && Math.random() > 0.4) {
                     // 60% chance they insist on asking price/premium if under it
                     setStatus('rejected');
-                    setStatusMessage(`They insist on the full premium ($${(askingPrice / 1e9).toFixed(2)}B). "Our growth justifies the price."`);
+                    setStatusMessage(`They insist on the full premium (${formatMoney(askingPrice)}). "Our growth justifies the price."`);
                 } else {
                     // Accepted!
                     setStatus('accepted');

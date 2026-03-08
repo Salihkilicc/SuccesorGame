@@ -37,6 +37,8 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     else if (successChance >= 40) chanceColor = '#FACC15'; // Yellow
 
     const formatMoney = (amount: number) => {
+        if (amount >= 1_000_000_000_000) return `$${(amount / 1_000_000_000_000).toFixed(1)}T`;
+        if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(1)}B`;
         return `$${(amount / 1_000_000).toFixed(1)}M`;
     };
 
