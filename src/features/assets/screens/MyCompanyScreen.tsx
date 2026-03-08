@@ -161,13 +161,17 @@ const MyCompanyScreen = () => {
         <View style={styles.header}>
           <Pressable
             onPress={() => navigation.navigate('Home')}
-            style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+            style={({ pressed }) => [
+              styles.backBtn,
+              pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
+            ]}
           >
-            <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
           </Pressable>
-          <View>
-            <Text style={styles.title}>COMMAND CENTER</Text>
-            <Text style={styles.subtitle}>Manage your company operations</Text>
+
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>COMMAND CENTER</Text>
+            <View style={styles.headerAccent} />
           </View>
         </View>
 
@@ -353,27 +357,52 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(197,160,89,0.15)',
+    minHeight: 80,
+    backgroundColor: 'transparent',
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    width: 38,
+    height: 38,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'absolute',
+    left: 16,
+    bottom: 12,
+    zIndex: 10,
+    backgroundColor: 'rgba(197,160,89,0.08)',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(197,160,89,0.2)',
   },
-  backBtnPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    transform: [{ scale: 0.95 }],
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '900', color: '#FFFFFF', letterSpacing: 2 },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: '#E5E5E5',
+    letterSpacing: 4,
+    textTransform: 'uppercase',
+  },
+  headerAccent: {
+    width: 32,
+    height: 2,
+    backgroundColor: '#D4AF37',
+    marginTop: 6,
+    borderRadius: 2,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   subtitle: { color: '#888888', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {

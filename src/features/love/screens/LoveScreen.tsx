@@ -879,15 +879,18 @@ const LoveScreen = () => {
           <Pressable
             onPress={handleBack}
             style={({ pressed }) => [
-              styles.headerLeft,
-              pressed && { opacity: 0.7 },
-            ]}>
-            <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
-            <View>
-              <Text style={styles.headerTitle}>CONTACTS</Text>
-              <Text style={styles.headerSubtitle}>Relationships & Love</Text>
-            </View>
+              styles.backBtn,
+              pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
+            ]}
+          >
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
           </Pressable>
+
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>CONTACTS</Text>
+            <View style={styles.headerAccent} />
+          </View>
+
           <View style={styles.headerRight}>
             <Text style={styles.balanceText}>
               {formatMoney(money)}
@@ -1263,22 +1266,51 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(197,160,89,0.15)',
+    minHeight: 80,
+    backgroundColor: 'transparent',
   },
-  headerLeft: {
-    flexDirection: 'row',
+  backBtn: {
+    width: 38,
+    height: 38,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    position: 'absolute',
+    left: 16,
+    bottom: 12,
+    zIndex: 10,
+    backgroundColor: 'rgba(197,160,89,0.08)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(197,160,89,0.2)',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
-    letterSpacing: 2,
+    fontSize: 22,
+    fontWeight: '300',
+    color: '#E5E5E5',
+    letterSpacing: 4,
+    textTransform: 'uppercase',
+  },
+  headerAccent: {
+    width: 32,
+    height: 2,
+    backgroundColor: '#D4AF37',
+    marginTop: 6,
+    borderRadius: 2,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 4,
   },
   headerSubtitle: {
     color: '#888888',
@@ -1288,12 +1320,15 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     marginTop: 2,
   },
-  headerRight: {},
+  headerRight: {
+    position: 'absolute',
+    right: 16,
+    bottom: 20,
+  },
   balanceText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: theme.colors.success,
+    fontSize: 14,
     fontWeight: '800',
-    fontVariant: ['tabular-nums'],
   },
   content: {
     padding: 20,
