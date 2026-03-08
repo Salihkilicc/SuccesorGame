@@ -6,9 +6,21 @@ export type WeatherCondition = {
     label: string;
 };
 
+export type DailyForecast = {
+    dayLabel: string; // e.g. "Mon", "Tue"
+    emoji: string;
+    high: number;
+    low: number;
+};
+
+export type TemperatureUnit = 'C' | 'F';
+
 export type WeatherState = {
     temperature: number | null;
     condition: WeatherCondition | null;
+    forecast: DailyForecast[];
+    unit: TemperatureUnit;
+    toggleUnit: () => void;
     loading: boolean;
     error: string | null;
 };
@@ -31,11 +43,19 @@ const getCondition = (code: number): WeatherCondition => {
     return { emoji: '🌡️', label: 'Unknown' };
 };
 
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const celsiusToFahrenheit = (celsius: number) => Math.round((celsius * 9) / 5 + 32);
+
 const useWeatherLogic = (): WeatherState => {
-    const [temperature, setTemperature] = useState<number | null>(null);
+    const [rawTempC, setRawTempC] = useState<number | null>(null);
+    const [rawForecastC, setRawForecastC] = useState<DailyForecast[]>([]);
+    const [unit, setUnit] = useState<TemperatureUnit>('C');
     const [condition, setCondition] = useState<WeatherCondition | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const toggleUnit = () => setUnit((prev) => (prev === 'C' ? 'F' : 'C'));
 
     useEffect(() => {
         Geolocation.setRNConfiguration({ skipPermissionRequests: false, authorizationLevel: 'whenInUse' });
@@ -45,20 +65,41 @@ const useWeatherLogic = (): WeatherState => {
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+                    const url =
+                        `https://api.open-meteo.com/v1/forecast` +
+                        `?latitude=${latitude}&longitude=${longitude}` +
+                        `&current_weather=true` +
+                        `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+                        `&timezone=auto`;
+
                     const response = await fetch(url);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
+
+                    // Current weather
                     const cw = data.current_weather;
-                    setTemperature(Math.round(cw.temperature));
+                    setRawTempC(Math.round(cw.temperature));
                     setCondition(getCondition(cw.weathercode));
+
+                    // 7-day daily forecast
+                    const daily = data.daily;
+                    const days: DailyForecast[] = daily.time.map((dateStr: string, i: number) => {
+                        const dow = new Date(dateStr).getDay();
+                        return {
+                            dayLabel: i === 0 ? 'Today' : DAY_LABELS[dow],
+                            emoji: getCondition(daily.weathercode[i]).emoji,
+                            high: Math.round(daily.temperature_2m_max[i]),
+                            low: Math.round(daily.temperature_2m_min[i]),
+                        };
+                    });
+                    setRawForecastC(days);
                 } catch (fetchErr) {
                     setError('Could not load weather data.');
                 } finally {
                     setLoading(false);
                 }
             },
-            (posErr) => {
+            () => {
                 setError('Location access denied or unavailable.');
                 setLoading(false);
             },
@@ -66,7 +107,15 @@ const useWeatherLogic = (): WeatherState => {
         );
     }, []);
 
-    return { temperature, condition, loading, error };
+    // Compute derived values based on unit
+    const temperature = rawTempC !== null ? (unit === 'C' ? rawTempC : celsiusToFahrenheit(rawTempC)) : null;
+    const forecast = rawForecastC.map(day => ({
+        ...day,
+        high: unit === 'C' ? day.high : celsiusToFahrenheit(day.high),
+        low: unit === 'C' ? day.low : celsiusToFahrenheit(day.low),
+    }));
+
+    return { temperature, condition, forecast, unit, toggleUnit, loading, error };
 };
 
 export default useWeatherLogic;

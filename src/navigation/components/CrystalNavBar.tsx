@@ -11,9 +11,10 @@ const { width } = Dimensions.get('window');
 interface CrystalNavBarProps {
     activeTab: 'Life' | 'Home' | 'Company' | 'Love';
     variant: 'light' | 'dark';
+    hideDots?: boolean;
 }
 
-const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => {
+const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots }) => {
     const navigation = useNavigation<any>();
     const [isStatsMode, setIsStatsMode] = useState(false);
 
@@ -89,18 +90,20 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant }) => 
 
             <View style={[styles.bottomBarContainer, { zIndex: 1000 }]}>
                 {/* Pagination Dots */}
-                <View style={styles.paginationContainer}>
-                    {dots.map((dot, index) => (
-                        <View
-                            key={index}
-                            style={[
-                                styles.dot,
-                                activeDotIndex === index ? styles.activeDot : styles.inactiveDot,
-                                isLight ? styles.lightDot : styles.darkDot
-                            ]}
-                        />
-                    ))}
-                </View>
+                {!hideDots && (
+                    <View style={styles.paginationContainer}>
+                        {dots.map((dot, index) => (
+                            <View
+                                key={index}
+                                style={[
+                                    styles.dot,
+                                    activeDotIndex === index ? styles.activeDot : styles.inactiveDot,
+                                    isLight ? styles.lightDot : styles.darkDot
+                                ]}
+                            />
+                        ))}
+                    </View>
+                )}
 
                 <BlurView
                     style={styles.blurContainer}
