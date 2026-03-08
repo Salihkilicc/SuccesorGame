@@ -15,6 +15,7 @@ import BreakupModal from '../components/BreakupModal';
 import { useEncounterSystem } from '../components/useEncounterSystem';
 import { applyPartnerBuffs, getPartnerPerks } from '../../../logic/relationshipLogic';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../core/utils';
 
 type LoveScreenProp = NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>;
 
@@ -887,10 +888,9 @@ const LoveScreen = () => {
               <Text style={styles.headerSubtitle}>Relationships & Love</Text>
             </View>
           </Pressable>
-          {/* Optional Right Node */}
           <View style={styles.headerRight}>
             <Text style={styles.balanceText}>
-              ${money.toLocaleString()}
+              {formatMoney(money)}
             </Text>
           </View>
         </View>
