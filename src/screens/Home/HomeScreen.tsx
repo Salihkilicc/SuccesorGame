@@ -324,7 +324,13 @@ const HomeScreen = () => {
                 <Text style={styles.sectionTitle}>Overview</Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="#888888" />
               </View>
-              <View style={[styles.card, styles.widgetCard]}>
+              <LinearGradient
+                colors={['#c38d9e', '#16121d', '#16121d', '#8b8ecc']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.2, 0.8, 1]}
+                style={[styles.card, styles.widgetCard, styles.modernCard]}
+              >
                 <View style={styles.widgetRowBetween}>
                   <Text style={styles.widgetLabel}>Net Worth</Text>
                   <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
@@ -345,13 +351,19 @@ const HomeScreen = () => {
                     {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
                   </Text>
                 </View>
-              </View>
+              </LinearGradient>
             </TouchableOpacity>
 
             {/* Status Widget */}
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
-              <View style={[styles.statusCard, styles.widgetCard]}>
+              <LinearGradient
+                colors={['#c38d9e', '#16121d', '#16121d', '#8b8ecc']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.2, 0.8, 1]}
+                style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
+              >
                 <View style={styles.widgetStatusRow}>
                   <Text style={styles.statusLabel}>Love</Text>
                   <Text style={styles.widgetStatusText} numberOfLines={1}>{partnerBrief}</Text>
@@ -364,7 +376,7 @@ const HomeScreen = () => {
                   <Text style={styles.statusLabel}>Life</Text>
                   <Text style={styles.widgetStatusText} numberOfLines={1}>{lifeBrief}</Text>
                 </View>
-              </View>
+              </LinearGradient>
             </View>
           </View>
 
@@ -656,10 +668,11 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#E5E5E5',
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#D4D4D8',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   widgetsContainer: {
     flexDirection: 'row',
@@ -671,8 +684,10 @@ const styles = StyleSheet.create({
   },
   widgetCard: {
     flex: 1,
-    padding: theme.spacing.md,
+    paddingVertical: 32,
+    paddingHorizontal: 12,
     justifyContent: 'space-between',
+    minHeight: 250,
   },
   widgetRowBetween: {
     flexDirection: 'column',
@@ -689,7 +704,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   appsSection: {
-    marginTop: theme.spacing.lg,
+    marginTop: theme.spacing.sm,
   },
   appsGrid: {
     flexDirection: 'row',
@@ -736,12 +751,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   widgetStatusRow: {
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   widgetStatusText: {
     color: theme.colors.textPrimary,
     fontSize: theme.typography.caption + 1,
-    marginTop: 2,
+    marginTop: 0,
+  },
+  statusCardAdjuster: {
+    justifyContent: 'flex-start',
+    paddingTop: 30,
+    gap: theme.spacing.xl || 24,
   },
   card: {
     backgroundColor: '#161618',
@@ -1039,5 +1059,19 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
     textTransform: 'uppercase',
+  },
+  modernCard: {
+    backgroundColor: 'transparent',
+    borderRadius: 33,
+    borderWidth: 0,
+    shadowColor: '#8b8ecc',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
+    marginHorizontal: -12,
+    marginVertical: -8,
+    padding: 30,
+    paddingBottom: 10,
   },
 });
