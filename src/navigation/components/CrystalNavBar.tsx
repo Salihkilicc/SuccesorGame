@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur';
+import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 import { useStatsStore, usePlayerStore } from '../../core/store';
@@ -105,12 +106,19 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                     </View>
                 )}
 
-                <BlurView
+                <LinearGradient
+                    colors={['rgba(195,141,158,0.5)', 'rgba(22,18,29,0.4)', 'rgba(22,18,29,0.4)', 'rgba(139,142,204,0.5)']}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    locations={[0, 0.2, 0.8, 1]}
                     style={styles.blurContainer}
-                    blurType={blurType}
-                    blurAmount={20}
-                    reducedTransparencyFallbackColor={isLight ? "white" : "black"}
                 >
+                    <BlurView
+                        style={StyleSheet.absoluteFill}
+                        blurType="dark"
+                        blurAmount={8}
+                        reducedTransparencyFallbackColor="black"
+                    />
                     <View style={[styles.bottomBar, containerStyle]}>
                         {!isStatsMode ? (
                             <>
@@ -158,7 +166,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                             </>
                         )}
                     </View>
-                </BlurView>
+                </LinearGradient>
             </View>
         </>
     );
@@ -175,10 +183,9 @@ const styles = StyleSheet.create({
     },
     bottomBarContainer: {
         position: 'absolute',
-        bottom: 34,
-        left: 15,
-        right: 15,
-        // Removed overflow: hidden so dots above it are visible if we place them inside
+        bottom: Platform.OS === 'ios' ? 36 : 24,
+        left: 18,
+        right: 18,
     },
     paginationContainer: {
         flexDirection: 'row',
@@ -211,21 +218,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.5)',
     },
     blurContainer: {
-        borderRadius: 24,
+        borderRadius: 20,
         overflow: 'hidden',
-        shadowColor: "#000",
+        shadowColor: "#8b8ecc",
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.6,
         shadowRadius: 20,
         elevation: 15,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        backgroundColor: 'rgba(19, 19, 21, 0.4)', // Slightly dark base
+        borderWidth: 1.5,
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+        backgroundColor: 'transparent',
     },
     bottomBar: {
         flexDirection: 'row',
         width: '100%',
-        paddingVertical: 14,
+        paddingVertical: 18,
         paddingHorizontal: 16,
         justifyContent: 'space-around',
         alignItems: 'center',
