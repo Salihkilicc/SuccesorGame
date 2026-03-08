@@ -47,7 +47,7 @@ const WeatherScreen = () => {
                         onPress={() => navigation.goBack()}
                         activeOpacity={0.7}
                     >
-                        <MaterialCommunityIcons name="chevron-left" size={28} color="rgba(255,255,255,0.8)" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="rgba(255,255,255,0.8)" />
                         <Text style={styles.backLabel}>Home</Text>
                     </TouchableOpacity>
 

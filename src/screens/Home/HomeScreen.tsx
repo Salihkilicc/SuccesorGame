@@ -208,7 +208,7 @@ const HomeScreen = () => {
 
   const handleAppAction = (key: string) => {
     switch (key) {
-      case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
+      case 'calendar': handleNavigateStack('Calendar'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
       case 'myCompany': handleNavigateTabs('MyCompany'); break;
       case 'news': setShowNews(true); break;
