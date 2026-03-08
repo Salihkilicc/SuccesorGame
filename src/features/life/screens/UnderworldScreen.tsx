@@ -68,7 +68,7 @@ const UnderworldScreen = () => {
         switch (key) {
             case 'contacts': navigation.navigate('Love'); break;
             case 'weather': navigation.navigate('Weather'); break;
-            case 'settings': Alert.alert('Settings', 'Settings screen is coming soon!'); break;
+            case 'settings': navigation.navigate('Settings' as never); break;
             case 'themes': Alert.alert('Themes', 'Coming Soon'); break;
             case 'godMode': setIsGodModeVisible(true); break;
             case 'casino': navigation.navigate('Casino'); break;
