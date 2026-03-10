@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Modal, StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React from 'react';
+import { Modal, StyleSheet, View, Platform, UIManager } from 'react-native';
 import { useGymSystem } from './useGymSystem';
 import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -33,12 +33,6 @@ const GymMasterModal = () => {
     const { isVisible, activeView, actions } = useGymSystem();
     const { closeGym } = actions;
 
-    // Animate view transitions
-    useEffect(() => {
-        if (isVisible) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        }
-    }, [activeView, isVisible]);
 
     const renderOverlay = () => {
         // Only render overlay if NOT on HUB

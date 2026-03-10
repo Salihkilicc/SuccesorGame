@@ -169,7 +169,7 @@ export const useSanctuarySystem = () => {
         }
 
         // Deduct money
-        updateStats({ money: currentStats.money - doctor.cost });
+        currentStats.spendMoney(doctor.cost);
 
         // Mark as used
         setUsed('surgery');
@@ -182,28 +182,33 @@ export const useSanctuarySystem = () => {
             // Calculate Looks Increase based on doctor tier
             let looksIncrease = 0;
             if (doctor.looksMin !== undefined && doctor.looksMax !== undefined) {
-                looksIncrease = Math.floor(Math.random() * (doctor.looksMax - doctor.looksMin + 1)) + doctor.looksMin;
+                const looksMinFallback = Number(doctor.looksMin) || 0;
+                const looksMaxFallback = Number(doctor.looksMax) || 0;
+                looksIncrease = Math.floor(Math.random() * (looksMaxFallback - looksMinFallback + 1)) + looksMinFallback;
             }
 
-            const newCharm = Math.min(100, playerState.attributes.charm + doctor.success.charm);
-            const newLooks = Math.min(100, playerState.attributes.looks + looksIncrease);
+            const successCharm = Number(doctor.success?.charm) || 0;
+            const successHighSociety = Number(doctor.success?.highSociety) || 0;
+
+            const newCharm = Math.min(100, (Number(playerState.attributes.charm) || 0) + successCharm);
+            const newLooks = Math.min(100, (Number(playerState.attributes.looks) || 0) + looksIncrease);
 
             playerState.updateAttribute('charm', newCharm);
             playerState.updateAttribute('looks', newLooks);
 
             // High Society bonus if applicable
-            if (doctor.success.highSociety) {
-                const newHighSociety = Math.min(100, playerState.reputation.social + doctor.success.highSociety);
+            if (successHighSociety > 0) {
+                const newHighSociety = Math.min(100, (Number(playerState.reputation.social) || 0) + successHighSociety);
                 playerState.updateReputation('social', newHighSociety);
             }
 
             setResultData({
                 title: 'SURGERY SUCCESSFUL',
-                message: `Surgery Successful! \n✨ Looks +${looksIncrease} \n💖 Charm +${doctor.success.charm}`,
+                message: `Surgery Successful! \n✨ Looks +${looksIncrease} \n💖 Charm +${successCharm}`,
                 stats: [
                     { label: 'Looks', value: `+${looksIncrease}`, isPositive: true },
-                    { label: 'Charm', value: `+${doctor.success.charm}`, isPositive: true },
-                    ...(doctor.success.highSociety ? [{ label: 'High Society', value: `+${doctor.success.highSociety}`, isPositive: true }] : []),
+                    { label: 'Charm', value: `+${successCharm}`, isPositive: true },
+                    ...(successHighSociety > 0 ? [{ label: 'High Society', value: `+${successHighSociety}`, isPositive: true }] : []),
                 ],
             });
         } else {
@@ -212,9 +217,11 @@ export const useSanctuarySystem = () => {
             const looksDecrease = 10;
             const stressIncrease = 20;
 
-            const newCharm = Math.max(0, playerState.attributes.charm + doctor.failure.charm);
-            const newStress = Math.min(100, playerState.core.stress + stressIncrease);
-            const newLooks = Math.max(0, playerState.attributes.looks - looksDecrease);
+            const failureCharm = Number(doctor.failure?.charm) || 0;
+
+            const newCharm = Math.max(0, (Number(playerState.attributes.charm) || 0) + failureCharm);
+            const newStress = Math.min(100, (Number(playerState.core.stress) || 0) + stressIncrease);
+            const newLooks = Math.max(0, (Number(playerState.attributes.looks) || 0) - looksDecrease);
 
             playerState.updateAttribute('charm', newCharm);
             playerState.updateCore('stress', newStress);
@@ -226,7 +233,7 @@ export const useSanctuarySystem = () => {
                 stats: [
                     { label: 'Looks', value: `-${looksDecrease}`, isPositive: false },
                     { label: 'Stress', value: `+${stressIncrease}`, isPositive: false },
-                    ...(doctor.failure.charm !== 0 ? [{ label: 'Charm', value: `${doctor.failure.charm}`, isPositive: false }] : []),
+                    ...(failureCharm !== 0 ? [{ label: 'Charm', value: `${failureCharm}`, isPositive: false }] : []),
                 ],
             });
         }

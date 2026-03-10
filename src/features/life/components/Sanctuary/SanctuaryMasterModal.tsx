@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Modal, StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React from 'react';
+import { Modal, StyleSheet, View, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AppLaunchLoader from '../../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -65,12 +65,6 @@ const SanctuaryMasterModal = ({
         navigation.navigate('Home');
     };
 
-    // Animate view transitions
-    useEffect(() => {
-        if (isHubVisible) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        }
-    }, [activeView, isHubVisible]);
 
     const renderOverlay = () => {
         if (activeView === 'HUB') return null;

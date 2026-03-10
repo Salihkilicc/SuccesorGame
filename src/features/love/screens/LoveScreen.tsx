@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Image, Alert, StatusBar, TextInput, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserStore, useStatsStore } from '../../../core/store';
+import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { useRelationshipStore } from '../../../core/store/useRelationshipStore';
 import type { LoveStackParamList } from '../../../navigation';
 import { theme } from '../../../core/theme';
@@ -49,11 +50,52 @@ const PROPOSAL_LOCATIONS = [
   { id: 'space_station', name: 'Orbit (Space Station)', cost: 5000000, bonus: 100 }
 ];
 
+// Progress-bar style gradient: left side fills with purple proportional to love%
+// Uses rich multi-stop colors so the card never looks flat
+const getLoveGradient = (love: number): { colors: string[]; locations: number[] } => {
+  const pct = Math.max(0, Math.min(100, love)) / 100;
+
+  if (pct <= 0) {
+    // Full navy: deep blue with subtle teal shimmer
+    return { colors: ['#0F172A', '#1E3A8A', '#1E40AF', '#0F172A'], locations: [0, 0.3, 0.7, 1] };
+  }
+  if (pct >= 1) {
+    // Full purple: vivid violet with highlights
+    return { colors: ['#3B0764', '#6D28D9', '#7C3AED', '#4C1D95'], locations: [0, 0.3, 0.7, 1] };
+  }
+
+  // Mixed: purple left (love%) → soft pink transition → rich navy right
+  // We need 6 stops to look modern and smooth
+  const midPurple = pct * 0.7;          // purple peak at 70% of love band
+  const transStart = pct - 0.02;         // transition starts just before boundary
+  const transEnd = Math.min(pct + 0.12, 0.97); // soft 12% wide blend band
+  const navyStart = Math.min(pct + 0.13, 0.98);
+
+  return {
+    colors: [
+      '#4C1D95',   // deep violet start
+      '#7C3AED',   // bright purple
+      '#A855F7',   // lighter purple peak
+      '#DB2777',   // hot pink transition
+      '#1E3A8A',   // navy
+      '#0F172A',   // deep midnight end
+    ],
+    locations: [
+      0,
+      Math.max(midPurple, 0.01),
+      Math.max(transStart, 0.02),
+      Math.min(transEnd, 0.96),
+      Math.min(navyStart, 0.97),
+      1,
+    ],
+  };
+};
+
 const LoveScreen = () => {
   const navigation = useNavigation<LoveScreenProp>();
   const {
     partner, family, friends, exes,
-    hasEngagementRing, proposeMarriage, marryPartner, removeItem, breakUp,
+    proposeMarriage, marryPartner, breakUp,
     setField: setUserField
   } = useUserStore();
   const { money, spendMoney, setField: setStatsField } = useStatsStore();
@@ -80,11 +122,25 @@ const LoveScreen = () => {
   const [proposalStep, setProposalStep] = useState(0); // 0: None, 1: Picker, 2: Prenup, 3: Result
   const [proposalResult, setProposalResult] = useState<{ success: boolean; message: string } | null>(null);
   const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  // --- Ring Selection State ---
+  const [selectedRingInstanceId, setSelectedRingInstanceId] = useState<string | null>(null);
+  const [isPickingRing, setIsPickingRing] = useState(false);
   // --- Baby Naming Modal state ---
   const [isNamingChild, setIsNamingChild] = useState(false);
   const [pendingChildGender, setPendingChildGender] = useState<'Male' | 'Female'>('Male');
   const [childName, setChildName] = useState('');
   // Removed local cheatingConsequence state to use hook's state
+
+  // --- Asset Store (Inventory) ---
+  const { ownedItems, removeOwnedItem } = useAssetStore();
+  const ownedRings = ownedItems.filter(i => i.type === 'engagement_ring');
+
+  // Auto-select the first ring when rings become available
+  useEffect(() => {
+    if (ownedRings.length > 0 && selectedRingInstanceId === null) {
+      setSelectedRingInstanceId(ownedRings[0].instanceId);
+    }
+  }, [ownedRings.length]);
 
 
   const handleBack = () => {
@@ -96,6 +152,10 @@ const LoveScreen = () => {
     setSelectedItem(null);
     setSubmenu(null);
     setFeedback(null);
+    setProposalStep(0);
+    setProposalResult(null);
+    setSelectedRingInstanceId(null);
+    setIsPickingRing(false);
   };
 
   const updatePartnerLove = (amount: number) => {
@@ -479,40 +539,39 @@ const LoveScreen = () => {
     if (submenu === 'propose') {
       const location = PROPOSAL_LOCATIONS[selectedLocationIndex];
       const canAfford = money >= location.cost;
+      const selectedRing = ownedRings.find(r => r.instanceId === selectedRingInstanceId) ?? ownedRings[0] ?? null;
 
       // STEP 1: Location & Ring Check
       const onStartProposal = () => {
-        if (!canAfford) {
-          setFeedback(`Not enough money! Need $${location.cost.toLocaleString()}`);
+        if (!selectedRingInstanceId || !selectedRing) {
+          setFeedback("You need an Engagement Ring first!");
           return;
         }
-        if (!hasEngagementRing) {
-          setFeedback("You need an Engagement Ring first!");
+        if (!canAfford) {
+          setFeedback(`Not enough money! Need $${location.cost.toLocaleString()}`);
           return;
         }
 
         // Initial Love Check
         if (partner && partner.love < 30) {
-          // Immediate Rejection
+          // Immediate Rejection — ring is NOT consumed for a love-check rejection
           setProposalResult({
             success: false,
             message: `${partner.name} doesn't love you enough yet... She said no.`
           });
-          setProposalStep(3); // Go to Result directly
+          setProposalStep(3);
           return;
         }
 
-        // Deduct Cost & Remove Ring
+        // Deduct Cost
         if (!spendMoney(location.cost)) {
           setFeedback(`Not enough money! Need $${location.cost.toLocaleString()}`);
           return;
         }
 
-        // Remove ring logic
-        const ring = useUserStore.getState().inventory.find(i => i.type === 'ring');
-        if (ring) {
-          removeItem(ring.id);
-        }
+        // Remove the EXACT selected ring instance from inventory
+        removeOwnedItem(selectedRingInstanceId);
+        setSelectedRingInstanceId(null);
 
         // Proceed to Step 2 (Prenup)
         setProposalStep(2);
@@ -535,6 +594,8 @@ const LoveScreen = () => {
         setSubmenu(null);
         setProposalStep(0);
         setProposalResult(null);
+        setSelectedRingInstanceId(null);
+        setIsPickingRing(false);
         closeModal();
       };
 
@@ -554,10 +615,6 @@ const LoveScreen = () => {
             <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 16 }}>
               {proposalResult.message}
             </Text>
-
-            <Pressable style={[styles.actionButton, { backgroundColor: theme.colors.cardSoft, width: '100%' }]} onPress={closeProposal}>
-              <Text style={styles.actionButtonText}>Close</Text>
-            </Pressable>
           </View>
         );
       }
@@ -588,6 +645,45 @@ const LoveScreen = () => {
               onPress={() => onDecidePrenup(false)}>
               <Text style={[styles.actionButtonText, { color: '#000' }]}>❤️ No Prenup (Trust)</Text>
             </Pressable>
+          </View>
+        );
+      }
+
+      // RING PICKER SCREEN (inline view swap)
+      if (isPickingRing) {
+        return (
+          <View style={{ gap: 12 }}>
+            <Text style={styles.modalSubtitle}>Choose Your Ring</Text>
+            {ownedRings.map(ring => (
+              <Pressable
+                key={ring.instanceId}
+                style={[styles.actionButton, {
+                  justifyContent: 'space-between',
+                  backgroundColor: ring.instanceId === selectedRingInstanceId
+                    ? 'rgba(197,160,89,0.18)'
+                    : 'rgba(255,255,255,0.04)',
+                  borderWidth: ring.instanceId === selectedRingInstanceId ? 1 : 0,
+                  borderColor: theme.colors.accent,
+                }]}
+                onPress={() => {
+                  setSelectedRingInstanceId(ring.instanceId);
+                  setIsPickingRing(false);
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <Text style={{ fontSize: 22 }}>💍</Text>
+                  <View>
+                    <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>{ring.name}</Text>
+                    <Text style={{ color: theme.colors.textSecondary, fontSize: 12, marginTop: 2 }}>
+                      Value: ${(ring.marketValue ?? ring.price).toLocaleString()}
+                    </Text>
+                  </View>
+                </View>
+                {ring.instanceId === selectedRingInstanceId && (
+                  <Text style={{ color: theme.colors.accent, fontSize: 18, fontWeight: 'bold' }}>✓</Text>
+                )}
+              </Pressable>
+            ))}
           </View>
         );
       }
@@ -625,43 +721,54 @@ const LoveScreen = () => {
             </Pressable>
           </View>
 
-
-          {/* Ring Check */}
-          <View style={[styles.actionButton, { justifyContent: 'space-between', backgroundColor: hasEngagementRing ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ fontSize: 18 }}>💍</Text>
-              <Text style={styles.actionButtonText}>
-                {hasEngagementRing ? "Ring Ready" : "No Ring"}
-              </Text>
-            </View>
-
-            {!hasEngagementRing && (
+          {/* Ring Check — always shows Go Shopping */}
+          <View style={[styles.actionButton, {
+            justifyContent: 'space-between',
+            backgroundColor: ownedRings.length > 0 ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)',
+          }]}>
+            {ownedRings.length === 0 ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontSize: 18 }}>💍</Text>
+                <Text style={[styles.actionButtonText, { color: theme.colors.danger }]}>No Ring</Text>
+              </View>
+            ) : (
               <Pressable
-                style={styles.smallButton}
-                // @ts-ignore
-                onPress={() => { closeModal(); navigation.navigate('Assets', { screen: 'Shopping' }); }}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}
+                onPress={() => setIsPickingRing(true)}
               >
-                <Text style={styles.smallButtonText}>Go Shopping</Text>
+                <Text style={{ fontSize: 18 }}>💍</Text>
+                <View>
+                  <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
+                    {selectedRing?.name ?? 'Ring Selected'}
+                  </Text>
+                  <Text style={{ color: theme.colors.accent, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>
+                    Tap to change
+                  </Text>
+                </View>
               </Pressable>
             )}
+
+            <Pressable
+              style={styles.smallButton}
+              // @ts-ignore
+              onPress={() => { closeProposal(); navigation.navigate('Assets', { screen: 'Shopping' }); }}
+            >
+              <Text style={styles.smallButtonText}>Go Shopping</Text>
+            </Pressable>
           </View>
 
           {/* Action Button */}
           <Pressable
             style={[
               styles.actionButton,
-              { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && hasEngagementRing) ? 1 : 0.5 }
+              { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5 }
             ]}
             onPress={onStartProposal}>
             <Text style={[styles.actionButtonText, { color: '#000', fontWeight: '800', letterSpacing: 1 }]}>
               PROPOSE ❤️
             </Text>
           </Pressable>
-
-          <Pressable style={[styles.actionButton, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]} onPress={() => setSubmenu(null)}>
-            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>Back</Text>
-          </Pressable>
-        </View >
+        </View>
       );
     }
 
@@ -902,100 +1009,109 @@ const LoveScreen = () => {
 
           {/* 2. Partner Section (Hero) */}
           {partner ? (
-            <Pressable style={styles.partnerCard} onPress={() => setModalType('partner')}>
-              <View style={styles.partnerPhotoContainer}>
-                {partner.photo ? (
-                  <Image source={{ uri: partner.photo }} style={styles.partnerPhoto} />
-                ) : (
-                  <Text style={{ fontSize: 32 }}>👤</Text>
-                )}
-              </View>
-              <View style={styles.partnerInfo}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text style={styles.partnerName}>{partner.name}</Text>
-                  <View style={styles.partnerBadge}>
-                    <Text style={styles.partnerBadgeText}>{getPartnerBadge(partner.love)}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.partnerStats}>
-                  <Text style={styles.partnerStatLabel}>Love: {partner.love}%</Text>
-                  <View style={styles.partnerBarTrack}>
-                    <View style={[styles.partnerBarFill, { width: `${partner.love}%` }]} />
-                  </View>
-
-                  {/* ACTIVE PERKS DISPLAY */}
-                  <View style={{ marginTop: 12 }}>
-                    <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginBottom: 6, fontWeight: '600', letterSpacing: 0.5 }}>
-                      ACTIVE PERKS
+            <Pressable onPress={() => setModalType('partner')} style={styles.partnerCardWrapper}>
+              <LinearGradient
+                {...getLoveGradient(partner.love)}
+                start={{ x: 0, y: 0.2 }}
+                end={{ x: 1, y: 0.8 }}
+                style={styles.partnerCardGradient}
+              >
+                <View style={[styles.partnerInfo, { paddingLeft: 16 }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                    <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
+                      {partner.name}
                     </Text>
-                    <ScrollView
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      contentContainerStyle={{ gap: 8 }}
-                    >
-                      {getPartnerPerks(partner).length > 0 ? (
-                        getPartnerPerks(partner).map(perk => (
-                          <View key={perk.id} style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: `${perk.color}15`, // 15 = ~8% opacity
-                            paddingVertical: 10,
-                            paddingHorizontal: 12,
-                            borderRadius: 12,
-                            borderLeftWidth: 3,
-                            borderLeftColor: perk.color,
-                            minWidth: 160,
-                            maxWidth: 240
-                          }}>
-                            <Text style={{ fontSize: 24, marginRight: 10 }}>{perk.icon}</Text>
-                            <View style={{ flex: 1 }}>
-                              <Text style={{
-                                color: perk.color,
-                                fontSize: 13,
-                                fontWeight: 'bold',
-                                marginBottom: 2
-                              }}>
-                                {perk.title}
-                              </Text>
-                              <Text style={{
-                                color: theme.colors.textSecondary,
-                                fontSize: 11,
-                                lineHeight: 14
-                              }}>
-                                {perk.desc}
-                              </Text>
+                    <View style={[styles.partnerBadge, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.4)', flexShrink: 0 }]}>
+                      <Text style={[styles.partnerBadgeText, { color: '#FFFFFF', fontSize: 9 }]}>{getPartnerBadge(partner.love)}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.partnerStats}>
+                    <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
+                    <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
+                      <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#F472B6', shadowColor: '#F472B6', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                    </View>
+
+                    {/* ACTIVE PERKS DISPLAY */}
+                    <View style={{ marginTop: 11, width: '100%', overflow: 'hidden' }}>
+                      <Text style={{ fontSize: 11.4, color: 'rgba(255,255,255,0.7)', marginBottom: 5, fontWeight: '700', letterSpacing: 0.5 }}>
+                        ACTIVE PERKS
+                      </Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ gap: 7 }}
+                      >
+                        {getPartnerPerks(partner).length > 0 ? (
+                          getPartnerPerks(partner).map(perk => (
+                            <View key={perk.id} style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              backgroundColor: `${perk.color}15`, // 15 = ~8% opacity
+                              paddingVertical: 9,
+                              paddingHorizontal: 11,
+                              borderRadius: 12,
+                              borderLeftWidth: 3,
+                              borderLeftColor: perk.color,
+                              minWidth: 152,
+                              maxWidth: 228
+                            }}>
+                              <Text style={{ fontSize: 22.8, marginRight: 9 }}>{perk.icon}</Text>
+                              <View style={{ flex: 1 }}>
+                                <Text style={{
+                                  color: perk.color,
+                                  fontSize: 11,
+                                  fontWeight: 'bold',
+                                  marginBottom: 2
+                                }}>
+                                  {perk.title}
+                                </Text>
+                                <Text style={{
+                                  color: theme.colors.textSecondary,
+                                  fontSize: 9,
+                                  lineHeight: 11
+                                }}>
+                                  {perk.desc}
+                                </Text>
+                              </View>
                             </View>
+                          ))
+                        ) : (
+                          <View style={{
+                            padding: 12,
+                            backgroundColor: 'rgba(0,0,0,0.2)',
+                            borderRadius: 12,
+                            borderWidth: 1,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            width: '100%'
+                          }}>
+                            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontStyle: 'italic' }}>
+                              Your partner has no active perks at the moment.
+                            </Text>
                           </View>
-                        ))
-                      ) : (
-                        <View style={{
-                          padding: 12,
-                          backgroundColor: 'rgba(255,255,255,0.03)',
-                          borderRadius: 8,
-                          borderWidth: 1,
-                          borderColor: 'rgba(255,255,255,0.05)',
-                          width: '100%'
-                        }}>
-                          <Text style={{ color: theme.colors.textMuted, fontSize: 12, fontStyle: 'italic' }}>
-                            Your partner has no active perks at the moment.
-                          </Text>
-                        </View>
-                      )}
-                    </ScrollView>
+                        )}
+                      </ScrollView>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </LinearGradient>
             </Pressable>
           ) : (
-            <View style={styles.partnerCard}>
-              <View style={[styles.partnerPhotoContainer, { borderColor: theme.colors.textMuted, borderWidth: 1 }]}>
-                <Text style={styles.noPartnerIcon}>?</Text>
-              </View>
-              <View style={styles.partnerInfo}>
-                <Text style={[styles.partnerName, { color: theme.colors.textMuted }]}>No Partner</Text>
-                <Text style={{ color: theme.colors.textMuted, fontSize: 12 }}>Maybe it's time to meet someone?</Text>
-              </View>
+            <View style={styles.partnerCardWrapper}>
+              <LinearGradient
+                colors={['#0F172A', '#1E293B', '#334155']} // Muted navy for no partner
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.partnerCardGradient, { opacity: 0.8 }]}
+              >
+                <View style={[styles.partnerPhotoContainer, { borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.3)' }]}>
+                  <Text style={styles.noPartnerIcon}>?</Text>
+                </View>
+                <View style={styles.partnerInfo}>
+                  <Text style={[styles.partnerName, { color: 'rgba(255,255,255,0.7)' }]}>No Partner</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 4 }}>Maybe it's time to meet someone?</Text>
+                </View>
+              </LinearGradient>
             </View>
           )}
 
@@ -1337,55 +1453,66 @@ const styles = StyleSheet.create({
   },
 
   // Partner Hero Card
-  partnerCard: {
-    backgroundColor: '#161618',
-    borderRadius: 24,
-    padding: 24,
+  partnerCardWrapper: {
+    width: '105%',
+    marginBottom: 12,
+  },
+  partnerCardGradient: {
+    borderRadius: 26,
+    padding: 0,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.4,
-    shadowRadius: 15,
+    width: '100%',
+    shadowColor: '#BE185D',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 18,
     elevation: 10,
   },
   partnerPhotoContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: theme.colors.card,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: theme.colors.accent,
+    borderColor: 'rgba(255,255,255,0.8)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
   },
   partnerPhoto: {
     width: '100%',
     height: '100%',
-    borderRadius: 36,
+    borderRadius: 32,
   },
   noPartnerIcon: {
-    fontSize: 32,
+    fontSize: 28,
     color: theme.colors.textMuted,
   },
   partnerInfo: {
     flex: 1,
     gap: 4,
+    overflow: 'hidden',
+    paddingVertical: 16,
+    paddingRight: 16,
   },
   partnerName: {
     color: theme.colors.textPrimary,
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '800',
+    flexShrink: 1,
   },
   partnerStats: {
     gap: 2,
   },
   partnerStatLabel: {
     color: theme.colors.accent,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
   },
   partnerBarTrack: {

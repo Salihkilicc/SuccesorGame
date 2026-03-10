@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Platform, UIManager } from 'react-native';
 import { useGymSystem } from '../components/Gym/useGymSystem';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,10 +20,6 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const GymScreen = () => {
     const { activeView } = useGymSystem();
 
-    // Animate view transitions
-    useEffect(() => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }, [activeView]);
 
     const renderOverlay = () => {
         // Only render overlay if NOT on HUB

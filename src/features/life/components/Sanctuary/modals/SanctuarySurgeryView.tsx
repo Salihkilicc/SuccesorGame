@@ -40,6 +40,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
     // Get relationship buffs (medicalDiscount is not implemented yet)
     const { partnerName } = useRelationshipBuffs();
     const hasDiscount = false;
+    const playerMoney = useStatsStore(state => state.money);
 
     // Reset state on close
     useEffect(() => {
@@ -104,8 +105,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 const successPercent = Math.round(doctor.successRate * 100);
 
                                 // Money validation
-                                const { money } = useStatsStore.getState();
-                                const canAfford = money >= discountedPrice;
+                                const canAfford = playerMoney >= discountedPrice;
 
                                 // Risk/Reward labels
                                 const getRiskLabel = () => {

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -41,10 +41,6 @@ const SanctuaryScreen = () => {
         navigation.goBack();
     };
 
-    // Animate view transitions
-    useEffect(() => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }, [activeView]);
 
     const renderOverlay = () => {
         if (activeView === 'HUB') return null;
