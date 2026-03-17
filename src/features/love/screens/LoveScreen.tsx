@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
 
   // ── Satisfaction Bar ──────────────────────────────
   satisfactionContainer: {
-    width: '100%', 
+    width: '100%',
     gap: 6,
     padding: 12,
     borderRadius: 10,
