@@ -11,6 +11,7 @@ import {
     BreakdownSection
 } from '../components/AssetsUI';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 const AssetsScreen = () => {
     const navigation = useNavigation<any>();
@@ -18,10 +19,7 @@ const AssetsScreen = () => {
 
     const formatMoney = (value: number) => {
         const absolute = Math.abs(value);
-        if (absolute >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-        if (absolute >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-        if (absolute >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
-        return `$${value.toLocaleString()}`;
+        return formatMoneyExact(value);
     };
 
     const backButton = (

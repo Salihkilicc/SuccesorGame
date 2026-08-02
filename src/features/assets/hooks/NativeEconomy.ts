@@ -34,16 +34,9 @@ interface EconomyBridgeType {
 
 export const NativeEconomy = EconomyBridge as EconomyBridgeType;
 
-// ✅ BU FONKSİYONU MERKEZİLEŞTİRDİK
-export const formatCurrency = (value: number | undefined | null): string => {
-    const val = value || 0;
-    if (val >= 1_000_000_000) {
-        return `$${(val / 1_000_000_000).toFixed(1)}B`;
-    } else if (val >= 1_000_000) {
-        return `$${(val / 1_000_000).toFixed(1)}M`;
-    } else if (val >= 1_000) {
-        return `$${(val / 1_000).toFixed(1)}K`;
-    } else {
-        return `$${val.toFixed(0)}`;
-    }
-};
+/**
+ * Geriye donuk uyumluluk icin duruyor.
+ * Gercek uygulama artik core/utils icinde — negatif degerleri ve T esigini
+ * de dogru islediginden tek kaynak orasi olmali.
+ */
+export { formatMoney as formatCurrency } from '../../../core/utils';

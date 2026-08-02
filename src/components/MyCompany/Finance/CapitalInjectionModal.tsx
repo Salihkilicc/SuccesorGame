@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { formatMoney } from '../../../core/utils';
 
 interface Props { visible: boolean; onClose: () => void; }
 
@@ -27,7 +28,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
 
                     <View style={styles.balanceCard}>
                         <Text style={styles.label}>AVAILABLE CASH</Text>
-                        <Text style={styles.balance}>${money.toLocaleString()}</Text>
+                        <Text style={styles.balance}>{formatMoney(money)}</Text>
                     </View>
 
                     <Text style={styles.sectionTitle}>Select Amount</Text>
@@ -42,7 +43,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
 
                     <View style={styles.preview}>
                         <Text style={styles.label}>Injecting:</Text>
-                        <Text style={styles.previewAmount}>${amount.toLocaleString()}</Text>
+                        <Text style={styles.previewAmount}>{formatMoney(amount)}</Text>
                     </View>
 
                     <View style={styles.actions}>

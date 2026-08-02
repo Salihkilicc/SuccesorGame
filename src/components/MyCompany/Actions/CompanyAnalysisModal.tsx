@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -12,10 +13,7 @@ type Props = {
 
 const formatMoney = (value: number) => {
     const absValue = Math.abs(value);
-    if (absValue >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
-    if (absValue >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-    if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-    return `$${value.toLocaleString()}`;
+    return formatMoneyExact(value);
 };
 
 const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) => {

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { formatMoney } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -26,7 +27,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
         onClose();
         Alert.alert(
             'IPO Successful!',
-            `Your company is now publicly traded. Valuation increased by $${(valuationIncrease / 1_000_000).toFixed(1)}M and you received $${(cashInjection / 1_000_000).toFixed(1)}M in capital.`
+            `Your company is now publicly traded. Valuation increased by ${formatMoney(valuationIncrease)} and you received ${formatMoney(cashInjection)} in capital.`
         );
     };
 
@@ -50,13 +51,13 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                         <View style={styles.projectionRow}>
                             <Text style={styles.projectionLabel}>Valuation Increase</Text>
                             <Text style={styles.projectionValue}>
-                                +${(valuationIncrease / 1_000_000).toFixed(1)}M (+40%)
+                                +{formatMoney(valuationIncrease)} (+40%)
                             </Text>
                         </View>
                         <View style={styles.projectionRow}>
                             <Text style={styles.projectionLabel}>Cash Injection</Text>
                             <Text style={styles.projectionValue}>
-                                +${(cashInjection / 1_000_000).toFixed(1)}M
+                                +{formatMoney(cashInjection)}
                             </Text>
                         </View>
                     </View>

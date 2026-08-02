@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../../features/finance/stores/useEquityStore';
+import { formatNumber, formatMoney } from '../../../../core/utils';
 
 /**
  * Hook: useBuybackLogic
@@ -35,13 +36,13 @@ export const useBuybackLogic = (onClose: () => void) => {
             return;
         }
         if (!isAffordable) {
-            Alert.alert('Insufficient Capital', `Company needs $${(cost / 1_000_000).toFixed(1)}M to buy back shares.`);
+            Alert.alert('Insufficient Capital', `Company needs ${formatMoney(cost)} to buy back shares.`);
             return;
         }
 
         Alert.alert(
             'Confirm Buyback',
-            `Spend $${(cost / 1_000_000).toFixed(1)}M to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\n` +
+            `Spend ${formatMoney(cost)} to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\n` +
             `📈 Market Boost: Stock price will increase by 5%\n\n` +
             `This will increase your ownership to ${newOwnership.toFixed(1)}%.`,
             [
@@ -70,7 +71,7 @@ export const useBuybackLogic = (onClose: () => void) => {
                         onClose();
                         Alert.alert(
                             'Buyback Complete',
-                            `${result.sharesBurned.toLocaleString()} shares retired.\n` +
+                            `${formatNumber(result.sharesBurned)} shares retired.\n` +
                             `Your ownership increased to ${result.newOwnershipPercent.toFixed(1)}%.`
                         );
                     },

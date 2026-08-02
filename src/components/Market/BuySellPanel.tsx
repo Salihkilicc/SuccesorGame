@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { useStatsStore, useMarketStore } from '../../core/store';
 import { theme } from '../../core/theme';
+import { formatMoney } from '../../core/utils';
 
 type BuySellPanelProps = {
   symbol: string;
@@ -85,7 +86,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
         </Pressable>
       </View>
       <Text style={styles.helper}>
-        Est. cost: ${(qty * price).toLocaleString()} • Balance: ${money.toLocaleString()}
+        Est. cost: {formatMoney(qty * price)} • Balance: {formatMoney(money)}
       </Text>
       <View style={styles.actions}>
         <Pressable

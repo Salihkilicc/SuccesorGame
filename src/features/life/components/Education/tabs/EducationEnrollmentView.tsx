@@ -24,6 +24,7 @@ import {
 } from '../data/educationData';
 import { theme } from '../../../../../core/theme';
 import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../../../core/utils';
 
 // ========================================
 // TYPES & CONSTANTS
@@ -92,23 +93,23 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
         if (selectedTab === 'Certificate') {
             const cert = CERTIFICATE_DATA[id as CertificateType];
             label = cert.label;
-            costDisplay = `$${cert.cost.toLocaleString()}`;
+            costDisplay = formatMoney(cert.cost);
             durationDisplay = cert.duration;
         } else if (selectedTab === 'Master') {
             const masters = MASTERS_DATA[id as MastersType];
             label = masters.label;
-            costDisplay = `$${masters.cost.toLocaleString()}`;
+            costDisplay = formatMoney(masters.cost);
             durationDisplay = masters.duration;
         } else if (selectedTab === 'PhD') {
             const phd = PHD_DATA[id as PhDType];
             label = phd.label;
-            costDisplay = `$${phd.cost.toLocaleString()}`;
+            costDisplay = formatMoney(phd.cost);
             durationDisplay = `${phd.duration / 4} Years`;
         } else {
             const major = MAJOR_DATA[id as MajorType];
             const program = PROGRAM_DETAILS[selectedTab as DegreeType];
             label = `${major.label} (${TAB_LABELS[selectedTab]})`;
-            costDisplay = program.cost === 0 ? 'Free' : `$${program.cost.toLocaleString()}`;
+            costDisplay = program.cost === 0 ? 'Free' : formatMoney(program.cost);
             durationDisplay = program.duration;
         }
 
@@ -157,7 +158,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                                 </View>
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Cost:</Text>
-                                    <Text style={styles.detailValue}>${cert.cost.toLocaleString()}</Text>
+                                    <Text style={styles.detailValue}>{formatMoney(cert.cost)}</Text>
                                 </View>
                             </View>
 
@@ -215,7 +216,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                                 </View>
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Cost:</Text>
-                                    <Text style={styles.detailValue}>${masters.cost.toLocaleString()}</Text>
+                                    <Text style={styles.detailValue}>{formatMoney(masters.cost)}</Text>
                                 </View>
                             </View>
 
@@ -288,7 +289,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                                 </View>
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Cost:</Text>
-                                    <Text style={styles.detailValue}>${phd.cost.toLocaleString()}</Text>
+                                    <Text style={styles.detailValue}>{formatMoney(phd.cost)}</Text>
                                 </View>
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailLabel}>Boosts:</Text>
@@ -317,7 +318,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
         } else {
             const majors = Object.keys(MAJOR_DATA) as MajorType[];
             const programDetails = PROGRAM_DETAILS[selectedTab];
-            const cost = programDetails.cost === 0 ? 'Free' : `$${programDetails.cost.toLocaleString()}`;
+            const cost = programDetails.cost === 0 ? 'Free' : formatMoney(programDetails.cost);
 
             return majors
                 .filter((majorId) => isVisible(majorId, 'Undergraduate'))

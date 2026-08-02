@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useBuybackLogic } from './logic/useBuybackLogic';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatPrice } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -127,7 +128,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.amountCard}>
                             <Text style={styles.amountLabel}>Amount to Spend</Text>
                             <Text style={styles.amountValue}>
-                                ${(cost / 1_000_000).toFixed(2)}M
+                                {formatMoney(cost)}
                             </Text>
                         </View>
 
@@ -136,7 +137,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
                                 <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
-                                    ${currentStockPrice.toFixed(2)} → ${estimatedNewStockPrice.toFixed(2)}
+                                    {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
@@ -146,7 +147,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                         +{(predictedImpact * 100).toFixed(1)}%
                                     </Text>
                                     <Text style={styles.impactSubValue}>
-                                        Target: ${predictedPrice.toFixed(2)}
+                                        Target: {formatPrice(predictedPrice)}
                                     </Text>
                                 </View>
                             </View>
@@ -166,7 +167,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                     styles.costValue,
                                     { color: isAffordable ? '#30D158' : '#FF453A' }
                                 ]}>
-                                    ${(companyCapital / 1_000_000).toFixed(2)}M
+                                    {formatMoney(companyCapital)}
                                 </Text>
                             </View>
                         </View>

@@ -1,6 +1,7 @@
 import { EDUCATION_DATA } from '../features/education/data/educationData';
 import { PlayerState } from '../core/store/usePlayerStore';
 import { EducationItem } from '../features/education/educationTypes';
+import { formatMoney } from '../core/utils';
 
 /**
  * Checks if a player can enroll in a specific education program.
@@ -32,7 +33,7 @@ export const canEnroll = (
     const costToPay = program.isMonthlyCost ? program.cost * 3 : program.cost;
 
     if (money < costToPay) {
-        return { success: false, reason: `Insufficient funds. Need $${costToPay.toLocaleString()}.` };
+        return { success: false, reason: `Insufficient funds. Need ${formatMoney(costToPay)}.` };
     }
 
     // 3. Check Prerequisite Degree

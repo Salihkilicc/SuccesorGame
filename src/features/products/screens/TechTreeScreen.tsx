@@ -6,6 +6,7 @@ import { theme } from '../../../core/theme';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
+import { formatNumber } from '../../../core/utils';
 
 const TechTreeScreen = () => {
     const navigation = useNavigation();
@@ -24,8 +25,8 @@ const TechTreeScreen = () => {
     };
 
     const formatRPShort = (value: number) => {
-        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M RP`;
-        if (value >= 1000) return `${(value / 1000).toFixed(1)}K RP`;
+        return `${formatNumber(value)} RP`;
+        // eslint-disable-next-line no-unreachable
         return `${value} RP`;
     };
 

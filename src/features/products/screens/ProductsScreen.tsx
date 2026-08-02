@@ -5,6 +5,8 @@ import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
+import { formatMoney } from '../../../core/utils';
 
 const ProductsScreen = () => {
   const navigation = useNavigation<any>();
@@ -41,7 +43,10 @@ const ProductsScreen = () => {
               </View>
               <Text style={styles.activeName}>{prod.name}</Text>
               <Text style={styles.activeProfit}>Prod: {prod.productionLevel}%</Text>
-              <Text style={styles.activePrice}>${prod.sellingPrice}</Text>
+              {/* Kategorisindeki pazar payi — son ceyregin gercek satisindan.
+                  Bkz. core/market/useMarketPosition.ts */}
+              <MarketPositionPanel category={prod.category} compact />
+              <Text style={styles.activePrice}>{formatMoney(prod.sellingPrice)}</Text>
             </Pressable>
           ))}
           {/* Discover New Tech Card */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatPrice } from '../../core/utils';
 
 type StockItemSkeletonProps = {
   symbol: string;
@@ -44,7 +45,7 @@ const StockItemSkeleton = ({
         ) : null}
       </View>
       <View style={styles.row}>
-        <Text style={styles.price}>${price.toLocaleString()}</Text>
+        <Text style={styles.price}>{formatPrice(price)}</Text>
         <Text style={[styles.change, changeColor]}>{formattedChange}</Text>
       </View>
       {meta ? <Text style={styles.meta}>{meta}</Text> : null}

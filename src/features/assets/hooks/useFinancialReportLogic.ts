@@ -1,4 +1,6 @@
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { getTier } from '../../../core/market/capacity';
+import { quarterlyWage } from '../../../core/market/workforce';
 import { useProductStore } from '../../../core/store/useProductStore';
 
 
@@ -31,8 +33,12 @@ export const useFinancialReportLogic = () => {
 
 
     // 1. Calculate Expenses
-    const salaryExpense = stats.employeeCount * 5000;
-    const factoryOverhead = stats.factoryCount * 30000000;
+    // NOT: burasi bir ONIZLEME ekrani; gercek rakamlar motorun urettigi
+    // lastQuarterReport'tadir. Yine de ayni sabitleri kullanir ki iki
+    // ekran birbiriyle celismesin. Eskiden fabrika basina 30.000.000
+    // yaziyordu ve hicbir yerle uyusmuyordu.
+    const salaryExpense = stats.employeeCount * quarterlyWage(stats.facilityTier, stats.salaryRatio);
+    const factoryOverhead = getTier(stats.facilityTier).opexPerQuarter;
 
     // 2. Process Products (Marketing, Production Costs, Table Data)
     const activeProducts = products.filter(p => p.status === 'active');
@@ -63,10 +69,11 @@ export const useFinancialReportLogic = () => {
 
         // Costs
         const unitCost = product.unitCost ?? product.baseProductionCost;
-        const marketingSpend = product.marketingSpendPerUnit || 0;
+        // Pazarlama artik ceyreklik butce, satisla carpilmaz.
+        const marketingSpend = (product.marketingBudget || 0) * quarters;
 
         const prodCost = productionVolume * unitCost;
-        const marketingCost = salesVolume * marketingSpend;
+        const marketingCost = marketingSpend;
 
         totalProductionCost += prodCost;
         totalMarketingCost += marketingCost;

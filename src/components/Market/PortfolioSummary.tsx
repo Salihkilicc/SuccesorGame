@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatMoney as formatMoneyExact } from '../../core/utils';
 
 type Props = {
   totalInvested: number;
@@ -43,16 +44,10 @@ const PortfolioSummary = ({ totalInvested, returnPct, holdingsCount, onOpen }: P
 
 export default PortfolioSummary;
 
-const formatMoney = (value: number) => {
-  if (!value) return '$0';
-  if (Math.abs(value) >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  }
-  if (Math.abs(value) >= 1_000) {
-    return `$${(value / 1_000).toFixed(1)}K`;
-  }
-  return `$${value.toLocaleString()}`;
-};
+// Paylasilan bicimlendiriciye devrediyor (core/utils).
+// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+// ayni deger farkli ekranlarda farkli gorunuyordu.
+const formatMoney = (value: number) => formatMoneyExact(value);
 
 const styles = StyleSheet.create({
   card: {

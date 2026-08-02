@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';
 import GameButton from '../../../common/GameButton';
 import SectionCard from '../../../common/SectionCard';
+import { formatNumber } from '../../../../core/utils';
 
 interface Props {
     allocated: number;
@@ -18,7 +19,7 @@ const ProductProductionSection = ({ allocated, onAllocChange }: Props) => {
                 <View style={{ flex: 1 }}>
                     <SectionCard
                         title="Allocated Units"
-                        rightText={allocated.toLocaleString()}
+                        rightText={formatNumber(allocated)}
                     />
                 </View>
 

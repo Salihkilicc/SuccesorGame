@@ -3,6 +3,7 @@ import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';
 import { useEquityStore } from './useEquityStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { formatMoney } from '../../../core/utils';
 
 /**
  * CORPORATE FINANCE STORE
@@ -160,7 +161,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 if (leverage > MAX_LEVERAGE) {
                     return {
                         success: false,
-                        message: `Leverage limit exceeded! Max debt: $${Math.floor(valuation * MAX_LEVERAGE).toLocaleString()}`
+                        message: `Leverage limit exceeded! Max debt: ${formatMoney(Math.floor(valuation * MAX_LEVERAGE))}`
                     };
                 }
 
@@ -196,7 +197,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 return {
                     success: true,
-                    message: `Loan approved! $${amount.toLocaleString()} at ${baseRate}% APR`
+                    message: `Loan approved! ${formatMoney(amount)} at ${baseRate}% APR`
                 };
             },
 
@@ -230,7 +231,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     });
                     return {
                         success: true,
-                        message: `Paid $${actualPayment.toLocaleString()}. Remaining: $${updatedRemaining.toLocaleString()}`
+                        message: `Paid ${formatMoney(actualPayment)}. Remaining: ${formatMoney(updatedRemaining)}`
                     };
                 }
             },
@@ -441,7 +442,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 return {
                     success: true,
-                    msg: `Injected $${(amount / 1_000_000).toFixed(1)}M into company.`
+                    msg: `Injected ${formatMoney(amount)} into company.`
                 };
             },
 

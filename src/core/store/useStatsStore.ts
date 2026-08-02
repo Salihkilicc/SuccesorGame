@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProductStore } from './useProductStore';
+import { BUILD_CANCEL_REFUND, getNextTier, getTier } from '../market/capacity';
+import { clampSalaryRatio, quarterlyWage } from '../market/workforce';
+import { useLaboratoryStore } from './useLaboratoryStore';
+import {
+  companyValuation,
+  ownershipPercent,
+  priceChangePercent,
+  sharePrice as equitySharePrice,
+} from '../market/equity';
 
 export type StatKey =
   | 'money'
@@ -17,6 +26,7 @@ export type StatKey =
   | 'companyValue'
   | 'companySharePrice'
   | 'companyDailyChange'
+  | 'previousSharePrice'
   | 'companyRevenueMonthly'
   | 'companyExpensesMonthly'
   | 'companyCapital'
@@ -27,6 +37,12 @@ export type StatKey =
   | 'productionCapacity'
   | 'productionLevel'
   | 'researchPoints'
+  | 'brandValue'
+  | 'facilityTier'
+  | 'targetHeadcount'
+  | 'incomingHires'
+  | 'avgTenureQuarters'
+  | 'salaryRatio'
   | 'stockSplitCount';
 
 export interface Shareholder {
@@ -59,10 +75,32 @@ export interface SubsidiaryState {
 
 export type Acquisitions = string[];
 
+/**
+ * Devam eden tesis insaati. Yoksa null.
+ * Bkz. core/market/capacity.ts — insaat sirasinda kapasite %65'e duser.
+ */
+export interface FacilityBuild {
+  /** Hedeflenen kademe numarasi */
+  targetTier: number;
+  /** Kac ceyrek kaldi */
+  quartersRemaining: number;
+  /** Odenen tutar — iptal halinde bir kismi geri doner */
+  paidCost: number;
+}
+
 export type StatsState = Record<StatKey, number> & {
   _hasHydrated: boolean;
+  facilityBuild: FacilityBuild | null;
   shareholders: Shareholder[];
-  salaryTier: 'low' | 'average' | 'above_average';
+  /**
+   * MAAS ORANI — piyasa maasina gore odedigin.
+   * 1.00 = piyasa. Altinda moral erir, ustunde birikir (tavan 85).
+   * Bkz. core/market/workforce.ts
+   *
+   * ESKI `salaryTier` alaninin yerini aldi: o alan motorla senkron
+   * degildi ve ekranda yanlis gider gosteriyordu.
+   */
+  salaryRatio: number;
   techLevels: TechLevels;
   acquisitions: Acquisitions;
   subsidiaryStates: Record<string, SubsidiaryState>; // Track subsidiary performance
@@ -92,7 +130,8 @@ type StatsStore = StatsState & {
   setCasinoReputation: (value: number) => void;
   setResearchPoints: (value: number) => void;
   setShareholders: (list: Shareholder[]) => void;
-  setSalaryTier: (tier: 'low' | 'average' | 'above_average') => void;
+  /** Maas oranini belirler (0.75-1.35). 1.00 = piyasa. */
+  setSalaryRatio: (ratio: number) => void;
   setTechLevel: (category: keyof TechLevels, level: number) => void;
   addAcquisition: (id: string, companyData: { name: string; marketCap: number; profit: number }) => void;
   setIsPublic: (value: boolean) => void;
@@ -103,48 +142,122 @@ type StatsStore = StatsState & {
   performBuyback: (percentage: number) => void;
   payDividend: (percentage: number) => void;
   processCompanyMonthlyTick: () => void;
+
+  /** Bir sonraki kademeye yukseltme baslatir. Parasi yetmezse false doner. */
+  startFacilityUpgrade: () => { success: boolean; message: string };
+  /** Devam eden insaati iptal eder; odenen tutarin bir kismi geri doner. */
+  cancelFacilityUpgrade: () => void;
+  /** Hedef kadroyu belirler. Ise alim/cikarma ceyrek sonunda islenir. */
+  setTargetHeadcount: (value: number) => void;
   borrowCapital: (amount: number, interestRate: number) => void;
   repayCapital: (amount: number) => void;
   reset: () => void;
 };
 
-// --- Financial Constants ---
-const SALARY_TIERS = {
-  low: 3000,
-  average: 5000,
-  above_average: 8000
+/**
+ * Kap tablosuna TEMBEL erisim.
+ *
+ * `useShareholderStore` bu dosyayi import ettigi icin ust seviye bir
+ * import dongu yaratiyor ve TypeScript store tiplerini `never` olarak
+ * cikariyordu. require ile dongu yalnizca calisma zamaninda cozulur.
+ */
+const getShareholderState = (): { totalShares: number; playerShareCount: number } => {
+  try {
+    const mod = require('../../features/shareholders/stores/useShareholderStore');
+    const st = mod.useShareholderStore.getState();
+    return { totalShares: st.totalShares, playerShareCount: st.playerShareCount };
+  } catch {
+    return { totalShares: 10_000_000, playerShareCount: 6_500_000 };
+  }
 };
-const FACTORY_COST_MONTHLY = 50_000;
+
+// --- Financial Constants ---
+
 const BASE_SHARES = 10_000_000;
+
+// ============================================================================
+//  BAŞLANGIÇ DURUMU
+// ============================================================================
+//  Tasarım kararı: küçük ama işleyen bir şirket. 1 fabrika, 20 çalışan,
+//  1 aktif ürün. Sermaye ~2M — hata affetmez ama boğmaz.
+//
+//  Uydurma geçmiş YOK: companyRevenueMonthly / companyExpensesMonthly sıfır.
+//  Eskiden 500K/400K yazıyordu, oyuncu hiç bir şey yapmadan kârlı görünüyordu.
+//
+//  Sahiplik %65: kurulda 4 üye var (Marcus %12, Elena %10, Victor %8,
+//  Sarah %5 = %35). Eskiden burada 100 yazıyordu, kurul ekranıyla çelişiyordu.
+//  Kaynak: features/shareholders/stores/useShareholderStore.ts
+// ============================================================================
+
+const START_COMPANY_CAPITAL = 2_000_000;
+const START_PLAYER_CASH = 50_000;
+const START_FACTORIES = 1;
+const START_EMPLOYEES = 20;
+/** Kurul üyelerinin toplam payı %35 → oyuncuya %65 kalıyor. */
+const START_PLAYER_OWNERSHIP = 65;
 
 export const initialStatsState: StatsState = {
   _hasHydrated: false,
-  money: 250_000, // Player Personal Cash (Lowered for challenge)
-  netWorth: 20_250_000, // Approx
-  monthlyIncome: 15_000, // Moderate CEO Salary
-  monthlyExpenses: 5_000,
+  money: START_PLAYER_CASH,
+  netWorth: START_PLAYER_CASH, // Şirket değeri recalculateFinancials'ta eklenecek
+  monthlyIncome: 8_000, // Kurucu maaşı — mütevazı
+  monthlyExpenses: 3_000,
 
   companyDebt: 0,
   companyDebtTotal: 0,
-  companyOwnership: 100,
+  companyOwnership: START_PLAYER_OWNERSHIP,
 
-  companyValue: 22_000_000, // Valuation based on new capital + assets
-  companySharePrice: 2.20, // Lower starting share price ($22M / 10M shares)
+  // Değerleme = sermaye * 1.5 (advanceMonth'un kullandığı formül)
+  companyValue: START_COMPANY_CAPITAL * 1.5,
+  companySharePrice: (START_COMPANY_CAPITAL * 1.5) / 10_000_000, // 10M hisse → $0.30
   companyDailyChange: 0,
+  /** Gecen ceyregin hisse fiyati — degisim yuzdesi buradan hesaplanir */
+  previousSharePrice: (START_COMPANY_CAPITAL * 1.5) / 10_000_000,
   casinoReputation: 0,
 
-  companyRevenueMonthly: 500_000, // Starting Revenue
-  companyExpensesMonthly: 400_000, // Starting Expenses
-  companyCapital: 20_000_000, // $20M Capital (Enough runway, but not infinite)
+  // Geçmiş yok: ilk çeyrek raporu oyuncunun kendi kararlarını göstersin.
+  companyRevenueMonthly: 0,
+  companyExpensesMonthly: 0,
+  companyCapital: START_COMPANY_CAPITAL,
 
-  factoryCount: 4, // Start with 4 Factories
-  employeeCount: 40, // Start with 40 Employees
+  factoryCount: START_FACTORIES, // ESKI ALAN — tesis kademesi devraldi, taşıma icin duruyor
+
+  // ------------------------------------------------------------------
+  //  TESIS VE KADRO
+  // ------------------------------------------------------------------
+  //  Kademe 1 = Workshop: 4.500 standart birim kapasite, 22 kisilik ekip.
+  //  20 calisanla basliyorsun, yani ekip EKSIK — ilk kararlardan biri
+  //  bu acigi kapatmak. Bkz. core/market/capacity.ts
+  // ------------------------------------------------------------------
+  facilityTier: 1,
+  facilityBuild: null,
+  targetHeadcount: START_EMPLOYEES,
+  incomingHires: 0,
+  /** Ortalama kidem (ceyrek). Deneyim primi buradan gelir. */
+  avgTenureQuarters: 0,
+
+  employeeCount: START_EMPLOYEES,
   employeeMorale: 75,
-  salaryTier: 'average', // Start with average salaries
+  salaryRatio: 1.0,
 
-  productionCapacity: 4000,
-  productionLevel: 3000,
-  researchPoints: 100, // Start with less RP to encourage R&D
+  // ESKI ALAN — gercek kapasite artik kademeden turetiliyor
+  // (core/market/capacity.ts). Sadece eski ekranlar patlamasin diye duruyor.
+  productionCapacity: 4_500,
+  productionLevel: 0, // Global alan; ürün bazlı üretim Product.productionLevel'da
+  researchPoints: 0, // Ar-Ge sıfırdan başlar
+
+  // ------------------------------------------------------------------
+  //  BRAND VALUE (0-100)
+  // ------------------------------------------------------------------
+  //  Yavas biriken itibar. Surekli pazarlama ve kaliteyle yukselir;
+  //  stok tukenmesi, fahis fiyat ve dusuk kaliteyle duser.
+  //  Pazar payi hesabinda carpan olarak kullanilacak — su an sadece
+  //  gosteriliyor. Bkz. core/market/productMarkets.ts
+  //
+  //  Bilinmeyen bir kurucunun sirketisin: 8 ile basliyorsun.
+  // ------------------------------------------------------------------
+  brandValue: 8,
+
   stockSplitCount: 0,
   isPublic: false,
 
@@ -158,7 +271,7 @@ export const initialStatsState: StatsState = {
   subsidiaryStates: {},
 
   shareholders: [
-    { id: 'player', name: 'Player', type: 'player', percentage: 100, avatar: 'P' },
+    { id: 'player', name: 'Player', type: 'player', percentage: START_PLAYER_OWNERSHIP, avatar: 'P' },
   ],
 };
 
@@ -166,8 +279,6 @@ export const initialStatsState: StatsState = {
 const recalculateFinancials = (currentState: StatsStore) => {
   const {
     employeeCount,
-    salaryTier,
-    factoryCount,
     companyDebtTotal,
     companyCapital,
     isPublic,
@@ -176,8 +287,14 @@ const recalculateFinancials = (currentState: StatsStore) => {
   } = currentState;
 
   // 1. Calculate Expenses
-  const salaryCost = employeeCount * SALARY_TIERS[salaryTier];
-  let factoryCost = factoryCount * FACTORY_COST_MONTHLY;
+  // TEK KAYNAK: gercek maas core/market/workforce.ts'ten gelir.
+  // Eskiden burada ayri bir SALARY_TIERS tablosu vardi ve
+  // `salaryTier` alani motorla hic senkron degildi — ekranda yanlis
+  // rakam gosteriyordu.
+  const salaryCost =
+    (employeeCount * quarterlyWage(currentState.facilityTier, currentState.salaryRatio)) / 3;
+  // Tesis gideri artik kademeden gelir, "fabrika sayisi"ndan degil.
+  let factoryCost = getTier(currentState.facilityTier).opexPerQuarter / 3;
 
   // ChipMaster Bonus: Reduces production costs
   if (Array.isArray(currentState.acquisitions) && currentState.acquisitions.includes('chipMaster')) {
@@ -192,25 +309,49 @@ const recalculateFinancials = (currentState: StatsStore) => {
   const activeProducts = productState.products.filter(p => p.status === 'active');
   const totalRevenue = activeProducts.reduce((sum, p) => sum + (p.revenue || 0), 0);
 
-  // 3. Calculate Valuation
-  // Multiplier Logic: Base 3x, Public 15x, +1 for each Tech Level
-  const techBonus = techLevels.hardware + techLevels.software + techLevels.future;
-  const multiplier = (isPublic ? 15 : 3) + techBonus;
+  // 3. DEGERLEME — TEK FORMUL (core/market/equity.ts)
+  //
+  //  ONCEDEN IKI TANE VARDI:
+  //    motor:      sermaye x 1.5
+  //    burasi:     aylikCiro x 12 x carpan + sermaye
+  //  Motor her ceyrek bunun uzerine yaziyordu, yani buradaki hic
+  //  gecerli olmuyordu. Artik ikisi de ayni fonksiyonu cagiriyor.
+  const valuationBreakdown = companyValuation({
+    cash: companyCapital,
+    quarterRevenue: totalRevenue * 3, // aylik -> ceyreklik
+    quarterEbit: (totalRevenue - totalExpenses) * 3,
+    debt: companyDebtTotal,
+    isPublic,
+    brandValue: currentState.brandValue ?? 0,
+  });
+  const valuation = valuationBreakdown.total;
 
-  // Annualized Revenue * Multiplier + Cash
-  const valuation = (totalRevenue * 12 * multiplier) + companyCapital;
-
-  // 4. Calculate Share Price
-  // Adjust base shares for splits
-  const currentTotalShares = BASE_SHARES * Math.pow(10, stockSplitCount);
-  const sharePrice = Math.max(0.01, valuation / currentTotalShares);
+  // 4. HISSE FIYATI — bolen TEK yerden: kap tablosundaki hisse sayisi.
+  //    Eskiden equityStore 1M'e, burasi 10M'e boluyordu; iki ekranda
+  //    on kat farkli fiyat gorunuyordu.
+  // TEMBEL ERISIM: useShareholderStore bu dosyayi da import ediyor.
+  // Ust seviye import donguye girip TypeScript'in tip cikarimini
+  // bozuyordu (`never[]`). require ile dongu calisma zamaninda cozuluyor.
+  const capTable = getShareholderState();
+  const capTableShares = capTable.totalShares || BASE_SHARES;
+  const currentTotalShares = capTableShares * Math.pow(10, stockSplitCount);
+  const price = Math.max(0.01, equitySharePrice(valuation, currentTotalShares));
 
   // Return partial state update
+  // 5. SAHIPLIK — kap tablosundan turetilir, elle tutulmaz.
+  //    Ekranda %100 gorunmesinin sebebi tam olarak buydu: uc ayri yerde
+  //    tutuluyor, hicbiri digerini guncellemiyordu.
+  const derivedOwnership = ownershipPercent(
+    capTable.playerShareCount ?? 0,
+    capTable.totalShares || BASE_SHARES,
+  );
+
   return {
+    companyOwnership: derivedOwnership,
     companyExpensesMonthly: totalExpenses,
     companyRevenueMonthly: totalRevenue,
     companyValue: valuation,
-    companySharePrice: sharePrice
+    companySharePrice: price
   };
 };
 
@@ -282,8 +423,8 @@ export const useStatsStore = create<StatsStore>()(
       setResearchPoints: value => set(state => ({ ...state, researchPoints: value })),
       setShareholders: list => set(state => ({ ...state, shareholders: list })),
 
-      setSalaryTier: tier => set(state => {
-        const nextState = { ...state, salaryTier: tier } as StatsStore;
+      setSalaryRatio: ratio => set(state => {
+        const nextState = { ...state, salaryRatio: clampSalaryRatio(ratio) } as StatsStore;
         const financials = recalculateFinancials(nextState);
         return { ...nextState, ...financials };
       }),
@@ -491,8 +632,11 @@ export const useStatsStore = create<StatsStore>()(
           if (profit > 0) moraleDelta += 1;
           else moraleDelta -= 2;
 
-          if (state.salaryTier === 'low') moraleDelta -= 2;
-          if (state.salaryTier === 'above_average') moraleDelta += 2;
+          // NOT: bu fonksiyon (processCompanyMonthlyTick) HIC CAGRILMIYOR.
+          // Moralin tek kaynagi motorun ceyrek dongusudur; oradaki hesap
+          // core/market/workforce.ts -> updateMorale icindedir.
+          if (state.salaryRatio < 0.95) moraleDelta -= 2;
+          if (state.salaryRatio > 1.10) moraleDelta += 2;
 
           const nextMorale = Math.max(0, Math.min(100, state.employeeMorale + moraleDelta));
 
@@ -560,6 +704,69 @@ export const useStatsStore = create<StatsStore>()(
           return { ...nextState, ...financials };
         }),
 
+      // ------------------------------------------------------------------
+      //  TESIS
+      // ------------------------------------------------------------------
+      startFacilityUpgrade: () => {
+        const state = get();
+        if (state.facilityBuild) {
+          return { success: false, message: 'A build is already in progress.' };
+        }
+        const next = getNextTier(state.facilityTier);
+        if (!next) {
+          return { success: false, message: 'You are already at the top tier.' };
+        }
+        if (state.companyCapital < next.upgradeCost) {
+          return { success: false, message: 'Not enough company capital.' };
+        }
+
+        // RP SARTI: para tek basina yetmez. Uretim kabiliyeti Ar-Ge'ye
+        // bagli — laboratuvara yatirim yapmadan fabrika buyutulemez.
+        const lab = useLaboratoryStore.getState();
+        if (next.upgradeRP > 0 && lab.totalRP < next.upgradeRP) {
+          return {
+            success: false,
+            message: `Needs ${next.upgradeRP.toLocaleString()} Research Points. You have ${Math.floor(lab.totalRP).toLocaleString()}.`,
+          };
+        }
+        if (next.upgradeRP > 0) lab.spendRP(next.upgradeRP);
+
+        set(current => {
+          const nextState = {
+            ...current,
+            companyCapital: current.companyCapital - next.upgradeCost,
+            facilityBuild: {
+              targetTier: next.level,
+              quartersRemaining: next.buildQuarters,
+              paidCost: next.upgradeCost,
+            },
+          } as StatsStore;
+          return { ...nextState, ...recalculateFinancials(nextState) };
+        });
+
+        return {
+          success: true,
+          message: `${next.name} started. Ready in ${next.buildQuarters} quarter(s).`,
+        };
+      },
+
+      cancelFacilityUpgrade: () =>
+        set(state => {
+          if (!state.facilityBuild) return state;
+          // Iptalin bedeli agir: odedigin paranin cogu geri gelmez.
+          // Taahhut gercek olsun diye boyle.
+          const refund = Math.floor(state.facilityBuild.paidCost * BUILD_CANCEL_REFUND);
+          const nextState = {
+            ...state,
+            companyCapital: state.companyCapital + refund,
+            facilityBuild: null,
+          } as StatsStore;
+          return { ...nextState, ...recalculateFinancials(nextState) };
+        }),
+
+      setTargetHeadcount: (value: number) =>
+        set(state => ({ ...state, targetHeadcount: Math.max(0, Math.floor(value || 0)) })),
+
       reset: () => set(() => ({ ...initialStatsState })),
     }),
     {
@@ -571,6 +778,7 @@ export const useStatsStore = create<StatsStore>()(
         monthlyIncome: state.monthlyIncome,
         monthlyExpenses: state.monthlyExpenses,
         companyValue: state.companyValue,
+        previousSharePrice: state.previousSharePrice,
         companyDebt: state.companyDebt,
         companyDebtTotal: state.companyDebtTotal,
         companyOwnership: state.companyOwnership,
@@ -580,10 +788,16 @@ export const useStatsStore = create<StatsStore>()(
         companyCapital: state.companyCapital,
         shareholders: state.shareholders,
         casinoReputation: state.casinoReputation,
+        brandValue: state.brandValue,
         factoryCount: state.factoryCount,
+        facilityTier: state.facilityTier,
+        facilityBuild: state.facilityBuild,
+        targetHeadcount: state.targetHeadcount,
+        incomingHires: state.incomingHires,
+        avgTenureQuarters: state.avgTenureQuarters,
         employeeCount: state.employeeCount,
         employeeMorale: state.employeeMorale,
-        salaryTier: state.salaryTier,
+        salaryRatio: state.salaryRatio,
         productionCapacity: state.productionCapacity,
         productionLevel: state.productionLevel,
         techLevels: state.techLevels,
@@ -592,6 +806,24 @@ export const useStatsStore = create<StatsStore>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // TASIMA: tesis kademesi eklenmeden onceki kayitlarda bu alanlar
+          // yok. `undefined` kalirsa kapasite hesabi NaN uretir ve uretim
+          // sessizce sifirlanir — bu yuzden burada dolduruluyor.
+          if (typeof state.facilityTier !== 'number' || state.facilityTier < 1) {
+            state.facilityTier = 1;
+          }
+          if (state.facilityBuild === undefined) state.facilityBuild = null;
+          if (typeof state.targetHeadcount !== 'number') {
+            state.targetHeadcount = state.employeeCount || 0;
+          }
+          if (typeof state.incomingHires !== 'number') state.incomingHires = 0;
+          if (typeof state.avgTenureQuarters !== 'number') state.avgTenureQuarters = 0;
+          // Eski kayitlarda salaryTier vardi; oranin karsiligina cevir.
+          if (typeof state.salaryRatio !== 'number') {
+            const legacy = (state as any).salaryTier;
+            state.salaryRatio = legacy === 'low' ? 0.85 : legacy === 'above_average' ? 1.2 : 1.0;
+          }
+
           state.setHasHydrated(true);
         }
       },

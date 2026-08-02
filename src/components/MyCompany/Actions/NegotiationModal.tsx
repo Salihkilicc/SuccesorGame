@@ -7,6 +7,7 @@ import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -17,8 +18,7 @@ type Props = {
 
 // Helpers
 const formatMoney = (val: number) => {
-    if (val >= 1e12) return `$${(val / 1e12).toFixed(2)}T`;
-    return `$${(val / 1e9).toFixed(2)}B`;
+    return formatMoneyExact(val);
 };
 
 const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {

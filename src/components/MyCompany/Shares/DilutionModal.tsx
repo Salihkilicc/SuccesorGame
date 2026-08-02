@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatPrice } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -133,7 +134,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>💵 Cash Raised</Text>
                                 <Text style={[styles.impactValue, { color: '#30D158' }]}>
-                                    +${(capitalRaised / 1_000_000).toFixed(2)}M
+                                    +{formatMoney(capitalRaised)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
@@ -158,7 +159,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                     </Text>
                                 </Text>
                                 <Text style={styles.stockWarningValue}>
-                                    New Price: ${predictedPrice.toFixed(2)}
+                                    New Price: {formatPrice(predictedPrice)}
                                 </Text>
                             </View>
                         </View>

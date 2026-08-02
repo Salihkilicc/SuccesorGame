@@ -1,28 +1,14 @@
 import { useUserStore } from '../../../core/store/useUserStore';
-import { useCompanyManagement, FACTORY_COST } from '../../../components/MyCompany/useCompanyManagement';
+import { useCompanyManagement } from '../../../components/MyCompany/useCompanyManagement';
 
 export const useCompanyLogic = () => {
   const subsidiaries = useUserStore(state => state.subsidiaries);
   const mgmt = useCompanyManagement();
 
-  // Legacy Management Logic (Bridged)
-  const limits = {
-    maxFactories: 100, // Static limit or based on tech
-    minEmployees: mgmt.factoryCount * 300,
-    maxEmployees: mgmt.factoryCount * 1000 // Capacity based
-  };
-
-  const costs = {
-    factory: FACTORY_COST,
-    employee: 0 // Hiring cost 0, salary is monthly expense
-  };
-
-  // Wrapper handlers to match expected signature
-  const handlePurchaseFactory = (delta: number) => {
-    // ManagementCard likely sends delta or check implementation
-    // Assuming delta based on standard usage
-    mgmt.updateFactories(delta);
-  };
+  // ESKI KAPASITE KURALLARI KALDIRILDI.
+  // `minEmployees = fabrika x 300` gibi kurallar hem baslangic durumuyla
+  // celisiyordu (1 fabrika, 20 calisan) hem de artik anlamsiz: kapasite
+  // tesis kademesinden geliyor. Bkz. core/market/capacity.ts
 
   const handleHireEmployees = (delta: number) => {
     mgmt.updateEmployees(delta);
@@ -55,9 +41,6 @@ export const useCompanyLogic = () => {
     activeBuffs: getAcquisitionBuffs(),
 
     // Restored Legacy Exports
-    limits,
-    costs,
-    handlePurchaseFactory,
     handleHireEmployees
   };
 };

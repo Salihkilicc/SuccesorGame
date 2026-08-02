@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
+import { formatMoney } from '../../../core/utils';
 
 export const StatPill = ({ label, value }: { label: string; value: string }) => (
     <View style={styles.pill}>
@@ -72,7 +73,7 @@ export const BreakdownSection = ({ title, items, isIncome }: { title: string, it
                 <View key={index} style={styles.breakdownRow}>
                     <Text style={styles.breakdownLabel}>{item.label}</Text>
                     <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : '#F0F0F0' }]}>
-                        {isIncome ? '+' : '-'}${item.amount.toLocaleString()}
+                        {isIncome ? '+' : '-'}{formatMoney(item.amount)}
                     </Text>
                 </View>
             ))}

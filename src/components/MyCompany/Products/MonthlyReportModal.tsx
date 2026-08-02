@@ -5,6 +5,7 @@ import { Product } from '../../../core/store/useProductStore';
 import GameModal from '../../common/GameModal';
 import SectionCard from '../../common/SectionCard';
 import GameButton from '../../common/GameButton';
+import { formatNumber, formatMoney } from '../../../core/utils';
 
 interface ProductReport {
     product: Product;
@@ -46,19 +47,19 @@ const MonthlyReportModal = ({
                     <View style={styles.row}>
                         <Text style={styles.label}>Total Revenue</Text>
                         <Text style={[styles.value, { color: theme.colors.success }]}>
-                            +${(totalRevenue / 1000).toFixed(1)}k
+                            +{formatMoney(totalRevenue)}
                         </Text>
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.label}>Total Expenses</Text>
                         <Text style={[styles.value, { color: theme.colors.danger }]}>
-                            -${(totalExpenses / 1000).toFixed(1)}k
+                            -{formatMoney(totalExpenses)}
                         </Text>
                     </View>
                     <View style={[styles.row, styles.totalRow]}>
                         <Text style={styles.totalLabel}>Net Profit</Text>
                         <Text style={[styles.totalValue, { color: netProfit >= 0 ? theme.colors.success : theme.colors.danger }]}>
-                            {netProfit >= 0 ? '+' : ''}${(netProfit / 1000).toFixed(1)}k
+                            {netProfit >= 0 ? '+' : ''}{formatMoney(netProfit)}
                         </Text>
                     </View>
                 </View>
@@ -70,8 +71,8 @@ const MonthlyReportModal = ({
                         <View key={report.product.id} style={{ gap: 4 }}>
                             <SectionCard
                                 title={report.product.name}
-                                subtitle={`Sold: ${report.unitsSold.toLocaleString()} units`}
-                                rightText={`$${(report.revenue / 1000).toFixed(1)}k`}
+                                subtitle={`Sold: ${formatNumber(report.unitsSold)} units`}
+                                rightText={`${formatMoney(report.revenue)}`}
                                 onPress={() => onConfigureProduct(report.product.id)}
                                 style={styles.productCard}
                             />

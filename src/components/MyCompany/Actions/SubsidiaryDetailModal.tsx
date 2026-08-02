@@ -6,6 +6,7 @@ import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/
 import { theme } from '../../../core/theme';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import SellCompanyModal from './SellCompanyModal';
+import { formatMoney } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -132,7 +133,7 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
                             <View style={styles.kpiItem}>
                                 <Text style={styles.kpiLabel}>VALUATION</Text>
                                 <Text style={styles.kpiValue}>
-                                    ${(company.valuation / 1_000_000).toFixed(1)}M
+                                    {formatMoney(company.valuation)}
                                 </Text>
                             </View>
                             <View style={styles.divider} />

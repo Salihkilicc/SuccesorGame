@@ -12,6 +12,7 @@ import BuySellPanel from '../../../components/Market/BuySellPanel';
 import SimpleLineChart from '../../../components/Market/SimpleLineChart';
 import { getFakeChartData } from '../data/chartData';
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
+import { formatPrice } from '../../../core/utils';
 
 const StockDetailScreen = () => {
     const route = useRoute<any>();
@@ -72,7 +73,7 @@ const StockDetailScreen = () => {
                         </View>
                         <View style={{ alignItems: 'flex-end' }}>
                             <Text style={styles.priceText}>
-                                ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatPrice(currentPrice)}
                             </Text>
                             <Text style={[styles.changeText, { color: changeColor }]}>
                                 {isPositive ? '+' : ''}{currentChange}%

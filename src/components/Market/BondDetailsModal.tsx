@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleBondItem } from './marketTypes';
+import { formatMoney as formatMoneyExact } from '../../core/utils';
 
 type Props = {
   visible: boolean;
@@ -68,7 +69,7 @@ const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
 
 export default BondDetailsModal;
 
-const formatMoney = (value: number) => `$${Math.max(0, value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+const formatMoney = (value: number) => formatMoneyExact(Math.max(0, value));
 
 const styles = StyleSheet.create({
   backdrop: {

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { formatPrice } from '../../core/utils';
 
 const MarketTicker = ({ items }: { items: any[] }) => {
     const flatListRef = useRef<FlatList>(null);
@@ -50,7 +51,7 @@ const MarketTicker = ({ items }: { items: any[] }) => {
             <View style={styles.itemContainer}>
                 <Text style={styles.symbol}>{item.symbol || 'N/A'}</Text>
                 <Text style={styles.price}>
-                    ${price < 1 ? price.toFixed(4) : price.toFixed(2)}
+                    {price < 1 ? `$${price.toFixed(4)}` : formatPrice(price)}
                 </Text>
                 <Text style={[styles.change, { color: isUp ? '#4ade80' : '#ef4444' }]}>
                     {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%

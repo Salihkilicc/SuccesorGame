@@ -1,4 +1,5 @@
 import { PartnerProfile } from '../core/types';
+import { formatMoney } from '../core/utils';
 
 export interface PartnerBuffResult {
     changes: {
@@ -149,7 +150,7 @@ export const applyPartnerBuffs = (partner: PartnerProfile): PartnerBuffResult =>
         if (Math.random() < 0.20) {
             const gift = Math.floor(Math.random() * (50000 - 5000 + 1)) + 5000;
             changes.money = gift;
-            notifications.push(`${partner.name} gave you a gift of $${gift.toLocaleString()}.`);
+            notifications.push(`${partner.name} gave you a gift of ${formatMoney(gift)}.`);
         }
     }
 

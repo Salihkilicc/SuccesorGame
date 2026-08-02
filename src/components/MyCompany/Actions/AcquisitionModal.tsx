@@ -18,6 +18,8 @@ import { useCorporateFinanceStore } from '../../../features/finance/stores/useCo
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
+import { findCompetitorByStockId } from '../../../core/market/productMarkets';
 
 const { width } = Dimensions.get('window');
 
@@ -27,10 +29,7 @@ interface AcquisitionModalProps {
 }
 
 const formatMoney = (value: number) => {
-  if (value >= 1_000_000_000_000) return `$${(value / 1_000_000_000_000).toFixed(1)}T`;
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  return `$${value.toLocaleString()}`;
+  return formatMoneyExact(value);
 };
 
 export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) => {
@@ -198,6 +197,30 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   <Text style={styles.infoLabel}>Current Valuation</Text>
                   <Text style={styles.infoValue}>{formatMoney(selectedTarget.currentValuation)}</Text>
                 </View>
+
+                {/* PAZAR PAYI — satin almanin asil gerekcesi.
+                    Bu sirket senin urun kategorilerinden birinde rakipse
+                    payini gosteriyoruz. Bkz. core/market/productMarkets.ts */}
+                {(() => {
+                  const found = findCompetitorByStockId(selectedTarget.id);
+                  if (!found) {
+                    return (
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Market Position</Text>
+                        <Text style={styles.infoValue}>Not a direct competitor</Text>
+                      </View>
+                    );
+                  }
+                  return (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Market Share</Text>
+                      <Text style={[styles.infoValue, { color: '#4CAF50' }]}>
+                        {found.competitor.share.toFixed(1)}% of {found.market.category}
+                      </Text>
+                    </View>
+                  );
+                })()}
+
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Synergy Buff</Text>
                   <Text style={styles.buffValue}>{selectedTarget.acquisitionBuff?.label || 'None'}</Text>

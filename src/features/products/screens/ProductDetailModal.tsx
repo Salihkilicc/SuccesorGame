@@ -3,6 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { theme } from '../../../core/theme';
 import { useProductDetail } from '../hooks/useProductDetail';
 import { useProductsLogic } from '../logic/useProductsLogic';
+import { formatMoney, formatNumber } from '../../../core/utils';
 
 interface ProductDetailModalProps {
     visible: boolean;
@@ -115,7 +116,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                         <View style={styles.statsGrid}>
                             <View style={styles.statBox}>
                                 <Text style={styles.statLabel}>Revenue</Text>
-                                <Text style={styles.statValue}>${(product.revenue || 0).toLocaleString()}</Text>
+                                <Text style={styles.statValue}>{formatMoney(product.revenue || 0)}</Text>
                             </View>
                             <View style={styles.statBox}>
                                 <Text style={styles.statLabel}>Profit Margin</Text>
@@ -149,7 +150,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                                     onPress={() => actions.handleUpgradeQuality(product)}
                                 >
                                     <Text style={styles.upgradeBtnText}>
-                                        Upgrade ({actions.calculateUpgradeCost(product, 'quality').toLocaleString()} RP)
+                                        Upgrade ({formatNumber(actions.calculateUpgradeCost(product, 'quality'))} RP)
                                     </Text>
                                 </Pressable>
                             </View>
@@ -172,7 +173,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ visible,
                                     <Text style={styles.upgradeBtnText}>
                                         {(product.unitCost || 0) <= (product.baseProductionCost * 0.4)
                                             ? 'Max Efficiency'
-                                            : `Optimize(${actions.calculateUpgradeCost(product, 'process').toLocaleString()} RP)`
+                                            : `Optimize(${formatNumber(actions.calculateUpgradeCost(product, 'process'))} RP)`
                                         }
                                     </Text>
                                 </Pressable>

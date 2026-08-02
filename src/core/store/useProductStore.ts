@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '../types';
 import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../../features/products/data/unlockableProductsData';
+import { formatMoney, formatNumber } from '../../core/utils';
 
 export interface SalesContext {
     morale: number;
@@ -54,7 +55,7 @@ export const initialProductState: ProductState = {
             // Active Config
             sellingPrice: 600,
             productionLevel: 50, // Started at 50%
-            marketingSpendPerUnit: 0,
+            marketingBudget: 0,
             inventory: 0,
             revenue: 0,
 
@@ -64,40 +65,10 @@ export const initialProductState: ProductState = {
             qualityLevel: 1,
             processLevel: 1
         },
-        {
-            id: 'pro_laptop',
-            name: 'Pro Laptop',
-            icon: '💻',
-            description: 'High margin tool for professionals.',
-            status: 'active',
-            category: 'Consumer',
-
-            // Requirements
-            rndCost: 0,
-            complexity: 90,
-            unlockCashCost: 0,
-
-            // Market Data
-            marketDemand: 60,
-            competition: 'Medium',
-            baseProductionCost: 550,
-            unitCost: 550,
-            suggestedPrice: 1200,
-
-            // Active Config
-            sellingPrice: 1200,
-            productionLevel: 0, // Stopped initially
-            marketingSpendPerUnit: 0,
-            inventory: 0,
-            revenue: 0,
-
-
-            // Levels
-            costLevel: 0,
-            priceLevel: 0,
-            qualityLevel: 1,
-            processLevel: 1
-        }
+        // Oyun TEK aktif urunle baslar: Smart Phone.
+        // Eskiden 'pro_laptop' da aktif basliyordu; o urun oyundan tamamen
+        // kaldirildi (bkz. features/products/data/unlockableProductsData.ts).
+        // Ikinci urun artik Tech Tree'den Ar-Ge ile acilir.
     ] as any[], // Cast to avoid strict type checking on partials if necessary
     unlockableProducts: UNLOCKABLE_PRODUCTS,
 };
@@ -204,7 +175,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
 
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Need ${rpCost.toLocaleString()} RP` };
+                        result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
                         return state;
                     }
 
@@ -250,7 +221,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
 
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Need ${rpCost.toLocaleString()} RP` };
+                        result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
                         return state;
                     }
 
@@ -324,7 +295,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 if (currentRP < product.unlockRPCost) {
                     return {
                         success: false,
-                        message: `Yetersiz Ar-Ge Puanı. Gereken: ${product.unlockRPCost.toLocaleString()} RP`
+                        message: `Yetersiz Ar-Ge Puanı. Gereken: ${formatNumber(product.unlockRPCost)} RP`
                     };
                 }
 
@@ -332,7 +303,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 if (currentCash < product.unlockCashCost) {
                     return {
                         success: false,
-                        message: `Yetersiz Sermaye. Gereken: $${product.unlockCashCost.toLocaleString()}`
+                        message: `Yetersiz Sermaye. Gereken: ${formatMoney(product.unlockCashCost)}`
                     };
                 }
 
@@ -362,7 +333,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         // Logic Props
                         productionLevel: 0, // Stopped
                         marketDemand: 100,
-                        marketingSpendPerUnit: 0,
+                        marketingBudget: 0,
                         inventory: 0,
 
                         // Levels
@@ -396,6 +367,13 @@ export const useProductStore = create<ProductState & ProductActions>()(
             storage: createJSONStorage(() => AsyncStorage),
             partialize: (state) => ({
                 products: state.products,
+                // HATA DUZELTMESI: bu satir yoktu.
+                // Sonuc: actigin teknolojiler diske yazilmiyordu. Uygulamayi
+                // kapatip acinca Tech Tree hepsini yeniden KILITLI gosteriyordu
+                // (urun products dizisinde kaldigi icin oynanabiliyordu ama
+                // agac yalan soyluyordu, ve ayni teknolojiye tekrar RP
+                // odenebiliyordu).
+                unlockableProducts: state.unlockableProducts,
             }),
         }
     )

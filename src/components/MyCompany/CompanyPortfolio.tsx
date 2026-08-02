@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import ShareControlHub from './Shares/ShareControlHub';
+import { formatMoney } from '../../core/utils';
 
 const CompanyPortfolio = () => {
   const { companyOwnership, companyValue, update } = useStatsStore();
@@ -24,10 +25,10 @@ const CompanyPortfolio = () => {
       '🔔 Launch IPO',
       `Going public will:\n\n` +
       `• Sell 20% of shares to public investors\n` +
-      `• Raise $${(cashRaised / 1_000_000).toFixed(1)}M in capital\n` +
+      `• Raise ${formatMoney(cashRaised)} in capital\n` +
       `• Reduce your ownership to 80%\n` +
       `• Apply 1.5x IPO hype multiplier\n\n` +
-      `Company Valuation: $${(companyValue / 1_000_000).toFixed(1)}M\n\n` +
+      `Company Valuation: ${formatMoney(companyValue)}\n\n` +
       `Are you ready to go public?`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -55,7 +56,7 @@ const CompanyPortfolio = () => {
             // Success feedback
             Alert.alert(
               '🎉 IPO Successful!',
-              `You raised $${(result.cashRaised / 1_000_000).toFixed(1)}M!\n\n` +
+              `You raised ${formatMoney(result.cashRaised)}!\n\n` +
               `The market is now open for trading.\n` +
               `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
             );

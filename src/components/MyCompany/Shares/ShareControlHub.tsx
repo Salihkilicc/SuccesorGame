@@ -12,10 +12,18 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
+import { useGameStore } from '../../../core/store/useGameStore';
+import {
+    CONTROL_NOTES,
+    EQUITY_EXPLANATIONS,
+    companyValuation,
+    controlStatus,
+} from '../../../core/market/equity';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import InfoTooltipModal from './InfoTooltipModal';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -25,6 +33,15 @@ interface Props {
     onOpenDividend: () => void;
     onOpenBuyback: () => void;
 }
+
+const BreakLine = ({ label, value, bold, negative }: { label: string; value: string; bold?: boolean; negative?: boolean }) => (
+    <View style={styles.breakRow}>
+        <Text style={[styles.breakLabel, bold && styles.breakBold]}>{label}</Text>
+        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#FF453A' }]}>
+            {value}
+        </Text>
+    </View>
+);
 
 const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
     const navigation = useNavigation<any>();
@@ -44,6 +61,23 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
     const isPublic = useEquityStore((state) => state.isPublic);
 
     const [tooltipTerm, setTooltipTerm] = useState<string | null>(null);
+
+    // Sahiplik artik TEK kap tablosundan geliyor. Eskiden bu ekran
+    // useEquityStore'un kendi 1M/1M tablosunu okuyordu ve hep %100 yaziyordu.
+    const ownership = getPlayerOwnership();
+    const control = controlStatus(ownership);
+
+    // Degerleme kirilimi — motorun kullandigi AYNI fonksiyon.
+    const stats = useStatsStore();
+    const lastReport = useGameStore(st => st.lastQuarterReport);
+    const vb = companyValuation({
+        cash: stats.companyCapital || 0,
+        quarterRevenue: lastReport?.revenue ?? 0,
+        quarterEbit: lastReport?.ebit ?? 0,
+        debt: stats.companyDebtTotal || 0,
+        isPublic: !!stats.isPublic,
+        brandValue: stats.brandValue ?? 0,
+    });
 
     // Sync stock price when valuation changes
     useEffect(() => {
@@ -100,11 +134,36 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                     </View>
 
                     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
+                        {/* Kontrol uyarisi — %50 esigi oyunun en onemli sayisi */}
+                        <View style={[
+                            styles.controlBanner,
+                            {
+                                backgroundColor:
+                                    control === 'lost' ? 'rgba(255,69,58,0.12)'
+                                        : control === 'contested' ? 'rgba(255,183,77,0.12)'
+                                            : 'rgba(48,209,88,0.10)',
+                                borderColor:
+                                    control === 'lost' ? 'rgba(255,69,58,0.35)'
+                                        : control === 'contested' ? 'rgba(255,183,77,0.35)'
+                                            : 'rgba(48,209,88,0.30)',
+                            },
+                        ]}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Text style={styles.controlPct}>{ownership.toFixed(1)}%</Text>
+                                <Text style={styles.controlLabel}>YOU OWN</Text>
+                                <View style={{ flex: 1 }} />
+                                <Text style={styles.controlShares}>
+                                    {formatNumber(playerShares)} sh
+                                </Text>
+                            </View>
+                            <Text style={styles.controlNote}>{CONTROL_NOTES[control]}</Text>
+                        </View>
+
                         {/* Stock Price Hero Card */}
                         <View style={styles.heroCard}>
                             <Text style={styles.heroLabel}>Current Stock Price</Text>
                             <View style={styles.heroRow}>
-                                <Text style={styles.heroPrice}>${stockPrice.toFixed(2)}</Text>
+                                <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
                                     styles.changeBadge,
                                     { backgroundColor: companyDailyChange >= 0 ? '#30D15820' : '#FF453A20' }
@@ -117,6 +176,33 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     </Text>
                                 </View>
                             </View>
+                            <Text style={styles.heroNote}>
+                                Since last quarter · {EQUITY_EXPLANATIONS.change}
+                            </Text>
+                        </View>
+
+                        {/* Degerleme kirilimi — fiyatin NEDEN o rakam oldugunu goster */}
+                        <View style={styles.breakdownCard}>
+                            <Text style={styles.breakdownTitle}>WHAT THE COMPANY IS WORTH</Text>
+                            <BreakLine label="Cash on hand" value={formatMoney(vb.cash)} />
+                            <BreakLine
+                                label={`Annual profit × ${vb.earningsMultiple.toFixed(1)}`}
+                                value={formatMoney(vb.earnings)}
+                            />
+                            <BreakLine
+                                label={`Annual revenue × ${vb.revenueMultiple.toFixed(2)}`}
+                                value={formatMoney(vb.revenue)}
+                            />
+                            {vb.debt > 0 && (
+                                <BreakLine label="Less: debt" value={`−${formatMoney(vb.debt)}`} negative />
+                            )}
+                            <View style={styles.breakDivider} />
+                            <BreakLine label="Valuation" value={formatMoney(vb.total)} bold />
+                            <BreakLine
+                                label={`÷ ${formatNumber(totalShares)} shares`}
+                                value={formatPrice(vb.total / Math.max(1, totalShares))}
+                            />
+                            <Text style={styles.breakdownNote}>{EQUITY_EXPLANATIONS.valuation}</Text>
                         </View>
 
                         {/* Stats Grid */}
@@ -124,12 +210,12 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>📊</Text>
                                 <Text style={styles.statLabel}>Total Shares</Text>
-                                <Text style={styles.statValue}>{(totalShares / 1_000_000).toFixed(2)}M</Text>
+                                <Text style={styles.statValue}>{formatNumber(totalShares)}</Text>
                             </View>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>💎</Text>
                                 <Text style={styles.statLabel}>Market Cap</Text>
-                                <Text style={styles.statValue}>${(marketCap / 1_000_000).toFixed(1)}M</Text>
+                                <Text style={styles.statValue}>{formatMoney(marketCap)}</Text>
                             </View>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>🌐</Text>
@@ -265,6 +351,27 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 };
 
 const styles = StyleSheet.create({
+    controlBanner: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 12 },
+    controlPct: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
+    controlLabel: { color: '#8A8A8A', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 3 },
+    controlShares: { color: '#8A8A8A', fontSize: 12, fontWeight: '700' },
+    controlNote: { color: '#B0B0B0', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+
+    heroNote: { color: '#6E6E6E', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+
+    breakdownCard: {
+        backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+        padding: 14, marginBottom: 12,
+    },
+    breakdownTitle: { color: '#8A8A8A', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
+    breakRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
+    breakLabel: { color: '#B0B0B0', fontSize: 12 },
+    breakValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
+    breakBold: { fontWeight: '800', fontSize: 13 },
+    breakDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
+    breakdownNote: { color: '#6E6E6E', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
+
     container: {
         flex: 1,
         backgroundColor: '#121212',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatPrice, formatNumber } from '../../core/utils';
 
 type Props = {
   symbol: string;
@@ -13,9 +14,8 @@ type Props = {
 };
 
 const formatCompactNumber = (num: number) => {
-  if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
-  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  return formatNumber(num);
+  // eslint-disable-next-line no-unreachable
   return num.toString();
 };
 
@@ -39,7 +39,7 @@ const StockDetailHeader = ({
           <Text style={styles.chipText}>{category}</Text>
         </View>
       </View>
-      <Text style={styles.price}>${price.toFixed(2)}</Text>
+      <Text style={styles.price}>{formatPrice(price)}</Text>
       <View style={styles.metaRow}>
         <Text style={[styles.change, changePositive ? styles.up : styles.down]}>
           {changeText}

@@ -6,6 +6,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 import { useStatsStore, usePlayerStore } from '../../core/store';
+import { FEATURES } from '../../core/featureFlags';
+import { formatMoney } from '../../core/utils';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +16,40 @@ interface CrystalNavBarProps {
     variant: 'light' | 'dark';
     hideDots?: boolean;
 }
+
+/**
+ * Swipe sekmelerinin sırası — SwipeNavigator ile birebir aynı olmalı.
+ * Pagination dot'ları bu listeden türetilir, elle sayılmaz.
+ * (bkz. RootNavigator > SwipeNavigator)
+ */
+const SWIPE_TABS: Array<{ key: string; feature?: keyof typeof FEATURES }> = [
+    { key: 'Life', feature: 'life' },
+    { key: 'Home' },
+    { key: 'Underworld', feature: 'underworld' },
+    { key: 'Company' },
+];
+
+const ACTIVE_SWIPE_TABS = SWIPE_TABS.filter(t => !t.feature || FEATURES[t.feature]);
+
+/** Alt bardaki eylem sekmeleri. Kapalı modüller hiç render edilmez. */
+const NAV_ITEMS: Array<{
+    key: string;
+    label: string;
+    icon: string;
+    target: string;
+    activeFor: string;
+    feature?: keyof typeof FEATURES;
+}> = [
+        { key: 'home', label: 'Home', icon: 'home-outline', target: 'Home', activeFor: 'Home' },
+        // target 'stats' özel: navigasyon yapmaz, stat modunu açar.
+        { key: 'stats', label: 'Stats', icon: 'chart-bar', target: 'stats', activeFor: '' },
+        // Contacts (ilişkiler) rafa kaldırıldı; yerini şirket aldı.
+        { key: 'contacts', label: 'Contacts', icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
+        { key: 'company', label: 'Company', icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
+        { key: 'profile', label: 'Profile', icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
+    ];
+
+const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]);
 
 const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots }) => {
     const navigation = useNavigation<any>();
@@ -28,6 +64,8 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         if (screen === 'Company') {
             navigation.navigate('MyCompany');
         } else if (screen === 'Contacts') {
+            // Güvenlik ağı: modül rafta ise route kayıtlı değil, navigate crash eder.
+            if (!FEATURES.love) return;
             navigation.navigate('Love');
         } else if (screen === 'Profile') {
             navigation.navigate('Profile');
@@ -63,19 +101,12 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         };
     };
 
-    // The order of tabs in SwipeNavigator is: Life, Home, Love, MyCompany.
-    // We map activeTab to an index for the pagination dots.
-    const getDotIndex = () => {
-        switch (activeTab) {
-            case 'Life': return 0;
-            case 'Home': return 1;
-            case 'Love': return 2;
-            case 'Company': return 3;
-            default: return 1; // Default to Home
-        }
-    };
-    const activeDotIndex = getDotIndex();
-    const dots = [0, 1, 2, 3];
+    // Dot sayısı ve aktif index, açık swipe sekmelerinden türetilir.
+    // Modül rafa kaldırıldığında dot'lar kendiliğinden azalır.
+    const foundIndex = ACTIVE_SWIPE_TABS.findIndex(t => t.key === activeTab);
+    const homeIndex = ACTIVE_SWIPE_TABS.findIndex(t => t.key === 'Home');
+    const activeDotIndex = foundIndex >= 0 ? foundIndex : homeIndex;
+    const dots = ACTIVE_SWIPE_TABS.map((_, i) => i);
 
     return (
         <>
@@ -122,31 +153,22 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                     <View style={[styles.bottomBar, containerStyle]}>
                         {!isStatsMode ? (
                             <>
-                                <Pressable style={styles.bottomTab} onPress={() => navigateTo('Home')}>
-                                    <MaterialCommunityIcons name="home-outline" style={getIconStyle('Home')} />
-                                    <Text style={getLabelStyle('Home')}>Home</Text>
-                                </Pressable>
-
-                                <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(true)}>
-                                    <MaterialCommunityIcons name="chart-bar" style={getIconStyle('')} />
-                                    <Text style={getLabelStyle('')}>Stats</Text>
-                                </Pressable>
-
-                                <Pressable style={styles.bottomTab} onPress={() => navigateTo('Contacts')}>
-                                    <MaterialCommunityIcons name="account-group-outline" style={getIconStyle('Love')} />
-                                    <Text style={getLabelStyle('Love')}>Contacts</Text>
-                                </Pressable>
-
-                                <Pressable style={styles.bottomTab} onPress={() => navigateTo('Profile')}>
-                                    <MaterialCommunityIcons name="dna" style={getIconStyle('DNA')} />
-                                    <Text style={getLabelStyle('DNA')}>Profile</Text>
-                                </Pressable>
+                                {ACTIVE_NAV_ITEMS.map(item => (
+                                    <Pressable
+                                        key={item.key}
+                                        style={styles.bottomTab}
+                                        onPress={() => (item.target === 'stats' ? setIsStatsMode(true) : navigateTo(item.target))}
+                                    >
+                                        <MaterialCommunityIcons name={item.icon} style={getIconStyle(item.activeFor)} />
+                                        <Text style={getLabelStyle(item.activeFor)}>{item.label}</Text>
+                                    </Pressable>
+                                ))}
                             </>
                         ) : (
                             <>
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
                                     <MaterialCommunityIcons name="cash" style={styles.statsIcon} />
-                                    <Text style={styles.statsLabel}>${userMoney.toLocaleString()}</Text>
+                                    <Text style={styles.statsLabel}>{formatMoney(userMoney)}</Text>
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>

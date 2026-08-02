@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RESEARCHER_ECONOMICS, getFacilityByTier, getNextTier } from '../../features/laboratory/data/laboratoryData';
+import { researchOutput } from '../market/workforce';
+import { formatNumber, formatMoney } from '../../core/utils';
 
 interface LaboratoryState {
     currentTier: number;
@@ -45,11 +47,11 @@ export const useLaboratoryStore = create<LaboratoryState & LaboratoryActions>()(
                 const { cash, rp } = nextTier.upgradeCost;
 
                 if (playerCash < cash) {
-                    return { success: false, message: `Insufficient cash. Need $${(cash / 1_000_000).toFixed(0)}M` };
+                    return { success: false, message: `Insufficient cash. Need ${formatMoney(cash)}` };
                 }
 
                 if (state.totalRP < rp) {
-                    return { success: false, message: `Insufficient RP. Need ${rp.toLocaleString()} RP` };
+                    return { success: false, message: `Insufficient RP. Need ${formatNumber(rp)} RP` };
                 }
 
                 // Deduct costs
@@ -76,7 +78,7 @@ export const useLaboratoryStore = create<LaboratoryState & LaboratoryActions>()(
                 const cost = count * RESEARCHER_ECONOMICS.SALARY_PER_QUARTER;
 
                 if (playerCash < cost) {
-                    return { success: false, message: `Insufficient cash. Need $${(cost / 1_000_000).toFixed(1)}M` };
+                    return { success: false, message: `Insufficient cash. Need ${formatMoney(cost)}` };
                 }
 
                 deductCash(cost);
@@ -94,7 +96,9 @@ export const useLaboratoryStore = create<LaboratoryState & LaboratoryActions>()(
             processQuarter: (deductCash) => {
                 const state = get();
                 const salaryPaid = state.researcherCount * RESEARCHER_ECONOMICS.SALARY_PER_QUARTER;
-                const rpAwarded = state.researcherCount * RESEARCHER_ECONOMICS.RP_OUTPUT_PER_QUARTER;
+                // AZALAN GETIRI: ekibi ikiye katlamak ciktiyi ikiye katlamaz.
+                // Bkz. core/market/workforce.ts -> researchOutput
+                const rpAwarded = researchOutput(state.researcherCount);
 
                 deductCash(salaryPaid);
                 set({ totalRP: state.totalRP + rpAwarded });

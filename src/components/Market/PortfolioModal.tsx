@@ -11,6 +11,7 @@ import {
 import { theme } from '../../core/theme';
 import { useMarketStore } from '../../core/store/useMarketStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
+import { formatMoney, formatPrice } from '../../core/utils';
 
 interface PortfolioModalProps {
   visible: boolean;
@@ -25,7 +26,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
   const handleBuy = (symbol: string, currentPrice: number, type: 'stock' | 'crypto' | 'bond' | 'fund') => {
     Alert.prompt(
       'Buy Stock',
-      `How many shares of ${symbol} would you like to buy at $${currentPrice.toFixed(2)}?`,
+      `How many shares of ${symbol} would you like to buy at ${formatPrice(currentPrice)}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -46,7 +47,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
   const handleSell = (symbol: string, currentPrice: number, maxQuantity: number) => {
     Alert.prompt(
       'Sell Stock',
-      `How many shares of ${symbol} would you like to sell at $${currentPrice.toFixed(2)}? (Max: ${maxQuantity})`,
+      `How many shares of ${symbol} would you like to sell at ${formatPrice(currentPrice)}? (Max: ${maxQuantity})`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -76,12 +77,12 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
           <Text style={styles.itemSymbol}>{item.symbol}</Text>
           <Text style={styles.itemQuantity}>{item.quantity.toFixed(2)} shares</Text>
           <Text style={styles.itemCostInfo}>
-            Avg: ${item.averageCost.toFixed(2)} → Now: ${item.currentPrice.toFixed(2)}
+            Avg: {formatPrice(item.averageCost)} → Now: {formatPrice(item.currentPrice)}
           </Text>
         </View>
 
         <View style={styles.itemRight}>
-          <Text style={styles.itemValue}>${item.currentValue.toLocaleString()}</Text>
+          <Text style={styles.itemValue}>{formatMoney(item.currentValue)}</Text>
           <Text style={[styles.itemPL, isProfitable ? styles.profit : styles.loss]}>
             {isProfitable ? '+' : ''}{item.profitLoss.toFixed(2)} ({item.profitLossPercent.toFixed(1)}%)
           </Text>
@@ -116,7 +117,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>My Portfolio</Text>
-              <Text style={styles.totalValue}>Total Value: ${totalValue.toLocaleString()}</Text>
+              <Text style={styles.totalValue}>Total Value: {formatMoney(totalValue)}</Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>

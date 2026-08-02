@@ -1,23 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useStatsStore } from '../../core/store';
+import { formatMoney } from '../../core/utils';
 
-const formatLargeMoney = (value: number) => {
-  const absolute = Math.abs(value);
-  if (absolute >= 1_000_000_000) {
-    const formatted = (value / 1_000_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}B`;
-  }
-  if (absolute >= 1_000_000) {
-    const formatted = (value / 1_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
-  }
-  if (absolute >= 1_000) {
-    const formatted = (value / 1_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
-  }
-  return `$${value.toLocaleString()}`;
-};
+// Paylasilan bicimlendiriciye devrediyor (core/utils).
+// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+// ayni deger farkli ekranlarda farkli gorunuyordu.
+const formatLargeMoney = (value: number) => formatMoney(value);
 
 const FinancialSummary = () => {
   const { companyDebt, companyOwnership } = useStatsStore();

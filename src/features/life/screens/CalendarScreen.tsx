@@ -249,7 +249,7 @@ const CalendarScreen = () => {
                 </ScrollView>
 
                 {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Life" variant="dark" hideDots={true} />
+                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
             </View>
 
             {/* ── Event Detail Modal ── */}

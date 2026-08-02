@@ -11,6 +11,7 @@ import { theme } from '../../../core/theme';
 import { Shareholder } from '../../../core/store/useStatsStore';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useNegotiationLogic } from '../../../features/shareholders/hooks/useNegotiationLogic';
+import { formatMoney, formatPrice } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -103,15 +104,15 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                                     placeholderTextColor={theme.colors.textMuted}
                                 />
                                 <View style={styles.marketRef}>
-                                    <Text style={styles.hint}>Market: ${companySharePrice.toFixed(0)}</Text>
+                                    <Text style={styles.hint}>Market: {formatPrice(companySharePrice)}</Text>
                                 </View>
                             </View>
                         ) : (
                             <View style={styles.npcOfferCard}>
                                 <Text style={styles.npcOfferLabel}>THEIR OFFER (Market +20%)</Text>
-                                <Text style={styles.npcOfferValue}>${npcOfferPrice.toFixed(0)} <Text style={styles.perShare}>/share</Text></Text>
+                                <Text style={styles.npcOfferValue}>{formatPrice(npcOfferPrice)} <Text style={styles.perShare}>/share</Text></Text>
                                 <Text style={styles.npcOfferContext}>
-                                    "I'm offering ${npcOfferPrice.toFixed(0)} per share for your lots. Take it or leave it."
+                                    "I'm offering {formatPrice(npcOfferPrice)} per share for your lots. Take it or leave it."
                                 </Text>
                             </View>
                         )}
@@ -119,7 +120,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                         {/* Toplam Tutar */}
                         <View style={styles.totalRow}>
                             <Text style={styles.totalLabel}>Total Amount</Text>
-                            <Text style={styles.totalAmount}>${currentTotal.toLocaleString()}</Text>
+                            <Text style={styles.totalAmount}>{formatMoney(currentTotal)}</Text>
                         </View>
 
                         {/* Butonlar */}

@@ -5,6 +5,7 @@ import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -75,7 +76,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                     <View style={styles.container}>
                         <Text style={styles.title}>Repay Debt</Text>
                         <Text style={styles.subtitle}>
-                            Total Debt: ${(totalDebt / 1_000_000).toFixed(2)}M • Cash: ${(companyCapital / 1_000_000).toFixed(2)}M
+                            Total Debt: {formatMoney(totalDebt)} • Cash: {formatMoney(companyCapital)}
                         </Text>
 
                         <ScrollView style={styles.loansScroll} showsVerticalScrollIndicator={false}>
@@ -92,7 +93,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             <View style={{ alignItems: 'flex-end' }}>
                                                 <Text style={styles.loanRemainingLabel}>Remaining</Text>
                                                 <Text style={styles.loanRemaining}>
-                                                    ${(loan.remaining / 1_000_000).toFixed(2)}M
+                                                    {formatMoney(loan.remaining)}
                                                 </Text>
                                             </View>
                                         </View>
@@ -101,13 +102,13 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>Monthly Payment</Text>
                                                 <Text style={styles.loanDetailValue}>
-                                                    ${(loan.monthlyPayment / 1_000).toFixed(0)}K
+                                                    {formatMoney(loan.monthlyPayment)}
                                                 </Text>
                                             </View>
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>Can Repay</Text>
                                                 <Text style={[styles.loanDetailValue, { color: '#90EE90' }]}>
-                                                    ${(maxRepayable / 1_000_000).toFixed(2)}M
+                                                    {formatMoney(maxRepayable)}
                                                 </Text>
                                             </View>
                                         </View>
@@ -125,7 +126,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                 >
                                                     <Text style={styles.repayButtonLabel}>Pay 50%</Text>
                                                     <Text style={styles.repayButtonValue}>
-                                                        ${(loan.remaining * 0.5 / 1_000_000).toFixed(2)}M
+                                                        {formatMoney(loan.remaining * 0.5)}
                                                     </Text>
                                                 </Pressable>
                                             )}
@@ -144,7 +145,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                         Pay Full
                                                     </Text>
                                                     <Text style={[styles.repayButtonValue, { color: '#000' }]}>
-                                                        ${(loan.remaining / 1_000_000).toFixed(2)}M
+                                                        {formatMoney(loan.remaining)}
                                                     </Text>
                                                 </Pressable>
                                             )}
@@ -160,7 +161,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                 >
                                                     <Text style={styles.repayButtonLabel}>Pay Max</Text>
                                                     <Text style={styles.repayButtonValue}>
-                                                        ${(maxRepayable / 1_000_000).toFixed(2)}M
+                                                        {formatMoney(maxRepayable)}
                                                     </Text>
                                                 </Pressable>
                                             )}

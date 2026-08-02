@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, Alert, ToastAndroid, Platform } from 'react-native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -37,9 +38,7 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     else if (successChance >= 40) chanceColor = '#FACC15'; // Yellow
 
     const formatMoney = (amount: number) => {
-        if (amount >= 1_000_000_000_000) return `$${(amount / 1_000_000_000_000).toFixed(1)}T`;
-        if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(1)}B`;
-        return `$${(amount / 1_000_000).toFixed(1)}M`;
+        return formatMoneyExact(amount);
     };
 
     const handlePriceChange = (amount: number) => {

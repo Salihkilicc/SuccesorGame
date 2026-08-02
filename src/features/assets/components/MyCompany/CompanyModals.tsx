@@ -9,7 +9,7 @@ import CorporateFinanceHubModal from '../../../../components/MyCompany/Finance/C
 import BorrowModal from '../../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../../components/MyCompany/Finance/RepayModal';
 import GameModal from '../../../../components/common/GameModal';
-import ProductsScreen from '../../../../features/products/screens/ProductsScreen'; import FactoriesModule from '../../../../components/MyCompany/Management/FactoriesModule';
+import ProductsScreen from '../../../../features/products/screens/ProductsScreen';
 import EmployeesModule from '../../../../components/MyCompany/Management/EmployeesModule';
 import ShareControlHub from '../../../../components/MyCompany/Shares/ShareControlHub';
 import BuybackModal from '../../../../components/MyCompany/Shares/BuybackModal';
@@ -88,7 +88,9 @@ export const CompanyModals = ({
           <View style={localStyles.card}>
             <Text style={localStyles.title}>HR & Management</Text>
             <View style={{ gap: 12 }}>
-              <GameButton title="🏭 Factories & Production" variant="secondary" onPress={() => { toggleModal('management', false); setTimeout(() => toggleModal('factories', true), 300); }} />
+              {/* "Factories & Production" kaldirildi: fabrika sayisi diye bir
+                  sey kalmadi. Kapasite tesis KADEMESINDEN geliyor ve kontrolu
+                  My Company ekranindaki FacilityPanel'de. */}
               <GameButton title="👥 Employees & Morale" variant="secondary" onPress={() => { toggleModal('management', false); setTimeout(() => toggleModal('employees', true), 300); }} />
               <GameButton title="Close" variant="ghost" onPress={() => toggleModal('management', false)} />
             </View>
@@ -96,7 +98,6 @@ export const CompanyModals = ({
         </View>
       )}
 
-      <FactoriesModule visible={!!modals.factories} onClose={() => toggleModal('factories', false)} />
       <EmployeesModule visible={!!modals.employees} onClose={() => toggleModal('employees', false)} />
 
       {/* --- HİSSELER & DİĞER --- */}

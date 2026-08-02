@@ -45,6 +45,7 @@ import UnderworldScreen from '../features/life/screens/UnderworldScreen';
 import StockDetailScreen from '../features/assets/screens/StockDetailScreen';
 
 import { formatScreenTitle } from '../core/utils';
+import { FEATURES } from '../core/featureFlags';
 
 // Import New Full Screens
 import GymScreen from '../features/life/screens/GymScreen';
@@ -191,21 +192,28 @@ const AssetsStackNavigator = () => (
       options={{ title: 'Quarterly Financial Report' }}
     />
 
-    <AssetsStack.Screen
-      name="Shopping"
-      component={ShoppingScreen}
-      options={{ title: formatScreenTitle('Shopping') }}
-    />
-    <AssetsStack.Screen
-      name="Belongings"
-      component={BelongingsScreen}
-      options={{ title: 'Asset Portfolio' }}
-    />
-    <AssetsStack.Screen
-      name="ShopDetail"
-      component={ShopDetailScreen}
-      options={{ title: formatScreenTitle('Shop Detail') }}
-    />
+    {/* --- RAFA KALDIRILDI: lüks tüketim --- */}
+    {FEATURES.shopping ? (
+      <AssetsStack.Screen
+        name="Shopping"
+        component={ShoppingScreen}
+        options={{ title: formatScreenTitle('Shopping') }}
+      />
+    ) : null}
+    {FEATURES.belongings ? (
+      <AssetsStack.Screen
+        name="Belongings"
+        component={BelongingsScreen}
+        options={{ title: 'Asset Portfolio' }}
+      />
+    ) : null}
+    {FEATURES.shopping ? (
+      <AssetsStack.Screen
+        name="ShopDetail"
+        component={ShopDetailScreen}
+        options={{ title: formatScreenTitle('Shop Detail') }}
+      />
+    ) : null}
   </AssetsStack.Navigator >
 );
 
@@ -289,9 +297,11 @@ const SwipeNavigator = () => (
       sceneStyle: { backgroundColor: '#000000' },
     }}
   >
-    <SwipeTab.Screen name="Life" component={LifeScreen} />
+    {/* --- RAFA KALDIRILDI: lifestyle hub'ı --- */}
+    {FEATURES.life ? <SwipeTab.Screen name="Life" component={LifeScreen} /> : null}
     <SwipeTab.Screen name="Home" component={HomeScreen} />
-    <SwipeTab.Screen name="Underworld" component={UnderworldScreen} />
+    {/* --- RAFA KALDIRILDI: underworld hub'ı --- */}
+    {FEATURES.underworld ? <SwipeTab.Screen name="Underworld" component={UnderworldScreen} /> : null}
     <SwipeTab.Screen name="MyCompany" component={MyCompanyScreen} />
   </SwipeTab.Navigator>
 );
@@ -336,24 +346,31 @@ const RootNavigator = () => {
 
           {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
           {/* <RootStack.Screen name="Achievements" component={AchievementsScreen} /> */}
-          <RootStack.Screen name="Casino" component={CasinoStackNavigator} />
+          {/* --- RAFA KALDIRILDI: kumarhane --- */}
+          {FEATURES.casino ? <RootStack.Screen name="Casino" component={CasinoStackNavigator} /> : null}
           <RootStack.Screen name="Assets" component={AssetsStackNavigator} />
-          <RootStack.Screen name="Love" component={LoveScreen} />
-          <RootStack.Screen name="DNA" component={DNAScreen} />
+          {/* --- RAFA KALDIRILDI: ilişkiler (stakeholder management olarak dönecek) --- */}
+          {FEATURES.love ? <RootStack.Screen name="Love" component={LoveScreen} /> : null}
+          {/* --- RAFA KALDIRILDI: karakter statları --- */}
+          {FEATURES.dna ? <RootStack.Screen name="DNA" component={DNAScreen} /> : null}
           <RootStack.Screen
             name="FinancialReport"
             component={FinancialReportScreen}
             options={{ title: 'Quarterly Financial Report' }}
           />
 
-          {/* New Modals translated to Screens */}
-          <RootStack.Screen name="Gym" component={GymScreen} />
-          <RootStack.Screen name="Sanctuary" component={SanctuaryScreen} />
-          <RootStack.Screen name="Travel" component={TravelScreen} />
-          <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} />
-          <RootStack.Screen name="NightOut" component={NightOutScreen} />
-          <RootStack.Screen name="Education" component={EducationScreen} />
-          <RootStack.Screen name="Weather" component={WeatherScreen} />
+          {/* --- RAFA KALDIRILDI: lifestyle ekranları --- */}
+          {FEATURES.gym ? <RootStack.Screen name="Gym" component={GymScreen} /> : null}
+          {FEATURES.sanctuary ? <RootStack.Screen name="Sanctuary" component={SanctuaryScreen} /> : null}
+          {FEATURES.travel ? <RootStack.Screen name="Travel" component={TravelScreen} /> : null}
+          {FEATURES.blackMarket ? <RootStack.Screen name="BlackMarket" component={BlackMarketScreen} /> : null}
+          {FEATURES.nightOut ? <RootStack.Screen name="NightOut" component={NightOutScreen} /> : null}
+          {FEATURES.weather ? <RootStack.Screen name="Weather" component={WeatherScreen} /> : null}
+
+          {/* --- AKTİF: MBA / executive education --- */}
+          {FEATURES.education ? <RootStack.Screen name="Education" component={EducationScreen} /> : null}
+
+          {/* --- AKTİF: OS kabuğu --- */}
           <RootStack.Screen name="Calendar" component={CalendarScreen} />
           <RootStack.Screen name="Notes" component={NotesScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />

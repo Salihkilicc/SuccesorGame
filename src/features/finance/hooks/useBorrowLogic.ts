@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { formatMoney } from '../../../core/utils';
 
 export interface BorrowLogicResult {
     // State
@@ -72,7 +73,7 @@ export const useBorrowLogic = (
 
         Alert.alert(
             "Loan Approved",
-            `$${(amount / 1_000_000).toFixed(1)}M added to company capital.`,
+            `${formatMoney(amount)} added to company capital.`,
             [
                 {
                     text: "OK",

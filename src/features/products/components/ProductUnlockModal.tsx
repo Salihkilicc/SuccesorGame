@@ -6,6 +6,7 @@ import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
+import { formatMoney, formatNumber } from '../../../core/utils';
 
 type Props = {
     product: UnlockableProduct;
@@ -19,15 +20,14 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     const { companyCapital, update: updateStats } = useStatsStore();
 
     const formatCurrency = (value: number) => {
-        if (value >= 1000000000) return `$${(value / 1000000000).toFixed(2)}B`;
-        if (value >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
-        if (value >= 1000) return `$${(value / 1000).toFixed(2)}K`;
+        return formatMoney(value);
+        // eslint-disable-next-line no-unreachable
         return `$${value}`;
     };
 
     const formatRP = (value: number) => {
-        if (value >= 1000000) return `${(value / 1000000).toFixed(2)}M RP`;
-        if (value >= 1000) return `${(value / 1000).toFixed(2)}K RP`;
+        return `${formatNumber(value)} RP`;
+        // eslint-disable-next-line no-unreachable
         return `${value} RP`;
     };
 

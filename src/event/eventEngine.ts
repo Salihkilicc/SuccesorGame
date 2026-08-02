@@ -9,6 +9,7 @@ import {
 } from './eventTemplates';
 import { buildAIEvent } from './aiEventBuilder';
 import { checkAllAchievementsAfterStateChange } from '../achievements/checker';
+import { isEnabled, type FeatureKey } from '../core/featureFlags';
 
 export type EventType = GameEvent['category'];
 
@@ -18,6 +19,22 @@ const pools: Record<EventType, GameEvent[]> = {
   market: marketEvents,
   company: companyEvents,
   casino: casinoEvents,
+};
+
+/**
+ * Hangi event kategorisi hangi modüle ait.
+ * Modül rafta ise o kategoriden event üretilmez — kapalı bir sistemin
+ * oyuncunun statlarına arkadan dokunması en sinsi bug türüdür.
+ */
+const categoryFeature: Partial<Record<EventType, FeatureKey>> = {
+  life: 'life',
+  love: 'love',
+  casino: 'casino',
+};
+
+export const isEventCategoryEnabled = (type: EventType): boolean => {
+  const feature = categoryFeature[type];
+  return feature === undefined || isEnabled(feature);
 };
 
 const clamp = (value: number, min = 0, max = 100) =>
@@ -108,6 +125,18 @@ export const applyEventEffects = (event: GameEvent) => {
 };
 
 export const triggerEvent = async (type: EventType): Promise<GameEvent> => {
+  // Rafa kaldırılmış kategoriler etkisiz bir placeholder döner, stat değiştirmez.
+  if (!isEventCategoryEnabled(type)) {
+    return {
+      id: `disabled_${type}`,
+      category: type,
+      text: '',
+      effects: {},
+      tags: ['feature-disabled'],
+      aiGenerated: false,
+    };
+  }
+
   const shouldAI = Math.random() < 0.3;
   const pool = pools[type] ?? [];
   const { hasPremium } = useUserStore.getState();

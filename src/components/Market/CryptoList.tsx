@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleCryptoAsset } from './marketTypes';
+import { formatMoney as formatMoneyExact, formatPrice } from '../../core/utils';
 
 type Props = {
   onSelect: (asset: SimpleCryptoAsset) => void;
@@ -19,7 +20,9 @@ const capSlowdown = (marketCap: number) => {
 const adjustedChange = (baseChange: number, marketCap: number) =>
   Number((baseChange * capSlowdown(marketCap)).toFixed(1));
 
-const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
+// Market cap tam dolar olarak saklaniyor (3_000_000_000_000 gibi).
+// Eskiden sonuna elle 'B' ekleniyordu -> "$3,000,000,000,000B".
+const formatCap = (marketCap: number) => formatMoneyExact(marketCap);
 
 const CRYPTOS: SimpleCryptoAsset[] = [
   { id: 'Bitron', name: 'Bitron', cost: 120, trend: 'High Trend', change: 6, risk: 'High', marketCap: 180 },
@@ -84,7 +87,7 @@ const CryptoList = ({ onSelect }: Props) => {
 
 export default CryptoList;
 
-const formatMoney = (value: number) => `$${value.toLocaleString()}`;
+const formatMoney = (value: number) => formatPrice(value);
 
 const styles = StyleSheet.create({
   card: {

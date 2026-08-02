@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleStockItem } from './marketTypes';
+import { formatMoney, formatPrice } from '../../core/utils';
 
 type Props = {
   onSelect: (stock: SimpleStockItem) => void;
@@ -81,7 +82,9 @@ const capSlowdown = (marketCap: number) => {
 const adjustedChange = (baseChange: number, marketCap: number) =>
   Number((baseChange * capSlowdown(marketCap)).toFixed(1));
 
-const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
+// Market cap tam dolar olarak saklaniyor (3_000_000_000_000 gibi).
+// Eskiden sonuna elle 'B' ekleniyordu -> "$3,000,000,000,000B".
+const formatCap = (marketCap: number) => formatMoney(marketCap);
 
 const StocksList = ({ onSelect }: Props) => {
   const [activeSector, setActiveSector] = useState(SECTORS[0]);
@@ -133,7 +136,7 @@ const StocksList = ({ onSelect }: Props) => {
                 </Text>
               </View>
               <View style={styles.priceBlock}>
-                <Text style={styles.price}>${stock.price.toFixed(2)}</Text>
+                <Text style={styles.price}>{formatPrice(stock.price)}</Text>
                 <Text style={[styles.change, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
                   {isPositive ? '+' : ''}{change}%
                 </Text>

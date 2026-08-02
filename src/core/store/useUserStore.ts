@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PartnerProfile, ExPartnerProfile, MarriageProposalResult } from '../types';
 import { useStatsStore } from './useStatsStore';
+import { formatMoney } from '../../core/utils';
 
 export interface AcquiredCompany {
   id: string;
@@ -352,7 +353,7 @@ export const useUserStore = create<UserStore>()(
           statsStore.setField('money', remainingMoney);
 
           console.log(
-            `💔 DIVORCE SETTLEMENT: Lost $${settlement.toLocaleString()} (50% of wealth). Remaining: $${remainingMoney.toLocaleString()}`
+            `💔 DIVORCE SETTLEMENT: Lost ${formatMoney(settlement)} (50% of wealth). Remaining: ${formatMoney(remainingMoney)}`
           );
         }
 

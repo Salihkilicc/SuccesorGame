@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../stores/useEquityStore';
+import { formatMoney } from '../../../core/utils';
 
 export interface DividendLogicResult {
     // State
@@ -92,7 +93,7 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
 
         Alert.alert(
             "Success",
-            `$${(result.playerPortion / 1_000_000).toFixed(2)}M Dividend Paid!`,
+            `${formatMoney(result.playerPortion)} Dividend Paid!`,
             [
                 {
                     text: "OK",

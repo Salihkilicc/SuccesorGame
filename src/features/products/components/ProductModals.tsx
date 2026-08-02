@@ -4,6 +4,21 @@ import { theme } from '../../../core/theme';
 import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
+import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { getMarket } from '../../../core/market/productMarkets';
+import {
+    computeAttraction,
+    computeShares,
+    demandUnits,
+    marketingBenchmark,
+    shareOfVoice,
+} from '../../../core/market/attraction';
+import { maxUnitsPerQuarter, resolveTargetUnits } from '../../../core/market/production';
+import { getTier, utilizationVerdict, UTILIZATION_NOTES } from '../../../core/market/capacity';
+import InfoDot from '../../../components/common/InfoDot';
+import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
+import CollapsibleSection from '../../../components/common/CollapsibleSection';
 // Removed obsolete imports
 // import { ... } from '../../../features/products/logic/productUpgrades';
 
@@ -91,9 +106,24 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const { totalRP } = useLaboratoryStore();
     const { optimizeProductionLine, upgradeProductQuality, randomizeProductName } = useProductStore();
 
-    const [production, setProduction] = useState(product.productionLevel ?? 50);
-    const [marketing, setMarketing] = useState(product.marketingBudget || 0);
-    const [marketingPerUnit, setMarketingPerUnit] = useState(product.marketingSpendPerUnit || 0);
+    const facilityTierAtMount = useStatsStore.getState().facilityTier;
+    const isRetoolingAtMount = !!useStatsStore.getState().facilityBuild;
+
+    // Uretim hedefi ADET olarak tutulur (yuzde degil).
+    // Kapasite buyudugunde bu sayi yerinde kalir — bkz. core/market/production.ts
+    const [productionUnits, setProductionUnits] = useState(() =>
+        resolveTargetUnits(product, totalCapacity || 0, facilityTierAtMount, isRetoolingAtMount),
+    );
+    // Pazarlama artik CEYREKLIK BUTCE. Eski kayitlarda birim basina tutuluyordu;
+    // tasima: eski birim tutari x mevcut uretim hedefi.
+    const [marketing, setMarketing] = useState(() => {
+        if (typeof product.marketingBudget === 'number') return product.marketingBudget;
+        const legacyPerUnit = product.marketingSpendPerUnit || 0;
+        if (legacyPerUnit > 0) {
+            return Math.round(legacyPerUnit * resolveTargetUnits(product, totalCapacity || 0, facilityTierAtMount, isRetoolingAtMount));
+        }
+        return 0;
+    });
     const displayName = product.name;
 
     const processLevel = product.processLevel || 1;
@@ -101,7 +131,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const complexity = product.complexity || 50;
 
     // Cost Calculator Check
-    const getUpgradeCost = (level: number) => Math.floor(complexity * 100 * Math.pow(1.5, level));
+    // DENGE: eskiden `complexity * 100 * 1.5^level` idi. Karmasikligi
+    // 10.000.000 olan Fusion Reactor icin seviye 1 yukseltmesi 1.5 MILYAR
+    // RP ediyordu — tum tech tree'nin toplamindan fazla.
+    // Artik karmasikligin KAREKOKUNE bagli: buyuk urun daha pahali ama
+    // ucuncu dereceden degil.
+    const getUpgradeCost = (level: number) =>
+        Math.floor(Math.sqrt(Math.max(1, complexity)) * 2_150 * Math.pow(1.55, level));
 
     const processUpgradeRP = getUpgradeCost(processLevel);
     const qualityUpgradeRP = getUpgradeCost(qualityLevel);
@@ -117,9 +153,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
     const handleSave = () => {
         onUpdate(product.id, {
-            productionLevel: production,
+            // Adet olarak kaydediyoruz; productionLevel artik yazilmiyor.
+            productionUnits: Math.min(productionUnits, maxUnits),
             marketingBudget: marketing,
-            marketingSpendPerUnit: marketingPerUnit
+            // Eski alan artik yazilmiyor; sifirlanarak tasima tamamlaniyor.
+            marketingSpendPerUnit: 0,
         });
         onClose();
     };
@@ -148,12 +186,82 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
     // Helper to format large numbers
     const formatNumber = (num: number) => {
-        return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(num);
+        return formatNumberShared(num);
     };
 
-    // Calculate Real Production Units (Dynamic Base)
-    const BASE_CAPACITY = totalCapacity || 1500000;
-    const estimatedUnits = Math.round(BASE_CAPACITY * (production / 100));
+    // ======================================================================
+    //  CANLI HESAPLAR
+    // ======================================================================
+    //  Hepsi motorun kullandigi AYNI saf fonksiyonlardan geliyor
+    //  (core/market/production.ts ve core/market/attraction.ts).
+    //  Boylece ekranda gordugun sayi ile ceyrek sonunda olan sey ayni olur.
+    //
+    //  Onceden burada `calisan * 468.75` diye ayri bir formul vardi ve
+    //  motorun urettiginin 47 KATINI gosteriyordu.
+    // ======================================================================
+
+    // totalCapacity artik CALISAN SAYISI tasiyor (bkz. useProductsLogic).
+    const employeeCount = totalCapacity || 0;
+    const brandValue = useStatsStore(state => state.brandValue);
+    // Kapasite artik tesis kademesinden gelir (core/market/capacity.ts).
+    const facilityTier = useStatsStore(state => state.facilityTier);
+    const isRetooling = useStatsStore(state => !!state.facilityBuild);
+    const tier = getTier(facilityTier);
+    const market = getMarket(product.category);
+
+    const maxUnits = maxUnitsPerQuarter(employeeCount, complexity, facilityTier, isRetooling);
+    // Kapasite kuculdiyse (eleman cikardin) hedef otomatik kirpilir.
+    const willBuild = Math.max(0, Math.min(productionUnits, maxUnits));
+    // Bar adimi: kapasitenin %5'i, en az 1
+    const unitStep = Math.max(1, Math.round(maxUnits * 0.05));
+
+    // ---- PAZARLAMA ESIKLERI ---------------------------------------------
+    // Kiyas butce: kategorinin tabani ile bu urunun gecen ceyrek cirosunun
+    // %25'inin buyugu. Buyudukce esik de buyur, ayni butce az gelmeye baslar.
+    const effectivePrice = product.sellingPrice || product.suggestedPrice || 1;
+    const benchmark = market ? marketingBenchmark(market, product.revenue || 0) : 1;
+    // Marka bakim esigi: kiyasin %35'i. Altinda marka erir, ustunde birikir.
+    const maintenancePoint = Math.round(benchmark * 0.35);
+    // Bar tavani kiyasin 3 kati: orada ses payi ~%75, otesi bosa para.
+    const marketingMax = Math.max(1, Math.round(benchmark * 3));
+    const marketingStep = Math.max(500, Math.round(marketingMax * 0.05));
+    const sov = shareOfVoice(marketing, benchmark);
+    const isOverSaturated = marketing > benchmark * 2;
+
+    // Bu ayarlarla beklenen pay ve talep
+    const attraction = market
+        ? computeAttraction(
+            {
+                sellingPrice: effectivePrice,
+                suggestedPrice: product.suggestedPrice,
+                marketingBudget: marketing,
+                benchmark,
+                qualityLevel,
+                brandValue,
+                marketDemand: product.marketDemand ?? 50,
+            },
+            market,
+        )
+        : null;
+
+    const projectedShare = market && attraction
+        ? computeShares([attraction.total], market).shares[0]
+        : 0;
+
+    const expectedDemand = market ? demandUnits(market, projectedShare) : 0;
+
+    // Elde stok da satilabilir
+    const available = willBuild + (product.inventory || 0);
+    const expectedSales = Math.min(available, expectedDemand);
+    const supplyGap = available - expectedDemand;
+    const neededUnits = Math.max(0, expectedDemand - (product.inventory || 0));
+
+    // Cubuk olcegi: uretim ve talebin buyugune gore
+    const compareMax = Math.max(1, willBuild, expectedDemand);
+
+    // Pazarlama artik sabit gider: satis adediyle carpilmaz, tumden dusulur.
+    const projectedMargin =
+        expectedSales * (effectivePrice - currentUnitCost) - marketing;
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -166,7 +274,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                             {/* RP Badge */}
                             <View style={styles.rpBadge}>
-                                <Text style={styles.rpBadgeText}>{totalRP.toLocaleString()} RP</Text>
+                                <Text style={styles.rpBadgeText}>{formatNumberShared(totalRP)} RP</Text>
                             </View>
                             <Pressable onPress={onClose}><Text style={styles.closeIcon}>✕</Text></Pressable>
                         </View>
@@ -179,10 +287,21 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             <Text style={styles.insightText}>{getTip(product)}</Text>
                         </View>
 
+                        {/* Pazar konumu — bu urunun kategorisindeki pay ve rakipler.
+                            Bkz. core/market/productMarkets.ts */}
+                        <MarketPositionPanel category={product.category} />
+
                         {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
                         {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
+                        <CollapsibleSection
+                            title="R&D UPGRADES"
+                            note="Spend Research Points to cut cost or raise quality"
+                            info="Optimizing the process lowers your unit cost. Raising quality increases the product's appeal, which directly increases your market share."
+                            infoDetail="Each level costs more than the last, so upgrades get progressively harder."
+                            summary={`${formatNumberShared(totalRP)} RP`}
+                            summaryColor="#BA68C8"
+                        >
                         <View style={styles.rdSection}>
-                            <Text style={styles.sectionTitle}>🔬 R&D Upgrades</Text>
 
                             {/* Optimize Process (Cost) */}
                             <View style={styles.upgradeCardCompact}>
@@ -234,56 +353,296 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </Pressable>
                             </View>
                         </View>
+                        </CollapsibleSection>
 
-                        {/* Production Capacity Control */}
+                        {/* ══ URETIM ══
+                            Soyut yuzde yerine GERCEK adet ve pazarin istedigi
+                            adet yan yana. Oyuncu "az mi cok mu uretiyorum"
+                            sorusunu tek bakista cevaplasin. */}
                         <View style={styles.controlGroup}>
-                            <Text style={styles.controlTitle}>Production Capacity</Text>
+                            <View style={styles.controlHeader}>
+                                <Text style={styles.controlTitle}>Production</Text>
+                                <InfoDot
+                                    title="Production"
+                                    text="Your factories can build a limited number of units each quarter. More complex products take longer, so the same team builds far fewer of them."
+                                    detail={`Max for this product: ${formatNumber(maxUnits)} units per quarter with ${formatNumber(employeeCount)} employees.`}
+                                />
+                            </View>
+
                             <View style={styles.sliderRow}>
-                                <Pressable onPress={() => setProduction(Math.max(0, production - 10))} style={styles.adjBtn}><Text style={styles.adjText}>-</Text></Pressable>
-                                <Text style={styles.controlValue}>{production}%</Text>
-                                <Pressable onPress={() => setProduction(Math.min(100, production + 10))} style={styles.adjBtn}><Text style={styles.adjText}>+</Text></Pressable>
-                            </View>
-                            <View style={styles.realStatsRow}>
-                                <Text style={styles.realStatsText}>Output: {formatNumber(estimatedUnits)} Units</Text>
-                                <Text style={styles.hint}>Market Demand: {product.marketDemand}%</Text>
-                            </View>
-                        </View>
-
-                        {/* Marketing Spend (Per Unit) - NEW */}
-                        <View style={styles.controlGroup}>
-                            <Text style={styles.controlTitle}>Marketing Spend (Per Unit)</Text>
-                            <Text style={styles.hint}>Higher spend increases sales conversion</Text>
-                            <Text style={styles.hint}>Max Limit: ${Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5)}</Text>
-                            <View style={styles.progressBarContainer}>
-                                <View style={styles.progressBarBg}>
-                                    <View style={[styles.progressBarFill, { width: `${Math.min(100, (marketingPerUnit / Math.max(1, Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5))) * 100)}%` }]} />
+                                <Pressable
+                                    onPress={() => setProductionUnits(Math.max(0, productionUnits - unitStep))}
+                                    style={styles.adjBtn}
+                                >
+                                    <Text style={styles.adjText}>−</Text>
+                                </Pressable>
+                                <View style={styles.controlValueBox}>
+                                    <Text style={styles.controlValue}>{formatNumber(willBuild)}</Text>
+                                    <Text style={styles.controlValueUnit}>units per quarter</Text>
                                 </View>
-                                <Text style={styles.progressValue}>${marketingPerUnit}</Text>
+                                <Pressable
+                                    onPress={() =>
+                                        setProductionUnits(Math.min(maxUnits, productionUnits + unitStep))
+                                    }
+                                    style={styles.adjBtn}
+                                >
+                                    <Text style={styles.adjText}>+</Text>
+                                </Pressable>
                             </View>
-                            <View style={styles.sliderRow}>
-                                <Pressable onPress={() => {
-                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
-                                    const delta = Math.floor(maxLimit * 0.05);
-                                    setMarketingPerUnit(Math.max(0, marketingPerUnit - delta));
-                                }} style={styles.adjBtn}><Text style={styles.adjText}>-5%</Text></Pressable>
-                                <Pressable onPress={() => {
-                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
-                                    const delta = Math.floor(maxLimit * 0.03);
-                                    setMarketingPerUnit(Math.max(0, marketingPerUnit - delta));
-                                }} style={styles.adjBtn}><Text style={styles.adjText}>-3%</Text></Pressable>
 
-                                <Pressable onPress={() => {
-                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
-                                    const delta = Math.floor(maxLimit * 0.03);
-                                    setMarketingPerUnit(Math.min(maxLimit, marketingPerUnit + delta));
-                                }} style={styles.adjBtn}><Text style={styles.adjText}>+3%</Text></Pressable>
-                                <Pressable onPress={() => {
-                                    const maxLimit = Math.floor((product.sellingPrice || product.suggestedPrice || 0) * 0.5);
-                                    const delta = Math.floor(maxLimit * 0.05);
-                                    setMarketingPerUnit(Math.min(maxLimit, marketingPerUnit + delta));
-                                }} style={styles.adjBtn}><Text style={styles.adjText}>+5%</Text></Pressable>
+                            {/* Bar olcegi 0 -> AZAMI KAPASITE.
+                                Fabrika/eleman alip kapasiteyi buyutunce bar tavani
+                                buyur ama hedefin yerinde kalir: dolu kisim kucuk
+                                gorunur ve tekrar artirman gerektigini gorursun. */}
+                            <View style={styles.capacityTrack}>
+                                <View
+                                    style={[
+                                        styles.capacityFill,
+                                        {
+                                            width: `${maxUnits > 0 ? Math.min(100, (willBuild / maxUnits) * 100) : 0}%`,
+                                            backgroundColor: supplyGap < 0 ? '#E57373' : '#4CAF50',
+                                        },
+                                    ]}
+                                />
+                                {/* Talep isareti — kapasite icinde nereye denk geliyor */}
+                                {expectedDemand > 0 && expectedDemand <= maxUnits && (
+                                    <View
+                                        style={[
+                                            styles.demandMarker,
+                                            { left: `${(expectedDemand / maxUnits) * 100}%` },
+                                        ]}
+                                    />
+                                )}
                             </View>
+
+                            {/* Sol her zaman 0 oldugu icin yazilmiyor; sagda tavan */}
+                            <View style={styles.scaleRow}>
+                                <Text style={styles.scaleHint}>
+                                    {expectedDemand > 0 && expectedDemand <= maxUnits
+                                        ? `▏demand ${formatNumber(expectedDemand)}`
+                                        : ' '}
+                                </Text>
+                                <Text style={styles.scaleMax}>max {formatNumber(maxUnits)}</Text>
+                            </View>
+
+                            <View style={styles.compareRow}>
+                                <View>
+                                    <Text style={styles.compareLabel}>You will build</Text>
+                                    <Text style={styles.compareValue}>{formatNumber(willBuild)}</Text>
+                                </View>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={styles.compareLabel}>Market wants</Text>
+                                    <Text style={[styles.compareValue, { color: '#7FB3FF' }]}>
+                                        {formatNumber(expectedDemand)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {/* Teshis satiri */}
+                            {supplyGap < 0 ? (
+                                <Text style={styles.warnLine}>
+                                    Under-supplying by {formatNumber(Math.abs(supplyGap))} units. Those customers
+                                    go to a rival and your brand takes a hit.
+                                </Text>
+                            ) : supplyGap > expectedDemand * 0.2 && expectedDemand > 0 ? (
+                                <Text style={styles.warnLine}>
+                                    Over-building by {formatNumber(supplyGap)} units. They become inventory and
+                                    cost $5 each per quarter to store.
+                                </Text>
+                            ) : (
+                                <Text style={styles.okLine}>Supply is close to demand.</Text>
+                            )}
+
+                            {/* Talebe esitle */}
+                            {expectedDemand > 0 && (
+                                <Pressable
+                                    style={styles.matchBtn}
+                                    onPress={() => setProductionUnits(Math.min(maxUnits, neededUnits))}
+                                >
+                                    <Text style={styles.matchBtnText}>
+                                        Match demand — build {formatNumber(Math.min(maxUnits, neededUnits))}
+                                    </Text>
+                                </Pressable>
+                            )}
+
+                            {maxUnits < expectedDemand && (
+                                <Text style={styles.capLine}>
+                                    Even at full capacity you can only build {formatNumber(maxUnits)}. Your
+                                    facility is a {tier.name} ({formatNumber(tier.capacity)} standard units,
+                                    crew of {formatNumber(tier.crew)}). Hire up to the crew, or upgrade the tier.
+                                </Text>
+                            )}
+
+                            {isRetooling && (
+                                <Text style={styles.warnLine}>
+                                    Retooling in progress — the facility is running at 65% while the upgrade
+                                    is built. Capacity comes back, and grows, when it lands.
+                                </Text>
+                            )}
+
+                            {qualityLevel > tier.qualityCeiling && (
+                                <Text style={styles.warnLine}>
+                                    This product is researched to quality {qualityLevel}, but a {tier.name}
+                                    can only build to {tier.qualityCeiling}. You are shipping the lower one.
+                                    Upgrade the facility to actually sell what you invented.
+                                </Text>
+                            )}
                         </View>
+
+                        {/* ══ PAZARLAMA ══
+                            Artik CEYREKLIK BUTCE. Barda iki isaret var:
+                            bakim esigi (markanin yerinde kaldigi nokta) ve
+                            kiyas butce (ses payinin %50 oldugu nokta). */}
+                        <View style={styles.controlGroup}>
+                            <View style={styles.controlHeader}>
+                                <Text style={styles.controlTitle}>Marketing Budget</Text>
+                                <InfoDot
+                                    title="Marketing Budget"
+                                    text="A fixed amount you spend every quarter, whether you sell anything or not. What matters is not the number itself but how it compares to what the market spends. Match the benchmark and you own about half the attention in your category."
+                                    detail={`Benchmark for this product: ${formatMoney(benchmark)} per quarter. It grows with your own revenue, so defending a large share costs more than winning a small one. Brand maintenance level: ${formatMoney(maintenancePoint)} — spend below that and Brand Value erodes.`}
+                                />
+                            </View>
+
+                            <View style={styles.sliderRow}>
+                                <Pressable
+                                    onPress={() => setMarketing(Math.max(0, marketing - marketingStep))}
+                                    style={styles.adjBtn}
+                                >
+                                    <Text style={styles.adjText}>−</Text>
+                                </Pressable>
+                                <View style={styles.controlValueBox}>
+                                    <Text style={styles.controlValue}>{formatMoney(marketing)}</Text>
+                                    <Text style={styles.controlValueUnit}>per quarter</Text>
+                                </View>
+                                <Pressable
+                                    onPress={() =>
+                                        setMarketing(Math.min(marketingMax, marketing + marketingStep))
+                                    }
+                                    style={styles.adjBtn}
+                                >
+                                    <Text style={styles.adjText}>+</Text>
+                                </Pressable>
+                            </View>
+
+                            {/* Bakim ve kiyas isaretli bar */}
+                            <View style={styles.mktTrack}>
+                                {/* Bakimin altinda kalan bolge: marka erir */}
+                                <View
+                                    style={[
+                                        styles.mktDeadZone,
+                                        { left: 0, right: `${100 - (maintenancePoint / marketingMax) * 100}%` },
+                                    ]}
+                                />
+                                <View
+                                    style={[
+                                        styles.mktFill,
+                                        {
+                                            width: `${Math.min(100, (marketing / marketingMax) * 100)}%`,
+                                            backgroundColor:
+                                                marketing < maintenancePoint
+                                                    ? '#FFB74D'
+                                                    : isOverSaturated
+                                                        ? '#64B5F6'
+                                                        : '#4CAF50',
+                                        },
+                                    ]}
+                                />
+                                {/* Bakim esigi */}
+                                <View
+                                    style={[
+                                        styles.mktMarker,
+                                        { left: `${(maintenancePoint / marketingMax) * 100}%` },
+                                    ]}
+                                />
+                                {/* Kiyas butce */}
+                                <View
+                                    style={[
+                                        styles.mktMarker,
+                                        styles.mktMarkerBenchmark,
+                                        { left: `${(benchmark / marketingMax) * 100}%` },
+                                    ]}
+                                />
+                            </View>
+                            <Text style={styles.mktScale}>
+                                Maintain {formatMoney(maintenancePoint)} · Benchmark {formatMoney(benchmark)} ·
+                                Max {formatMoney(marketingMax)}
+                            </Text>
+
+                            <Text style={styles.costLine}>
+                                Share of voice {formatPercent(sov * 100)} — that is how much of this
+                                category's attention your budget buys.
+                            </Text>
+
+                            {marketing === 0 ? (
+                                <Text style={styles.warnLine}>
+                                    No marketing. Fewer customers will ever consider this product, and
+                                    Brand Value will erode every quarter.
+                                </Text>
+                            ) : marketing < maintenancePoint ? (
+                                <Text style={styles.warnLine}>
+                                    Below the maintenance level. You are still selling, but Brand Value
+                                    will slide — add {formatMoney(maintenancePoint - marketing)} to hold it.
+                                </Text>
+                            ) : isOverSaturated ? (
+                                <Text style={styles.okLine}>
+                                    Heavy spend. Good for a launch push or taking share fast, but the
+                                    last dollars buy far less than the first — plan to taper back once
+                                    Brand Value has built up.
+                                </Text>
+                            ) : (
+                                <Text style={styles.okLine}>
+                                    Above the maintenance level. Brand Value builds — as long as you can
+                                    actually deliver the demand you create.
+                                </Text>
+                            )}
+
+                            <Text style={styles.costLine}>
+                                Charged every quarter regardless of sales: {formatMoney(marketing)}
+                            </Text>
+                        </View>
+
+                        {/* ══ CANLI ONIZLEME ══
+                            Kaydetmeden once sonucunu gor. computeAttraction
+                            saf fonksiyon oldugu icin burada da cagrilabiliyor. */}
+                        {market && (
+                            <View style={styles.previewBox}>
+                                <View style={styles.controlHeader}>
+                                    <Text style={styles.previewTitle}>Projected Result</Text>
+                                    <InfoDot
+                                        title="Projected Result"
+                                        text="What these settings are expected to produce next quarter, based on the same math the simulation uses."
+                                        detail="It is an estimate — morale problems and competitor moves can still change the outcome."
+                                    />
+                                </View>
+                                <View style={styles.previewRow}>
+                                    <View style={styles.previewCell}>
+                                        <Text style={styles.previewLabel}>Market Share</Text>
+                                        <Text style={styles.previewValue}>
+                                            {projectedShare < 1
+                                                ? `${projectedShare.toFixed(3)}%`
+                                                : `${projectedShare.toFixed(2)}%`}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.previewCell}>
+                                        <Text style={styles.previewLabel}>Units Sold</Text>
+                                        <Text style={[styles.previewValue, { color: '#4CAF50' }]}>
+                                            {formatNumber(expectedSales)}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.previewCell}>
+                                        <Text style={styles.previewLabel}>Gross Margin</Text>
+                                        <Text
+                                            style={[
+                                                styles.previewValue,
+                                                { color: projectedMargin >= 0 ? '#4CAF50' : '#F44336' },
+                                            ]}
+                                        >
+                                            {formatMoney(projectedMargin)}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
 
                         {/* Inventory Status - NEW */}
                         <View style={styles.controlGroup}>
@@ -312,6 +671,94 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 };
 
 const styles = StyleSheet.create({
+    // --- Yeni uretim / pazarlama kontrolleri ---
+    controlHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+    controlValueBox: { alignItems: 'center', flex: 1 },
+    controlValueUnit: { color: '#6E6E6E', fontSize: 9.5, marginTop: 2 },
+
+    capacityTrack: {
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        marginTop: 14,
+        justifyContent: 'center',
+    },
+    capacityFill: { height: 10, borderRadius: 5 },
+    scaleRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
+    scaleHint: { color: '#7FB3FF', fontSize: 9.5 },
+    scaleMax: { color: '#8A8A8A', fontSize: 9.5, fontWeight: '700' },
+
+    compareTrack: {
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        marginTop: 14,
+        overflow: 'visible',
+        justifyContent: 'center',
+    },
+    compareFill: { height: 8, borderRadius: 4 },
+    demandMarker: {
+        position: 'absolute',
+        width: 2,
+        height: 16,
+        backgroundColor: '#7FB3FF',
+        borderRadius: 1,
+    },
+    compareRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
+    compareLabel: { color: '#6E6E6E', fontSize: 9.5, letterSpacing: 0.5 },
+    compareValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 2 },
+
+    warnLine: { color: '#E57373', fontSize: 11, lineHeight: 16, marginTop: 10 },
+    okLine: { color: '#4CAF50', fontSize: 11, marginTop: 10 },
+    capLine: { color: '#FFB74D', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    costLine: { color: '#8A8A8A', fontSize: 10.5, marginTop: 10 },
+
+    matchBtn: {
+        marginTop: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(127,179,255,0.4)',
+        backgroundColor: 'rgba(127,179,255,0.1)',
+        borderRadius: 10,
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
+    matchBtnText: { color: '#7FB3FF', fontSize: 12, fontWeight: '700' },
+
+    mktTrack: {
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        marginTop: 14,
+        overflow: 'hidden',
+        justifyContent: 'center',
+    },
+    mktDeadZone: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(244,67,54,0.12)',
+    },
+    mktFill: { height: 8, borderRadius: 4 },
+    mktMarker: { position: 'absolute', width: 2, height: 14, backgroundColor: '#FFD700' },
+    // Kiyas butce isareti — bakim esiginden ayirt edilsin diye farkli renk
+    mktMarkerBenchmark: { backgroundColor: '#7FB3FF', width: 2, height: 14 },
+    mktScale: { color: '#6E6E6E', fontSize: 9.5, marginTop: 6 },
+
+    previewBox: {
+        backgroundColor: 'rgba(127,179,255,0.07)',
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: 'rgba(127,179,255,0.22)',
+        padding: 14,
+        marginBottom: 16,
+    },
+    previewTitle: { color: '#7FB3FF', fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
+    previewRow: { flexDirection: 'row', marginTop: 6 },
+    previewCell: { flex: 1, alignItems: 'center' },
+    previewLabel: { color: '#6E6E6E', fontSize: 9.5 },
+    previewValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', marginTop: 3 },
+
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 16 },
     content: { backgroundColor: '#1A202C', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#2D3748' },
     modalTitle: { fontSize: 22, fontWeight: '800', color: '#fff', textAlign: 'center' },

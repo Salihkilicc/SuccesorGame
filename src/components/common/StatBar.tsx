@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, StyleProp, ViewStyle } from 'react-native';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { usePlayerStore } from '../../core/store/usePlayerStore';
 import { theme } from '../../core/theme';
+import { formatNumber } from '../../core/utils';
 
 type StatBarProps = {
   style?: StyleProp<ViewStyle>;
@@ -15,20 +16,11 @@ type StatItemProps = {
   accent?: string;
 };
 
+// Paylasilan bicimlendiriciye devrediyor (core/utils).
+// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+// ayni deger farkli ekranlarda farkli gorunuyordu.
 const formatMoney = (value: number) => {
-  const absolute = Math.abs(value);
-
-  if (absolute >= 1_000_000) {
-    const formatted = (value / 1_000_000).toFixed(1);
-    return `${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
-  }
-
-  if (absolute >= 1_000) {
-    const formatted = (value / 1_000).toFixed(1);
-    return `${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
-  }
-
-  return value.toLocaleString();
+  return formatNumber(value);
 };
 
 const StatItem = ({ icon, label, value, accent }: StatItemProps) => (

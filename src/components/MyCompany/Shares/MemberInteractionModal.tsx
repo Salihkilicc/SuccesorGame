@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-nati
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
+import { formatMoney } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -42,13 +43,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const TRUST_BOOST = 5;
 
         if (money < GIFT_COST) {
-            Alert.alert('Insufficient Funds', `You need $${GIFT_COST.toLocaleString()} to send a gift.`);
+            Alert.alert('Insufficient Funds', `You need ${formatMoney(GIFT_COST)} to send a gift.`);
             return;
         }
 
         Alert.alert(
             '🎁 Send Gift',
-            `Send a $${GIFT_COST.toLocaleString()} gift to ${member.name}?\n\nTrust will increase by ${TRUST_BOOST}.`,
+            `Send a ${formatMoney(GIFT_COST)} gift to ${member.name}?\n\nTrust will increase by ${TRUST_BOOST}.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
@@ -125,7 +126,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     const handleMakeOffer = () => {
         if (money < offerPrice) {
-            Alert.alert('Insufficient Funds', `You need $${(offerPrice / 1_000_000).toFixed(1)}M to make this offer.`);
+            Alert.alert('Insufficient Funds', `You need ${formatMoney(offerPrice)} to make this offer.`);
             return;
         }
 
@@ -154,7 +155,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
             Alert.alert(
                 '✅ Offer Accepted!',
                 `${member.name} has accepted your offer!\n\n` +
-                `Price: $${(offerPrice / 1_000_000).toFixed(2)}M\n` +
+                `Price: ${formatMoney(offerPrice)}\n` +
                 `Shares Acquired: ${member.shares.toFixed(1)}%\n\n` +
                 `Your ownership will increase to ${(member.shares + 65).toFixed(1)}%`,
                 [
@@ -175,8 +176,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
             Alert.alert(
                 '❌ Offer Too Low',
                 `${member.name} rejected your offer.\n\n` +
-                `Your Offer: $${(offerPrice / 1_000_000).toFixed(2)}M\n` +
-                `They Want: $${(requiredPrice / 1_000_000).toFixed(2)}M\n\n` +
+                `Your Offer: ${formatMoney(offerPrice)}\n` +
+                `They Want: ${formatMoney(requiredPrice)}\n\n` +
                 `Try increasing your premium.`,
                 [{ text: 'OK', style: 'destructive' }]
             );
@@ -316,7 +317,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
                                 <View style={styles.stepperDisplay}>
                                     <Text style={styles.stepperPrice}>
-                                        ${(offerPrice / 1_000_000).toFixed(2)}M
+                                        {formatMoney(offerPrice)}
                                     </Text>
                                     <Text style={[
                                         styles.stepperPremium,

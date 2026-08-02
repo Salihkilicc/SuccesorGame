@@ -4,6 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
 import GameButton from '../common/GameButton';
 import { PercentageSelector } from '../atoms/PercentageSelector';
+import { formatNumber, formatMoney } from '../../core/utils';
 
 type ManagementCardProps = {
     title: string;
@@ -45,15 +46,10 @@ const ManagementCard = ({
         }
     };
 
-    const formatCost = (value: number) => {
-        if (value >= 1_000_000) {
-            return `$${(value / 1_000_000).toFixed(1)}M`;
-        }
-        if (value >= 1_000) {
-            return `$${(value / 1_000).toFixed(1)}K`;
-        }
-        return `$${value}`;
-    };
+    // Paylasilan bicimlendiriciye devrediyor (core/utils).
+    // Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+    // ayni deger farkli ekranlarda farkli gorunuyordu.
+    const formatCost = (value: number) => formatMoney(value);
 
     return (
         <View style={styles.card}>
@@ -63,7 +59,7 @@ const ManagementCard = ({
                 </View>
                 <View>
                     <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>Current: {currentValue.toLocaleString()}</Text>
+                    <Text style={styles.subtitle}>Current: {formatNumber(currentValue)}</Text>
                 </View>
                 {headerRight}
                 {!headerRight && costPerUnit > 0 && (

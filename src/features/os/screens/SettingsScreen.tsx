@@ -16,6 +16,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import LinearGradient from 'react-native-linear-gradient';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { startNewGame } from '../../../core/newGame';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -92,6 +93,37 @@ const SettingsScreen = () => {
 
     const handleUnavailable = () => {
         Alert.alert('Successor OS', 'This document is currently unavailable.');
+    };
+
+    /**
+     * Temiz yeni oyun. startNewGame() tum store'lari ve AsyncStorage'i
+     * temizleyip initialStatsState'e doner (1 fabrika, 20 calisan, 2M sermaye).
+     */
+    const handleNewGame = () => {
+        Alert.alert(
+            'New Game',
+            'All progress will be erased and a fresh run will be set up. Are you sure?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Reset',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await startNewGame();
+                            navigation.goBack();
+                            Alert.alert(
+                                'New Game',
+                                'Fresh start ready.\n\n• Company capital: $2M\n• Personal cash: $50K\n• 1 factory, 20 employees\n• 1 active product (Smart Phone)',
+                            );
+                        } catch (e) {
+                            console.error('[Settings] Yeni oyun baslatilamadi', e);
+                            Alert.alert('Error', 'Could not start a new game. Check the console.');
+                        }
+                    },
+                },
+            ],
+        );
     };
 
     return (
@@ -187,6 +219,18 @@ const SettingsScreen = () => {
                             icon="help-circle-outline"
                             label="Help & Support"
                             onPress={handleUnavailable}
+                            isLast
+                        />
+                    </View>
+
+                    {/* Oyun Yonetimi */}
+                    <Text style={styles.sectionTitle}>GAME</Text>
+                    <View style={styles.group}>
+                        <SettingsRow
+                            icon="restart"
+                            label="New Game"
+                            onPress={handleNewGame}
+                            isFirst
                             isLast
                         />
                     </View>

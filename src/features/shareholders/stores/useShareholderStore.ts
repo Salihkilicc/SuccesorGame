@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
 import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { formatMoney, formatNumber } from '../../../core/utils';
 
 
 
@@ -186,11 +187,11 @@ export const useShareholderStore = create<ShareholderState>()(
             // ========================================================================
             // STATE
             // ========================================================================
-            members: [],
+            members: [] as BoardMember[],
             totalShares: TOTAL_SHARES,
             playerShareCount: 6_500_000, // 65% of 10M
             boardMood: 'Conservative', // Default mood
-            sharkLoans: [], // No loans initially
+            sharkLoans: [] as SharkLoan[], // No loans initially
 
             // ========================================================================
             // ACTIONS
@@ -369,7 +370,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (playerShareCount < shareCount) {
                     return {
                         success: false,
-                        message: `Insufficient shares. You have ${playerShareCount.toLocaleString()}, need ${shareCount.toLocaleString()}.`,
+                        message: `Insufficient shares. You have ${formatNumber(playerShareCount)}, need ${formatNumber(shareCount)}.`,
                     };
                 }
 
@@ -378,7 +379,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (shareCount < MIN_SHARE_COUNT) {
                     return {
                         success: false,
-                        message: `Minimum share allocation is ${MIN_SHARE_COUNT.toLocaleString()} shares (1%).`,
+                        message: `Minimum share allocation is ${formatNumber(MIN_SHARE_COUNT)} shares (1%).`,
                     };
                 }
 
@@ -433,7 +434,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 return {
                     success: true,
-                    message: `${networkContact.name} appointed to Board with ${shareCount.toLocaleString()} shares (${ownershipPercent.toFixed(1)}%).`,
+                    message: `${networkContact.name} appointed to Board with ${formatNumber(shareCount)} shares (${ownershipPercent.toFixed(1)}%).`,
                 };
             },
 
@@ -611,7 +612,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 return {
                     success: true,
-                    message: `Loan of $${amount.toLocaleString()} secured from ${lender.name}. Due by turn ${deadlineTurn}.`,
+                    message: `Loan of ${formatMoney(amount)} secured from ${lender.name}. Due by turn ${deadlineTurn}.`,
                 };
             },
 
@@ -794,7 +795,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (money < giftCost) {
                     return {
                         success: false,
-                        message: `Insufficient funds. Need $${giftCost.toLocaleString()}, have $${money.toLocaleString()}.`,
+                        message: `Insufficient funds. Need ${formatMoney(giftCost)}, have ${formatMoney(money)}.`,
                         trustChange: 0,
                     };
                 }
@@ -1048,7 +1049,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (money < finalPrice) {
                     return {
                         success: false,
-                        message: `Insufficient funds. Need $${finalPrice.toLocaleString()} but only have $${money.toLocaleString()}.`,
+                        message: `Insufficient funds. Need ${formatMoney(finalPrice)} but only have ${formatMoney(money)}.`,
                         sharesBought: 0,
                     };
                 }
@@ -1142,7 +1143,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 return {
                     success: true,
-                    message: `Acquired ${actualBuyAmount.toLocaleString()} shares from ${member.name}.`,
+                    message: `Acquired ${formatNumber(actualBuyAmount)} shares from ${member.name}.`,
                     sharesBought: actualBuyAmount,
                 };
             },
@@ -1180,7 +1181,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (shareCount > maxTransactionShares) {
                     return {
                         success: false,
-                        message: `Cannot sell more than ${maxTransactionShares.toLocaleString()} shares (20%) in a single transaction.`,
+                        message: `Cannot sell more than ${formatNumber(maxTransactionShares)} shares (20%) in a single transaction.`,
                         sharesSold: 0,
                     };
                 }
@@ -1297,7 +1298,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 return {
                     success: true,
-                    message: `Sold ${shareCount.toLocaleString()} shares to ${member.name} for $${finalPrice.toLocaleString()}.`,
+                    message: `Sold ${formatNumber(shareCount)} shares to ${member.name} for ${formatMoney(finalPrice)}.`,
                     sharesSold: shareCount,
                 };
             },

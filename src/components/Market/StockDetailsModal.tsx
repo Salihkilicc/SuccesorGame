@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleStockItem } from './marketTypes';
+import { formatMoney, formatPrice } from '../../core/utils';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -15,7 +16,9 @@ const capSlowdown = (marketCap: number) => {
 const adjustedChange = (baseChange: number, marketCap: number) =>
   Number((baseChange * capSlowdown(marketCap)).toFixed(1));
 
-const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
+// Market cap tam dolar olarak saklaniyor (3_000_000_000_000 gibi).
+// Eskiden sonuna elle 'B' ekleniyordu -> "$3,000,000,000,000B".
+const formatCap = (marketCap: number) => formatMoney(marketCap);
 
 type Props = {
   visible: boolean;
@@ -51,7 +54,7 @@ const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
             <Text style={styles.meta}>Symbol: {stock.symbol}</Text>
             <Text style={styles.meta}>Sector: {stock.sector}</Text>
             <Text style={styles.meta}>Market Cap: {formatCap(stock.marketCap)}</Text>
-            <Text style={styles.meta}>Current Price: ${stock.price.toFixed(2)}</Text>
+            <Text style={styles.meta}>Current Price: {formatPrice(stock.price)}</Text>
             <Text style={[styles.meta, { color: dailyColor }]}>
               Daily Change (size-adjusted): {dailyAdjusted}%
             </Text>

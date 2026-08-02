@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useUserStore } from '../../core/store';
 import { theme } from '../../core/theme';
+import { formatMoney, formatNumber, formatPrice } from '../../core/utils';
 
 export type CompanyHeaderProps = {
   companyName?: string;
@@ -12,30 +13,12 @@ export type CompanyHeaderProps = {
   debt: number;
 };
 
-const formatLargeMoney = (value: number) => {
-  const absolute = Math.abs(value);
-  if (absolute >= 1_000_000_000) {
-    const formatted = (value / 1_000_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}B`;
-  }
-  if (absolute >= 1_000_000) {
-    const formatted = (value / 1_000_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
-  }
-  if (absolute >= 1_000) {
-    const formatted = (value / 1_000).toFixed(1);
-    return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
-  }
-  return `$${value.toLocaleString()}`;
-};
+// Paylasilan bicimlendiriciye devrediyor (core/utils).
+// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+// ayni deger farkli ekranlarda farkli gorunuyordu.
+const formatLargeMoney = (value: number) => formatMoney(value);
 
-const formatShortMoney = (value: number) => {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
-  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-  return value.toLocaleString();
-};
+const formatShortMoney = (value: number) => formatNumber(value);
 
 const CompanyHeader = ({
   companyName = 'Rich Industries',
@@ -60,7 +43,7 @@ const CompanyHeader = ({
         <View style={styles.rightCol}>
           <Text style={styles.metricLabel}>Company Value</Text>
           <Text style={styles.metricValue}>${formatShortMoney(valuation)}</Text>
-          <Text style={styles.meta}>Share Price: ${sharePrice.toFixed(2)}</Text>
+          <Text style={styles.meta}>Share Price: {formatPrice(sharePrice)}</Text>
           <Text style={[styles.change, changeColor]}>{formattedChange}</Text>
           <Text style={[styles.meta, styles.debt]}>Debt: ${formatShortMoney(debt)}</Text>
         </View>

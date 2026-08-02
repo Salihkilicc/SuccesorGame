@@ -16,6 +16,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -411,7 +412,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {/* Current Stock Price Info */}
                                 <View style={{ backgroundColor: '#2C2C2E', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
                                     <Text style={{ fontSize: 14, color: '#8E8E93', marginBottom: 4 }}>Current Stock Price</Text>
-                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#30D158' }}>${stockPrice.toFixed(2)}</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#30D158' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
                                 {/* Context Text */}
@@ -433,7 +434,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                         <View style={styles.stepperDisplay}>
                                             <Text style={styles.stepperValue}>
-                                                {shareCount.toLocaleString()} Shares
+                                                {formatNumber(shareCount)} Shares
                                             </Text>
                                             <Text style={styles.stepperPremium}>
                                                 (= {((shareCount / totalShares) * 100).toFixed(2)}% Ownership)
@@ -464,7 +465,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                         <View style={styles.stepperDisplay}>
                                             <Text style={styles.stepperValue}>
-                                                ${Math.round(calculateOfferPrice()).toLocaleString()}
+                                                {formatMoney(calculateOfferPrice())}
                                             </Text>
                                             <Text style={styles.stepperPremium}>
                                                 ({offerPremium >= 0 ? '+' : ''}{offerPremium}%)
@@ -508,7 +509,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                         {tradeMode === 'buy' ? 'You pay:' : 'You receive:'}
                                     </Text>
                                     <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#30D158' }]}>
-                                        ${calculateOfferPrice().toLocaleString()}
+                                        {formatMoney(calculateOfferPrice())}
                                     </Text>
                                 </View>
 

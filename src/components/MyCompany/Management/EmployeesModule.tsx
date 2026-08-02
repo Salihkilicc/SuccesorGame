@@ -1,605 +1,316 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../../core/theme';
-import { COMPANY_EVENTS, useCompanyManagement } from '../useCompanyManagement';
-import GameModal from '../../common/GameModal';
-import SectionCard from '../../common/SectionCard';
-import GameButton from '../../common/GameButton';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+// src/components/MyCompany/Management/EmployeesModule.tsx
+//
+// ============================================================================
+//  EKİP — maaş, moral, etkinlikler, fazla mesai
+// ============================================================================
+//
+//  ESKI HALI NEYDI:
+//    - Uc kademeli maas butonlari (low / average / above_average). Motorla
+//      senkron degildi; ekranda gosterilen gider hep yanlisti.
+//    - KENDI ayri etkinlik listesi vardi (Pizza Party 50.000, Gala
+//      1.000.000) ve useCompanyManagement'taki COMPANY_EVENTS listesinden
+//      farkliydi. Ayni sey icin ucuncu bir kaynak.
+//    - Etkinlikler sabit fiyatliydi, yani sirket buyudukce bedavaya
+//      geliyordu.
+//    - Metinler Turkce idi; oyunun dili Ingilizce.
+//
+//  SIMDI: tek kaynak core/market/workforce.ts.
+//
+// ============================================================================
 
-interface EmployeesModalProps {
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Switch } from 'react-native';
+import { theme } from '../../../core/theme';
+import GameModal from '../../common/GameModal';
+import InfoDot from '../../common/InfoDot';
+import CollapsibleSection from '../../common/CollapsibleSection';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useGameStore } from '../../../core/store/useGameStore';
+import { getTier } from '../../../core/market/capacity';
+import {
+    MAX_EVENTS_PER_QUARTER,
+    OVERTIME_MAX_RATIO,
+    SALARY_RATIO_MAX,
+    SALARY_RATIO_MIN,
+    TEAM_EVENTS,
+    WORKFORCE_EXPLANATIONS,
+    efficiencyMultiplier,
+    eventCost,
+    eventMoraleGain,
+    marketWage,
+    payCutShock,
+    quarterlyWage,
+    scrapMultiplier,
+    wageMoraleTarget,
+} from '../../../core/market/workforce';
+import { formatMoney, formatNumber, formatPercent } from '../../../core/utils';
+
+interface Props {
     visible: boolean;
     onClose: () => void;
 }
 
-const EmployeesModule = ({ visible, onClose }: EmployeesModalProps) => {
-    const navigation = useNavigation<any>();
-    const {
-        employeeCount,
-        factoryCount,
-        employeeMorale,
-        salaryTier,
-        updateEmployees,
-        changeSalaryTier,
-        distributeBonus,
-        organizeEvent,
-        eventsHostedThisQuarter,
+const EmployeesModule = ({ visible, onClose }: Props) => {
+    const employeeCount = useStatsStore(s => s.employeeCount);
+    const facilityTier = useStatsStore(s => s.facilityTier);
+    const salaryRatio = useStatsStore(s => s.salaryRatio);
+    const companyCapital = useStatsStore(s => s.companyCapital);
+    const avgTenure = useStatsStore(s => s.avgTenureQuarters);
 
-        companyCapital,
-        lastQuarterProfit,
-        bonusDistributedThisQuarter,
-    } = useCompanyManagement();
+    const morale = useGameStore(s => s.employeeMorale);
+    const overtimeEnabled = useGameStore(s => s.overtimeEnabled);
+    const eventsHosted = useGameStore(s => s.eventsHostedThisQuarter);
+    const lastQuarterProfit = useGameStore(s => s.lastQuarterProfit);
+    const bonusDistributed = useGameStore(s => s.bonusDistributedThisQuarter);
+    const setSalaryRatio = useGameStore(s => s.setSalaryRatio);
+    const setOvertime = useGameStore(s => s.setOvertime);
+    const organizeEvent = useGameStore(s => s.organizeEvent);
+    const distributeBonus = useGameStore(s => s.distributeBonus);
 
-    const [eventsVisible, setEventsVisible] = useState(false);
-    const [successModal, setSuccessModal] = useState<{ visible: boolean; event?: typeof EVENTS[0] }>({ visible: false });
+    const tier = getTier(facilityTier);
+    const market = marketWage(tier.level);
+    const perPerson = quarterlyWage(tier.level, salaryRatio);
+    const wageBill = perPerson * employeeCount;
+    const target = wageMoraleTarget(salaryRatio);
+    const efficiency = efficiencyMultiplier(morale);
+    const scrap = scrapMultiplier(morale);
 
-    const EVENTS = [
-        { id: 'pizza', name: 'Pizza Party', cost: 50_000, morale: 5, desc: 'Herkes ekstra peynirli pizzaya bayıldı!' },
-        { id: 'retreat', name: 'Team Building Retreat', cost: 250_000, morale: 12, desc: 'Doğada yapılan aktiviteler takımı kaynaştırdı.' },
-        { id: 'gala', name: 'Grand Gala', cost: 1_000_000, morale: 25, desc: 'Şehirdeki en lüks otelde unutulmaz bir gece.' },
-    ];
-
-    const handleHomePress = () => {
-        onClose();
-        navigation.navigate('Home');
-    };
-
-    const renderTierBtn = (tier: 'low' | 'average' | 'above_average', label: string) => {
-        const isActive = salaryTier === tier;
-        return (
-            <GameButton
-                key={tier}
-                title={label}
-                variant={isActive ? 'primary' : 'secondary'}
-                onPress={() => changeSalaryTier(tier)}
-                style={{ flex: 1 }}
-                textStyle={{ fontSize: 11 }}
-            />
-        );
-    };
-
-    const handleEvent = (item: typeof EVENTS[0]) => {
-        // Funds Check
-        if (companyCapital < item.cost) {
+    const changeRatio = (next: number) => {
+        const clamped = Math.min(SALARY_RATIO_MAX, Math.max(SALARY_RATIO_MIN, next));
+        const shock = payCutShock(salaryRatio, clamped);
+        if (shock > 0) {
+            Alert.alert(
+                'Cut pay?',
+                `Raising pay is easy; taking it back is not. This will cost ${shock} morale points ` +
+                `immediately, on top of the lower level your pay will sustain.`,
+                [
+                    { text: 'Never mind', style: 'cancel' },
+                    { text: 'Cut anyway', style: 'destructive', onPress: () => setSalaryRatio(clamped) },
+                ],
+            );
             return;
         }
-
-        organizeEvent(item.cost, item.morale);
-        setEventsVisible(false);
-        setTimeout(() => {
-            setSuccessModal({ visible: true, event: item });
-        }, 300);
+        setSalaryRatio(clamped);
     };
 
-    const handleBonus = () => {
-        const bonusCost = lastQuarterProfit * 0.05;
-        if (bonusDistributedThisQuarter || lastQuarterProfit <= 0 || companyCapital < bonusCost) return;
-
-        distributeBonus(5); // 5% param kept for hook compatibility, though ignored by store
-
-        setSuccessModal({
-            visible: true,
-            event: {
-                id: 'bonus',
-                name: 'Bonuses Distributed! 💸',
-                desc: 'Your employees appreciate your generosity! Motivation has skyrocketed.',
-                cost: bonusCost,
-                morale: 15
-            }
-        });
+    const handleEvent = (id: string) => {
+        const result = organizeEvent(id);
+        if (!result.success) Alert.alert('Cannot host', result.message);
     };
 
-    const EventItem = ({ item }: { item: typeof EVENTS[0] }) => {
-        const canAfford = companyCapital >= item.cost;
-        return (
-            <View
-                style={[
-                    styles.eventCard,
-                    !canAfford && styles.eventCardDisabled
-                ]}
-            >
-                <View style={styles.eventCardContent}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.eventName}>{item.name}</Text>
-                        <View style={styles.eventStats}>
-                            <View style={styles.statBadge}>
-                                <Text style={styles.statLabel}>COST</Text>
-                                <Text style={styles.statValue}>
-                                    ${item.cost >= 1_000_000
-                                        ? `${(item.cost / 1_000_000).toFixed(1)}M`
-                                        : `${(item.cost / 1_000).toFixed(0)}K`}
-                                </Text>
-                            </View>
-                            <View style={[styles.statBadge, styles.moraleBadge]}>
-                                <Text style={styles.statLabel}>BOOST</Text>
-                                <Text style={[styles.statValue, styles.moraleBoostValue]}>+{item.morale}%</Text>
-                            </View>
-                        </View>
-                    </View>
-
-                    <GameButton
-                        title={canAfford ? "SELECT" : "NO FUNDS"}
-                        variant={canAfford ? "primary" : "secondary"}
-                        disabled={!canAfford}
-                        onPress={() => handleEvent(item)}
-                        style={styles.eventButton}
-                        textStyle={{ fontSize: 12, fontWeight: '800' }}
-                    />
-                </View>
-            </View>
-        );
-    };
+    const bonusCost = Math.max(0, lastQuarterProfit) * 0.05;
+    const canBonus = !bonusDistributed && lastQuarterProfit > 0 && companyCapital >= bonusCost;
 
     return (
-        <GameModal
-            visible={visible}
-            onClose={onClose}
-            title="👥 Employees & Morale"
-        >
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: 80 }}>
-
-                {/* Premium Morale Dashboard */}
-                <View style={styles.moraleDashboard}>
-                    <View style={styles.dashboardHeader}>
-                        <View>
-                            <Text style={styles.dashboardLabel}>EMPLOYEE MORALE</Text>
-                            <Text style={styles.dashboardValue}>{employeeMorale}%</Text>
-                        </View>
-                        <View style={styles.employeeCountBadge}>
-                            <Text style={styles.employeeCountLabel}>WORKFORCE</Text>
-                            <Text style={styles.employeeCountValue}>{employeeCount}</Text>
-                        </View>
-                    </View>
-
-                    {/* Large Premium Progress Bar */}
-                    <View style={styles.largeMoraleTrack}>
-                        <View
-                            style={[
-                                styles.largeMoraleFill,
-                                {
-                                    width: `${employeeMorale}%`,
-                                    backgroundColor:
-                                        employeeMorale < 30 ? '#FF453A' :
-                                            employeeMorale < 50 ? '#FF9F0A' :
-                                                employeeMorale < 70 ? '#32D74B' :
-                                                    '#30D158'
-                                }
-                            ]}
-                        />
-                    </View>
-
-                    <Text style={styles.dashboardDesc}>
-                        {employeeMorale >= 70 ? '🎉 Excellent morale! Your team is highly motivated.' :
-                            employeeMorale >= 50 ? '✅ Good morale. Keep up the positive environment.' :
-                                employeeMorale >= 30 ? '⚠️ Morale needs attention. Consider boosting activities.' :
-                                    '🚨 Critical! Low morale affects productivity.'}
-                    </Text>
-                </View>
-
-                {/* Salary Tier */}
-                <View>
-                    <Text style={styles.sectionTitle}>SALARY POLICY</Text>
-                    <View style={styles.tierContainer}>
-                        {renderTierBtn('low', 'Low')}
-                        {renderTierBtn('average', 'Avg')}
-                        {renderTierBtn('above_average', 'High')}
-                    </View>
-                </View>
-
-                {/* Actions */}
-                <View>
-                    <Text style={styles.sectionTitle}>MORALE ACTIONS</Text>
-                    <View style={{ gap: 10 }}>
-                        <View style={styles.premiumActionCard}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.actionCardTitle}>💰 Distribute Bonus</Text>
-                                <Text style={styles.actionCardSubtitle}>
-                                    {lastQuarterProfit <= 0 ? "No Profit to Share" :
-                                        bonusDistributedThisQuarter ? "Limit Reached (Once per Qtr)" :
-                                            `Est. Cost: $${(lastQuarterProfit * 0.05 / 1000000).toFixed(2)}M`}
-                                </Text>
-                            </View>
-                            <GameButton
-                                title={lastQuarterProfit > 0 && !bonusDistributedThisQuarter ? "5%" : "LOCKED"}
-                                variant={lastQuarterProfit > 0 && !bonusDistributedThisQuarter ? "primary" : "secondary"}
-                                disabled={lastQuarterProfit <= 0 || bonusDistributedThisQuarter}
-                                onPress={handleBonus}
-                                style={{ minWidth: 80 }}
-                                textStyle={{ fontSize: 12, fontWeight: '800' }}
-                            />
-                        </View>
-
-                        <View style={styles.premiumActionCard}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.actionCardTitle}>🎉 Organize Event</Text>
-                                <Text style={styles.actionCardSubtitle}>
-                                    {eventsHostedThisQuarter >= 2 ? "Limit Reached (2/2)" : "Boost team morale"}
-                                </Text>
-                            </View>
-                            <GameButton
-                                title={eventsHostedThisQuarter >= 2 ? "LOCKED" : "SELECT"}
-                                variant={eventsHostedThisQuarter >= 2 ? "secondary" : "primary"}
-                                disabled={eventsHostedThisQuarter >= 2}
-                                onPress={() => setEventsVisible(true)}
-                                style={{ minWidth: 80 }}
-                                textStyle={{ fontSize: 12, fontWeight: '800' }}
-                            />
-                        </View>
-                    </View>
-                </View>
-
-            </ScrollView>
-
-            {/* Persistent Bottom Bar */}
-            <CrystalNavBar activeTab="Company" variant="dark" />
-
-            <GameModal
-                visible={eventsVisible}
-                onClose={() => setEventsVisible(false)}
-            >
-                <View style={styles.modalHeader}>
-                    {/* LEFT: Close Button */}
-                    <TouchableOpacity onPress={() => setEventsVisible(false)} style={{ padding: 8 }}>
-                        <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>✕</Text>
-                    </TouchableOpacity>
-
-                    {/* CENTER: Title */}
-                    <Text style={styles.modalTitle}>Boost Morale</Text>
-
-                    {/* RIGHT: Empty View for centering */}
-                    <View style={{ width: 24 }} />
-                </View>
-                <View style={{ gap: 20 }}>
-                    {/* Current Morale Display */}
-                    <View style={styles.moraleSection}>
-                        <View style={styles.moraleHeader}>
-                            <Text style={styles.moraleLabel}>CURRENT MORALE</Text>
-                            <Text style={styles.moraleValue}>{employeeMorale}%</Text>
-                        </View>
-
-                        {/* Premium Progress Bar */}
-                        <View style={styles.progressTrack}>
-                            <View
-                                style={[
-                                    styles.progressFill,
-                                    {
-                                        width: `${employeeMorale}%`,
-                                        backgroundColor:
-                                            employeeMorale < 30 ? '#FF453A' :
-                                                employeeMorale < 50 ? '#FF9F0A' :
-                                                    employeeMorale < 70 ? '#32D74B' :
-                                                        '#30D158'
-                                    }
-                                ]}
-                            />
-                        </View>
-
-                        <Text style={styles.moraleDesc}>
-                            Boosting morale improves productivity and reduces turnover
+        <GameModal visible={visible} onClose={onClose} title="Team">
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* ══ MORAL ŞERİDİ ══ */}
+                <View style={styles.stripe}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.label}>MORALE</Text>
+                        <Text style={styles.big}>{morale.toFixed(0)}</Text>
+                        <Text style={styles.sub}>
+                            Pay alone sustains {target.toFixed(0)}
                         </Text>
                     </View>
-
-                    {/* Event Cards */}
-                    <View style={{ gap: 12 }}>
-                        <Text style={styles.eventsTitle}>SELECT AN EVENT</Text>
-                        <FlatList
-                            data={EVENTS}
-                            keyExtractor={i => i.id}
-                            renderItem={({ item }) => <EventItem item={item} />}
-                            contentContainerStyle={{ gap: 10 }}
-                            scrollEnabled={false}
-                        />
+                    <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={styles.label}>OUTPUT</Text>
+                        <Text style={[styles.big, { color: efficiency >= 1 ? '#4CAF50' : '#FFB74D' }]}>
+                            ×{efficiency.toFixed(2)}
+                        </Text>
+                        <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
                     </View>
                 </View>
-            </GameModal>
 
-            {/* Success Overlay Modal */}
-            {successModal.visible && successModal.event && (
-                <GameModal
-                    visible={true}
-                    onClose={() => setSuccessModal({ visible: false })}
-                    title={successModal.event.name}
+                <View style={styles.moraleTrack}>
+                    <View style={[styles.moraleFill, {
+                        width: `${morale}%`,
+                        backgroundColor: morale < 40 ? '#EF5350' : morale < 65 ? '#FFB74D' : '#4CAF50',
+                    }]} />
+                    {/* Maasin tasidigi seviye isareti */}
+                    <View style={[styles.moraleMarker, { left: `${target}%` }]} />
+                </View>
+                <Text style={styles.note}>{WORKFORCE_EXPLANATIONS.morale}</Text>
+
+                {/* ══ MAAŞ ══ */}
+                <CollapsibleSection
+                    title="PAY"
+                    note="What you pay against the market rate"
+                    info={WORKFORCE_EXPLANATIONS.salaryRatio}
+                    infoDetail={`Market rate for a ${tier.name} is ${formatMoney(market)} per person per quarter. You are paying ${formatMoney(perPerson)}.`}
+                    summary={`${Math.round(salaryRatio * 100)}%`}
+                    summaryColor={salaryRatio < 0.95 ? '#FFB74D' : '#4CAF50'}
+                    defaultOpen
                 >
-                    <View style={{ alignItems: 'center', padding: 20, gap: 16 }}>
-                        <Text style={{ fontSize: 40 }}>🎉</Text>
-                        <Text style={{ color: theme.colors.textSecondary, textAlign: 'center', fontSize: 16 }}>
-                            {successModal.event.desc}
-                        </Text>
-                        <Text style={{ color: theme.colors.danger, fontSize: 18, fontWeight: '700' }}>
-                            Total Cost: -${successModal.event.cost.toLocaleString()}
-                        </Text>
-                        <GameButton
-                            title="Great!"
-                            onPress={() => setSuccessModal({ visible: false })}
-                            style={{ width: '100%', marginTop: 20 }}
-                        />
+                    <View style={styles.row}>
+                        <Pressable onPress={() => changeRatio(salaryRatio - 0.05)} style={styles.adj}>
+                            <Text style={styles.adjText}>−</Text>
+                        </Pressable>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
+                            <Text style={styles.big}>{Math.round(salaryRatio * 100)}%</Text>
+                            <Text style={styles.sub}>of market rate</Text>
+                        </View>
+                        <Pressable onPress={() => changeRatio(salaryRatio + 0.05)} style={styles.adj}>
+                            <Text style={styles.adjText}>+</Text>
+                        </Pressable>
                     </View>
-                </GameModal>
-            )}
+
+                    <Text style={styles.line}>
+                        {formatMoney(perPerson)} per person · {formatNumber(employeeCount)} people ·{' '}
+                        <Text style={styles.strong}>{formatMoney(wageBill)}</Text> per quarter
+                    </Text>
+
+                    {salaryRatio < 0.95 ? (
+                        <Text style={styles.warn}>
+                            Below market. Morale is heading for {target.toFixed(0)}, people leave faster,
+                            and defects go up. You are saving cash and paying for it in output.
+                        </Text>
+                    ) : salaryRatio > 1.15 ? (
+                        <Text style={styles.warn}>
+                            Past the point where pay still buys morale. The ceiling money can reach is 85 —
+                            the rest has to come from events, bonuses and the company actually doing well.
+                        </Text>
+                    ) : (
+                        <Text style={styles.ok}>
+                            Around market. Morale settles near {target.toFixed(0)} and stays there.
+                        </Text>
+                    )}
+                </CollapsibleSection>
+
+                {/* ══ ETKİNLİKLER ══ */}
+                <CollapsibleSection
+                    title="TEAM EVENTS"
+                    note="Priced per person — they never get cheap"
+                    info={WORKFORCE_EXPLANATIONS.events}
+                    summary={`${eventsHosted} / ${MAX_EVENTS_PER_QUARTER}`}
+                >
+                    {TEAM_EVENTS.map(ev => {
+                        const cost = eventCost(ev, employeeCount);
+                        const gain = eventMoraleGain(ev, eventsHosted);
+                        const afford = companyCapital >= cost;
+                        const used = eventsHosted >= MAX_EVENTS_PER_QUARTER;
+                        return (
+                            <Pressable
+                                key={ev.id}
+                                disabled={!afford || used}
+                                onPress={() => handleEvent(ev.id)}
+                                style={[styles.eventRow, (!afford || used) && styles.eventOff]}
+                            >
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.eventName}>{ev.name}</Text>
+                                    <Text style={styles.eventDesc}>{ev.description}</Text>
+                                </View>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={styles.eventCost}>{formatMoney(cost)}</Text>
+                                    <Text style={styles.eventGain}>+{gain} morale</Text>
+                                </View>
+                            </Pressable>
+                        );
+                    })}
+                </CollapsibleSection>
+
+                {/* ══ İKRAMİYE ══ */}
+                <CollapsibleSection
+                    title="BONUS"
+                    note="Share last quarter's profit"
+                    summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
+                    summaryColor={canBonus ? '#4CAF50' : '#8A8A8A'}
+                >
+                    <Text style={styles.line}>
+                        5% of last quarter's profit: {formatMoney(bonusCost)}
+                    </Text>
+                    <Pressable
+                        disabled={!canBonus}
+                        onPress={() => distributeBonus()}
+                        style={[styles.primary, !canBonus && styles.primaryOff]}
+                    >
+                        <Text style={styles.primaryText}>
+                            {bonusDistributed
+                                ? 'Already paid this quarter'
+                                : lastQuarterProfit <= 0
+                                    ? 'No profit to share'
+                                    : `Distribute ${formatMoney(bonusCost)}`}
+                        </Text>
+                    </Pressable>
+                </CollapsibleSection>
+
+                {/* ══ FAZLA MESAİ ══ */}
+                <View style={styles.overtimeBox}>
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.rowTight}>
+                            <Text style={styles.otTitle}>OVERTIME</Text>
+                            <InfoDot title="Overtime" text={WORKFORCE_EXPLANATIONS.overtime} />
+                        </View>
+                        <Text style={styles.sub}>
+                            Runs to {Math.round(OVERTIME_MAX_RATIO * 100)}% of capacity · wages ×1.5 ·
+                            morale −3 every quarter it stays on
+                        </Text>
+                    </View>
+                    <Switch value={overtimeEnabled} onValueChange={setOvertime} />
+                </View>
+
+                {avgTenure > 0 && (
+                    <Text style={styles.note}>
+                        Average tenure {avgTenure.toFixed(1)} quarters — experienced teams produce more,
+                        but every hiring wave dilutes it.
+                    </Text>
+                )}
+            </ScrollView>
         </GameModal>
     );
 };
 
-export default EmployeesModule;
-
 const styles = StyleSheet.create({
-    sectionTitle: {
-        fontSize: 12,
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        color: theme.colors.textMuted,
-        letterSpacing: 0.5,
-        marginBottom: 8,
-        marginLeft: 4,
+    stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
+    label: { color: '#6E6E6E', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },
+    sub: { color: '#8A8A8A', fontSize: 11, marginTop: 2 },
+    strong: { color: theme.colors.textPrimary, fontWeight: '800' },
+
+    moraleTrack: {
+        height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.08)',
+        overflow: 'hidden', marginBottom: 8,
     },
-    controlsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 16,
+    moraleFill: { height: '100%', borderRadius: 5 },
+    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#FFD700' },
+
+    note: { color: '#8A8A8A', fontSize: 11, lineHeight: 16, marginBottom: 14 },
+    line: { color: '#B0B0B0', fontSize: 12, lineHeight: 17, marginTop: 6 },
+    warn: { color: '#FFB74D', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    ok: { color: '#4CAF50', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+
+    row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 6 },
+    rowTight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    adj: {
+        width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.07)',
     },
-    miniBtn: {
-        paddingVertical: 8,
-        paddingHorizontal: 0,
-        minHeight: 36,
+    adjText: { color: theme.colors.textPrimary, fontSize: 22, fontWeight: '700' },
+
+    eventRow: {
+        flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10,
+        borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
     },
-    centralDisplay: {
-        alignItems: 'center',
-        width: 100,
+    eventOff: { opacity: 0.4 },
+    eventName: { color: theme.colors.textPrimary, fontSize: 13.5, fontWeight: '700' },
+    eventDesc: { color: '#6E6E6E', fontSize: 10.5, marginTop: 2 },
+    eventCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '800' },
+    eventGain: { color: '#4CAF50', fontSize: 11, marginTop: 2 },
+
+    primary: {
+        marginTop: 10, paddingVertical: 12, borderRadius: 12,
+        alignItems: 'center', backgroundColor: '#2E7D32',
     },
-    centralValue: {
-        fontSize: 20,
-        fontWeight: '800',
-        color: theme.colors.textPrimary,
-        fontVariant: ['tabular-nums'],
+    primaryOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
+    primaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+
+    overtimeBox: {
+        flexDirection: 'row', alignItems: 'center', gap: 12,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+        padding: 14, marginTop: 12, marginBottom: 12,
     },
-    centralMini: {
-        fontSize: 10,
-        color: theme.colors.textSecondary,
-    },
-    minWarning: {
-        fontSize: 10,
-        color: theme.colors.textMuted,
-        textAlign: 'center',
-        fontStyle: 'italic',
-        marginTop: 8,
-    },
-    tierContainer: {
-        flexDirection: 'row',
-        gap: 8,
-    },
-    // Premium Main Modal Dashboard
-    moraleDashboard: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 20,
-        padding: 24,
-        borderWidth: 1,
-        borderColor: '#333',
-        gap: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.6,
-        shadowRadius: 8,
-        elevation: 12,
-    },
-    dashboardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-    },
-    dashboardLabel: {
-        fontSize: 11,
-        fontWeight: '800',
-        color: '#8E8E93',
-        letterSpacing: 1.2,
-        textTransform: 'uppercase',
-        marginBottom: 6,
-    },
-    dashboardValue: {
-        fontSize: 42,
-        fontWeight: 'bold',
-        color: '#30D158',
-        letterSpacing: -1,
-    },
-    employeeCountBadge: {
-        backgroundColor: '#2C2C2E',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#0A84FF',
-        alignItems: 'center',
-    },
-    employeeCountLabel: {
-        fontSize: 9,
-        fontWeight: '800',
-        color: '#8E8E93',
-        letterSpacing: 0.8,
-        marginBottom: 4,
-    },
-    employeeCountValue: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-    },
-    largeMoraleTrack: {
-        height: 16,
-        backgroundColor: '#2C2C2E',
-        borderRadius: 8,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#333',
-    },
-    largeMoraleFill: {
-        height: '100%',
-        borderRadius: 8,
-        shadowColor: '#30D158',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 6,
-    },
-    dashboardDesc: {
-        fontSize: 13,
-        color: '#8E8E93',
-        textAlign: 'center',
-        lineHeight: 19,
-        fontWeight: '500',
-    },
-    premiumActionCard: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#333',
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 4,
-        elevation: 6,
-    },
-    actionCardTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 4,
-    },
-    actionCardSubtitle: {
-        fontSize: 12,
-        color: '#8E8E93',
-        lineHeight: 16,
-    },
-    // Premium Morale Boost Modal Styles
-    moraleSection: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 16,
-        padding: 20,
-        borderWidth: 1,
-        borderColor: '#333',
-        gap: 12,
-    },
-    moraleHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    moraleLabel: {
-        fontSize: 11,
-        fontWeight: '800',
-        color: '#8E8E93',
-        letterSpacing: 1,
-        textTransform: 'uppercase',
-    },
-    moraleValue: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#30D158',
-    },
-    progressTrack: {
-        height: 12,
-        backgroundColor: '#2C2C2E',
-        borderRadius: 6,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#333',
-    },
-    progressFill: {
-        height: '100%',
-        borderRadius: 6,
-        shadowColor: '#30D158',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 4,
-    },
-    moraleDesc: {
-        fontSize: 13,
-        color: '#8E8E93',
-        textAlign: 'center',
-        lineHeight: 18,
-    },
-    eventsTitle: {
-        fontSize: 11,
-        fontWeight: '800',
-        color: '#8E8E93',
-        letterSpacing: 1,
-        textTransform: 'uppercase',
-        marginLeft: 4,
-    },
-    eventCard: {
-        backgroundColor: '#1C1C1E',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#0A84FF',
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 5,
-        elevation: 8,
-    },
-    eventCardDisabled: {
-        borderColor: '#333',
-        opacity: 0.5,
-    },
-    eventCardContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    eventName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 8,
-    },
-    eventStats: {
-        flexDirection: 'row',
-        gap: 12,
-    },
-    statBadge: {
-        backgroundColor: '#2C2C2E',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#333',
-    },
-    moraleBadge: {
-        borderColor: '#30D158',
-        backgroundColor: 'rgba(48, 209, 88, 0.1)',
-    },
-    statLabel: {
-        fontSize: 9,
-        fontWeight: '800',
-        color: '#8E8E93',
-        letterSpacing: 0.5,
-        marginBottom: 2,
-    },
-    statValue: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-    },
-    moraleBoostValue: {
-        color: '#30D158',
-    },
-    eventButton: {
-        minWidth: 90,
-        paddingVertical: 10,
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-        width: '100%',
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-    },
+    otTitle: { color: theme.colors.textPrimary, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
 });
+
+export default EmployeesModule;

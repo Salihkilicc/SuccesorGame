@@ -6,6 +6,7 @@ import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -95,7 +96,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                     <View style={styles.container}>
                         <Text style={styles.title}>Request New Loan</Text>
                         <Text style={styles.subtitle}>
-                            Credit Score: {creditScore} • {borrowingCapacity > 0 ? `$${(borrowingCapacity / 1_000_000).toFixed(1)}M Available` : 'No Capacity'}
+                            Credit Score: {creditScore} • {borrowingCapacity > 0 ? `${formatMoney(borrowingCapacity)} Available` : 'No Capacity'}
                         </Text>
 
                         {/* Loan Type Selection */}
@@ -155,7 +156,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                             <View style={styles.previewRow}>
                                 <Text style={styles.previewLabel}>Monthly Payment</Text>
                                 <Text style={[styles.previewValue, { color: '#FFD700' }]}>
-                                    ${Math.round(monthlyPayment).toLocaleString()}
+                                    {formatMoney(monthlyPayment)}
                                 </Text>
                             </View>
                             <View style={styles.previewRow}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatMoney } from '../../core/utils';
 
 const ADVISORS = [
   { name: 'Elite Advisor', fee: 50_000 },
@@ -47,7 +48,7 @@ const FinancialAdvisorsButton = () => {
                   style={({ pressed }) => [styles.advisorRow, pressed && styles.advisorPressed]}>
                   <View>
                     <Text style={styles.advisorName}>{advisor.name}</Text>
-                    <Text style={styles.advisorFee}>Fee: ${advisor.fee.toLocaleString()}</Text>
+                    <Text style={styles.advisorFee}>Fee: {formatMoney(advisor.fee)}</Text>
                   </View>
                   <Text style={styles.chevron}>›</Text>
                 </Pressable>

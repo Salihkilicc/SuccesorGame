@@ -30,9 +30,36 @@ export interface Product {
 
   // Aktif Durum Verileri (Kullanıcı Ayarları)
   sellingPrice?: number;
-  marketingBudget?: number; // DEPRECATED - kept for migration
-  marketingSpendPerUnit?: number; // NEW: $0-$500 per unit sold
-  productionLevel?: number; // 0-100 Kapasite
+  /**
+   * CEYREKLIK PAZARLAMA BUTCESI (dolar) — pazarlamanin tek kontrolu.
+   *
+   * Satistan BAGIMSIZ, sabit gider: satsan da satmasan da odenir.
+   * Etkisi mutlak degil goreli — kategorinin kiyas butcesine kiyasla
+   * ne harcadigin onemli. Bkz. core/market/attraction.ts
+   */
+  marketingBudget?: number;
+  /**
+   * ESKI ALAN — satilan birim basina pazarlama.
+   * Satmazsan odemiyordun, bu da onu risksiz bir kaldirac yapiyordu.
+   * Sadece eski kayitlari tasimak icin okunuyor; yeni kayit yazmiyor.
+   */
+  marketingSpendPerUnit?: number;
+  /**
+   * ESKI ALAN — kapasitenin yuzdesi (0-100).
+   * Artik uretim MUTLAK ADET ile ayarlaniyor (productionUnits).
+   * Sadece eski kayitlari tasimak icin okunuyor; yeni kayit yazmiyor.
+   * Bkz. core/market/production.ts -> resolveTargetUnits
+   */
+  productionLevel?: number;
+  /**
+   * Ceyreklik uretim HEDEFI (adet).
+   *
+   * Neden yuzde degil: fabrika/eleman alip kapasiteni buyuttugunde
+   * yuzdeli ayar uretimi kendiliginden artiriyordu. Mutlak adette hedef
+   * yerinde kalir, artirmak istersen bilerek artirirsin.
+   * Kapasiteyi asarsa motor otomatik kirpar.
+   */
+  productionUnits?: number;
   supplierId?: string; // 'local' | 'global'
   inventory?: number; // Stock count (unsold units)
   revenue?: number; // Calculated revenue from sales

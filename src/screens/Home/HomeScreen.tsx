@@ -33,6 +33,8 @@ import { EducationExamModal } from '../../features/life/components/Education/mod
 import { startNewQuarter } from '../../features/life/components/Sanctuary/store/useSanctuarySystem';
 import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
+import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
+import { startNewGame } from '../../core/newGame';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -52,12 +54,27 @@ const GRADIENTS = {
   tealCyan: ['#00b09b', '#96c93d'],
 };
 
-const HOMESCREEN_APPS = [
-  { key: 'calendar', label: 'Calendar', icon: 'calendar', gradient: GRADIENTS.orangeYellow },
-  { key: 'mail', label: 'Mail', icon: 'email', gradient: GRADIENTS.blueSky },
-  { key: 'myCompany', label: 'My Company', icon: 'office-building', gradient: GRADIENTS.networkBlue },
-  { key: 'news', label: 'News', icon: 'newspaper', gradient: GRADIENTS.tealCyan },
-];
+// Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
+const HOMESCREEN_APPS: Array<{
+  key: string;
+  label: string;
+  icon: string;
+  gradient: string[];
+  feature?: FeatureKey;
+}> = [
+    { key: 'calendar', label: 'Calendar', icon: 'calendar', gradient: GRADIENTS.orangeYellow },
+    { key: 'mail', label: 'Mail', icon: 'email', gradient: GRADIENTS.blueSky },
+    { key: 'myCompany', label: 'My Company', icon: 'office-building', gradient: GRADIENTS.networkBlue },
+    // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
+    { key: 'education', label: 'Education', icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
+    { key: 'financials', label: 'Financials', icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
+    { key: 'news', label: 'News', icon: 'newspaper', gradient: GRADIENTS.tealCyan },
+    // Settings'e giden tek yol Underworld sekmesiydi; o sekme rafa
+    // kaldirilinca ekran yetim kalmisti (featureFlags.underworld = false).
+    { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
+  ];
+
+const ACTIVE_HOMESCREEN_APPS = filterByFeature(HOMESCREEN_APPS);
 
 const NewsItem = ({ text }: { text: string }) => (
   <View style={styles.newsItem}>
@@ -69,7 +86,7 @@ const NewsItem = ({ text }: { text: string }) => (
 const HomeScreen = () => {
   const navigation = useNavigation<HomeNavProp>();
   const { name, bio, gender, hasPremium, partner } = useUserStore();
-  const { age, currentMonth, advanceMonth } = useGameStore();
+  const { age, currentMonth, advanceMonth, employeeMorale } = useGameStore();
   // Using useAssetsLogic for real-time financial data
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
   const { setField, factoryCount, employeeCount } = useStatsStore();
@@ -108,25 +125,30 @@ const HomeScreen = () => {
     }
   }, [isGameOver]);
 
-  const handleRestart = () => {
-    // 1. Reset Animation & State
+  /**
+   * Temiz yeni oyun.
+   *
+   * ESKIDEN: "New Game+" adiyla 100 MILYAR sermaye ve 1 MILYAR nakit
+   * veriyordu. Sacma baslangicin kaynagi buydu — iflas edince oyuncu
+   * oyunun geri kalanini anlamsiz kilan bir servetle devam ediyordu.
+   *
+   * Artik startNewGame() tum store'lari ve diski temizleyip
+   * initialStatsState'e donuyor (1 fabrika, 20 calisan, 2M sermaye).
+   */
+  const handleRestart = async () => {
     setIsGameOver(false);
     fadeAnim.setValue(0);
 
-    // 2. New Game+ Logic
-    const retainedFactories = Math.floor((factoryCount || 0) * 0.10);
-    const retainedEmployees = Math.floor((employeeCount || 0) * 0.10);
-
-    // Reset Products Logic
-    resetProducts();
-
-    // Set New Stats
-    setField('companyCapital', 100_000_000_000); // 100 Billion
-    setField('money', 1_000_000_000); // 1 Billion
-    setField('factoryCount', retainedFactories);
-    setField('employeeCount', retainedEmployees);
-
-    Alert.alert("New Game+", `You have been reborn!\n\n+ $100B Capital\n+ $1B Cash\n+ ${retainedFactories} Factories Retained\n+ ${retainedEmployees} Employees Retained`);
+    try {
+      await startNewGame();
+      Alert.alert(
+        'New Game',
+        'Fresh start ready.\n\n• Company capital: $2M\n• Personal cash: $50K\n• 1 factory, 20 employees\n• 1 active product (Smart Phone)',
+      );
+    } catch (e) {
+      console.error('[HomeScreen] Yeni oyun baslatilamadi', e);
+      Alert.alert('Error', 'Could not start a new game. Check the console.');
+    }
   };
 
   const handleAdvanceTime = async () => {
@@ -137,10 +159,14 @@ const HomeScreen = () => {
       const result = await advanceMonth(3);
 
       // 2. Advance Education System (Degrees, Certificates, Refresh Library)
-      useEducationSystem.getState().progressQuarter();
+      if (FEATURES.education) {
+        useEducationSystem.getState().progressQuarter();
+      }
 
       // 3. Sanctuary Cleanup (Reset Limits, Remove Temporary Luck Buffs)
-      startNewQuarter();
+      if (FEATURES.sanctuary) {
+        startNewQuarter();
+      }
 
       console.log('>>> Advance Result:', result);
 
@@ -198,6 +224,23 @@ const HomeScreen = () => {
 
   const lifeBrief = lastLifeEvent ?? 'Nothing remarkable happened recently.';
 
+  const moraleBrief =
+    employeeMorale >= 70
+      ? `Team morale high (${employeeMorale}%)`
+      : employeeMorale >= 40
+        ? `Team morale slipping (${employeeMorale}%)`
+        : `Team morale critical (${employeeMorale}%)`;
+
+  // Status widget satırları. Kapalı modüllerin satırı hiç basılmaz;
+  // yerini CEO'ya ait bir gösterge alır.
+  const statusRows = [
+    FEATURES.love ? { key: 'love', label: 'Love', value: partnerBrief } : null,
+    { key: 'assets', label: 'Assets', value: assetsBrief },
+    FEATURES.life
+      ? { key: 'life', label: 'Life', value: lifeBrief }
+      : { key: 'team', label: 'Team', value: moraleBrief },
+  ].filter((row): row is { key: string; label: string; value: string } => row !== null);
+
   const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {
     navigation.navigate(screen as any);
   };
@@ -211,6 +254,9 @@ const HomeScreen = () => {
       case 'calendar': handleNavigateStack('Calendar'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
       case 'myCompany': handleNavigateTabs('MyCompany'); break;
+      case 'education': handleNavigateStack('Education'); break;
+      case 'financials': handleNavigateStack('FinancialReport'); break;
+      case 'settings': handleNavigateStack('Settings'); break;
       case 'news': setShowNews(true); break;
     }
   };
@@ -248,9 +294,20 @@ const HomeScreen = () => {
           style={styles.container}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}>
-          {/* ── Brand Logo ── */}
+          {/* ── Brand Logo + Ayarlar ── */}
           <View style={styles.brandContainer}>
             <Text style={styles.brandText}>SUCCESSOR</Text>
+            {/* Drawer'i acan tek buton. Onceden drawer JSX'i vardi ama
+                setDrawerOpen(true) hicbir yerde cagrilmiyordu — yani
+                icindeki Dil/Bildirim/Yeni Oyun secenekleri erisilemezdi. */}
+            <Pressable
+              onPress={() => setDrawerOpen(true)}
+              hitSlop={12}
+              style={styles.brandSettingsButton}
+              accessibilityLabel="Settings"
+            >
+              <MaterialCommunityIcons name="cog-outline" size={22} color="rgba(255,255,255,0.55)" />
+            </Pressable>
           </View>
 
           {/* ── Premium Player Header ── */}
@@ -364,18 +421,18 @@ const HomeScreen = () => {
                 locations={[0, 0.2, 0.8, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
-                <View style={styles.widgetStatusRow}>
-                  <Text style={styles.statusLabel}>Love</Text>
-                  <Text style={styles.widgetStatusText} numberOfLines={1}>{partnerBrief}</Text>
-                </View>
-                <View style={styles.widgetStatusRow}>
-                  <Text style={styles.statusLabel}>Assets</Text>
-                  <Text style={styles.widgetStatusText} numberOfLines={1}>{assetsBrief}</Text>
-                </View>
-                <View style={[styles.widgetStatusRow, { marginBottom: 0 }]}>
-                  <Text style={styles.statusLabel}>Life</Text>
-                  <Text style={styles.widgetStatusText} numberOfLines={1}>{lifeBrief}</Text>
-                </View>
+                {statusRows.map((row, index) => (
+                  <View
+                    key={row.key}
+                    style={[
+                      styles.widgetStatusRow,
+                      index === statusRows.length - 1 ? { marginBottom: 0 } : null,
+                    ]}
+                  >
+                    <Text style={styles.statusLabel}>{row.label}</Text>
+                    <Text style={styles.widgetStatusText} numberOfLines={1}>{row.value}</Text>
+                  </View>
+                ))}
               </LinearGradient>
             </View>
           </View>
@@ -383,7 +440,7 @@ const HomeScreen = () => {
           <View style={styles.appsSection}>
             <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>Applications</Text>
             <View style={styles.appsGrid}>
-              {HOMESCREEN_APPS.map(renderAppIcon)}
+              {ACTIVE_HOMESCREEN_APPS.map(renderAppIcon)}
             </View>
           </View>
 
@@ -421,6 +478,30 @@ const HomeScreen = () => {
                     handleNavigateStack('Premium');
                   }}
                 />
+
+                {/* Yeni oyun. Eskiden bu secenek yalnizca iflas ekraninda ve
+                    God Mode'da vardi; God Mode Underworld sekmesinden
+                    aciliyordu ve o sekme rafa kaldirildi (featureFlags).
+                    Yani hicbir erisim yolu kalmamisti. */}
+                <DrawerItem
+                  label="New Game"
+                  rightNode={<Text style={styles.drawerMeta}>Reset</Text>}
+                  onPress={() => {
+                    setDrawerOpen(false);
+                    Alert.alert(
+                      'New Game',
+                      'All progress will be erased and a fresh run will be set up. Are you sure?',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Reset',
+                          style: 'destructive',
+                          onPress: () => { void handleRestart(); },
+                        },
+                      ],
+                    );
+                  }}
+                />
               </View>
             </View>
           ) : null
@@ -442,8 +523,8 @@ const HomeScreen = () => {
               </View>
               <ScrollView showsVerticalScrollIndicator={false}>
                 <NewsItem text="Markets rally on tech earnings." />
-                <NewsItem text="Luxury real estate market shows signs of cooling." />
-                <NewsItem text="Casino regulators tighten VIP controls." />
+                <NewsItem text="Supplier costs climb as input prices tighten margins." />
+                <NewsItem text="Investors punish growth without free cash flow." />
                 <NewsItem text="Private equity eyes distressed assets this quarter." />
               </ScrollView>
             </View>
@@ -465,7 +546,7 @@ const HomeScreen = () => {
         }
 
         {/* Education Exam Modal - Only show when report is closed */}
-        {!reportVisible && <EducationExamModal />}
+        {FEATURES.education && !reportVisible && <EducationExamModal />}
 
         {/* Universal Crystal Navigation Bar (Dark Variant) */}
         <CrystalNavBar activeTab="Home" variant="dark" />
@@ -1048,7 +1129,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 4,
     paddingHorizontal: 4,
-    alignItems: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brandSettingsButton: {
+    padding: 4,
   },
   brandText: {
     fontSize: 22,

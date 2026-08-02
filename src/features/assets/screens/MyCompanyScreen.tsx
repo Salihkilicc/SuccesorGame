@@ -18,9 +18,11 @@ import { useCompanyLogic } from '../hooks/useCompanyLogic';
 // --- UI Components ---
 import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../components/MyCompany/CompanyUI';
 import { CompanyModals } from '../components/MyCompany/CompanyModals';
+import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
 const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any) => (
@@ -38,8 +40,8 @@ const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any)
 );
 
 const formatCompactNumber = (num: number) => {
-  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
-  if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+  return formatNumber(num);
+  // eslint-disable-next-line no-unreachable
   return num.toString();
 };
 
@@ -48,7 +50,7 @@ const MyCompanyScreen = () => {
   const navigation = useNavigation<any>();
 
   // Logic Hook
-  const { handlePurchaseFactory, handleHireEmployees, costs, limits } = useCompanyLogic();
+  const { handleHireEmployees } = useCompanyLogic();
   const { products } = useProductStore();
   const { employeeMorale } = useGameStore();
 
@@ -106,10 +108,10 @@ const MyCompanyScreen = () => {
       '🔔 Launch IPO',
       `Going public will:\n\n` +
       `• Sell 20% of shares to public investors\n` +
-      `• Raise $${(cashRaised / 1_000_000).toFixed(1)}M in capital\n` +
+      `• Raise ${formatMoney(cashRaised)} in capital\n` +
       `• Reduce your ownership to 80%\n` +
       `• Apply 1.5x IPO hype multiplier\n\n` +
-      `Company Valuation: $${(stats.companyValue / 1_000_000).toFixed(1)}M\n\n` +
+      `Company Valuation: ${formatMoney(stats.companyValue)}\n\n` +
       `Are you ready to go public?`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -137,7 +139,7 @@ const MyCompanyScreen = () => {
             // Success feedback
             Alert.alert(
               '🎉 IPO Successful!',
-              `You raised $${(result.cashRaised / 1_000_000).toFixed(1)}M!\n\n` +
+              `You raised ${formatMoney(result.cashRaised)}!\n\n` +
               `The market is now open for trading.\n` +
               `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
             );
@@ -183,7 +185,7 @@ const MyCompanyScreen = () => {
             title="My Company"
             rightContent={
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Text style={styles.sharePrice}>${stockPrice.toFixed(2)}</Text>
+                <Text style={styles.sharePrice}>{formatPrice(stockPrice)}</Text>
                 <Text style={{ color: (stats.companyDailyChange || 0) >= 0 ? theme.colors.success : theme.colors.danger, fontWeight: '700' }}>
                   {(stats.companyDailyChange || 0).toFixed(2)}%
                 </Text>
@@ -214,6 +216,23 @@ const MyCompanyScreen = () => {
                 value={`${((playerShareCount || 0) / (totalShares || 10_000_000) * 100).toFixed(1)}%`}
                 colorType={stats.companyOwnership >= 51 ? 'success' : 'danger'}
               />
+            </View>
+
+            <View style={{ width: '100%', height: 1, backgroundColor: '#333', marginVertical: 16 }} />
+
+            {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
+                su an yavas biriken bir itibar gostergesi.
+                Bkz. core/market/productMarkets.ts */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+              <StatColumn
+                label="Brand Value"
+                value={`${stats.brandValue}/100`}
+                colorType={stats.brandValue >= 40 ? 'success' : 'default'}
+              />
+              <VerticalDivider />
+              <StatColumn label="Employees" value={formatCompactNumber(stats.employeeCount)} />
+              <VerticalDivider />
+              <StatColumn label="Morale" value={`${Math.round(employeeMorale)}%`} colorType={employeeMorale >= 50 ? 'success' : 'danger'} />
             </View>
           </DashboardCard>
 
@@ -253,60 +272,19 @@ const MyCompanyScreen = () => {
 
 
           {/* OPERATIONS */}
-          <SectionHeader title="OPERATIONS MANAGEMENT" />
-          <View style={{ gap: 12 }}>
-            <ManagementCard title="Factories" icon="🏭" currentValue={stats.factoryCount} maxValue={limits.maxFactories} costPerUnit={costs.factory} onSave={handlePurchaseFactory} />
+          {/* Fabrika +1/-1 butonlari ve "Employees" kartinin sayi kontrolu
+              kaldirildi. Kapasite artik tesis KADEMESINDEN geliyor ve kadro
+              HEDEF olarak veriliyor — bkz. core/market/capacity.ts */}
+          <SectionHeader title="OPERATIONS" />
+          <FacilityPanel />
 
-            <ManagementCard
-              title="Employees"
-              icon="👥"
-              currentValue={stats.employeeCount}
-              minValue={limits.minEmployees}
-              maxValue={limits.maxEmployees}
-              costPerUnit={costs.employee}
-              onSave={handleHireEmployees}
-              headerRight={
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-                  {/* Morale Bar */}
-                  {/* Morale Bar with Label */}
-                  <View style={{ alignItems: 'center', gap: 4 }}>
-                    <Text style={{ fontSize: 9, color: '#8E8E93', fontWeight: '800', letterSpacing: 0.5 }}>MORALE</Text>
-                    <View style={{ width: 80, height: 8, backgroundColor: '#2C2C2E', borderRadius: 4, overflow: 'hidden' }}>
-                      <View style={{
-                        width: `${employeeMorale}%`,
-                        height: '100%',
-                        backgroundColor:
-                          employeeMorale < 30 ? '#FF453A' : // Red
-                            employeeMorale < 50 ? '#FF9F0A' : // Orange
-                              employeeMorale < 70 ? '#32D74B' : // Light Green
-                                '#30D158' // Success Green
-                      }} />
-                    </View>
-                  </View>
-                  <Pressable
-                    onPress={() => toggleModal('employees', true)}
-                    style={({ pressed }) => [{
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      backgroundColor: pressed ? '#0A84FF' : '#2C2C2E',
-                      borderRadius: 8,
-                      borderWidth: 1,
-                      borderColor: 'rgba(10, 132, 255, 0.3)',
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 3,
-                      elevation: 4,
-                    }]}
-                  >
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#FFFFFF' }}>+ Boost</Text>
-                  </Pressable>
-                </View>
-              }
+          <View style={{ marginTop: 12 }}>
+            <SectionCard
+              title="🎉 Team Morale"
+              subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
+              onPress={() => toggleModal('employees', true)}
             />
           </View>
-
-
 
           {/* QUICK ACTIONS */}
           <SectionHeader title="QUICK ACTIONS" />

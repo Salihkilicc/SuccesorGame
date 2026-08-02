@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -50,7 +51,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.sector}>{item.sector}</Text>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
-                                <Text style={styles.value}>${(item.valuation / 1_000_000).toFixed(1)}M</Text>
+                                <Text style={styles.value}>{formatMoney(item.valuation)}</Text>
                                 <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#4ADE80' } : { color: '#FF453A' }]}>
                                     {item.lastChangePercent > 0 ? '+' : ''}{item.lastChangePercent.toFixed(1)}%
                                 </Text>

@@ -22,5 +22,49 @@ target 'Succesor' do
         config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
       end
     end
+
+    # --------------------------------------------------------------------
+    #  GEÇİCİ YAMA: Xcode 26 (Apple Clang 21) + fmt 11.0.2 uyumsuzluğu
+    # --------------------------------------------------------------------
+    #  RN 0.81.5, RCT-Folly üzerinden fmt 11.0.2 çekiyor. fmt, __cpp_consteval
+    #  gördüğünde FMT_USE_CONSTEVAL=1 yapıyor; Xcode 26'nın Clang'ı ise
+    #  consteval kurallarını daha katı uyguluyor ve FMT_STRING makro
+    #  açılımları "call to consteval function ... is not a constant
+    #  expression" hatası veriyor.
+    #
+    #  NOT: base.h bu makroyu KOŞULSUZ tanımlıyor (#ifndef koruması yok),
+    #  bu yüzden derleyiciye -DFMT_USE_CONSTEVAL=0 vermek işe yaramaz —
+    #  dosyanın kendi tanımı kazanır. Dosyayı yamalamak zorunlu.
+    #
+    #  Yama, ilk #if dalını her zaman doğru yapıp FMT_USE_CONSTEVAL'ı 0'a
+    #  sabitler. Kaybedilen tek şey format string'lerin derleme zamanı
+    #  denetimi; çalışma davranışı aynı.
+    #
+    #  KALDIRMA KOŞULU: React Native >= 0.83.9'a çıkıldığında (fmt 12.1.0
+    #  ile geliyor, Xcode 26 ile sorunsuz derleniyor) bu blok silinmeli.
+    # --------------------------------------------------------------------
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      source = File.read(fmt_base)
+      needle = "#if !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0"
+      marker = "#if 1 // PATCHED: Xcode 26 / Apple Clang 21\n#  define FMT_USE_CONSTEVAL 0"
+
+      if source.include?(marker)
+        Pod::UI.puts '[fmt yama] Zaten uygulanmis, atlandi.'
+      elsif source.include?(needle)
+        # CocoaPods indirdigi pod kaynaklarini salt-okunur birakabiliyor.
+        # Yazmadan once izni acip sonra geri kapatiyoruz.
+        original_mode = File.stat(fmt_base).mode
+        begin
+          File.chmod(0o644, fmt_base)
+          File.write(fmt_base, source.sub(needle, marker))
+          Pod::UI.puts '[fmt yama] FMT_USE_CONSTEVAL 0a sabitlendi (Xcode 26 uyumu).'
+        ensure
+          File.chmod(original_mode, fmt_base) rescue nil
+        end
+      else
+        Pod::UI.warn '[fmt yama] Beklenen kod blogu bulunamadi. fmt surumu degismis olabilir; yama gerekli mi kontrol et.'
+      end
+    end
   end
 end

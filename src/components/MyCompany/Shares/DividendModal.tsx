@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDividendLogic } from '../../../features/finance/hooks/useDividendLogic';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney, formatPrice } from '../../../core/utils';
+import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 
 interface Props {
     visible: boolean;
@@ -11,6 +13,8 @@ interface Props {
 
 const DividendModal = ({ visible, onClose }: Props) => {
     const navigation = useNavigation<any>();
+    // Hisse basi temettu hesabi icin gercek hisse sayisi gerekli.
+    const totalShares = useShareholderStore(state => state.totalShares);
     const {
         dividendPercentage,
         setDividendPercentage,
@@ -53,7 +57,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         <View style={styles.cashCard}>
                             <Text style={styles.cashLabel}>Available Company Cash</Text>
                             <Text style={styles.cashValue}>
-                                ${(availableCash / 1_000_000).toFixed(2)}M
+                                {formatMoney(availableCash)}
                             </Text>
                         </View>
 
@@ -129,7 +133,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             <View style={styles.infoRow}>
                                 <Text style={styles.infoLabel}>Total Payout</Text>
                                 <Text style={styles.infoValue}>
-                                    ${(distributionAmount / 1_000_000).toFixed(2)}M
+                                    {formatMoney(distributionAmount)}
                                 </Text>
                             </View>
                             <View style={styles.divider} />
@@ -137,8 +141,12 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.infoLabel}>
                                     Dividend Per Share
                                 </Text>
+                                {/* HATA DUZELTMESI: eskiden sabit 1.000.000'a bolunuyordu.
+                                    Toplam hisse 10.000.000 oldugu icin hisse basi temettu
+                                    10 KAT fazla gorunuyordu. Artik gercek hisse sayisina bolunuyor.
+                                    Kaynak: features/shareholders/stores/useShareholderStore.ts (TOTAL_SHARES) */}
                                 <Text style={styles.infoValue}>
-                                    ${(distributionAmount / 1_000_000).toFixed(4)}
+                                    {formatPrice(distributionAmount / (totalShares || 10_000_000))}
                                 </Text>
                             </View>
                             <View style={styles.divider} />
@@ -148,7 +156,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                     styles.infoValue,
                                     { color: isRisky ? '#FF453A' : '#FFFFFF' }
                                 ]}>
-                                    ${(remainingCapital / 1_000_000).toFixed(2)}M
+                                    {formatMoney(remainingCapital)}
                                 </Text>
                             </View>
                         </View>
@@ -157,7 +165,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         <View style={styles.profitHighlight}>
                             <Text style={styles.profitLabel}>💰 You Receive</Text>
                             <Text style={styles.profitAmount}>
-                                ${(playerDividend / 1_000_000).toFixed(2)}M
+                                {formatMoney(playerDividend)}
                             </Text>
                             <Text style={styles.profitNote}>
                                 Based on your {playerSharePercentage.toFixed(1)}% ownership

@@ -55,7 +55,7 @@ const ProfileScreen = () => {
                     I'll use 'Home' but visually activeTab highlights the specific icon.
                     Actually, let's just use 'Life' as it's a fallback.
                 */}
-                <CrystalNavBar activeTab="Life" variant="dark" hideDots={true} />
+                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
             </View>
         </View>
     );

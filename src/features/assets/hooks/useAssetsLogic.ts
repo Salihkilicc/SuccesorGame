@@ -3,6 +3,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
 import { STOCKS } from '../data/marketData';
+import { formatMoney } from '../../../core/utils';
 
 export const useAssetsLogic = () => {
     const user = useUserStore((state) => state);
@@ -35,7 +36,7 @@ export const useAssetsLogic = () => {
 
         Alert.alert(
             "Liquidate Portfolio",
-            `Are you sure you want to sell all your assets? Estimated value: $${portfolioValue.toLocaleString()}`,
+            `Are you sure you want to sell all your assets? Estimated value: ${formatMoney(portfolioValue)}`,
             [
                 { text: "Cancel", style: "cancel" },
                 {
@@ -43,7 +44,7 @@ export const useAssetsLogic = () => {
                     style: "destructive",
                     onPress: () => {
                         const soldAmount = liquidatePortfolio();
-                        Alert.alert("Success", `Sold all assets for $${soldAmount.toLocaleString()}`);
+                        Alert.alert("Success", `Sold all assets for ${formatMoney(soldAmount)}`);
                     }
                 }
             ]

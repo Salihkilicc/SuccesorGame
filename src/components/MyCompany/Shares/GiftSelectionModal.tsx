@@ -4,6 +4,7 @@ import { theme } from '../../../core/theme';
 import { Shareholder } from '../../../core/store/useStatsStore';
 // 👇 YOL GÜNCELLENDİ
 import { useGiftLogic } from './logic/useGiftLogic';
+import { formatMoney } from '../../../core/utils';
 
 interface Props {
     visible: boolean;
@@ -73,7 +74,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                         <View style={styles.header}>
                             <Text style={styles.title}>Send Gift</Text>
                             <View style={styles.walletBadge}>
-                                <Text style={styles.walletText}>💰 ${money.toLocaleString()}</Text>
+                                <Text style={styles.walletText}>💰 {formatMoney(money)}</Text>
                             </View>
                         </View>
 
@@ -87,7 +88,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                                     onPress={() => sendGift(gift)}>
                                     <Text style={styles.icon}>{gift.icon}</Text>
                                     <Text style={styles.name}>{gift.name}</Text>
-                                    <Text style={styles.cost}>${gift.cost.toLocaleString()}</Text>
+                                    <Text style={styles.cost}>{formatMoney(gift.cost)}</Text>
                                     <View style={styles.impactBadge}>
                                         <Text style={styles.impactTextSmall}>+{gift.impact} Rel</Text>
                                     </View>

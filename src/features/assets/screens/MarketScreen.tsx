@@ -25,6 +25,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 // Veriler ve Tipler
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
 import { MarketItem, StockItem, BondItem, CryptoAsset, FundItem } from '../../../components/Market/marketTypes';
+import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 // Type Guards
 function isCrypto(item: MarketItem): item is CryptoAsset {
@@ -98,17 +99,11 @@ const MarketScreen = () => {
     return items;
   }, [selectedTab, stockCategory, subsidiaries]);
 
+  // Paylasilan bicimlendiriciye devrediyor (core/utils).
+  // Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+  // ayni deger farkli ekranlarda farkli gorunuyordu.
   const formatMoney = (value: number) => {
-    const absolute = Math.abs(value);
-    if (absolute >= 1_000_000) {
-      const formatted = (value / 1_000_000).toFixed(1);
-      return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
-    }
-    if (absolute >= 1_000) {
-      const formatted = (value / 1_000).toFixed(1);
-      return `$${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}K`;
-    }
-    return `$${value.toLocaleString()}`;
+    return formatMoneyExact(value);
   };
 
   return (

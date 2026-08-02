@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../../core/theme'; // Tema yolunu projene göre kontrol et
+import { formatNumber } from '../../core/utils';
 
 interface Props {
     label: string;
@@ -53,7 +54,7 @@ export const PercentageSelector = ({
             <View style={styles.header}>
                 <Text style={styles.label}>{label}</Text>
                 <Text style={styles.value}>
-                    {value.toLocaleString()} <Text style={styles.unit}>{unit}</Text>
+                    {formatNumber(value)} <Text style={styles.unit}>{unit}</Text>
                 </Text>
             </View>
 

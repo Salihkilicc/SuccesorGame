@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 // 👇 DÜZELTME: Bir "../" daha eklendi
 import { useStatsStore, Shareholder } from '../../../../core/store/useStatsStore';
+import { formatMoney } from '../../../../core/utils';
 
 export const GIFTS = [
     { id: 'watch', name: 'Luxury Watch', cost: 15_000, impact: 5, icon: '⌚' },
@@ -22,7 +23,7 @@ export const useGiftLogic = (shareholder: Shareholder) => {
 
         Alert.alert(
             'Confirm Gift',
-            `Send ${gift.name} ($${gift.cost.toLocaleString()})?`,
+            `Send ${gift.name} (${formatMoney(gift.cost)})?`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {

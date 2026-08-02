@@ -4,6 +4,7 @@ import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { useGameStore } from '../../../core/store/useGameStore';
+import { formatMoney } from '../../../core/utils';
 
 type Props = {
     visible: boolean;
@@ -67,7 +68,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 
                     <View style={styles.dealRow}>
                         <Text style={styles.dealLabel}>Amount:</Text>
-                        <Text style={styles.dealAmount}>${(LOAN_AMOUNT / 1_000_000).toFixed(1)}M</Text>
+                        <Text style={styles.dealAmount}>{formatMoney(LOAN_AMOUNT)}</Text>
                     </View>
 
                     <View style={styles.dealRow}>

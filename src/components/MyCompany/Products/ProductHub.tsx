@@ -6,6 +6,7 @@ import ProductDetailModal from './ProductDetailModal';
 import NewProductWizard from './NewProductWizard';
 import ManagementCard from '../ManagementCard';
 import { useStatsStore } from '../../../core/store';
+import { formatNumber, formatMoney } from '../../../core/utils';
 
 interface Props {
     onClose?: () => void;
@@ -33,7 +34,7 @@ const ProductHub = ({ onClose }: Props) => {
                     <Text style={styles.title}>🏭 Products</Text>
                     <View style={styles.capacityBadge}>
                         <Text style={styles.capacityText}>
-                            Cap: {availableCapacity.toLocaleString()}
+                            Cap: {formatNumber(availableCapacity)}
                         </Text>
                     </View>
                 </View>
@@ -91,13 +92,13 @@ const ProductHub = ({ onClose }: Props) => {
                             <View style={styles.stat}>
                                 <Text style={styles.statLabel}>Revenue</Text>
                                 <Text style={styles.statValue}>
-                                    ${(product.revenue / 1000).toFixed(0)}k
+                                    {formatMoney(product.revenue)}
                                 </Text>
                             </View>
                             <View style={styles.stat}>
                                 <Text style={styles.statLabel}>Production</Text>
                                 <Text style={styles.statValue}>
-                                    {product.production.allocated.toLocaleString()}
+                                    {formatNumber(product.production.allocated)}
                                 </Text>
                             </View>
                         </View>

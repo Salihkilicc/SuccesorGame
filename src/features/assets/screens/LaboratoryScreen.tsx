@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
+import StepperBar from '../../../components/common/StepperBar';
+import { researchOutput, researcherWage } from '../../../core/market/workforce';
 import { useStatsStore } from '../../../core/store';
 import {
     getFacilityByTier,
@@ -12,30 +14,14 @@ import {
     calculateQuarterlyRP,
     RESEARCHER_ECONOMICS,
 } from '../../../features/laboratory/data/laboratoryData';
+import { formatMoney as formatMoneyExact, formatNumber } from '../../../core/utils';
 
-const formatMoney = (value: number = 0): string => {
-    if (value === undefined || value === null) return '$0';
-    if (value >= 1_000_000_000) {
-        return `$${(value / 1_000_000_000).toFixed(1)}B`;
-    }
-    if (value >= 1_000_000) {
-        return `$${(value / 1_000_000).toFixed(1)}M`;
-    }
-    if (value >= 1_000) {
-        return `$${(value / 1_000).toFixed(1)}K`;
-    }
-    return `$${value.toLocaleString()}`;
-};
+// Paylasilan bicimlendiriciye devrediyor (core/utils).
+// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
+// ayni deger farkli ekranlarda farkli gorunuyordu.
+const formatMoney = (value: number = 0): string => formatMoneyExact(value);
 
-const formatRP = (value: number): string => {
-    if (value >= 1_000_000) {
-        return `${(value / 1_000_000).toFixed(1)}M RP`;
-    }
-    if (value >= 1_000) {
-        return `${(value / 1_000).toFixed(1)}K RP`;
-    }
-    return `${value.toLocaleString()} RP`;
-};
+const formatRP = (value: number): string => `${formatNumber(value)} RP`;
 
 const LaboratoryScreen = () => {
     const navigation = useNavigation();
@@ -57,15 +43,20 @@ const LaboratoryScreen = () => {
     const nextTier = getNextTier(currentTier);
 
     // Derived calculations
-    const quarterlyCost = calculateQuarterlyCost(tempCount);
+    const facilityTier = useStatsStore(st => st.facilityTier);
+    const salaryRatio = useStatsStore(st => st.salaryRatio);
+    const quarterlyCost = tempCount * researcherWage(facilityTier, salaryRatio);
     const quarterlyRP = calculateQuarterlyRP(tempCount);
-    const costDiff = calculateQuarterlyCost(tempCount - researcherCount); // Immediate hiring cost if any
+    const costDiff = (tempCount - researcherCount) * researcherWage(facilityTier, salaryRatio);
 
     // NOTE: hireResearchers assumes immediate payment of first quarter salary? 
     // Based on user prompt "Expenses will be deducted from Capital", checking if we need to show immediate cost.
     // The store logic deducts (count * Salary). 
     // If tempCount > researcherCount, we need to pay (tempCount - researcherCount) * Salary * 1 (now).
-    const immediateCost = Math.max(0, tempCount - researcherCount) * RESEARCHER_ECONOMICS.SALARY_PER_QUARTER;
+    // Maas artik tek kaynaktan: core/market/workforce.ts. Eskiden sabit
+    // 500.000 dolardi ve sirket olcegiyle hicbir ilgisi yoktu.
+    const perResearcher = researcherWage(facilityTier, salaryRatio);
+    const immediateCost = Math.max(0, tempCount - researcherCount) * perResearcher;
 
     const canAfford = companyCapital >= immediateCost;
 
@@ -182,7 +173,7 @@ const LaboratoryScreen = () => {
                             />
                         </View>
                         <Text style={styles.capacityText}>
-                            {tempCount.toLocaleString()} / {facility.capacity.toLocaleString()}
+                            {formatNumber(tempCount)} / {formatNumber(facility.capacity)}
                         </Text>
                     </View>
 
@@ -214,53 +205,30 @@ const LaboratoryScreen = () => {
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Staffing Controls</Text>
 
-                    {/* Capacity Progress Bar */}
-                    <View style={styles.capacityHeader}>
-                        <View style={styles.capacityBarBg}>
-                            {/* Current Fill */}
-                            <View
-                                style={[
-                                    styles.capacityBarFill,
-                                    { width: `${(researcherCount / facility.capacity) * 100}%`, backgroundColor: theme.colors.textSecondary, opacity: 0.3 }
-                                ]}
-                            />
-                            {/* Target Fill */}
-                            <View
-                                style={[
-                                    styles.capacityBarFill,
-                                    {
-                                        position: 'absolute',
-                                        width: `${(tempCount / facility.capacity) * 100}%`,
-                                        backgroundColor: hasChanges ? (canAfford ? theme.colors.accent : theme.colors.danger) : theme.colors.accent
-                                    }
-                                ]}
-                            />
-                        </View>
-                        <Text style={styles.capacityOverlayText}>
-                            {tempCount.toLocaleString()} / {facility.capacity.toLocaleString()} Researchers
-                        </Text>
-                    </View>
+                    {/* Yuzdelik kontroller KALDIRILDI.
+                        ±%5 / ±%10 mevcut sayinin yuzdesiydi, yani sayi
+                        buyudukce adim da buyuyordu ve kontrolden cikiyordu.
+                        Artik urun uretim barindaki mantik: mutlak sayi,
+                        buyuyen tavan, 1/10/100 butonlari ve KUCUK yuzde
+                        kisayollari. Bkz. components/common/StepperBar.tsx */}
+                    <Text style={{ color: '#8A8A8A', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
+                        {formatNumber(tempCount)} researchers produce{' '}
+                        <Text style={{ color: '#7FB3FF', fontWeight: '800' }}>
+                            {formatNumber(researchOutput(tempCount))} RP
+                        </Text>{' '}
+                        per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
+                        power of 0.85 — doubling the team does not double the discoveries.
+                    </Text>
 
-                    {/* Compact Controls */}
-                    <View style={styles.controlsContainer}>
-                        {/* Row 1: Percentages */}
-                        <View style={styles.compactRow}>
-                            {[-0.10, -0.05, 0.05, 0.10].map((pct) => (
-                                <Pressable key={pct} style={styles.compactBtn} onPress={() => handlePercentage(pct)}>
-                                    <Text style={styles.compactBtnText}>{pct > 0 ? '+' : ''}{pct * 100}%</Text>
-                                </Pressable>
-                            ))}
-                        </View>
-
-                        {/* Row 2: Numbers */}
-                        <View style={styles.compactRow}>
-                            {[-100, -10, -1, 1, 10, 100].map((num) => (
-                                <Pressable key={num} style={styles.compactBtn} onPress={() => handleAdjust(num)}>
-                                    <Text style={styles.compactBtnText}>{num > 0 ? '+' : ''}{num}</Text>
-                                </Pressable>
-                            ))}
-                        </View>
-                    </View>
+                    <StepperBar
+                        value={tempCount}
+                        onChange={setTempCount}
+                        max={facility.capacity}
+                        unit="researchers"
+                        markers={[{ value: researcherCount, label: 'Now', color: '#7FB3FF' }]}
+                        steps={[1, 10, 100]}
+                        fillColor={canAfford ? '#7FB3FF' : '#EF5350'}
+                    />
 
                     {/* Summary & Confirm */}
                     <View style={styles.confirmSection}>

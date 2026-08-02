@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleCryptoAsset } from './marketTypes';
+import { formatMoney as formatMoneyExact, formatPrice } from '../../core/utils';
 
 const capSlowdown = (marketCap: number) => {
   if (marketCap >= 400) return 0.35;
@@ -15,7 +16,9 @@ const capSlowdown = (marketCap: number) => {
 const adjustedChange = (baseChange: number, marketCap: number) =>
   Number((baseChange * capSlowdown(marketCap)).toFixed(1));
 
-const formatCap = (marketCap: number) => `$${marketCap.toLocaleString()}B`;
+// Market cap tam dolar olarak saklaniyor (3_000_000_000_000 gibi).
+// Eskiden sonuna elle 'B' ekleniyordu -> "$3,000,000,000,000B".
+const formatCap = (marketCap: number) => formatMoneyExact(marketCap);
 
 type Props = {
   visible: boolean;
@@ -85,7 +88,7 @@ const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
 
 export default CryptoDetailsModal;
 
-const formatMoney = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+const formatMoney = (value: number) => formatPrice(value);
 
 const styles = StyleSheet.create({
   backdrop: {

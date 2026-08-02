@@ -5,6 +5,7 @@ import { useStatsStore, TechLevels } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
 import { theme } from '../../../core/theme';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
+import { formatMoney } from '../../../core/utils';
 
 export type RAndDModalProps = {
   visible: boolean;
@@ -166,7 +167,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
             </Pressable>
           </View>
           <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
-          <Text style={styles.capitalText}>Available Capital: ${(companyCapital / 1_000_000_000).toFixed(2)}B</Text>
+          <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
 
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
             {renderCategory('hardware', 'Category A: Hardware Engineering')}
@@ -329,7 +330,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
               </Pressable>
             </View>
             <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
-            <Text style={styles.capitalText}>Available Capital: ${(companyCapital / 1_000_000_000).toFixed(2)}B</Text>
+            <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
 
             <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
               {renderCategory('hardware', 'Category A: Hardware Engineering')}

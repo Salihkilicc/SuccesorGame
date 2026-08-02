@@ -5,9 +5,10 @@ import { Product, INITIAL_PRODUCTS } from '../data/productsData';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 
-// --- KRİTİK AYAR ---
-// 75.000.000 Üretim / 160.000 İşçi = 468.75
-const UNITS_PER_EMPLOYEE = 468.75;
+// NOT: Buradaki 'UNITS_PER_EMPLOYEE = 468.75' sabiti KALDIRILDI.
+// Motorun formulunden tamamen farkliydi (karmasikligi hic hesaba katmiyordu)
+// ve ekranda motorun urettiginin 47 KATI bir sayi gosteriyordu.
+// Kapasite artik core/market/production.ts uzerinden hesaplaniyor.
 
 export const useProductsLogic = () => {
     const { researchPoints = 1000, employeeCount } = useStatsStore();
@@ -17,9 +18,11 @@ export const useProductsLogic = () => {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [analysisData, setAnalysisData] = useState<Product | null>(null);
 
-    // --- KAPASİTE HESABI (BORDER) ---
-    // Full kapasitede (160k işçi) bu değer tam 75.000.000 olacak.
-    const maxCapacityUnits = Math.floor(employeeCount * UNITS_PER_EMPLOYEE);
+    // Kapasite artik URUNE OZEL: karmasiklik bolen oldugu icin her urunun
+    // azami uretimi farkli. Bu yuzden tek bir sayi yerine calisan sayisini
+    // gecirip hesabi urun ekraninda yapiyoruz.
+    // (Geriye donuk uyumluluk icin alan duruyor; artik calisan sayisi.)
+    const maxCapacityUnits = employeeCount;
 
     useEffect(() => {
         if (products.length === 0) {
@@ -69,7 +72,7 @@ export const useProductsLogic = () => {
         updateProduct(target.id, {
             status: 'active',
             sellingPrice: target.suggestedPrice,
-            marketingSpendPerUnit: 10, // Default start
+            marketingBudget: 0, // Oyuncu bilerek acsin
             productionLevel: 50, // Default 50%
             supplierId: 'local'
         });
@@ -101,7 +104,7 @@ export const useProductsLogic = () => {
         const diff = (product.sellingPrice || 0) - product.suggestedPrice;
         if (diff > 15) return "Price is too high!";
         if (diff < -15) return "Price is too low.";
-        if ((product.marketingBudget || 0) < 2000) return "Marketing is weak.";
+        if ((product.marketingBudget || 0) <= 0) return "No marketing budget.";
 
         const demand = product.marketDemand;
         const production = product.productionLevel || 0;

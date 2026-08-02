@@ -8,6 +8,7 @@ import GameModal from '../../common/GameModal';
 import GameButton from '../../common/GameButton';
 import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
+import { formatMoney } from '../../../core/utils';
 
 
 type Props = {
@@ -127,7 +128,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             />
                         </View>
                         <Text style={styles.capacityValue}>
-                            ${(borrowingCapacity / 1_000_000).toFixed(1)}M Available
+                            {formatMoney(borrowingCapacity)} Available
                         </Text>
                     </View>
                 </View>
@@ -137,13 +138,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>Total Debt</Text>
                         <Text style={[styles.statValue, { color: '#FF6B6B' }]}>
-                            ${(totalDebt / 1_000_000).toFixed(2)}M
+                            {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>Monthly Interest</Text>
                         <Text style={[styles.statValue, { color: '#FFA500' }]}>
-                            ${(monthlyInterest / 1_000).toFixed(0)}K
+                            {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
@@ -175,13 +176,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                         <View>
                                             <Text style={styles.loanDetailLabel}>Remaining</Text>
                                             <Text style={styles.loanDetailValue}>
-                                                ${(loan.remaining / 1_000_000).toFixed(2)}M
+                                                {formatMoney(loan.remaining)}
                                             </Text>
                                         </View>
                                         <View>
                                             <Text style={styles.loanDetailLabel}>Monthly</Text>
                                             <Text style={styles.loanDetailValue}>
-                                                ${(loan.monthlyPayment / 1_000).toFixed(0)}K
+                                                {formatMoney(loan.monthlyPayment)}
                                             </Text>
                                         </View>
                                     </View>

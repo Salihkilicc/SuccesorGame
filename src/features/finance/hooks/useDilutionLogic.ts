@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../stores/useEquityStore';
+import { formatMoney } from '../../../core/utils';
 
 export interface DilutionLogicResult {
     // State
@@ -90,7 +91,7 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
 
                         Alert.alert(
                             "Success",
-                            `$${(result.capitalRaised / 1_000_000).toFixed(1)}M Raised!\n` +
+                            `${formatMoney(result.capitalRaised)} Raised!\n` +
                             `New Ownership: ${result.newOwnershipPercent.toFixed(1)}%`
                         );
                         onClose();
