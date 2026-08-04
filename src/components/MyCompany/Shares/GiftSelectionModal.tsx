@@ -80,7 +80,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                             </View>
                         </View>
 
-                        <Text style={styles.subtitle}>Select a gift for {shareholder.name}:</Text>
+                        <Text style={styles.subtitle}>{t('equity.selectAGiftForV1', { v1: shareholder.name })}</Text>
 
                         <View style={styles.grid}>
                             {GIFTS.map(gift => (

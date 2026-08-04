@@ -163,18 +163,17 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                         </View>
 
                         <View style={styles.strategyList}>
-                            {renderStrategyRow('Marketing', 'marketing', '📢', 'Boosts sales & brand awareness')}
-                            {renderStrategyRow('R&D', 'rnd', '🔬', 'Drives innovation & tech growth')}
-                            {renderStrategyRow('Production', 'production', '🏭', 'Increases output & efficiency')}
-                            {renderStrategyRow('Workforce', 'workforce', '👥', 'Improves morale & stability')}
+                            {renderStrategyRow(t('sub.marketing'), 'marketing', '📢', t('sub.marketingDesc'))}
+                            {renderStrategyRow(t('sub.rnd'), 'rnd', '🔬', t('sub.rndDesc'))}
+                            {renderStrategyRow(t('sub.production'), 'production', '🏭', t('sub.productionDesc'))}
+                            {renderStrategyRow(t('sub.workforce'), 'workforce', '👥', t('sub.workforceDesc'))}
                         </View>
 
                         {/* Info Note */}
                         <View style={styles.infoBox}>
                             <Ionicons name="information-circle-outline" size={20} color="#8E8E93" />
                             <Text style={styles.infoText}>
-                                Max 10 points total. High R&D benefits Tech companies. High Production benefits Industrial.
-                                Workforce below 2 causes instability.
+                                {t('sub.pointsHint')}
                             </Text>
                         </View>
                     </ScrollView>

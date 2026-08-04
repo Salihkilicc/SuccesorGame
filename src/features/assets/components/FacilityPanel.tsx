@@ -88,14 +88,17 @@ const FacilityPanel: React.FC = () => {
     const handleUpgrade = () => {
         if (!next) return;
         Alert.alert(
-            `Upgrade to ${next.name}?`,
-            `${formatMoney(next.upgradeCost)}${next.upgradeRP > 0 ? ` and ${formatNumber(next.upgradeRP)} RP` : ''} now, ` +
-            `${next.buildQuarters} quarter(s) to build.\n\n` +
-            `While it is being built your facility runs at ${Math.round(tier.retoolingRatio * 100)}% ` +
-            `capacity. You will produce less, and you may lose share.\n\n` +
-            `When it lands: ${formatNumber(next.capacity)} capacity, crew of ${formatNumber(next.crew)}, ` +
-            `unit cost ×${next.unitCostMultiplier.toFixed(2)}, Brand Value ceiling ${next.brandCeiling}, ` +
-            `quality ceiling ${next.qualityCeiling}.`,
+            t('fac.upgradeTo', { v1: next.name }),
+            t('fac.upgradeBody', {
+                v1: formatMoney(next.upgradeCost) + (next.upgradeRP > 0 ? ` + ${formatNumber(next.upgradeRP)} RP` : ''),
+                v2: next.buildQuarters,
+                v3: Math.round(tier.retoolingRatio * 100),
+                v4: formatNumber(next.capacity),
+                v5: formatNumber(next.crew),
+                v6: next.unitCostMultiplier.toFixed(2),
+                v7: next.brandCeiling,
+                v8: next.qualityCeiling,
+            }),
             [
                 { text: t('company.notNow'), style: 'cancel' },
                 {
@@ -133,7 +136,7 @@ const FacilityPanel: React.FC = () => {
             <View style={styles.stripe}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.tierLabel}>
-                        TIER {tier.level}/{MAX_TIER_LEVEL}{isBuilding ? '  ·  RETOOLING' : ''}
+                        {t('fac.tierBadge', { v1: tier.level, v2: MAX_TIER_LEVEL })}{isBuilding ? `  ·  ${t('fac.retooling')}` : ''}
                     </Text>
                     <Text style={styles.tierName}>{tier.name}</Text>
                     <Text style={styles.stripeMeta}>
@@ -155,10 +158,12 @@ const FacilityPanel: React.FC = () => {
             {staffing < 1 && (
                 <Pressable style={styles.alertBox} onPress={() => setTarget(tier.crew)}>
                     <Text style={styles.alertText}>
-                        Understaffed — {formatNumber(tier.crew - employeeCount)} people short.
-                        You are getting {formatPercent(staffing * 100)} of what this facility can build.
+                        {t('company.understaffedShort', {
+                            v1: formatNumber(tier.crew - employeeCount),
+                            v2: formatPercent(staffing * 100),
+                        })}
                     </Text>
-                    <Text style={styles.alertCta}>Tap to set the target to {formatNumber(tier.crew)}</Text>
+                    <Text style={styles.alertCta}>{t('company.tapToSetTheTarget', { v1: formatNumber(tier.crew) })}</Text>
                 </Pressable>
             )}
 
@@ -167,7 +172,7 @@ const FacilityPanel: React.FC = () => {
                 title={t('company.facility')}
                 note={t('company.whatThisTierGivesYou')}
                 info={t('company.yourProductionCapabilityItSets')}
-                infoDetail={`Production = capacity × min(1, employees / crew) × yield. Hiring past the crew adds cost and no output; upgrading the tier without hiring raises the ceiling you cannot reach. The two go together.`}
+                infoDetail={t('fac.productionFormula')}
                 summary={tier.name}
             >
                 <Text style={styles.tierDesc}>{tier.description}</Text>
@@ -245,7 +250,7 @@ const FacilityPanel: React.FC = () => {
                     note={`${next.name} — ${formatMoney(next.upgradeCost)}, ${next.buildQuarters}q`}
                     info={t('company.youCannotSkipTiersYou')}
                     infoDetail={t('company.thatDowntimeIsTheReal')}
-                    summary={companyCapital >= next.upgradeCost ? 'Affordable' : 'Saving'}
+                    summary={companyCapital >= next.upgradeCost ? t('fac.affordable') : t('fac.saving')}
                     summaryColor={companyCapital >= next.upgradeCost ? '#4CAF50' : '#8A8A8A'}
                 >
                     <Text style={styles.nextName}>{next.name}</Text>
@@ -269,7 +274,7 @@ const FacilityPanel: React.FC = () => {
 
                     {next.upgradeRP > 0 && (
                         <Text style={totalRP >= next.upgradeRP ? styles.okLine : styles.warn}>
-                            Research: {formatNumber(Math.floor(totalRP))} / {formatNumber(next.upgradeRP)} RP
+                            {t('fac.researchProgress', { v1: formatNumber(Math.floor(totalRP)), v2: formatNumber(next.upgradeRP) })}
                             {totalRP < next.upgradeRP
                                 ? ' — money alone will not build this. Fund the lab.'
                                 : ' — cleared.'}
@@ -290,12 +295,12 @@ const FacilityPanel: React.FC = () => {
                     >
                         <Text style={styles.primaryBtnText}>
                             {isBuilding
-                                ? 'Build already in progress'
+                                ? t('fac.buildInProgress')
                                 : companyCapital < next.upgradeCost
-                                    ? `Need ${formatMoney(next.upgradeCost - companyCapital)} more`
+                                    ? t('fac.needMoreCash', { v1: formatMoney(next.upgradeCost - companyCapital) })
                                     : totalRP < next.upgradeRP
-                                        ? `Need ${formatNumber(next.upgradeRP - Math.floor(totalRP))} more RP`
-                                        : `Start ${next.name}`}
+                                        ? t('fac.needMoreRp', { v1: formatNumber(next.upgradeRP - Math.floor(totalRP)) })
+                                        : t('fac.startBuild', { v1: next.name })}
                         </Text>
                     </Pressable>
                 </CollapsibleSection>
@@ -335,23 +340,19 @@ const FacilityPanel: React.FC = () => {
                     steps={[1, 10, 100]}
                 />
 
-                <Text style={styles.costLine}>
-                    Wage bill at this size: {formatMoney(wageBill)} per quarter
-                </Text>
+                <Text style={styles.costLine}>{t('company.wageBillAtThisSize', { v1: formatMoney(wageBill) })}</Text>
 
                 {delta !== 0 && (
                     <Text style={delta > 0 ? styles.okLine : styles.warn}>
                         {delta > 0
-                            ? `Hiring ${formatNumber(delta)} costs ${formatMoney(changeCost)} up front. They start next quarter.`
-                            : `Letting ${formatNumber(-delta)} go costs ${formatMoney(changeCost)} in severance, plus a morale hit.`}
+                            ? t('fac.hiringCost', { v1: formatNumber(delta), v2: formatMoney(changeCost) })
+                            : t('fac.layoffCost', { v1: formatNumber(-delta), v2: formatMoney(changeCost) })}
                     </Text>
                 )}
 
                 {delta > perQuarterHiringCap && (
                     <Text style={styles.warn}>
-                        You can only take on about {formatNumber(perQuarterHiringCap)} people per quarter.
-                        The rest will follow in later quarters — a stronger brand and better morale
-                        raise that ceiling.
+                        {t('fac.hiringCapWarn', { v1: formatNumber(perQuarterHiringCap) })}
                     </Text>
                 )}
 
@@ -368,7 +369,7 @@ const FacilityPanel: React.FC = () => {
                     onPress={applyTarget}
                 >
                     <Text style={styles.primaryBtnText}>
-                        {delta === 0 ? 'No change' : 'Confirm target'}
+                        {delta === 0 ? t('fac.noChange') : t('fac.confirmTarget')}
                     </Text>
                 </Pressable>
             </CollapsibleSection>

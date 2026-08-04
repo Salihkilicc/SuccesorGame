@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/governance.ts
 //
 // ============================================================================
@@ -374,13 +375,13 @@ export const requiresVote = (
         return {
             required: true,
             reason:
-                `You hold ${owns.toFixed(1)}% — below majority. The board decides this, not you.`,
+                t('gov.belowMajorityDecides', { v1: owns.toFixed(1) }),
         };
     }
 
     const threshold = MAJORITY_VOTE_THRESHOLDS[proposal.kind];
     if (threshold === undefined) {
-        return { required: false, reason: 'Within your authority as majority holder.' };
+        return { required: false, reason: t('data.governance.withinYourAuthorityAsMajority') };
     }
 
     const val = Math.max(1, proposal.valuation || 1);
@@ -389,18 +390,20 @@ export const requiresVote = (
     if (proposal.kind === 'mezzanine') {
         return {
             required: true,
-            reason: 'Mezzanine always goes to a vote — the lender may end up on this board.',
+            reason: t('data.governance.mezzanineAlwaysGoesToA'),
         };
     }
     if (ratio >= threshold) {
         return {
             required: true,
             reason:
-                `This is ${(ratio * 100).toFixed(0)}% of the company's value. ` +
-                `Anything above ${(threshold * 100).toFixed(0)}% needs board approval.`,
+                t('gov.needsApprovalAbove', {
+                    v1: (ratio * 100).toFixed(0),
+                    v2: (threshold * 100).toFixed(0),
+                }),
         };
     }
-    return { required: false, reason: 'Within your authority as majority holder.' };
+    return { required: false, reason: t('data.governance.withinYourAuthorityAsMajority') };
 };
 
 /** Bir uyenin bir teklife karsi temel durusu. */
@@ -508,13 +511,13 @@ export const castVotes = (
         let reason: string;
         if (Math.abs(trustPull) > Math.abs(stance) && trustPull !== 0) {
             reason = trustPull > 0
-                ? `Backs you personally (trust ${m.trust}).`
-                : `Does not trust you (trust ${m.trust}).`;
-        } else if (stance > 0.2) reason = `A ${m.trait} likes this kind of move.`;
-        else if (stance < -0.2) reason = `A ${m.trait} is against this on principle.`;
-        else if (performance < -0.3) reason = 'Thinks the company cannot afford risk right now.';
-        else if (lobby > 0) reason = 'Persuaded in private.';
-        else reason = 'Undecided, leaning on the numbers.';
+                ? t('gov.backsYou', { v1: m.trust })
+                : t('gov.doesNotTrust', { v1: m.trust });
+        } else if (stance > 0.2) reason = t('gov.traitLikes', { v1: t('data.trait.' + m.trait) });
+        else if (stance < -0.2) reason = t('gov.traitAgainst', { v1: t('data.trait.' + m.trait) });
+        else if (performance < -0.3) reason = t('gov.cannotAffordRisk');
+        else if (lobby > 0) reason = t('gov.persuadedInPrivate');
+        else reason = t('gov.undecided');
 
         return { memberId: m.id, name: m.name, trait: m.trait, vote, shareCount: m.shareCount, reason };
     });
@@ -562,10 +565,10 @@ export const castVotes = (
         boardRecommends,
         overrode,
         summary: overrode
-            ? `Carried on your shares alone — the board voted against you. That will be remembered.`
+            ? t('gov.carriedAlone')
             : passed
-                ? `Approved — ${((yesShares / Math.max(1, totalVoting)) * 100).toFixed(1)}% in favour.`
-                : `Rejected — only ${((yesShares / Math.max(1, totalVoting)) * 100).toFixed(1)}% in favour.`,
+                ? t('gov.approvedPct', { v1: ((yesShares / Math.max(1, totalVoting)) * 100).toFixed(1) })
+                : t('gov.rejectedPct', { v1: ((yesShares / Math.max(1, totalVoting)) * 100).toFixed(1) }),
     };
 };
 
@@ -630,7 +633,7 @@ export const checkNoConfidence = (
     // 1) KONTROL — cogunluktaysan kimse seni indiremez. Matematiksel.
     const lostControl = playerOwnershipPercent < CONTROL_THRESHOLD;
     if (lostControl) {
-        reasons.push(`You hold ${playerOwnershipPercent.toFixed(1)}% — no longer a majority.`);
+        reasons.push(t('gov.noLongerMajority', { v1: playerOwnershipPercent.toFixed(1) }));
     }
 
     // 2) ILISKI — kurul sana guvenmiyor.
@@ -643,7 +646,7 @@ export const checkNoConfidence = (
         : 100;
     const lostRoom = avgTrust < NO_CONFIDENCE_TRUST;
     if (lostRoom) {
-        reasons.push(`Weighted board loyalty is ${avgTrust.toFixed(0)} — they have stopped defending you.`);
+        reasons.push(t('gov.loyaltyGone', { v1: avgTrust.toFixed(0) }));
     }
 
     // 3) PERFORMANS — sonuclar kotu.
@@ -653,11 +656,11 @@ export const checkNoConfidence = (
         ctx.priceVsPeak < 0.45;
     if (failing) {
         if (ctx.lossStreak >= NO_CONFIDENCE_LOSS_STREAK) {
-            reasons.push(`${ctx.lossStreak} consecutive losing quarters.`);
+            reasons.push(t('gov.losingQuarters', { v1: ctx.lossStreak }));
         }
-        if (ctx.inBreach) reasons.push('The company is in breach of its covenants.');
+        if (ctx.inBreach) reasons.push(t('gov.inBreach'));
         if (ctx.priceVsPeak < 0.45) {
-            reasons.push(`The share price is ${((1 - ctx.priceVsPeak) * 100).toFixed(0)}% below its peak.`);
+            reasons.push(t('gov.belowPeak', { v1: ((1 - ctx.priceVsPeak) * 100).toFixed(0) }));
         }
     }
 
@@ -667,9 +670,9 @@ export const checkNoConfidence = (
     // gormeli. Habersiz kaybetmek adil degil.
     let warning: string | undefined;
     if (conditionsMet === 2) {
-        if (!lostControl) warning = 'If you fall below 50%, the board can move against you.';
-        else if (!lostRoom) warning = 'Trust is the only thing keeping you in the chair.';
-        else warning = 'One more bad quarter and they will call a vote.';
+        if (!lostControl) warning = t('gov.warnControl');
+        else if (!lostRoom) warning = t('gov.warnTrust');
+        else warning = t('gov.warnPerformance');
     }
 
     return { triggered: conditionsMet === 3, reasons, conditionsMet, warning };
@@ -708,8 +711,8 @@ export const voteNoConfidence = (
             vote,
             shareCount: m.shareCount,
             reason: vote === 'YES'
-                ? `Votes to remove you (trust ${m.trust}).`
-                : `Stands by you (trust ${m.trust}).`,
+                ? t('gov.votesToRemove', { v1: m.trust })
+                : t('gov.standsByYou', { v1: m.trust }),
         };
     });
 
@@ -730,8 +733,8 @@ export const voteNoConfidence = (
         totalVoting,
         requiredShares,
         summary: removed
-            ? `The board has removed you as CEO. ${((removeShares / Math.max(1, totalVoting)) * 100).toFixed(1)}% voted against you.`
-            : `You survive. ${((keepShares / Math.max(1, totalVoting)) * 100).toFixed(1)}% of the register stood by you.`,
+            ? t('gov.removedAsCeo', { v1: ((removeShares / Math.max(1, totalVoting)) * 100).toFixed(1) })
+            : t('gov.survivedVote', { v1: ((keepShares / Math.max(1, totalVoting)) * 100).toFixed(1) }),
     };
 };
 
@@ -842,8 +845,8 @@ export const resolvePromise = (
     kind: kept ? 'promise_kept' : 'promise_broken',
     magnitude: clamp01(promise.magnitude),
     label: kept
-        ? `You kept your word: ${promise.description}`
-        : `You broke your word: ${promise.description}`,
+        ? t('gov.keptWord', { v1: promise.description })
+        : t('gov.brokeWord', { v1: promise.description }),
 });
 
 // ============================================================================
@@ -870,13 +873,13 @@ export const boardMoodFrom = (members: GovMember[]): BoardMood => {
  * gecerler (bkz. credit.ts FINANCING_SIGNALS).
  */
 export const GOVERNANCE_SIGNALS: Record<string, { impactPercent: number; note: string }> = {
-    proposal_rejected: { impactPercent: -4, note: 'The board publicly overruled its CEO.' },
-    director_resigned: { impactPercent: -6, note: 'A director walked out. Investors ask why.' },
-    no_confidence_called: { impactPercent: -14, note: 'A no-confidence vote is a governance crisis.' },
-    ceo_removed: { impactPercent: -22, note: 'The founder has been removed.' },
-    ceo_survived: { impactPercent: -5, note: 'Survived, but the fight was public.' },
-    board_aligned: { impactPercent: 2, note: 'A united board reads as stability.' },
-    promise_broken: { impactPercent: -3, note: 'Word gets around that the CEO does not keep commitments.' },
+    proposal_rejected: { impactPercent: -4, note: t('data.governance.theBoardPubliclyOverruledIts') },
+    director_resigned: { impactPercent: -6, note: t('data.governance.aDirectorWalkedOutInvestors') },
+    no_confidence_called: { impactPercent: -14, note: t('data.governance.aNoConfidenceVoteIs') },
+    ceo_removed: { impactPercent: -22, note: t('data.governance.theFounderHasBeenRemoved') },
+    ceo_survived: { impactPercent: -5, note: t('data.governance.survivedButTheFightWas') },
+    board_aligned: { impactPercent: 2, note: t('data.governance.aUnitedBoardReadsAs') },
+    promise_broken: { impactPercent: -3, note: t('data.governance.wordGetsAroundThatThe') },
 };
 
 // ============================================================================
@@ -960,13 +963,12 @@ export const directorFromAcquisition = (
     const shareCount = Math.round((totalShares || 10_000_000) * stake);
 
     return {
-        name: `${targetName} founder`,
+        name: t('gov.founderOf', { v1: targetName }),
         trait: TRAIT_BY_RISK[risk] ?? 'Loyalist',
         // Sana kendi istegiyle katildi: iyi niyetli ama korlemesine degil.
         trust: 60,
         shareCount,
         note:
-            `Rolled ${(stake * 100).toFixed(1)}% of your company into the deal and took a board seat. ` +
-            `Friendly deals are cheaper, but they cost you a slice of control.`,
+            t('gov.rolloverNote', { v1: (stake * 100).toFixed(1) }),
     };
 };

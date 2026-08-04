@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/mergers.ts
 //
 // ============================================================================
@@ -493,7 +494,7 @@ export const quoteFinancing = (
 
     if (method === 'cash') {
         if (availableCash < price) {
-            return { ...base, feasible: false, reason: 'Not enough cash. Try debt or a share exchange.' };
+            return { ...base, feasible: false, reason: t('data.mergers.notEnoughCashTryDebt') };
         }
         return { ...base, cashUsed: price };
     }
@@ -512,7 +513,7 @@ export const quoteFinancing = (
 
     // HISSE TAKASI: nakit gerekmez, ama seyrelirsin.
     if (!(currentSharePrice > 0)) {
-        return { ...base, feasible: false, reason: 'No share price yet — you need a valuation first.' };
+        return { ...base, feasible: false, reason: t('data.mergers.noSharePriceYetYou') };
     }
     const sharesIssued = Math.ceil(price / currentSharePrice);
     return {

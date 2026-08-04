@@ -160,9 +160,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                         -{(predictedDrop * 100).toFixed(1)}%
                                     </Text>
                                 </Text>
-                                <Text style={styles.stockWarningValue}>
-                                    New Price: {formatPrice(predictedPrice)}
-                                </Text>
+                                <Text style={styles.stockWarningValue}>{t('equity.newPriceV1', { v1: formatPrice(predictedPrice) })}</Text>
                             </View>
                         </View>
 

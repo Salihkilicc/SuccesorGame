@@ -45,13 +45,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const TRUST_BOOST = 5;
 
         if (money < GIFT_COST) {
-            Alert.alert(t('alert.insufficientFunds'), `You need ${formatMoney(GIFT_COST)} to send a gift.`);
+            Alert.alert(t('alert.insufficientFunds'), t('mem.needForGift', { v1: formatMoney(GIFT_COST) }));
             return;
         }
 
         Alert.alert(
             '🎁 Send Gift',
-            `Send a ${formatMoney(GIFT_COST)} gift to ${member.name}?\n\nTrust will increase by ${TRUST_BOOST}.`,
+            t('mem.sendGiftBody', { v1: formatMoney(GIFT_COST), v2: member.name, v3: TRUST_BOOST }),
             [
                 { text: t('equity.cancel'), style: 'cancel' },
                 {
@@ -59,7 +59,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     onPress: () => {
                         updateStats({ money: money - GIFT_COST });
                         // TODO: Implement trust increase in store
-                        Alert.alert('✅ Gift Sent', `${member.name} appreciates your generosity!\n\nTrust +${TRUST_BOOST}`);
+                        Alert.alert(t('mem.giftSent'), t('mem.giftSentBody', { v1: member.name, v2: TRUST_BOOST }));
                         console.log(`[Lobbying] Gift sent to ${member.name}. Trust +${TRUST_BOOST}`);
                     },
                 },
@@ -74,14 +74,14 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         // TODO: Check energy from stats store
         Alert.alert(
             '🍽️ Private Dinner',
-            `Invite ${member.name} to a private dinner?\n\nCost: ${ENERGY_COST} Energy\nTrust will increase by ${TRUST_BOOST}.`,
+            t('mem.dinnerBody', { v1: member.name, v2: ENERGY_COST, v3: TRUST_BOOST }),
             [
                 { text: t('equity.cancel'), style: 'cancel' },
                 {
                     text: t('equity.arrangeDinner'),
                     onPress: () => {
                         // TODO: Deduct energy, increase trust
-                        Alert.alert('✅ Dinner Arranged', `You had a productive conversation with ${member.name}.\n\nTrust +${TRUST_BOOST}`);
+                        Alert.alert(t('mem.dinnerArranged'), t('mem.dinnerArrangedBody', { v1: member.name, v2: TRUST_BOOST }));
                         console.log(`[Lobbying] Dinner with ${member.name}. Trust +${TRUST_BOOST}`);
                     },
                 },
@@ -113,10 +113,10 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     };
 
     const getLikelihoodLabel = () => {
-        if (offerPremium < 0) return 'Insulted';
-        if (offerPremium < 20) return 'Hesitant';
-        if (offerPremium < 50) return 'Interested';
-        return 'Very Interested';
+        if (offerPremium < 0) return t('mem.insulted');
+        if (offerPremium < 20) return t('mem.hesitant');
+        if (offerPremium < 50) return t('mem.interested');
+        return t('mem.veryInterested');
     };
 
     const getLikelihoodWidth = (): string => {
@@ -128,7 +128,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     const handleMakeOffer = () => {
         if (money < offerPrice) {
-            Alert.alert(t('alert.insufficientFunds'), `You need ${formatMoney(offerPrice)} to make this offer.`);
+            Alert.alert(t('alert.insufficientFunds'), t('mem.needForOffer', { v1: formatMoney(offerPrice) }));
             return;
         }
 
@@ -155,11 +155,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
         if (offerAcceptable) {
             Alert.alert(
-                '✅ Offer Accepted!',
+                t('mem.offerAccepted'),
                 `${member.name} has accepted your offer!\n\n` +
-                `Price: ${formatMoney(offerPrice)}\n` +
-                `Shares Acquired: ${member.shares.toFixed(1)}%\n\n` +
-                `Your ownership will increase to ${(member.shares + 65).toFixed(1)}%`,
+                t('mem.offerAcceptedBody', {
+                    v1: formatMoney(offerPrice),
+                    v2: member.shares.toFixed(1),
+                    v3: (member.shares + 65).toFixed(1),
+                }),
                 [
                     { text: t('equity.cancel'), style: 'cancel' },
                     {
@@ -167,7 +169,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         onPress: () => {
                             // TODO: Implement actual share transfer
                             updateStats({ money: money - offerPrice });
-                            Alert.alert('🎉 Purchase Complete', `You now own ${member.shares.toFixed(1)}% more of the company!`);
+                            Alert.alert(t('mem.purchaseComplete'), t('mem.purchaseCompleteBody', { v1: member.shares.toFixed(1) }));
                             console.log(`[Buyout] Purchased ${member.shares}% from ${member.name} for $${offerPrice}`);
                             onClose();
                         },
@@ -178,9 +180,10 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
             Alert.alert(
                 '❌ Offer Too Low',
                 `${member.name} rejected your offer.\n\n` +
-                `Your Offer: ${formatMoney(offerPrice)}\n` +
-                `They Want: ${formatMoney(requiredPrice)}\n\n` +
-                `Try increasing your premium.`,
+                t('mem.offerRejectedBody', {
+                    v1: formatMoney(offerPrice),
+                    v2: formatMoney(requiredPrice),
+                }),
                 [{ text: 'OK', style: 'destructive' }]
             );
         }
@@ -198,7 +201,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     <Text style={styles.heroAvatarText}>{member.name.charAt(0)}</Text>
                 </View>
                 <Text style={styles.heroName}>{member.name}</Text>
-                <Text style={styles.heroRole}>The {member.trait}</Text>
+                <Text style={styles.heroRole}>{t('equity.theV1', { v1: member.trait })}</Text>
                 <View style={[styles.trustBadge, { borderColor: trustStatus.color }]}>
                     <Text style={[styles.trustBadgeText, { color: trustStatus.color }]}>
                         {trustStatus.label}
@@ -371,7 +374,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                             disabled={money < offerPrice}
                         >
                             <Text style={styles.makeOfferButtonText}>
-                                {money < offerPrice ? '💰 INSUFFICIENT FUNDS' : '💼 MAKE OFFER'}
+                                {money < offerPrice ? `💰 ${t('mem.insufficientFunds')}` : `💼 ${t('mem.makeOffer')}`}
                             </Text>
                         </Pressable>
 

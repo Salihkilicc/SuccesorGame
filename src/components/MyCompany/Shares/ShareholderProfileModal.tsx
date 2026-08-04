@@ -117,9 +117,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         const result = giftMember(member.id, giftType);
 
         if (result.success) {
-            Alert.alert('✅ Gift Sent', result.message);
+            Alert.alert(t('mem.giftSent'), result.message);
         } else {
-            Alert.alert('❌ Failed', result.message);
+            Alert.alert(`❌ ${t('common.failed')}`, result.message);
         }
     };
 
@@ -221,9 +221,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     };
 
     const getReactionLabel = () => {
-        if (offerPremium < 0) return 'Insulted';
-        if (offerPremium <= 20) return 'Neutral';
-        return 'Happy';
+        if (offerPremium < 0) return t('mem.insulted');
+        if (offerPremium <= 20) return t('mem.neutralMood');
+        return t('mem.happy');
     };
 
     const calculateSuccessChance = () => {
@@ -281,7 +281,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {member.trait === 'Snake' && '🐍'}
                                 {member.trait === 'Loyalist' && '🤝'}
                                 {' '}
-                                {member.trait}
+                                {t('data.trait.' + member.trait)}
                             </Text>
                         </View>
 
@@ -411,7 +411,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                 {/* Context Text */}
                                 <Text style={styles.tradeContext}>
-                                    {tradeMode === 'buy' ? 'Buy their shares' : 'Sell your shares to them'}
+                                    {tradeMode === 'buy' ? t('shp.buyTheirShares') : t('shp.sellYourShares')}
                                 </Text>
 
                                 {/* Amount Stepper */}
@@ -479,7 +479,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {/* Reaction Indicator */}
                                 <View style={styles.reactionContainer}>
                                     <View style={styles.reactionLabelRow}>
-                                        <Text style={styles.reactionLabel}>Reaction: {getReactionLabel()}</Text>
+                                        <Text style={styles.reactionLabel}>{t('equity.reactionV1', { v1: getReactionLabel() })}</Text>
                                         <Text style={styles.reactionChance}>
                                             {calculateSuccessChance()}% chance
                                         </Text>
@@ -500,7 +500,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {/* Price Display */}
                                 <View style={styles.priceDisplay}>
                                     <Text style={styles.priceLabel}>
-                                        {tradeMode === 'buy' ? 'You pay:' : 'You receive:'}
+                                        {tradeMode === 'buy' ? t('shp.youPay') : t('shp.youReceive')}
                                     </Text>
                                     <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#30D158' }]}>
                                         {formatMoney(calculateOfferPrice())}
@@ -517,7 +517,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     disabled={animationState !== 'idle'}
                                 >
                                     <Text style={styles.makeOfferButtonText}>
-                                        {tradeMode === 'buy' ? 'MAKE OFFER' : 'DUMP SHARES'}
+                                        {tradeMode === 'buy' ? t('mem.makeOffer') : t('shp.dumpShares')}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -543,7 +543,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             <View style={styles.animationContent}>
                                 <ActivityIndicator size="large" color="#0A84FF" />
                                 <Text style={styles.animationText}>
-                                    {tradeMode === 'buy' ? 'Negotiating...' : 'Processing...'}
+                                    {tradeMode === 'buy' ? t('shp.negotiating') : t('shp.processing')}
                                 </Text>
                             </View>
                         )}
@@ -551,7 +551,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             <View style={styles.animationContent}>
                                 <Text style={styles.animationIcon}>✅</Text>
                                 <Text style={styles.animationText}>
-                                    {tradeMode === 'buy' ? 'OFFER ACCEPTED' : 'SHARES SOLD'}
+                                    {tradeMode === 'buy' ? t('shp.offerAccepted') : t('shp.sharesSold')}
                                 </Text>
                             </View>
                         )}
@@ -559,7 +559,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             <View style={styles.animationContent}>
                                 <Text style={styles.animationIcon}>❌</Text>
                                 <Text style={styles.animationText}>
-                                    {tradeMode === 'buy' ? 'OFFER REJECTED' : 'SALE REJECTED'}
+                                    {tradeMode === 'buy' ? t('shp.offerRejected') : t('shp.saleRejected')}
                                 </Text>
                             </View>
                         )}

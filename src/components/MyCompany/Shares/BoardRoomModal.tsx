@@ -198,7 +198,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                                 <View style={{ flex: 1 }}>
                                                     <Text style={styles.memberName}>{m.name}</Text>
                                                     <Text style={styles.memberTrait}>
-                                                        {m.trait} · {weight.toFixed(1)}% of the vote
+                                                        {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
                                                     </Text>
                                                 </View>
                                                 <Text style={[styles.memberTrust, { color: trustColor }]}>

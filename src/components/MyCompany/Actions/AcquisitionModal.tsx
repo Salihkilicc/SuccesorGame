@@ -138,20 +138,23 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
     }
 
     const describe = (o: FinancingQuote) => {
-      if (o.method === 'cash') return `Cash — ${formatMoney(o.cashUsed)} from the treasury`;
-      if (o.method === 'debt') return `Debt — ${formatMoney(o.annualInterest)}/yr interest`;
-      return `Shares — you drop to ${o.playerOwnershipAfter.toFixed(2)}%`;
+      if (o.method === 'cash') return t('acq.payCashDesc', { v1: formatMoney(o.cashUsed) });
+      if (o.method === 'debt') return t('acq.payDebtDesc', { v1: formatMoney(o.annualInterest) });
+      return t('acq.payStockDesc', { v1: o.playerOwnershipAfter.toFixed(2) });
     };
 
     Alert.alert(
-      `How do you pay for ${selectedTarget.name}?`,
-      `Price ${formatMoney(q.price)} · your company is worth ${formatMoney(acquirerValuation)}\n` +
-      `This deal is ${(q.relativeSize * 100).toFixed(1)}% of your size.\n\n` +
+      t('acq.howDoYouPay', { v1: selectedTarget.name }),
+      t('acq.financingHeader', {
+        v1: formatMoney(q.price),
+        v2: formatMoney(acquirerValuation),
+        v3: (q.relativeSize * 100).toFixed(1),
+      }) +
       feasible.map(o => `${describe(o)}`).join('\n'),
       [
         { text: t('action.cancel'), style: 'cancel' },
         ...feasible.map(o => ({
-          text: o.method === 'cash' ? 'Pay cash' : o.method === 'debt' ? 'Borrow' : 'Issue shares',
+          text: o.method === 'cash' ? t('acq.payCash') : o.method === 'debt' ? t('acq.borrow') : t('acq.issueShares'),
           onPress: () => confirmDeal(q, o, hostile, acquirerValuation),
         })),
       ]
@@ -167,31 +170,34 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
     if (!selectedTarget) return;
 
     Alert.alert(
-      hostile ? `Hostile bid for ${selectedTarget.name}` : `Acquire ${selectedTarget.name}`,
-      `Market value        ${formatMoney(q.fairValue)}\n` +
-      `Premium (${Math.round(q.premiumRatio * 100)}%)      +${formatMoney(q.premium)}\n` +
-      `You pay             ${formatMoney(q.price)}\n\n` +
-      `Their annual profit ${formatMoney(q.targetAnnualEbit)}\n` +
-      `Integration cost    −${formatMoney(q.firstYearIntegration)}\n` +
-      `Synergies (full)    +${formatMoney(q.annualSynergyAtFullRun)}\n\n` +
-      `First year impact   ${q.firstYearEbitImpact >= 0 ? '+' : ''}${formatMoney(q.firstYearEbitImpact)}` +
-      ` (${q.accretive ? 'accretive' : 'DILUTIVE'})\n` +
-      `At full run rate    +${formatMoney(q.steadyStateEbitImpact)}\n` +
-      `Payback             ${isFinite(q.paybackYears) ? q.paybackYears.toFixed(1) + ' years' : 'never at this price'}\n\n` +
-      `Expected share reaction on announcement: ${q.announcementImpactPercent.toFixed(1)}%\n\n` +
+      hostile ? t('acq.hostileBidFor', { v1: selectedTarget.name }) : t('acq.acquireTitle', { v1: selectedTarget.name }),
+      t('acq.dealSheet', {
+        v1: formatMoney(q.fairValue),
+        v2: Math.round(q.premiumRatio * 100),
+        v3: formatMoney(q.premium),
+        v4: formatMoney(q.price),
+        v5: formatMoney(q.targetAnnualEbit),
+        v6: formatMoney(q.firstYearIntegration),
+        v7: formatMoney(q.annualSynergyAtFullRun),
+        v8: (q.firstYearEbitImpact >= 0 ? '+' : '') + formatMoney(q.firstYearEbitImpact),
+        v9: q.accretive ? t('acq.accretive') : t('acq.dilutive'),
+        v10: formatMoney(q.steadyStateEbitImpact),
+        v11: isFinite(q.paybackYears) ? t('acq.paybackYears', { v1: q.paybackYears.toFixed(1) }) : t('acq.neverAtThisPrice'),
+        v12: q.announcementImpactPercent.toFixed(1),
+      }) +
       (fin.method === 'stock'
-        ? `PAID IN SHARES: ${fin.sharesIssued.toLocaleString()} new shares go to their owners. ` +
-          `Your ownership falls to ${fin.playerOwnershipAfter.toFixed(2)}%.\n\n`
+        ? t('acq.paidInShares', {
+            v1: fin.sharesIssued.toLocaleString(),
+            v2: fin.playerOwnershipAfter.toFixed(2),
+          })
         : fin.method === 'debt'
-          ? `PAID WITH DEBT: ${formatMoney(fin.annualInterest)} of interest every year, and the debt ` +
-            `sits against your valuation until it is repaid.\n\n`
+          ? t('acq.paidWithDebt', { v1: formatMoney(fin.annualInterest) })
           : '') +
-      `The ${formatMoney(q.premium)} premium goes to their shareholders on day one and does not come back. ` +
-      `Integration lands first; the benefits take about six quarters.`,
+      t('acq.premiumWarning', { v1: formatMoney(q.premium) }),
       [
         { text: t('action.walkAway'), style: 'cancel' },
         {
-          text: hostile ? 'Launch hostile bid' : 'Sign the deal',
+          text: hostile ? t('acq.launchHostile') : t('acq.signDeal'),
           style: hostile ? 'destructive' : 'default',
           onPress: () => {
             // TEK KAPI — finansman, anlasma kaydi, buff ve piyasa tepkisi
@@ -224,10 +230,10 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                 .map(v => `${v.vote === 'YES' ? '✓' : '✕'}  ${v.name} — ${v.reason}`)
                 .join('\n');
               Alert.alert(
-                vote!.passed ? 'The board approved it' : 'The board voted it down',
+                vote!.passed ? t('acq.boardApproved') : t('acq.boardVotedDown'),
                 `${vote!.summary}\n\n${lines}` +
                 (vote!.overrode
-                  ? '\n\n⚠️ It carried on your shares alone. The board was against you, and they will remember.'
+                  ? `\n\n${t('acq.carriedOnYourShares')}`
                   : ''),
               );
             }
@@ -239,12 +245,8 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 
             Alert.alert(
               t('alert.dealClosed'),
-              `${selectedTarget.name} is yours.\n\n` +
-              `Integration starts now and runs for four quarters. Their profit will reach you ` +
-              `gradually, and synergies take about six quarters to arrive.\n\n` +
-              `${q.accretive
-                ? 'The deal should add to profit within the first year.'
-                : 'The first year will be dilutive — that is normal, but the market will be watching.'}`
+              t('acq.dealClosedBody', { v1: selectedTarget.name }) +
+              (q.accretive ? t('acq.accretiveNote') : t('acq.dilutiveNote'))
             );
             setSelectedTarget(null);
             onClose();
@@ -268,7 +270,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         </View>
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemSector}>{item.category || 'Technology'}</Text>
+          <Text style={styles.itemSector}>{item.category || t('common.technology')}</Text>
         </View>
         <View style={styles.itemValue}>
           <Text style={styles.marketCap}>{formatMoney(valuation)}</Text>
@@ -342,7 +344,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
           <View style={styles.overlayBackdrop}>
             <View style={styles.negotiationCard}>
               <View style={styles.negHeader}>
-                <Text style={styles.negTitle}>Acquire {selectedTarget.name}</Text>
+                <Text style={styles.negTitle}>{t('action.acquireV1', { v1: selectedTarget.name })}</Text>
                 <Text style={styles.negSubtitle}>{t('action.chooseYourApproach')}</Text>
               </View>
 
@@ -377,7 +379,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('action.synergyBuff')}</Text>
-                  <Text style={styles.buffValue}>{selectedTarget.acquisitionBuff?.label || 'None'}</Text>
+                  <Text style={styles.buffValue}>{selectedTarget.acquisitionBuff?.label || t('common.none')}</Text>
                 </View>
               </View>
 
@@ -388,7 +390,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   onPress={() => handleAcquire('FRIENDLY')}
                 >
                   <View style={styles.optionHeader}>
-                    <Text style={styles.optionTitle}>🤝 Friendly Offer</Text>
+                    <Text style={styles.optionTitle}>🤝 {t('acq.friendlyOffer')}</Text>
                     <Text style={styles.optionPrice}>{formatMoney(selectedTarget.currentValuation)}</Text>
                   </View>
                   <Text style={styles.optionDesc}>{t('action.purchaseAtFairMarketValue')}</Text>
@@ -400,7 +402,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   onPress={() => handleAcquire('HOSTILE')}
                 >
                   <View style={styles.optionHeader}>
-                    <Text style={[styles.optionTitle, styles.hostileText]}>⚔️ Hostile Takeover</Text>
+                    <Text style={[styles.optionTitle, styles.hostileText]}>⚔️ {t('acq.hostileTakeover')}</Text>
                     <Text style={[styles.optionPrice, styles.hostileText]}>
                       {formatMoney(selectedTarget.currentValuation * 1.2)}
                     </Text>

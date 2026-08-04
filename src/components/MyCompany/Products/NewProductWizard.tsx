@@ -217,7 +217,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                         {!locked && !isActiveOwned && (
                                             <View style={{ marginTop: 4 }}>
                                                 <Text style={styles.metaText}>{item.estCost}</Text>
-                                                <Text style={styles.metaText}>Cap: {item.capacityWeight}x</Text>
+                                                <Text style={styles.metaText}>{t('company.capV1X', { v1: item.capacityWeight })}</Text>
                                             </View>
                                         )}
                                         {locked && (
@@ -278,7 +278,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
 
                                 <View style={{ marginTop: 'auto', gap: 8 }}>
                                     <GameButton
-                                        title="🚀 Launch Product"
+                                        title={`🚀 ${t('company.launchProduct')}`}
                                         variant="primary" // Could be 'success' color if available, but primary is fine
                                         onPress={handleLaunch}
                                         style={{ backgroundColor: '#4CAF50', borderColor: '#4CAF50' }} // Custom override for success green

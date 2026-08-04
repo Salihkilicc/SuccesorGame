@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/workforce.ts
 //
 // ============================================================================
@@ -413,31 +414,31 @@ export interface TeamEvent {
 export const TEAM_EVENTS: TeamEvent[] = [
     {
         id: 'lunch',
-        name: 'Team Lunch',
+        name: t('data.workforce.teamLunch'),
         costPerPerson: 150,
         moraleBoost: 3,
-        description: 'Cheap, quick, and forgotten by Friday.',
+        description: t('data.workforce.cheapQuickAndForgottenBy'),
     },
     {
         id: 'offsite',
-        name: 'Offsite Day',
+        name: t('data.workforce.offsiteDay'),
         costPerPerson: 600,
         moraleBoost: 7,
-        description: 'A day out of the building. People actually talk to each other.',
+        description: t('data.workforce.aDayOutOfThe'),
     },
     {
         id: 'retreat',
-        name: 'Company Retreat',
+        name: t('data.workforce.companyRetreat'),
         costPerPerson: 2_200,
         moraleBoost: 13,
-        description: 'Two nights away. Expensive, and people remember it.',
+        description: t('data.workforce.twoNightsAwayExpensiveAnd'),
     },
     {
         id: 'gala',
-        name: 'Flagship Gala',
+        name: t('data.workforce.flagshipGala'),
         costPerPerson: 6_000,
         moraleBoost: 20,
-        description: 'The kind of night that gets photographed. Costs like it too.',
+        description: t('data.workforce.theKindOfNightThat'),
     },
 ];
 

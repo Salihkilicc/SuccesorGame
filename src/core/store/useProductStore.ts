@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { t } from '../../core/i18n';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '../types';
@@ -49,9 +50,9 @@ export const initialProductState: ProductState = {
     products: [
         {
             id: 'smart_phone',
-            name: 'Smart Phone',
+            name: t('product.smartPhone'),
             icon: '📱',
-            description: 'Essential for modern life.',
+            description: t('product.essentialForModernLife'),
             status: 'active',
             category: 'Consumer', // Type cast if needed, but 'Consumer' is valid
             // Requirements
@@ -178,7 +179,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 set((state) => {
                     const product = state.products.find(p => p.id === productId);
                     if (!product) {
-                        result = { success: false, message: 'Product not found' };
+                        result = { success: false, message: t('product.productNotFound') };
                         return state;
                     }
 
@@ -189,7 +190,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const rpCost = productUpgradeRP(complexity, currentLevel);
 
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
+                        result = { success: false, message: t('product.needV1Rp', { v1: formatNumber(rpCost) }) };
                         return state;
                     }
 
@@ -200,7 +201,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const currentPrice = product.sellingPrice || product.suggestedPrice;
                     const newPrice = Math.floor(currentPrice * 1.03);
 
-                    result = { success: true, message: `Quality Improved! Price increased to $${newPrice}` };
+                    result = { success: true, message: t('product.qualityImprovedPriceIncreasedTo', { v1: newPrice }) };
 
                     return {
                         products: state.products.map(p => {
@@ -224,7 +225,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 set((state) => {
                     const product = state.products.find(p => p.id === productId);
                     if (!product) {
-                        result = { success: false, message: 'Product not found' };
+                        result = { success: false, message: t('product.productNotFound') };
                         return state;
                     }
 
@@ -235,7 +236,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const rpCost = productUpgradeRP(complexity, currentLevel);
 
                     if (currentRP < rpCost) {
-                        result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
+                        result = { success: false, message: t('product.needV1Rp', { v1: formatNumber(rpCost) }) };
                         return state;
                     }
 
@@ -245,7 +246,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const minCost = Math.floor(product.baseProductionCost * 0.40);
 
                     if (currentCost <= minCost) {
-                        result = { success: false, message: 'Max efficiency reached (40% limit).' };
+                        result = { success: false, message: t('product.maxEfficiencyReached40Limit') };
                         return state;
                     }
 
@@ -256,7 +257,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     let newCost = Math.floor(currentCost * 0.98);
                     if (newCost < minCost) newCost = minCost;
 
-                    result = { success: true, message: `Process Optimized! Cost reduced to $${newCost}` };
+                    result = { success: true, message: t('product.processOptimizedCostReducedTo', { v1: newCost }) };
 
                     return {
                         products: state.products.map(p => {
@@ -290,7 +291,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
             discontinueProduct: (productId: string) => {
                 const state = get();
                 const product = state.products.find((p: any) => p.id === productId);
-                if (!product) return { success: false, message: 'Product not found.' };
+                if (!product) return { success: false, message: t('product.productNotFound2') };
 
                 const leftoverStock = product.inventory || 0;
 
@@ -326,14 +327,14 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 }
 
                 if (product.isUnlocked) {
-                    return { success: false, message: 'Bu ürün zaten açılmış.' };
+                    return { success: false, message: t('product.buRNZatenA') };
                 }
 
                 // Check RP requirement
                 if (currentRP < product.unlockRPCost) {
                     return {
                         success: false,
-                        message: `Yetersiz Ar-Ge Puanı. Gereken: ${formatNumber(product.unlockRPCost)} RP`
+                        message: t('product.yetersizArGePuanGereken', { v1: formatNumber(product.unlockRPCost) })
                     };
                 }
 
@@ -341,7 +342,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 if (currentCash < product.unlockCashCost) {
                     return {
                         success: false,
-                        message: `Yetersiz Sermaye. Gereken: ${formatMoney(product.unlockCashCost)}`
+                        message: t('product.yetersizSermayeGerekenV1', { v1: formatMoney(product.unlockCashCost) })
                     };
                 }
 
@@ -358,7 +359,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     products: [...state.products, {
                         id: product.id, // Tech ID as Product ID
                         name: product.name,
-                        description: `Produced from ${product.name} technology.`,
+                        description: t('product.producedFromV1Technology', { v1: product.name }),
                         category: product.category as any,
                         status: 'active',
 

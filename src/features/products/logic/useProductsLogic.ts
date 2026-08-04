@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { t } from '../../../core/i18n';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { Product, INITIAL_PRODUCTS } from '../data/productsData';
@@ -60,12 +61,12 @@ export const useProductsLogic = () => {
 
         const currentProduct = products.find((p: Product) => p.id === target.id);
         if (currentProduct?.status === 'active') {
-            Alert.alert('Already Active', 'This product is already on the market.');
+            Alert.alert(t('product.alreadyActive'), 'This product is already on the market.');
             return false;
         }
 
         if (researchPoints < target.rndCost) {
-            Alert.alert('Insufficient R&D', `You need ${target.rndCost} Research Points.`);
+            Alert.alert(t('product.insufficientRD'), t('product.youNeedV1ResearchPoints', { v1: target.rndCost }));
             return false;
         }
 
@@ -101,20 +102,20 @@ export const useProductsLogic = () => {
         const stock = product?.inventory || 0;
 
         Alert.alert(
-            'Discontinue Product',
-            `Take ${product?.name || 'this product'} off the line for good.\n\n` +
+            t('product.discontinueProduct'),
+            t('product.takeV1OffTheLine', { v1: product?.name || 'this product' }) +
             (stock > 0
                 ? `${stock.toLocaleString()} units still in the warehouse will be written off.\n\n`
                 : '') +
             'The technology goes back to locked. You can bring it back later, but you will pay the research and cash cost again.',
             [
-                { text: 'Keep it', style: 'cancel' },
+                { text: t('product.keepIt'), style: 'cancel' },
                 {
-                    text: 'Discontinue',
+                    text: t('product.discontinue'),
                     style: 'destructive',
                     onPress: () => {
                         const result = discontinueProduct(id);
-                        if (!result.success) Alert.alert('Error', result.message);
+                        if (!result.success) Alert.alert(t('product.error'), result.message);
                         closeModal();
                     },
                 },
@@ -124,17 +125,17 @@ export const useProductsLogic = () => {
 
     const getInsightTip = (product: Product) => {
         const diff = (product.sellingPrice || 0) - product.suggestedPrice;
-        if (diff > 15) return "Price is too high!";
-        if (diff < -15) return "Price is too low.";
-        if ((product.marketingBudget || 0) <= 0) return "No marketing budget.";
+        if (diff > 15) return t('product.priceIsTooHigh');
+        if (diff < -15) return t('product.priceIsTooLow');
+        if ((product.marketingBudget || 0) <= 0) return t('product.noMarketingBudget');
 
         const demand = product.marketDemand;
         const production = product.productionLevel || 0;
 
-        if (production < demand) return "High Demand! Increase production.";
-        if (production > demand + 20) return "Overproduction!";
+        if (production < demand) return t('product.highDemandIncreaseProduction');
+        if (production > demand + 20) return t('product.overproduction');
 
-        return "Operations stable.";
+        return t('product.operationsStable');
     };
 
     // NEW HELPERS
@@ -149,7 +150,7 @@ export const useProductsLogic = () => {
         if (result.success) {
             // Optional: Success feedback handled by UI update
         } else {
-            Alert.alert('Upgrade Failed', result.message);
+            Alert.alert(t('product.upgradeFailed'), result.message);
         }
         return result;
     };
@@ -159,7 +160,7 @@ export const useProductsLogic = () => {
         if (result.success) {
             // Optional
         } else {
-            Alert.alert('Optimization Failed', result.message);
+            Alert.alert(t('product.optimizationFailed'), result.message);
         }
         return result;
     };

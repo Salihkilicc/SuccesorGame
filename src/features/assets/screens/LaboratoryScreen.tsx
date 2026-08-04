@@ -127,7 +127,7 @@ const LaboratoryScreen = () => {
                 </Pressable>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.headerTitle}>{t('company.rDLaboratory')}</Text>
-                    <Text style={styles.headerSubtitle}>Target Output: +{formatRP(quarterlyRP)}/q</Text>
+                    <Text style={styles.headerSubtitle}>{t('company.targetOutputV1Q', { v1: formatRP(quarterlyRP) })}</Text>
                 </View>
                 <View style={styles.rpBadge}>
                     <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
@@ -150,7 +150,7 @@ const LaboratoryScreen = () => {
                             <Text style={styles.facilityDesc}>{facility.description}</Text>
                         </View>
                         <View style={styles.tierBadge}>
-                            <Text style={styles.tierBadgeText}>Tier {currentTier}</Text>
+                            <Text style={styles.tierBadgeText}>{t('company.tierV1', { v1: currentTier })}</Text>
                         </View>
                     </View>
 
@@ -185,9 +185,7 @@ const LaboratoryScreen = () => {
                             onPress={handleUpgrade}
                             disabled={!canUpgrade}
                         >
-                            <Text style={[styles.upgradeBtnText, !canUpgrade && styles.upgradeBtnTextDisabled]}>
-                                Upgrade to {nextTier.name}
-                            </Text>
+                            <Text style={[styles.upgradeBtnText, !canUpgrade && styles.upgradeBtnTextDisabled]}>{t('company.upgradeToV1', { v1: nextTier.name })}</Text>
                             {nextTier.upgradeCost && (
                                 <Text style={[styles.upgradeCost, !canUpgrade && styles.upgradeCostDisabled]}>
                                     {formatMoney(nextTier.upgradeCost.cash)} + {formatRP(nextTier.upgradeCost.rp)}
@@ -239,9 +237,7 @@ const LaboratoryScreen = () => {
                             <Text style={styles.costValue}>{formatMoney(quarterlyCost)}</Text>
                             <Text style={styles.costSource}>{t('company.deductedFromCapital')}</Text>
                             {immediateCost > 0 && (
-                                <Text style={[styles.immediateCost, !canAfford && styles.textDanger]}>
-                                    Initial Cost: {formatMoney(immediateCost)}
-                                </Text>
+                                <Text style={[styles.immediateCost, !canAfford && styles.textDanger]}>{t('company.initialCostV1', { v1: formatMoney(immediateCost) })}</Text>
                             )}
                         </View>
 

@@ -61,7 +61,7 @@ const ManagementCard = ({
                 </View>
                 <View>
                     <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>Current: {formatNumber(currentValue)}</Text>
+                    <Text style={styles.subtitle}>{t('company.currentV1', { v1: formatNumber(currentValue) })}</Text>
                 </View>
                 {headerRight}
                 {!headerRight && costPerUnit > 0 && (

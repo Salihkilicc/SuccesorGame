@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/contract.ts
 //
 // ============================================================================
@@ -69,8 +70,8 @@ export interface ContractPartner {
 export const CONTRACT_PARTNERS: ContractPartner[] = [
     {
         id: 'local_assembly',
-        name: 'Local Assembly Co.',
-        description: 'A shed with twelve people and a soldering station. They will take any order, and it shows.',
+        name: t('data.contract.localAssemblyCo'),
+        description: t('data.contract.aShedWithTwelvePeople'),
         costMultiplier: 1.60,
         qualityCeiling: 4,
         yieldRate: 0.92,
@@ -81,8 +82,8 @@ export const CONTRACT_PARTNERS: ContractPartner[] = [
     },
     {
         id: 'meridian',
-        name: 'Meridian Contract Mfg.',
-        description: 'A real factory with real quality control. The standard choice once you are shipping seriously.',
+        name: t('data.contract.meridianContractMfg'),
+        description: t('data.contract.aRealFactoryWithReal'),
         costMultiplier: 1.42,
         qualityCeiling: 7,
         yieldRate: 0.96,
@@ -93,8 +94,8 @@ export const CONTRACT_PARTNERS: ContractPartner[] = [
     },
     {
         id: 'apex',
-        name: 'Apex Precision',
-        description: 'They build for the biggest names in the world. They will not return your call until you are one.',
+        name: t('data.contract.apexPrecision'),
+        description: t('data.contract.theyBuildForTheBiggest'),
         costMultiplier: 1.30,
         qualityCeiling: 10,
         yieldRate: 0.985,

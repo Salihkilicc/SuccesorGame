@@ -161,7 +161,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 
                     <View style={styles.dealRow}>
                         <Text style={styles.dealLabel}>{t('finance.dueBy')}</Text>
-                        <Text style={styles.dealDeadline}>Turn {deadlineTurn}</Text>
+                        <Text style={styles.dealDeadline}>{t('finance.turnV1', { v1: deadlineTurn })}</Text>
                     </View>
                 </View>
 
@@ -171,9 +171,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                         <Text style={styles.warningHeaderIcon}>⚠️</Text>
                         <Text style={styles.warningHeaderText}>{t('finance.collateralClause')}</Text>
                     </View>
-                    <Text style={styles.warningText}>
-                        Failure to repay by the deadline will result in the{' '}
-                        <Text style={styles.warningTextBold}>immediate seizure</Text> of your personal shares
+                    <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>immediate seizure</Text> of your personal shares
                         equivalent to the debt value{' '}
                         <Text style={styles.warningTextBold}>+ 50% penalty</Text>.
                     </Text>

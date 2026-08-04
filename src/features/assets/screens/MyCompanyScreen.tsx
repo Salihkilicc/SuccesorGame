@@ -300,7 +300,7 @@ const MyCompanyScreen = () => {
 
           <View style={{ marginTop: 12 }}>
             <SectionCard
-              title="🎉 Team Morale"
+              title={`🎉 ${t('company.teamMorale')}`}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
               onPress={() => toggleModal('employees', true)}
             />
@@ -309,10 +309,10 @@ const MyCompanyScreen = () => {
           {/* QUICK ACTIONS */}
           <SectionHeader title={t('company.quickActions')} />
           <View style={{ gap: 8 }}>
-            <SectionCard title="🔬 R&D Investment" subtitle={t('company.investInFutureGrowth')} onPress={() => navigation.navigate('Research')} />
-            <SectionCard title="🏢 Hostile Takeover" subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => toggleModal('acquire', true)} />
-            <SectionCard title="👔 Board Members" subtitle={t('company.viewShareholders')} onPress={() => toggleModal('boardMembers', true)} />
-            <SectionCard title="🏆 My Empire" subtitle={t('company.manageSubsidiaries')} onPress={() => toggleModal('existingCompanies', true)} />
+            <SectionCard title={`🔬 ${t('company.rDInvestment')}`} subtitle={t('company.investInFutureGrowth')} onPress={() => navigation.navigate('Research')} />
+            <SectionCard title={`🏢 ${t('company.hostileTakeover')}`} subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => toggleModal('acquire', true)} />
+            <SectionCard title={`👔 ${t('company.boardMembers')}`} subtitle={t('company.viewShareholders')} onPress={() => toggleModal('boardMembers', true)} />
+            <SectionCard title={`🏆 ${t('company.myEmpire')}`} subtitle={t('company.manageSubsidiaries')} onPress={() => toggleModal('existingCompanies', true)} />
           </View>
 
         </ScrollView>

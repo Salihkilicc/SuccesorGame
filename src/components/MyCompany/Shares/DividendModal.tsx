@@ -95,9 +95,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             ]}>
                                 {formatMoney(lastQuarterProfit)}
                             </Text>
-                            <Text style={styles.cashHint}>
-                                Cash on hand {formatMoney(availableCash)}
-                            </Text>
+                            <Text style={styles.cashHint}>{t('equity.cashOnHandV1', { v1: formatMoney(availableCash) })}</Text>
                         </View>
 
                         {fundedFromReserves && (
@@ -220,9 +218,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             <Text style={styles.profitAmount}>
                                 {formatMoney(playerDividend * (1 - DIVIDEND_TAX))}
                             </Text>
-                            <Text style={styles.profitNote}>
-                                Based on your {playerSharePercentage.toFixed(1)}% ownership
-                            </Text>
+                            <Text style={styles.profitNote}>{t('equity.basedOnYourV1Ownership', { v1: playerSharePercentage.toFixed(1) })}</Text>
                             <View style={styles.profitBadge}>
                                 <Text style={styles.profitBadgeText}>{t('dividend.addedToWallet')}</Text>
                             </View>

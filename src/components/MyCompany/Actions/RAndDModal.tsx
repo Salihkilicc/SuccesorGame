@@ -98,7 +98,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
         <View style={styles.categoryHeader}>
           <Text style={styles.categoryTitle}>{label}</Text>
           <View style={styles.levelBadge}>
-            <Text style={styles.levelText}>Lv. {currentLevel}</Text>
+            <Text style={styles.levelText}>{t('action.lvV1', { v1: currentLevel })}</Text>
           </View>
         </View>
 
@@ -121,12 +121,12 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         {!isMaxLevel && nextUpgrade && (
           <View style={styles.upgradeCard}>
-            <Text style={styles.upgradeTitle}>Next: {nextUpgrade.title}</Text>
+            <Text style={styles.upgradeTitle}>{t('action.nextV1', { v1: nextUpgrade.title })}</Text>
             <Text style={styles.upgradeReward}>{nextUpgrade.reward}</Text>
 
             {isLocked ? (
               <View style={styles.lockedBtn}>
-                <Text style={styles.lockedText}>LOCKED ({lockReason})</Text>
+                <Text style={styles.lockedText}>{t('action.lockedV1', { v1: lockReason })}</Text>
               </View>
             ) : (
               <Pressable
@@ -136,9 +136,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
                   pressed && styles.upgradeBtnPressed,
                   companyCapital < nextUpgrade.cost && styles.upgradeBtnDisabled
                 ]}>
-                <Text style={styles.upgradeBtnText}>
-                  Upgrade (${nextUpgrade.cost / 1_000_000_000}B)
-                </Text>
+                <Text style={styles.upgradeBtnText}>{t('action.upgradeV1B', { v1: nextUpgrade.cost / 1_000_000_000 })}</Text>
               </Pressable>
             )}
           </View>
@@ -169,7 +167,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
             </Pressable>
           </View>
           <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
-          <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
+          <Text style={styles.capitalText}>{t('action.availableCapitalV1', { v1: formatMoney(companyCapital) })}</Text>
 
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
             {renderCategory('hardware', 'Category A: Hardware Engineering')}
@@ -256,7 +254,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
         <View style={styles.categoryHeader}>
           <Text style={styles.categoryTitle}>{label}</Text>
           <View style={styles.levelBadge}>
-            <Text style={styles.levelText}>Lv. {currentLevel}</Text>
+            <Text style={styles.levelText}>{t('action.lvV1', { v1: currentLevel })}</Text>
           </View>
         </View>
 
@@ -278,12 +276,12 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         {!isMaxLevel && nextUpgrade && (
           <View style={styles.upgradeCard}>
-            <Text style={styles.upgradeTitle}>Next: {nextUpgrade.title}</Text>
+            <Text style={styles.upgradeTitle}>{t('action.nextV1', { v1: nextUpgrade.title })}</Text>
             <Text style={styles.upgradeReward}>{nextUpgrade.reward}</Text>
 
             {isLocked ? (
               <View style={styles.lockedBtn}>
-                <Text style={styles.lockedText}>LOCKED ({lockReason})</Text>
+                <Text style={styles.lockedText}>{t('action.lockedV1', { v1: lockReason })}</Text>
               </View>
             ) : (
               <Pressable
@@ -293,9 +291,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
                   pressed && styles.upgradeBtnPressed,
                   companyCapital < nextUpgrade.cost && styles.upgradeBtnDisabled
                 ]}>
-                <Text style={styles.upgradeBtnText}>
-                  Upgrade (${nextUpgrade.cost / 1_000_000_000}B)
-                </Text>
+                <Text style={styles.upgradeBtnText}>{t('action.upgradeV1B', { v1: nextUpgrade.cost / 1_000_000_000 })}</Text>
               </Pressable>
             )}
           </View>
@@ -332,7 +328,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
               </Pressable>
             </View>
             <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
-            <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
+            <Text style={styles.capitalText}>{t('action.availableCapitalV1', { v1: formatMoney(companyCapital) })}</Text>
 
             <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
               {renderCategory('hardware', 'Category A: Hardware Engineering')}

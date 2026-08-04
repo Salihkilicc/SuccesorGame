@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/brand.ts
 //
 // ============================================================================
@@ -253,7 +254,7 @@ export const advanceBrand = (input: BrandQuarterInput): BrandQuarterResult => {
 
     // 1) Pazarlama ve kalite (attraction.ts'ten gelir)
     if (Math.abs(input.marketingDelta) > 0.01) {
-        sources.push({ label: 'Marketing & quality', amount: input.marketingDelta });
+        sources.push({ label: t('data.brand.marketingQuality'), amount: input.marketingDelta });
     }
 
     // 2) Pazar payi
@@ -267,11 +268,11 @@ export const advanceBrand = (input: BrandQuarterInput): BrandQuarterResult => {
 
     // 3) Zaman
     const tenure = brandFromTenure(start, input.profitable);
-    if (tenure > 0) sources.push({ label: 'Another profitable quarter', amount: tenure });
+    if (tenure > 0) sources.push({ label: t('data.brand.anotherProfitableQuarter'), amount: tenure });
 
     // 4) Devralmalar
     if (input.acquisitionGain > 0.01) {
-        sources.push({ label: 'Brands you acquired', amount: input.acquisitionGain });
+        sources.push({ label: t('data.brand.brandsYouAcquired'), amount: input.acquisitionGain });
     }
 
     // 5) Haber (ileride)

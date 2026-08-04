@@ -1,3 +1,4 @@
+import { t } from '../../../core/i18n';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
@@ -1386,7 +1387,7 @@ export const useShareholderStore = create<ShareholderState>()(
                     const delta = trustDelta(gm, event, ctx);
                     if (delta !== 0) {
                         log.push({
-                            label: `${m.name} (${m.trait})`,
+                            label: `${m.name} (${t('data.trait.' + m.trait)})`,
                             effect: `${delta > 0 ? '+' : ''}${delta} trust`,
                         });
                     }

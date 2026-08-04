@@ -74,7 +74,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         if (result.success) {
             Alert.alert(
                 '🎉 Success!',
-                `${product.name} has been unlocked!\n\nStock Boost: +${product.stockBoost}%`,
+                t('product.v1HasBeenUnlockedN', { v1: product.name, v2: product.stockBoost }),
                 [{ text: t('product.continue'), onPress: onClose }]
             );
         } else {
@@ -132,23 +132,19 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                             <View style={[styles.costBadge, totalRP < product.unlockRPCost && styles.costBadgeInsufficient]}>
                                 <Text style={styles.costLabel}>{t('product.researchPoints')}</Text>
                                 <Text style={styles.costValue}>{formatRP(product.unlockRPCost)}</Text>
-                                <Text style={styles.costAvailable}>
-                                    Available: {formatRP(totalRP)}
-                                </Text>
+                                <Text style={styles.costAvailable}>{t('product.availableV1', { v1: formatRP(totalRP) })}</Text>
                             </View>
                             <View style={[styles.costBadge, companyCapital < product.unlockCashCost && styles.costBadgeInsufficient]}>
                                 <Text style={styles.costLabel}>{t('product.capital')}</Text>
                                 <Text style={styles.costValue}>{formatCurrency(product.unlockCashCost)}</Text>
-                                <Text style={styles.costAvailable}>
-                                    Available: {formatCurrency(companyCapital)}
-                                </Text>
+                                <Text style={styles.costAvailable}>{t('product.availableV1', { v1: formatCurrency(companyCapital) })}</Text>
                             </View>
                         </View>
                     </View>
 
                     {/* Action Button */}
                     <GameButton
-                        title={product.isUnlocked ? "ALREADY UNLOCKED" : "DEVELOP PROTOTYPE"}
+                        title={product.isUnlocked ? t('product.alreadyUnlocked') : t('product.developPrototype')}
                         onPress={handleUnlock}
                         disabled={!canAfford || product.isUnlocked}
                         variant={canAfford && !product.isUnlocked ? 'primary' : 'ghost'}

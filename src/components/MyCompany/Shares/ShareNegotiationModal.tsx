@@ -90,7 +90,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                                 onChange={setQuantity}
                                 unit="lot"
                             />
-                            <Text style={styles.hint}>Total Impact: %{(quantity * 0.1).toFixed(1)} Share</Text>
+                            <Text style={styles.hint}>{t('equity.totalImpactV1Share', { v1: (quantity * 0.1).toFixed(1) })}</Text>
                         </View>
 
                         {/* Fiyat Kartları */}
@@ -106,7 +106,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                                     placeholderTextColor={theme.colors.textMuted}
                                 />
                                 <View style={styles.marketRef}>
-                                    <Text style={styles.hint}>Market: {formatPrice(companySharePrice)}</Text>
+                                    <Text style={styles.hint}>{t('equity.marketV1', { v1: formatPrice(companySharePrice) })}</Text>
                                 </View>
                             </View>
                         ) : (

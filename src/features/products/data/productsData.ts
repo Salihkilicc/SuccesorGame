@@ -1,3 +1,4 @@
+import { t } from '../../../core/i18n';
 export type ProductStatus = 'locked' | 'active' | 'retired';
 export type ProductCategory = 'phone' | 'computer' | 'watch' | 'other';
 
@@ -103,13 +104,13 @@ export interface Supplier {
 
 export const DEFAULT_SUPPLIERS: Record<string, Supplier[]> = {
   'Electronics': [
-    { name: 'Global Components Inc.', cost: 100, quality: 75 },
-    { name: 'Budget Tech Supplies', cost: 60, quality: 45 },
-    { name: 'Premium Silicon Wafer', cost: 180, quality: 95 }
+    { name: t('product.globalComponentsInc'), cost: 100, quality: 75 },
+    { name: t('product.budgetTechSupplies'), cost: 60, quality: 45 },
+    { name: t('product.premiumSiliconWafer'), cost: 180, quality: 95 }
   ],
   'Fashion': [ // Just in case
-    { name: 'Textile Global', cost: 50, quality: 70 },
-    { name: 'Cheap Fabrics', cost: 20, quality: 30 }
+    { name: t('product.textileGlobal'), cost: 50, quality: 70 },
+    { name: t('product.cheapFabrics'), cost: 20, quality: 30 }
   ]
 };
 

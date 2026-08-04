@@ -35,7 +35,7 @@ const ProductsScreen = () => {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* ACTIVE PRODUCTS */}
-        <Text style={styles.sectionTitle}>Active Products ({activeProducts.length})</Text>
+        <Text style={styles.sectionTitle}>{t('product.activeProductsV1', { v1: activeProducts.length })}</Text>
         <View style={styles.activeList}>
           {activeProducts.map(prod => (
             <Pressable key={prod.id} style={styles.activeCard} onPress={() => actions.openDetailModal(prod)}>
@@ -44,7 +44,7 @@ const ProductsScreen = () => {
                 <View style={styles.statusBadge}><Text style={styles.statusText}>{t('product.active')}</Text></View>
               </View>
               <Text style={styles.activeName}>{prod.name}</Text>
-              <Text style={styles.activeProfit}>Prod: {prod.productionLevel}%</Text>
+              <Text style={styles.activeProfit}>{t('product.prodV1', { v1: prod.productionLevel ?? 0 })}</Text>
               {/* Kategorisindeki pazar payi — son ceyregin gercek satisindan.
                   Bkz. core/market/useMarketPosition.ts */}
               <MarketPositionPanel category={prod.category} compact />

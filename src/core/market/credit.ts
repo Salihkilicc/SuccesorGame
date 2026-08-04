@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // src/core/market/credit.ts
 //
 // ============================================================================
@@ -64,13 +65,13 @@ export interface RatingTier {
  * notu belirler.
  */
 export const RATING_TIERS: RatingTier[] = [
-    { rating: 'AAA', maxLeverage: 1.0, minCoverage: 12, rate: 0.035, meaning: 'Pristine. Lenders compete for you.' },
-    { rating: 'AA', maxLeverage: 1.5, minCoverage: 8, rate: 0.042, meaning: 'Very strong. Debt is cheap and plentiful.' },
-    { rating: 'A', maxLeverage: 2.0, minCoverage: 6, rate: 0.050, meaning: 'Solid investment grade.' },
-    { rating: 'BBB', maxLeverage: 3.0, minCoverage: 4, rate: 0.065, meaning: 'Lowest investment grade. One bad year from junk.' },
-    { rating: 'BB', maxLeverage: 4.0, minCoverage: 2.5, rate: 0.090, meaning: 'Junk. Lenders are watching every quarter.' },
-    { rating: 'B', maxLeverage: 5.0, minCoverage: 1.5, rate: 0.130, meaning: 'Deep junk. Refinancing is a real risk.' },
-    { rating: 'CCC', maxLeverage: Infinity, minCoverage: 0, rate: 0.190, meaning: 'Distressed. Only opportunists will lend.' },
+    { rating: 'AAA', maxLeverage: 1.0, minCoverage: 12, rate: 0.035, meaning: t('data.credit.pristineLendersCompeteForYou') },
+    { rating: 'AA', maxLeverage: 1.5, minCoverage: 8, rate: 0.042, meaning: t('data.credit.veryStrongDebtIsCheap') },
+    { rating: 'A', maxLeverage: 2.0, minCoverage: 6, rate: 0.050, meaning: t('data.credit.solidInvestmentGrade') },
+    { rating: 'BBB', maxLeverage: 3.0, minCoverage: 4, rate: 0.065, meaning: t('data.credit.lowestInvestmentGradeOneBad') },
+    { rating: 'BB', maxLeverage: 4.0, minCoverage: 2.5, rate: 0.090, meaning: t('data.credit.junkLendersAreWatchingEvery') },
+    { rating: 'B', maxLeverage: 5.0, minCoverage: 1.5, rate: 0.130, meaning: t('data.credit.deepJunkRefinancingIsA') },
+    { rating: 'CCC', maxLeverage: Infinity, minCoverage: 0, rate: 0.190, meaning: t('data.credit.distressedOnlyOpportunistsWillLend') },
 ];
 
 export interface CreditAssessment {
@@ -179,38 +180,38 @@ export interface LoanProduct {
 export const LOAN_PRODUCTS: LoanProduct[] = [
     {
         kind: 'revolver',
-        name: 'Revolving Credit',
+        name: t('data.credit.revolvingCredit'),
         spread: 0.02,
         termQuarters: 0,
         prepaymentPenalty: 0,
-        description: 'Draw and repay whenever you like. Costs more, but it is the line you keep for the quarter that surprises you.',
+        description: t('data.credit.drawAndRepayWheneverYou'),
     },
     {
         kind: 'term',
-        name: 'Term Loan',
+        name: t('data.credit.termLoan'),
         spread: 0,
         termQuarters: 20,
         prepaymentPenalty: 0.02,
-        description: 'Five years, fixed schedule, your rate. Cheapest ordinary money — but the payments come whether the quarter was good or not.',
+        description: t('data.credit.fiveYearsFixedScheduleYour'),
     },
     {
         kind: 'bond',
-        name: 'Corporate Bond',
+        name: t('data.credit.corporateBond'),
         spread: -0.01,
         termQuarters: 40,
         prepaymentPenalty: 0.05,
-        description: 'Ten years at the finest rate you can get. Public markets only, and only if you are investment grade.',
+        description: t('data.credit.tenYearsAtTheFinest'),
         minRating: 'BBB',
         requiresPublic: true,
     },
     {
         kind: 'shark',
-        name: 'Private Credit',
+        name: t('data.credit.privateCredit'),
         spread: 0,
         fixedRate: 0.35,
         termQuarters: 8,
         prepaymentPenalty: 0.10,
-        description: 'Money today, no questions, no covenants. At 35% it is not financing — it is a countdown.',
+        description: t('data.credit.moneyTodayNoQuestionsNo'),
     },
 ];
 
@@ -357,7 +358,7 @@ export const assessDistress = (
             penaltyRate,
             canBorrow: true,
             mustSellAssets: false,
-            message: 'Covenant breached. Your lenders have raised the rate on existing debt. Fix it this year.',
+            message: t('data.credit.covenantBreachedYourLendersHave'),
         };
     }
     if (q <= 3) {
@@ -367,7 +368,7 @@ export const assessDistress = (
             penaltyRate,
             canBorrow: false,
             mustSellAssets: false,
-            message: 'Still in breach. No new credit until the ratios recover, and the penalty rate keeps climbing.',
+            message: t('data.credit.stillInBreachNoNew'),
         };
     }
     return {
@@ -376,7 +377,7 @@ export const assessDistress = (
         penaltyRate,
         canBorrow: false,
         mustSellAssets: true,
-        message: 'A year in breach. Your lenders are forcing asset sales to bring the debt down.',
+        message: t('data.credit.aYearInBreachYour'),
     };
 };
 
@@ -555,39 +556,39 @@ export interface FinancingSignal {
 export const FINANCING_SIGNALS: Record<FinancingEvent, FinancingSignal> = {
     loan_healthy: {
         impactPercent: 0.8,
-        message: 'The market reads cheap debt from a strong balance sheet as confidence, not desperation.',
+        message: t('data.credit.theMarketReadsCheapDebt'),
     },
     loan_stretched: {
         impactPercent: -3.5,
-        message: 'Borrowing again at this leverage worries your shareholders. The balance sheet is starting to look thin.',
+        message: t('data.credit.borrowingAgainAtThisLeverage'),
     },
     revolver_draw: {
         impactPercent: -1.2,
-        message: 'Drawing on the credit line reads as a liquidity squeeze, even when it is only prudence.',
+        message: t('data.credit.drawingOnTheCreditLine'),
     },
     private_credit: {
         impactPercent: -8,
-        message: 'Borrowing at 35% tells the market no bank would take you. That is a louder statement than the money is worth.',
+        message: t('data.credit.borrowingAt35TellsThe'),
     },
     insider_loan: {
         impactPercent: -6,
-        message: 'A director lending to the company, secured on your shares, is a governance red flag. Investors now wonder who really controls this business.',
+        message: t('data.credit.aDirectorLendingToThe'),
     },
     capital_injection: {
         impactPercent: 4,
-        message: 'The founder putting personal money in is the strongest signal there is. Insiders buying is what the market trusts most.',
+        message: t('data.credit.theFounderPuttingPersonalMoney'),
     },
     debt_repaid: {
         impactPercent: 1,
-        message: 'Paying down debt lowers the risk attached to every share.',
+        message: t('data.credit.payingDownDebtLowersThe'),
     },
     rating_downgrade: {
         impactPercent: -3,
-        message: 'A downgrade raises the cost of every future dollar you borrow, and the market prices that in immediately.',
+        message: t('data.credit.aDowngradeRaisesTheCost'),
     },
     covenant_breach: {
         impactPercent: -10,
-        message: 'A covenant breach becomes public. Lenders are now in the driver\'s seat and shareholders know it.',
+        message: t('data.credit.aCovenantBreachBecomesPublic'),
     },
 };
 
@@ -774,21 +775,19 @@ export const quoteMezzanine = (
 export const EXTENDED_LOAN_PRODUCTS: LoanProduct[] = [
     {
         kind: 'secured',
-        name: 'Asset-Backed Loan',
+        name: t('data.credit.assetBackedLoan'),
         spread: 0.015,
         termQuarters: 24,
         prepaymentPenalty: 0.01,
-        description:
-            'Secured on your plant, inventory and subsidiaries. Bigger than anything your earnings alone would support — but miss a payment and the collateral is gone, no negotiation.',
+        description: t('data.credit.securedOnYourPlantInventory'),
     },
     {
         kind: 'mezzanine',
-        name: 'Mezzanine Facility',
+        name: t('data.credit.mezzanineFacility'),
         spread: 0,
         fixedRate: 0.18,
         termQuarters: 12,
         prepaymentPenalty: 0.03,
-        description:
-            'Large money against the company itself, not its earnings. Repay in cash or it converts into equity at a discount — and the lender takes a board seat.',
+        description: t('data.credit.largeMoneyAgainstTheCompany'),
     },
 ];

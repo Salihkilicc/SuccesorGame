@@ -96,7 +96,7 @@ export const CompanyModals = ({
               {/* "Factories & Production" kaldirildi: fabrika sayisi diye bir
                   sey kalmadi. Kapasite tesis KADEMESINDEN geliyor ve kontrolu
                   My Company ekranindaki FacilityPanel'de. */}
-              <GameButton title="👥 Employees & Morale" variant="secondary" onPress={() => { toggleModal('management', false); setTimeout(() => toggleModal('employees', true), 300); }} />
+              <GameButton title={`👥 ${t('company.employeesMorale')}`} variant="secondary" onPress={() => { toggleModal('management', false); setTimeout(() => toggleModal('employees', true), 300); }} />
               <GameButton title={t('company.close')} variant="ghost" onPress={() => toggleModal('management', false)} />
             </View>
           </View>

@@ -148,9 +148,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                     <Text style={[styles.impactValue, { color: '#30D158' }]}>
                                         +{(predictedImpact * 100).toFixed(1)}%
                                     </Text>
-                                    <Text style={styles.impactSubValue}>
-                                        Target: {formatPrice(predictedPrice)}
-                                    </Text>
+                                    <Text style={styles.impactSubValue}>{t('equity.targetV1', { v1: formatPrice(predictedPrice) })}</Text>
                                 </View>
                             </View>
                             <View style={styles.impactRow}>

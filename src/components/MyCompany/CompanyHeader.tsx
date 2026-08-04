@@ -39,15 +39,15 @@ const CompanyHeader = ({
       <View style={styles.topRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>{companyName}</Text>
-          <Text style={styles.subtitle}>CEO: {name}</Text>
-          <Text style={styles.subtitle}>Ownership: {ownership}%</Text>
+          <Text style={styles.subtitle}>{t('company.ceoV1', { v1: name })}</Text>
+          <Text style={styles.subtitle}>{t('company.ownershipV1', { v1: ownership })}</Text>
         </View>
         <View style={styles.rightCol}>
           <Text style={styles.metricLabel}>{t('ui.companyValue')}</Text>
           <Text style={styles.metricValue}>${formatShortMoney(valuation)}</Text>
-          <Text style={styles.meta}>Share Price: {formatPrice(sharePrice)}</Text>
+          <Text style={styles.meta}>{t('company.sharePriceV1', { v1: formatPrice(sharePrice) })}</Text>
           <Text style={[styles.change, changeColor]}>{formattedChange}</Text>
-          <Text style={[styles.meta, styles.debt]}>Debt: ${formatShortMoney(debt)}</Text>
+          <Text style={[styles.meta, styles.debt]}>{t('company.debtV1', { v1: formatShortMoney(debt) })}</Text>
         </View>
       </View>
     </View>

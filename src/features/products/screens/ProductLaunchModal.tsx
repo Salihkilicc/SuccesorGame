@@ -117,7 +117,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
             <View style={styles.backdrop}>
                 <View style={styles.card}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>{step === 1 ? 'New Product Launch' : 'Market Research'}</Text>
+                        <Text style={styles.title}>{step === 1 ? t('product.newProductLaunch') : t('product.marketResearch')}</Text>
                         <Pressable onPress={onClose}>
                             <Text style={styles.closeIcon}>✕</Text>
                         </Pressable>

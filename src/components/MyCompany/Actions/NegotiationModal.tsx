@@ -91,13 +91,13 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 boardApproved = roll < approvalChance;
 
                 if (!boardApproved) {
-                    rejectReason = 'The Board feels this deal is too risky based on current synergy and your standing.';
+                    rejectReason = t('neg.tooRisky');
                 }
             }
 
             if (!boardApproved) {
                 setStatus('rejected');
-                setStatusMessage(`BOARD VETOED: ${rejectReason}`);
+                setStatusMessage(t('neg.boardVetoed', { v1: rejectReason }));
                 return;
             }
 
@@ -116,11 +116,11 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 } else if (offer < askingPrice && Math.random() > 0.4) {
                     // 60% chance they insist on asking price/premium if under it
                     setStatus('rejected');
-                    setStatusMessage(`They insist on the full premium (${formatMoney(askingPrice)}). "Our growth justifies the price."`);
+                    setStatusMessage(t('neg.insistFullPremium', { v1: formatMoney(askingPrice) }));
                 } else {
                     // Accepted!
                     setStatus('accepted');
-                    setStatusMessage('Deal Closed! Transferring assets...'); // ... rest same                 // Finalize after short delay
+                    setStatusMessage(t('neg.dealClosedTransfer')); // ... rest same                 // Finalize after short delay
                     setTimeout(() => {
                         // TEK KAPI. Once burasi parayi elle dusup kaydi
                         // statsStore.acquisitions'a yaziyordu; motor oraya
@@ -160,7 +160,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
         <GameModal
             visible={visible}
             onClose={onClose}
-            title={`Deal Room: ${company.name}`}
+            title={t('neg.dealRoom', { v1: company.name })}
             subtitle={t('action.negotiateAcquisition')}
         >
             <View style={{ minHeight: 350 }}>
@@ -188,9 +188,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                             onChangeText={setOfferAmount}
                         />
 
-                        <Text style={styles.hint}>
-                            Cash Available: {formatMoney(companyCapital)}
-                        </Text>
+                        <Text style={styles.hint}>{t('action.cashAvailableV1', { v1: formatMoney(companyCapital) })}</Text>
 
                         <GameButton
                             title={t('action.submitOfferToBoard')}
@@ -205,7 +203,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                         <ActivityIndicator size="large" color={theme.colors.primary} />
                         <Text style={styles.statusTitle}>{t('action.boardVoting')}</Text>
                         <Text style={styles.statusDesc}>
-                            {isMajorityOwner ? "You have majority control. Rubber stamping..." : "Seeking shareholder approval..."}
+                            {isMajorityOwner ? t('neg.rubberStamp') : t('neg.seekingApproval')}
                         </Text>
                     </View>
                 )}
@@ -214,7 +212,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                     <View style={styles.centerContent}>
                         <ActivityIndicator size="large" color={theme.colors.accent} />
                         <Text style={styles.statusTitle}>{t('action.negotiating')}</Text>
-                        <Text style={styles.statusDesc}>Offer sent to {company.name} board.</Text>
+                        <Text style={styles.statusDesc}>{t('action.offerSentToV1Board', { v1: company.name })}</Text>
                     </View>
                 )}
 

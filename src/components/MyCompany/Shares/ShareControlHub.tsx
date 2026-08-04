@@ -187,9 +187,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     </Text>
                                 </View>
                             </View>
-                            <Text style={styles.heroNote}>
-                                Since last quarter · {EQUITY_EXPLANATIONS.change}
-                            </Text>
+                            <Text style={styles.heroNote}>{t('equity.sinceLastQuarterV1', { v1: EQUITY_EXPLANATIONS.change })}</Text>
                             {damping < 0.95 && (
                                 <View style={styles.dampBadge}>
                                     <Text style={styles.dampText}>

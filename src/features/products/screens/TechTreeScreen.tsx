@@ -88,9 +88,7 @@ const TechTreeScreen = () => {
                                                 {product.name}
                                             </Text>
                                             {product.isUnlocked && (
-                                                <Text style={styles.stockBoostLabel}>
-                                                    Stock Boost: +{product.stockBoost}%
-                                                </Text>
+                                                <Text style={styles.stockBoostLabel}>{t('product.stockBoostV1', { v1: product.stockBoost })}</Text>
                                             )}
                                         </View>
 

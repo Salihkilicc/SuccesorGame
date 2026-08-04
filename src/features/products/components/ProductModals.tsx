@@ -361,7 +361,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 >
                                     <Text style={styles.upgradeBtnTextCompact}>
                                         {isMaxEfficiency
-                                            ? 'MAX EFFICIENCY'
+                                            ? t('product.maxEfficiency')
                                             : `${formatNumber(processUpgradeRP)} RP`}
                                     </Text>
                                 </Pressable>
@@ -403,7 +403,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 <InfoDot
                                     title={t('product.production')}
                                     text={t('product.yourFactoriesCanBuildA')}
-                                    detail={`Max for this product: ${formatNumber(maxUnits)} units per quarter with ${formatNumber(employeeCount)} employees.`}
+                                    detail={t('product.maxForThisProduct', { v1: formatNumber(maxUnits), v2: formatNumber(employeeCount) })}
                                 />
                             </View>
 
@@ -457,10 +457,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             <View style={styles.scaleRow}>
                                 <Text style={styles.scaleHint}>
                                     {expectedDemand > 0 && expectedDemand <= maxUnits
-                                        ? `▏demand ${formatNumber(expectedDemand)}`
+                                        ? `▏${t('product.demandTick', { v1: formatNumber(expectedDemand) })}`
                                         : ' '}
                                 </Text>
-                                <Text style={styles.scaleMax}>max {formatNumber(maxUnits)}</Text>
+                                <Text style={styles.scaleMax}>{t('product.maxUnits', { v1: formatNumber(maxUnits) })}</Text>
                             </View>
 
                             <View style={styles.compareRow}>
@@ -479,13 +479,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             {/* Teshis satiri */}
                             {supplyGap < 0 ? (
                                 <Text style={styles.warnLine}>
-                                    Under-supplying by {formatNumber(Math.abs(supplyGap))} units. Those customers
-                                    go to a rival and your brand takes a hit.
+                                    {t('product.underSupplying', { v1: formatNumber(Math.abs(supplyGap)) })}
                                 </Text>
                             ) : supplyGap > expectedDemand * 0.2 && expectedDemand > 0 ? (
                                 <Text style={styles.warnLine}>
-                                    Over-building by {formatNumber(supplyGap)} units. They become inventory and
-                                    cost $5 each per quarter to store.
+                                    {t('product.overBuilding', { v1: formatNumber(supplyGap) })}
                                 </Text>
                             ) : (
                                 <Text style={styles.okLine}>{t('product.supplyIsCloseToDemand')}</Text>
@@ -512,24 +510,28 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                             {maxUnits < expectedDemand && (
                                 <Text style={styles.capLine}>
-                                    Even at full capacity you can only build {formatNumber(maxUnits)}. Your
-                                    facility is a {tier.name} ({formatNumber(tier.capacity)} standard units,
-                                    crew of {formatNumber(tier.crew)}). Hire up to the crew, or upgrade the tier.
+                                    {t('product.capacityCeiling', {
+                                        v1: formatNumber(maxUnits),
+                                        v2: tier.name,
+                                        v3: formatNumber(tier.capacity),
+                                        v4: formatNumber(tier.crew),
+                                    })}
                                 </Text>
                             )}
 
                             {isRetooling && (
                                 <Text style={styles.warnLine}>
-                                    Retooling in progress — the facility is running at 65% while the upgrade
-                                    is built. Capacity comes back, and grows, when it lands.
+                                    {t('product.retoolingWarn')}
                                 </Text>
                             )}
 
                             {qualityLevel > tier.qualityCeiling && (
                                 <Text style={styles.warnLine}>
-                                    This product is researched to quality {qualityLevel}, but a {tier.name}
-                                    can only build to {tier.qualityCeiling}. You are shipping the lower one.
-                                    Upgrade the facility to actually sell what you invented.
+                                    {t('product.qualityCappedByTier', {
+                                        v1: qualityLevel,
+                                        v2: tier.name,
+                                        v3: tier.qualityCeiling,
+                                    })}
                                 </Text>
                             )}
                         </View>
@@ -726,7 +728,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 <InfoDot
                                     title={t('product.marketingBudget')}
                                     text="A fixed amount you spend every quarter, whether you sell anything or not. What matters is not the number itself but how it compares to what the market spends. Match the benchmark and you own about half the attention in your category."
-                                    detail={`Benchmark for this product: ${formatMoney(benchmark)} per quarter. It grows with your own revenue, so defending a large share costs more than winning a small one. Brand maintenance level: ${formatMoney(maintenancePoint)} — spend below that and Brand Value erodes.`}
+                                    detail={t('product.benchmarkForThisProductV1', { v1: formatMoney(benchmark), v2: formatMoney(maintenancePoint) })}
                                 />
                             </View>
 
@@ -791,41 +793,36 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 />
                             </View>
                             <Text style={styles.mktScale}>
-                                Maintain {formatMoney(maintenancePoint)} · Benchmark {formatMoney(benchmark)} ·
-                                Max {formatMoney(marketingMax)}
+                                {t('product.marketingScale', {
+                                    v1: formatMoney(maintenancePoint),
+                                    v2: formatMoney(benchmark),
+                                    v3: formatMoney(marketingMax),
+                                })}
                             </Text>
 
                             <Text style={styles.costLine}>
-                                Share of voice {formatPercent(sov * 100)} — that is how much of this
-                                category's attention your budget buys.
+                                {t('product.shareOfVoice', { v1: formatPercent(sov * 100) })}
                             </Text>
 
                             {marketing === 0 ? (
                                 <Text style={styles.warnLine}>
-                                    No marketing. Fewer customers will ever consider this product, and
-                                    Brand Value will erode every quarter.
+                                    {t('product.noMarketingWarn')}
                                 </Text>
                             ) : marketing < maintenancePoint ? (
                                 <Text style={styles.warnLine}>
-                                    Below the maintenance level. You are still selling, but Brand Value
-                                    will slide — add {formatMoney(maintenancePoint - marketing)} to hold it.
+                                    {t('product.belowMaintenance', { v1: formatMoney(maintenancePoint - marketing) })}
                                 </Text>
                             ) : isOverSaturated ? (
                                 <Text style={styles.okLine}>
-                                    Heavy spend. Good for a launch push or taking share fast, but the
-                                    last dollars buy far less than the first — plan to taper back once
-                                    Brand Value has built up.
+                                    {t('product.heavySpend')}
                                 </Text>
                             ) : (
                                 <Text style={styles.okLine}>
-                                    Above the maintenance level. Brand Value builds — as long as you can
-                                    actually deliver the demand you create.
+                                    {t('product.aboveMaintenance')}
                                 </Text>
                             )}
 
-                            <Text style={styles.costLine}>
-                                Charged every quarter regardless of sales: {formatMoney(marketing)}
-                            </Text>
+                            <Text style={styles.costLine}>{t('product.chargedEveryQuarterRegardlessOf', { v1: formatMoney(marketing) })}</Text>
                         </View>
 
                         {/* ══ CANLI ONIZLEME ══
@@ -838,7 +835,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     <InfoDot
                                         title={t('product.projectedResult')}
                                         text={t('product.whatTheseSettingsAreExpected')}
-                                        detail="It is an estimate — morale problems and competitor moves can still change the outcome."
+                                        detail={t('product.estimateNote')}
                                     />
                                 </View>
                                 <View style={styles.previewRow}>
@@ -875,7 +872,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         <View style={styles.controlGroup}>
                             <Text style={styles.controlTitle}>📦 Inventory Status</Text>
                             <Text style={styles.heroValue}>{formatNumber(product.inventory || 0)} Units</Text>
-                            <Text style={styles.hint}>Est. Storage Cost: ${formatNumber((product.inventory || 0) * 5)} / quarter</Text>
+                            <Text style={styles.hint}>{t('product.estStorageCostV1Quarter', { v1: formatNumber((product.inventory || 0) * 5) })}</Text>
                         </View>
 
                         <Pressable style={styles.btnPrimary} onPress={handleSave}>

@@ -111,9 +111,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     <View style={{ flex: 1 }}>
                         <Text style={styles.label}>{t('ui.morale')}</Text>
                         <Text style={styles.big}>{morale.toFixed(0)}</Text>
-                        <Text style={styles.sub}>
-                            Pay alone sustains {target.toFixed(0)}
-                        </Text>
+                        <Text style={styles.sub}>{t('company.payAloneSustainsV1', { v1: target.toFixed(0) })}</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.label}>{t('ui.output')}</Text>
@@ -173,9 +171,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                             the rest has to come from events, bonuses and the company actually doing well.
                         </Text>
                     ) : (
-                        <Text style={styles.ok}>
-                            Around market. Morale settles near {target.toFixed(0)} and stays there.
-                        </Text>
+                        <Text style={styles.ok}>{t('company.aroundMarketMoraleSettlesNear', { v1: target.toFixed(0) })}</Text>
                     )}
                 </CollapsibleSection>
 
