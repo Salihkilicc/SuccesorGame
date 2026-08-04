@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -26,6 +27,7 @@ const NightOutOutcomeModal = ({
     onClose,
     onHookupAccept,
 }: NightOutOutcomeModalProps) => {
+    useLocale();
     const [funLevel, setFunLevel] = useState(0);
 
     useEffect(() => {
@@ -47,13 +49,11 @@ const NightOutOutcomeModal = ({
             <View style={styles.backdrop}>
                 <View style={styles.card}>
                     <Text style={styles.emojiIcon}>🎉</Text>
-                    <Text style={styles.title}>UNFORGETTABLE NIGHT</Text>
-                    <Text style={styles.description}>
-                        The music was perfect, the drinks were flowing, and you felt truly alive.
-                    </Text>
+                    <Text style={styles.title}>{t('life.unforgettableNight')}</Text>
+                    <Text style={styles.description}>{t('life.theMusicWasPerfectThe')}</Text>
 
                     <View style={styles.barContainer}>
-                        <Text style={styles.barLabel}>Fun Level</Text>
+                        <Text style={styles.barLabel}>{t('life.funLevel')}</Text>
                         <View style={styles.progressBarBg}>
                             <View style={[styles.progressBarFill, { width: `${funLevel}%` }]} />
                         </View>
@@ -61,7 +61,7 @@ const NightOutOutcomeModal = ({
                     </View>
 
                     <Pressable onPress={onClose} style={styles.closeButton}>
-                        <Text style={styles.closeButtonText}>Awesome</Text>
+                        <Text style={styles.closeButtonText}>{t('life.awesome')}</Text>
                     </Pressable>
                 </View>
             </View>

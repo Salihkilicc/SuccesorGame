@@ -1,5 +1,6 @@
 // src/features/casino/screens/BlackjackGameScreen.tsx
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -10,6 +11,7 @@ import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 
 const BlackjackGameScreen = () => {
+    useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
   const initialBet = route.params?.betAmount ?? 500;
@@ -78,9 +80,7 @@ const BlackjackGameScreen = () => {
 
         {/* LOGO / TABLE CENTER */}
         <View style={styles.tableCenter}>
-          <Text style={[styles.tableLogo, { color: currentLocation.theme.primary, opacity: 0.2 }]}>
-            BLACKJACK PAYS 3:2
-          </Text>
+          <Text style={[styles.tableLogo, { color: currentLocation.theme.primary, opacity: 0.2 }]}>{t('ui.blackjackPays32')}</Text>
         </View>
 
         {/* PLAYER HAND */}
@@ -113,7 +113,7 @@ const BlackjackGameScreen = () => {
 
           <View style={styles.bottomControls}>
             <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>BET</Text>
+              <Text style={styles.betLabel}>{t('ui.bet')}</Text>
               <Text style={styles.betValueText}>${bet.toLocaleString()}</Text>
             </View>
 
@@ -138,10 +138,10 @@ const BlackjackGameScreen = () => {
               {roundState === 'player' && (
                 <>
                   <Pressable onPress={actions.hit} style={({ pressed }) => [styles.gameBtn, styles.hitBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-                    <Text style={styles.gameBtnText}>HIT</Text>
+                    <Text style={styles.gameBtnText}>{t('ui.hit')}</Text>
                   </Pressable>
                   <Pressable onPress={actions.stand} style={({ pressed }) => [styles.gameBtn, styles.standBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-                    <Text style={styles.gameBtnText}>STAND</Text>
+                    <Text style={styles.gameBtnText}>{t('ui.stand')}</Text>
                   </Pressable>
                 </>
               )}

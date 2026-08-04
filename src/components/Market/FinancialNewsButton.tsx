@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 
@@ -13,6 +14,7 @@ const NEWS_ITEMS = [
 ];
 
 const FinancialNewsButton = () => {
+    useLocale();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -21,8 +23,8 @@ const FinancialNewsButton = () => {
         onPress={() => setVisible(true)}
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text style={styles.title}>Financial News</Text>
-          <Text style={styles.subtitle}>Daily pulse of the global markets.</Text>
+          <Text style={styles.title}>{t('market.financialNews')}</Text>
+          <Text style={styles.subtitle}>{t('market.dailyPulseOfTheGlobal')}</Text>
         </View>
         <Text style={styles.chevron}>›</Text>
       </Pressable>
@@ -31,7 +33,7 @@ const FinancialNewsButton = () => {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Financial News</Text>
+              <Text style={styles.modalTitle}>{t('market.financialNews')}</Text>
               <Pressable
                 onPress={() => setVisible(false)}
                 style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
@@ -48,7 +50,7 @@ const FinancialNewsButton = () => {
             <Pressable
               onPress={() => setVisible(false)}
               style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-              <Text style={styles.closeButtonText}>Close</Text>
+              <Text style={styles.closeButtonText}>{t('market.close')}</Text>
             </Pressable>
           </View>
         </View>

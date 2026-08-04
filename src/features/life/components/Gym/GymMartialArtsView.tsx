@@ -1,13 +1,14 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
 import { useGymSystem, MartialArtStyle } from './useGymSystem';
 
 const MARTIAL_ARTS_LIST: { id: MartialArtStyle; name: string; icon: string; desc: string }[] = [
-    { id: 'boxing', name: 'Boxing', icon: '🥊', desc: 'Focus on punches and footwork.' },
-    { id: 'muaythai', name: 'Muay Thai', icon: '🦵', desc: 'The art of eight limbs.' },
-    { id: 'bjj', name: 'Jiu-Jitsu', icon: '🥋', desc: 'Ground fighting and submission.' },
-    { id: 'mma', name: 'MMA', icon: '🤼', desc: 'Mixed martial arts combat.' },
-    { id: 'karate', name: 'Karate', icon: '🥷', desc: 'Striking, kicking, and knee strikes.' },
+    { id: 'boxing', name: t('life.boxing'), icon: '🥊', desc: t('life.focusOnPunchesAndFootwork') },
+    { id: 'muaythai', name: t('life.muayThai'), icon: '🦵', desc: t('life.theArtOfEightLimbs') },
+    { id: 'bjj', name: t('life.jiuJitsu'), icon: '🥋', desc: t('life.groundFightingAndSubmission') },
+    { id: 'mma', name: 'MMA', icon: '🤼', desc: t('life.mixedMartialArtsCombat') },
+    { id: 'karate', name: t('life.karate'), icon: '🥷', desc: t('life.strikingKickingAndKneeStrikes') },
 ];
 
 /**
@@ -18,6 +19,7 @@ const MARTIAL_ARTS_LIST: { id: MartialArtStyle; name: string; icon: string; desc
  * - Training Mode: View progress and train
  */
 const GymMartialArtsView = () => {
+    useLocale();
     // --- Hook Destructuring ---
     const { data, actions } = useGymSystem();
     const { stats, martialArts, currentQuarter } = data;
@@ -108,7 +110,7 @@ const GymMartialArtsView = () => {
                                         <Text style={styles.artDesc}>{art.desc}</Text>
                                     </View>
                                     <View style={styles.selectBtn}>
-                                        <Text style={styles.selectBtnText}>SELECT</Text>
+                                        <Text style={styles.selectBtnText}>{t('life.select')}</Text>
                                     </View>
                                 </TouchableOpacity>
                             ))}
@@ -128,7 +130,7 @@ const GymMartialArtsView = () => {
                             {/* Progress */}
                             <View style={styles.progressSection}>
                                 <View style={styles.progressHeader}>
-                                    <Text style={styles.progressLabel}>PROGRESS TO NEXT BELT</Text>
+                                    <Text style={styles.progressLabel}>{t('life.progressToNextBelt')}</Text>
                                     <Text style={styles.progressValue}>{trainingCount} / {maxTrainings}</Text>
                                 </View>
                                 <View style={styles.progressBarBg}>
@@ -143,15 +145,15 @@ const GymMartialArtsView = () => {
 
                             {/* Stats/Info */}
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>Fatigue Cost:</Text>
+                                <Text style={styles.infoLabel}>{t('life.fatigueCost')}</Text>
                                 <Text style={styles.infoValue}>+45%</Text>
                             </View>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>Strength Gain:</Text>
+                                <Text style={styles.infoLabel}>{t('life.strengthGain')}</Text>
                                 <Text style={styles.infoValue}>+3</Text>
                             </View>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>Frequency:</Text>
+                                <Text style={styles.infoLabel}>{t('life.frequency')}</Text>
                                 <Text style={styles.infoValue}>1x / Quarter</Text>
                             </View>
 

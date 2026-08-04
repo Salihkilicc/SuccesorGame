@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useBuybackLogic } from './logic/useBuybackLogic';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const BuybackModal = ({ visible, onClose }: Props) => {
+    useLocale();
     const navigation = useNavigation<any>();
     const {
         buybackPercentage,
@@ -54,12 +56,12 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                 <View style={styles.centeredView}>
                     <View style={styles.card}>
                         {/* Header */}
-                        <Text style={styles.title}>Share Buyback</Text>
-                        <Text style={styles.subtitle}>Retire shares to increase ownership</Text>
+                        <Text style={styles.title}>{t('equity.shareBuyback')}</Text>
+                        <Text style={styles.subtitle}>{t('equity.retireSharesToIncreaseOwnership')}</Text>
 
                         {/* Stepper Interface */}
                         <View style={styles.stepperSection}>
-                            <Text style={styles.label}>Buyback Percentage</Text>
+                            <Text style={styles.label}>{t('equity.buybackPercentage')}</Text>
                             <View style={styles.stepperContainer}>
                                 {/* Decrease Button */}
                                 <TouchableOpacity
@@ -79,7 +81,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 {/* Display */}
                                 <View style={styles.valueContainer}>
                                     <Text style={styles.valueText}>{buybackPercentage}%</Text>
-                                    <Text style={styles.labelSmall}>OF VALUATION</Text>
+                                    <Text style={styles.labelSmall}>{t('equity.ofValuation')}</Text>
                                 </View>
 
                                 {/* Increase Button */}
@@ -126,7 +128,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 
                         {/* Amount to Spend Display */}
                         <View style={styles.amountCard}>
-                            <Text style={styles.amountLabel}>Amount to Spend</Text>
+                            <Text style={styles.amountLabel}>{t('equity.amountToSpend')}</Text>
                             <Text style={styles.amountValue}>
                                 {formatMoney(cost)}
                             </Text>
@@ -162,7 +164,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         {/* Cost Summary */}
                         <View style={styles.costSection}>
                             <View style={styles.costRow}>
-                                <Text style={styles.costLabel}>Available Cash</Text>
+                                <Text style={styles.costLabel}>{t('equity.availableCash')}</Text>
                                 <Text style={[
                                     styles.costValue,
                                     { color: isAffordable ? '#30D158' : '#FF453A' }
@@ -186,7 +188,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 onPress={onClose}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={styles.cancelButtonText}>{t('equity.cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[
@@ -200,9 +202,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 <Text style={[
                                     styles.executeButtonText,
                                     !isAffordable && styles.executeButtonTextDisabled
-                                ]}>
-                                    Execute Buyback
-                                </Text>
+                                ]}>{t('equity.executeBuyback')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

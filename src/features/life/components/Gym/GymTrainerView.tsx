@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -19,13 +20,14 @@ interface Props {
 }
 
 const TRAINERS: { id: TrainerTier; name: string; title: string; cost: number; icon: string; boost: string }[] = [
-    { id: 'rookie', name: 'Mike', title: 'Gym Bro', cost: TRAINER_COSTS.rookie, icon: '🧢', boost: '+5% Gains' },
-    { id: 'local', name: 'Sarah', title: 'Local Trainer', cost: TRAINER_COSTS.local, icon: '⏱️', boost: '+15% Gains' },
-    { id: 'influencer', name: 'Chad', title: 'Influencer', cost: TRAINER_COSTS.influencer, icon: '📸', boost: '+30% Gains' },
-    { id: 'legend', name: 'Ronnie', title: 'Mr. Olympia', cost: TRAINER_COSTS.legend, icon: '🏆', boost: '+50% Gains' },
+    { id: 'rookie', name: t('life.mike'), title: t('life.gymBro'), cost: TRAINER_COSTS.rookie, icon: '🧢', boost: '+5% Gains' },
+    { id: 'local', name: t('life.sarah'), title: t('life.localTrainer'), cost: TRAINER_COSTS.local, icon: '⏱️', boost: '+15% Gains' },
+    { id: 'influencer', name: t('life.chad'), title: t('life.influencer'), cost: TRAINER_COSTS.influencer, icon: '📸', boost: '+30% Gains' },
+    { id: 'legend', name: t('life.ronnie'), title: t('life.mrOlympia'), cost: TRAINER_COSTS.legend, icon: '🏆', boost: '+50% Gains' },
 ];
 
 const GymTrainerView = () => {
+    useLocale();
     const { data, actions, activeView, isVisible } = useGymSystem();
     const { trainerId: currentTrainer } = data;
     const { goBackToHub, hireTrainer } = actions;
@@ -55,8 +57,8 @@ const GymTrainerView = () => {
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.title}>HIRE TRAINER</Text>
-                            <Text style={styles.subtitle}>Boost your gains</Text>
+                            <Text style={styles.title}>{t('life.hireTrainer')}</Text>
+                            <Text style={styles.subtitle}>{t('life.boostYourGains')}</Text>
                         </View>
                         <View style={{ width: 60 }} />
                     </View>

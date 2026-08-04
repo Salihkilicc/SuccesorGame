@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { theme } from '../../../../core/theme';
 
@@ -14,12 +15,13 @@ const formatMoney = (value: number) => {
 };
 
 const OfferModal = ({ visible, item, onBuy, onReject }: OfferModalProps) => {
+    useLocale();
     if (!visible || !item) return null;
 
     return (
         <View style={styles.overlay}>
             <View style={styles.container}>
-                <Text style={styles.title}>EXCLUSIVE OFFER</Text>
+                <Text style={styles.title}>{t('life.exclusiveOffer')}</Text>
 
                 <View style={styles.content}>
                     <View style={styles.iconContainer}>
@@ -39,14 +41,14 @@ const OfferModal = ({ visible, item, onBuy, onReject }: OfferModalProps) => {
                         style={({ pressed }) => [styles.button, styles.buyButton, pressed && styles.pressed]}
                         onPress={onBuy}
                     >
-                        <Text style={styles.buyText}>BUY IT</Text>
+                        <Text style={styles.buyText}>{t('life.buyIt')}</Text>
                     </Pressable>
 
                     <Pressable
                         style={({ pressed }) => [styles.button, styles.rejectButton, pressed && styles.pressed]}
                         onPress={onReject}
                     >
-                        <Text style={styles.rejectText}>NOT INTERESTED</Text>
+                        <Text style={styles.rejectText}>{t('life.notInterested')}</Text>
                     </Pressable>
                 </View>
             </View>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../core/i18n';
 import { Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -189,7 +190,7 @@ const AssetsStackNavigator = () => (
     <AssetsStack.Screen
       name="FinancialReport"
       component={FinancialReportScreen}
-      options={{ title: 'Quarterly Financial Report' }}
+      options={{ title: t('nav.quarterlyFinancialReport') }}
     />
 
     {/* --- RAFA KALDIRILDI: lüks tüketim --- */}
@@ -204,7 +205,7 @@ const AssetsStackNavigator = () => (
       <AssetsStack.Screen
         name="Belongings"
         component={BelongingsScreen}
-        options={{ title: 'Asset Portfolio' }}
+        options={{ title: t('nav.assetPortfolio') }}
       />
     ) : null}
     {FEATURES.shopping ? (
@@ -341,7 +342,7 @@ const RootNavigator = () => {
           <RootStack.Screen
             name="TechTree"
             component={TechTreeScreen}
-            options={{ title: 'Innovation Tech Tree' }}
+            options={{ title: t('nav.innovationTechTree') }}
           />
 
           {/* <RootStack.Screen name="Premium" component={PremiumScreen} /> */}
@@ -356,7 +357,7 @@ const RootNavigator = () => {
           <RootStack.Screen
             name="FinancialReport"
             component={FinancialReportScreen}
-            options={{ title: 'Quarterly Financial Report' }}
+            options={{ title: t('nav.quarterlyFinancialReport') }}
           />
 
           {/* --- RAFA KALDIRILDI: lifestyle ekranları --- */}

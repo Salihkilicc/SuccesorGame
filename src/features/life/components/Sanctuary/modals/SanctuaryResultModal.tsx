@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import GameModal from '../../../../../components/common/GameModal';
@@ -15,6 +16,7 @@ type SanctuaryResultModalProps = {
 };
 
 const SanctuaryResultModal = ({ visible, onClose, resultData }: SanctuaryResultModalProps) => {
+    useLocale();
     const [enjoyment] = useState(new Animated.Value(0));
     const [randomEnjoyment, setRandomEnjoyment] = useState(85);
 
@@ -52,7 +54,7 @@ const SanctuaryResultModal = ({ visible, onClose, resultData }: SanctuaryResultM
             {/* ENJOYMENT BAR */}
             <View style={styles.barSection}>
                 <View style={styles.barHeader}>
-                    <Text style={styles.barLabel}>Your Enjoyment</Text>
+                    <Text style={styles.barLabel}>{t('life.yourEnjoyment')}</Text>
                     <Text style={styles.barValue}>{randomEnjoyment}%</Text>
                 </View>
                 <View style={styles.barTrack}>
@@ -72,7 +74,7 @@ const SanctuaryResultModal = ({ visible, onClose, resultData }: SanctuaryResultM
             </View>
 
             <GameButton
-                title="Return to Life"
+                title={t('life.returnToLife')}
                 onPress={onClose}
                 variant="primary"
                 style={{ marginTop: 10 }}

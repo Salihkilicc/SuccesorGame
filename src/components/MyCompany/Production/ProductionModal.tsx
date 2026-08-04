@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, StyleSheet, Text } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ProductionModal = ({ visible, onClose }: Props) => {
+    useLocale();
     // Hook'tan verileri çek
     const {
         localEmployeeCount,
@@ -33,13 +35,13 @@ const ProductionModal = ({ visible, onClose }: Props) => {
         <GameModal
             visible={visible}
             onClose={onClose}
-            title="Production Command"
+            title={t('ui.productionCommand')}
         >
             <View style={styles.container}>
 
                 {/* 1. İŞÇİ YÖNETİMİ */}
                 <PercentageSelector
-                    label="Workforce"
+                    label={t('ui.workforce')}
                     value={localEmployeeCount}
                     min={minEmployees}
                     max={maxEmployees}
@@ -49,7 +51,7 @@ const ProductionModal = ({ visible, onClose }: Props) => {
 
                 {/* 2. ÜRETİM HEDEFİ */}
                 <PercentageSelector
-                    label="Daily Output"
+                    label={t('ui.dailyOutput')}
                     value={localProductionTarget}
                     min={0}
                     max={maxProductionPossible}
@@ -60,7 +62,7 @@ const ProductionModal = ({ visible, onClose }: Props) => {
                 {/* ÖZET KARTI */}
                 <View style={styles.infoBox}>
                     <SectionCard
-                        title="Factory Efficiency"
+                        title={t('ui.factoryEfficiency')}
                         rightText={`${maxProductionPossible > 0 ? ((localProductionTarget / maxProductionPossible) * 100).toFixed(0) : 0}%`}
                     />
                     <Text style={styles.hint}>
@@ -71,13 +73,13 @@ const ProductionModal = ({ visible, onClose }: Props) => {
                 {/* BUTONLAR */}
                 <View style={styles.actionRow}>
                     <GameButton
-                        title="Execute Orders"
+                        title={t('ui.executeOrders')}
                         onPress={handleConfirm}
                         variant="primary"
                         style={{ flex: 1 }}
                     />
                     <GameButton
-                        title="Cancel"
+                        title={t('ui.cancel')}
                         onPress={onClose}
                         variant="ghost"
                         style={{ flex: 1 }}

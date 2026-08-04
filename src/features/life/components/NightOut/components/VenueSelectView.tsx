@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { RegionCode, Venue } from '../data/nightOutVenues';
@@ -12,6 +13,7 @@ type VenueSelectViewProps = {
 };
 
 const VenueSelectView = ({ region, venues, selectedVenue, onSelectVenue, onBack }: VenueSelectViewProps) => {
+    useLocale();
     const renderStars = (tier: number) => {
         return '⭐'.repeat(tier);
     };
@@ -19,7 +21,7 @@ const VenueSelectView = ({ region, venues, selectedVenue, onSelectVenue, onBack 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>Select Venue</Text>
+                <Text style={styles.title}>{t('life.selectVenue')}</Text>
                 <Text style={styles.subtitle}>{region}</Text>
             </View>
 

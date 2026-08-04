@@ -6,7 +6,15 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import {
     BUYBACK_PRICE_SUPPORT,
     DILUTION_PRICE_PRESSURE,
+    DIVIDEND_SENTIMENT_BOOST,
+    IPO_HYPE_MULTIPLIER,
+    IPO_MIN_VALUATION,
     ownershipPercent,
+    quoteBuyback,
+    quoteIpo,
+    quoteSecondary,
+    DIVIDEND_TAX,
+    quoteSecondarySale,
     sharePrice,
 } from '../../../core/market/equity';
 
@@ -51,10 +59,16 @@ export interface EquityState {
     isPublic: boolean;
 
     syncStockPrice: (valuation: number) => void;
-    goPublic: (valuation: number, addCashFn: (amount: number) => void) => { cashRaised: number; sharesSold: number; newOwnershipPercent: number };
+    goPublic: (valuation: number, addCashFn: (amount: number) => void, floatRatio?: number) => { cashRaised: number; sharesSold: number; newOwnershipPercent: number; fee: number; leftOnTable: number; error?: string };
     executeBuyback: (amountToSpend: number, currentValuation: number, spendCashFn: (amount: number) => void) => { sharesBurned: number; newOwnershipPercent: number };
     executeDilution: (percentToSell: number, currentValuation: number, addCashFn: (amount: number) => void) => { newShares: number; capitalRaised: number; newOwnershipPercent: number };
-    distributeDividend: (amountPerShare: number, spendCashFn: (amount: number) => void) => { totalRequired: number; playerPortion: number; isAffordable: boolean };
+    /**
+     * KENDI HISSENI SAT. Para SIRKETE degil SANA gider (vergi dusulur).
+     * Yeni hisse basilmaz, toplam degismez — yalnizca sahiplik degisir.
+     */
+    sellOwnShares: (sharesToSell: number, addPersonalCashFn: (n: number) => void) =>
+        { netToFounder: number; tax: number; newOwnershipPercent: number; error?: string };
+    distributeDividend: (amountPerShare: number, spendCashFn: (amount: number) => void) => { totalRequired: number; playerPortion: number; playerGross: number; tax: number; isAffordable: boolean };
 
     getPlayerOwnership: () => number;
     getMarketCap: () => number;
@@ -129,70 +143,95 @@ export const useEquityStore = create<EquityState>()(
                 });
             },
 
-            // ---- IPO ----
-            goPublic: (valuation, addCashFn) => {
+            // ---- HALKA ARZ ----
+            //  ESKIDEN BEDAVAYDI: sabit %20 satiliyor, degerleme neyse o
+            //  kadar nakit geliyordu. Gercekte iki buyuk kesinti var:
+            //  aracilik komisyonu (%7) ve halka arz iskontosu (%12).
+            //  Ikincisi kasten yapilir — talep dolsun diye hisse adil
+            //  degerin altinda fiyatlanir. Literaturde "masada birakilan
+            //  para" denir ve halka arzi otomatik bir kazanc olmaktan
+            //  cikaran sey tam olarak budur.
+            goPublic: (valuation, addCashFn, floatRatio = 0.20) => {
                 const stats = useStatsStore.getState();
-                if (stats.isPublic) {
-                    return { cashRaised: 0, sharesSold: 0, newOwnershipPercent: get().getPlayerOwnership() };
+                const cap = readCapTable();
+                const fail = (error: string) => ({
+                    cashRaised: 0, sharesSold: 0,
+                    newOwnershipPercent: get().getPlayerOwnership(),
+                    fee: 0, leftOnTable: 0, error,
+                });
+
+                if (stats.isPublic) return fail('Already public.');
+                if (valuation < IPO_MIN_VALUATION) {
+                    return fail(
+                        `Underwriters will not take you public below ${Math.round(IPO_MIN_VALUATION / 1_000_000)}M in valuation.`
+                    );
                 }
 
-                const cap = readCapTable();
-                // Halka arzda YENI hisse cikarilir; oyuncunun hisseleri
-                // yerinde kalir ama toplam artar, yani orantili seyrelir.
-                const sharesToSell = Math.floor(cap.totalShares * 0.20);
-                const cashRaised = sharePrice(valuation, cap.totalShares) * sharesToSell;
+                const q = quoteIpo(valuation, cap.totalShares, cap.playerShares, floatRatio);
 
-                addCashFn(cashRaised);
-                shareholderStore().setState({ totalShares: cap.totalShares + sharesToSell });
+                addCashFn(q.netProceeds);
+                shareholderStore().setState({ totalShares: cap.totalShares + q.newShares });
                 useStatsStore.getState().setIsPublic(true);
 
-                // IPO coskusu — bir sure fiyati yukari tasir
-                set({ marketMultiplier: 1.5 });
+                // Ilk gun coskusu. Artik KALICI DEGIL: her ceyrek 1.0'a
+                // dogru soner (bkz. decaySentiment). Once sonumleme yoktu
+                // ve fiyat sonsuza kadar %50 sisik kaliyordu.
+                set({ marketMultiplier: IPO_HYPE_MULTIPLIER });
                 get().syncStockPrice(valuation);
 
                 return {
-                    cashRaised,
-                    sharesSold: sharesToSell,
-                    newOwnershipPercent: get().getPlayerOwnership(),
+                    cashRaised: q.netProceeds,
+                    sharesSold: q.newShares,
+                    newOwnershipPercent: q.playerOwnershipAfter,
+                    fee: q.underwritingFee,
+                    leftOnTable: q.moneyLeftOnTable,
                 };
             },
 
             // ---- GERI ALIM ----
+            //  Yalnizca HALKA ACIK dolasimdaki hisse geri alinabilir; ozel
+            //  sirkette geri alinacak bir sey yoktur.
+            //
+            //  ISLEM PRIMI: buyuk bir blok almak fiyati sana karsi yukseltir.
+            //  Dolasimin yarisini almaya kalkarsan ortalama gerceklesme
+            //  fiyatin ciddi sekilde artar. Once bu yoktu ve geri alim
+            //  bedava bir sahiplik artirma yoluydu.
             executeBuyback: (amountToSpend, currentValuation, spendCashFn) => {
                 const cap = readCapTable();
                 const price = useStatsStore.getState().companySharePrice || 0;
-                if (amountToSpend <= 0 || price <= 0) {
+                const q = quoteBuyback(amountToSpend, price, cap.totalShares, cap.playerShares, cap.publicShares);
+
+                if (q.shares <= 0) {
                     return { sharesBurned: 0, newOwnershipPercent: get().getPlayerOwnership() };
                 }
 
-                const wanted = Math.floor(amountToSpend / price);
-                // Yalnizca halka acik dolasimdaki hisse geri alinabilir.
-                const burned = Math.min(wanted, cap.publicShares);
-                if (burned <= 0) {
-                    return { sharesBurned: 0, newOwnershipPercent: get().getPlayerOwnership() };
-                }
-
-                spendCashFn(burned * price);
-                shareholderStore().setState({ totalShares: cap.totalShares - burned });
+                spendCashFn(q.totalCost);
+                shareholderStore().setState({ totalShares: cap.totalShares - q.shares });
 
                 // Arz azaldi, sinyal olumlu: fiyat destek gorur.
-                const impact = (burned / cap.totalShares) * BUYBACK_PRICE_SUPPORT;
+                const impact = q.floatConsumed * BUYBACK_PRICE_SUPPORT * 0.15;
                 set(state => ({ marketMultiplier: state.marketMultiplier + impact }));
                 get().syncStockPrice(currentValuation);
 
-                return { sharesBurned: burned, newOwnershipPercent: get().getPlayerOwnership() };
+                return { sharesBurned: q.shares, newOwnershipPercent: q.playerOwnershipAfter };
             },
 
-            // ---- SEYRELTME ----
+            // ---- IKINCIL ARZ (SEYRELTME) ----
+            //  Yeni hisse ADIL fiyattan degil, ISKONTOLU satilir (%8) ve
+            //  ustune komisyon vardir (%4). Once iskontosuz ve komisyonsuzdu,
+            //  yani "istedigin an degerlemenden nakit basmak" gibiydi.
             executeDilution: (percentToSell, valuation, addCashFn) => {
                 const cap = readCapTable();
-                const decimal = Math.max(0, Math.min(0.9, percentToSell / 100));
-                const newTotal = Math.floor(cap.totalShares / (1 - decimal));
-                const sharesCreated = newTotal - cap.totalShares;
-                const cashRaised = sharePrice(valuation, cap.totalShares) * sharesCreated;
+                const decimal = Math.max(0, Math.min(0.5, percentToSell / 100));
+                const price = useStatsStore.getState().companySharePrice
+                    || sharePrice(valuation, cap.totalShares);
+
+                const q = quoteSecondary(price, cap.totalShares, cap.playerShares, decimal);
+                const sharesCreated = q.newShares;
+                const cashRaised = q.netProceeds;
 
                 addCashFn(cashRaised);
-                shareholderStore().setState({ totalShares: newTotal });
+                shareholderStore().setState({ totalShares: cap.totalShares + sharesCreated });
 
                 // Yeni hisse cikarmak piyasada olumsuz sinyaldir.
                 const impact = decimal * DILUTION_PRICE_PRESSURE;
@@ -202,20 +241,97 @@ export const useEquityStore = create<EquityState>()(
                 return {
                     newShares: sharesCreated,
                     capitalRaised: cashRaised,
-                    newOwnershipPercent: get().getPlayerOwnership(),
+                    newOwnershipPercent: q.playerOwnershipAfter,
                 };
             },
 
             // ---- TEMETTU ----
+            //  Istikrar sinyalidir: piyasa olumlu karsilar.
+            // ---- KENDI HISSENI SAT (ikincil satis) ----
+            //  Para SIRKETE DEGIL SANA gider. Yeni hisse basilmaz, toplam
+            //  degismez — yalnizca sahiplik el degistirir. Yukaridaki
+            //  seyreltmenin tam tersi ve ikisi ayri ekranda olmali.
+            sellOwnShares: (sharesToSell, addPersonalCashFn) => {
+                const cap = readCapTable();
+                const stats = useStatsStore.getState();
+                const price = stats.companySharePrice || 0;
+
+                if (price <= 0) {
+                    return {
+                        netToFounder: 0, tax: 0,
+                        newOwnershipPercent: get().getPlayerOwnership(),
+                        error: 'No share price yet.',
+                    };
+                }
+                // En az %10 sende kalmali.
+                const floor = cap.totalShares * 0.10;
+                if (cap.playerShares - sharesToSell < floor) {
+                    return {
+                        netToFounder: 0, tax: 0,
+                        newOwnershipPercent: get().getPlayerOwnership(),
+                        error: 'You cannot go below 10%. Below that you are a passenger, not a founder.',
+                    };
+                }
+
+                const q = quoteSecondarySale(sharesToSell, price, cap.playerShares, cap.totalShares);
+
+                // Hisseler dolasima gecer: TOPLAM DEGISMEZ, yalnizca senden cikar.
+                shareholderStore().setState({ playerShareCount: cap.playerShares - q.sharesSold });
+                addPersonalCashFn(q.netToFounder);
+
+                // Iceriden satis piyasanin en guclu olumsuz isaretlerinden biri.
+                const drop = Math.min(0.35, (q.sharesSold / cap.totalShares) * 1.2);
+                set(state => ({ marketMultiplier: Math.max(0.3, state.marketMultiplier * (1 - drop)) }));
+                get().refresh();
+
+                return {
+                    netToFounder: q.netToFounder,
+                    tax: q.tax,
+                    newOwnershipPercent: q.newOwnershipPercent,
+                };
+            },
+
             distributeDividend: (amountPerShare, spendCashFn) => {
                 const cap = readCapTable();
                 const totalCost = amountPerShare * cap.totalShares;
-                const playerCut = amountPerShare * cap.playerShares;
+                const playerGross = amountPerShare * cap.playerShares;
+
+                // ----------------------------------------------------------
+                //  PARA GORUNMEZ BIR DEPOYA GIDIYORDU
+                // ----------------------------------------------------------
+                //  `usePlayerStore.earnMoney` cagriliyordu ve o store
+                //  `core.money` tutuyor. Ama oyunun her yeri (ve az once
+                //  yazdigim hisse satisi dahil) `useStatsStore.money`
+                //  okuyor. Yani temettu "odendi" diyor, para hicbir ekranda
+                //  gorunmuyordu.
+                //
+                //  Bu projede ONUNCU kez ayni desen: ayni sey iki yerde
+                //  tutuluyor, biri digerini bilmiyor. Kisisel nakit artik
+                //  TEK yerde — useStatsStore.money.
+                //
+                //  TEMETTU VERGISI: sirket zaten kurumlar vergisi odedi,
+                //  sen de temettu vergisi odersin. Finansta buna "cifte
+                //  vergilendirme" denir ve sirketlerin neden temettu yerine
+                //  hisse geri alimi tercih ettiginin bir numarali sebebidir.
+                // ----------------------------------------------------------
+                const tax = playerGross * DIVIDEND_TAX;
+                const playerNet = playerGross - tax;
 
                 spendCashFn(totalCost);
-                usePlayerStore.getState().earnMoney(playerCut);
+                const st = useStatsStore.getState();
+                st.update({ money: (st.money || 0) + playerNet });
 
-                return { totalRequired: totalCost, playerPortion: playerCut, isAffordable: true };
+                set(state => ({
+                    marketMultiplier: state.marketMultiplier + DIVIDEND_SENTIMENT_BOOST,
+                }));
+
+                return {
+                    totalRequired: totalCost,
+                    playerPortion: playerNet,
+                    playerGross,
+                    tax,
+                    isAffordable: true,
+                };
             },
 
             getPlayerOwnership: () => {

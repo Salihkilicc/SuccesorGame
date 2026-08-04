@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
 
 type Props = {
@@ -9,11 +10,12 @@ type Props = {
 };
 
 const CasinoRoomCard = ({name, requirement, locked, onPress}: Props) => {
+    useLocale();
   const content = (
     <View style={[styles.card, locked && styles.cardLocked]}>
       <View style={styles.headerRow}>
         <Text style={styles.name}>{name}</Text>
-        {locked ? <Text style={styles.lockedTag}>LOCKED</Text> : null}
+        {locked ? <Text style={styles.lockedTag}>{t('ui.locked')}</Text> : null}
       </View>
       <Text style={styles.requirement}>{requirement}</Text>
     </View>

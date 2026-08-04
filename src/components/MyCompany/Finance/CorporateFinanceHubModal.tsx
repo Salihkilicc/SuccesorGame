@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
@@ -19,13 +20,14 @@ type Props = {
 };
 
 const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt }: Props) => {
+    useLocale();
     // Navigation removed as it was only used for BottomStatsBar
     const { companyValue, companyCapital } = useStatsStore();
     const {
         creditScore,
         totalDebt,
         loans,
-        getBorrowingCapacity,
+        getAssessment,
         getCurrentLeverage,
         getMonthlyInterestTotal,
         refreshCreditScore,
@@ -47,19 +49,31 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
         }
     }, [visible, companyValue, companyCapital, refreshCreditScore]);
 
-    const borrowingCapacity = getBorrowingCapacity(companyValue);
+    // ------------------------------------------------------------------
+    //  ONCE BU EKRAN 100M YAZIP BANKA 6M VERIYORDU.
+    //
+    //  Cunku iki farkli kapasite vardi:
+    //    burasi  -> DEGERLEME x kaldirac   (hayale borc verir)
+    //    banka   -> EBITDA x kaldirac      (nakit akisina borc verir)
+    //
+    //  Dogrusu ikincisi. Bankalar degerlemeye degil kazanca borc verir;
+    //  degerleme dususte buhar olur, faiz odemesi olmaz. Tek kaynak:
+    //  credit.ts / assessCredit.
+    // ------------------------------------------------------------------
+    const assessment = getAssessment();
+    const borrowingCapacity = assessment.headroom;
     const leverage = getCurrentLeverage(companyValue);
     const monthlyInterest = getMonthlyInterestTotal();
 
     // Credit Rating Display
     const getCreditRating = () => {
-        if (creditScore >= 800) return { label: 'AAA', color: '#FFD700', description: 'Excellent' };
-        if (creditScore >= 750) return { label: 'AA', color: '#FFD700', description: 'Very Good' };
-        if (creditScore >= 700) return { label: 'A', color: '#90EE90', description: 'Good' };
-        if (creditScore >= 650) return { label: 'BBB', color: '#FFA500', description: 'Fair' };
-        if (creditScore >= 600) return { label: 'BB', color: '#FFA500', description: 'Moderate' };
-        if (creditScore >= 500) return { label: 'B', color: '#FF6B6B', description: 'Risky' };
-        return { label: 'C', color: '#FF0000', description: 'Junk' };
+        if (creditScore >= 800) return { label: 'AAA', color: '#FFD700', description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: '#FFD700', description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: '#90EE90', description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: '#FFA500', description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: '#FFA500', description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: '#FF6B6B', description: t('finance.risky') };
+        return { label: 'C', color: '#FF0000', description: t('finance.junk') };
     };
 
     const rating = getCreditRating();
@@ -75,8 +89,8 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     <Text style={styles.closeButtonText}>✕</Text>
                 </TouchableOpacity>
                 <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>CORPORATE FINANCE</Text>
-                    <Text style={styles.headerSubtitle}>Premium Private Banking</Text>
+                    <Text style={styles.headerTitle}>{t('finance.corporateFinance')}</Text>
+                    <Text style={styles.headerSubtitle}>{t('finance.premiumPrivateBanking')}</Text>
                 </View>
                 {/* Spacer to balance the absolute close button if needed, but absolute works best */}
             </View>
@@ -91,8 +105,8 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.cardTitle}>Injection</Text>
-                            <Text style={styles.cardDesc}>Personal investment</Text>
+                            <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
+                            <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
                         </View>
                         <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
@@ -100,7 +114,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
                 {/* HERO: Credit Score */}
                 <View style={styles.heroSection}>
-                    <Text style={styles.heroLabel}>CREDIT SCORE</Text>
+                    <Text style={styles.heroLabel}>{t('finance.creditScore')}</Text>
                     <View style={styles.scoreContainer}>
                         <Text style={[styles.scoreNumber, { color: rating.color }]}>
                             {creditScore}
@@ -115,7 +129,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
                     {/* Borrowing Capacity Progress Bar */}
                     <View style={styles.capacityContainer}>
-                        <Text style={styles.capacityLabel}>Borrowing Capacity</Text>
+                        <Text style={styles.capacityLabel}>{t('finance.borrowingCapacity')}</Text>
                         <View style={styles.progressBar}>
                             <View
                                 style={[
@@ -136,19 +150,19 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 {/* STATS GRID */}
                 <View style={styles.statsGrid}>
                     <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>Total Debt</Text>
+                        <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
                         <Text style={[styles.statValue, { color: '#FF6B6B' }]}>
                             {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>Monthly Interest</Text>
+                        <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
                         <Text style={[styles.statValue, { color: '#FFA500' }]}>
                             {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>Leverage</Text>
+                        <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
                         <Text style={[styles.statValue, { color: leverage > 60 ? '#FF6B6B' : '#90EE90' }]}>
                             {leverage.toFixed(1)}%
                         </Text>
@@ -157,32 +171,32 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
                 {/* ACTIVE LOANS */}
                 <View>
-                    <Text style={styles.sectionTitle}>Active Loans</Text>
+                    <Text style={styles.sectionTitle}>{t('finance.activeLoans')}</Text>
                     {loans.length === 0 ? (
                         <View style={styles.emptyState}>
                             <Text style={styles.emptyStateIcon}>✓</Text>
-                            <Text style={styles.emptyStateText}>No Active Debt</Text>
-                            <Text style={styles.emptyStateSubtext}>Clean Balance Sheet</Text>
+                            <Text style={styles.emptyStateText}>{t('finance.noActiveDebt')}</Text>
+                            <Text style={styles.emptyStateSubtext}>{t('finance.cleanBalanceSheet')}</Text>
                         </View>
                     ) : (
                         <View style={styles.loansList}>
                             {loans.map((loan) => (
                                 <View key={loan.id} style={styles.loanCard}>
                                     <View style={styles.loanHeader}>
-                                        <Text style={styles.loanType}>{loan.type} Loan</Text>
-                                        <Text style={styles.loanRate}>{loan.interestRate}% APR</Text>
+                                        <Text style={styles.loanType}>{loan.name} Loan</Text>
+                                        <Text style={styles.loanRate}>{loan.rate}% APR</Text>
                                     </View>
                                     <View style={styles.loanDetails}>
                                         <View>
-                                            <Text style={styles.loanDetailLabel}>Remaining</Text>
+                                            <Text style={styles.loanDetailLabel}>{t('finance.remaining')}</Text>
                                             <Text style={styles.loanDetailValue}>
-                                                {formatMoney(loan.remaining)}
+                                                {formatMoney(loan.balance)}
                                             </Text>
                                         </View>
                                         <View>
-                                            <Text style={styles.loanDetailLabel}>Monthly</Text>
+                                            <Text style={styles.loanDetailLabel}>{t('finance.monthly')}</Text>
                                             <Text style={styles.loanDetailValue}>
-                                                {formatMoney(loan.monthlyPayment)}
+                                                {formatMoney(((loan.balance * loan.rate) / 4))}
                                             </Text>
                                         </View>
                                     </View>
@@ -210,15 +224,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     </Text>
                                 </View>
                                 <View style={styles.sharkDealInfo}>
-                                    <Text style={styles.sharkDealTitle}>
-                                        Private Equity Injection
-                                    </Text>
+                                    <Text style={styles.sharkDealTitle}>{t('finance.privateEquityInjection')}</Text>
                                     <Text style={styles.sharkDealSubtitle}>
                                         from {sharkMember.name}
                                     </Text>
                                 </View>
                                 <View style={styles.instantBadge}>
-                                    <Text style={styles.instantBadgeText}>INSTANT CASH</Text>
+                                    <Text style={styles.instantBadgeText}>{t('finance.instantCash')}</Text>
                                 </View>
                             </View>
                             <View style={styles.sharkDealFooter}>
@@ -242,7 +254,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             ]}
                             onPress={onRepayDebt}
                         >
-                            <Text style={styles.repayButtonText}>Repay Debt</Text>
+                            <Text style={styles.repayButtonText}>{t('finance.repayDebt')}</Text>
                         </Pressable>
                     )}
 
@@ -253,7 +265,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         ]}
                         onPress={onRequestLoan}
                     >
-                        <Text style={styles.ctaButtonText}>Request New Loan</Text>
+                        <Text style={styles.ctaButtonText}>{t('finance.requestNewLoan')}</Text>
                     </Pressable>
                 </View>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -20,6 +21,7 @@ interface Props {
 }
 
 const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
+    useLocale();
 
     // Connect Logic Hook
     const {
@@ -57,31 +59,31 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                                     : "They were a bit offended by your rejection."}
                         </Text>
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
-                            <Text style={styles.closeBtnText}>Close</Text>
+                            <Text style={styles.closeBtnText}>{t('equity.close')}</Text>
                         </Pressable>
                     </View>
                 ) : (
                     <View style={styles.content}>
-                        <Text style={styles.title}>Share Negotiation</Text>
+                        <Text style={styles.title}>{t('equity.shareNegotiation')}</Text>
 
                         {/* Tabs */}
                         <View style={styles.tabs}>
                             <Pressable
                                 onPress={() => setTransactionType('buy')}
                                 style={[styles.tab, transactionType === 'buy' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>BUY</Text>
+                                <Text style={[styles.tabText, transactionType === 'buy' && styles.activeTabText]}>{t('equity.buy')}</Text>
                             </Pressable>
                             <Pressable
                                 onPress={() => setTransactionType('sell')}
                                 style={[styles.tab, transactionType === 'sell' && styles.activeTab]}>
-                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>SELL</Text>
+                                <Text style={[styles.tabText, transactionType === 'sell' && styles.activeTabText]}>{t('equity.sell')}</Text>
                             </Pressable>
                         </View>
 
                         {/* YENİ Quantity Seçici (Slider Yerine) */}
                         <View style={styles.section}>
                             <PercentageSelector
-                                label="Quantity (Lots)"
+                                label={t('equity.quantityLots')}
                                 value={quantity}
                                 min={1}
                                 max={Math.max(1, maxQuantity)}
@@ -94,13 +96,13 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                         {/* Fiyat Kartları */}
                         {transactionType === 'buy' ? (
                             <View style={styles.section}>
-                                <Text style={styles.label}>Your Offer (Per Share)</Text>
+                                <Text style={styles.label}>{t('equity.yourOfferPerShare')}</Text>
                                 <TextInput
                                     style={styles.input}
                                     value={offerPrice}
                                     onChangeText={setOfferPrice}
                                     keyboardType="numeric"
-                                    placeholder="Price"
+                                    placeholder={t('equity.price')}
                                     placeholderTextColor={theme.colors.textMuted}
                                 />
                                 <View style={styles.marketRef}>
@@ -109,7 +111,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                             </View>
                         ) : (
                             <View style={styles.npcOfferCard}>
-                                <Text style={styles.npcOfferLabel}>THEIR OFFER (Market +20%)</Text>
+                                <Text style={styles.npcOfferLabel}>{t('equity.theirOfferMarket20')}</Text>
                                 <Text style={styles.npcOfferValue}>{formatPrice(npcOfferPrice)} <Text style={styles.perShare}>/share</Text></Text>
                                 <Text style={styles.npcOfferContext}>
                                     "I'm offering {formatPrice(npcOfferPrice)} per share for your lots. Take it or leave it."
@@ -119,7 +121,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
 
                         {/* Toplam Tutar */}
                         <View style={styles.totalRow}>
-                            <Text style={styles.totalLabel}>Total Amount</Text>
+                            <Text style={styles.totalLabel}>{t('equity.totalAmount')}</Text>
                             <Text style={styles.totalAmount}>{formatMoney(currentTotal)}</Text>
                         </View>
 
@@ -127,7 +129,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                         <View style={styles.actions}>
                             {transactionType === 'sell' && (
                                 <Pressable style={styles.rejectBtn} onPress={handleRejectOffer}>
-                                    <Text style={styles.rejectText}>Reject</Text>
+                                    <Text style={styles.rejectText}>{t('equity.reject')}</Text>
                                 </Pressable>
                             )}
                             <Pressable

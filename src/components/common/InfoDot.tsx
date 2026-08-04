@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 
 // ============================================================================
@@ -13,7 +14,7 @@ import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 //  istemeyen sadece rakamlari gorur.
 //
 //  KULLANIM:
-//    <InfoDot title="Cost of Goods Sold" text="Uretilen birime yazilir..." />
+//    <InfoDot title={t('ui.costOfGoodsSold')} text={t('ui.uretilenBirimeYazilir')} />
 // ============================================================================
 
 type Props = {
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export const InfoDot = ({ title, text, detail, small }: Props) => {
+    useLocale();
     const [open, setOpen] = useState(false);
 
     const show = useCallback(() => setOpen(true), []);
@@ -58,7 +60,7 @@ export const InfoDot = ({ title, text, detail, small }: Props) => {
                         {detail ? <Text style={styles.detail}>{detail}</Text> : null}
 
                         <Pressable style={styles.button} onPress={hide}>
-                            <Text style={styles.buttonText}>Got it</Text>
+                            <Text style={styles.buttonText}>{t('ui.gotIt')}</Text>
                         </Pressable>
                     </Pressable>
                 </Pressable>

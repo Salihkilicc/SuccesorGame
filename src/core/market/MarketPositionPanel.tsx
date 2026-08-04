@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { useMarketPosition } from './useMarketPosition';
 import { useStatsStore } from '../store/useStatsStore';
@@ -34,12 +35,13 @@ type Props = {
 };
 
 export const MarketPositionPanel = ({ category, compact }: Props) => {
+    useLocale();
     const position = useMarketPosition(category);
     const brandValue = useStatsStore(state => state.brandValue);
 
     if (!position) return null;
 
-    const { market, playerShare, playerRank, ranking, unitsSold } = position;
+    const { market, playerShare, playerRank, ranking, unitsSold, ownedShare, groupShare } = position;
 
     if (compact) {
         return (
@@ -55,8 +57,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 <View style={styles.titleRow}>
                     <Text style={styles.title}>📈 Market Position</Text>
                     <InfoDot
-                        title="Market Position"
-                        text="Every product category is a fixed-size market. Your share of it is decided by price, marketing, quality, brand and how appealing the product is."
+                        title={t('os.marketPosition')}
+                        text={t('os.everyProductCategoryIsA')}
                         detail="Building more units does not create demand. Buying a competitor transfers most of their share to you."
                     />
                 </View>
@@ -70,21 +72,29 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
             {/* Ozet sayilar */}
             <View style={styles.summaryRow}>
                 <View style={styles.summaryCell}>
-                    <Text style={styles.summaryLabel}>Market Size</Text>
+                    <Text style={styles.summaryLabel}>{t('os.marketSize')}</Text>
                     <Text style={styles.summaryValue}>
                         {formatNumber(market.sizeUnitsPerQuarter)}
                     </Text>
                     <Text style={styles.summaryUnit}>units / quarter</Text>
                 </View>
                 <View style={styles.summaryCell}>
-                    <Text style={styles.summaryLabel}>Your Share</Text>
+                    <Text style={styles.summaryLabel}>{t('os.yourShare')}</Text>
                     <Text style={[styles.summaryValue, { color: '#4CAF50' }]}>
                         {formatShare(playerShare)}
+                    </Text>
+                    {ownedShare > 0 && (
+                        <Text style={styles.groupNote}>
+                            +{formatShare(ownedShare)} through companies you own = {formatShare(groupShare)} of
+                            this market
+                        </Text>
+                    )}
+                    <Text style={{ display: 'none' }}>
                     </Text>
                     <Text style={styles.summaryUnit}>rank #{playerRank}</Text>
                 </View>
                 <View style={styles.summaryCell}>
-                    <Text style={styles.summaryLabel}>Brand Value</Text>
+                    <Text style={styles.summaryLabel}>{t('os.brandValue')}</Text>
                     <Text style={[styles.summaryValue, { color: '#FFD700' }]}>{brandValue}</Text>
                     <Text style={styles.summaryUnit}>out of 100</Text>
                 </View>
@@ -96,21 +106,21 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
 
             {/* Siralama — katlanir. Ozet yukarida zaten gorunuyor. */}
             <CollapsibleSection
-                title="COMPETITORS"
-                note="Who holds this market and how much"
-                info="These are real companies you can buy on the stock market. Acquiring one transfers most of its market share to you."
+                title={t('os.competitors')}
+                note={t('os.whoHoldsThisMarketAnd')}
+                info={t('os.theseAreRealCompaniesYou')}
                 summary={`#${playerRank} of ${ranking.length}`}
                 summaryColor="#7FB3FF"
                 style={styles.rankingSection}
             >
             <View style={styles.rankingBox}>
                 {ranking.map((p, index) => (
-                    <View key={p.id} style={[styles.rankRow, p.isPlayer && styles.rankRowPlayer]}>
-                        <Text style={[styles.rankNum, p.isPlayer && styles.rankTextPlayer]}>
+                    <View key={p.id} style={[styles.rankRow, (p.isPlayer || p.owned) && styles.rankRowPlayer]}>
+                        <Text style={[styles.rankNum, (p.isPlayer || p.owned) && styles.rankTextPlayer]}>
                             {index + 1}
                         </Text>
                         <Text
-                            style={[styles.rankName, p.isPlayer && styles.rankTextPlayer]}
+                            style={[styles.rankName, (p.isPlayer || p.owned) && styles.rankTextPlayer]}
                             numberOfLines={1}
                         >
                             {p.name}
@@ -122,12 +132,14 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                                     styles.rankBarFill,
                                     {
                                         width: `${Math.min(100, p.share)}%`,
-                                        backgroundColor: p.isPlayer ? '#4CAF50' : 'rgba(255,255,255,0.28)',
+                                        backgroundColor: p.isPlayer
+                                            ? '#4CAF50'
+                                            : p.owned ? '#7FB3FF' : 'rgba(255,255,255,0.28)',
                                     },
                                 ]}
                             />
                         </View>
-                        <Text style={[styles.rankShare, p.isPlayer && styles.rankTextPlayer]}>
+                        <Text style={[styles.rankShare, (p.isPlayer || p.owned) && styles.rankTextPlayer]}>
                             {formatShare(p.share)}
                         </Text>
                     </View>
@@ -146,6 +158,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
 export default MarketPositionPanel;
 
 const styles = StyleSheet.create({
+    groupNote: { color: '#7FB3FF', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
     compactLine: { color: '#7FB3FF', fontSize: 11, fontWeight: '600' },
 
     panel: {

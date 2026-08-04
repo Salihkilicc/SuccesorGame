@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, Text, Pressable, StyleSheet, SafeAreaView, Alert, Platform, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,22 +34,23 @@ const GRADIENTS = {
 };
 
 const SECTION_ESSENTIALS = [
-    { key: 'contacts', label: 'Contacts', icon: 'account-multiple', gradient: GRADIENTS.purplePink },
-    { key: 'weather', label: 'Weather', icon: 'weather-partly-cloudy', gradient: GRADIENTS.bluePurple },
-    { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey },
-    { key: 'themes', label: 'Themes', icon: 'palette', gradient: GRADIENTS.networkBlue },
-    { key: 'godMode', label: 'God Mode', icon: 'flash', gradient: GRADIENTS.hookupFire },
-    { key: 'stockMarket', label: 'Stock Market', icon: 'chart-line', gradient: GRADIENTS.greenTeal },
+    { key: 'contacts', label: t('life.contacts'), icon: 'account-multiple', gradient: GRADIENTS.purplePink },
+    { key: 'weather', label: t('life.weather'), icon: 'weather-partly-cloudy', gradient: GRADIENTS.bluePurple },
+    { key: 'settings', label: t('life.settings'), icon: 'cog', gradient: GRADIENTS.darkGrey },
+    { key: 'themes', label: t('life.themes'), icon: 'palette', gradient: GRADIENTS.networkBlue },
+    { key: 'godMode', label: t('life.godMode'), icon: 'flash', gradient: GRADIENTS.hookupFire },
+    { key: 'stockMarket', label: t('life.stockMarket'), icon: 'chart-line', gradient: GRADIENTS.greenTeal },
 ];
 
 const SECTION_UNDERWORLD = [
-    { key: 'casino', label: 'Casino', icon: 'slot-machine', gradient: GRADIENTS.redCasino },
-    { key: 'blackMarket', label: 'Black Market', icon: 'incognito', gradient: GRADIENTS.darkGrey },
-    { key: 'hookup', label: 'Hookup', icon: 'fire', gradient: GRADIENTS.hookupFire },
-    { key: 'network', label: 'Network', icon: 'lan', gradient: GRADIENTS.networkBlue },
+    { key: 'casino', label: t('life.casino'), icon: 'slot-machine', gradient: GRADIENTS.redCasino },
+    { key: 'blackMarket', label: t('life.blackMarket'), icon: 'incognito', gradient: GRADIENTS.darkGrey },
+    { key: 'hookup', label: t('life.hookup'), icon: 'fire', gradient: GRADIENTS.hookupFire },
+    { key: 'network', label: t('life.network'), icon: 'lan', gradient: GRADIENTS.networkBlue },
 ];
 
 const UnderworldScreen = () => {
+    useLocale();
     const navigation = useNavigation<UnderworldNavigationProp>();
 
     // Underworld specific systems
@@ -112,20 +114,20 @@ const UnderworldScreen = () => {
 
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.headerContainer}>
-                    <Text style={styles.headerTitle}>CITY</Text>
+                    <Text style={styles.headerTitle}>{t('life.city')}</Text>
                     <View style={styles.headerAccent} />
                 </View>
 
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Essentials</Text>
+                        <Text style={styles.sectionTitle}>{t('life.essentials')}</Text>
                         <View style={styles.grid}>
                             {SECTION_ESSENTIALS.map(renderAppIcon)}
                         </View>
                     </View>
 
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Underworld</Text>
+                        <Text style={styles.sectionTitle}>{t('life.underworld')}</Text>
                         <View style={styles.grid}>
                             {SECTION_UNDERWORLD.map(renderAppIcon)}
                         </View>

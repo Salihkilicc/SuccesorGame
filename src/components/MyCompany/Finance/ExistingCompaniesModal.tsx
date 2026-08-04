@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     Modal,
     View,
@@ -20,6 +21,7 @@ type Props = {
 };
 
 const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
+    useLocale();
     const navigation = useNavigation<any>();
     const { subsidiaries } = useCorporateFinanceStore();
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
@@ -37,7 +39,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                     <TouchableOpacity onPress={onClose} style={styles.backBtn}>
                         <Text style={styles.backText}>← Back</Text>
                     </TouchableOpacity>
-                    <Text style={styles.title}>My Empire</Text>
+                    <Text style={styles.title}>{t('finance.myEmpire')}</Text>
                     <View style={{ width: 50 }} />
                 </View>
 
@@ -61,7 +63,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
-                            <Text style={styles.empty}>No companies owned.</Text>
+                            <Text style={styles.empty}>{t('finance.noCompaniesOwned')}</Text>
                         </View>
                     }
                     contentContainerStyle={[

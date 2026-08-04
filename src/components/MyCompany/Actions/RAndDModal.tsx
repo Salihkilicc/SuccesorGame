@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStatsStore, TechLevels } from '../../../core/store';
@@ -25,30 +26,31 @@ interface TechUpgrade {
 
 const TECH_TREE: Record<TechCategory, TechUpgrade[]> = {
   hardware: [
-    { level: 1, cost: 0, title: 'Basic Accessories', reward: 'Start' },
-    { level: 2, cost: 1_000_000_000, title: 'Miniaturization', reward: 'Unlocks MyPhone' },
-    { level: 3, cost: 4_200_000_000, title: 'Silicon Processors', reward: 'Unlocks MyMac' },
-    { level: 4, cost: 10_500_000_000, title: 'Wearable Sensors', reward: 'Unlocks MyWatch & MyPods' },
+    { level: 1, cost: 0, title: t('action.basicAccessories'), reward: 'Start' },
+    { level: 2, cost: 1_000_000_000, title: t('action.miniaturization'), reward: 'Unlocks MyPhone' },
+    { level: 3, cost: 4_200_000_000, title: t('action.siliconProcessors'), reward: 'Unlocks MyMac' },
+    { level: 4, cost: 10_500_000_000, title: t('action.wearableSensors'), reward: 'Unlocks MyWatch & MyPods' },
   ],
   software: [
-    { level: 1, cost: 0, title: 'Basic OS', reward: 'Start' },
-    { level: 2, cost: 1_800_000_000, title: 'Cloud Integration', reward: 'Unlocks MyPad' },
-    { level: 3, cost: 7_000_000_000, title: 'MyAI Integration', reward: 'Sales Price limit +20% & Demand Boost' },
+    { level: 1, cost: 0, title: t('action.basicOs'), reward: 'Start' },
+    { level: 2, cost: 1_800_000_000, title: t('action.cloudIntegration'), reward: 'Unlocks MyPad' },
+    { level: 3, cost: 7_000_000_000, title: t('action.myaiIntegration'), reward: 'Sales Price limit +20% & Demand Boost' },
   ],
   future: [
-    { level: 1, cost: 0, title: 'Research Lab', reward: 'Requires Hardware Lvl 4 to Unlock', req: { category: 'hardware', level: 4 } },
-    { level: 2, cost: 35_000_000_000, title: 'Autonomous Driving', reward: 'Unlocks MyCar' },
-    { level: 3, cost: 70_000_000_000, title: 'Spatial Computing', reward: 'Unlocks MyVision' },
+    { level: 1, cost: 0, title: t('action.researchLab'), reward: 'Requires Hardware Lvl 4 to Unlock', req: { category: 'hardware', level: 4 } },
+    { level: 2, cost: 35_000_000_000, title: t('action.autonomousDriving'), reward: 'Unlocks MyCar' },
+    { level: 3, cost: 70_000_000_000, title: t('action.spatialComputing'), reward: 'Unlocks MyVision' },
   ],
 };
 
 const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
+    useLocale();
   const navigation = useNavigation<any>();
   const { companyCapital, setField, techLevels, setTechLevel } = useStatsStore();
 
   const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
     if (companyCapital < cost) {
-      Alert.alert('Insufficient Funds', "Your company doesn't have enough capital for this investment.");
+      Alert.alert(t('alert.insufficientFunds'), "Your company doesn't have enough capital for this investment.");
       return;
     }
 
@@ -58,7 +60,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     // Find the upgrade info for messages
     const upgradeInfo = TECH_TREE[category].find(u => u.level === nextLevel);
     if (upgradeInfo) {
-      Alert.alert('Research Complete', `You have unlocked: ${upgradeInfo.title}!`);
+      Alert.alert(t('alert.researchComplete'), `You have unlocked: ${upgradeInfo.title}!`);
     }
 
     checkAllAchievementsAfterStateChange();
@@ -111,7 +113,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
         </View>
 
         <View style={styles.statusContainer}>
-          <Text style={styles.currentStatusLabel}>Current Tech:</Text>
+          <Text style={styles.currentStatusLabel}>{t('action.currentTech')}</Text>
           <Text style={styles.currentStatusValue}>
             {upgrades.find(u => u.level === currentLevel)?.title || 'Unknown'}
           </Text>
@@ -144,7 +146,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         {isMaxLevel && (
           <View style={styles.maxLevelContainer}>
-            <Text style={styles.maxLevelText}>MAX LEVEL REACHED</Text>
+            <Text style={styles.maxLevelText}>{t('action.maxLevelReached')}</Text>
           </View>
         )}
       </View>
@@ -161,12 +163,12 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={styles.title}>R&D Labs</Text>
+            <Text style={styles.title}>{t('action.rDLabs')}</Text>
             <Pressable onPress={onClose} hitSlop={10}>
               <Text style={styles.closeIcon}>✕</Text>
             </Pressable>
           </View>
-          <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
+          <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
           <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
 
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
@@ -214,7 +216,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
   const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
     if (companyCapital < cost) {
-      Alert.alert('Insufficient Funds', "Your company doesn't have enough capital for this investment.");
+      Alert.alert(t('alert.insufficientFunds'), "Your company doesn't have enough capital for this investment.");
       return;
     }
 
@@ -224,7 +226,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
     // Find the upgrade info for messages
     const upgradeInfo = TECH_TREE[category].find(u => u.level === nextLevel);
     if (upgradeInfo) {
-      Alert.alert('Research Complete', `You have unlocked: ${upgradeInfo.title}!`);
+      Alert.alert(t('alert.researchComplete'), `You have unlocked: ${upgradeInfo.title}!`);
     }
 
     checkAllAchievementsAfterStateChange();
@@ -268,7 +270,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
         </View>
 
         <View style={styles.statusContainer}>
-          <Text style={styles.currentStatusLabel}>Current Tech:</Text>
+          <Text style={styles.currentStatusLabel}>{t('action.currentTech')}</Text>
           <Text style={styles.currentStatusValue}>
             {upgrades.find(u => u.level === currentLevel)?.title || 'Unknown'}
           </Text>
@@ -301,7 +303,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         {isMaxLevel && (
           <View style={styles.maxLevelContainer}>
-            <Text style={styles.maxLevelText}>MAX LEVEL REACHED</Text>
+            <Text style={styles.maxLevelText}>{t('action.maxLevelReached')}</Text>
           </View>
         )}
       </View>
@@ -324,12 +326,12 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
           {/* The Card */}
           <View style={styles.card}>
             <View style={styles.header}>
-              <Text style={styles.title}>R&D Labs</Text>
+              <Text style={styles.title}>{t('action.rDLabs')}</Text>
               <Pressable onPress={onClose} hitSlop={10}>
                 <Text style={styles.closeIcon}>✕</Text>
               </Pressable>
             </View>
-            <Text style={styles.subtitle}>Invest in technology to unlock new products.</Text>
+            <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
             <Text style={styles.capitalText}>Available Capital: {formatMoney(companyCapital)}</Text>
 
             <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>

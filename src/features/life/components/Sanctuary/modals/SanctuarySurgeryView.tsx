@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { useStatsStore } from '../../../../../core/store/useStatsStore';
@@ -34,6 +35,7 @@ type SanctuarySurgeryViewProps = {
 };
 
 const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: SanctuarySurgeryViewProps) => {
+    useLocale();
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
     const [stage, setStage] = useState<'selection' | 'warning' | 'processing'>('selection');
 
@@ -84,8 +86,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                         <Text style={styles.backIcon}>←</Text>
                     </Pressable>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>PLASTIC SURGERY</Text>
-                        <Text style={styles.subtitle}>Choose Your Surgeon Wisely</Text>
+                        <Text style={styles.title}>{t('life.plasticSurgery2')}</Text>
+                        <Text style={styles.subtitle}>{t('life.chooseYourSurgeonWisely')}</Text>
                     </View>
                     <View style={{ width: 40 }} />
                 </View>
@@ -145,7 +147,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                         </View>
 
                                         <View style={styles.successRateContainer}>
-                                            <Text style={styles.successRateLabel}>Success Rate:</Text>
+                                            <Text style={styles.successRateLabel}>{t('life.successRate')}</Text>
                                             <View style={[
                                                 styles.successRateBadge,
                                                 { backgroundColor: successPercent === 100 ? '#48BB78' : successPercent >= 80 ? '#ECC94B' : '#ED8936' }
@@ -215,8 +217,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 )}?
                             </Text>
                             <View style={styles.buttonGroup}>
-                                <GameButton title="YES, I ACCEPT THE RISK" variant="danger" onPress={handleConfirm} style={{ flex: 1 }} />
-                                <GameButton title="No, take me back" variant="secondary" onPress={() => setStage('selection')} style={{ flex: 1 }} />
+                                <GameButton title={t('life.yesIAcceptTheRisk')} variant="danger" onPress={handleConfirm} style={{ flex: 1 }} />
+                                <GameButton title={t('life.noTakeMeBack')} variant="secondary" onPress={() => setStage('selection')} style={{ flex: 1 }} />
                             </View>
                         </View>
                     )}
@@ -225,8 +227,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                     {stage === 'processing' && (
                         <View style={styles.processingContent}>
                             <ActivityIndicator size="large" color="#C5A065" />
-                            <Text style={styles.processingText}>Performing Surgery...</Text>
-                            <Text style={styles.processingSubText}>Anesthesia administered.</Text>
+                            <Text style={styles.processingText}>{t('life.performingSurgery')}</Text>
+                            <Text style={styles.processingSubText}>{t('life.anesthesiaAdministered')}</Text>
                         </View>
                     )}
                 </ScrollView>

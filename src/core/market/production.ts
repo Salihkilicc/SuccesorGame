@@ -189,3 +189,27 @@ export const allocateCapacity = (
         fulfilledRatio: ratio,
     };
 };
+
+// ============================================================================
+//  ÜRÜN YÜKSELTME MALİYETİ (RP)
+// ============================================================================
+//  ONCE IKI AYRI FORMUL VARDI ve ekran biriyle, kasa digeriyle konusuyordu:
+//
+//    Ekran (ProductModals):  sqrt(karmasiklik) x 2.150 x 1,55^seviye
+//    Kasa  (useProductStore): karmasiklik x 100 x 1,5^seviye
+//
+//  Karmasikligi 3.481 olan Industrial Arm icin ekran 197.000 RP yaziyor,
+//  kasa 522.000 RP cekiyordu. Yani oyuncu gordugu fiyatin UC KATINI
+//  oduyordu ve nedenini bilmiyordu.
+//
+//  Eski formul karmasiklikla DOGRUSAL buyuyordu; karmasikligi 10.000.000
+//  olan Fusion Reactor'da tek yukseltme 1,5 MILYAR RP ediyordu — tum tech
+//  tree'nin toplamindan fazla. Karekok buyuk urunu pahali tutar ama
+//  imkansiz yapmaz.
+// ============================================================================
+
+/** Bir urunun bir sonraki seviye yukseltmesinin RP maliyeti. */
+export const productUpgradeRP = (complexity: number, currentLevel: number): number =>
+    Math.floor(
+        Math.sqrt(Math.max(1, complexity || 50)) * 2_150 * Math.pow(1.55, Math.max(1, currentLevel || 1)),
+    );

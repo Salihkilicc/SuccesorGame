@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     View,
     Text,
@@ -84,6 +85,7 @@ const movePoliceRandomly = (policePos: Position): Position => {
 // --- COMPONENT ---
 
 export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, onClose }) => {
+    useLocale();
     const { attributes } = usePlayerStore();
 
     // Gym Integration: Use strength as stamina proxy
@@ -207,7 +209,7 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
             Alert.alert(
                 "Busted!",
                 "The police caught you!",
-                [{ text: "Damn", onPress: () => onComplete(false) }]
+                [{ text: t('life.damn'), onPress: () => onComplete(false) }]
             );
         }
     }, [gameState.status, onComplete]);
@@ -318,19 +320,17 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
                         adjustsFontSizeToFit
                         numberOfLines={1}
                         minimumFontScale={0.5}
-                    >
-                        Reach the Green Zone
-                    </Text>
+                    >{t('life.reachTheGreenZone')}</Text>
                 </View>
 
                 {/* Stats */}
                 <View style={styles.statsContainer}>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Moves:</Text>
+                        <Text style={styles.statLabel}>{t('life.moves')}</Text>
                         <Text style={styles.statValue}>{gameState.moveCount}</Text>
                     </View>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Stamina:</Text>
+                        <Text style={styles.statLabel}>{t('life.stamina')}</Text>
                         <View style={styles.staminaBarContainer}>
                             <View
                                 style={[
@@ -394,7 +394,7 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
 
                 {/* Quit Button */}
                 <TouchableOpacity style={styles.quitButton} onPress={onClose}>
-                    <Text style={styles.quitText}>Give Up</Text>
+                    <Text style={styles.quitText}>{t('life.giveUp')}</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

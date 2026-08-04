@@ -1,12 +1,13 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useGymSystem, SupplementType } from './useGymSystem';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 
 const SUPPLEMENTS: { type: SupplementType; icon: string; label: string; desc: string; price: number }[] = [
-    { type: 'protein', icon: '🥤', label: 'Protein Shake', desc: 'Track usage', price: 50 },
-    { type: 'creatine', icon: '💊', label: 'Creatine', desc: 'Track usage', price: 100 },
-    { type: 'steroids', icon: '💉', label: 'Steroids', desc: '+7 Mastery, -45 Health', price: 500 },
+    { type: 'protein', icon: '🥤', label: t('life.proteinShake'), desc: t('life.trackUsage'), price: 50 },
+    { type: 'creatine', icon: '💊', label: t('life.creatine'), desc: t('life.trackUsage'), price: 100 },
+    { type: 'steroids', icon: '💉', label: t('life.steroids'), desc: '+7 Mastery, -45 Health', price: 500 },
 ];
 
 /**
@@ -16,6 +17,7 @@ const SUPPLEMENTS: { type: SupplementType; icon: string; label: string; desc: st
  * Supplements can only be used once per quarter.
  */
 const GymLockerRoomView = () => {
+    useLocale();
     // --- Hook Destructuring ---
     const { data, actions } = useGymSystem();
     const { inventory, currentQuarter } = data;
@@ -33,9 +35,9 @@ const GymLockerRoomView = () => {
                 '⚠️ WARNING: STEROIDS',
                 'Massive gains (+7 Mastery, +5 Strength) but severe health damage (-45 HP). Continue?',
                 [
-                    { text: 'Cancel', style: 'cancel' },
+                    { text: t('life.cancel'), style: 'cancel' },
                     {
-                        text: 'Use Anyway',
+                        text: t('life.useAnyway'),
                         style: 'destructive',
                         onPress: () => executeConsume(type)
                     }
@@ -70,8 +72,8 @@ const GymLockerRoomView = () => {
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.title}>LOCKER ROOM</Text>
-                            <Text style={styles.subtitle}>Supplements & Gear</Text>
+                            <Text style={styles.title}>{t('life.lockerRoom2')}</Text>
+                            <Text style={styles.subtitle}>{t('life.supplementsGear')}</Text>
                         </View>
                         <View style={{ width: 60 }} />
                     </View>
@@ -79,19 +81,19 @@ const GymLockerRoomView = () => {
                     {/* Stats Summary */}
                     <View style={styles.statsCard}>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>STRENGTH</Text>
+                            <Text style={styles.statLabel}>{t('life.strength2')}</Text>
                             <Text style={styles.statValue}>{strength.toFixed(0)}</Text>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>HEALTH</Text>
+                            <Text style={styles.statLabel}>{t('life.health2')}</Text>
                             <Text style={[styles.statValue, { color: health < 50 ? '#FF6F00' : '#FF6F00' }]}>
                                 {health.toFixed(0)}
                             </Text>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>CHARM</Text>
+                            <Text style={styles.statLabel}>{t('life.charm2')}</Text>
                             <Text style={styles.statValue}>{charm.toFixed(0)}</Text>
                         </View>
                     </View>
@@ -123,7 +125,7 @@ const GymLockerRoomView = () => {
                                     </Text>
                                     {used && (
                                         <View style={styles.usedBadge}>
-                                            <Text style={styles.usedBadgeText}>CONSUMED ⏳</Text>
+                                            <Text style={styles.usedBadgeText}>{t('life.consumed')}</Text>
                                         </View>
                                     )}
                                     {!used && (

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { shareValuationMultiplier } from '../market/competitors';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
@@ -23,12 +24,31 @@ interface PriceHistoryEntry {
     price: number;
 }
 
+/**
+ * Bir rakibin baslangic pazar payi. `productMarkets.ts` tek kaynak;
+ * burada yalnizca okunur.
+ */
+const baselineShareFor = (stockId: string): number => {
+    const { PRODUCT_MARKETS } = require('../market/productMarkets');
+    for (const m of PRODUCT_MARKETS) {
+        const c = (m.competitors || []).find((x: any) => x.stockId === stockId);
+        if (c) return c.share;
+    }
+    return 0;
+};
+
 interface MarketState {
     holdings: HoldingItem[];
     marketPrices: Record<string, number>; // Dynamic price map: { [itemId]: currentPrice }
     marketTrend: 'BULL' | 'BEAR' | 'FLAT';
     priceHistory: Record<string, PriceHistoryEntry[]>; // { [itemId]: [{quarter, price}] }
     currentQuarter: number;
+    /**
+     * Rakiplerin CANLI pazar paylari (stockId -> yuzde).
+     * Bos ise `productMarkets.ts` icindeki baslangic paylari gecerlidir.
+     * Bkz. core/market/competitors.ts
+     */
+    competitorShares: Record<string, number>;
     // Actions
     buyAsset: (symbol: string, price: number, quantity: number, type: 'stock' | 'crypto' | 'bond' | 'fund') => void;
     sellAsset: (symbol: string, quantity: number, currentPrice: number) => void;
@@ -43,6 +63,7 @@ interface MarketState {
 
 export const initialMarketState = {
     holdings: [],
+    competitorShares: {} as Record<string, number>,
     marketPrices: {},
     marketTrend: 'FLAT' as const,
     priceHistory: {},
@@ -53,6 +74,8 @@ export const useMarketStore = create<MarketState>()(
     persist(
         (set, get) => ({
             holdings: [],
+            // Rakiplerin canli pazar paylari — bkz. core/market/competitors.ts
+            competitorShares: {} as Record<string, number>,
             marketPrices: {},
             marketTrend: 'FLAT' as const,
             priceHistory: {},
@@ -227,7 +250,7 @@ export const useMarketStore = create<MarketState>()(
                 }
             },
 
-            reset: () => set({ holdings: [], marketPrices: {} }),
+            reset: () => set({ holdings: [], marketPrices: {}, competitorShares: {} }),
 
             liquidatePortfolio: () => {
                 const state = get();
@@ -248,57 +271,30 @@ export const useMarketStore = create<MarketState>()(
                 return totalValue;
             },
 
+            /**
+             * EMEKLIYE AYRILDI — cagirmayin.
+             *
+             * Bu yol KISISEL cuzdandan harciyordu (statsStore.spendMoney)
+             * ve sonucu useUserStore.subsidiaries'e yaziyordu. Hicbir
+             * ekrandan cagrilmiyordu ama duruyordu; birisi baglasa oyunun
+             * butun devralma modelini atlayacakti.
+             *
+             * Tek kapi: useCorporateFinanceStore.executeAcquisition
+             */
             acquireCompany: (id) => {
-                const item = INITIAL_MARKET_ITEMS.find((i) => i.id === id);
-                if (!item) {
-                    console.warn(`[MarketStore] Company ${id} not found.`);
-                    return false;
-                }
-
-                // Only Stocks can be acquired as companies
-                if (!isStock(item)) {
-                    console.warn(`[MarketStore] Item ${id} is not acquirable company.`);
-                    return false;
-                }
-
-                const statsStore = require('./useStatsStore').useStatsStore.getState();
-                const canAfford = statsStore.spendMoney(item.acquisitionCost);
-
-                if (!canAfford) {
-                    return false;
-                }
-
-                // Add to User Store
-                const userStore = require('./useUserStore').useUserStore.getState();
-                userStore.addSubsidiary({
-                    id: item.id,
-                    name: item.name,
-                    symbol: item.symbol,
-                    category: item.category,
-                    acquisitionBuff: item.acquisitionBuff,
-                });
-
-                // Remove existing shares
-                const { holdings } = get();
-                // Check if symbol exists (stocks have symbol)
-                if (item.symbol) {
-                    const holdingIndex = holdings.findIndex((h) => h.symbol === item.symbol);
-                    if (holdingIndex !== -1) {
-                        const h = holdings[holdingIndex];
-                        const liquidationValue = h.quantity * item.price;
-                        statsStore.earnMoney(liquidationValue);
-
-                        const newHoldings = holdings.filter((h) => h.symbol !== item.symbol);
-                        set({ holdings: newHoldings });
-                        console.log(`[MarketStore] Liquidated ${h.quantity} shares of ${item.symbol} upon acquisition.`);
-                    }
-                }
-
-                console.log(`[MarketStore] Acquired ${item.name} for $${item.acquisitionCost.toLocaleString()}`);
-                return true;
+                console.warn(
+                    `[MarketStore] acquireCompany is retired. Use ` +
+                    `useCorporateFinanceStore.executeAcquisition instead. (id: ${id})`
+                );
+                return false;
             },
 
             simulateQuarter: () => {
+                /** Temel degerin ceyreklik buyumesi. Yilda ~%4. */
+                const ANCHOR_GROWTH = 0.01;
+                /** Fiyatin her ceyrek cipaya dogru cekilme orani. */
+                const REVERSION_STRENGTH = 0.15;
+
                 const state = get();
                 let { marketTrend, marketPrices, priceHistory, currentQuarter } = state;
 
@@ -320,13 +316,20 @@ export const useMarketStore = create<MarketState>()(
                     // Bonds: Very stable
                     if (isBond(item)) return 0.1;
 
-                    // Stocks and Funds: Based on market cap
+                    // Stocks and Funds: Based on market cap.
+                    //
+                    // ONCE KUCUK SIRKETLER 2,5 CARPAN ALIYORDU. Trend
+                    // +%5 iken bu ceyrekte +%12,5, ustune +%5 gurultu:
+                    // ceyrekte ~%17. Yilda ~%90 ve CAPASIZ. Oyuncu
+                    // "satin alacagim sirketler surekli buyuyor, hic
+                    //  yetisemiyorum" dedi — dogru gormus, bilesik
+                    // faizle kaciyorlardi.
                     const marketCap = (item as any).marketCap;
                     if (marketCap) {
-                        if (marketCap > 200_000_000_000) return 0.5; // Mega Cap (>$200B) - Very stable
-                        if (marketCap < 1_000_000_000) return 2.5; // Small Cap (<$1B) - Very volatile
-                        if (marketCap < 10_000_000_000) return 2.0; // Small-Mid Cap
-                        return 1.2; // Mid-Large Cap
+                        if (marketCap > 200_000_000_000) return 0.5;
+                        if (marketCap < 1_000_000_000) return 1.5;
+                        if (marketCap < 10_000_000_000) return 1.2;
+                        return 0.9;
                     }
 
                     // Default for funds without market cap
@@ -358,11 +361,13 @@ export const useMarketStore = create<MarketState>()(
                         else currentPrice = 100;
                     }
 
-                    // Calculate base change based on market trend
+                    // Calculate base change based on market trend.
+                    // Ceyreklik %5 yillik %20 demekti — kalici bir boga
+                    // piyasasi. %2,5 ile yillik ~%10, gercekci ust sinir.
                     let baseChange = 0;
-                    if (marketTrend === 'BULL') baseChange = 0.05; // +5%
-                    else if (marketTrend === 'BEAR') baseChange = -0.05; // -5%
-                    else baseChange = 0; // FLAT: 0%
+                    if (marketTrend === 'BULL') baseChange = 0.025;
+                    else if (marketTrend === 'BEAR') baseChange = -0.025;
+                    else baseChange = 0;
 
                     // Get volatility multiplier
                     const volatilityMultiplier = getVolatilityMultiplier(item);
@@ -376,8 +381,49 @@ export const useMarketStore = create<MarketState>()(
                     // Total change percentage
                     const totalChangePercent = trendAdjustedChange + randomNoise;
 
-                    // Calculate new price
+                    // ==========================================================
+                    //  TEMEL DEGERE DONUS (mean reversion)
+                    // ==========================================================
+                    //  Once fiyat CAPASIZ rastgele yuruyusteydi. Rastgele
+                    //  yuruyusun tanimi geri donmemektir: bir kez yukari
+                    //  saparsa orada kalir ve ustune yine sapar. Sekiz
+                    //  ceyrek sonra 50M'lik sirket 300M oluyordu.
+                    //
+                    //  Gercek hisse fiyatlari da oynar ama bir TEMEL DEGERIN
+                    //  etrafinda oynar. Cok yukselirse pahalidir, satis
+                    //  gelir; cok duserse ucuzdur, alim gelir. Fiyati
+                    //  kazanca bagli tutan sey budur.
+                    //
+                    //  Cipa yavas buyur (~ceyrekte %1 = yilda %4): ekonomi
+                    //  buyur ama kacmaz. Oyuncunun karliligi ceyrekte bunun
+                    //  cok ustunde artabilir — yani YETISEBILIR.
+                    // ==========================================================
+                    const basePrice = ('price' in item ? (item as any).price : 0) || currentPrice;
+                    // ==========================================================
+                    //  PAZAR PAYI DEGERLEMEYI SURUKLER
+                    // ==========================================================
+                    //  Bir sirketin degeri gelecekteki nakit akisidir; pazar
+                    //  payi da onun en dogrudan gostergesi. Pay kaybeden
+                    //  sirketin hissesi duser.
+                    //
+                    //  Once bu bag HIC YOKTU: pazarda dovdugun rakibin
+                    //  hissesi yukselmeye devam edebiliyordu. Simdi rekabet
+                    //  dongusu kapaniyor — bir rakibi ucuza kapatmanin yolu
+                    //  once onu pazarda dovmekten geciyor.
+                    // ==========================================================
+                    const live = get().competitorShares[item.id];
+                    const baseShare = baselineShareFor(item.id);
+                    const shareMult =
+                        live !== undefined && baseShare > 0
+                            ? shareValuationMultiplier(live, baseShare)
+                            : 1;
+                    const anchor =
+                        basePrice * Math.pow(1 + ANCHOR_GROWTH, currentQuarter + 1) * shareMult;
+
                     let newPrice = currentPrice * (1 + totalChangePercent);
+                    // Cipaya dogru cek. Tahvilde neredeyse tam, kriptoda hic.
+                    const pull = isCrypto(item) ? 0 : isBond(item) ? 0.6 : REVERSION_STRENGTH;
+                    newPrice += (anchor - newPrice) * pull;
 
                     // Floor protection (prevent prices from going too low)
                     if (isCrypto(item) && newPrice < 0.0001) newPrice = 0.0001;
@@ -433,7 +479,11 @@ export const useMarketStore = create<MarketState>()(
                 marketPrices: state.marketPrices,
                 marketTrend: state.marketTrend,
                 priceHistory: state.priceHistory,
-                currentQuarter: state.currentQuarter
+                currentQuarter: state.currentQuarter,
+                // Rakiplerin kazandigi/kaybettigi pay KALICI olmali; yoksa
+                // uygulama her acildiginda pazar baslangica doner ve
+                // oyuncunun yillarca surdurdugu rekabet silinir.
+                competitorShares: state.competitorShares,
             }),
         }
     )

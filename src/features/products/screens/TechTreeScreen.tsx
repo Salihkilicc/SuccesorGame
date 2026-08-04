@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ import { ProductUnlockModal } from '../components';
 import { formatNumber } from '../../../core/utils';
 
 const TechTreeScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const { unlockableProducts } = useProductStore();
@@ -46,7 +48,7 @@ const TechTreeScreen = () => {
                 <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Text style={styles.backButtonText}>←</Text>
                 </Pressable>
-                <Text style={styles.title}>Future Technologies</Text>
+                <Text style={styles.title}>{t('product.futureTechnologies')}</Text>
             </View>
 
             <ScrollView
@@ -96,7 +98,7 @@ const TechTreeScreen = () => {
                                         <View style={styles.statusContainer}>
                                             {product.isUnlocked ? (
                                                 <View style={styles.activeBadge}>
-                                                    <Text style={styles.activeText}>ACTIVE</Text>
+                                                    <Text style={styles.activeText}>{t('product.active')}</Text>
                                                 </View>
                                             ) : (
                                                 <View style={styles.lockedStatus}>

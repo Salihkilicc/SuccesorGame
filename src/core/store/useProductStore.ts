@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '../types';
 import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../../features/products/data/unlockableProductsData';
 import { formatMoney, formatNumber } from '../../core/utils';
+import { productUpgradeRP } from '../market/production';
 
 export interface SalesContext {
     morale: number;
@@ -28,6 +29,19 @@ interface ProductActions {
     optimizeProductionLine: (productId: string, currentRP: number, deductRP: (amount: number) => void) => { success: boolean; message: string };
     randomizeProductName: (productId: string) => void;
     unlockProduct: (productId: string, currentRP: number, currentCash: number, deductRP: (amount: number) => void, deductCash: (amount: number) => void) => { success: boolean; message: string; stockBoost?: number };
+    /**
+     * Urunu tamamen HATTAN CIKARIR.
+     *
+     * `status: 'retired'` yalnizca uretimi durduruyordu; urun listede
+     * kaliyor ve tekrar acilamiyordu. Bu, "pazari kucuk olan urunu
+     * birakip sonra tekrar denemek" gibi tamamen makul bir hamleyi
+     * imkansiz kiliyordu.
+     *
+     * Artik urun listeden silinir ve teknoloji YENIDEN KILITLENIR —
+     * yani tekrar acmak icin RP ve nakit odemen gerekir. Vazgecmenin
+     * bir bedeli var, ama kapi kapanmiyor.
+     */
+    discontinueProduct: (productId: string) => { success: boolean; message: string };
     reset: () => void;
 }
 
@@ -75,7 +89,7 @@ export const initialProductState: ProductState = {
 
 export const useProductStore = create<ProductState & ProductActions>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             ...initialProductState,
             setProducts: (products) => set({ products }),
             addProduct: (product) =>
@@ -171,8 +185,8 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const currentLevel = product.qualityLevel || 1;
                     const complexity = product.complexity || 50;
 
-                    // Formula: complexity * 100 * (1.5 ^ level)
-                    const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
+                    // TEK KAYNAK: ekran da bunu kullaniyor (production.ts).
+                    const rpCost = productUpgradeRP(complexity, currentLevel);
 
                     if (currentRP < rpCost) {
                         result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
@@ -217,8 +231,8 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     const currentLevel = product.processLevel || 1;
                     const complexity = product.complexity || 50;
 
-                    // Formula: complexity * 100 * (1.5 ^ level)
-                    const rpCost = Math.floor(complexity * 100 * Math.pow(1.5, currentLevel));
+                    // TEK KAYNAK: ekran da bunu kullaniyor (production.ts).
+                    const rpCost = productUpgradeRP(complexity, currentLevel);
 
                     if (currentRP < rpCost) {
                         result = { success: false, message: `Need ${formatNumber(rpCost)} RP` };
@@ -271,6 +285,30 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         return p;
                     })
                 }));
+            },
+
+            discontinueProduct: (productId: string) => {
+                const state = get();
+                const product = state.products.find((p: any) => p.id === productId);
+                if (!product) return { success: false, message: 'Product not found.' };
+
+                const leftoverStock = product.inventory || 0;
+
+                set(current => ({
+                    // Urunu listeden cikar
+                    products: current.products.filter((p: any) => p.id !== productId),
+                    // Teknolojiyi yeniden kilitle: tekrar acmak bedel ister
+                    unlockableProducts: current.unlockableProducts.map((p: any) =>
+                        p.id === productId ? { ...p, isUnlocked: false } : p
+                    ),
+                }));
+
+                return {
+                    success: true,
+                    message: leftoverStock > 0
+                        ? `${product.name} discontinued. ${leftoverStock.toLocaleString()} units written off.`
+                        : `${product.name} discontinued.`,
+                };
             },
 
             unlockProduct: (productId, currentRP, currentCash, deductRP, deductCash) => {
@@ -375,6 +413,37 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 // odenebiliyordu).
                 unlockableProducts: state.unlockableProducts,
             }),
+
+            // ------------------------------------------------------------------
+            //  PAZARLAMA TASIMASI — BIR KEZ, BURADA
+            // ------------------------------------------------------------------
+            //  HATA: tasima ProductModals icinde, MODAL HER ACILDIGINDA
+            //  yapiliyordu:
+            //      butce = eskiBirimTutari x O ANKI uretim hedefi
+            //
+            //  Uretim hedefi her ceyrek buyudugu icin ayni urunun butcesi
+            //  her acilista biraz DAHA BUYUK cikiyor, kaydedince de
+            //  kaliciasiyordu. Oyuncu "pazarlama degeri kendiliginden
+            //  birkac tik artiyor" diye gordu — dogru gormus.
+            //
+            //  Artik tasima yalnizca yuklemede bir kez yapilir ve eski alan
+            //  sifirlanir, yani ikinci kez calisamaz.
+            // ------------------------------------------------------------------
+            onRehydrateStorage: () => (state) => {
+                if (!state || !Array.isArray(state.products)) return;
+                state.products = state.products.map((p: any) => {
+                    if (typeof p.marketingBudget === 'number') {
+                        return p.marketingSpendPerUnit ? { ...p, marketingSpendPerUnit: 0 } : p;
+                    }
+                    const legacyPerUnit = p.marketingSpendPerUnit || 0;
+                    const units = p.productionUnits ?? 0;
+                    return {
+                        ...p,
+                        marketingBudget: Math.round(legacyPerUnit * units),
+                        marketingSpendPerUnit: 0,
+                    };
+                });
+            },
         }
     )
 );

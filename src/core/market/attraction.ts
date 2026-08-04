@@ -125,8 +125,45 @@ export const priceFactor = (
  * Kucukken taban gecerlidir; buyudukce kiyas seninle birlikte buyur,
  * yani ayni butce giderek daha az ses getirir. Payi savunmak pahalilasir.
  */
-export const marketingBenchmark = (market: ProductMarket, previousRevenue: number): number =>
+/**
+ * Kiyas butcenin HEDEFI. Kategorinin tabani ile cironun %25'inin buyugu.
+ */
+export const marketingBenchmarkTarget = (market: ProductMarket, previousRevenue: number): number =>
     Math.max(market.marketingBenchmark, Math.max(0, previousRevenue) * BENCHMARK_OF_REVENUE);
+
+/**
+ * Kiyasin ceyrek basina hedefe yaklasma hizi.
+ * 0.25 = mesafenin dortte biri. Tam yakinsama ~8 ceyrek surer.
+ */
+export const BENCHMARK_ADJUST_SPEED = 0.25;
+
+/**
+ * KIYAS BUTCE — yumuşatılmış.
+ *
+ * ONCE ANINDA ZIPLIYORDU ve oyuncu bunu oynarken yakaladi: "urunu aldim
+ * marketingi 150k ile brand, sonraki quarter 450k".
+ *
+ * Sebebi acikti — lansman ceyreginde ciro SIFIRDIR, yani kiyas
+ * kategorinin tabaniyla (150k) baslar. Ikinci ceyrekte gercek ciro
+ * gelince kiyas aninda cironun %25'ine firliyordu: TEK ADIMDA UC KAT.
+ *
+ * Oyuncunun barinda dun yeterli olan butce bugun yetersiz gorunuyordu
+ * ve bunun sebebi ekranda hicbir yerde yazmiyordu. Mekanik dogruydu
+ * (buyudukce ayni butce daha az ses getirir) ama HIZI yanlisti.
+ *
+ * Artik kiyas hedefe her ceyrek mesafenin %25'i kadar yaklasir. Ayni
+ * yere gider, ama oyuncunun gorup tepki verebilecegi bir hizda.
+ */
+export const marketingBenchmark = (
+    market: ProductMarket,
+    previousRevenue: number,
+    currentBenchmark?: number,
+): number => {
+    const target = marketingBenchmarkTarget(market, previousRevenue);
+    // Kayit yoksa (yeni urun / eski kayit) hedefle basla.
+    if (!currentBenchmark || currentBenchmark <= 0) return market.marketingBenchmark;
+    return currentBenchmark + (target - currentBenchmark) * BENCHMARK_ADJUST_SPEED;
+};
 
 /**
  * Pazarlama carpani — SES PAYI modeli.

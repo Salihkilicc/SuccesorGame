@@ -35,6 +35,7 @@ import { useShareholderStore } from '../../features/shareholders/stores/useShare
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGame } from '../../core/newGame';
+import { t, useLocale, useLocaleStore } from '../../core/i18n';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -62,16 +63,16 @@ const HOMESCREEN_APPS: Array<{
   gradient: string[];
   feature?: FeatureKey;
 }> = [
-    { key: 'calendar', label: 'Calendar', icon: 'calendar', gradient: GRADIENTS.orangeYellow },
-    { key: 'mail', label: 'Mail', icon: 'email', gradient: GRADIENTS.blueSky },
-    { key: 'myCompany', label: 'My Company', icon: 'office-building', gradient: GRADIENTS.networkBlue },
+    { key: 'calendar', label: t('home.calendar'), icon: 'calendar', gradient: GRADIENTS.orangeYellow },
+    { key: 'mail', label: t('home.mail'), icon: 'email', gradient: GRADIENTS.blueSky },
+    { key: 'myCompany', label: t('home.myCompany'), icon: 'office-building', gradient: GRADIENTS.networkBlue },
     // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
-    { key: 'education', label: 'Education', icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
-    { key: 'financials', label: 'Financials', icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
-    { key: 'news', label: 'News', icon: 'newspaper', gradient: GRADIENTS.tealCyan },
+    { key: 'education', label: t('home.education'), icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
+    { key: 'financials', label: t('home.financials'), icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
+    { key: 'news', label: t('home.news'), icon: 'newspaper', gradient: GRADIENTS.tealCyan },
     // Settings'e giden tek yol Underworld sekmesiydi; o sekme rafa
     // kaldirilinca ekran yetim kalmisti (featureFlags.underworld = false).
-    { key: 'settings', label: 'Settings', icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
+    { key: 'settings', label: t('home.settings'), icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
   ];
 
 const ACTIVE_HOMESCREEN_APPS = filterByFeature(HOMESCREEN_APPS);
@@ -102,7 +103,10 @@ const HomeScreen = () => {
   const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [language, setLanguage] = useState<'EN' | 'TR'>('EN');
+  // OLU PLACEHOLDER KALDIRILDI: `useState<'EN'|'TR'>('EN')` idi, dugmeye
+  // basinca yalnizca buradaki etiket degisiyordu ve ekran kapaninca
+  // kayboluyordu. Artik tek kaynak: core/i18n.
+  const locale = useLocale();
   const [showNews, setShowNews] = useState(false);
 
   // --- Quarterly Report State ---
@@ -111,6 +115,7 @@ const HomeScreen = () => {
 
   // --- Game Over State ---
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameOverReason, setGameOverReason] = useState<'bankrupt' | 'removed'>('bankrupt');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -192,8 +197,11 @@ const HomeScreen = () => {
         setLastReportData(mappedData);
         setReportVisible(true);
 
-        if (result.status === 'bankrupt') {
-          // Alert yerine Game Over ekranını tetikle
+        // IKI FARKLI BITIS. Ikisi de oyunu bitirir ama sebepleri
+        // tamamen farkli ve oyuncunun hangisini yasadigini bilmesi
+        // gerekir: parasi mi bitti, yoksa sirketi elinden mi alindi.
+        if (result.status === 'bankrupt' || result.status === 'removed') {
+          setGameOverReason(result.status);
           setIsGameOver(true);
         }
       }
@@ -234,11 +242,11 @@ const HomeScreen = () => {
   // Status widget satırları. Kapalı modüllerin satırı hiç basılmaz;
   // yerini CEO'ya ait bir gösterge alır.
   const statusRows = [
-    FEATURES.love ? { key: 'love', label: 'Love', value: partnerBrief } : null,
-    { key: 'assets', label: 'Assets', value: assetsBrief },
+    FEATURES.love ? { key: 'love', label: t('home.love'), value: partnerBrief } : null,
+    { key: 'assets', label: t('home.assets'), value: assetsBrief },
     FEATURES.life
-      ? { key: 'life', label: 'Life', value: lifeBrief }
-      : { key: 'team', label: 'Team', value: moraleBrief },
+      ? { key: 'life', label: t('home.life'), value: lifeBrief }
+      : { key: 'team', label: t('home.team'), value: moraleBrief },
   ].filter((row): row is { key: string; label: string; value: string } => row !== null);
 
   const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {
@@ -296,7 +304,7 @@ const HomeScreen = () => {
           showsVerticalScrollIndicator={false}>
           {/* ── Brand Logo + Ayarlar ── */}
           <View style={styles.brandContainer}>
-            <Text style={styles.brandText}>SUCCESSOR</Text>
+            <Text style={styles.brandText}>{t('home.successor')}</Text>
             {/* Drawer'i acan tek buton. Onceden drawer JSX'i vardi ama
                 setDrawerOpen(true) hicbir yerde cagrilmiyordu — yani
                 icindeki Dil/Bildirim/Yeni Oyun secenekleri erisilemezdi. */}
@@ -338,12 +346,12 @@ const HomeScreen = () => {
               {/* Age / Month chips — right-aligned, same row as name */}
               <View style={styles.ageChips}>
                 <View style={styles.ageChip}>
-                  <Text style={styles.ageChipLabel}>AGE</Text>
+                  <Text style={styles.ageChipLabel}>{t('home.age')}</Text>
                   <Text style={styles.ageChipValue}>{age}</Text>
                 </View>
                 <View style={styles.ageChipDivider} />
                 <View style={styles.ageChip}>
-                  <Text style={styles.ageChipLabel}>MTH</Text>
+                  <Text style={styles.ageChipLabel}>{t('home.mth')}</Text>
                   <Text style={styles.ageChipValue}>{currentMonth}</Text>
                 </View>
               </View>
@@ -364,7 +372,7 @@ const HomeScreen = () => {
                 end={{ x: 1, y: 1 }}
               />
               <View style={styles.nextMonthContent}>
-                <Text style={styles.nextMonthText}>ADVANCE TO NEXT QUARTER</Text>
+                <Text style={styles.nextMonthText}>{t('home.advanceToNextQuarter')}</Text>
                 <MaterialCommunityIcons name="chevron-double-right" size={16} color="#FFFFFF" />
               </View>
             </Pressable>
@@ -378,7 +386,7 @@ const HomeScreen = () => {
               onPress={() => handleNavigateStack('Assets')}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
-                <Text style={styles.sectionTitle}>Overview</Text>
+                <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="#888888" />
               </View>
               <LinearGradient
@@ -389,21 +397,21 @@ const HomeScreen = () => {
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
-                  <Text style={styles.widgetLabel}>Net Worth</Text>
+                  <Text style={styles.widgetLabel}>{t('home.netWorth')}</Text>
                   <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
                 </View>
                 <View style={styles.widgetRowBetween}>
-                  <Text style={styles.widgetLabel}>Cash</Text>
+                  <Text style={styles.widgetLabel}>{t('home.cash')}</Text>
                   <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(cash)}</Text>
                 </View>
                 <View style={styles.widgetRowBetween}>
-                  <Text style={styles.widgetLabel}>Income</Text>
+                  <Text style={styles.widgetLabel}>{t('home.income')}</Text>
                   <Text style={[styles.widgetValue, { color: theme.colors.success }]} numberOfLines={1} adjustsFontSizeToFit>
                     {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
                   </Text>
                 </View>
                 <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
-                  <Text style={styles.widgetLabel}>Expenses</Text>
+                  <Text style={styles.widgetLabel}>{t('home.expenses')}</Text>
                   <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
                     {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
                   </Text>
@@ -413,7 +421,7 @@ const HomeScreen = () => {
 
             {/* Status Widget */}
             <View style={[styles.widgetColumn, { flex: 2 }]}>
-              <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>Status</Text>
+              <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
                 colors={['#c38d9e', '#16121d', '#16121d', '#8b8ecc']}
                 start={{ x: 0, y: 0.5 }}
@@ -438,7 +446,7 @@ const HomeScreen = () => {
           </View>
 
           <View style={styles.appsSection}>
-            <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>Applications</Text>
+            <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.md }]}>{t('home.applications')}</Text>
             <View style={styles.appsGrid}>
               {ACTIVE_HOMESCREEN_APPS.map(renderAppIcon)}
             </View>
@@ -452,27 +460,27 @@ const HomeScreen = () => {
               <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
               <View style={styles.drawer}>
                 <View style={styles.drawerHeader}>
-                  <Text style={styles.drawerTitle}>Settings</Text>
+                  <Text style={styles.drawerTitle}>{t('home.settings')}</Text>
                   <Pressable onPress={() => setDrawerOpen(false)}>
                     <Text style={styles.drawerClose}>✕</Text>
                   </Pressable>
                 </View>
-                <DrawerItem label="Privacy Policy" onPress={() => console.log('Privacy Policy')} />
-                <DrawerItem label="Terms & Conditions" onPress={() => console.log('Terms')} />
+                <DrawerItem label={t('home.privacyPolicy')} onPress={() => console.log('Privacy Policy')} />
+                <DrawerItem label={t('home.termsConditions')} onPress={() => console.log('Terms')} />
                 <DrawerItem
-                  label="Notifications"
+                  label={t('home.notifications')}
                   onPress={() => setNotificationsEnabled(prev => !prev)}
                   rightNode={
                     <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
                   }
                 />
                 <DrawerItem
-                  label="Language"
-                  onPress={() => setLanguage(prev => (prev === 'EN' ? 'TR' : 'EN'))}
-                  rightNode={<Text style={styles.drawerMeta}>{language}</Text>}
+                  label={t('home.language')}
+                  onPress={() => useLocaleStore.getState().setLocale(locale === 'en' ? 'tr' : 'en')}
+                  rightNode={<Text style={styles.drawerMeta}>{locale.toUpperCase()}</Text>}
                 />
                 <DrawerItem
-                  label="Be Premium"
+                  label={t('home.bePremium')}
                   onPress={() => {
                     setDrawerOpen(false);
                     handleNavigateStack('Premium');
@@ -484,17 +492,17 @@ const HomeScreen = () => {
                     aciliyordu ve o sekme rafa kaldirildi (featureFlags).
                     Yani hicbir erisim yolu kalmamisti. */}
                 <DrawerItem
-                  label="New Game"
-                  rightNode={<Text style={styles.drawerMeta}>Reset</Text>}
+                  label={t('home.newGame')}
+                  rightNode={<Text style={styles.drawerMeta}>{t('home.reset')}</Text>}
                   onPress={() => {
                     setDrawerOpen(false);
                     Alert.alert(
                       'New Game',
                       'All progress will be erased and a fresh run will be set up. Are you sure?',
                       [
-                        { text: 'Cancel', style: 'cancel' },
+                        { text: t('home.cancel'), style: 'cancel' },
                         {
-                          text: 'Reset',
+                          text: t('home.reset'),
                           style: 'destructive',
                           onPress: () => { void handleRestart(); },
                         },
@@ -516,16 +524,16 @@ const HomeScreen = () => {
           <View style={styles.newsOverlay}>
             <View style={styles.newsModal}>
               <View style={styles.newsHeader}>
-                <Text style={styles.newsTitle}>News</Text>
+                <Text style={styles.newsTitle}>{t('home.news')}</Text>
                 <TouchableOpacity onPress={() => setShowNews(false)}>
-                  <Text style={styles.newsClose}>Close</Text>
+                  <Text style={styles.newsClose}>{t('home.close')}</Text>
                 </TouchableOpacity>
               </View>
               <ScrollView showsVerticalScrollIndicator={false}>
-                <NewsItem text="Markets rally on tech earnings." />
-                <NewsItem text="Supplier costs climb as input prices tighten margins." />
-                <NewsItem text="Investors punish growth without free cash flow." />
-                <NewsItem text="Private equity eyes distressed assets this quarter." />
+                <NewsItem text={t('home.marketsRallyOnTechEarnings')} />
+                <NewsItem text={t('home.supplierCostsClimbAsInput')} />
+                <NewsItem text={t('home.investorsPunishGrowthWithoutFree')} />
+                <NewsItem text={t('home.privateEquityEyesDistressedAssets')} />
               </ScrollView>
             </View>
           </View>
@@ -535,11 +543,17 @@ const HomeScreen = () => {
         {
           isGameOver && (
             <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
-              <Text style={styles.gameOverText}>GAME OVER</Text>
-              <Text style={styles.gameOverSubText}>Your company realized its fate.</Text>
+              <Text style={styles.gameOverText}>
+                {gameOverReason === 'removed' ? t('gameover.removed') : t('gameover.bankrupt')}
+              </Text>
+              <Text style={styles.gameOverSubText}>
+                {gameOverReason === 'removed'
+                  ? t('gameover.removedBody')
+                  : t('gameover.bankruptBody')}
+              </Text>
 
               <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-                <Text style={styles.restartButtonText}>NEW GAME</Text>
+                <Text style={styles.restartButtonText}>{t('gameover.newGame')}</Text>
               </TouchableOpacity>
             </Animated.View>
           )

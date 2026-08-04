@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -17,6 +18,7 @@ type NightEndModalProps = {
 const { width } = Dimensions.get('window');
 
 const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
+    useLocale();
     if (!visible) return null;
 
     return (
@@ -27,7 +29,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
             onRequestClose={() => { }}>
             <View style={styles.backdrop}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>How does the night end?</Text>
+                    <Text style={styles.title}>{t('life.howDoesTheNightEnd')}</Text>
 
                     <View style={styles.optionsContainer}>
                         {/* Option A: Keep It Classy */}
@@ -36,16 +38,16 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             onPress={() => onDecision('classy')}
                         >
                             <View style={styles.badgeContainer}>
-                                <Text style={styles.classyBadge}>SAFE & ELEGANT</Text>
+                                <Text style={styles.classyBadge}>{t('life.safeElegant')}</Text>
                             </View>
                             <Text style={styles.emoji}>🥂</Text>
-                            <Text style={styles.optionTitle}>Keep It Classy</Text>
+                            <Text style={styles.optionTitle}>{t('life.keepItClassy')}</Text>
                             <Text style={styles.optionDescription}>
                                 "Luxury hotel suite. Safe & Relaxing."
                             </Text>
                             <View style={styles.statsRow}>
-                                <Text style={styles.statGain}>Stress -10</Text>
-                                <Text style={[styles.statGain, { color: '#C0A062' }]}>Cost: $2,000</Text>
+                                <Text style={styles.statGain}>{t('life.stress10')}</Text>
+                                <Text style={[styles.statGain, { color: '#C0A062' }]}>{t('life.cost2000')}</Text>
                             </View>
                         </Pressable>
 
@@ -55,15 +57,15 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             onPress={() => onDecision('wild')}
                         >
                             <View style={styles.badgeContainer}>
-                                <Text style={styles.wildBadge}>HIGH RISK</Text>
+                                <Text style={styles.wildBadge}>{t('life.highRisk')}</Text>
                             </View>
                             <Text style={styles.emoji}>🔥</Text>
-                            <Text style={styles.optionTitle}>Go Wild</Text>
+                            <Text style={styles.optionTitle}>{t('life.goWild')}</Text>
                             <Text style={styles.optionDescription}>
                                 "Total chaos. High risk, high reward."
                             </Text>
                             <View style={styles.statsRow}>
-                                <Text style={styles.statGain}>Stress -25</Text>
+                                <Text style={styles.statGain}>{t('life.stress25')}</Text>
                                 <Text style={[styles.statGain, { color: '#FF9E00' }]}>⚠️ Multiple Risks</Text>
                             </View>
                         </Pressable>

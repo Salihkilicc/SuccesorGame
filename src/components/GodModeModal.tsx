@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../core/i18n';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -10,14 +11,15 @@ interface GodModeModalProps {
 }
 
 const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
+    useLocale();
     const handleReset = () => {
         Alert.alert(
             'Reset Game',
             'Are you sure you want to completely reset your progress?',
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('ui.cancel'), style: 'cancel' },
                 {
-                    text: 'Reset',
+                    text: t('ui.reset'),
                     style: 'destructive',
                     onPress: async () => {
                         await useGameStore.getState().resetGame();
@@ -40,7 +42,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                             <MaterialCommunityIcons name="flash" size={24} color="#D4AF37" />
-                            <Text style={styles.title}>GOD MODE</Text>
+                            <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <MaterialCommunityIcons name="close" size={24} color="#AAAAAA" />
@@ -56,7 +58,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="cash-multiple" size={24} color="#2ecc71" />
-                            <Text style={styles.actionTextMoney}>Add $100M</Text>
+                            <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(192, 57, 43, 0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
@@ -65,7 +67,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="skull" size={24} color="#e74c3c" />
-                            <Text style={styles.actionTextReset}>Reset Game</Text>
+                            <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

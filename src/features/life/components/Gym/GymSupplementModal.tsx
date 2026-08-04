@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -15,6 +16,7 @@ type GymSupplementModalProps = {
 };
 
 const GymSupplementModal = ({ visible, onClose }: GymSupplementModalProps) => {
+    useLocale();
     const [showWarning, setShowWarning] = useState(false);
 
     const handleSelect = (item: string) => {
@@ -44,8 +46,8 @@ const GymSupplementModal = ({ visible, onClose }: GymSupplementModalProps) => {
 
                     {!showWarning ? (
                         <>
-                            <Text style={styles.title}>LOCKER ROOM</Text>
-                            <Text style={styles.subtitle}>Enhance your performance.</Text>
+                            <Text style={styles.title}>{t('life.lockerRoom2')}</Text>
+                            <Text style={styles.subtitle}>{t('life.enhanceYourPerformance')}</Text>
 
                             <View style={styles.grid}>
                                 {['Protein Shake', 'Creatine', 'Pre-Workout'].map((item) => (
@@ -56,13 +58,13 @@ const GymSupplementModal = ({ visible, onClose }: GymSupplementModalProps) => {
                                 ))}
 
                                 <Pressable style={styles.dangerItem} onPress={() => handleSelect('steroids')}>
-                                    <Text style={styles.dangerText}>ANABOLIC STEROIDS</Text>
+                                    <Text style={styles.dangerText}>{t('life.anabolicSteroids')}</Text>
                                     <Text style={styles.dangerPrice}>$2,000</Text>
                                 </Pressable>
                             </View>
 
                             <Pressable onPress={onClose} style={styles.closeBtn}>
-                                <Text style={styles.closeText}>Leave</Text>
+                                <Text style={styles.closeText}>{t('life.leave2')}</Text>
                             </Pressable>
                         </>
                     ) : (
@@ -81,10 +83,10 @@ const GymSupplementModal = ({ visible, onClose }: GymSupplementModalProps) => {
                             </Text>
                             <View style={styles.warningActions}>
                                 <Pressable style={styles.cancelBtn} onPress={() => setShowWarning(false)}>
-                                    <Text style={styles.cancelText}>CANCEL</Text>
+                                    <Text style={styles.cancelText}>{t('life.cancel2')}</Text>
                                 </Pressable>
                                 <Pressable style={styles.injectBtn} onPress={confirmSteroids}>
-                                    <Text style={styles.injectText}>INJECT ANYWAY</Text>
+                                    <Text style={styles.injectText}>{t('life.injectAnyway')}</Text>
                                 </Pressable>
                             </View>
                         </View>

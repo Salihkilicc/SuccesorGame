@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useEffect, useCallback } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     Modal,
     View,
@@ -42,6 +43,7 @@ export function HookupModal({
     nextCandidate,
     onClose,
 }: HookupModalProps) {
+    useLocale();
     // Animation Values
     const translateX = useRef(new Animated.Value(0)).current;
 
@@ -154,12 +156,12 @@ export function HookupModal({
 
                                     {/* Swipe Feedback Overlay - LIKE */}
                                     <Animated.View style={[styles.swipeFeedback, styles.likeFeedback, { opacity: likeOpacity }]}>
-                                        <Text style={styles.likeText}>LIKE</Text>
+                                        <Text style={styles.likeText}>{t('life.like')}</Text>
                                     </Animated.View>
 
                                     {/* Swipe Feedback Overlay - NOPE */}
                                     <Animated.View style={[styles.swipeFeedback, styles.nopeFeedback, { opacity: nopeOpacity }]}>
-                                        <Text style={styles.nopeText}>NOPE</Text>
+                                        <Text style={styles.nopeText}>{t('life.nope')}</Text>
                                     </Animated.View>
                                 </View>
 
@@ -184,7 +186,7 @@ export function HookupModal({
                                         <View style={styles.divider} />
 
                                         {/* Interests Chips */}
-                                        <Text style={styles.sectionTitle}>PASSIONS</Text>
+                                        <Text style={styles.sectionTitle}>{t('life.passions')}</Text>
                                         <View style={styles.chipsContainer}>
                                             {candidate.interests.map((interest, index) => (
                                                 <View key={index} style={styles.chip}>
@@ -196,7 +198,7 @@ export function HookupModal({
                                         <View style={styles.divider} />
 
                                         {/* Bio */}
-                                        <Text style={styles.sectionTitle}>ABOUT ME</Text>
+                                        <Text style={styles.sectionTitle}>{t('life.aboutMe')}</Text>
                                         <Text style={styles.bioText}>{candidate.bio}</Text>
 
                                         {/* Padding for Scroll */}
@@ -219,7 +221,7 @@ export function HookupModal({
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.smallButton} onPress={onClose}>
-                                    <Text style={styles.smallButtonText}>Close</Text>
+                                    <Text style={styles.smallButtonText}>{t('life.close')}</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -238,7 +240,7 @@ export function HookupModal({
                         {matchStatus === 'MATCHED' && candidate && (
                             <View style={styles.overlayContainer}>
                                 <View style={[styles.overlayCard, { backgroundColor: '#22C55E' }]}>
-                                    <Text style={styles.overlayTitle}>IT'S A MATCH! 💕</Text>
+                                    <Text style={styles.overlayTitle}>{t('life.itSAMatch')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         You and {candidate.name} passed the vibe check.
                                     </Text>
@@ -256,11 +258,11 @@ export function HookupModal({
                                         style={styles.keepPlayingBtn}
                                         onPress={handleNext}
                                     >
-                                        <Text style={styles.keepPlayingText}>Keep Swiping</Text>
+                                        <Text style={styles.keepPlayingText}>{t('life.keepSwiping')}</Text>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity onPress={onClose} style={{ marginTop: 15 }}>
-                                        <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Close</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.8)' }}>{t('life.close')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -270,7 +272,7 @@ export function HookupModal({
                         {matchStatus === 'NO_MATCH' && candidate && (
                             <View style={styles.overlayContainer}>
                                 <View style={[styles.overlayCard, { backgroundColor: '#EF4444' }]}>
-                                    <Text style={styles.overlayTitle}>GHOSTED 👻</Text>
+                                    <Text style={styles.overlayTitle}>{t('life.ghosted')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         {candidate.name} wasn't interested...
                                     </Text>

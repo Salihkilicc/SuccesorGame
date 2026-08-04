@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
 import { formatMoney } from '../../core/utils';
@@ -10,9 +11,10 @@ type StockInfoSectionProps = {
 };
 
 const StockInfoSection = ({ description, targetPrice = 165, valuation }: StockInfoSectionProps) => {
+    useLocale();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Stock Info</Text>
+      <Text style={styles.title}>{t('market.stockInfo')}</Text>
       <Text style={styles.row}>🎯 Target Price: ${targetPrice}</Text>
       {valuation !== undefined && (
         <Text style={styles.row}>Company Valuation: {formatMoney(valuation)}</Text>
@@ -21,7 +23,7 @@ const StockInfoSection = ({ description, targetPrice = 165, valuation }: StockIn
         {description || "Company Bio: Rising player in its sector with strong fundamentals."}
       </Text>
       <View style={styles.sentimentChip}>
-        <Text style={styles.sentimentText}>Market Sentiment: Mildly Positive</Text>
+        <Text style={styles.sentimentText}>{t('market.marketSentimentMildlyPositive')}</Text>
       </View>
     </View>
   );

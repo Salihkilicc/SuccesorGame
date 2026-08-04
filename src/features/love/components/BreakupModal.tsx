@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -10,6 +11,7 @@ interface BreakupModalProps {
 }
 
 const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: BreakupModalProps) => {
+    useLocale();
     // Defensive check: Ensure we handle 0 explicitly in boolean context logic
     const hasSettlement = typeof settlementCost === 'number' && settlementCost > 0;
     const safePartnerName = partnerName || 'Your Partner';
@@ -27,7 +29,7 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
                         <Text style={styles.icon}>💔</Text>
                     </View>
 
-                    <Text style={styles.title}>CAUGHT!</Text>
+                    <Text style={styles.title}>{t('love.caught')}</Text>
 
                     <View>
                         <Text style={styles.message}>
@@ -35,13 +37,11 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
                         </Text>
                     </View>
 
-                    <Text style={styles.subMessage}>
-                        The relationship is over immediately.
-                    </Text>
+                    <Text style={styles.subMessage}>{t('love.theRelationshipIsOverImmediately')}</Text>
 
                     {hasSettlement ? (
                         <View style={styles.costContainer}>
-                            <Text style={styles.costLabel}>Divorce Settlement</Text>
+                            <Text style={styles.costLabel}>{t('love.divorceSettlement')}</Text>
                             <Text style={styles.costValue}>-${settlementCost.toLocaleString()}</Text>
                             <Text style={styles.costSub}>50% of your current wealth</Text>
                         </View>
@@ -51,7 +51,7 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
                         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
                         onPress={onClose}
                     >
-                        <Text style={styles.buttonText}>MOVE ON</Text>
+                        <Text style={styles.buttonText}>{t('love.moveOn')}</Text>
                     </Pressable>
                 </View>
             </View>

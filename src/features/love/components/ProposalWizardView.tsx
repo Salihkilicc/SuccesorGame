@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { theme } from '../../../core/theme';
 import { PROPOSAL_LOCATIONS } from '../data/loveConstants';
@@ -48,6 +49,7 @@ const ProposalWizardView: React.FC<Props> = ({
     onClose,
     onGoShopping,
 }) => {
+    useLocale();
     const location = PROPOSAL_LOCATIONS[selectedLocationIndex];
     const canAfford = money >= location.cost;
     const selectedRing = ownedRings.find(r => r.instanceId === selectedRingInstanceId) ?? ownedRings[0] ?? null;
@@ -73,12 +75,12 @@ const ProposalWizardView: React.FC<Props> = ({
         return (
             <View style={{ gap: 16, padding: 10 }}>
                 <Text style={{ fontSize: 50, textAlign: 'center' }}>😲</Text>
-                <Text style={[styles.modalSubtitle, { textAlign: 'center' }]}>She Said YES! (Kind of...)</Text>
+                <Text style={[styles.modalSubtitle, { textAlign: 'center' }]}>{t('love.sheSaidYesKindOf')}</Text>
 
                 <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
                     She is emotional and waiting for the ring. This is your moment.
                     {"\n\n"}
-                    <Text style={{ fontWeight: 'bold', color: theme.colors.accent }}>Do you want to ask for a Prenup?</Text>
+                    <Text style={{ fontWeight: 'bold', color: theme.colors.accent }}>{t('love.doYouWantToAsk')}</Text>
                     {"\n"}
                     (Protects assets, but might offend her)
                 </Text>
@@ -102,7 +104,7 @@ const ProposalWizardView: React.FC<Props> = ({
     if (isPickingRing) {
         return (
             <View style={{ gap: 12 }}>
-                <Text style={styles.modalSubtitle}>Choose Your Ring</Text>
+                <Text style={styles.modalSubtitle}>{t('love.chooseYourRing')}</Text>
                 {ownedRings.map(ring => (
                     <Pressable
                         key={ring.instanceId}
@@ -140,7 +142,7 @@ const ProposalWizardView: React.FC<Props> = ({
     // STEP 1: PICKER (Default)
     return (
         <View style={{ gap: 16 }}>
-            <Text style={styles.modalSubtitle}>Plan Proposal</Text>
+            <Text style={styles.modalSubtitle}>{t('love.planProposal')}</Text>
 
             {/* Location Picker */}
             <View style={styles.locationPicker}>
@@ -169,7 +171,7 @@ const ProposalWizardView: React.FC<Props> = ({
                 {ownedRings.length === 0 ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                         <Text style={{ fontSize: 18 }}>💍</Text>
-                        <Text style={[styles.actionButtonText, { color: theme.colors.danger }]}>No Ring</Text>
+                        <Text style={[styles.actionButtonText, { color: theme.colors.danger }]}>{t('love.noRing')}</Text>
                     </View>
                 ) : (
                     <Pressable
@@ -181,15 +183,13 @@ const ProposalWizardView: React.FC<Props> = ({
                             <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
                                 {selectedRing?.name ?? 'Ring Selected'}
                             </Text>
-                            <Text style={{ color: theme.colors.accent, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>
-                                Tap to change
-                            </Text>
+                            <Text style={{ color: theme.colors.accent, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>{t('love.tapToChange')}</Text>
                         </View>
                     </Pressable>
                 )}
 
                 <Pressable style={styles.smallButton} onPress={onGoShopping}>
-                    <Text style={styles.smallButtonText}>Go Shopping</Text>
+                    <Text style={styles.smallButtonText}>{t('love.goShopping')}</Text>
                 </Pressable>
             </View>
 
@@ -200,9 +200,7 @@ const ProposalWizardView: React.FC<Props> = ({
                     { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5 }
                 ]}
                 onPress={onStartProposal}>
-                <Text style={[styles.actionButtonText, { color: '#000', fontWeight: '800', letterSpacing: 1 }]}>
-                    PROPOSE ❤️
-                </Text>
+                <Text style={[styles.actionButtonText, { color: '#000', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
             </Pressable>
         </View>
     );

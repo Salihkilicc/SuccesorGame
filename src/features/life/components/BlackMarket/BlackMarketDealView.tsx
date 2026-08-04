@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image, Dimensions } from 'react-native';
 import { BlackMarketItem } from './blackMarketData';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
@@ -26,6 +27,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
     onConsume,
     isDrug
 }) => {
+    useLocale();
     const { money } = useStatsStore();
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -72,16 +74,16 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
                 {/* Stats */}
                 <View style={styles.statsContainer}>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Price:</Text>
+                        <Text style={styles.statLabel}>{t('life.price')}</Text>
                         <Text style={styles.statValue}>${deal.price.toLocaleString()}</Text>
                     </View>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Street Rep:</Text>
+                        <Text style={styles.statLabel}>{t('life.streetRep')}</Text>
                         <Text style={styles.statGain}>+{deal.streetRepGain.toFixed(1)}</Text>
                     </View>
                     {deal.tier === 4 && (
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>High Society:</Text>
+                            <Text style={styles.statLabel}>{t('life.highSociety2')}</Text>
                             <Text style={[styles.statGain, { color: '#fbbf24' }]}>+5</Text>
                         </View>
                     )}
@@ -94,7 +96,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
                     style={[styles.actionButton, styles.passButton]}
                     onPress={onPass}
                 >
-                    <Text style={styles.passButtonText}>PASS</Text>
+                    <Text style={styles.passButtonText}>{t('life.pass')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -118,7 +120,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
             </View>
 
             {!canAfford && (
-                <Text style={styles.warningText}>INSUFFICIENT FUNDS</Text>
+                <Text style={styles.warningText}>{t('life.insufficientFunds')}</Text>
             )}
 
         </Animated.View>

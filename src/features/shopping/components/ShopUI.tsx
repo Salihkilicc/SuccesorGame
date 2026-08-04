@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -10,7 +11,7 @@ export const ShopHeader = ({ title, money, onBack, formatMoney }: any) => (
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
         <View style={styles.balanceContainer}>
-            <Text style={styles.balanceLabel}>CASH</Text>
+            <Text style={styles.balanceLabel}>{t('ui.cash')}</Text>
             <Text style={styles.balanceValue}>{formatMoney(money)}</Text>
         </View>
     </View>
@@ -18,6 +19,7 @@ export const ShopHeader = ({ title, money, onBack, formatMoney }: any) => (
 
 // --- SHOP LIST CARD (Ana Menüdeki Kartlar) ---
 export const ShopListCard = ({ shop, onPress }: any) => {
+    useLocale();
     let icon = '🛒';
     if (shop.category === 'Cars') icon = '🏎️';
     if (shop.category === 'Jewelry') icon = '💎';

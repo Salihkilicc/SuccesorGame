@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import {
     View,
     Text,
@@ -25,6 +26,7 @@ interface EducationTranscriptViewProps {
 // ========================================
 
 export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = ({ onBack }) => {
+    useLocale();
     const navigation = useNavigation();
     const { completedDegrees, salaryMultiplier, closeEducation } = useEducationSystem();
 
@@ -37,8 +39,8 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
                         <Text style={styles.backText}>← Back</Text>
                     </TouchableOpacity>
                     <View style={styles.headerTitleContainer}>
-                        <Text style={styles.title}>Academic Transcript</Text>
-                        <Text style={styles.subtitle}>Your Education History</Text>
+                        <Text style={styles.title}>{t('life.academicTranscript')}</Text>
+                        <Text style={styles.subtitle}>{t('life.yourEducationHistory')}</Text>
                     </View>
                     <View style={{ width: 60 }} />
                 </View>
@@ -46,23 +48,19 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     {/* Salary Multiplier Card */}
                     <View style={styles.multiplierCard}>
-                        <Text style={styles.multiplierLabel}>Current Salary Multiplier</Text>
+                        <Text style={styles.multiplierLabel}>{t('life.currentSalaryMultiplier')}</Text>
                         <Text style={styles.multiplierValue}>{salaryMultiplier()}x</Text>
-                        <Text style={styles.multiplierHint}>
-                            Based on your completed degrees
-                        </Text>
+                        <Text style={styles.multiplierHint}>{t('life.basedOnYourCompletedDegrees')}</Text>
                     </View>
 
                     {/* Completed Degrees */}
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Completed Degrees</Text>
+                        <Text style={styles.sectionTitle}>{t('life.completedDegrees')}</Text>
                         {completedDegrees.length === 0 ? (
                             <View style={styles.emptyState}>
                                 <Text style={styles.emptyIcon}>📜</Text>
-                                <Text style={styles.emptyText}>No degrees completed yet</Text>
-                                <Text style={styles.emptyHint}>
-                                    Enroll in Academic Programs to start your education journey
-                                </Text>
+                                <Text style={styles.emptyText}>{t('life.noDegreesCompletedYet')}</Text>
+                                <Text style={styles.emptyHint}>{t('life.enrollInAcademicProgramsTo')}</Text>
                             </View>
                         ) : (
                             completedDegrees.map((degree, index) => {

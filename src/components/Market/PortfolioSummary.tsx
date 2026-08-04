@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import { formatMoney as formatMoneyExact } from '../../core/utils';
@@ -11,23 +12,24 @@ type Props = {
 };
 
 const PortfolioSummary = ({ totalInvested, returnPct, holdingsCount, onOpen }: Props) => {
+    useLocale();
   const isPositive = returnPct >= 0;
 
   return (
     <View style={styles.card}>
       <View style={styles.row}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text style={styles.label}>Invested Value</Text>
+          <Text style={styles.label}>{t('market.investedValue')}</Text>
           <Text style={styles.value}>{formatMoney(totalInvested)}</Text>
         </View>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text style={styles.label}>Return (3 Months)</Text>
+          <Text style={styles.label}>{t('market.return3Months')}</Text>
           <Text style={[styles.value, { color: isPositive ? theme.colors.success : theme.colors.danger }]}>
             {isPositive ? '+' : ''}{returnPct.toFixed(1)}%
           </Text>
         </View>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text style={styles.label}>Total Holdings</Text>
+          <Text style={styles.label}>{t('market.totalHoldings')}</Text>
           <Text style={styles.value}>{holdingsCount}</Text>
         </View>
       </View>
@@ -35,7 +37,7 @@ const PortfolioSummary = ({ totalInvested, returnPct, holdingsCount, onOpen }: P
       <Pressable
         onPress={onOpen}
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}>
-        <Text style={styles.buttonText}>TOTAL INVESTMENTS</Text>
+        <Text style={styles.buttonText}>{t('market.totalInvestments')}</Text>
         <Text style={styles.buttonArrow}>↗</Text>
       </Pressable>
     </View>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import {
     View,
     Text,
@@ -13,6 +14,7 @@ import { theme } from '../../../../../core/theme';
 const { width } = Dimensions.get('window');
 
 export const EducationExamModal: React.FC = () => {
+    useLocale();
     const { isExamModalVisible, currentExamQuestion, submitExam, activeDegree } = useEducationSystem();
 
     if (!isExamModalVisible || !currentExamQuestion) {
@@ -32,7 +34,7 @@ export const EducationExamModal: React.FC = () => {
                     <View style={styles.header}>
                         <Text style={styles.headerIcon}>🎓</Text>
                         <View>
-                            <Text style={styles.headerTitle}>Academic Exam</Text>
+                            <Text style={styles.headerTitle}>{t('life.academicExam')}</Text>
                             <Text style={styles.headerSubtitle}>
                                 {activeDegree?.id ? `${activeDegree.id} Finals` : 'Final Exam'}
                             </Text>
@@ -66,9 +68,7 @@ export const EducationExamModal: React.FC = () => {
                     </View>
 
                     {/* Footer Warning */}
-                    <Text style={styles.footerWarning}>
-                        Passing ensures your academic progress and grants stat boosts.
-                    </Text>
+                    <Text style={styles.footerWarning}>{t('life.passingEnsuresYourAcademicProgress')}</Text>
                 </View>
             </View>
         </Modal>

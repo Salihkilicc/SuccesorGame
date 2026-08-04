@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -17,6 +18,7 @@ type GymResultModalProps = {
 };
 
 const GymResultModal = ({ visible, onClose, result }: GymResultModalProps) => {
+    useLocale();
     if (!result) return null;
 
     return (
@@ -27,23 +29,23 @@ const GymResultModal = ({ visible, onClose, result }: GymResultModalProps) => {
             onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 <View style={styles.card}>
-                    <Text style={styles.title}>WORKOUT COMPLETE</Text>
+                    <Text style={styles.title}>{t('life.workoutComplete')}</Text>
 
                     <View style={styles.statsContainer}>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Health</Text>
+                            <Text style={styles.statLabel}>{t('life.health')}</Text>
                             <Text style={[styles.statValue, result.healthChange < 0 ? styles.red : styles.green]}>
                                 {result.healthChange > 0 ? '+' : ''}{result.healthChange}
                             </Text>
                         </View>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Stress</Text>
+                            <Text style={styles.statLabel}>{t('life.stress')}</Text>
                             <Text style={[styles.statValue, result.stressChange < 0 ? styles.green : styles.red]}>
                                 {result.stressChange}
                             </Text>
                         </View>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Charisma</Text>
+                            <Text style={styles.statLabel}>{t('life.charisma')}</Text>
                             <Text style={[styles.statValue, styles.green]}>
                                 +{result.charismaChange}
                             </Text>
@@ -53,7 +55,7 @@ const GymResultModal = ({ visible, onClose, result }: GymResultModalProps) => {
                     <Text style={styles.message}>{result.message}</Text>
 
                     <Pressable onPress={onClose} style={styles.button}>
-                        <Text style={styles.buttonText}>CONTINUE</Text>
+                        <Text style={styles.buttonText}>{t('life.continue')}</Text>
                     </Pressable>
                 </View>
             </View>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { InventoryItem } from '../../../../../core/store/useUserStore';
@@ -16,18 +17,17 @@ const NightOutTravelView = ({
     selectedAircraft,
     onSelectAircraft
 }: NightOutTravelViewProps) => {
+    useLocale();
     if (!needsTravel) return null;
 
     return (
         <View style={styles.travelSection}>
-            <Text style={styles.sectionHeader}>
-                TRAVEL METHOD (International)
-            </Text>
+            <Text style={styles.sectionHeader}>{t('life.travelMethodInternational')}</Text>
             {aircrafts.length === 0 ? (
                 <View style={styles.charterBox}>
-                    <Text style={styles.charterTitle}>Charter Flight Jet</Text>
-                    <Text style={styles.charterSub}>You own no aircrafts.</Text>
-                    <Text style={styles.charterCost}>Cost: $50,000</Text>
+                    <Text style={styles.charterTitle}>{t('life.charterFlightJet')}</Text>
+                    <Text style={styles.charterSub}>{t('life.youOwnNoAircrafts')}</Text>
+                    <Text style={styles.charterCost}>{t('life.cost50000')}</Text>
                 </View>
             ) : (
                 <View style={styles.optionsGrid}>
@@ -48,9 +48,7 @@ const NightOutTravelView = ({
                                     ]}>
                                     {aircraft.name}
                                 </Text>
-                                <Text style={styles.optionSubText}>
-                                    Owned Aircraft
-                                </Text>
+                                <Text style={styles.optionSubText}>{t('life.ownedAircraft')}</Text>
                             </Pressable>
                         );
                     })}

@@ -1,5 +1,6 @@
 // src/features/MyCompany/components/CompanyModals.tsx
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';
 import GameButton from '../../../../components/common/GameButton';
@@ -15,7 +16,10 @@ import ShareControlHub from '../../../../components/MyCompany/Shares/ShareContro
 import BuybackModal from '../../../../components/MyCompany/Shares/BuybackModal';
 import DilutionModal from '../../../../components/MyCompany/Shares/DilutionModal';
 import DividendModal from '../../../../components/MyCompany/Shares/DividendModal';
-import BoardMembersModal from '../../../../components/MyCompany/Shares/BoardMembersModal';
+// KURUL ODASI: eski `BoardMembersModal` yalnizca uyeleri LISTELIYORDU ve
+// "Call Emergency Vote" dugmesi console.log yapiyordu. Yerine karar
+// verilen ekran geldi — lobi, soz, oy dokumu ve gorevden alma uyarisi.
+import BoardRoomModal from '../../../../components/MyCompany/Shares/BoardRoomModal';
 import ShareholderProfileModal from '../../../../components/MyCompany/Shares/ShareholderProfileModal';
 import GiftSelectionModal from '../../../../components/MyCompany/Shares/GiftSelectionModal';
 import ShareNegotiationModal from '../../../../components/MyCompany/Shares/ShareNegotiationModal';
@@ -54,6 +58,7 @@ export const CompanyModals = ({
   companyDebtTotal,
   selectedShareholder
 }: CompanyModalsProps) => {
+    useLocale();
 
   const { borrowConfig, setBorrowConfig, repayConfig, setRepayConfig, handleBorrow, handleRepay } = financeActions;
 
@@ -86,13 +91,13 @@ export const CompanyModals = ({
         <View style={localStyles.backdrop}>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => toggleModal('management', false)} />
           <View style={localStyles.card}>
-            <Text style={localStyles.title}>HR & Management</Text>
+            <Text style={localStyles.title}>{t('company.hrManagement')}</Text>
             <View style={{ gap: 12 }}>
               {/* "Factories & Production" kaldirildi: fabrika sayisi diye bir
                   sey kalmadi. Kapasite tesis KADEMESINDEN geliyor ve kontrolu
                   My Company ekranindaki FacilityPanel'de. */}
               <GameButton title="👥 Employees & Morale" variant="secondary" onPress={() => { toggleModal('management', false); setTimeout(() => toggleModal('employees', true), 300); }} />
-              <GameButton title="Close" variant="ghost" onPress={() => toggleModal('management', false)} />
+              <GameButton title={t('company.close')} variant="ghost" onPress={() => toggleModal('management', false)} />
             </View>
           </View>
         </View>
@@ -126,7 +131,7 @@ export const CompanyModals = ({
         onClose={() => toggleModal('dividend', false)}
       />
 
-      <BoardMembersModal
+      <BoardRoomModal
         visible={!!modals.boardMembers}
         onClose={() => toggleModal('boardMembers', false)}
       />

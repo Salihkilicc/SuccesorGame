@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { theme } from '../../../core/theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
+import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import GameModal from '../../common/GameModal';
@@ -22,7 +24,8 @@ const formatMoney = (val: number) => {
 };
 
 const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
-    const { companyCapital, shareholders, addAcquisition, setField } = useStatsStore();
+    useLocale();
+    const { companyCapital, shareholders, setField } = useStatsStore();
     const { reputation: playerRep } = usePlayerStore();
     const reputation = playerRep.business;
 
@@ -50,12 +53,12 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
         const offer = parseFloat(offerAmount) * 1_000_000_000;
 
         if (isNaN(offer) || offer <= 0) {
-            Alert.alert('Invalid Offer', 'Please enter a valid amount.');
+            Alert.alert(t('alert.invalidOffer'), t('alert.pleaseEnterAValidAmount'));
             return;
         }
 
         if (offer > companyCapital) {
-            Alert.alert('Insufficient Funds', 'You do not have enough capital for this offer. Consider borrowing first.');
+            Alert.alert(t('alert.insufficientFunds'), t('alert.youDoNotHaveEnough'));
             return;
         }
 
@@ -119,12 +122,31 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                     setStatus('accepted');
                     setStatusMessage('Deal Closed! Transferring assets...'); // ... rest same                 // Finalize after short delay
                     setTimeout(() => {
-                        setField('companyCapital', companyCapital - offer);
-                        addAcquisition(company.id, {
-                            name: company.name,
-                            marketCap: company.marketCap,
-                            profit: company.profit,
+                        // TEK KAPI. Once burasi parayi elle dusup kaydi
+                        // statsStore.acquisitions'a yaziyordu; motor oraya
+                        // BAKMADIGI icin pazarlikla alinan sirketin pazar
+                        // payi gecmiyor, kari EBIT'e girmiyor, entegrasyon
+                        // ve sinerji hic islemiyordu. Yani pazarlik ekrani
+                        // sonucu olmayan bir animasyondu.
+                        const result = useCorporateFinanceStore.getState().executeAcquisition({
+                            target: {
+                                id: company.id,
+                                name: company.name,
+                                marketCap: company.marketCap,
+                                risk: company.risk,
+                                category: company.category,
+                                acquisitionBuff: company.acquisitionBuff,
+                            },
+                            hostile: false,
+                            financing: 'cash',
+                            negotiatedPrice: offer,
                         });
+
+                        if (!result.success) {
+                            setStatus('rejected');
+                            setStatusMessage(result.message);
+                            return;
+                        }
                         onSuccess();
                     }, 1500);
                 }
@@ -139,24 +161,24 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
             visible={visible}
             onClose={onClose}
             title={`Deal Room: ${company.name}`}
-            subtitle="Negotiate Acquisition"
+            subtitle={t('action.negotiateAcquisition')}
         >
             <View style={{ minHeight: 350 }}>
                 {status === 'initial' && (
                     <View style={styles.content}>
                         <SectionCard
-                            title="Valuation (Market Cap)"
+                            title={t('action.valuationMarketCap')}
                             rightText={formatMoney(company.marketCap)}
                         />
                         <SectionCard
-                            title="Asking Price (Inc. Premium)"
+                            title={t('action.askingPriceIncPremium')}
                             rightText={formatMoney(askingPrice)}
                             style={{ borderColor: theme.colors.accent }}
                         />
 
                         <View style={styles.divider} />
 
-                        <Text style={styles.inputLabel}>Your Offer ($ Billions)</Text>
+                        <Text style={styles.inputLabel}>{t('action.yourOfferBillions')}</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="e.g. 52.5"
@@ -171,7 +193,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                         </Text>
 
                         <GameButton
-                            title="Submit Offer to Board"
+                            title={t('action.submitOfferToBoard')}
                             onPress={handleSubmitOffer}
                             style={{ marginTop: 8 }}
                         />
@@ -181,7 +203,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 {status === 'board_voting' && (
                     <View style={styles.centerContent}>
                         <ActivityIndicator size="large" color={theme.colors.primary} />
-                        <Text style={styles.statusTitle}>Board Voting...</Text>
+                        <Text style={styles.statusTitle}>{t('action.boardVoting')}</Text>
                         <Text style={styles.statusDesc}>
                             {isMajorityOwner ? "You have majority control. Rubber stamping..." : "Seeking shareholder approval..."}
                         </Text>
@@ -191,7 +213,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 {status === 'negotiating' && (
                     <View style={styles.centerContent}>
                         <ActivityIndicator size="large" color={theme.colors.accent} />
-                        <Text style={styles.statusTitle}>Negotiating...</Text>
+                        <Text style={styles.statusTitle}>{t('action.negotiating')}</Text>
                         <Text style={styles.statusDesc}>Offer sent to {company.name} board.</Text>
                     </View>
                 )}
@@ -199,11 +221,11 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 {status === 'rejected' && (
                     <View style={styles.centerContent}>
                         <Text style={styles.icon}>❌</Text>
-                        <Text style={[styles.statusTitle, { color: theme.colors.danger }]}>Offer Failed</Text>
+                        <Text style={[styles.statusTitle, { color: theme.colors.danger }]}>{t('action.offerFailed')}</Text>
                         <Text style={styles.statusDesc}>{statusMessage}</Text>
 
                         <GameButton
-                            title="Adjust Offer"
+                            title={t('action.adjustOffer')}
                             onPress={() => setStatus('initial')}
                             variant="secondary"
                             style={{ marginTop: 16, width: '100%' }}
@@ -214,7 +236,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                 {status === 'accepted' && (
                     <View style={styles.centerContent}>
                         <Text style={styles.icon}>🤝</Text>
-                        <Text style={[styles.statusTitle, { color: theme.colors.success }]}>OFFER ACCEPTED</Text>
+                        <Text style={[styles.statusTitle, { color: theme.colors.success }]}>{t('action.offerAccepted')}</Text>
                         <Text style={styles.statusDesc}>{statusMessage}</Text>
                     </View>
                 )}

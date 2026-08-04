@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 
@@ -10,13 +11,14 @@ interface CompanyActionsProps {
 }
 
 const ACTIONS = [
-  { label: 'Finance Hub', key: 'finance', icon: '🏦', description: 'Capital & debt', borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#FFD700' }, // Gold
-  { label: 'Boardroom', key: 'board', icon: '📈', description: 'Board & shareholders', borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#30D158' }, // Green
-  { label: 'Production', key: 'production', icon: '🏭', description: 'Factories & output', borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#0A84FF' }, // Blue
-  { label: 'Workforce', key: 'hr', icon: '👥', description: 'Employees & morale', borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#BF5AF2' }, // Purple
+  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#FFD700' }, // Gold
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#30D158' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#0A84FF' }, // Blue
+  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#BF5AF2' }, // Purple
 ] as const;
 
 const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {
+    useLocale();
   const handlePress = (key: (typeof ACTIONS)[number]['key']) => {
     switch (key) {
       case 'finance':
@@ -39,7 +41,7 @@ const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Company Actions</Text>
+        <Text style={styles.title}>{t('action.companyActions')}</Text>
       </View>
       <View style={styles.grid}>
         {ACTIONS.map(action => (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     View,
     Text,
@@ -28,6 +29,7 @@ interface EducationHubViewProps {
 // ========================================
 
 export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, onStudy }) => {
+    useLocale();
     const { activeDegree, activeCertificate, salaryMultiplier, dropProgram } = useEducationSystem();
     const hasStudied = usePlayerStore((state) => state.quarterlyActions.hasStudied);
     const navigation = useNavigation<any>();
@@ -67,13 +69,13 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
             // Placeholder if no degree
             return (
                 <View style={styles.primaryCardEmpty}>
-                    <Text style={styles.emptyTitle}>No Active Degree</Text>
-                    <Text style={styles.emptySubtitle}>Start your academic journey today.</Text>
+                    <Text style={styles.emptyTitle}>{t('life.noActiveDegree')}</Text>
+                    <Text style={styles.emptySubtitle}>{t('life.startYourAcademicJourneyToday')}</Text>
                     <TouchableOpacity
                         style={styles.enrollBtnPrimary}
                         onPress={() => onNavigate('PROGRAMS')}
                     >
-                        <Text style={styles.enrollBtnText}>Browse Degrees</Text>
+                        <Text style={styles.enrollBtnText}>{t('life.browseDegrees')}</Text>
                     </TouchableOpacity>
                 </View>
             );
@@ -118,7 +120,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                     onPress={() => dropProgram('degree')}
                     activeOpacity={0.7}
                 >
-                    <Text style={styles.dropButtonText}>Drop Out</Text>
+                    <Text style={styles.dropButtonText}>{t('life.dropOut')}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -135,7 +137,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
             return (
                 <View style={styles.secondaryCard}>
                     <View style={styles.secondaryHeader}>
-                        <Text style={styles.secondaryType}>ACTIVE CERTIFICATE</Text>
+                        <Text style={styles.secondaryType}>{t('life.activeCertificate')}</Text>
                         <Text style={styles.secondaryTitle}>{label}</Text>
                     </View>
 
@@ -156,7 +158,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                         onPress={() => dropProgram('certificate')}
                         activeOpacity={0.7}
                     >
-                        <Text style={styles.dropButtonText}>Drop</Text>
+                        <Text style={styles.dropButtonText}>{t('life.drop')}</Text>
                     </TouchableOpacity>
                 </View>
             );
@@ -173,8 +175,8 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                     <Text style={styles.addSkillIcon}>+</Text>
                 </View>
                 <View>
-                    <Text style={styles.addSkillTitle}>Add a Skill</Text>
-                    <Text style={styles.addSkillSubtitle}>Enroll in a Certificate Program</Text>
+                    <Text style={styles.addSkillTitle}>{t('life.addASkill')}</Text>
+                    <Text style={styles.addSkillSubtitle}>{t('life.enrollInACertificateProgram')}</Text>
                 </View>
             </TouchableOpacity>
         );
@@ -183,21 +185,21 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
     const menuItems = [
         {
             id: 'LIBRARY',
-            title: 'Library',
+            title: t('life.library'),
             icon: '📚',
             subtitle: '+3 Intellect',
             action: onStudy,
         },
         {
             id: 'CLUBS',
-            title: 'Student Clubs',
+            title: t('life.studentClubs'),
             icon: '🤝',
-            subtitle: 'Join Elite Societies',
+            subtitle: t('life.joinEliteSocieties'),
             action: () => onNavigate('CLUBS'),
         },
         {
             id: 'TRANSCRIPT',
-            title: 'Transcript',
+            title: t('life.transcript'),
             icon: '📜',
             subtitle: `Multiplier: ${salaryMultiplier()}x`,
             action: () => onNavigate('TRANSCRIPT'),
@@ -218,8 +220,8 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                         <View style={styles.headerTitleContainer}>
                             <Text style={styles.universitySymbol}>🏛️</Text>
                             <View>
-                                <Text style={styles.headerTitle}>IVY LEAGUE</Text>
-                                <Text style={styles.headerSubtitle}>UNIVERSITY</Text>
+                                <Text style={styles.headerTitle}>{t('life.ivyLeague')}</Text>
+                                <Text style={styles.headerSubtitle}>{t('life.university')}</Text>
                             </View>
                         </View>
 
@@ -249,7 +251,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                                     disabled={hasStudied}
                                 >
                                     <Text style={styles.menuIcon}>📚</Text>
-                                    <Text style={styles.menuTitle}>Library</Text>
+                                    <Text style={styles.menuTitle}>{t('life.library')}</Text>
                                     <Text style={[
                                         styles.menuSubtitle,
                                         hasStudied && styles.menuSubtitleDisabled
@@ -264,8 +266,8 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                                     activeOpacity={0.7}
                                 >
                                     <Text style={styles.menuIcon}>🤝</Text>
-                                    <Text style={styles.menuTitle}>Student Clubs</Text>
-                                    <Text style={styles.menuSubtitle}>Join Elite Societies</Text>
+                                    <Text style={styles.menuTitle}>{t('life.studentClubs')}</Text>
+                                    <Text style={styles.menuSubtitle}>{t('life.joinEliteSocieties')}</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -277,7 +279,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                             >
                                 <Text style={styles.menuIconLarge}>📜</Text>
                                 <View style={styles.menuFullContent}>
-                                    <Text style={styles.menuTitleLarge}>Education History</Text>
+                                    <Text style={styles.menuTitleLarge}>{t('life.educationHistory')}</Text>
                                     <Text style={styles.menuSubtitleLarge}>Salary Multiplier: {salaryMultiplier()}x</Text>
                                 </View>
                             </TouchableOpacity>

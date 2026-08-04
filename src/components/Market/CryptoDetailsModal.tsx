@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleCryptoAsset } from './marketTypes';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
+    useLocale();
   const [amount, setAmount] = useState('5000');
 
   if (!asset) return null;
@@ -55,13 +57,11 @@ const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
             <Text style={styles.meta}>Risk: {asset.risk}</Text>
             <Text style={styles.meta}>Trend: {asset.trend}</Text>
             <Text style={styles.meta}>3-Month Change: {changeText}</Text>
-            <Text style={styles.meta}>
-              High trend: coin has strong momentum. Low trend: momentum cooling.
-            </Text>
+            <Text style={styles.meta}>{t('market.highTrendCoinHasStrong')}</Text>
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.inputLabel}>Buy Amount</Text>
+            <Text style={styles.inputLabel}>{t('market.buyAmount')}</Text>
             <TextInput
               value={amount}
               onChangeText={setAmount}
@@ -78,7 +78,7 @@ const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
               setAmount('');
             }}
             style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
-            <Text style={styles.buyText}>Buy</Text>
+            <Text style={styles.buyText}>{t('market.buy')}</Text>
           </Pressable>
         </View>
       </View>

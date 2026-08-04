@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
@@ -13,13 +14,41 @@ type Props = {
 };
 
 const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
+    useLocale();
     const { takeSharkLoan } = useShareholderStore();
     const { update } = useStatsStore();
     const { currentMonth } = useGameStore();
 
-    const LOAN_AMOUNT = 10_000_000;
-    const DEADLINE_MONTHS = 6;
-    const deadlineTurn = currentMonth + DEADLINE_MONTHS;
+    // ------------------------------------------------------------------
+    //  ONCE SABIT 10 MILYON VE BELIRSIZ "6 AY" IDI
+    // ------------------------------------------------------------------
+    //  Oyuncu "6 ay ne, 6 quarter mi? 10M aliyor baskasi yok" dedi.
+    //  Ikisi de hakli:
+    //
+    //   1) Tutar SABITTI. 2 milyonluk sirkette de 2 milyarlik sirkette de
+    //      ayni 10 milyon. Erken oyunda kurtaris, gec oyunda anlamsiz.
+    //
+    //   2) `currentMonth + 6` yaziyordu ama oyun CEYREK ilerliyor (3 ay).
+    //      Yani "6 ay" aslinda 2 tur demekti ve ekranda ay olarak
+    //      gorunuyordu. Iki farkli zaman birimi ayni alanda.
+    //
+    //  Artik tutar sirketin degerlemesine gore olceklenir ve vade
+    //  CEYREK cinsinden yazilir.
+    // ------------------------------------------------------------------
+    const valuation = useStatsStore(st => st.companyValue) || 0;
+    /** Tefeci degerlemenin en fazla %30'unu verir — otesi kendi riski. */
+    const maxLoan = Math.max(2_000_000, Math.round(valuation * 0.30));
+    const [loanAmount, setLoanAmount] = React.useState(Math.round(maxLoan * 0.5));
+    const LOAN_AMOUNT = Math.min(loanAmount, maxLoan);
+
+    /** Vade CEYREK cinsinden. Motor ay sayiyor, o yuzden x3. */
+    const DEADLINE_QUARTERS = 4;
+    const deadlineTurn = currentMonth + DEADLINE_QUARTERS * 3;
+
+    /** %30 yillik — bir yilda odenecek toplam. */
+    const totalOwed = Math.round(LOAN_AMOUNT * (1 + 0.30));
+    /** Odeyemezsen haczedilecek hisse degeri: anaparanin 1.5 kati. */
+    const collateralValue = Math.round(LOAN_AMOUNT * 1.5);
 
     const handleSignAgreement = () => {
         const result = takeSharkLoan(
@@ -34,10 +63,16 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
         );
 
         if (result.success) {
-            Alert.alert('Deal Signed', `✅ ${result.message}\n\n⚠️ WARNING: Failure to repay by turn ${deadlineTurn} will result in equity seizure!`);
+            Alert.alert(
+                t('alert.dealSigned'),
+                `${result.message}\n\n` +
+                `You owe ${formatMoney(totalOwed)} within ${DEADLINE_QUARTERS} quarters.\n` +
+                `Collateral pledged: ${formatMoney(collateralValue)} of your own shares.\n\n` +
+                `⚠️ Miss the date and he takes the shares — not the money.`,
+            );
             onClose();
         } else {
-            Alert.alert('Deal Failed', `❌ ${result.message}`);
+            Alert.alert(t('alert.dealFailed'), `❌ ${result.message}`);
         }
     };
 
@@ -46,11 +81,54 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.warningIcon}>⚠️</Text>
-                <Text style={styles.headerTitle}>OFFER TERMS</Text>
-                <Text style={styles.headerSubtitle}>Private Equity Agreement</Text>
+                <Text style={styles.headerTitle}>{t('finance.offerTerms')}</Text>
+                <Text style={styles.headerSubtitle}>{t('finance.privateEquityAgreement')}</Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
+                {/* TUTAR — sirketin buyuklugune gore */}
+                <View style={styles.amountCard}>
+                    <Text style={styles.amountLabel}>{t('finance.howMuchDoYouNeed')}</Text>
+                    <Text style={styles.amountValue}>{formatMoney(LOAN_AMOUNT)}</Text>
+                    <View style={styles.amountRow}>
+                        {[0.25, 0.5, 0.75, 1].map(f => (
+                            <Pressable
+                                key={f}
+                                style={[
+                                    styles.amountChip,
+                                    Math.abs(LOAN_AMOUNT - maxLoan * f) < maxLoan * 0.05 && styles.amountChipActive,
+                                ]}
+                                onPress={() => setLoanAmount(Math.round(maxLoan * f))}
+                            >
+                                <Text style={styles.amountChipText}>{Math.round(f * 100)}%</Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                    <Text style={styles.amountNote}>
+                        He will go up to {formatMoney(maxLoan)} — 30% of what your company is worth.
+                        Beyond that even he thinks you are a bad bet.
+                    </Text>
+                </View>
+
+                {/* SARTLAR — hepsi acik */}
+                <View style={styles.termsCard}>
+                    <View style={styles.termRow}>
+                        <Text style={styles.termLabel}>{t('finance.rate')}</Text>
+                        <Text style={styles.termBad}>30% a year</Text>
+                    </View>
+                    <View style={styles.termRow}>
+                        <Text style={styles.termLabel}>{t('finance.dueIn')}</Text>
+                        <Text style={styles.termValue}>{DEADLINE_QUARTERS} quarters</Text>
+                    </View>
+                    <View style={styles.termRow}>
+                        <Text style={styles.termLabel}>{t('finance.totalToRepay')}</Text>
+                        <Text style={styles.termBad}>{formatMoney(totalOwed)}</Text>
+                    </View>
+                    <View style={styles.termRow}>
+                        <Text style={styles.termLabel}>{t('finance.collateral')}</Text>
+                        <Text style={styles.termBad}>{formatMoney(collateralValue)} of your shares</Text>
+                    </View>
+                </View>
                 {/* Lender Info */}
                 <View style={styles.lenderCard}>
                     <View style={styles.lenderAvatar}>
@@ -58,31 +136,31 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                     </View>
                     <View>
                         <Text style={styles.lenderName}>{sharkMember.name}</Text>
-                        <Text style={styles.lenderRole}>Private Equity Investor</Text>
+                        <Text style={styles.lenderRole}>{t('finance.privateEquityInvestor')}</Text>
                     </View>
                 </View>
 
                 {/* The Deal */}
                 <View style={styles.dealSection}>
-                    <Text style={styles.sectionTitle}>THE DEAL</Text>
+                    <Text style={styles.sectionTitle}>{t('finance.theDeal')}</Text>
 
                     <View style={styles.dealRow}>
-                        <Text style={styles.dealLabel}>Amount:</Text>
+                        <Text style={styles.dealLabel}>{t('finance.amount')}</Text>
                         <Text style={styles.dealAmount}>{formatMoney(LOAN_AMOUNT)}</Text>
                     </View>
 
                     <View style={styles.dealRow}>
-                        <Text style={styles.dealLabel}>Interest Rate:</Text>
+                        <Text style={styles.dealLabel}>{t('finance.interestRate')}</Text>
                         <Text style={styles.dealInterest}>0%</Text>
                     </View>
 
                     <View style={styles.dealRow}>
-                        <Text style={styles.dealLabel}>Deadline:</Text>
-                        <Text style={styles.dealDeadline}>{DEADLINE_MONTHS} Months</Text>
+                        <Text style={styles.dealLabel}>{t('finance.deadline')}</Text>
+                        <Text style={styles.dealDeadline}>{DEADLINE_QUARTERS} Quarters</Text>
                     </View>
 
                     <View style={styles.dealRow}>
-                        <Text style={styles.dealLabel}>Due By:</Text>
+                        <Text style={styles.dealLabel}>{t('finance.dueBy')}</Text>
                         <Text style={styles.dealDeadline}>Turn {deadlineTurn}</Text>
                     </View>
                 </View>
@@ -91,7 +169,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                 <View style={styles.warningBox}>
                     <View style={styles.warningHeader}>
                         <Text style={styles.warningHeaderIcon}>⚠️</Text>
-                        <Text style={styles.warningHeaderText}>COLLATERAL CLAUSE</Text>
+                        <Text style={styles.warningHeaderText}>{t('finance.collateralClause')}</Text>
                     </View>
                     <Text style={styles.warningText}>
                         Failure to repay by the deadline will result in the{' '}
@@ -99,9 +177,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                         equivalent to the debt value{' '}
                         <Text style={styles.warningTextBold}>+ 50% penalty</Text>.
                     </Text>
-                    <Text style={styles.warningSubtext}>
-                        This may result in permanent loss of majority ownership.
-                    </Text>
+                    <Text style={styles.warningSubtext}>{t('finance.thisMayResultInPermanent')}</Text>
                 </View>
 
                 {/* Additional Warnings */}
@@ -122,7 +198,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                         ]}
                         onPress={onClose}
                     >
-                        <Text style={styles.rejectButtonText}>Reject Offer</Text>
+                        <Text style={styles.rejectButtonText}>{t('finance.rejectOffer')}</Text>
                     </Pressable>
 
                     <Pressable
@@ -149,6 +225,19 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 export default SharkDealModal;
 
 const styles = StyleSheet.create({
+    amountCard: { backgroundColor: '#2A2D35', borderRadius: 12, padding: 16 },
+    amountLabel: { fontSize: 12, color: '#8A9BA8', fontWeight: '600' },
+    amountValue: { fontSize: 26, color: '#FFF', fontWeight: '800', marginVertical: 6 },
+    amountRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
+    amountChip: { flex: 1, padding: 8, borderRadius: 8, backgroundColor: '#1C1C1E', alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
+    amountChipActive: { borderColor: '#FF6B6B' },
+    amountChipText: { fontSize: 12, color: '#FFF', fontWeight: '700' },
+    amountNote: { fontSize: 11, color: '#8A9BA8', marginTop: 10, lineHeight: 16 },
+    termsCard: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: '#FF6B6B' },
+    termRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    termLabel: { fontSize: 12, color: '#8A9BA8' },
+    termValue: { fontSize: 12, color: '#FFF', fontWeight: '700' },
+    termBad: { fontSize: 12, color: '#FF6B6B', fontWeight: '700' },
     header: {
         alignItems: 'center',
         marginBottom: 24,

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 
@@ -9,11 +10,12 @@ type NightOutFooterViewProps = {
 };
 
 const NightOutFooterView = ({ totalCost, onConfirm, onClose }: NightOutFooterViewProps) => {
+    useLocale();
     return (
         <>
             <View style={styles.footer}>
                 <View>
-                    <Text style={styles.totalLabel}>TOTAL COST</Text>
+                    <Text style={styles.totalLabel}>{t('life.totalCost')}</Text>
                     <Text style={styles.totalValue}>
                         ${totalCost.toLocaleString()}
                     </Text>
@@ -24,12 +26,12 @@ const NightOutFooterView = ({ totalCost, onConfirm, onClose }: NightOutFooterVie
                         styles.confirmButton,
                         pressed && styles.confirmButtonPressed,
                     ]}>
-                    <Text style={styles.confirmButtonText}>GO NIGHT OUT</Text>
+                    <Text style={styles.confirmButtonText}>{t('life.goNightOut')}</Text>
                 </Pressable>
             </View>
 
             <Pressable onPress={onClose} style={styles.closeButton}>
-                <Text style={styles.closeText}>Cancel</Text>
+                <Text style={styles.closeText}>{t('life.cancel')}</Text>
             </Pressable>
         </>
     );

@@ -22,6 +22,7 @@
 // ============================================================================
 
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -50,6 +51,7 @@ import StepperBar from '../../../components/common/StepperBar';
 import InfoDot from '../../../components/common/InfoDot';
 
 const FacilityPanel: React.FC = () => {
+    useLocale();
     const facilityTier = useStatsStore(s => s.facilityTier);
     const facilityBuild = useStatsStore(s => s.facilityBuild);
     const employeeCount = useStatsStore(s => s.employeeCount);
@@ -95,12 +97,12 @@ const FacilityPanel: React.FC = () => {
             `unit cost ×${next.unitCostMultiplier.toFixed(2)}, Brand Value ceiling ${next.brandCeiling}, ` +
             `quality ceiling ${next.qualityCeiling}.`,
             [
-                { text: 'Not now', style: 'cancel' },
+                { text: t('company.notNow'), style: 'cancel' },
                 {
-                    text: 'Start build',
+                    text: t('company.startBuild'),
                     onPress: () => {
                         const result = startFacilityUpgrade();
-                        if (!result.success) Alert.alert('Cannot start', result.message);
+                        if (!result.success) Alert.alert(t('alert.cannotStart'), result.message);
                     },
                 },
             ],
@@ -109,11 +111,11 @@ const FacilityPanel: React.FC = () => {
 
     const handleCancel = () => {
         Alert.alert(
-            'Cancel the build?',
-            'You get 40% of what you paid back. The rest is gone — steel, contracts and time do not refund.',
+            t('alert.cancelTheBuild'),
+            t('alert.youGet40OfWhat'),
             [
-                { text: 'Keep building', style: 'cancel' },
-                { text: 'Cancel build', style: 'destructive', onPress: cancelFacilityUpgrade },
+                { text: t('company.keepBuilding'), style: 'cancel' },
+                { text: t('company.cancelBuild'), style: 'destructive', onPress: cancelFacilityUpgrade },
             ],
         );
     };
@@ -144,7 +146,7 @@ const FacilityPanel: React.FC = () => {
                         <Text style={[styles.utilValue, styles[`util_${verdict}`]]}>
                             {formatPercent(utilization)}
                         </Text>
-                        <Text style={styles.utilLabel}>USED</Text>
+                        <Text style={styles.utilLabel}>{t('company.used')}</Text>
                     </View>
                 )}
             </View>
@@ -162,25 +164,25 @@ const FacilityPanel: React.FC = () => {
 
             {/* ══ KADEME DETAYI ══ */}
             <CollapsibleSection
-                title="FACILITY"
-                note="What this tier gives you, and what it caps"
-                info="Your production capability. It sets how much you can build, how cheaply, at what quality — and how high your Brand Value can climb."
+                title={t('company.facility')}
+                note={t('company.whatThisTierGivesYou')}
+                info={t('company.yourProductionCapabilityItSets')}
                 infoDetail={`Production = capacity × min(1, employees / crew) × yield. Hiring past the crew adds cost and no output; upgrading the tier without hiring raises the ceiling you cannot reach. The two go together.`}
                 summary={tier.name}
             >
                 <Text style={styles.tierDesc}>{tier.description}</Text>
 
                 <View style={styles.statRow}>
-                    <Stat label="Capacity now" value={formatNumber(capacityNow)} />
-                    <Stat label="Crew" value={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
+                    <Stat label={t('company.capacityNow')} value={formatNumber(capacityNow)} />
+                    <Stat label={t('company.crew')} value={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
                         tone={staffing < 1 ? 'warn' : 'ok'} />
-                    <Stat label="Unit cost" value={`×${tier.unitCostMultiplier.toFixed(2)}`} />
+                    <Stat label={t('company.unitCost')} value={`×${tier.unitCostMultiplier.toFixed(2)}`} />
                 </View>
 
                 <View style={styles.statRow}>
-                    <Stat label="Yield" value={formatPercent(tier.yieldRate * 100)} />
-                    <Stat label="Brand ceiling" value={`${tier.brandCeiling}`} />
-                    <Stat label="Quality ceiling" value={`${tier.qualityCeiling}`} />
+                    <Stat label={t('company.yield')} value={formatPercent(tier.yieldRate * 100)} />
+                    <Stat label={t('company.brandCeiling')} value={`${tier.brandCeiling}`} />
+                    <Stat label={t('company.qualityCeiling')} value={`${tier.qualityCeiling}`} />
                 </View>
 
                 {lastReport && (
@@ -202,7 +204,7 @@ const FacilityPanel: React.FC = () => {
                 gelecegini tek yerde gormek CEO'nun bakacagi tablo. */}
             {(isBuilding || incomingHires > 0) && (
                 <View style={styles.queue}>
-                    <Text style={styles.queueTitle}>IN PROGRESS</Text>
+                    <Text style={styles.queueTitle}>{t('company.inProgress')}</Text>
 
                     {isBuilding && facilityBuild && (
                         <View style={styles.queueRow}>
@@ -217,7 +219,7 @@ const FacilityPanel: React.FC = () => {
                                 </Text>
                             </View>
                             <Pressable onPress={handleCancel} style={styles.cancelBtn}>
-                                <Text style={styles.cancelText}>Cancel</Text>
+                                <Text style={styles.cancelText}>{t('company.cancel')}</Text>
                             </Pressable>
                         </View>
                     )}
@@ -229,9 +231,7 @@ const FacilityPanel: React.FC = () => {
                                 <Text style={styles.queueName}>
                                     {formatNumber(incomingHires)} people hired
                                 </Text>
-                                <Text style={styles.queueSub}>
-                                    Arriving next quarter · half productivity for their first one
-                                </Text>
+                                <Text style={styles.queueSub}>{t('company.arrivingNextQuarterHalfProductivity')}</Text>
                             </View>
                         </View>
                     )}
@@ -241,10 +241,10 @@ const FacilityPanel: React.FC = () => {
             {/* ══ YUKSELTME ══ */}
             {next ? (
                 <CollapsibleSection
-                    title="NEXT TIER"
+                    title={t('company.nextTier')}
                     note={`${next.name} — ${formatMoney(next.upgradeCost)}, ${next.buildQuarters}q`}
-                    info="You cannot skip tiers — you climb them one at a time. The cost is paid up front, the capacity arrives later, and while it is being built you produce less."
-                    infoDetail="That downtime is the real decision: upgrading during a demand peak costs you share, but waiting too long caps your brand and your quality."
+                    info={t('company.youCannotSkipTiersYou')}
+                    infoDetail={t('company.thatDowntimeIsTheReal')}
                     summary={companyCapital >= next.upgradeCost ? 'Affordable' : 'Saving'}
                     summaryColor={companyCapital >= next.upgradeCost ? '#4CAF50' : '#8A8A8A'}
                 >
@@ -252,12 +252,12 @@ const FacilityPanel: React.FC = () => {
                     <Text style={styles.tierDesc}>{next.description}</Text>
 
                     <View style={styles.compareRow}>
-                        <Compare label="Capacity" from={formatNumber(tier.capacity)} to={formatNumber(next.capacity)} />
-                        <Compare label="Crew" from={formatNumber(tier.crew)} to={formatNumber(next.crew)} />
+                        <Compare label={t('company.capacity')} from={formatNumber(tier.capacity)} to={formatNumber(next.capacity)} />
+                        <Compare label={t('company.crew')} from={formatNumber(tier.crew)} to={formatNumber(next.crew)} />
                     </View>
                     <View style={styles.compareRow}>
-                        <Compare label="Unit cost" from={`×${tier.unitCostMultiplier.toFixed(2)}`} to={`×${next.unitCostMultiplier.toFixed(2)}`} />
-                        <Compare label="Brand cap" from={`${tier.brandCeiling}`} to={`${next.brandCeiling}`} />
+                        <Compare label={t('company.unitCost')} from={`×${tier.unitCostMultiplier.toFixed(2)}`} to={`×${next.unitCostMultiplier.toFixed(2)}`} />
+                        <Compare label={t('company.brandCap')} from={`${tier.brandCeiling}`} to={`${next.brandCeiling}`} />
                     </View>
 
                     <Text style={styles.costLine}>
@@ -301,7 +301,7 @@ const FacilityPanel: React.FC = () => {
                 </CollapsibleSection>
             ) : (
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>TOP TIER REACHED</Text>
+                    <Text style={styles.sectionTitle}>{t('company.topTierReached')}</Text>
                     <Text style={styles.tierDesc}>
                         There is nothing left to build. From here, growth comes from products,
                         pricing and acquisitions.
@@ -311,9 +311,9 @@ const FacilityPanel: React.FC = () => {
 
             {/* ══ KADRO ══ */}
             <CollapsibleSection
-                title="HEADCOUNT"
-                note="Set a target — the company hires toward it"
-                info="You set a target and the company moves toward it. Hiring takes a quarter and new people work at half speed for their first one. Layoffs are instant, but the morale damage is not."
+                title={t('company.headcount')}
+                note={t('company.setATargetTheCompany')}
+                info={t('company.youSetATargetAnd')}
                 infoDetail={`Hiring costs ${formatMoney(hiringFee(tier.level, salaryRatio))} per person. Severance is ${formatMoney(severancePay(tier.level, salaryRatio))} per person, and cutting a large share of the workforce hits morale hard — worse if you just reported a profit.`}
                 summary={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
                 summaryColor={staffing < 1 ? '#FFB74D' : '#4CAF50'}
@@ -375,8 +375,8 @@ const FacilityPanel: React.FC = () => {
 
             {/* ══ TUM MERDIVEN ══ */}
             <CollapsibleSection
-                title="THE LADDER"
-                note="Every tier, and what it unlocks"
+                title={t('company.theLadder')}
+                note={t('company.everyTierAndWhatIt')}
                 summary={`${tier.level} / ${MAX_TIER_LEVEL}`}
             >
                 {FACILITY_TIERS.map(t => {

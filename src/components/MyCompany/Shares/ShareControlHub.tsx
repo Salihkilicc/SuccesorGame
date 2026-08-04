@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -18,6 +19,9 @@ import {
     EQUITY_EXPLANATIONS,
     companyValuation,
     controlStatus,
+    quoteSecondarySale,
+    trailingTotal,
+    volatilityDamping,
 } from '../../../core/market/equity';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
@@ -44,6 +48,8 @@ const BreakLine = ({ label, value, bold, negative }: { label: string; value: str
 );
 
 const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
+    // Dil degisince yeniden ciz.
+    useLocale();
     const navigation = useNavigation<any>();
     const {
         companyValue,
@@ -70,10 +76,15 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
     // Degerleme kirilimi — motorun kullandigi AYNI fonksiyon.
     const stats = useStatsStore();
     const lastReport = useGameStore(st => st.lastQuarterReport);
+    // Buyuk sirket daha az oynar — oyuncuya bunu goster.
+    const damping = volatilityDamping(stats.companyValue || 0);
+
     const vb = companyValuation({
         cash: stats.companyCapital || 0,
-        quarterRevenue: lastReport?.revenue ?? 0,
-        quarterEbit: lastReport?.ebit ?? 0,
+        // Motorun kullandigi AYNI TTM penceresi
+        ttmRevenue: trailingTotal(stats.revenueHistory ?? []),
+        // Motorun fiyatladigi AYNI kazanc gucu
+        ttmEbit: stats.earningsPower || trailingTotal(stats.ebitHistory ?? []),
         debt: stats.companyDebtTotal || 0,
         isPublic: !!stats.isPublic,
         brandValue: stats.brandValue ?? 0,
@@ -88,20 +99,20 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
     const handleStockSplit = () => {
         if (stockPrice <= 1000) {
-            Alert.alert('Not Available', 'Stock split is only available when share price exceeds $1,000.');
+            Alert.alert(t('alert.notAvailable'), t('alert.stockSplitIsOnlyAvailable'));
             return;
         }
 
         Alert.alert(
-            'Stock Split',
-            'This will divide your share price by 10 and multiply share count by 10. Continue?',
+            t('alert.stockSplit'),
+            t('alert.thisWillDivideYourShare'),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('equity.cancel'), style: 'cancel' },
                 {
-                    text: 'Split',
+                    text: t('equity.split'),
                     onPress: () => {
                         performStockSplit();
-                        Alert.alert('Success', 'Stock split completed successfully!');
+                        Alert.alert(t('alert.success'), t('alert.stockSplitCompletedSuccessfully'));
                     },
                 },
             ]
@@ -129,7 +140,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         >
                             <Text style={styles.backButtonText}>← Close</Text>
                         </TouchableOpacity>
-                        <Text style={styles.headerTitle}>Equity Management</Text>
+                        <Text style={styles.headerTitle}>{t('equity.equityManagement')}</Text>
                         <View style={styles.headerSpacer} />
                     </View>
 
@@ -150,7 +161,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         ]}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                 <Text style={styles.controlPct}>{ownership.toFixed(1)}%</Text>
-                                <Text style={styles.controlLabel}>YOU OWN</Text>
+                                <Text style={styles.controlLabel}>{t('equity.youOwn')}</Text>
                                 <View style={{ flex: 1 }} />
                                 <Text style={styles.controlShares}>
                                     {formatNumber(playerShares)} sh
@@ -161,7 +172,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
                         {/* Stock Price Hero Card */}
                         <View style={styles.heroCard}>
-                            <Text style={styles.heroLabel}>Current Stock Price</Text>
+                            <Text style={styles.heroLabel}>{t('equity.currentStockPrice')}</Text>
                             <View style={styles.heroRow}>
                                 <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
@@ -179,12 +190,20 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <Text style={styles.heroNote}>
                                 Since last quarter · {EQUITY_EXPLANATIONS.change}
                             </Text>
+                            {damping < 0.95 && (
+                                <View style={styles.dampBadge}>
+                                    <Text style={styles.dampText}>
+                                        SIZE DAMPING {Math.round((1 - damping) * 100)}% — a company
+                                        this large absorbs shocks a small one cannot
+                                    </Text>
+                                </View>
+                            )}
                         </View>
 
                         {/* Degerleme kirilimi — fiyatin NEDEN o rakam oldugunu goster */}
                         <View style={styles.breakdownCard}>
-                            <Text style={styles.breakdownTitle}>WHAT THE COMPANY IS WORTH</Text>
-                            <BreakLine label="Cash on hand" value={formatMoney(vb.cash)} />
+                            <Text style={styles.breakdownTitle}>{t('equity.whatTheCompanyIsWorth')}</Text>
+                            <BreakLine label={t('equity.cashOnHand')} value={formatMoney(vb.cash)} />
                             <BreakLine
                                 label={`Annual profit × ${vb.earningsMultiple.toFixed(1)}`}
                                 value={formatMoney(vb.earnings)}
@@ -194,10 +213,10 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 value={formatMoney(vb.revenue)}
                             />
                             {vb.debt > 0 && (
-                                <BreakLine label="Less: debt" value={`−${formatMoney(vb.debt)}`} negative />
+                                <BreakLine label={t('equity.lessDebt')} value={`−${formatMoney(vb.debt)}`} negative />
                             )}
                             <View style={styles.breakDivider} />
-                            <BreakLine label="Valuation" value={formatMoney(vb.total)} bold />
+                            <BreakLine label={t('equity.valuation')} value={formatMoney(vb.total)} bold />
                             <BreakLine
                                 label={`÷ ${formatNumber(totalShares)} shares`}
                                 value={formatPrice(vb.total / Math.max(1, totalShares))}
@@ -209,28 +228,28 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         <View style={styles.statsGrid}>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>📊</Text>
-                                <Text style={styles.statLabel}>Total Shares</Text>
+                                <Text style={styles.statLabel}>{t('equity.totalShares')}</Text>
                                 <Text style={styles.statValue}>{formatNumber(totalShares)}</Text>
                             </View>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>💎</Text>
-                                <Text style={styles.statLabel}>Market Cap</Text>
+                                <Text style={styles.statLabel}>{t('equity.marketCap')}</Text>
                                 <Text style={styles.statValue}>{formatMoney(marketCap)}</Text>
                             </View>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>🌐</Text>
-                                <Text style={styles.statLabel}>Public Float</Text>
+                                <Text style={styles.statLabel}>{t('equity.publicFloat')}</Text>
                                 <Text style={styles.statValue}>{((publicShares / totalShares) * 100).toFixed(1)}%</Text>
                             </View>
                             <View style={styles.statCard}>
                                 <Text style={styles.statIcon}>👤</Text>
-                                <Text style={styles.statLabel}>My Ownership</Text>
+                                <Text style={styles.statLabel}>{t('equity.myOwnership')}</Text>
                                 <Text style={styles.statValue}>{playerOwnership.toFixed(1)}%</Text>
                             </View>
                         </View>
 
                         {/* Actions Section */}
-                        <Text style={styles.sectionTitle}>Market Actions</Text>
+                        <Text style={styles.sectionTitle}>{t('equity.marketActions')}</Text>
 
                         {/* IPO / Stock Split */}
                         {!isPublic ? (
@@ -243,8 +262,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     <Text style={styles.actionIcon}>🔔</Text>
                                 </View>
                                 <View style={styles.actionContent}>
-                                    <Text style={styles.actionTitle}>Launch IPO</Text>
-                                    <Text style={styles.actionDescription}>Go public to maximize valuation</Text>
+                                    <Text style={styles.actionTitle}>{t('equity.launchIpo')}</Text>
+                                    <Text style={styles.actionDescription}>{t('equity.goPublicToMaximizeValuation')}</Text>
                                 </View>
                                 <Text style={styles.actionArrow}>›</Text>
                             </TouchableOpacity>
@@ -259,12 +278,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     <Text style={styles.actionIcon}>✂️</Text>
                                 </View>
                                 <View style={styles.actionContent}>
-                                    <Text style={[styles.actionTitle, stockPrice <= 1000 && styles.textDisabled]}>
-                                        Stock Split
-                                    </Text>
-                                    <Text style={[styles.actionDescription, stockPrice <= 1000 && styles.textDisabled]}>
-                                        Requires $1,000+ share price
-                                    </Text>
+                                    <Text style={[styles.actionTitle, stockPrice <= 1000 && styles.textDisabled]}>{t('equity.stockSplit')}</Text>
+                                    <Text style={[styles.actionDescription, stockPrice <= 1000 && styles.textDisabled]}>{t('equity.requires1000SharePrice')}</Text>
                                 </View>
                                 <Text style={[styles.actionArrow, stockPrice <= 1000 && styles.textDisabled]}>›</Text>
                             </TouchableOpacity>
@@ -281,11 +296,9 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.actionIcon}>📈</Text>
                             </View>
                             <View style={styles.actionContent}>
-                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
-                                    Stock Buyback
-                                </Text>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.stockBuyback')}</Text>
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
-                                    {isPublic ? 'Buy back shares using company cash' : 'Requires IPO first'}
+                                    {isPublic ? 'Buy back shares using company cash' : t('equity.requiresIpo')}
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
@@ -303,10 +316,76 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             </View>
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
-                                    Issue Shares
+                                    {t('equity.issueNew')}
+                                </Text>
+                                {/* ISIMLENDIRME: "Issue Shares" belirsizdi ve oyuncu
+                                    hakli olarak sordu — "para sirkete gidiyor ama benim
+                                    hissem azaliyor". Ikisi de dogru cunku bu YENI HISSE
+                                    IHRACI: pasta buyur, para SIRKETE girer, senin dilimin
+                                    kucululur. Kendi hisseni satmak AYRI bir islem ve
+                                    asagida ayri duruyor. */}
+                                <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
+                                    {isPublic
+                                        ? t('equity.issueNewDesc')
+                                        : t('equity.requiresIpo')}
+                                </Text>
+                            </View>
+                            <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
+                        </TouchableOpacity>
+
+                        {/* ---- KENDI HISSENI SAT — para SANA gelir ---- */}
+                        <TouchableOpacity
+                            style={[styles.actionRow, !isPublic && styles.actionRowDisabled]}
+                            onPress={() => {
+                                const eq = useEquityStore.getState();
+                                const cap = eq.totalShares || 0;
+                                const chunk = Math.round(cap * 0.05);
+                                const price = useStatsStore.getState().companySharePrice || 0;
+                                const q = quoteSecondarySale(chunk, price, eq.playerShares, cap);
+                                Alert.alert(
+                                    t('equity.sellOwnConfirm'),
+                                    `Gross: ${formatMoney(q.grossProceeds)}\n` +
+                                    `Capital gains tax: −${formatMoney(q.tax)}\n` +
+                                    `Block discount: −${q.discountPercent.toFixed(1)}%\n\n` +
+                                    `You receive ${formatMoney(q.netToFounder)} personally. ` +
+                                    `The company gets nothing — these are your shares, not new ones.\n\n` +
+                                    `Your stake falls to ${q.newOwnershipPercent.toFixed(1)}%. ` +
+                                    `The market reads insider selling as a warning.`,
+                                    [
+                                        { text: t('equity.cancel'), style: 'cancel' },
+                                        {
+                                            text: t('equity.sell'),
+                                            style: 'destructive',
+                                            onPress: () => {
+                                                const r = eq.sellOwnShares(chunk, (n) => {
+                                                    const st = useStatsStore.getState();
+                                                    st.update({ money: (st.money || 0) + n });
+                                                });
+                                                Alert.alert(
+                                                    r.error ? 'Blocked' : 'Sold',
+                                                    r.error ||
+                                                    `${formatMoney(r.netToFounder)} is in your personal account ` +
+                                                    `after ${formatMoney(r.tax)} of tax.`,
+                                                );
+                                            },
+                                        },
+                                    ],
+                                );
+                            }}
+                            disabled={!isPublic}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.actionIconBox, { backgroundColor: '#34C75920' }]}>
+                                <Text style={styles.actionIcon}>💼</Text>
+                            </View>
+                            <View style={styles.actionContent}>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
+                                    {t('equity.sellOwn')}
                                 </Text>
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
-                                    {isPublic ? 'Raise capital by diluting ownership' : 'Requires IPO first'}
+                                    {isPublic
+                                        ? t('equity.sellOwnDesc')
+                                        : t('equity.requiresIpo')}
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
@@ -323,11 +402,9 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.actionIcon}>💰</Text>
                             </View>
                             <View style={styles.actionContent}>
-                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
-                                    Distribute Dividends
-                                </Text>
+                                <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.distributeDividends')}</Text>
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
-                                    {isPublic ? 'Pay cash to shareholders' : 'Requires IPO first'}
+                                    {isPublic ? 'Pay cash to shareholders' : t('equity.requiresIpo')}
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
@@ -358,6 +435,11 @@ const styles = StyleSheet.create({
     controlNote: { color: '#B0B0B0', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
     heroNote: { color: '#6E6E6E', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    dampBadge: {
+        backgroundColor: 'rgba(127,179,255,0.10)', borderRadius: 8,
+        paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
+    },
+    dampText: { color: '#7FB3FF', fontSize: 10, lineHeight: 14, fontWeight: '600' },
 
     breakdownCard: {
         backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,

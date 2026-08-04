@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { StyleSheet, Text, View, StyleProp, ViewStyle } from 'react-native';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { usePlayerStore } from '../../core/store/usePlayerStore';
@@ -34,6 +35,7 @@ const StatItem = ({ icon, label, value, accent }: StatItemProps) => (
 );
 
 const StatBar = ({ style }: StatBarProps) => {
+    useLocale();
   const { money } = useStatsStore();
   const { core, attributes } = usePlayerStore();
   const { health, stress } = core;
@@ -41,10 +43,10 @@ const StatBar = ({ style }: StatBarProps) => {
 
   return (
     <View style={[styles.container, style]}>
-      <StatItem icon="💰" label="Para" value={formatMoney(money)} accent={theme.colors.accent} />
-      <StatItem icon="❤️" label="Sağlık" value={`${health}%`} accent={theme.colors.success} />
-      <StatItem icon="😖" label="Stres" value={`${stress}%`} accent={theme.colors.danger} />
-      <StatItem icon="⭐" label="Karizma" value={`${charisma}%`} accent={theme.colors.accent} />
+      <StatItem icon="💰" label={t('ui.para')} value={formatMoney(money)} accent={theme.colors.accent} />
+      <StatItem icon="❤️" label={t('ui.saLK')} value={`${health}%`} accent={theme.colors.success} />
+      <StatItem icon="😖" label={t('ui.stres')} value={`${stress}%`} accent={theme.colors.danger} />
+      <StatItem icon="⭐" label={t('ui.karizma')} value={`${charisma}%`} accent={theme.colors.accent} />
     </View>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Pressable, TextInput, Modal, StyleSheet } from 'react-native';
 
 interface Props {
@@ -18,6 +19,7 @@ const BabyNamingModal: React.FC<Props> = ({
     onConfirm,
     onSkip,
 }) => {
+    useLocale();
     return (
         <Modal
             visible={visible}
@@ -29,7 +31,7 @@ const BabyNamingModal: React.FC<Props> = ({
                 <View style={styles.namingCard}>
                     {/* Header */}
                     <Text style={styles.namingHeadEmoji}>👶</Text>
-                    <Text style={styles.namingTitle}>A New Life</Text>
+                    <Text style={styles.namingTitle}>{t('love.aNewLife')}</Text>
                     <Text style={styles.namingSubtitle}>
                         {'Congratulations! You just had a ' + (pendingChildGender === 'Female' ? 'baby girl' : 'baby boy') + '.\nWhat will you name them?'}
                     </Text>
@@ -38,7 +40,7 @@ const BabyNamingModal: React.FC<Props> = ({
                     <TextInput
                         style={styles.namingInput}
                         placeholderTextColor="rgba(255,255,255,0.3)"
-                        placeholder="Enter a name..."
+                        placeholder={t('love.enterAName')}
                         value={childName}
                         onChangeText={onChangeName}
                         autoFocus
@@ -55,12 +57,12 @@ const BabyNamingModal: React.FC<Props> = ({
                         onPress={onConfirm}
                         disabled={!childName.trim()}
                     >
-                        <Text style={styles.namingConfirmText}>Confirm Name</Text>
+                        <Text style={styles.namingConfirmText}>{t('love.confirmName')}</Text>
                     </Pressable>
 
                     {/* Dismiss (skip naming) */}
                     <Pressable style={styles.namingSkip} onPress={onSkip}>
-                        <Text style={styles.namingSkipText}>Skip</Text>
+                        <Text style={styles.namingSkipText}>{t('love.skip')}</Text>
                     </Pressable>
                 </View>
             </View>

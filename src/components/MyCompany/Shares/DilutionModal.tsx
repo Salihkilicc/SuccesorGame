@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const DilutionModal = ({ visible, onClose }: Props) => {
+    useLocale();
     const navigation = useNavigation<any>();
     const {
         dilutionPercentage,
@@ -52,8 +54,8 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                 <View style={styles.centeredView}>
                     <View style={styles.card}>
                         {/* Header */}
-                        <Text style={styles.title}>Issue Shares</Text>
-                        <Text style={styles.subtitle}>Raise capital by diluting ownership</Text>
+                        <Text style={styles.title}>{t('equity.issueShares')}</Text>
+                        <Text style={styles.subtitle}>{t('equity.raiseCapitalByDilutingOwnership')}</Text>
 
                         {/* Warning Banner */}
                         <View style={styles.warningBanner}>
@@ -64,7 +66,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
 
                         {/* Stepper Interface */}
                         <View style={styles.stepperSection}>
-                            <Text style={styles.label}>Select Dilution Percentage</Text>
+                            <Text style={styles.label}>{t('equity.selectDilutionPercentage')}</Text>
                             <View style={styles.stepperContainer}>
                                 {/* Decrease Button */}
                                 <TouchableOpacity
@@ -84,7 +86,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                 {/* Display */}
                                 <View style={styles.valueContainer}>
                                     <Text style={styles.valueText}>{dilutionPercentage}%</Text>
-                                    <Text style={styles.labelSmall}>EQUITY</Text>
+                                    <Text style={styles.labelSmall}>{t('equity.equity')}</Text>
                                 </View>
 
                                 {/* Increase Button */}
@@ -152,7 +154,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         <View style={styles.stockWarningBox}>
                             <Text style={styles.stockWarningIcon}>📉</Text>
                             <View style={styles.stockWarningContent}>
-                                <Text style={styles.stockWarningTitle}>Stock Price Impact</Text>
+                                <Text style={styles.stockWarningTitle}>{t('equity.stockPriceImpact')}</Text>
                                 <Text style={styles.stockWarningText}>
                                     Est. Price Drop: <Text style={{ color: '#FF453A', fontWeight: '700' }}>
                                         -{(predictedDrop * 100).toFixed(1)}%
@@ -178,14 +180,14 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                 onPress={onClose}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={styles.cancelButtonText}>{t('equity.cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.authorizeButton}
                                 onPress={handleConfirm}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.authorizeButtonText}>Authorize Dilution</Text>
+                                <Text style={styles.authorizeButtonText}>{t('equity.authorizeDilution')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';
 import GameButton from '../../../common/GameButton';
@@ -11,14 +12,15 @@ interface Props {
 }
 
 const ProductProductionSection = ({ allocated, onAllocChange }: Props) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>PRODUCTION CAPACITY</Text>
+            <Text style={styles.sectionTitle}>{t('product.productionCapacity')}</Text>
 
             <View style={styles.row}>
                 <View style={{ flex: 1 }}>
                     <SectionCard
-                        title="Allocated Units"
+                        title={t('product.allocatedUnits')}
                         rightText={formatNumber(allocated)}
                     />
                 </View>

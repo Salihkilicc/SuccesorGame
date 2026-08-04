@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePlayerStore } from '../../core/store/usePlayerStore';
 import { theme } from '../../core/theme';
@@ -14,6 +15,7 @@ type BottomStatsBarProps = {
 };
 
 const StatPill = ({ label, value, color }: StatPillProps) => {
+    useLocale();
   const clamped = Math.max(0, Math.min(100, Math.round(value)));
   return (
     <View style={styles.pill}>
@@ -41,9 +43,9 @@ const BottomStatsBar = ({ onHomePress }: BottomStatsBarProps) => {
           style={({ pressed }) => [styles.homeButton, pressed && styles.homeButtonPressed]}>
           <Text style={styles.homeIcon}>🏠</Text>
         </Pressable>
-        <StatPill label="Health" value={health} color={theme.colors.success} />
-        <StatPill label="Stress" value={stress} color={theme.colors.danger} />
-        <StatPill label="Charisma" value={charisma} color={theme.colors.accent} />
+        <StatPill label={t('ui.health')} value={health} color={theme.colors.success} />
+        <StatPill label={t('ui.stress')} value={stress} color={theme.colors.danger} />
+        <StatPill label={t('ui.charisma')} value={charisma} color={theme.colors.accent} />
       </View>
     </View>
   );

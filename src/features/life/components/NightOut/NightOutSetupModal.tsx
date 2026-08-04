@@ -1,5 +1,6 @@
 
 import React, { useMemo } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     View,
     Text,
@@ -60,6 +61,7 @@ const NightOutSetupModal = ({
     selectTravelMethod,
     confirmNightOut,
 }: NightOutSetupModalProps) => {
+    useLocale();
     const navigation = useNavigation<any>();
 
     // Filter venues by selected region
@@ -107,7 +109,7 @@ const NightOutSetupModal = ({
                         </Pressable>
                     </View>
                     <View style={styles.headerCenter}>
-                        <Text style={styles.title}>NIGHT OUT</Text>
+                        <Text style={styles.title}>{t('life.nightOut')}</Text>
                         <Text style={styles.progress}>
                             Step {getStepNumber()} of {getTotalSteps()}
                         </Text>

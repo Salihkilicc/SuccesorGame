@@ -9,6 +9,14 @@ export interface AcquisitionTarget {
     description: string;
     synergyDescription: string;
     synergyScore: number;
+    /**
+     * Risk profili — hedefin karliligini belirler.
+     * Bkz. core/market/mergers.ts -> EARNINGS_YIELD_BY_RISK
+     * Verilmezse 'Medium' kabul edilir.
+     */
+    risk?: 'Very Low' | 'Low' | 'Medium' | 'Medium-High' | 'High' | 'Extreme';
+    /** Satin alindiginda kazanilan kalici avantaj (varsa) */
+    acquisitionBuff?: { type: string; value: number; label: string };
     // UI Display Fields
     logo: string;
     revenue: number;

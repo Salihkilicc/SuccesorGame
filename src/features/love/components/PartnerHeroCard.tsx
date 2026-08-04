@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { getPartnerPerks } from '../../../logic/relationshipLogic';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
+    useLocale();
     if (partner) {
         return (
             <Pressable onPress={onPress} style={styles.partnerCardWrapper}>
@@ -39,9 +41,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
 
                             {/* ACTIVE PERKS DISPLAY */}
                             <View style={{ marginTop: 11, width: '100%', overflow: 'hidden' }}>
-                                <Text style={{ fontSize: 11.4, color: 'rgba(255,255,255,0.7)', marginBottom: 5, fontWeight: '700', letterSpacing: 0.5 }}>
-                                    ACTIVE PERKS
-                                </Text>
+                                <Text style={{ fontSize: 11.4, color: 'rgba(255,255,255,0.7)', marginBottom: 5, fontWeight: '700', letterSpacing: 0.5 }}>{t('love.activePerks')}</Text>
                                 <ScrollView
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
@@ -90,9 +90,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                                             borderColor: 'rgba(255,255,255,0.1)',
                                             width: '100%'
                                         }}>
-                                            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontStyle: 'italic' }}>
-                                                Your partner has no active perks at the moment.
-                                            </Text>
+                                            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontStyle: 'italic' }}>{t('love.yourPartnerHasNoActive')}</Text>
                                         </View>
                                     )}
                                 </ScrollView>
@@ -117,8 +115,8 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                     <Text style={styles.noPartnerIcon}>?</Text>
                 </View>
                 <View style={styles.partnerInfo}>
-                    <Text style={[styles.partnerName, { color: 'rgba(255,255,255,0.7)' }]}>No Partner</Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 4 }}>Maybe it's time to meet someone?</Text>
+                    <Text style={[styles.partnerName, { color: 'rgba(255,255,255,0.7)' }]}>{t('love.noPartner')}</Text>
+                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 4 }}>{t('love.maybeItSTimeTo')}</Text>
                 </View>
             </LinearGradient>
         </View>

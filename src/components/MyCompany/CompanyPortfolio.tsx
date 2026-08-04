@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
@@ -6,6 +7,7 @@ import ShareControlHub from './Shares/ShareControlHub';
 import { formatMoney } from '../../core/utils';
 
 const CompanyPortfolio = () => {
+    useLocale();
   const { companyOwnership, companyValue, update } = useStatsStore();
   const goPublic = useEquityStore((state) => state.goPublic);
   const [showShareControl, setShowShareControl] = useState(false);
@@ -13,7 +15,7 @@ const CompanyPortfolio = () => {
   const handleLaunchIPO = () => {
     // Validation
     if (companyValue <= 0) {
-      Alert.alert('Cannot Launch IPO', 'Company valuation must be greater than $0.');
+      Alert.alert(t('alert.cannotLaunchIpo'), t('alert.companyValuationMustBeGreater'));
       return;
     }
 
@@ -31,9 +33,9 @@ const CompanyPortfolio = () => {
       `Company Valuation: ${formatMoney(companyValue)}\n\n` +
       `Are you ready to go public?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('ui.cancel'), style: 'cancel' },
         {
-          text: 'Launch IPO',
+          text: t('ui.launchIpo'),
           style: 'default',
           onPress: () => {
             // Execute IPO via Equity Store
@@ -69,7 +71,7 @@ const CompanyPortfolio = () => {
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.title}>Portfolio</Text>
+        <Text style={styles.title}>{t('ui.portfolio')}</Text>
         <View style={styles.list}>
           {/* Share Control Card */}
           <Pressable
@@ -79,7 +81,7 @@ const CompanyPortfolio = () => {
               <Text style={styles.name}>📊 Share Control</Text>
               <Text style={styles.ownershipBadge}>{companyOwnership.toFixed(1)}%</Text>
             </View>
-            <Text style={styles.revenue}>Manage shareholders & equity</Text>
+            <Text style={styles.revenue}>{t('ui.manageShareholdersEquity')}</Text>
           </Pressable>
         </View>
       </View>

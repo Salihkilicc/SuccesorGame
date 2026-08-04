@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { useStatsStore } from '../../../../../core/store/useStatsStore';
@@ -19,12 +20,13 @@ type SunStudioModalProps = {
 };
 
 const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioModalProps) => {
+    useLocale();
     return (
         <GameModal
             visible={visible}
             onClose={onClose}
-            title="SUN STUDIO"
-            subtitle="Achieve the perfect glow">
+            title={t('life.sunStudio')}
+            subtitle={t('life.achieveThePerfectGlow')}>
 
             <View style={styles.options}>
                 {/* SPRAY TAN */}
@@ -36,15 +38,15 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                             { charisma: usePlayerStore.getState().attributes.charm + 2 },
                             'SPRAY TAN',
                             'You look glowing and ready for summer.',
-                            [{ label: 'Charisma', value: '+2', isPositive: true }]
+                            [{ label: t('life.charisma'), value: '+2', isPositive: true }]
                         );
                     }}
                 >
                     <Text style={styles.emoji}>🧴</Text>
-                    <Text style={styles.cardTitle}>Instant Spray Tan</Text>
+                    <Text style={styles.cardTitle}>{t('life.instantSprayTan')}</Text>
                     <Text style={styles.cardPrice}>$100</Text>
-                    <Text style={styles.cardDesc}>Safe, quick, and orange-free guaranteed.</Text>
-                    <Text style={styles.statText}>Charisma +2 (Safe)</Text>
+                    <Text style={styles.cardDesc}>{t('life.safeQuickAndOrangeFree')}</Text>
+                    <Text style={styles.statText}>{t('life.charisma2Safe')}</Text>
                 </Pressable>
 
                 {/* UV BED */}
@@ -66,8 +68,8 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                                 'SKIN BURN!',
                                 'The UV bed was too intense. You look red and painful.',
                                 [
-                                    { label: 'Charisma', value: '-2', isPositive: false },
-                                    { label: 'Health', value: '-1', isPositive: false }
+                                    { label: t('life.charisma'), value: '-2', isPositive: false },
+                                    { label: t('life.health'), value: '-1', isPositive: false }
                                 ]
                             );
                         } else {
@@ -76,21 +78,21 @@ const SunStudioModal = ({ visible, onClose, handleServicePurchase }: SunStudioMo
                                 { charisma: currentCharm + 5 },
                                 'DEEP BRONZE',
                                 'Perfect, deep tan achieved. You look amazing.',
-                                [{ label: 'Charisma', value: '+5', isPositive: true }]
+                                [{ label: t('life.charisma'), value: '+5', isPositive: true }]
                             );
                         }
                     }}
                 >
                     <Text style={styles.emoji}>☀️</Text>
-                    <Text style={styles.cardTitle}>UV Solarium Bed</Text>
+                    <Text style={styles.cardTitle}>{t('life.uvSolariumBed')}</Text>
                     <Text style={styles.cardPrice}>$250</Text>
-                    <Text style={styles.cardDesc}>Deep bronze look with a hint of danger.</Text>
-                    <Text style={[styles.statText, styles.riskText]}>Charisma +5 (Risk: Skin Burn)</Text>
+                    <Text style={styles.cardDesc}>{t('life.deepBronzeLookWithA')}</Text>
+                    <Text style={[styles.statText, styles.riskText]}>{t('life.charisma5RiskSkinBurn')}</Text>
                 </Pressable>
             </View>
 
             <GameButton
-                title="Close"
+                title={t('life.close')}
                 variant="ghost"
                 onPress={onClose}
                 style={{ marginTop: 24 }}

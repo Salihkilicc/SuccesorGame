@@ -96,7 +96,7 @@ export const quarterlyWage = (facilityTier: number, salaryRatio: number): number
  * %30'unu yiyordu. Artik piyasa maasina bagli: uzman insan pahalidir
  * ama sirketin olcegiyle orantilidir.
  */
-export const RESEARCHER_WAGE_MULTIPLIER = 2.5;
+export const RESEARCHER_WAGE_MULTIPLIER = 1.2;
 
 export const researcherWage = (facilityTier: number, salaryRatio: number): number =>
     Math.round(quarterlyWage(facilityTier, salaryRatio) * RESEARCHER_WAGE_MULTIPLIER);
@@ -104,7 +104,7 @@ export const researcherWage = (facilityTier: number, salaryRatio: number): numbe
 /**
  * ARASTIRMA CIKTISI — AZALAN GETIRI.
  *
- *     RP = 1.800 x arastirmaci^0.85
+ *     RP = 600 x arastirmaci^0.85
  *
  * Dogrusal DEGIL, ve bu bilincli. Ar-Ge ekibini ikiye katlamak ciktiyi
  * ikiye katlamaz: koordinasyon, ayni fikri iki kez kesfetmek, entegrasyon.
@@ -115,10 +115,22 @@ export const researcherWage = (facilityTier: number, salaryRatio: number): numbe
  * ceyrekte bitirirdi. Azalan getiri, zamanin gec oyunda da bir kaynak
  * olarak kalmasini saglar.
  *
- * Kalibrasyon: 3 arastirmaci ~4.600 RP/ceyrek (ikinci urun ~11 ceyrek),
- * 6.000 arastirmaci ~2.93 milyon RP/ceyrek (Mind Upload ~15 ceyrek).
+ * DENGE NOTU (oyun testinden sonra): once kisi basi cikti cok yuksekti
+ * (taban 1800) ve maas pahaliydi (piyasa x2.5). Sonuc: tek bir
+ * arastirmaci ceyrekte 1.800 RP uretiyordu, yani laboratuvar iki
+ * kisilik bir odaydi ve erken oyunda RP "kasmak" fazla kolaydi.
+ *
+ * Simdi maas ucuz (piyasa x1.2), kisi basi cikti dusuk (taban 600).
+ * Ayni butceyle 15 kisi calistirirsin ve ayni RP'yi alirsin — ama
+ * laboratuvar gercekten bir EKIP olur, buyutmek anlamli bir karar
+ * haline gelir ve azalan getiri hissedilir.
+ *
+ * Kalibrasyon (asamaya uygun butcelerle):
+ *   tier 1-2, 15 arastirmaci   ->  6.000 RP/ceyrek, 2. urun ~8 ceyrek
+ *   tier 8,  388 arastirmaci   ->  95.000 RP/ceyrek
+ *   tier 17, 28.000 arastirmaci -> 3.66M RP/ceyrek, Mind Upload ~12 ceyrek
  */
-export const RP_BASE_OUTPUT = 1_800;
+export const RP_BASE_OUTPUT = 600;
 export const RP_SCALING_EXPONENT = 0.85;
 
 export const researchOutput = (researcherCount: number): number =>

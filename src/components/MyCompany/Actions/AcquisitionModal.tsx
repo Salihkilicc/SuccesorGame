@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
   Modal,
   View,
@@ -20,6 +21,15 @@ import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 import { findCompetitorByStockId } from '../../../core/market/productMarkets';
+import {
+  FinancingMethod,
+  FinancingQuote,
+  TargetRisk,
+  quoteAcquisition,
+  quoteFinancing,
+} from '../../../core/market/mergers';
+import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
+import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 
 const { width } = Dimensions.get('window');
 
@@ -33,9 +43,10 @@ const formatMoney = (value: number) => {
 };
 
 export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) => {
+    useLocale();
   const navigation = useNavigation<any>();
   const { marketPrices } = useMarketStore();
-  const { subsidiaries, acquireCompany } = useCorporateFinanceStore();
+  const { subsidiaries, executeAcquisition } = useCorporateFinanceStore();
   const { companyCapital } = useStatsStore();
 
   const [selectedSector, setSelectedSector] = useState<string>('All');
@@ -69,6 +80,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
   }, [selectedSector, availableCompanies]);
 
   // 4. Calculate Current Valuation Helper
+  const currentValuationOf = (item: any) => getValuation(item);
   const getValuation = (item: any) => {
     const baseStockPrice = item.price || 100;
     const currentStockPrice = marketPrices[item.id] || baseStockPrice;
@@ -76,28 +88,170 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
     return (item.marketCap || 1_000_000_000) * priceRatio;
   };
 
-  // 5. Handle Acquisition
+  // ------------------------------------------------------------------
+  //  SATIN ALMA
+  // ------------------------------------------------------------------
+  //  ESKIDEN: fiyati ode, sirket listene eklensin. Bitti.
+  //  Dusmanca devralma "%20 prim" diyordu ama o prim hicbir yere
+  //  yansimıyordu — ne hisseye, ne kara, ne gelecek ceyreklere.
+  //
+  //  SIMDI: her islem bir finansal kayit dogurur ve ceyreklere yayilir.
+  //  Bkz. core/market/mergers.ts
+  // ------------------------------------------------------------------
   const handleAcquire = (type: 'FRIENDLY' | 'HOSTILE') => {
     if (!selectedTarget) return;
 
+    const hostile = type === 'HOSTILE';
     const currentValuation = getValuation(selectedTarget);
-    let finalPrice = currentValuation;
+    const stats = useStatsStore.getState();
+    const acquirerValuation = stats.companyValue || 0;
+    const risk: TargetRisk = (selectedTarget.risk as TargetRisk) || 'Medium';
 
-    if (type === 'HOSTILE') {
-      finalPrice = currentValuation * 1.2; // 20% Premium
-    }
+    const q = quoteAcquisition(currentValuation, risk, hostile, acquirerValuation);
 
-    if (companyCapital < finalPrice) {
-      Alert.alert('Insufficient Funds', `You need ${formatMoney(finalPrice)} to complete this transaction.`);
+    // ------------------------------------------------------------------
+    //  FINANSMAN SECIMI
+    // ------------------------------------------------------------------
+    //  Once yalnizca nakit vardi, yani kendinden buyuk bir sirketi asla
+    //  alamiyordun. Gercekte kucuk sirket buyugu alir — borcla veya
+    //  hisse takasiyla. Agirlik da oradan gelir: hisseyle alirsan
+    //  seyrelirsin, ve cok buyuk bir seyi alirsan sonunda sirketin
+    //  sahibi sen olmazsin.
+    // ------------------------------------------------------------------
+    const cap = useShareholderStore.getState();
+    const rate = useCorporateFinanceStore.getState().getInterestRate();
+    const options = (['cash', 'debt', 'stock'] as FinancingMethod[]).map(m =>
+      quoteFinancing(
+        m, q.price, companyCapital, acquirerValuation,
+        stats.companyDebtTotal || 0, stats.companySharePrice || 0,
+        cap.totalShares, cap.playerShareCount, rate,
+      ),
+    );
+
+    const feasible = options.filter(o => o.feasible);
+    if (feasible.length === 0) {
+      Alert.alert(
+        t('alert.cannotFinanceThisDeal'),
+        options.map(o => `${o.method.toUpperCase()}: ${o.reason}`).join('\n\n')
+      );
       return;
     }
 
-    // Process Acquisition
-    acquireCompany(selectedTarget, finalPrice);
+    const describe = (o: FinancingQuote) => {
+      if (o.method === 'cash') return `Cash — ${formatMoney(o.cashUsed)} from the treasury`;
+      if (o.method === 'debt') return `Debt — ${formatMoney(o.annualInterest)}/yr interest`;
+      return `Shares — you drop to ${o.playerOwnershipAfter.toFixed(2)}%`;
+    };
 
-    Alert.alert('Acquisition Complete', `You are now the owner of ${selectedTarget.name}.`);
-    setSelectedTarget(null);
-    onClose();
+    Alert.alert(
+      `How do you pay for ${selectedTarget.name}?`,
+      `Price ${formatMoney(q.price)} · your company is worth ${formatMoney(acquirerValuation)}\n` +
+      `This deal is ${(q.relativeSize * 100).toFixed(1)}% of your size.\n\n` +
+      feasible.map(o => `${describe(o)}`).join('\n'),
+      [
+        { text: t('action.cancel'), style: 'cancel' },
+        ...feasible.map(o => ({
+          text: o.method === 'cash' ? 'Pay cash' : o.method === 'debt' ? 'Borrow' : 'Issue shares',
+          onPress: () => confirmDeal(q, o, hostile, acquirerValuation),
+        })),
+      ]
+    );
+  };
+
+  const confirmDeal = (
+    q: ReturnType<typeof quoteAcquisition>,
+    fin: FinancingQuote,
+    hostile: boolean,
+    acquirerValuation: number,
+  ) => {
+    if (!selectedTarget) return;
+
+    Alert.alert(
+      hostile ? `Hostile bid for ${selectedTarget.name}` : `Acquire ${selectedTarget.name}`,
+      `Market value        ${formatMoney(q.fairValue)}\n` +
+      `Premium (${Math.round(q.premiumRatio * 100)}%)      +${formatMoney(q.premium)}\n` +
+      `You pay             ${formatMoney(q.price)}\n\n` +
+      `Their annual profit ${formatMoney(q.targetAnnualEbit)}\n` +
+      `Integration cost    −${formatMoney(q.firstYearIntegration)}\n` +
+      `Synergies (full)    +${formatMoney(q.annualSynergyAtFullRun)}\n\n` +
+      `First year impact   ${q.firstYearEbitImpact >= 0 ? '+' : ''}${formatMoney(q.firstYearEbitImpact)}` +
+      ` (${q.accretive ? 'accretive' : 'DILUTIVE'})\n` +
+      `At full run rate    +${formatMoney(q.steadyStateEbitImpact)}\n` +
+      `Payback             ${isFinite(q.paybackYears) ? q.paybackYears.toFixed(1) + ' years' : 'never at this price'}\n\n` +
+      `Expected share reaction on announcement: ${q.announcementImpactPercent.toFixed(1)}%\n\n` +
+      (fin.method === 'stock'
+        ? `PAID IN SHARES: ${fin.sharesIssued.toLocaleString()} new shares go to their owners. ` +
+          `Your ownership falls to ${fin.playerOwnershipAfter.toFixed(2)}%.\n\n`
+        : fin.method === 'debt'
+          ? `PAID WITH DEBT: ${formatMoney(fin.annualInterest)} of interest every year, and the debt ` +
+            `sits against your valuation until it is repaid.\n\n`
+          : '') +
+      `The ${formatMoney(q.premium)} premium goes to their shareholders on day one and does not come back. ` +
+      `Integration lands first; the benefits take about six quarters.`,
+      [
+        { text: t('action.walkAway'), style: 'cancel' },
+        {
+          text: hostile ? 'Launch hostile bid' : 'Sign the deal',
+          style: hostile ? 'destructive' : 'default',
+          onPress: () => {
+            // TEK KAPI — finansman, anlasma kaydi, buff ve piyasa tepkisi
+            // hepsi orada. Bkz. useCorporateFinanceStore.executeAcquisition
+            const result = executeAcquisition({
+              target: {
+                id: selectedTarget.id || selectedTarget.symbol,
+                name: selectedTarget.name,
+                marketCap: currentValuationOf(selectedTarget),
+                risk: selectedTarget.risk,
+                category: selectedTarget.category,
+                acquisitionBuff: selectedTarget.acquisitionBuff,
+              },
+              hostile,
+              financing: fin.method,
+            });
+
+            // ------------------------------------------------------------
+            //  OYLAMA SONUCUNU GOSTER
+            // ------------------------------------------------------------
+            //  Oyuncu "%50'nin altina dusup sirket aldim, kimse oylamadi"
+            //  dedi. Oylama ASLINDA OLUYORDU — sessizce. Gectiginde hicbir
+            //  sey gorunmuyordu; sistemin var oldugunu ancak KAYBEDINCE
+            //  anliyordun. Kurulu gorunmez yapan sey buydu.
+            // ------------------------------------------------------------
+            const vote = useShareholderStore.getState().lastVote;
+            const votedOnThis = vote && vote.title.includes(selectedTarget.name);
+            if (votedOnThis) {
+              const lines = vote!.votes
+                .map(v => `${v.vote === 'YES' ? '✓' : '✕'}  ${v.name} — ${v.reason}`)
+                .join('\n');
+              Alert.alert(
+                vote!.passed ? 'The board approved it' : 'The board voted it down',
+                `${vote!.summary}\n\n${lines}` +
+                (vote!.overrode
+                  ? '\n\n⚠️ It carried on your shares alone. The board was against you, and they will remember.'
+                  : ''),
+              );
+            }
+
+            if (!result.success) {
+              if (!votedOnThis) Alert.alert(t('alert.dealFailed'), result.message);
+              return;
+            }
+
+            Alert.alert(
+              t('alert.dealClosed'),
+              `${selectedTarget.name} is yours.\n\n` +
+              `Integration starts now and runs for four quarters. Their profit will reach you ` +
+              `gradually, and synergies take about six quarters to arrive.\n\n` +
+              `${q.accretive
+                ? 'The deal should add to profit within the first year.'
+                : 'The first year will be dilutive — that is normal, but the market will be watching.'}`
+            );
+            setSelectedTarget(null);
+            onClose();
+          },
+        },
+      ]
+    );
   };
 
   const renderCompanyItem = ({ item }: { item: any }) => {
@@ -118,7 +272,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         </View>
         <View style={styles.itemValue}>
           <Text style={styles.marketCap}>{formatMoney(valuation)}</Text>
-          <Text style={styles.valueLabel}>Market Cap</Text>
+          <Text style={styles.valueLabel}>{t('action.marketCap')}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -136,17 +290,17 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         {/* HEADER */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>Mergers & Acquisitions</Text>
-            <Text style={styles.subtitle}>Expand your corporate empire</Text>
+            <Text style={styles.title}>{t('action.mergersAcquisitions')}</Text>
+            <Text style={styles.subtitle}>{t('action.expandYourCorporateEmpire')}</Text>
           </View>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Text style={styles.closeText}>Done</Text>
+            <Text style={styles.closeText}>{t('action.done')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* CAPITAL INDICATOR */}
         <View style={styles.capitalBar}>
-          <Text style={styles.capitalLabel}>Acquisition Power</Text>
+          <Text style={styles.capitalLabel}>{t('action.acquisitionPower')}</Text>
           <Text style={styles.capitalValue}>{formatMoney(companyCapital)}</Text>
         </View>
 
@@ -175,7 +329,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No companies available in this sector.</Text>
+              <Text style={styles.emptyText}>{t('action.noCompaniesAvailableInThis')}</Text>
             </View>
           }
         />
@@ -189,12 +343,12 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
             <View style={styles.negotiationCard}>
               <View style={styles.negHeader}>
                 <Text style={styles.negTitle}>Acquire {selectedTarget.name}</Text>
-                <Text style={styles.negSubtitle}>Choose your approach</Text>
+                <Text style={styles.negSubtitle}>{t('action.chooseYourApproach')}</Text>
               </View>
 
               <View style={styles.negBody}>
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Current Valuation</Text>
+                  <Text style={styles.infoLabel}>{t('action.currentValuation')}</Text>
                   <Text style={styles.infoValue}>{formatMoney(selectedTarget.currentValuation)}</Text>
                 </View>
 
@@ -206,14 +360,14 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   if (!found) {
                     return (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Market Position</Text>
-                        <Text style={styles.infoValue}>Not a direct competitor</Text>
+                        <Text style={styles.infoLabel}>{t('action.marketPosition')}</Text>
+                        <Text style={styles.infoValue}>{t('action.notADirectCompetitor')}</Text>
                       </View>
                     );
                   }
                   return (
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Market Share</Text>
+                      <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
                       <Text style={[styles.infoValue, { color: '#4CAF50' }]}>
                         {found.competitor.share.toFixed(1)}% of {found.market.category}
                       </Text>
@@ -222,7 +376,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                 })()}
 
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Synergy Buff</Text>
+                  <Text style={styles.infoLabel}>{t('action.synergyBuff')}</Text>
                   <Text style={styles.buffValue}>{selectedTarget.acquisitionBuff?.label || 'None'}</Text>
                 </View>
               </View>
@@ -237,7 +391,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                     <Text style={styles.optionTitle}>🤝 Friendly Offer</Text>
                     <Text style={styles.optionPrice}>{formatMoney(selectedTarget.currentValuation)}</Text>
                   </View>
-                  <Text style={styles.optionDesc}>Purchase at fair market value.</Text>
+                  <Text style={styles.optionDesc}>{t('action.purchaseAtFairMarketValue')}</Text>
                 </TouchableOpacity>
 
                 {/* Hostile Takeover */}
@@ -251,9 +405,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                       {formatMoney(selectedTarget.currentValuation * 1.2)}
                     </Text>
                   </View>
-                  <Text style={[styles.optionDesc, styles.hostileDesc]}>
-                    Pay +20% premium. Instant close.
-                  </Text>
+                  <Text style={[styles.optionDesc, styles.hostileDesc]}>{t('action.pay20PremiumInstantClose')}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -261,7 +413,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                 style={styles.cancelBtn}
                 onPress={() => setSelectedTarget(null)}
               >
-                <Text style={styles.cancelText}>Cancel Negotiation</Text>
+                <Text style={styles.cancelText}>{t('action.cancelNegotiation')}</Text>
               </TouchableOpacity>
             </View>
           </View>

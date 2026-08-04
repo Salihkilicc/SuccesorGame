@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../../core/theme';
 import { Supplier } from '../../../../core/store/useProductStore';
@@ -20,9 +21,10 @@ const ProductSupplierSection = ({
     onFindSuppliers,
     onSelectSupplier,
 }: Props) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>SUPPLIER CHAIN</Text>
+            <Text style={styles.sectionTitle}>{t('product.supplierChain')}</Text>
 
             <SectionCard
                 title={currentSupplier.name}

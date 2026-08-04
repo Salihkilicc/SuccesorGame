@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme'; // Adjust path
 import { AcquisitionTarget } from '../../../data/AcquisitionData';
@@ -17,6 +18,7 @@ const formatMoney = (value: number) => {
 };
 
 const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) => {
+    useLocale();
     if (!company) return null;
 
     const isProfitable = company.profit > 0;
@@ -54,20 +56,20 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
 
                         {/* Financial Grid */}
                         <View style={styles.gridContainer}>
-                            <Text style={styles.sectionTitle}>FINANCIALS (ANNUAL)</Text>
+                            <Text style={styles.sectionTitle}>{t('action.financialsAnnual')}</Text>
                             <View style={styles.grid}>
                                 <View style={styles.gridItem}>
-                                    <Text style={styles.gridLabel}>VALUATION</Text>
+                                    <Text style={styles.gridLabel}>{t('action.valuation')}</Text>
                                     <Text style={styles.gridValue}>{formatMoney(company.marketCap)}</Text>
                                 </View>
                                 <View style={styles.gridItem}>
-                                    <Text style={styles.gridLabel}>NET PROFIT</Text>
+                                    <Text style={styles.gridLabel}>{t('action.netProfit')}</Text>
                                     <Text style={[styles.gridValue, { color: isProfitable ? theme.colors.success : theme.colors.danger }]}>
                                         {formatMoney(company.profit)}
                                     </Text>
                                 </View>
                                 <View style={styles.gridItem}>
-                                    <Text style={styles.gridLabel}>GROWTH</Text>
+                                    <Text style={styles.gridLabel}>{t('action.growth')}</Text>
                                     <Text style={styles.gridValue}>+{company.growthRate}%</Text>
                                 </View>
                             </View>
@@ -75,12 +77,12 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
 
                         {/* Strategic Fit */}
                         <View style={styles.fitContainer}>
-                            <Text style={styles.sectionTitle}>DUE DILIGENCE</Text>
+                            <Text style={styles.sectionTitle}>{t('action.dueDiligence')}</Text>
 
                             {/* Synergy Score */}
                             <View style={styles.fitRow}>
                                 <View style={styles.fitHeader}>
-                                    <Text style={styles.fitLabel}>Synergy Score</Text>
+                                    <Text style={styles.fitLabel}>{t('action.synergyScore')}</Text>
                                     <Text style={styles.fitValue}>{company.synergyScore}/100</Text>
                                 </View>
                                 <View style={styles.progressBarBg}>
@@ -95,7 +97,7 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
 
                             {/* Board Sentiment */}
                             <View style={styles.fitRow}>
-                                <Text style={styles.fitLabel}>Board Sentiment</Text>
+                                <Text style={styles.fitLabel}>{t('action.boardSentiment')}</Text>
                                 <View style={[styles.sentimentBadge, { backgroundColor: sentimentColor + '20' }]}>
                                     <Text style={[styles.sentimentText, { color: sentimentColor }]}>
                                         {company.boardSentiment.toUpperCase()}
@@ -108,14 +110,14 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
                     {/* Bottom Action */}
                     <View style={styles.footer}>
                         <View style={styles.priceContainer}>
-                            <Text style={styles.priceLabel}>ASKING PRICE</Text>
+                            <Text style={styles.priceLabel}>{t('action.askingPrice')}</Text>
                             <Text style={styles.priceValue}>{formatMoney(company.marketCap * company.acquisitionPremium)}</Text>
                         </View>
                         <Pressable
                             style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}
                             onPress={() => onAcquire(company)}
                         >
-                            <Text style={styles.buyButtonText}>START NEGOTIATIONS</Text>
+                            <Text style={styles.buyButtonText}>{t('action.startNegotiations')}</Text>
                         </Pressable>
                     </View>
                 </View>

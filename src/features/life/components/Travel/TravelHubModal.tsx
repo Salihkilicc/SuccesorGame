@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -37,6 +38,7 @@ const TravelHubModal = ({
     onOpenCollection,
     onHomePress
 }: TravelHubModalProps) => {
+    useLocale();
 
     if (!visible) return null;
 
@@ -46,9 +48,9 @@ const TravelHubModal = ({
                 {/* Header */}
                 <View style={styles.header}>
                     <Pressable onPress={onClose} style={styles.headerButton}>
-                        <Text style={styles.headerButtonText}>CLOSE</Text>
+                        <Text style={styles.headerButtonText}>{t('life.close2')}</Text>
                     </Pressable>
-                    <Text style={styles.headerTitle}>WORLD TRAVEL</Text>
+                    <Text style={styles.headerTitle}>{t('life.worldTravel')}</Text>
                     <Pressable onPress={onOpenCollection} style={styles.headerButton}>
                         <Text style={styles.headerIcon}>🎒</Text>
                     </Pressable>

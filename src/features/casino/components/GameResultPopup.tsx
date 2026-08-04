@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 import GameModal from '../../../components/common/GameModal';
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const GameResultPopup = ({ result, onHide }: Props) => {
+    useLocale();
   // If result is null, modal is not visible
   const visible = !!result;
 
@@ -50,7 +52,7 @@ const GameResultPopup = ({ result, onHide }: Props) => {
           <Text style={[styles.amount, { color }]}>
             {sign}${result.amount.toLocaleString()}
           </Text>
-          <Text style={styles.tapText}>Tap to close</Text>
+          <Text style={styles.tapText}>{t('ui.tapToClose')}</Text>
         </View>
       </Pressable>
     </GameModal>

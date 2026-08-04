@@ -1,6 +1,7 @@
 // src/screens/MyCompany/MyCompanyScreen.tsx
 
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, ScrollView, StyleSheet, Text, Pressable, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +13,8 @@ import { useProductStore } from '../../../core/store/useProductStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
+import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
+import { IPO_MIN_VALUATION, quoteIpo } from '../../../core/market/equity';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
@@ -46,6 +49,7 @@ const formatCompactNumber = (num: number) => {
 };
 
 const MyCompanyScreen = () => {
+    useLocale();
   // Navigation'a <any> veriyoruz ki TypeScript hata vermesin
   const navigation = useNavigation<any>();
 
@@ -94,54 +98,70 @@ const MyCompanyScreen = () => {
   const goPublic = useEquityStore((state) => state.goPublic);
 
   const handleLaunchIPO = () => {
-    // Validation
-    if (stats.companyValue <= 0) {
-      Alert.alert('Cannot Launch IPO', 'Company valuation must be greater than $0.');
+    // ------------------------------------------------------------------
+    //  HALKA ARZ
+    // ------------------------------------------------------------------
+    //  ESKI EKRAN YANLIS SEY VAAD EDIYORDU: "degerlemenin %20'si kadar
+    //  nakit, sahiplik %80'e duser". Ikisi de yanlisti — oyuncu zaten
+    //  %100'e sahip degildi (%65), ve gercek bir halka arzda paranin
+    //  tamami sirkete girmez.
+    //
+    //  Artik teklif gercek maliyetleriyle gosteriliyor: aracilik
+    //  komisyonu ve halka arz iskontosu dahil.
+    // ------------------------------------------------------------------
+    const cap = useShareholderStore.getState();
+    const quote = quoteIpo(stats.companyValue, cap.totalShares, cap.playerShareCount, 0.20);
+
+    if (stats.companyValue < IPO_MIN_VALUATION) {
+      Alert.alert(
+        t('alert.notReadyToList'),
+        `Underwriters will not take a company public below ${formatMoney(IPO_MIN_VALUATION)} in valuation.\n\n` +
+        `You are at ${formatMoney(stats.companyValue)}. Grow revenue and profit first — the multiple follows.`
+      );
       return;
     }
 
-    // Calculate IPO details
-    const cashRaised = stats.companyValue * 0.20;
-
-    // Show confirmation dialog
     Alert.alert(
-      '🔔 Launch IPO',
-      `Going public will:\n\n` +
-      `• Sell 20% of shares to public investors\n` +
-      `• Raise ${formatMoney(cashRaised)} in capital\n` +
-      `• Reduce your ownership to 80%\n` +
-      `• Apply 1.5x IPO hype multiplier\n\n` +
-      `Company Valuation: ${formatMoney(stats.companyValue)}\n\n` +
-      `Are you ready to go public?`,
+      t('alert.launchIpo'),
+      `Selling 20% of the company to public investors.\n\n` +
+      `Fair value per share    ${formatPrice(quote.fairPrice)}\n` +
+      `Offer price (−12%)      ${formatPrice(quote.offerPrice)}\n` +
+      `Gross proceeds          ${formatMoney(quote.grossProceeds)}\n` +
+      `Underwriting fee (7%)   −${formatMoney(quote.underwritingFee)}\n` +
+      `Net to the company      ${formatMoney(quote.netProceeds)}\n\n` +
+      `Your ownership: ${stats.companyOwnership.toFixed(1)}% → ${quote.playerOwnershipAfter.toFixed(1)}%\n\n` +
+      `The shares are priced below fair value on purpose so the book fills. ` +
+      `That ${formatMoney(quote.moneyLeftOnTable)} is the cost of listing.\n\n` +
+      `Once public your multiples rise, but the market reprices you every quarter.`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('company.notYet'), style: 'cancel' },
         {
-          text: 'Launch IPO',
-          style: 'default',
+          text: t('company.launchIpo'),
           onPress: () => {
-            // Execute IPO via Equity Store
             const result = goPublic(
               stats.companyValue,
               (amount) => {
                 const currentCapital = useStatsStore.getState().companyCapital;
                 stats.update({ companyCapital: currentCapital + amount });
-              }
+              },
+              0.20,
             );
 
-            // Update stats ownership and status (sync)
+            if (result.error) {
+              Alert.alert(t('alert.cannotLaunchIpo'), result.error);
+              return;
+            }
+
             stats.update({
               companyOwnership: result.newOwnershipPercent,
               isPublic: true,
             });
 
-            console.log('[MyCompanyScreen] IPO Executed:', result);
-
-            // Success feedback
             Alert.alert(
-              '🎉 IPO Successful!',
-              `You raised ${formatMoney(result.cashRaised)}!\n\n` +
-              `The market is now open for trading.\n` +
-              `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+              t('alert.ipoComplete'),
+              `${formatMoney(result.cashRaised)} raised, after ${formatMoney(result.fee)} in fees.\n\n` +
+              `Your ownership is now ${result.newOwnershipPercent.toFixed(1)}%.\n\n` +
+              `You are a public company. Every quarter is now a scorecard.`
             );
           },
         },
@@ -172,7 +192,7 @@ const MyCompanyScreen = () => {
           </Pressable>
 
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>COMMAND CENTER</Text>
+            <Text style={styles.headerTitle}>{t('company.commandCenter')}</Text>
             <View style={styles.headerAccent} />
           </View>
         </View>
@@ -182,7 +202,7 @@ const MyCompanyScreen = () => {
 
           {/* COMPANY STATS CARD */}
           <DashboardCard
-            title="My Company"
+            title={t('company.myCompany')}
             rightContent={
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <Text style={styles.sharePrice}>{formatPrice(stockPrice)}</Text>
@@ -194,11 +214,11 @@ const MyCompanyScreen = () => {
           >
             {/* Row 1: Finances */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-              <StatColumn label="Valuation" value={formatCurrency(stats.companyValue)} />
+              <StatColumn label={t('company.valuation')} value={formatCurrency(stats.companyValue)} />
               <VerticalDivider />
-              <StatColumn label="Capital" value={formatCurrency(stats.companyCapital)} />
+              <StatColumn label={t('company.capital')} value={formatCurrency(stats.companyCapital)} />
               <VerticalDivider />
-              <StatColumn label="CEO Cash" value={formatCurrency(stats.money)} colorType="success" />
+              <StatColumn label={t('company.ceoCash')} value={formatCurrency(stats.money)} colorType="success" />
             </View>
 
             {/* Divider */}
@@ -206,13 +226,13 @@ const MyCompanyScreen = () => {
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-              <StatColumn label="Outstanding" value={formatCompactNumber(totalShares || 10_000_000)} />
+              <StatColumn label={t('company.outstanding')} value={formatCompactNumber(totalShares || 10_000_000)} />
               <VerticalDivider />
-              <StatColumn label="Your Shares" value={formatCompactNumber(playerShareCount || 0)} />
+              <StatColumn label={t('company.yourShares')} value={formatCompactNumber(playerShareCount || 0)} />
               <VerticalDivider />
               {/* Ownership % */}
               <StatColumn
-                label="Ownership"
+                label={t('company.ownership')}
                 value={`${((playerShareCount || 0) / (totalShares || 10_000_000) * 100).toFixed(1)}%`}
                 colorType={stats.companyOwnership >= 51 ? 'success' : 'danger'}
               />
@@ -225,14 +245,14 @@ const MyCompanyScreen = () => {
                 Bkz. core/market/productMarkets.ts */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
               <StatColumn
-                label="Brand Value"
+                label={t('company.brandValue')}
                 value={`${stats.brandValue}/100`}
                 colorType={stats.brandValue >= 40 ? 'success' : 'default'}
               />
               <VerticalDivider />
-              <StatColumn label="Employees" value={formatCompactNumber(stats.employeeCount)} />
+              <StatColumn label={t('company.employees')} value={formatCompactNumber(stats.employeeCount)} />
               <VerticalDivider />
-              <StatColumn label="Morale" value={`${Math.round(employeeMorale)}%`} colorType={employeeMorale >= 50 ? 'success' : 'danger'} />
+              <StatColumn label={t('company.morale')} value={`${Math.round(employeeMorale)}%`} colorType={employeeMorale >= 50 ? 'success' : 'danger'} />
             </View>
           </DashboardCard>
 
@@ -240,7 +260,7 @@ const MyCompanyScreen = () => {
           <View style={styles.grid}>
             <DepartmentCard
               icon="🏦"
-              title="Finance"
+              title={t('company.finance')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => toggleModal('finance', true)}
               color="rgba(255, 215, 0, 0.5)" // Gold
@@ -248,7 +268,7 @@ const MyCompanyScreen = () => {
 
             <DepartmentCard
               icon="🏭"
-              title="Products"
+              title={t('company.products')}
               subtitle={`${activeProductsCount} Active`}
               onPress={() => navigation.navigate('Products')}
               color="rgba(10, 132, 255, 0.5)" // Blue
@@ -256,14 +276,14 @@ const MyCompanyScreen = () => {
 
             <DepartmentCard
               icon="📊"
-              title="Financial Report"
-              subtitle="Expenses, Profits & ROI"
+              title={t('company.financialReport')}
+              subtitle={t('company.expensesProfitsRoi')}
               onPress={() => navigation.navigate('FinancialReport')}
               color="rgba(191, 90, 242, 0.5)" // Purple
             />
             <DepartmentCard
               icon="📈"
-              title="Stock Market"
+              title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => toggleModal('shareControl', true)}
               color="rgba(48, 209, 88, 0.5)" // Green
@@ -275,7 +295,7 @@ const MyCompanyScreen = () => {
           {/* Fabrika +1/-1 butonlari ve "Employees" kartinin sayi kontrolu
               kaldirildi. Kapasite artik tesis KADEMESINDEN geliyor ve kadro
               HEDEF olarak veriliyor — bkz. core/market/capacity.ts */}
-          <SectionHeader title="OPERATIONS" />
+          <SectionHeader title={t('company.operations')} />
           <FacilityPanel />
 
           <View style={{ marginTop: 12 }}>
@@ -287,12 +307,12 @@ const MyCompanyScreen = () => {
           </View>
 
           {/* QUICK ACTIONS */}
-          <SectionHeader title="QUICK ACTIONS" />
+          <SectionHeader title={t('company.quickActions')} />
           <View style={{ gap: 8 }}>
-            <SectionCard title="🔬 R&D Investment" subtitle="Invest in future growth" onPress={() => navigation.navigate('Research')} />
-            <SectionCard title="🏢 Hostile Takeover" subtitle="Buy public companies to gain their tech and buffs" onPress={() => toggleModal('acquire', true)} />
-            <SectionCard title="👔 Board Members" subtitle="View shareholders" onPress={() => toggleModal('boardMembers', true)} />
-            <SectionCard title="🏆 My Empire" subtitle="Manage subsidiaries" onPress={() => toggleModal('existingCompanies', true)} />
+            <SectionCard title="🔬 R&D Investment" subtitle={t('company.investInFutureGrowth')} onPress={() => navigation.navigate('Research')} />
+            <SectionCard title="🏢 Hostile Takeover" subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => toggleModal('acquire', true)} />
+            <SectionCard title="👔 Board Members" subtitle={t('company.viewShareholders')} onPress={() => toggleModal('boardMembers', true)} />
+            <SectionCard title="🏆 My Empire" subtitle={t('company.manageSubsidiaries')} onPress={() => toggleModal('existingCompanies', true)} />
           </View>
 
         </ScrollView>
@@ -309,8 +329,30 @@ const MyCompanyScreen = () => {
           selectedShareholder={selectedShareholder}
           financeActions={{
             borrowConfig, setBorrowConfig, repayConfig, setRepayConfig,
-            handleBorrow: (amt: number, rate: number) => { stats.borrowCapital(amt, rate); setBorrowConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); },
-            handleRepay: (amt: number) => { stats.repayCapital(amt); setRepayConfig(p => ({ ...p, visible: false })); setTimeout(() => toggleModal('finance', true), 300); }
+            // TEK KAPI: takeLoan. Once `borrowCapital` cagriliyordu ve
+            // olusan borcun taksiti hic kesilmiyordu.
+            handleBorrow: (amt: number, _rate: number) => {
+              const res = useCorporateFinanceStore.getState().takeLoan(
+                amt, 0, 'term', 0,
+                (n: number) => stats.update({ companyCapital: (stats.companyCapital || 0) + n }),
+              );
+              if (!res.success) { Alert.alert(t('alert.loanDeclined'), res.message); return; }
+              setBorrowConfig(p => ({ ...p, visible: false }));
+              setTimeout(() => toggleModal('finance', true), 300);
+            },
+            handleRepay: (amt: number) => {
+              // En eski krediden basla — gercek hayatta da once pahali
+              // olan kapatilir, ama basit ve ongorulebilir olsun diye
+              // siradaki ilk krediyi kapatiyoruz.
+              const fin = useCorporateFinanceStore.getState();
+              const first = fin.loans[0];
+              if (first) {
+                fin.repayLoan(first.id, amt, (n: number) =>
+                  stats.update({ companyCapital: (stats.companyCapital || 0) - n }));
+              }
+              setRepayConfig(p => ({ ...p, visible: false }));
+              setTimeout(() => toggleModal('finance', true), 300);
+            }
           }}
           shareActions={{
             onOpenAction: (type: string) => { toggleModal('shareControl', false); setTimeout(() => setActiveShareAction(type), 300); },

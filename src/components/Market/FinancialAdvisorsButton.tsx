@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import { formatMoney } from '../../core/utils';
 
 const ADVISORS = [
-  { name: 'Elite Advisor', fee: 50_000 },
-  { name: 'Senior Analyst', fee: 20_000 },
-  { name: 'Junior Advisor', fee: 5_000 },
+  { name: t('market.eliteAdvisor'), fee: 50_000 },
+  { name: t('market.seniorAnalyst'), fee: 20_000 },
+  { name: t('market.juniorAdvisor'), fee: 5_000 },
 ];
 
 const FinancialAdvisorsButton = () => {
+    useLocale();
   const [visible, setVisible] = useState(false);
 
   const handleSelect = (advisor: (typeof ADVISORS)[number]) => {
@@ -23,8 +25,8 @@ const FinancialAdvisorsButton = () => {
         onPress={() => setVisible(true)}
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text style={styles.title}>Financial Advisors</Text>
-          <Text style={styles.subtitle}>Premium insights on demand.</Text>
+          <Text style={styles.title}>{t('market.financialAdvisors')}</Text>
+          <Text style={styles.subtitle}>{t('market.premiumInsightsOnDemand')}</Text>
         </View>
         <Text style={styles.chevron}>›</Text>
       </Pressable>
@@ -33,7 +35,7 @@ const FinancialAdvisorsButton = () => {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Financial Advisors</Text>
+              <Text style={styles.modalTitle}>{t('market.financialAdvisors')}</Text>
               <Pressable
                 onPress={() => setVisible(false)}
                 style={({ pressed }) => [styles.closeCircle, pressed && styles.closeCirclePressed]}>
@@ -57,7 +59,7 @@ const FinancialAdvisorsButton = () => {
             <Pressable
               onPress={() => setVisible(false)}
               style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-              <Text style={styles.closeButtonText}>Close</Text>
+              <Text style={styles.closeButtonText}>{t('market.close')}</Text>
             </Pressable>
           </View>
         </View>

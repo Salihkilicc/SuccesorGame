@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -17,6 +18,7 @@ type PregnancyRevealModalProps = {
 const { width } = Dimensions.get('window');
 
 const PregnancyRevealModal = ({ visible, onClose }: PregnancyRevealModalProps) => {
+    useLocale();
     if (!visible) return null;
 
     return (
@@ -31,18 +33,14 @@ const PregnancyRevealModal = ({ visible, onClose }: PregnancyRevealModalProps) =
                         <Text style={styles.icon}>⏸️</Text>
                     </View>
 
-                    <Text style={styles.title}>Unexpected News...</Text>
+                    <Text style={styles.title}>{t('life.unexpectedNews')}</Text>
 
-                    <Text style={styles.description}>
-                        Your wild night has left a permanent mark. You are going to be a parent.
-                    </Text>
+                    <Text style={styles.description}>{t('life.yourWildNightHasLeft')}</Text>
 
-                    <Text style={styles.subtext}>
-                        A few weeks later, you receive a message that changes everything.
-                    </Text>
+                    <Text style={styles.subtext}>{t('life.aFewWeeksLaterYou')}</Text>
 
                     <Pressable onPress={onClose} style={styles.button}>
-                        <Text style={styles.buttonText}>Process this...</Text>
+                        <Text style={styles.buttonText}>{t('life.processThis')}</Text>
                     </Pressable>
                 </View>
             </View>

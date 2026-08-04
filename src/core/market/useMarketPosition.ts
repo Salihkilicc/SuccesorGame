@@ -37,6 +37,8 @@ export interface MarketPlayer {
     share: number;
     strength?: number;
     isPlayer: boolean;
+    /** Satin alinmis bir rakip mi — artik senin */
+    owned?: boolean;
 }
 
 export interface MarketPosition {
@@ -51,6 +53,10 @@ export interface MarketPosition {
     playerRank: number;
     /** Kimseye ait olmayan pay — "digerleri" */
     unclaimedShare: number;
+    /** Satin alinan rakiplerin toplam payi */
+    ownedShare: number;
+    /** Oyuncunun kendi payi + satin aldiklarinin payi */
+    groupShare: number;
 }
 
 /**
@@ -60,15 +66,29 @@ export interface MarketPosition {
  * birinden pay almasi gerekir, yoksa toplam %100'u asar ve tablo sacmalar.
  * Oyuncunun payi rakiplerden ORANTILI olarak dusulur.
  */
-const buildRanking = (market: ProductMarket, playerShare: number): MarketPlayer[] => {
-    const rawCompetitorTotal = competitorShareTotal(market);
+const buildRanking = (
+    market: ProductMarket,
+    playerShare: number,
+    acquiredIds: string[] = [],
+): MarketPlayer[] => {
+    // SATIN ALINAN RAKIPLER ARTIK RAKIP DEGIL.
+    //
+    // HATA BUYDU: motor payi dogru devrediyordu (attraction.ts icinde
+    // satin alinan sirketin cekiciligi oyuncuya geciyor), ama BU EKRAN
+    // bunu bilmiyordu. StartApp IO'yu aldiktan sonra tabloda hala
+    // "rakip, %1.2" olarak duruyordu ve oyuncu "payini alamadim"
+    // diye gordu.
+    const owned = market.competitors.filter(c => acquiredIds.includes(c.stockId));
+    const stillRivals = market.competitors.filter(c => !acquiredIds.includes(c.stockId));
+
+    const rawCompetitorTotal = stillRivals.reduce((sum, c) => sum + c.share, 0);
     const availableForCompetitors = Math.max(0, 100 - playerShare);
     // Rakipler kalan alana sigacak sekilde orantili kucultulur.
     const scale = rawCompetitorTotal > 0
         ? Math.min(1, availableForCompetitors / rawCompetitorTotal)
         : 0;
 
-    const players: MarketPlayer[] = market.competitors.map(c => ({
+    const players: MarketPlayer[] = stillRivals.map(c => ({
         id: c.stockId,
         name: c.name,
         symbol: c.symbol,
@@ -76,6 +96,19 @@ const buildRanking = (market: ProductMarket, playerShare: number): MarketPlayer[
         strength: c.strength,
         isPlayer: false,
     }));
+
+    // Satin alinanlar ayri gosterilir: senin, ama ayri bir marka.
+    owned.forEach(c => {
+        players.push({
+            id: c.stockId,
+            name: c.name,
+            symbol: c.symbol,
+            share: c.share * scale,
+            strength: c.strength,
+            isPlayer: false,
+            owned: true,
+        });
+    });
 
     players.push({
         id: 'player',
@@ -91,6 +124,7 @@ const buildRanking = (market: ProductMarket, playerShare: number): MarketPlayer[
 export const getMarketPosition = (
     category: string | undefined,
     productLines: { category?: string; sold: number }[],
+    acquiredIds: string[] = [],
 ): MarketPosition | null => {
     const market = getMarket(category);
     if (!market) return null;
@@ -105,9 +139,10 @@ export const getMarketPosition = (
     // %100'u asamaz; pazardan fazla satamazsin.
     const playerShare = Math.min(100, rawShare);
 
-    const ranking = buildRanking(market, playerShare);
+    const ranking = buildRanking(market, playerShare, acquiredIds);
     const playerRank = ranking.findIndex(p => p.isPlayer) + 1;
     const claimed = ranking.reduce((sum, p) => sum + p.share, 0);
+    const ownedShare = ranking.filter(p => p.owned).reduce((sum, p) => sum + p.share, 0);
 
     return {
         market,
@@ -116,7 +151,19 @@ export const getMarketPosition = (
         ranking,
         playerRank,
         unclaimedShare: Math.max(0, 100 - claimed),
+        ownedShare,
+        groupShare: playerShare + ownedShare,
     };
+};
+
+/** Satin alinan rakiplerin id listesi — tek kaynak. */
+const acquiredCompetitorIds = (): string[] => {
+    try {
+        const mod = require('../../features/finance/stores/useCorporateFinanceStore');
+        return mod.useCorporateFinanceStore.getState().subsidiaries.map((s: any) => s.id);
+    } catch {
+        return [];
+    }
 };
 
 /**
@@ -126,15 +173,16 @@ export const getMarketPosition = (
  */
 export const useMarketPosition = (category: string | undefined): MarketPosition | null => {
     const report = normalizeQuarterReport(useGameStore(state => state.lastQuarterReport));
-    return getMarketPosition(category, report?.products ?? []);
+    return getMarketPosition(category, report?.products ?? [], acquiredCompetitorIds());
 };
 
 /** Tum kategorilerin konumu — genel bakis ekranlari icin. */
 export const useAllMarketPositions = (): MarketPosition[] => {
     const report = normalizeQuarterReport(useGameStore(state => state.lastQuarterReport));
     const lines = report?.products ?? [];
+    const acquired = acquiredCompetitorIds();
     return PRODUCT_MARKETS
-        .map(m => getMarketPosition(m.category, lines))
+        .map(m => getMarketPosition(m.category, lines, acquired))
         .filter((p): p is MarketPosition => p !== null);
 };
 

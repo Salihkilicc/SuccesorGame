@@ -1,12 +1,13 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useGymSystem, WorkoutType } from './useGymSystem';
 
 const WORKOUTS: { type: WorkoutType; icon: string; label: string; desc: string }[] = [
-    { type: 'Weights', icon: '🏋️', label: 'Weights', desc: 'Build raw power' },
-    { type: 'Yoga', icon: '🧘', label: 'Yoga', desc: 'Flexibility & balance' },
-    { type: 'Running', icon: '🏃', label: 'Running', desc: 'Cardio endurance' },
-    { type: 'Pilates', icon: '🤸', label: 'Pilates', desc: 'Core strength' },
+    { type: 'Weights', icon: '🏋️', label: t('life.weights'), desc: t('life.buildRawPower') },
+    { type: 'Yoga', icon: '🧘', label: t('life.yoga'), desc: t('life.flexibilityBalance') },
+    { type: 'Running', icon: '🏃', label: t('life.running'), desc: t('life.cardioEndurance') },
+    { type: 'Pilates', icon: '🤸', label: t('life.pilates'), desc: t('life.coreStrength') },
 ];
 
 /**
@@ -16,6 +17,7 @@ const WORKOUTS: { type: WorkoutType; icon: string; label: string; desc: string }
  * Each workout applies the same base formula with trainer multipliers.
  */
 const GymWorkoutConfigView = () => {
+    useLocale();
     // --- Hook Destructuring ---
     const { data, actions } = useGymSystem();
     const { stats, trainerId } = data;
@@ -47,8 +49,8 @@ const GymWorkoutConfigView = () => {
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.title}>WORKOUT</Text>
-                            <Text style={styles.subtitle}>Choose your training</Text>
+                            <Text style={styles.title}>{t('life.workout')}</Text>
+                            <Text style={styles.subtitle}>{t('life.chooseYourTraining')}</Text>
                         </View>
                         <View style={{ width: 60 }} />
                     </View>
@@ -56,19 +58,19 @@ const GymWorkoutConfigView = () => {
                     {/* Stats Summary */}
                     <View style={styles.statsCard}>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>FATIGUE</Text>
+                            <Text style={styles.statLabel}>{t('life.fatigue')}</Text>
                             <Text style={[styles.statValue, { color: fatigue > 80 ? '#FF6F00' : '#FF6F00' }]}>
                                 {fatigue}%
                             </Text>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>POTENTIAL GAIN</Text>
+                            <Text style={styles.statLabel}>{t('life.potentialGain')}</Text>
                             <Text style={styles.statValue}>+{potentialGain.toFixed(2)}</Text>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>TRAINER BOOST</Text>
+                            <Text style={styles.statLabel}>{t('life.trainerBoost')}</Text>
                             <Text style={styles.statValue}>{trainerId === 'none' ? 'None' : trainerId.toUpperCase()}</Text>
                         </View>
                     </View>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import GameButton from '../../../../../components/common/GameButton';
@@ -32,6 +33,7 @@ const HAIRCOLORS = ['Natural Black', 'Chestnut Brown', 'Platinum Blonde', 'Silve
 const COST = 200;
 
 const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFreshCut, onGoHome, activeBuffs }: GroomingLoungeModalProps) => {
+    useLocale();
     const [selectedHair, setHair] = useState(HAIRSTYLES[0]);
     const [selectedBeard, setBeard] = useState(BEARDSTYLES[0]);
     const [selectedColor, setColor] = useState(HAIRCOLORS[0]);
@@ -44,7 +46,7 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
             { charisma: usePlayerStore.getState().attributes.charm + 1 },
             'FRESH CUT',
             `You look sharp with your ${selectedHair} and ${selectedBeard}.`,
-            [{ label: 'Charisma', value: '+1', isPositive: true }]
+            [{ label: t('life.charisma'), value: '+1', isPositive: true }]
         );
     };
 
@@ -62,8 +64,8 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
                         <Text style={styles.backIcon}>←</Text>
                     </Pressable>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>GROOMING LOUNGE</Text>
-                        <Text style={styles.subtitle}>Look Sharp, Feel Lucky</Text>
+                        <Text style={styles.title}>{t('life.groomingLounge2')}</Text>
+                        <Text style={styles.subtitle}>{t('life.lookSharpFeelLucky')}</Text>
                     </View>
                     <View style={{ width: 40 }} />
                 </View>
@@ -98,21 +100,21 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
 
                     <View style={styles.divider} />
 
-                    <SectionTitle title="Hairstyle" />
+                    <SectionTitle title={t('life.hairstyle')} />
                     <SelectorGrid
                         items={HAIRSTYLES}
                         selected={selectedHair}
                         onSelect={setHair}
                     />
 
-                    <SectionTitle title="Beard Style" />
+                    <SectionTitle title={t('life.beardStyle')} />
                     <SelectorGrid
                         items={BEARDSTYLES}
                         selected={selectedBeard}
                         onSelect={setBeard}
                     />
 
-                    <SectionTitle title="Hair Color" />
+                    <SectionTitle title={t('life.hairColor')} />
                     <SelectorGrid
                         items={HAIRCOLORS}
                         selected={selectedColor}
@@ -120,7 +122,7 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
                     />
 
                     <GameButton
-                        title="Apply New Look"
+                        title={t('life.applyNewLook')}
                         variant="primary"
                         onPress={onApply}
                         style={{ marginTop: 24 }}

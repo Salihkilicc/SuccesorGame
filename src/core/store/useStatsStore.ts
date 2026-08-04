@@ -10,6 +10,7 @@ import {
   ownershipPercent,
   priceChangePercent,
   sharePrice as equitySharePrice,
+  trailingTotal,
 } from '../market/equity';
 
 export type StatKey =
@@ -27,6 +28,8 @@ export type StatKey =
   | 'companySharePrice'
   | 'companyDailyChange'
   | 'previousSharePrice'
+  | 'earningsPower'
+  | 'lossCarryforward'
   | 'companyRevenueMonthly'
   | 'companyExpensesMonthly'
   | 'companyCapital'
@@ -90,7 +93,21 @@ export interface FacilityBuild {
 
 export type StatsState = Record<StatKey, number> & {
   _hasHydrated: boolean;
+  /** Gecen ceyregin kredi notu — not dususunu yakalamak icin */
+  creditRatingPrev?: string;
+  /** Ust uste zararli ceyrek sayisi — guvensizlik oyu bunu okur */
+  lossStreak?: number;
+  /** Gecen ceyregin hisse adedi — seyreltmeme sozu bununla olculur */
+  totalSharesPrev?: number;
   facilityBuild: FacilityBuild | null;
+  /**
+   * Son dort ceyregin hasilati — degerleme TTM ile yapilir.
+   * Tek ceyregi 4'le carpmak sacma oynaklik uretiyordu (bir kotu
+   * ceyrek hisseyi %66 eritiyordu).
+   */
+  revenueHistory: number[];
+  /** Son dort ceyregin faaliyet kari */
+  ebitHistory: number[];
   shareholders: Shareholder[];
   /**
    * MAAS ORANI — piyasa maasina gore odedigin.
@@ -133,6 +150,17 @@ type StatsStore = StatsState & {
   /** Maas oranini belirler (0.75-1.35). 1.00 = piyasa. */
   setSalaryRatio: (ratio: number) => void;
   setTechLevel: (category: keyof TechLevels, level: number) => void;
+  /**
+   * EMEKLIYE AYRILDI — cagirmayin.
+   *
+   * Bu yol devralmayi yalnizca `acquisitions[]` ve `subsidiaryStates`
+   * icine yaziyordu. Motor ORAYA BAKMIYOR: pazar payi gecmiyor, hedefin
+   * kari EBIT'e girmiyor, entegrasyon/sinerji islemiyordu. Yani bu
+   * fonksiyonla alinan sirket oyunda hicbir sey yapmiyordu.
+   *
+   * Tek kapi: useCorporateFinanceStore.executeAcquisition
+   * Alan yalnizca eski kayitlar bozulmasin diye duruyor.
+   */
   addAcquisition: (id: string, companyData: { name: string; marketCap: number; profit: number }) => void;
   setIsPublic: (value: boolean) => void;
   performIPO: () => void;
@@ -149,7 +177,17 @@ type StatsStore = StatsState & {
   cancelFacilityUpgrade: () => void;
   /** Hedef kadroyu belirler. Ise alim/cikarma ceyrek sonunda islenir. */
   setTargetHeadcount: (value: number) => void;
+  /**
+   * EMEKLIYE AYRILDI — cagirmayin.
+   *
+   * Bu yol yalnizca nakit ve borc rakamini artiriyordu: kredi kaydi yok,
+   * amortisman yok, taksit yok, vade yok, sozlesme yok. Yani hangi
+   * ekrandan borclandigina gore tamamen farkli bir sistem aliyordun.
+   *
+   * Tek kapi: useCorporateFinanceStore.takeLoan
+   */
   borrowCapital: (amount: number, interestRate: number) => void;
+  /** EMEKLIYE AYRILDI — yerine useCorporateFinanceStore.repayLoan */
   repayCapital: (amount: number) => void;
   reset: () => void;
 };
@@ -231,6 +269,15 @@ export const initialStatsState: StatsState = {
   // ------------------------------------------------------------------
   facilityTier: 1,
   facilityBuild: null,
+  revenueHistory: [],
+  ebitHistory: [],
+  /** Yumusatilmis TTM EBIT — piyasanin fiyatladigi "kazanc gucu" */
+  earningsPower: 0,
+  /** Ileriye tasinan zarar — sonraki karli ceyreklerde matrahtan duser */
+  lossCarryforward: 0,
+  creditRatingPrev: '',
+  lossStreak: 0,
+  totalSharesPrev: 0,
   targetHeadcount: START_EMPLOYEES,
   incomingHires: 0,
   /** Ortalama kidem (ceyrek). Deneyim primi buradan gelir. */
@@ -301,7 +348,15 @@ const recalculateFinancials = (currentState: StatsStore) => {
     factoryCost *= 0.9;
   }
 
-  const debtInterest = (companyDebtTotal * 0.05) / 12; // Approx 5% annual interest base
+  // Faiz orani kredi skorundan gelir — motorla AYNI kaynak.
+  // Once burada da sabit %5 vardi ve ekranda gosterilen gider motorun
+  // gercekten tahsil ettiginden farkli cikiyordu.
+  let annualRate = 0.05;
+  try {
+    annualRate = require('../../features/finance/stores/useCorporateFinanceStore')
+      .useCorporateFinanceStore.getState().getInterestRate();
+  } catch { /* varsayilan oran */ }
+  const debtInterest = (companyDebtTotal * annualRate) / 12;
   const totalExpenses = salaryCost + factoryCost + debtInterest;
 
   // 2. Calculate Revenue (from Product Store)
@@ -316,10 +371,22 @@ const recalculateFinancials = (currentState: StatsStore) => {
   //    burasi:     aylikCiro x 12 x carpan + sermaye
   //  Motor her ceyrek bunun uzerine yaziyordu, yani buradaki hic
   //  gecerli olmuyordu. Artik ikisi de ayni fonksiyonu cagiriyor.
+  //  TTM (son dort ceyrek). Gecmis henuz yoksa mevcut aylik rakamdan
+  //  yila tamamlanir — ilk ceyreklerde de makul bir deger cikar.
+  const revHist = currentState.revenueHistory ?? [];
+  const ebitHist = currentState.ebitHistory ?? [];
+  const ttmRevenue = revHist.length ? trailingTotal(revHist) : totalRevenue * 12;
+  //  Kazanc gucu: motorun sakladigi yumusatilmis deger. Henuz yoksa
+  //  ham TTM'e duser.
+  const rawTtmEbit = ebitHist.length
+    ? trailingTotal(ebitHist)
+    : (totalRevenue - totalExpenses) * 12;
+  const ttmEbit = currentState.earningsPower || rawTtmEbit;
+
   const valuationBreakdown = companyValuation({
     cash: companyCapital,
-    quarterRevenue: totalRevenue * 3, // aylik -> ceyreklik
-    quarterEbit: (totalRevenue - totalExpenses) * 3,
+    ttmRevenue,
+    ttmEbit,
     debt: companyDebtTotal,
     isPublic,
     brandValue: currentState.brandValue ?? 0,
@@ -333,8 +400,11 @@ const recalculateFinancials = (currentState: StatsStore) => {
   // Ust seviye import donguye girip TypeScript'in tip cikarimini
   // bozuyordu (`never[]`). require ile dongu calisma zamaninda cozuluyor.
   const capTable = getShareholderState();
-  const capTableShares = capTable.totalShares || BASE_SHARES;
-  const currentTotalShares = capTableShares * Math.pow(10, stockSplitCount);
+  // BOLUNME ARTIK BURADA CARPILMIYOR. `performStockSplit` kap tablosunun
+  // KENDISINI 10 katina cikariyor, yani `stockSplitCount` ile bir daha
+  // carpmak ayni bolunmeyi IKI KEZ saymak olurdu. Sayac yalnizca gecmis
+  // kaydi olarak duruyor.
+  const currentTotalShares = capTable.totalShares || BASE_SHARES;
   const price = Math.max(0.01, equitySharePrice(valuation, currentTotalShares));
 
   // Return partial state update
@@ -441,6 +511,10 @@ export const useStatsStore = create<StatsStore>()(
 
       addAcquisition: (id, companyData) =>
         set(state => {
+          console.warn(
+            '[StatsStore] addAcquisition is retired — the engine does not read this. ' +
+            'Use useCorporateFinanceStore.executeAcquisition instead.'
+          );
           const purchasePrice = companyData.marketCap * 1.15; // Assume 15% premium
 
           const subsidiaryState: SubsidiaryState = {
@@ -496,13 +570,43 @@ export const useStatsStore = create<StatsStore>()(
           return { ...nextState, ...financials };
         }),
 
+      /**
+       * HISSE BOLUNMESI (10'a 1).
+       *
+       * ONCE SADECE YARIM CALISIYORDU: yalnizca `stockSplitCount` artiyordu
+       * ve bu sayac SADECE bu dosyadaki `recalculateFinancials` icinde
+       * kullaniliyordu. Gercek kap tablosu (useShareholderStore.totalShares
+       * ve uyelerin adetleri) hic degismiyordu.
+       *
+       * Sonuc: ayni sirket icin IKI FARKLI hisse adedi. Stock ekrani birini,
+       * temettu/geri alim digerini kullaniyordu — yani bolunme "tam olarak
+       * calismiyor" gorunuyordu. Dogru gorulmus.
+       *
+       * SIMDI: bolunme kap tablosunda gercekten yapilir. Herkesin adedi
+       * 10 katina cikar, fiyat 10'a bolunur, kimsenin YUZDESI degismez.
+       * Bolunmenin tanimi zaten budur: pastanin dilim sayisi artar, pasta
+       * ayni kalir. Degeri degistirmez, hisseyi ulasilabilir kilar.
+       */
       performStockSplit: () =>
         set(state => {
-          if (state.companySharePrice <= 1000) return state; // Only split if > $1000
+          if (state.companySharePrice <= 1000) return state;
+
+          const RATIO = 10;
+          const sh = require('../../features/shareholders/stores/useShareholderStore').useShareholderStore;
+          const cap = sh.getState();
+          sh.setState({
+            totalShares: (cap.totalShares || 10_000_000) * RATIO,
+            playerShareCount: (cap.playerShareCount || 0) * RATIO,
+            members: (cap.members || []).map((m: any) => ({
+              ...m,
+              shareCount: (m.shareCount || 0) * RATIO,
+            })),
+          });
 
           const nextState = {
             ...state,
             stockSplitCount: state.stockSplitCount + 1,
+            companySharePrice: state.companySharePrice / RATIO,
           } as StatsStore;
 
           const financials = recalculateFinancials(nextState);
@@ -676,6 +780,10 @@ export const useStatsStore = create<StatsStore>()(
 
       borrowCapital: (amount, interestRate) =>
         set(state => {
+          console.warn(
+            '[StatsStore] borrowCapital is retired — no amortisation, no covenant. ' +
+            'Use useCorporateFinanceStore.takeLoan instead.'
+          );
           // Interest is handled in recalculateFinancials based on TotalDebt
           // But here we need to update Capital and Debt first
           const nextState = {
@@ -792,6 +900,13 @@ export const useStatsStore = create<StatsStore>()(
         factoryCount: state.factoryCount,
         facilityTier: state.facilityTier,
         facilityBuild: state.facilityBuild,
+        revenueHistory: state.revenueHistory,
+        ebitHistory: state.ebitHistory,
+        earningsPower: state.earningsPower,
+        lossCarryforward: state.lossCarryforward,
+        creditRatingPrev: state.creditRatingPrev,
+        lossStreak: state.lossStreak,
+        totalSharesPrev: state.totalSharesPrev,
         targetHeadcount: state.targetHeadcount,
         incomingHires: state.incomingHires,
         avgTenureQuarters: state.avgTenureQuarters,
@@ -813,6 +928,10 @@ export const useStatsStore = create<StatsStore>()(
             state.facilityTier = 1;
           }
           if (state.facilityBuild === undefined) state.facilityBuild = null;
+          if (!Array.isArray(state.revenueHistory)) state.revenueHistory = [];
+          if (!Array.isArray(state.ebitHistory)) state.ebitHistory = [];
+          if (typeof state.earningsPower !== 'number') state.earningsPower = 0;
+          if (typeof state.lossCarryforward !== 'number') state.lossCarryforward = 0;
           if (typeof state.targetHeadcount !== 'number') {
             state.targetHeadcount = state.employeeCount || 0;
           }

@@ -3,6 +3,25 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
 import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import {
+    BoardEvent,
+    BoardPromise,
+    CompanyContext,
+    GovMember,
+    OVERRIDE_RESIGN_CHANCE,
+    OVERRIDE_TRUST_COST,
+    Proposal,
+    VoteResult,
+    boardMoodFrom,
+    decayTrust,
+    castVotes,
+    checkNoConfidence,
+    lobbyMember,
+    requiresVote,
+    resolvePromise,
+    trustDelta,
+    voteNoConfidence,
+} from '../../../core/market/governance';
 import { formatMoney, formatNumber } from '../../../core/utils';
 
 
@@ -68,7 +87,17 @@ interface ShareholderState {
     members: BoardMember[];
     totalShares: number; // Total shares in company (e.g., 10,000,000)
     playerShareCount: number; // Absolute share count owned by player (e.g., 6,500,000)
-    boardMood: TraitType; // The dominant personality of the board
+    /**
+     * Kurulun BASKIN HUYU (hisse agirlikli). Bu bir "hava" degil, kurulun
+     * karakteri: cogunlugu Conservative olan bir kurul farkli sey ister.
+     */
+    boardMood: TraitType;
+    /**
+     * Kurulun SANA KARSI TAVRI — ortalama guvenden gelir.
+     * Bunlar iki AYRI kavram ve baslangicta ayni alani paylasiyorlardi.
+     * Kurul Conservative olabilir ve yine de seni destekliyor olabilir.
+     */
+    boardStance: 'Supportive' | 'Neutral' | 'Restless' | 'Hostile';
     sharkLoans: SharkLoan[]; // Active predatory loans
 
     // Actions
@@ -91,6 +120,37 @@ interface ShareholderState {
     sellSharesToMember: (memberId: string, shareCount: number, priceMultiplier: number) => { success: boolean; message: string; sharesSold: number };
 
     // Helper Selectors
+    // ================= YONETISIM (bkz. core/market/governance.ts) =========
+    /** Verilen ve henuz kapanmamis sozler */
+    promises: BoardPromise[];
+    /** Bu ceyrek kimlere lobi yapildi: memberId -> egilim katkisi */
+    lobbied: Record<string, number>;
+    /** Son oylamanin sonucu — ekranda gosterilir */
+    lastVote?: VoteResult & { title: string };
+    /** CEO gorevden alindi mi */
+    ceoRemoved: boolean;
+    /** Guvensizlik oyunun kac kosulu saglandi (erken uyari) */
+    noConfidenceLevel: number;
+    /** Kurulun bu ceyrek gordugu olaylar — rapor ekraninda listelenir */
+    boardLog: { label: string; effect: string }[];
+
+    /** Bir olayi kurula bildir: dereceli, baglamli tepki */
+    applyBoardEvent: (event: BoardEvent, ctx: CompanyContext) => void;
+    /** Bu karar oya gitmeli mi */
+    needsVote: (proposal: Proposal) => { required: boolean; reason: string };
+    /** Oylamayi yurut */
+    holdVote: (proposal: Proposal, ctx: CompanyContext) => VoteResult;
+    /** Bir uyeye lobi yap */
+    lobby: (memberId: string, proposal: Proposal) => ReturnType<typeof lobbyMember>;
+    /** Soz ver */
+    makePromise: (memberId: string, kind: BoardPromise['kind'], dueQuarter: number, magnitude: number, description: string) => void;
+    /** Vadesi gelen sozleri degerlendir */
+    settlePromises: (currentQuarter: number, keptKinds: BoardPromise['kind'][], ctx: CompanyContext) => void;
+    /** Guvensizlik kontrolu — ceyrek sonunda */
+    runNoConfidence: (ctx: CompanyContext) => { called: boolean; removed: boolean; result?: VoteResult; warning?: string };
+    /** Ceyrek basinda lobi ve gunlugu temizle */
+    resetQuarterlyBoard: () => void;
+
     getPlayerOwnershipPercent: () => number;
     getMemberOwnershipPercent: (memberId: string) => number;
 }
@@ -181,6 +241,23 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
 // ZUSTAND STORE
 // ============================================================================
 
+/**
+ * Yonetisim olayini hisse fiyatina isle.
+ * Zaten kurulmus olan sinyal borusundan gecer (marketMultiplier).
+ */
+const applyGovernanceSignal = (key: string) => {
+    try {
+        const { GOVERNANCE_SIGNALS } = require('../../../core/market/governance');
+        const sig = GOVERNANCE_SIGNALS[key];
+        if (!sig) return;
+        const eq = require('../../finance/stores/useEquityStore').useEquityStore;
+        const cur = eq.getState().marketMultiplier || 1;
+        eq.setState({
+            marketMultiplier: Math.max(0.3, cur * (1 + sig.impactPercent / 100)),
+        });
+    } catch { /* piyasa sinyali uygulanamadi */ }
+};
+
 export const useShareholderStore = create<ShareholderState>()(
     persist(
         (set, get) => ({
@@ -190,7 +267,8 @@ export const useShareholderStore = create<ShareholderState>()(
             members: [] as BoardMember[],
             totalShares: TOTAL_SHARES,
             playerShareCount: 6_500_000, // 65% of 10M
-            boardMood: 'Conservative', // Default mood
+            boardMood: 'Conservative',
+            boardStance: 'Neutral' as const,
             sharkLoans: [] as SharkLoan[], // No loans initially
 
             // ========================================================================
@@ -201,6 +279,12 @@ export const useShareholderStore = create<ShareholderState>()(
              * Initialize the game with default board members and player shares.
              * Player starts with 6.5M shares (65%), NPCs hold 3.5M (35%).
              */
+            promises: [] as BoardPromise[],
+            lobbied: {} as Record<string, number>,
+            ceoRemoved: false,
+            noConfidenceLevel: 0,
+            boardLog: [] as { label: string; effect: string }[],
+
             initializeGame: () => {
                 const members = INITIAL_BOARD_MEMBERS;
 
@@ -234,6 +318,18 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 // Calculate initial board mood
                 get().recalculateBoardMood();
+                // YONETISIM KIRMIZI BAYRAGI.
+                // Bir yonetim kurulu uyesinin sirkete borc vermesi, ustelik
+                // teminat olarak CEO'nun hisselerini almasi, ciddi bir cikar
+                // catismasidir. Piyasa bunu bankadan borc almaktan cok daha
+                // agir okur. Bkz. core/market/credit.ts -> FINANCING_SIGNALS
+                try {
+                    const eq = require('../../finance/stores/useEquityStore').useEquityStore;
+                    const sig = require('../../../core/market/credit').FINANCING_SIGNALS.insider_loan;
+                    eq.setState((st: any) => ({
+                        marketMultiplier: Math.max(0.3, st.marketMultiplier * (1 + sig.impactPercent / 100)),
+                    }));
+                } catch { /* piyasa tepkisi uygulanamadi */ }
             },
 
             /**
@@ -243,36 +339,24 @@ export const useShareholderStore = create<ShareholderState>()(
             recalculateBoardMood: () => {
                 const { members } = get();
 
-                // Group shares by trait
-                const traitTotals: Record<TraitType, number> = {
-                    Conservative: 0,
-                    Aggressive: 0,
-                    Snake: 0,
-                    Shark: 0,
-                    Loyalist: 0,
-                    Visionary: 0,
-                };
-
-                members.forEach((member) => {
-                    traitTotals[member.trait] += member.shareCount;
+                // 1) BASKIN HUY — hisse agirlikli. Kurulun karakteri.
+                const byTrait: Record<string, number> = {};
+                members.forEach(m => {
+                    byTrait[m.trait] = (byTrait[m.trait] || 0) + m.shareCount;
                 });
+                const dominant = Object.entries(byTrait)
+                    .sort((a, b) => b[1] - a[1])[0]?.[0] as TraitType | undefined;
 
-                // Find the dominant trait (highest total shares)
-                let dominantTrait: TraitType = 'Conservative';
-                let maxShares = 0;
+                // 2) SANA KARSI TAVIR — ortalama guvenden. Esikler
+                //    governance.ts icinde, tek kaynak.
+                const stance = boardMoodFrom(members.map(m => ({
+                    id: m.id, name: m.name, trait: m.trait as any,
+                    trust: m.trust, shareCount: m.shareCount,
+                })));
 
-                (Object.keys(traitTotals) as TraitType[]).forEach((trait) => {
-                    if (traitTotals[trait] > maxShares) {
-                        maxShares = traitTotals[trait];
-                        dominantTrait = trait;
-                    }
-                });
-
-                set({ boardMood: dominantTrait });
-
-                console.log('[Shareholder Store] Board Mood Recalculated:', {
-                    boardMood: dominantTrait,
-                    traitDistribution: traitTotals,
+                set({
+                    boardMood: dominant ?? get().boardMood,
+                    boardStance: stance,
                 });
             },
 
@@ -280,79 +364,25 @@ export const useShareholderStore = create<ShareholderState>()(
              * Evaluate player action and update board member trust based on their traits.
              * Each trait reacts differently to different actions.
              */
-            evaluatePlayerAction: (actionType: 'DIVIDEND' | 'DILUTION' | 'ACQUISITION' | 'HOLD_CASH') => {
-                const { members } = get();
-
-                const updatedMembers = members.map((member) => {
-                    let trustChange = 0;
-
-                    // ============================================================
-                    // TRAIT REACTION MATRIX
-                    // ============================================================
-
-                    switch (actionType) {
-                        case 'DIVIDEND':
-                            // Paying profits to shareholders
-                            if (member.trait === 'Conservative') trustChange = 15; // Loves safety
-                            if (member.trait === 'Shark') trustChange = -5; // Indifferent
-                            if (member.trait === 'Aggressive') trustChange = -10; // Hates wasting cash
-                            if (member.trait === 'Visionary') trustChange = -5; // Prefers reinvestment
-                            break;
-
-                        case 'DILUTION':
-                            // Selling shares (issuing new equity)
-                            if (member.trait === 'Conservative') trustChange = -20; // Hates risk
-                            if (member.trait === 'Shark') trustChange = 15; // Loves chaos/opportunity
-                            if (member.trait === 'Aggressive') trustChange = 10; // Loves growth funds
-                            if (member.trait === 'Loyalist') trustChange = -5; // Follows but worried
-                            break;
-
-                        case 'ACQUISITION':
-                            // Buying another company
-                            if (member.trait === 'Conservative') trustChange = -10; // Too risky
-                            if (member.trait === 'Aggressive') trustChange = 20; // Loves expansion
-                            if (member.trait === 'Visionary') trustChange = 25; // Loves big moves
-                            if (member.trait === 'Shark') trustChange = 10; // Opportunity for profit
-                            break;
-
-                        case 'HOLD_CASH':
-                            // Sitting on money without investing
-                            if (member.trait === 'Conservative') trustChange = 10; // Loves stability
-                            if (member.trait === 'Shark') trustChange = -15; // Money must work!
-                            if (member.trait === 'Aggressive') trustChange = -15; // Money must work!
-                            break;
-
-                        default:
-                            console.warn(`[Shareholder Store] Unknown action type: ${actionType}`);
-                    }
-
-                    // Apply trust change and clamp between 0-100
-                    const newTrust = Math.max(0, Math.min(100, member.trust + trustChange));
-
-                    // Set hostile flag if trust drops below 20
-                    const isHostile = newTrust < 20;
-
-                    return {
-                        ...member,
-                        trust: newTrust,
-                        isHostile,
-                    };
-                });
-
-                set({ members: updatedMembers });
-
-                // Recalculate board mood after trust changes
-                get().recalculateBoardMood();
-
-                // Log the action and reactions
-                console.log(`[Shareholder Store] Action: ${actionType}`, {
-                    reactions: updatedMembers.map((m) => ({
-                        name: m.name,
-                        trait: m.trait,
-                        trust: m.trust,
-                        isHostile: m.isHostile,
-                    })),
-                });
+            /**
+             * EMEKLİYE AYRILDI — çağırmayın.
+             *
+             * Dort secenekli bir enum aliyordu ve motor her ceyrek "en
+             * belirgin hamle neydi" diye TAHMIN edip birini yolluyordu.
+             * Tepki yalnizca huya bakiyor, BUYUKLUGE ve BAGLAMA bakmiyordu:
+             * 1 dolarlik temettu ile 500 milyonluk temettu ayni +15'i
+             * veriyordu.
+             *
+             * Yerine `applyBoardEvent` geldi: her hamle kendi buyuklugu ve
+             * baglamiyla ulasir. Bu fonksiyonu birakmiyoruz cunku bu
+             * projede IKINCI YOL biraktigimiz her yerde iki sayi sessizce
+             * birbirinden ayrildi.
+             */
+            evaluatePlayerAction: (actionType) => {
+                console.warn(
+                    `[Board] evaluatePlayerAction is retired. Use applyBoardEvent ` +
+                    `with a magnitude and context instead. (${actionType})`
+                );
             },
 
             /**
@@ -1244,7 +1274,16 @@ export const useShareholderStore = create<ShareholderState>()(
                 // EXECUTE ATOMIC TRANSFER
                 // ------------------------------------------------------------
 
-                // 1. Add Cash
+                // ----------------------------------------------------------
+                //  1. PARA NEREYE GIDIYOR
+                // ----------------------------------------------------------
+                //  Bunlar SENIN hisselerin; sattiginda para SIRKETE degil
+                //  SANA gider (ikincil satis). Gercek hayatta da boyledir.
+                //
+                //  Ama oyuncu bunu goremiyordu: sirket kasasina bakiyor,
+                //  hicbir sey degismedigi icin "para gelmedi" diyordu.
+                //  Artik donus mesajinda hangi cebe girdigi yaziyor.
+                // ----------------------------------------------------------
                 useStatsStore.getState().earnMoney(finalPrice);
 
                 set((state) => {
@@ -1278,12 +1317,32 @@ export const useShareholderStore = create<ShareholderState>()(
                 // Recalculate board mood
                 get().recalculateBoardMood();
 
-                // Price impact (selling signals weakness → negative)
-                const PRICE_IMPACT_SENSITIVITY = 0.05;
-                const currentValuation = useEquityStore.getState().getMarketCap();
-                const impactMultiplier = 1 - (percentTraded / 100 * PRICE_IMPACT_SENSITIVITY);
-                const newValuation = currentValuation * impactMultiplier;
-                useEquityStore.getState().syncStockPrice(newValuation);
+                // ----------------------------------------------------------
+                //  FIYAT ETKISI — iki yonden birden kirikti
+                // ----------------------------------------------------------
+                //  1) BUYUKLUK: `percentTraded / 100 * 0.05` idi. %10 hisse
+                //     satmak fiyati %0,5 dusuruyordu — gorulmez.
+                //
+                //  2) KALICILIK: degerlemeyi bir kez oynatip birakiyordu.
+                //     Motor bir sonraki ceyrekte degerlemeyi temel verilerden
+                //     yeniden hesapladigi icin etki SILINIYORDU.
+                //
+                //  Dogrusu: kurucunun hisse satmasi bir SINYALDIR, temel
+                //  veri degildir. O yuzden digerleri gibi piyasa duygusu
+                //  carpanindan gecer ve zamanla soner.
+                //
+                //  Gercek piyasada icerideki birinin sattigini duyurmasi en
+                //  guclu olumsuz isaretlerden biridir: sirketi en iyi tanian
+                //  kisi cikiyor demektir. %10'luk bir satis ~%12 dusurur.
+                // ----------------------------------------------------------
+                const INSIDER_SELL_IMPACT = 1.2;   // satilan her %1 icin %1,2 dusus
+                const drop = Math.min(0.35, (percentTraded * INSIDER_SELL_IMPACT) / 100);
+                const eq = useEquityStore.getState();
+                useEquityStore.setState({
+                    marketMultiplier: Math.max(0.3, eq.marketMultiplier * (1 - drop)),
+                });
+                eq.syncStockPrice(useStatsStore.getState().companyValue || eq.getMarketCap());
+                const impactMultiplier = 1 - drop;
 
                 console.log('[Share Sale]', {
                     seller: 'Player',
@@ -1298,7 +1357,11 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 return {
                     success: true,
-                    message: `Sold ${formatNumber(shareCount)} shares to ${member.name} for ${formatMoney(finalPrice)}.`,
+                    message:
+                        `Sold ${formatNumber(shareCount)} shares to ${member.name} for ` +
+                        `${formatMoney(finalPrice)}. The proceeds go to you personally, not the ` +
+                        `company. The market read it as an insider exit: the share price fell ` +
+                        `${(drop * 100).toFixed(1)}%.`,
                     sharesSold: shareCount,
                 };
             },
@@ -1306,6 +1369,198 @@ export const useShareholderStore = create<ShareholderState>()(
             /**
              * Get player's ownership percentage
              */
+
+            // ================================================================
+            //  YÖNETİŞİM — bkz. core/market/governance.ts
+            // ================================================================
+
+            applyBoardEvent: (event, ctx) => {
+                const { members } = get();
+                const log: { label: string; effect: string }[] = [];
+
+                const updated = members.map(m => {
+                    const gm: GovMember = {
+                        id: m.id, name: m.name, trait: m.trait as any,
+                        trust: m.trust, shareCount: m.shareCount,
+                    };
+                    const delta = trustDelta(gm, event, ctx);
+                    if (delta !== 0) {
+                        log.push({
+                            label: `${m.name} (${m.trait})`,
+                            effect: `${delta > 0 ? '+' : ''}${delta} trust`,
+                        });
+                    }
+                    const trust = Math.max(0, Math.min(100, m.trust + delta));
+                    return { ...m, trust, isHostile: trust < 20 };
+                });
+
+                set(state => ({
+                    members: updated,
+                    boardLog: [...state.boardLog, { label: event.label, effect: '' }, ...log],
+                }));
+                get().recalculateBoardMood();
+            },
+
+            needsVote: (proposal) =>
+                requiresVote(proposal, get().getPlayerOwnershipPercent()),
+
+            holdVote: (proposal, ctx) => {
+                const { members, playerShareCount, totalShares, lobbied } = get();
+                const gov: GovMember[] = members.map(m => ({
+                    id: m.id, name: m.name, trait: m.trait as any,
+                    trust: m.trust, shareCount: m.shareCount,
+                }));
+
+                const result = castVotes(gov, playerShareCount, totalShares, proposal, ctx, lobbied);
+
+                // ----------------------------------------------------------
+                //  KURULA RAĞMEN GEÇİRMENİN BEDELİ
+                // ----------------------------------------------------------
+                //  Cogunluktaysan oyu kaybedemezsin — gercek hayatta da
+                //  oyle. Ama kurulun aleyhine oy verdigi bir karari yine de
+                //  gecirmek bedava degildir: guven coker, yoneticiler
+                //  istifa eder, piyasa bunu yonetisim sorunu olarak fiyatlar.
+                //  Kurulu, kaybedemeyecegin bir oyda bile onemli kilan sey.
+                // ----------------------------------------------------------
+                if (result.overrode) {
+                    const survivors: typeof members = [];
+                    let resigned = 0;
+                    members.forEach(m => {
+                        const votedNo = result.votes.find(v => v.memberId === m.id)?.vote === 'NO';
+                        if (votedNo && Math.random() < OVERRIDE_RESIGN_CHANCE) {
+                            resigned++;
+                            return; // istifa etti — hisseleri dolasima cikar
+                        }
+                        const trust = votedNo
+                            ? Math.max(0, m.trust - OVERRIDE_TRUST_COST)
+                            : m.trust;
+                        survivors.push({ ...m, trust, isHostile: trust < 20 });
+                    });
+                    set(state => ({
+                        members: survivors,
+                        boardLog: [...state.boardLog, {
+                            label: `You overrode the board on "${proposal.title}"`,
+                            effect: resigned > 0
+                                ? `${resigned} director(s) resigned`
+                                : `−${OVERRIDE_TRUST_COST} trust from every dissenter`,
+                        }],
+                    }));
+                    applyGovernanceSignal('proposal_rejected');
+                    if (resigned > 0) applyGovernanceSignal('director_resigned');
+                } else if (!result.passed) {
+                    applyGovernanceSignal('proposal_rejected');
+                }
+
+                set({ lastVote: { ...result, title: proposal.title } });
+                get().recalculateBoardMood();
+                return result;
+            },
+
+            lobby: (memberId, proposal) => {
+                const { members, lobbied } = get();
+                const m = members.find(x => x.id === memberId);
+                if (!m) {
+                    return { success: false, pull: 0, message: 'Member not found.' };
+                }
+                const gm: GovMember = {
+                    id: m.id, name: m.name, trait: m.trait as any,
+                    trust: m.trust, shareCount: m.shareCount,
+                };
+                const res = lobbyMember(gm, proposal, lobbied[memberId] !== undefined);
+                if (res.success) {
+                    set({ lobbied: { ...lobbied, [memberId]: res.pull } });
+                } else {
+                    // Basarisiz lobi de kaydedilir: ayni ceyrek tekrar denenemez.
+                    set({ lobbied: { ...lobbied, [memberId]: 0 } });
+                }
+                return res;
+            },
+
+            makePromise: (memberId, kind, dueQuarter, magnitude, description) => {
+                set(state => ({
+                    promises: [...state.promises, {
+                        id: `PROM_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        memberId, kind, dueQuarter, magnitude, description,
+                    }],
+                }));
+            },
+
+            settlePromises: (currentQuarter, keptKinds, ctx) => {
+                const { promises } = get();
+                const due = promises.filter(p => !p.resolved && p.dueQuarter <= currentQuarter);
+                if (due.length === 0) return;
+
+                due.forEach(p => {
+                    const kept = keptKinds.includes(p.kind);
+                    const event = resolvePromise(p, kept);
+                    // Soz KISIYE verilir: yalnizca o uyenin guveni oynar.
+                    const { members } = get();
+                    const updated = members.map(m => {
+                        if (m.id !== p.memberId) return m;
+                        const gm: GovMember = {
+                            id: m.id, name: m.name, trait: m.trait as any,
+                            trust: m.trust, shareCount: m.shareCount,
+                        };
+                        const d = trustDelta(gm, event, ctx);
+                        const trust = Math.max(0, Math.min(100, m.trust + d));
+                        return { ...m, trust, isHostile: trust < 20 };
+                    });
+                    set(state => ({
+                        members: updated,
+                        boardLog: [...state.boardLog, { label: event.label, effect: kept ? 'trust restored' : 'trust broken' }],
+                    }));
+                    if (!kept) applyGovernanceSignal('promise_broken');
+                });
+
+                set(state => ({
+                    promises: state.promises.map(p =>
+                        due.find(d => d.id === p.id)
+                            ? { ...p, resolved: keptKinds.includes(p.kind) ? 'kept' as const : 'broken' as const }
+                            : p,
+                    ),
+                }));
+                get().recalculateBoardMood();
+            },
+
+            runNoConfidence: (ctx) => {
+                const { members, playerShareCount } = get();
+                const gov: GovMember[] = members.map(m => ({
+                    id: m.id, name: m.name, trait: m.trait as any,
+                    trust: m.trust, shareCount: m.shareCount,
+                }));
+                const check = checkNoConfidence(gov, get().getPlayerOwnershipPercent(), ctx);
+                set({ noConfidenceLevel: check.conditionsMet });
+
+                if (!check.triggered) {
+                    return { called: false, removed: false, warning: check.warning };
+                }
+
+                applyGovernanceSignal('no_confidence_called');
+                const result = voteNoConfidence(gov, playerShareCount, ctx);
+                applyGovernanceSignal(result.passed ? 'ceo_removed' : 'ceo_survived');
+
+                set(state => ({
+                    ceoRemoved: result.passed,
+                    lastVote: { ...result, title: 'Vote of No Confidence' },
+                    boardLog: [...state.boardLog, {
+                        label: 'Vote of no confidence',
+                        effect: result.summary,
+                    }],
+                }));
+                return { called: true, removed: result.passed, result };
+            },
+
+            resetQuarterlyBoard: () => {
+                // NOTRE CEKIM: guven her ceyrek 55'e dogru kayar. Olaylar
+                // uygulanmadan ONCE, ki o ceyregin hamleleri taze kalsin.
+                const decayed = get().members.map(m => {
+                    const t = decayTrust(m.trust);
+                    return { ...m, trust: Math.round(t), isHostile: t < 20 };
+                });
+                set({ members: decayed, lobbied: {}, boardLog: [] });
+                get().recalculateBoardMood();
+            },
+
             getPlayerOwnershipPercent: () => {
                 const { playerShareCount, totalShares } = get();
                 return (playerShareCount / totalShares) * 100;

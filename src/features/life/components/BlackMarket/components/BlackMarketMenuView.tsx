@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 
 type BlackMarketMenuViewProps = {
@@ -34,41 +35,42 @@ const BlackMarketMenuView = ({
     onSelectWeapons,
     onSelectSubstances,
 }: BlackMarketMenuViewProps) => {
+    useLocale();
     return (
         <View style={styles.menuContainer}>
-            <Text style={styles.headerTitle}>THE UNDERGROUND</Text>
-            <Text style={styles.headerSubtitle}>Money talks. Silence pays.</Text>
+            <Text style={styles.headerTitle}>{t('life.theUnderground')}</Text>
+            <Text style={styles.headerSubtitle}>{t('life.moneyTalksSilencePays')}</Text>
 
             <View style={styles.buttonsContainer}>
                 <MenuButton
                     icon="🎨"
-                    title="Art Thief"
-                    subtitle="Stolen Masterpieces"
+                    title={t('life.artThief')}
+                    subtitle={t('life.stolenMasterpieces')}
                     onPress={onSelectArt}
                 />
                 <MenuButton
                     icon="🏺"
-                    title="Antique Dealer"
-                    subtitle="History for Sale"
+                    title={t('life.antiqueDealer')}
+                    subtitle={t('life.historyForSale')}
                     onPress={onSelectAntique}
                 />
                 <MenuButton
                     icon="💎"
-                    title="Jewel Dealer"
-                    subtitle="Royal Gems"
+                    title={t('life.jewelDealer')}
+                    subtitle={t('life.royalGems')}
                     onPress={onSelectJewel}
                 />
                 <MenuButton
                     icon="🔫"
-                    title="Arms Dealer"
-                    subtitle="Lethal Hardware"
+                    title={t('life.armsDealer')}
+                    subtitle={t('life.lethalHardware')}
                     onPress={onSelectWeapons}
                     danger
                 />
                 <MenuButton
                     icon="💊"
-                    title="Street Dealer"
-                    subtitle="Quick Fix"
+                    title={t('life.streetDealer')}
+                    subtitle={t('life.quickFix')}
                     onPress={onSelectSubstances}
                     danger
                 />

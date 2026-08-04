@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert, ToastAndroid, Platform } from 'react-native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
@@ -10,6 +11,7 @@ type Props = {
 };
 
 const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
+    useLocale();
     const { subsidiaries, attemptToSellCompany } = useCorporateFinanceStore();
     const company = subsidiaries.find(c => c.id === companyId);
 
@@ -53,13 +55,13 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
             if (Platform.OS === 'android') {
                 ToastAndroid.show(`Sold for ${formatMoney(askingPrice)}!`, ToastAndroid.LONG);
             } else {
-                Alert.alert('Offer Accepted!', `You successfully sold ${company.name} for ${formatMoney(askingPrice)}.`);
+                Alert.alert(t('alert.offerAccepted'), `You successfully sold ${company.name} for ${formatMoney(askingPrice)}.`);
             }
             onClose();
         } else {
             // Failure Logic
             Alert.alert(
-                'Deal Fell Through',
+                t('alert.dealFellThrough'),
                 result.msg || "Buyers walked away.",
                 [{ text: 'OK', onPress: onClose }]
             );
@@ -77,13 +79,13 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
                 <View style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>NEGOTIATE SALE</Text>
+                        <Text style={styles.headerTitle}>{t('action.negotiateSale')}</Text>
                         <Text style={styles.headerSubtitle}>{company.name}</Text>
                     </View>
 
                     {/* Valuation Display */}
                     <View style={styles.valuationContainer}>
-                        <Text style={styles.label}>Current Valuation</Text>
+                        <Text style={styles.label}>{t('action.currentValuation')}</Text>
                         <Text style={styles.valuationValue}>{formatMoney(currentValuation)}</Text>
                     </View>
 
@@ -114,9 +116,7 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
 
                     {/* Probability Meter */}
                     <View style={[styles.probabilityBox, { borderColor: chanceColor }]}>
-                        <Text style={[styles.probabilityLabel, { color: chanceColor }]}>
-                            PROBABILITY OF SALE
-                        </Text>
+                        <Text style={[styles.probabilityLabel, { color: chanceColor }]}>{t('action.probabilityOfSale')}</Text>
                         <Text style={[styles.probabilityValue, { color: chanceColor }]}>
                             {successChance.toFixed(0)}%
                         </Text>
@@ -131,14 +131,14 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
                             style={({ pressed }) => [styles.cancelBtn, pressed && styles.btnPressed]}
                             onPress={onClose}
                         >
-                            <Text style={styles.cancelBtnText}>CANCEL</Text>
+                            <Text style={styles.cancelBtnText}>{t('action.cancel')}</Text>
                         </Pressable>
 
                         <Pressable
                             style={({ pressed }) => [styles.submitBtn, pressed && styles.btnPressed]}
                             onPress={handleSubmit}
                         >
-                            <Text style={styles.submitBtnText}>SUBMIT OFFER</Text>
+                            <Text style={styles.submitBtnText}>{t('action.submitOffer')}</Text>
                         </Pressable>
                     </View>
                 </View>

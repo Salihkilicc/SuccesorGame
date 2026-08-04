@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, StatusBar, ScrollView, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -39,6 +40,7 @@ const FilterChip = ({ label, active, onPress }: { label: string; active: boolean
 // ============================================================================
 
 const BelongingsScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const {
         filteredItems,
@@ -52,9 +54,9 @@ const BelongingsScreen = () => {
     // Map internal filter types to display labels
     const FILTERS: { label: string; value: typeof selectedCategory }[] = [
         { label: 'ALL', value: 'ALL' },
-        { label: 'REAL ESTATE', value: 'REAL_ESTATE' },
-        { label: 'VEHICLES', value: 'VEHICLE' },
-        { label: 'VALUABLES', value: 'COLLECTION' },
+        { label: t('ui.realEstate2'), value: 'REAL_ESTATE' },
+        { label: t('ui.vehicles2'), value: 'VEHICLE' },
+        { label: t('ui.valuables'), value: 'COLLECTION' },
     ];
 
     return (
@@ -73,7 +75,7 @@ const BelongingsScreen = () => {
                             <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                                 <Text style={styles.backButtonText}>← BACK</Text>
                             </Pressable>
-                            <Text style={styles.headerTitle}>PORTFOLIO DASHBOARD</Text>
+                            <Text style={styles.headerTitle}>{t('ui.portfolioDashboard')}</Text>
                             <View style={{ width: 60 }} />
                         </View>
 
@@ -86,8 +88,8 @@ const BelongingsScreen = () => {
                                 <View style={styles.cardContent}>
                                     <View style={styles.cardTopRow}>
                                         <View>
-                                            <Text style={styles.cardBankName}>LUXENET</Text>
-                                            <Text style={styles.cardLabelSmall}>EMPIRE RESERVE</Text>
+                                            <Text style={styles.cardBankName}>{t('ui.luxenet')}</Text>
+                                            <Text style={styles.cardLabelSmall}>{t('ui.empireReserve')}</Text>
                                         </View>
                                         <Text style={styles.cardLabelSmall}>2026</Text>
                                     </View>
@@ -99,14 +101,14 @@ const BelongingsScreen = () => {
                                         </View>
                                         <View>
                                             <Text style={styles.netWorthValue}>{formatCurrencyMain(netWorth)}</Text>
-                                            <Text style={styles.netWorthLabel}>TOTAL NET WORTH</Text>
+                                            <Text style={styles.netWorthLabel}>{t('ui.totalNetWorth')}</Text>
                                         </View>
                                     </View>
 
                                     <View style={styles.cardBottomRow}>
-                                        <Text style={styles.memberName}>MEMBER SINCE 2024</Text>
+                                        <Text style={styles.memberName}>{t('ui.memberSince2024')}</Text>
                                         <View style={styles.badgeContainer}>
-                                            <Text style={styles.badgeText}>ELITE</Text>
+                                            <Text style={styles.badgeText}>{t('ui.elite')}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -156,13 +158,13 @@ const BelongingsScreen = () => {
                         ListEmptyComponent={
                             <View style={styles.emptyState}>
                                 <Text style={styles.emptyEmoji}>🏛️</Text>
-                                <Text style={styles.emptyTitle}>NO ASSETS FOUND</Text>
-                                <Text style={styles.emptyText}>Visit LuxeNet to acquire items.</Text>
+                                <Text style={styles.emptyTitle}>{t('ui.noAssetsFound')}</Text>
+                                <Text style={styles.emptyText}>{t('ui.visitLuxenetToAcquireItems')}</Text>
                                 <Pressable
                                     style={styles.shopAction}
                                     onPress={() => navigation.navigate('Shopping')}
                                 >
-                                    <Text style={styles.shopActionText}>OPEN CATALOG</Text>
+                                    <Text style={styles.shopActionText}>{t('ui.openCatalog')}</Text>
                                 </Pressable>
                             </View>
                         }

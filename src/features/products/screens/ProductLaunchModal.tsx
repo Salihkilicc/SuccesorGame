@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { Product } from '../data/productsData';
@@ -12,6 +13,7 @@ interface ProductLaunchModalProps {
 }
 
 export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible, product, onClose, onLaunchComplete }) => {
+    useLocale();
     const [step, setStep] = useState(1);
     const [analysisData, setAnalysisData] = useState<any>(null);
     const { actions } = useProductsLogic();
@@ -35,44 +37,44 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
     const handleLaunch = () => {
         const success = launchProduct(product);
         if (success) {
-            Alert.alert('Success', `${product.name} has been launched successfully!`, [
+            Alert.alert(t('alert.success'), `${product.name} has been launched successfully!`, [
                 { text: 'OK', onPress: onLaunchComplete }
             ]);
         } else {
-            Alert.alert('Error', 'Failed to launch product. Check R&D points.');
+            Alert.alert(t('alert.error'), t('alert.failedToLaunchProductCheck'));
         }
     };
 
     const renderStep1 = () => (
         <View style={styles.stepContainer}>
-            <Text style={styles.sectionTitle}>Product Summary</Text>
+            <Text style={styles.sectionTitle}>{t('product.productSummary')}</Text>
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Name:</Text>
+                <Text style={styles.label}>{t('product.name')}</Text>
                 <Text style={styles.value}>{product.icon} {product.name}</Text>
             </View>
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Description:</Text>
+                <Text style={styles.label}>{t('product.description')}</Text>
                 <Text style={styles.value} numberOfLines={3}>{product.description}</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Base R&D Cost:</Text>
+                <Text style={styles.label}>{t('product.baseRDCost')}</Text>
                 <Text style={styles.costValue}>{product.rndCost} Pts</Text>
             </View>
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Base Demand:</Text>
+                <Text style={styles.label}>{t('product.baseDemand')}</Text>
                 <Text style={styles.value}>{product.marketDemand}%</Text>
             </View>
 
             <Pressable style={styles.primaryBtn} onPress={handleMarketAnalysis}>
-                <Text style={styles.btnText}>Perform Market Analysis</Text>
+                <Text style={styles.btnText}>{t('product.performMarketAnalysis')}</Text>
             </Pressable>
         </View>
     );
 
     const renderStep2 = () => (
         <View style={styles.stepContainer}>
-            <Text style={styles.sectionTitle}>Market Analysis Results</Text>
+            <Text style={styles.sectionTitle}>{t('product.marketAnalysisResults')}</Text>
             {analysisData && (
                 <>
                     <View style={styles.chartContainer}>
@@ -84,28 +86,28 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
                         ))}
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.label}>Estimated Demand:</Text>
+                        <Text style={styles.label}>{t('product.estimatedDemand')}</Text>
                         <Text style={styles.valueHighlight}>{analysisData.demand}%</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.label}>Recommended Price:</Text>
+                        <Text style={styles.label}>{t('product.recommendedPrice')}</Text>
                         <Text style={styles.valueHighlight}>${analysisData.suggestedPrice}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Text style={styles.label}>Competition:</Text>
+                        <Text style={styles.label}>{t('product.competition')}</Text>
                         <Text style={styles.value}>{analysisData.competition}</Text>
                     </View>
                     <View style={styles.tipsBox}>
-                        <Text style={styles.tipText}>Tip: Initial Production will match Demand automatically.</Text>
+                        <Text style={styles.tipText}>{t('product.tipInitialProductionWillMatch')}</Text>
                     </View>
                 </>
             )}
 
             <Pressable style={styles.successBtn} onPress={handleLaunch}>
-                <Text style={styles.btnText}>LAUNCH PRODUCT</Text>
+                <Text style={styles.btnText}>{t('product.launchProduct')}</Text>
             </Pressable>
             <Pressable style={styles.secondaryBtn} onPress={() => setStep(1)}>
-                <Text style={styles.secondaryBtnText}>Back</Text>
+                <Text style={styles.secondaryBtnText}>{t('product.back')}</Text>
             </Pressable>
         </View>
     );

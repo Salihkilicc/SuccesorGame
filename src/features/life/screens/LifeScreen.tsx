@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, Text, Pressable, StyleSheet, SafeAreaView, Alert, Dimensions, Platform, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -56,26 +57,27 @@ const GRADIENTS = {
 };
 
 const SECTION_LEISURE = [
-  { key: 'nightOut', label: 'Night Out', icon: 'glass-cocktail', gradient: GRADIENTS.purplePink },
-  { key: 'spa', label: 'Spa & Relax', icon: 'spa', gradient: GRADIENTS.tealCyan },
+  { key: 'nightOut', label: t('life.nightOut'), icon: 'glass-cocktail', gradient: GRADIENTS.purplePink },
+  { key: 'spa', label: t('life.spaRelax'), icon: 'spa', gradient: GRADIENTS.tealCyan },
   { key: 'gym', label: 'Gym', icon: 'dumbbell', gradient: GRADIENTS.orangeYellow },
-  { key: 'shopping', label: 'Shopping', icon: 'shopping', gradient: GRADIENTS.pinkRed },
+  { key: 'shopping', label: t('life.shopping'), icon: 'shopping', gradient: GRADIENTS.pinkRed },
 ];
 
 const SECTION_LIFESTYLE = [
   // Organization & Productivity
-  { key: 'notes', label: 'Notes', icon: 'notebook', gradient: GRADIENTS.tealCyan },
-  { key: 'education', label: 'Education', icon: 'school', gradient: GRADIENTS.greenTeal },
-  { key: 'travel', label: 'Travel', icon: 'airplane', gradient: GRADIENTS.blueSky },
+  { key: 'notes', label: t('life.notes'), icon: 'notebook', gradient: GRADIENTS.tealCyan },
+  { key: 'education', label: t('life.education'), icon: 'school', gradient: GRADIENTS.greenTeal },
+  { key: 'travel', label: t('life.travel'), icon: 'airplane', gradient: GRADIENTS.blueSky },
 
   // Personal Assets & Data
-  { key: 'belongings', label: 'Belongings', icon: 'briefcase', gradient: GRADIENTS.brownGold },
-  { key: 'dna', label: 'DNA / Stats', icon: 'dna', gradient: GRADIENTS.bluePurple },
-  { key: 'health', label: 'Health', icon: 'heart', gradient: GRADIENTS.pinkRed },
-  { key: 'appStore', label: 'App Store', icon: 'store', gradient: GRADIENTS.networkBlue },
+  { key: 'belongings', label: t('life.belongings'), icon: 'briefcase', gradient: GRADIENTS.brownGold },
+  { key: 'dna', label: t('life.dnaStats'), icon: 'dna', gradient: GRADIENTS.bluePurple },
+  { key: 'health', label: t('life.health'), icon: 'heart', gradient: GRADIENTS.pinkRed },
+  { key: 'appStore', label: t('life.appStore'), icon: 'store', gradient: GRADIENTS.networkBlue },
 ];
 
 const LifeScreen = () => {
+    useLocale();
   const navigation = useNavigation<LifeNavigationProp>();
 
   // Systems Logic
@@ -175,21 +177,21 @@ const LifeScreen = () => {
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>LIFESTYLE</Text>
+          <Text style={styles.headerTitle}>{t('life.lifestyle')}</Text>
           <View style={styles.headerAccent} />
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Leisure</Text>
+            <Text style={styles.sectionTitle}>{t('life.leisure')}</Text>
             <View style={styles.grid}>
               {SECTION_LEISURE.map(renderAppIcon)}
             </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Essentials</Text>
+            <Text style={styles.sectionTitle}>{t('life.essentials')}</Text>
             <View style={styles.grid}>
               {SECTION_LIFESTYLE.map(renderAppIcon)}
             </View>

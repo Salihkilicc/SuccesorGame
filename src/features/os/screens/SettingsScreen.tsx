@@ -17,6 +17,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { startNewGame } from '../../../core/newGame';
+import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -78,6 +79,8 @@ const SettingsRow = ({
 
 const SettingsScreen = () => {
     const navigation = useNavigation();
+    // Dil degisince bu ekran yeniden cizilsin.
+    const locale = useLocale();
     const insets = useSafeAreaInsets();
 
     const {
@@ -104,9 +107,9 @@ const SettingsScreen = () => {
             'New Game',
             'All progress will be erased and a fresh run will be set up. Are you sure?',
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('os.cancel'), style: 'cancel' },
                 {
-                    text: 'Reset',
+                    text: t('os.reset'),
                     style: 'destructive',
                     onPress: async () => {
                         try {
@@ -151,7 +154,7 @@ const SettingsScreen = () => {
                     </Pressable>
 
                     <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>SETTINGS</Text>
+                        <Text style={styles.headerTitle}>{t('os.settings')}</Text>
                         <View style={styles.headerAccent} />
                     </View>
                 </View>
@@ -161,12 +164,50 @@ const SettingsScreen = () => {
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    {/* ============================================================
+                        DİL
+                        ============================================================
+                        Once HomeScreen icinde `useState<'EN'|'TR'>('EN')` ve bir
+                        dugme vardi. Basinca yalnizca o ekrandaki etiket
+                        degisiyordu, hicbir metin cevrilmiyordu ve deger ekran
+                        kapaninca kayboluyordu. Artik tek kaynak ve kalici.
+                       ============================================================ */}
+                    <Text style={styles.sectionTitle}>{t('settings.language').toUpperCase()}</Text>
+                    <View style={styles.group}>
+                        {LOCALES.map((l, i) => (
+                            <React.Fragment key={l.code}>
+                                {i > 0 && <View style={styles.divider} />}
+                                <TouchableOpacity
+                                    style={styles.langRow}
+                                    onPress={() => useLocaleStore.getState().setLocale(l.code)}
+                                    activeOpacity={0.7}
+                                >
+                                    <MaterialCommunityIcons
+                                        name="translate"
+                                        size={22}
+                                        color={locale === l.code ? '#FFD700' : '#8A9BA8'}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.langLabel,
+                                            locale === l.code && styles.langLabelActive,
+                                        ]}
+                                    >
+                                        {l.native}
+                                    </Text>
+                                    {locale === l.code && <Text style={styles.langCheck}>✓</Text>}
+                                </TouchableOpacity>
+                            </React.Fragment>
+                        ))}
+                    </View>
+                    <Text style={styles.langNote}>{t('settings.languageNote')}</Text>
+
                     {/* Preferences Group */}
-                    <Text style={styles.sectionTitle}>PREFERENCES</Text>
+                    <Text style={styles.sectionTitle}>{t('os.preferences')}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="music-note"
-                            label="Music"
+                            label={t('os.music')}
                             value={isMusicEnabled}
                             onToggle={toggleMusic}
                             isFirst
@@ -175,7 +216,7 @@ const SettingsScreen = () => {
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="volume-high"
-                            label="Sound Effects"
+                            label={t('os.soundEffects')}
                             value={isSoundEnabled}
                             onToggle={toggleSound}
                             color="#2980B9"
@@ -183,7 +224,7 @@ const SettingsScreen = () => {
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="bell"
-                            label="Notifications"
+                            label={t('os.notifications')}
                             value={isNotificationsEnabled}
                             onToggle={toggleNotifications}
                             color="#ec008c"
@@ -191,7 +232,7 @@ const SettingsScreen = () => {
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="vibrate"
-                            label="Haptics"
+                            label={t('os.haptics')}
                             value={isHapticsEnabled}
                             onToggle={toggleHaptics}
                             isLast
@@ -200,35 +241,35 @@ const SettingsScreen = () => {
                     </View>
 
                     {/* Legal & Support Group */}
-                    <Text style={styles.sectionTitle}>ABOUT</Text>
+                    <Text style={styles.sectionTitle}>{t('os.about')}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="file-document-outline"
-                            label="Terms & Conditions"
+                            label={t('os.termsConditions')}
                             onPress={handleUnavailable}
                             isFirst
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="shield-check-outline"
-                            label="Privacy Policy"
+                            label={t('os.privacyPolicy')}
                             onPress={handleUnavailable}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="help-circle-outline"
-                            label="Help & Support"
+                            label={t('os.helpSupport')}
                             onPress={handleUnavailable}
                             isLast
                         />
                     </View>
 
                     {/* Oyun Yonetimi */}
-                    <Text style={styles.sectionTitle}>GAME</Text>
+                    <Text style={styles.sectionTitle}>{t('os.game')}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="restart"
-                            label="New Game"
+                            label={t('os.newGame')}
                             onPress={handleNewGame}
                             isFirst
                             isLast
@@ -237,8 +278,8 @@ const SettingsScreen = () => {
 
                     {/* Footer */}
                     <View style={styles.footer}>
-                        <Text style={styles.footerVersion}>Successor OS v1.0.0</Text>
-                        <Text style={styles.footerTagline}>Designed for Billionaires</Text>
+                        <Text style={styles.footerVersion}>{t('os.successorOsV100')}</Text>
+                        <Text style={styles.footerTagline}>{t('os.designedForBillionaires')}</Text>
                     </View>
                 </ScrollView>
 
@@ -254,6 +295,14 @@ export default SettingsScreen;
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+    langRow: {
+        flexDirection: 'row', alignItems: 'center', gap: 14,
+        paddingVertical: 15, paddingHorizontal: 16,
+    },
+    langLabel: { flex: 1, fontSize: 15, color: '#8A9BA8', fontWeight: '600' },
+    langLabelActive: { color: '#FFF' },
+    langCheck: { color: '#FFD700', fontSize: 16, fontWeight: '800' },
+    langNote: { fontSize: 11, color: '#8A9BA8', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
         backgroundColor: '#020205',

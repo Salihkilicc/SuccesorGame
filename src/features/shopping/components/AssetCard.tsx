@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -20,6 +21,7 @@ const formatCurrency = (amount: number) => {
 };
 
 const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose, variant = 'list' }) => {
+    useLocale();
     const isGrid = variant === 'grid';
 
     // 1. Determine Visuals based on Category/Value
@@ -64,7 +66,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
             } else {
                 ActionButton = (
                     <View style={[styles.badge, { backgroundColor: 'rgba(58, 134, 255, 0.2)', borderColor: '#3A86FF' }]}>
-                        <Text style={[styles.badgeText, { color: '#3A86FF' }]}>PERFECT</Text>
+                        <Text style={[styles.badgeText, { color: '#3A86FF' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );
             }
@@ -119,7 +121,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                     <Text style={styles.icon}>{emoji}</Text>
                 </View>
                 <View style={styles.valueContainer}>
-                    <Text style={styles.marketValueLabel}>Market Value</Text>
+                    <Text style={styles.marketValueLabel}>{t('ui.marketValue')}</Text>
                     <Text style={styles.marketValue}>{formatCurrency(item.marketValue)}</Text>
                 </View>
             </View>

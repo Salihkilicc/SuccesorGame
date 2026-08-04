@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import {Text, StyleSheet, ViewStyle, TextStyle, View} from 'react-native';
 
 type BadgeSize = 'small' | 'large';
@@ -9,12 +10,11 @@ type Props = {
 };
 
 const PremiumBadge = ({size = 'small', style}: Props) => {
+    useLocale();
   const isLarge = size === 'large';
   return (
     <View style={[styles.base, isLarge ? styles.large : styles.small, style]}>
-      <Text style={[styles.label, isLarge ? styles.labelLarge : styles.labelSmall]}>
-        PREMIUM
-      </Text>
+      <Text style={[styles.label, isLarge ? styles.labelLarge : styles.labelSmall]}>{t('ui.premium')}</Text>
     </View>
   );
 };

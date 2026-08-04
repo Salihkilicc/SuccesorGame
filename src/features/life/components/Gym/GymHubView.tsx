@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useGymSystem } from './useGymSystem';
@@ -11,6 +12,7 @@ import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
  * Displays body stats and navigation menu to sub-features.
  */
 const GymHubView = () => {
+    useLocale();
     // --- Hook Destructuring ---
     const { data, actions } = useGymSystem();
     const { stats, martialArts, membership } = data;
@@ -68,7 +70,7 @@ const GymHubView = () => {
                             <Text style={styles.closeIcon}>←</Text>
                         </TouchableOpacity>
                         <View style={styles.titleContainer}>
-                            <Text style={styles.title}>GYM</Text>
+                            <Text style={styles.title}>{t('life.gym')}</Text>
                             <View style={[styles.badge, membership === 'TITANIUM' ? styles.badgeTitanium : styles.badgeStandard]}>
                                 <Text style={[styles.badgeText, membership === 'TITANIUM' ? styles.textTitanium : styles.textStandard]}>
                                     {membership || 'GUEST'}
@@ -81,7 +83,7 @@ const GymHubView = () => {
                     {/* Stats Card */}
                     <View style={styles.statsCard}>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>BODY TYPE</Text>
+                            <Text style={styles.statLabel}>{t('life.bodyType')}</Text>
                             <Text style={[styles.statValue, { color: getBodyTypeColor(bodyType) }]}>
                                 {bodyType}
                             </Text>
@@ -90,7 +92,7 @@ const GymHubView = () => {
                         <View style={styles.divider} />
 
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>FATIGUE</Text>
+                            <Text style={styles.statLabel}>{t('life.fatigue')}</Text>
                             <View style={styles.fatigueContainer}>
                                 <View style={styles.fatigueBar}>
                                     <View
@@ -114,8 +116,8 @@ const GymHubView = () => {
                         <TouchableOpacity style={styles.menuButton} onPress={() => navigate('WORKOUT')}>
                             <Text style={styles.menuIcon}>🏋️</Text>
                             <View>
-                                <Text style={styles.menuLabel}>Workout</Text>
-                                <Text style={styles.menuSubLabel}>Strength & Cardio</Text>
+                                <Text style={styles.menuLabel}>{t('life.workout2')}</Text>
+                                <Text style={styles.menuSubLabel}>{t('life.strengthCardio')}</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -126,8 +128,8 @@ const GymHubView = () => {
                         <TouchableOpacity style={styles.menuButton} onPress={() => navigate('TRAINER')}>
                             <Text style={styles.menuIcon}>🧢</Text>
                             <View>
-                                <Text style={styles.menuLabel}>Trainer</Text>
-                                <Text style={styles.menuSubLabel}>Hire Expert</Text>
+                                <Text style={styles.menuLabel}>{t('life.trainer')}</Text>
+                                <Text style={styles.menuSubLabel}>{t('life.hireExpert')}</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -135,8 +137,8 @@ const GymHubView = () => {
                         <TouchableOpacity style={styles.menuButton} onPress={() => navigate('MEMBERSHIP')}>
                             <Text style={styles.menuIcon}>💳</Text>
                             <View>
-                                <Text style={styles.menuLabel}>Membership</Text>
-                                <Text style={styles.menuSubLabel}>Upgrade Status</Text>
+                                <Text style={styles.menuLabel}>{t('life.membership')}</Text>
+                                <Text style={styles.menuSubLabel}>{t('life.upgradeStatus')}</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -144,8 +146,8 @@ const GymHubView = () => {
                         <TouchableOpacity style={styles.menuButton} onPress={() => navigate('SUPPLEMENTS')}>
                             <Text style={styles.menuIcon}>🧪</Text>
                             <View>
-                                <Text style={styles.menuLabel}>Locker Room</Text>
-                                <Text style={styles.menuSubLabel}>Supplements & Gear</Text>
+                                <Text style={styles.menuLabel}>{t('life.lockerRoom')}</Text>
+                                <Text style={styles.menuSubLabel}>{t('life.supplementsGear')}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>

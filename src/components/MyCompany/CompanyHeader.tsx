@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { useUserStore } from '../../core/store';
 import { theme } from '../../core/theme';
@@ -28,6 +29,7 @@ const CompanyHeader = ({
   ownership,
   debt,
 }: CompanyHeaderProps) => {
+    useLocale();
   const { name } = useUserStore();
   const changeColor = dailyChange >= 0 ? styles.changeUp : styles.changeDown;
   const formattedChange = `${dailyChange >= 0 ? '+' : ''}${dailyChange}%`;
@@ -41,7 +43,7 @@ const CompanyHeader = ({
           <Text style={styles.subtitle}>Ownership: {ownership}%</Text>
         </View>
         <View style={styles.rightCol}>
-          <Text style={styles.metricLabel}>Company Value</Text>
+          <Text style={styles.metricLabel}>{t('ui.companyValue')}</Text>
           <Text style={styles.metricValue}>${formatShortMoney(valuation)}</Text>
           <Text style={styles.meta}>Share Price: {formatPrice(sharePrice)}</Text>
           <Text style={[styles.change, changeColor]}>{formattedChange}</Text>

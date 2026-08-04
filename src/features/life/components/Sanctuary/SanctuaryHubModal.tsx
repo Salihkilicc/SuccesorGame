@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import GameModal from '../../../../components/common/GameModal';
 import GameButton from '../../../../components/common/GameButton';
 import SanctuaryMenuGrid from './components/SanctuaryMenuGrid';
@@ -24,12 +25,13 @@ const SanctuaryHubModal = ({
     onBuyMembership,
     isVIPMember,
 }: SanctuaryHubModalProps) => {
+    useLocale();
     return (
         <GameModal
             visible={visible}
             onClose={onClose}
-            title="THE WELLNESS SANCTUARY"
-            subtitle="Luxury Care & Aesthetic Perfection">
+            title={t('life.theWellnessSanctuary')}
+            subtitle={t('life.luxuryCareAestheticPerfection')}>
 
             <SanctuaryMenuGrid
                 onOpenGrooming={onOpenGrooming}
@@ -41,7 +43,7 @@ const SanctuaryHubModal = ({
             />
 
             <GameButton
-                title="Leave Sanctuary"
+                title={t('life.leaveSanctuary')}
                 variant="ghost"
                 onPress={onClose}
                 style={{ marginTop: 24 }}

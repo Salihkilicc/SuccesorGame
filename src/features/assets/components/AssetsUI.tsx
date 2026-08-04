@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 import { formatMoney } from '../../../core/utils';
@@ -16,12 +17,12 @@ export const AssetsHeader = ({ onBack, risk, strategy }: any) => (
             <Pressable onPress={onBack} style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
                 <Text style={styles.backIcon}>←</Text>
             </Pressable>
-            <Text style={styles.title}>Assets</Text>
+            <Text style={styles.title}>{t('company.assets2')}</Text>
             <View style={{ width: 32 }} />
         </View>
         <View style={styles.riskRow}>
-            <StatPill label="Risk Appetite" value={`${Math.round(risk)}%`} />
-            <StatPill label="Strategic Sense" value={`${Math.round(strategy)}%`} />
+            <StatPill label={t('company.riskAppetite')} value={`${Math.round(risk)}%`} />
+            <StatPill label={t('company.strategicSense')} value={`${Math.round(strategy)}%`} />
         </View>
     </View>
 );
@@ -65,6 +66,7 @@ export const ActionTile = ({ title, body, onPress, variant = 'market' }: any) =>
 );
 
 export const BreakdownSection = ({ title, items, isIncome }: { title: string, items: any[], isIncome?: boolean }) => {
+    useLocale();
     if (!items || items.length === 0) return null;
     return (
         <View style={{ gap: theme.spacing.xs, marginTop: theme.spacing.lg }}>

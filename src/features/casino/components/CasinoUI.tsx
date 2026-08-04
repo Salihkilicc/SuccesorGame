@@ -1,5 +1,6 @@
 // src/features/casino/components/CasinoUI.tsx
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -9,11 +10,12 @@ import { theme } from '../../../core/theme';
 
 // --- REPUTATION BAR ---
 export const ReputationSection = ({ reputation }: { reputation: number }) => {
+    useLocale();
     const safeRep = Math.max(0, Math.min(100, Math.round(reputation)));
     return (
         <View style={styles.repContainer}>
             <View style={styles.repHeader}>
-                <Text style={styles.repLabel}>Casino Rep</Text>
+                <Text style={styles.repLabel}>{t('ui.casinoRep')}</Text>
                 <Text style={styles.repValueText}>{safeRep} / 100</Text>
             </View>
             <View style={styles.repTrack}>
@@ -27,10 +29,10 @@ export const ReputationSection = ({ reputation }: { reputation: number }) => {
 export const LocationSelector = ({ name, onPress }: { name: string, onPress: () => void }) => (
     <View style={styles.locationContainer}>
         <Pressable onPress={onPress} style={({ pressed }) => [styles.locationButton, pressed && styles.cardPressed]}>
-            <Text style={styles.locationLabel}>Selected Casino:</Text>
+            <Text style={styles.locationLabel}>{t('ui.selectedCasino')}</Text>
             <Text style={styles.locationValue}>{name.toUpperCase()}</Text>
         </Pressable>
-        <Text style={styles.locationHint}>Tap for other casinos</Text>
+        <Text style={styles.locationHint}>{t('ui.tapForOtherCasinos')}</Text>
     </View>
 );
 
@@ -52,7 +54,7 @@ export const SlotCard = ({ title, icon, note, onPress }: any) => (
         <Text style={styles.slotIcon}>{icon}</Text>
         <Text style={styles.slotTitle}>{title}</Text>
         <Text style={styles.slotNote}>{note}</Text>
-        <Text style={styles.slotCta}>Play ›</Text>
+        <Text style={styles.slotCta}>{t('ui.play')}</Text>
     </Pressable>
 );
 
@@ -65,7 +67,7 @@ export const HighRollerCard = ({ title, icon, note, onPress }: any) => (
                 <Text style={styles.highRollerNote}>{note}</Text>
             </View>
         </View>
-        <Text style={styles.playCta}>Play ›</Text>
+        <Text style={styles.playCta}>{t('ui.play')}</Text>
     </Pressable>
 );
 

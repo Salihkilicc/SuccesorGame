@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 // Removed Slider import
 import { theme } from '../../core/theme';
@@ -27,6 +28,7 @@ const ManagementCard = ({
     headerRight,
     onSave,
 }: ManagementCardProps) => {
+    useLocale();
     const [targetValue, setTargetValue] = useState(currentValue);
 
     // Reset slider when currentValue changes
@@ -71,7 +73,7 @@ const ManagementCard = ({
 
             <View style={styles.sliderContainer}>
                 <PercentageSelector
-                    label="Target Level"
+                    label={t('ui.targetLevel')}
                     value={targetValue}
                     min={minValue}
                     max={maxValue}
@@ -100,7 +102,7 @@ const ManagementCard = ({
                 {/* Only show button if there is a change */}
                 {delta !== 0 && (
                     <GameButton
-                        title="CONFIRM"
+                        title={t('ui.confirm')}
                         onPress={handleSave}
                         variant='primary'
                         style={{ height: 36, paddingHorizontal: 16, paddingVertical: 0, minWidth: 80 }}

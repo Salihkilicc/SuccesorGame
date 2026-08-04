@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -24,15 +25,16 @@ const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
 
 // Categories for Hub Grid
 const CATEGORIES = [
-    { id: 'VEHICLE', name: 'Vehicles', emoji: '🏎️', color: '#E60000' },
-    { id: 'REAL_ESTATE', name: 'Real Estate', emoji: '🏠', color: '#3A86FF' },
-    { id: 'JEWELRY', name: 'Jewelry', emoji: '💎', color: '#FF3366' },
-    { id: 'WATCH', name: 'Watches', emoji: '⌚', color: '#7209B7' },
-    { id: 'MARINE', name: 'Marine', emoji: '⛵', color: '#3A86FF' },
-    { id: 'AIRCRAFT', name: 'Aircraft', emoji: '✈️', color: '#FF3366' },
+    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: '#E60000' },
+    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#3A86FF' },
+    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: '#FF3366' },
+    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#7209B7' },
+    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#3A86FF' },
+    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: '#FF3366' },
 ];
 
 const ShoppingScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const userName = useUserStore((state) => state.name);
     const { addToCart, isOwned, cart } = useAssetStore();
@@ -80,7 +82,7 @@ const ShoppingScreen = () => {
                 "Acquisition Complete",
                 "The assets have been transferred to your portfolio. Delivery agents have been dispatched.",
                 [{
-                    text: "Excellent",
+                    text: t('ui.excellent'),
                     onPress: () => navigation.navigate('Life')
                 }]
             );
@@ -111,7 +113,7 @@ const ShoppingScreen = () => {
             {/* Welcome */}
             <View style={styles.welcomeSection}>
                 <Text style={styles.welcomeText}>Welcome back, {userName}</Text>
-                <Text style={styles.subtitleText}>The world's marketplace is yours.</Text>
+                <Text style={styles.subtitleText}>{t('ui.theWorldSMarketplaceIs')}</Text>
             </View>
 
             {/* Ads */}
@@ -119,7 +121,7 @@ const ShoppingScreen = () => {
 
             {/* Departments Grid */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Browse Departments</Text>
+                <Text style={styles.sectionTitle}>{t('ui.browseDepartments')}</Text>
                 <View style={styles.categoryGrid}>
                     {CATEGORIES.map(cat => (
                         <Pressable
@@ -140,7 +142,7 @@ const ShoppingScreen = () => {
 
             {/* Trending Items */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Trending Now</Text>
+                <Text style={styles.sectionTitle}>{t('ui.trendingNow')}</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalRow}>
                     {trendingItems.map(item => {
                         const shop = SHOPS.find(s => s.id === item.shopId);

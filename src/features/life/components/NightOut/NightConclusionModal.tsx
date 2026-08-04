@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -28,6 +29,7 @@ type NightConclusionModalProps = {
 const { width } = Dimensions.get('window');
 
 const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalProps) => {
+    useLocale();
     if (!visible || !data) return null;
 
     const themeColor = data.themeColor || '#FFFFFF';
@@ -98,7 +100,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
                     </View>
 
                     <Pressable onPress={onClose} style={styles.closeButton}>
-                        <Text style={styles.closeButtonText}>Close Chapter</Text>
+                        <Text style={styles.closeButtonText}>{t('life.closeChapter')}</Text>
                     </Pressable>
                 </View>
             </View>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../../core/theme';
 import { BLACK_MARKET_WEAPONS, BLACK_MARKET_SUBSTANCES } from '../../../../data/BlackMarketData';
@@ -39,6 +40,7 @@ const BlackMarketHubModal = ({
     onAcceptOffer,
     onRejectOffer
 }: BlackMarketHubModalProps) => {
+    useLocale();
     const [view, setView] = useState<ViewState>('MENU');
 
     const handleClose = () => {
@@ -55,7 +57,7 @@ const BlackMarketHubModal = ({
         >
             <View style={styles.container}>
                 <Pressable style={styles.closeOverlay} onPress={handleClose}>
-                    <Text style={styles.closeText}>LEAVE</Text>
+                    <Text style={styles.closeText}>{t('life.leave')}</Text>
                 </Pressable>
 
                 <View style={styles.content}>
@@ -70,7 +72,7 @@ const BlackMarketHubModal = ({
                     )}
                     {view === 'WEAPONS' && (
                         <BlackMarketListView
-                            title="ARSENAL"
+                            title={t('life.arsenal')}
                             data={BLACK_MARKET_WEAPONS}
                             onBuy={onBuyWeapon}
                             onBack={() => setView('MENU')}
@@ -78,7 +80,7 @@ const BlackMarketHubModal = ({
                     )}
                     {view === 'SUBSTANCES' && (
                         <BlackMarketListView
-                            title="STREET STASH"
+                            title={t('life.streetStash')}
                             data={BLACK_MARKET_SUBSTANCES}
                             onBuy={onBuySubstance}
                             onBack={() => setView('MENU')}

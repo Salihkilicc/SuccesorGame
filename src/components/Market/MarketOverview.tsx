@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
 
@@ -10,14 +11,16 @@ type MarketOverviewProps = {
 const MarketOverview = ({
   trend = 'Bullish',
   volatility = 'Medium',
-}: MarketOverviewProps) => (
+}: MarketOverviewProps) => {
+    useLocale();
+    return (
   <View style={styles.container}>
     <View style={styles.headerRow}>
       <Text style={styles.icon}>📊</Text>
-      <Text style={styles.title}>Market Overview</Text>
+      <Text style={styles.title}>{t('market.marketOverview')}</Text>
     </View>
     <View style={styles.row}>
-      <Text style={styles.label}>Trend</Text>
+      <Text style={styles.label}>{t('market.trend')}</Text>
       <Text
         style={[
           styles.value,
@@ -27,7 +30,7 @@ const MarketOverview = ({
       </Text>
     </View>
     <View style={styles.row}>
-      <Text style={styles.label}>Volatility</Text>
+      <Text style={styles.label}>{t('market.volatility')}</Text>
       <Text
         style={[
           styles.value,
@@ -40,9 +43,10 @@ const MarketOverview = ({
         {volatility}
       </Text>
     </View>
-    <Text style={styles.helper}>All data is fictional & simulated.</Text>
+    <Text style={styles.helper}>{t('market.allDataIsFictionalSimulated')}</Text>
   </View>
-);
+    );
+};
 
 export default MarketOverview;
 

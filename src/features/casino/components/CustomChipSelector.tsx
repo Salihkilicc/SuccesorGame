@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Animated, Vibration, Platform } from 'react-native';
 import { CasinoTheme } from '../data/casinoData';
 import { theme } from '../../../core/theme';
@@ -96,9 +97,10 @@ const ChipItem = ({
 };
 
 export const CustomChipSelector = ({ chips, selectedChip, onSelect, gameTheme }: CustomChipSelectorProps) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>BET SIZE</Text>
+            <Text style={styles.label}>{t('ui.betSize')}</Text>
             <View style={styles.row}>
                 {chips.map((chipVal) => (
                     <ChipItem

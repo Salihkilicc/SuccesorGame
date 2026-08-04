@@ -231,3 +231,36 @@ export const findCompetitorByStockId = (
     }
     return undefined;
 };
+
+// ============================================================================
+//  KATEGORİNİN DOLAR BÜYÜKLÜĞÜ
+// ============================================================================
+//  Oyuncunun en cok kafasini karistiran sey: "Smart Speaker 200 bin
+//  kazandiriyor, Auto-Drone 2 milyon, neden?"
+//
+//  Cevap adet degil DOLAR. Consumer pazari ceyrekte 1 milyon adet ama
+//  ortalama 600 dolar — yani ~0.6 milyar dolar. Robotics 270 bin adet
+//  ama ortalama 25 bin dolar — ~6.8 milyar dolar. ON BIR KAT.
+//
+//  Yani ayni pazar payi Robotics'te on bir kat daha cok para eder.
+//  Bu, oyunun en onemli stratejik gercegi ve hicbir ekranda
+//  gorunmuyordu.
+// ============================================================================
+
+/** Kategorideki ortalama birim fiyat — dolar buyuklugunu hesaplamak icin. */
+export const CATEGORY_AVERAGE_PRICE: Record<MarketCategory, number> = {
+    Consumer: 600,
+    Robotics: 25_000,
+    'Bio-Tech': 300_000,
+    'Deep Tech': 5_000_000,
+};
+
+/** Kategorinin ceyreklik DOLAR buyuklugu. */
+export const marketDollarSize = (market: ProductMarket): number =>
+    market.sizeUnitsPerQuarter * (CATEGORY_AVERAGE_PRICE[market.category] ?? 600);
+
+/** Tum kategoriler, dolar buyuklugune gore siralanmis. */
+export const marketsByValue = (): { market: ProductMarket; dollarSize: number }[] =>
+    PRODUCT_MARKETS
+        .map(m => ({ market: m, dollarSize: marketDollarSize(m) }))
+        .sort((a, b) => b.dollarSize - a.dollarSize);

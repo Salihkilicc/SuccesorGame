@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleCryptoAsset } from './marketTypes';
@@ -25,31 +26,31 @@ const adjustedChange = (baseChange: number, marketCap: number) =>
 const formatCap = (marketCap: number) => formatMoneyExact(marketCap);
 
 const CRYPTOS: SimpleCryptoAsset[] = [
-  { id: 'Bitron', name: 'Bitron', cost: 120, trend: 'High Trend', change: 6, risk: 'High', marketCap: 180 },
-  { id: 'Etheriq', name: 'Etheriq', cost: 450, trend: 'High Trend', change: 8, risk: 'High', marketCap: 220 },
-  { id: 'Solara', name: 'Solara', cost: 22, trend: 'High Trend', change: 3, risk: 'High', marketCap: 35 },
-  { id: 'Lunar', name: 'Lunar', cost: 15, trend: 'Low Trend', change: -4, risk: 'High', marketCap: 12 },
-  { id: 'NeonX', name: 'NeonX', cost: 65, trend: 'High Trend', change: 5, risk: 'High', marketCap: 68 },
-  { id: 'Stellarum', name: 'Stellarum', cost: 9, trend: 'Low Trend', change: -6, risk: 'High', marketCap: 9 },
-  { id: 'QuantumCoin', name: 'QuantumCoin', cost: 88, trend: 'High Trend', change: 10, risk: 'High', marketCap: 95 },
-  { id: 'FusionCash', name: 'FusionCash', cost: 32, trend: 'High Trend', change: 2, risk: 'High', marketCap: 22 },
-  { id: 'Aurora', name: 'Aurora', cost: 18, trend: 'Low Trend', change: -3, risk: 'High', marketCap: 7 },
-  { id: 'Vertex', name: 'Vertex', cost: 55, trend: 'High Trend', change: 7, risk: 'High', marketCap: 40 },
-  { id: 'Hyperion', name: 'Hyperion', cost: 12, trend: 'High Trend', change: 4, risk: 'High', marketCap: 6 },
-  { id: 'CoreLink', name: 'CoreLink', cost: 24, trend: 'Low Trend', change: -2, risk: 'High', marketCap: 11 },
-  { id: 'Pulse', name: 'Pulse', cost: 6, trend: 'High Trend', change: 12, risk: 'High', marketCap: 3 },
-  { id: 'TerraMint', name: 'TerraMint', cost: 40, trend: 'Low Trend', change: -5, risk: 'High', marketCap: 18 },
-  { id: 'NovaChain', name: 'NovaChain', cost: 72, trend: 'High Trend', change: 9, risk: 'High', marketCap: 55 },
-  { id: 'CarbonX', name: 'CarbonX', cost: 27, trend: 'Low Trend', change: -1, risk: 'High', marketCap: 25 },
-  { id: 'OrbitPay', name: 'OrbitPay', cost: 19, trend: 'Low Trend', change: -2, risk: 'High', marketCap: 14 },
-  { id: 'MetaByte', name: 'MetaByte', cost: 95, trend: 'High Trend', change: 6, risk: 'High', marketCap: 72 },
-  { id: 'AtlasCoin', name: 'AtlasCoin', cost: 34, trend: 'High Trend', change: 3, risk: 'High', marketCap: 26 },
-  { id: 'Pyra', name: 'Pyra', cost: 14, trend: 'Low Trend', change: -4, risk: 'High', marketCap: 8 },
-  { id: 'Cypher', name: 'Cypher', cost: 52, trend: 'High Trend', change: 8, risk: 'High', marketCap: 38 },
-  { id: 'Glimmer', name: 'Glimmer', cost: 16, trend: 'High Trend', change: 5, risk: 'High', marketCap: 12 },
-  { id: 'Drift', name: 'Drift', cost: 11, trend: 'Low Trend', change: -3, risk: 'High', marketCap: 4 },
-  { id: 'Proton', name: 'Proton', cost: 28, trend: 'High Trend', change: 4, risk: 'High', marketCap: 16 },
-  { id: 'Radiant', name: 'Radiant', cost: 60, trend: 'High Trend', change: 2, risk: 'High', marketCap: 30 },
+  { id: 'Bitron', name: t('market.bitron'), cost: 120, trend: 'High Trend', change: 6, risk: 'High', marketCap: 180 },
+  { id: 'Etheriq', name: t('market.etheriq'), cost: 450, trend: 'High Trend', change: 8, risk: 'High', marketCap: 220 },
+  { id: 'Solara', name: t('market.solara'), cost: 22, trend: 'High Trend', change: 3, risk: 'High', marketCap: 35 },
+  { id: 'Lunar', name: t('market.lunar'), cost: 15, trend: 'Low Trend', change: -4, risk: 'High', marketCap: 12 },
+  { id: 'NeonX', name: t('market.neonx'), cost: 65, trend: 'High Trend', change: 5, risk: 'High', marketCap: 68 },
+  { id: 'Stellarum', name: t('market.stellarum'), cost: 9, trend: 'Low Trend', change: -6, risk: 'High', marketCap: 9 },
+  { id: 'QuantumCoin', name: t('market.quantumcoin'), cost: 88, trend: 'High Trend', change: 10, risk: 'High', marketCap: 95 },
+  { id: 'FusionCash', name: t('market.fusioncash'), cost: 32, trend: 'High Trend', change: 2, risk: 'High', marketCap: 22 },
+  { id: 'Aurora', name: t('market.aurora'), cost: 18, trend: 'Low Trend', change: -3, risk: 'High', marketCap: 7 },
+  { id: 'Vertex', name: t('market.vertex'), cost: 55, trend: 'High Trend', change: 7, risk: 'High', marketCap: 40 },
+  { id: 'Hyperion', name: t('market.hyperion'), cost: 12, trend: 'High Trend', change: 4, risk: 'High', marketCap: 6 },
+  { id: 'CoreLink', name: t('market.corelink'), cost: 24, trend: 'Low Trend', change: -2, risk: 'High', marketCap: 11 },
+  { id: 'Pulse', name: t('market.pulse'), cost: 6, trend: 'High Trend', change: 12, risk: 'High', marketCap: 3 },
+  { id: 'TerraMint', name: t('market.terramint'), cost: 40, trend: 'Low Trend', change: -5, risk: 'High', marketCap: 18 },
+  { id: 'NovaChain', name: t('market.novachain'), cost: 72, trend: 'High Trend', change: 9, risk: 'High', marketCap: 55 },
+  { id: 'CarbonX', name: t('market.carbonx'), cost: 27, trend: 'Low Trend', change: -1, risk: 'High', marketCap: 25 },
+  { id: 'OrbitPay', name: t('market.orbitpay'), cost: 19, trend: 'Low Trend', change: -2, risk: 'High', marketCap: 14 },
+  { id: 'MetaByte', name: t('market.metabyte'), cost: 95, trend: 'High Trend', change: 6, risk: 'High', marketCap: 72 },
+  { id: 'AtlasCoin', name: t('market.atlascoin'), cost: 34, trend: 'High Trend', change: 3, risk: 'High', marketCap: 26 },
+  { id: 'Pyra', name: t('market.pyra'), cost: 14, trend: 'Low Trend', change: -4, risk: 'High', marketCap: 8 },
+  { id: 'Cypher', name: t('market.cypher'), cost: 52, trend: 'High Trend', change: 8, risk: 'High', marketCap: 38 },
+  { id: 'Glimmer', name: t('market.glimmer'), cost: 16, trend: 'High Trend', change: 5, risk: 'High', marketCap: 12 },
+  { id: 'Drift', name: t('market.drift'), cost: 11, trend: 'Low Trend', change: -3, risk: 'High', marketCap: 4 },
+  { id: 'Proton', name: t('market.proton'), cost: 28, trend: 'High Trend', change: 4, risk: 'High', marketCap: 16 },
+  { id: 'Radiant', name: t('market.radiant'), cost: 60, trend: 'High Trend', change: 2, risk: 'High', marketCap: 30 },
 ];
 
 const CryptoList = ({ onSelect }: Props) => {

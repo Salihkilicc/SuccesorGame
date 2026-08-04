@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme';
 import { ITEMS } from '../data/shoppingRegistry';
@@ -13,6 +14,7 @@ type ShopPreviewCardProps = {
 };
 
 const ShopPreviewCard = ({ shopId, name, emoji, description, color, onVisit }: ShopPreviewCardProps) => {
+    useLocale();
 
     // Get 3 random items for this shop
     const previewItems = useMemo(() => {
@@ -49,7 +51,7 @@ const ShopPreviewCard = ({ shopId, name, emoji, description, color, onVisit }: S
                 </View>
 
                 <View style={[styles.visitButton, { backgroundColor: `${color}15` }]}>
-                    <Text style={[styles.visitText, { color: color }]}>Visit Site ›</Text>
+                    <Text style={[styles.visitText, { color: color }]}>{t('ui.visitSite')}</Text>
                 </View>
             </Pressable>
 

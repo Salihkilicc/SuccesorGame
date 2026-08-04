@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Image, Pressable, Dimensions } from 'react-native';
 import type { PartnerProfile } from '../../../data/relationshipTypes';
 import type { Partner, SocialTier } from '../types';
@@ -68,7 +69,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   // Derived Info
   const name = partner.name;
   const initial = name[0] || '?';
-  const jobTitle = isDeepPersona ? partner.job.title : 'Unemployed';
+  const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
   const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
   const statusColor = (partner as PartnerProfile).isMarried ? '#a855f7' : '#ec4899';

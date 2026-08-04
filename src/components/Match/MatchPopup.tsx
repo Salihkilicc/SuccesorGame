@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import {
   Modal,
   View,
@@ -27,11 +28,13 @@ const MatchPopup = ({
   onAccept,
   onReject,
   onClose,
-}: MatchPopupProps) => (
+}: MatchPopupProps) => {
+    useLocale();
+    return (
   <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.backdrop}>
       <View style={styles.card}>
-        <Text style={styles.header}>New Match Opportunity</Text>
+        <Text style={styles.header}>{t('ui.newMatchOpportunity')}</Text>
         <MatchCandidateCard candidate={candidate} />
         <View style={styles.actions}>
           <Pressable
@@ -56,7 +59,8 @@ const MatchPopup = ({
       </View>
     </View>
   </Modal>
-);
+    );
+};
 
 export default MatchPopup;
 

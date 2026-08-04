@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import GameButton from '../../../../../components/common/GameButton';
@@ -24,6 +25,7 @@ type RoyalMassageModalProps = {
 };
 
 const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMember, onGoHome }: RoyalMassageModalProps) => {
+    useLocale();
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.safeArea}>
@@ -33,8 +35,8 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                         <Text style={styles.backIcon}>←</Text>
                     </Pressable>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>ROYAL MASSAGE</Text>
-                        <Text style={styles.subtitle}>Relax & Rejuvenate</Text>
+                        <Text style={styles.title}>{t('life.royalMassage2')}</Text>
+                        <Text style={styles.subtitle}>{t('life.relaxRejuvenate')}</Text>
                     </View>
                     <View style={{ width: 40 }} />
                 </View>
@@ -47,8 +49,8 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                         <View style={styles.vipBanner}>
                             <Text style={styles.vipIcon}>👑</Text>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.vipTitle}>VIP Platinum Member</Text>
-                                <Text style={styles.vipText}>All massages are FREE for you!</Text>
+                                <Text style={styles.vipTitle}>{t('life.vipPlatinumMember')}</Text>
+                                <Text style={styles.vipText}>{t('life.allMassagesAreFreeFor')}</Text>
                             </View>
                         </View>
                     )}
@@ -75,8 +77,8 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                                         option.name,
                                         `You enjoyed a ${option.name}.`,
                                         [
-                                            { label: 'Stress', value: `-${option.stress}`, isPositive: true },
-                                            ...(option.health > 0 ? [{ label: 'Health', value: `+${option.health}`, isPositive: true }] : [])
+                                            { label: t('life.stress'), value: `-${option.stress}`, isPositive: true },
+                                            ...(option.health > 0 ? [{ label: t('life.health'), value: `+${option.health}`, isPositive: true }] : [])
                                         ]
                                     );
                                 }}
@@ -85,7 +87,7 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                                     <Text style={styles.optionName}>{option.name}</Text>
                                     {isVIPMember ? (
                                         <View style={styles.freeBadge}>
-                                            <Text style={styles.freeText}>FREE</Text>
+                                            <Text style={styles.freeText}>{t('life.free')}</Text>
                                         </View>
                                     ) : (
                                         <Text style={styles.optionCost}>${option.cost.toLocaleString()}</Text>

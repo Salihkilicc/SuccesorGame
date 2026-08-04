@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
@@ -20,6 +21,7 @@ type SanctuaryHubViewProps = {
 };
 
 const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership, onGoHome }: SanctuaryHubViewProps) => {
+    useLocale();
 
     const handleBuyMembership = () => {
         if (!isVIPMember) {
@@ -40,8 +42,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
                         <Text style={styles.closeIcon}>{ICONS.CLOSE}</Text>
                     </TouchableOpacity>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>SANCTUARY</Text>
-                        <Text style={styles.subtitle}>Wellness & Aesthetics</Text>
+                        <Text style={styles.title}>{t('life.sanctuary')}</Text>
+                        <Text style={styles.subtitle}>{t('life.wellnessAesthetics')}</Text>
                     </View>
                     <View style={{ width: 40 }} />
                 </View>
@@ -81,8 +83,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
                             <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.MASSAGE}</Text>
                             </View>
-                            <Text style={styles.cardTitle}>Royal Massage</Text>
-                            <Text style={styles.cardDesc}>Relieve stress & restore health</Text>
+                            <Text style={styles.cardTitle}>{t('life.royalMassage')}</Text>
+                            <Text style={styles.cardDesc}>{t('life.relieveStressRestoreHealth')}</Text>
                         </TouchableOpacity>
 
                         {/* Grooming */}
@@ -90,8 +92,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
                             <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.GROOMING}</Text>
                             </View>
-                            <Text style={styles.cardTitle}>Grooming Lounge</Text>
-                            <Text style={styles.cardDesc}>Boost luck & style</Text>
+                            <Text style={styles.cardTitle}>{t('life.groomingLounge')}</Text>
+                            <Text style={styles.cardDesc}>{t('life.boostLuckStyle')}</Text>
                         </TouchableOpacity>
 
                         {/* Surgery */}
@@ -99,8 +101,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
                             <View style={[styles.iconContainer, { backgroundColor: '#133323' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.SURGERY}</Text>
                             </View>
-                            <Text style={styles.cardTitle}>Plastic Surgery</Text>
-                            <Text style={styles.cardDesc}>Enhance looks & charm</Text>
+                            <Text style={styles.cardTitle}>{t('life.plasticSurgery')}</Text>
+                            <Text style={styles.cardDesc}>{t('life.enhanceLooksCharm')}</Text>
                         </TouchableOpacity>
 
                     </View>

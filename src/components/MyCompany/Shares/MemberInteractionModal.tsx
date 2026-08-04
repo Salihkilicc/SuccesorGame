@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
@@ -14,6 +15,7 @@ interface Props {
 type TabType = 'LOBBYING' | 'BUYOUT';
 
 const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
+    useLocale();
     const { members, calculateBuyoutPrice } = useShareholderStore();
     const { money, companySharePrice, update: updateStats } = useStatsStore();
 
@@ -28,11 +30,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: 'Loyal Ally', color: '#90EE90' };
-        if (trust >= 60) return { label: 'Supportive', color: '#FFD700' };
-        if (trust >= 40) return { label: 'Neutral', color: '#FFA500' };
-        if (trust >= 20) return { label: 'Suspicious of You', color: '#FF6B6B' };
-        return { label: 'Hostile Enemy', color: '#FF3B30' };
+        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#90EE90' };
+        if (trust >= 60) return { label: t('equity.supportive'), color: '#FFD700' };
+        if (trust >= 40) return { label: t('equity.neutral'), color: '#FFA500' };
+        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#FF6B6B' };
+        return { label: t('equity.hostileEnemy'), color: '#FF3B30' };
     };
 
     const trustStatus = getTrustStatus(member.trust);
@@ -43,7 +45,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const TRUST_BOOST = 5;
 
         if (money < GIFT_COST) {
-            Alert.alert('Insufficient Funds', `You need ${formatMoney(GIFT_COST)} to send a gift.`);
+            Alert.alert(t('alert.insufficientFunds'), `You need ${formatMoney(GIFT_COST)} to send a gift.`);
             return;
         }
 
@@ -51,9 +53,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
             '🎁 Send Gift',
             `Send a ${formatMoney(GIFT_COST)} gift to ${member.name}?\n\nTrust will increase by ${TRUST_BOOST}.`,
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('equity.cancel'), style: 'cancel' },
                 {
-                    text: 'Send Gift',
+                    text: t('equity.sendGift'),
                     onPress: () => {
                         updateStats({ money: money - GIFT_COST });
                         // TODO: Implement trust increase in store
@@ -74,9 +76,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
             '🍽️ Private Dinner',
             `Invite ${member.name} to a private dinner?\n\nCost: ${ENERGY_COST} Energy\nTrust will increase by ${TRUST_BOOST}.`,
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('equity.cancel'), style: 'cancel' },
                 {
-                    text: 'Arrange Dinner',
+                    text: t('equity.arrangeDinner'),
                     onPress: () => {
                         // TODO: Deduct energy, increase trust
                         Alert.alert('✅ Dinner Arranged', `You had a productive conversation with ${member.name}.\n\nTrust +${TRUST_BOOST}`);
@@ -90,7 +92,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     const handleBlackmail = () => {
         Alert.alert(
             '🕵️ Blackmail',
-            'This feature is locked.\n\nUnlock by completing the "Corporate Espionage" storyline.',
+            t('alert.thisFeatureIsLockedN'),
             [{ text: 'OK' }]
         );
     };
@@ -126,7 +128,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     const handleMakeOffer = () => {
         if (money < offerPrice) {
-            Alert.alert('Insufficient Funds', `You need ${formatMoney(offerPrice)} to make this offer.`);
+            Alert.alert(t('alert.insufficientFunds'), `You need ${formatMoney(offerPrice)} to make this offer.`);
             return;
         }
 
@@ -134,7 +136,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const buyoutResult = calculateBuyoutPrice(member.id, companySharePrice);
 
         if (!buyoutResult) {
-            Alert.alert('Error', 'Unable to calculate buyout price.');
+            Alert.alert(t('alert.error'), t('alert.unableToCalculateBuyoutPrice'));
             return;
         }
 
@@ -159,9 +161,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 `Shares Acquired: ${member.shares.toFixed(1)}%\n\n` +
                 `Your ownership will increase to ${(member.shares + 65).toFixed(1)}%`,
                 [
-                    { text: 'Cancel', style: 'cancel' },
+                    { text: t('equity.cancel'), style: 'cancel' },
                     {
-                        text: 'Complete Purchase',
+                        text: t('equity.completePurchase'),
                         onPress: () => {
                             // TODO: Implement actual share transfer
                             updateStats({ money: money - offerPrice });
@@ -204,17 +206,17 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 </View>
                 <View style={styles.statsRow}>
                     <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Shares</Text>
+                        <Text style={styles.statLabel}>{t('equity.shares')}</Text>
                         <Text style={styles.statValue}>{member.shares.toFixed(1)}%</Text>
                     </View>
                     <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Trust</Text>
+                        <Text style={styles.statLabel}>{t('equity.trust')}</Text>
                         <Text style={[styles.statValue, { color: trustStatus.color }]}>
                             {member.trust}
                         </Text>
                     </View>
                     <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Origin</Text>
+                        <Text style={styles.statLabel}>{t('equity.origin')}</Text>
                         <Text style={styles.statValue}>{member.origin}</Text>
                     </View>
                 </View>
@@ -226,17 +228,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     style={[styles.tab, activeTab === 'LOBBYING' && styles.tabActive]}
                     onPress={() => setActiveTab('LOBBYING')}
                 >
-                    <Text style={[styles.tabText, activeTab === 'LOBBYING' && styles.tabTextActive]}>
-                        LOBBYING
-                    </Text>
+                    <Text style={[styles.tabText, activeTab === 'LOBBYING' && styles.tabTextActive]}>{t('equity.lobbying')}</Text>
                 </Pressable>
                 <Pressable
                     style={[styles.tab, activeTab === 'BUYOUT' && styles.tabActive]}
                     onPress={() => setActiveTab('BUYOUT')}
                 >
-                    <Text style={[styles.tabText, activeTab === 'BUYOUT' && styles.tabTextActive]}>
-                        BUYOUT
-                    </Text>
+                    <Text style={[styles.tabText, activeTab === 'BUYOUT' && styles.tabTextActive]}>{t('equity.buyout')}</Text>
                 </Pressable>
             </View>
 
@@ -244,7 +242,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 {/* Lobbying Tab */}
                 {activeTab === 'LOBBYING' && (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>INFLUENCE ACTIONS</Text>
+                        <Text style={styles.sectionTitle}>{t('equity.influenceActions')}</Text>
                         <View style={styles.actionGrid}>
                             {/* Send Gift */}
                             <Pressable
@@ -257,9 +255,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 disabled={money < 50000}
                             >
                                 <Text style={styles.actionIcon}>🎁</Text>
-                                <Text style={styles.actionTitle}>Send Gift</Text>
+                                <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
-                                <Text style={styles.actionEffect}>Trust +5</Text>
+                                <Text style={styles.actionEffect}>{t('equity.trust5')}</Text>
                             </Pressable>
 
                             {/* Private Dinner */}
@@ -271,9 +269,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 onPress={handlePrivateDinner}
                             >
                                 <Text style={styles.actionIcon}>🍽️</Text>
-                                <Text style={styles.actionTitle}>Private Dinner</Text>
+                                <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
-                                <Text style={styles.actionEffect}>Trust +15</Text>
+                                <Text style={styles.actionEffect}>{t('equity.trust15')}</Text>
                             </Pressable>
 
                             {/* Blackmail */}
@@ -286,9 +284,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 onPress={handleBlackmail}
                             >
                                 <Text style={styles.actionIcon}>🕵️</Text>
-                                <Text style={styles.actionTitle}>Blackmail</Text>
+                                <Text style={styles.actionTitle}>{t('equity.blackmail')}</Text>
                                 <Text style={styles.actionCost}>🔒 Locked</Text>
-                                <Text style={styles.actionEffect}>Force Vote</Text>
+                                <Text style={styles.actionEffect}>{t('equity.forceVote')}</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -297,11 +295,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 {/* Buyout Tab */}
                 {activeTab === 'BUYOUT' && (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>SHARE NEGOTIATION</Text>
+                        <Text style={styles.sectionTitle}>{t('equity.shareNegotiation2')}</Text>
 
                         {/* Stepper UI */}
                         <View style={styles.stepperContainer}>
-                            <Text style={styles.stepperLabel}>Offer Premium</Text>
+                            <Text style={styles.stepperLabel}>{t('equity.offerPremium')}</Text>
                             <View style={styles.stepperRow}>
                                 <Pressable
                                     style={({ pressed }) => [
@@ -344,7 +342,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         {/* Reaction Bar */}
                         <View style={styles.reactionContainer}>
                             <View style={styles.reactionLabels}>
-                                <Text style={styles.reactionLabel}>Likelihood to Sell</Text>
+                                <Text style={styles.reactionLabel}>{t('equity.likelihoodToSell')}</Text>
                                 <Text style={[styles.reactionStatus, { color: getLikelihoodColor() }]}>
                                     {getLikelihoodLabel()}
                                 </Text>

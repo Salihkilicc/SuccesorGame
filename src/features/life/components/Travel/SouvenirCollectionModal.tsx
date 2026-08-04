@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -24,6 +25,7 @@ const SouvenirCollectionModal = ({
     onClose,
     onHomePress,
 }: SouvenirCollectionModalProps) => {
+    useLocale();
     const allSouvenirs = VACATION_SPOTS.map(spot => ({
         ...spot.souvenir,
         spotName: spot.name,
@@ -44,10 +46,10 @@ const SouvenirCollectionModal = ({
                 {/* Header */}
                 <View style={styles.header}>
                     <Pressable onPress={onClose} style={styles.closeButton}>
-                        <Text style={styles.closeButtonText}>CLOSE</Text>
+                        <Text style={styles.closeButtonText}>{t('life.close2')}</Text>
                     </Pressable>
                     <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>SOUVENIR COLLECTION</Text>
+                        <Text style={styles.headerTitle}>{t('life.souvenirCollection')}</Text>
                         <Text style={styles.headerSubtitle}>
                             {collectedCount} / {totalCount} Collected
                         </Text>

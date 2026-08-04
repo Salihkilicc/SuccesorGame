@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, StatusBar, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,6 +8,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const ProfileScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
 
@@ -35,7 +37,7 @@ const ProfileScreen = () => {
                     </Pressable>
 
                     <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>PROFILE</Text>
+                        <Text style={styles.headerTitle}>{t('ui.profile')}</Text>
                         <View style={styles.headerAccent} />
                     </View>
                 </View>

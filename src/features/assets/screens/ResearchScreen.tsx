@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,8 +16,8 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
     const navigation = useNavigation();
     return (
         <ScrollView contentContainerStyle={styles.hubContainer}>
-            <Text style={styles.hubTitle}>Research & Development</Text>
-            <Text style={styles.hubSubtitle}>Innovate to dominate the market.</Text>
+            <Text style={styles.hubTitle}>{t('company.researchDevelopment')}</Text>
+            <Text style={styles.hubSubtitle}>{t('company.innovateToDominateTheMarket')}</Text>
 
             <View style={styles.cardsContainer}>
                 {/* Laboratory Card */}
@@ -28,8 +29,8 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                         <Text style={styles.cardIcon}>🧪</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>R&D Laboratory</Text>
-                        <Text style={styles.cardDesc}>Hire scientists and generate Research Points (RP).</Text>
+                        <Text style={styles.cardTitle}>{t('company.rDLaboratory')}</Text>
+                        <Text style={styles.cardDesc}>{t('company.hireScientistsAndGenerateResearch')}</Text>
                     </View>
                     <Text style={styles.chevron}>›</Text>
                 </Pressable>
@@ -43,8 +44,8 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                         <Text style={styles.cardIcon}>🧬</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>Innovation & Tech Tree</Text>
-                        <Text style={styles.cardDesc}>Discover new products and upgrade existing tech.</Text>
+                        <Text style={styles.cardTitle}>{t('company.innovationTechTree')}</Text>
+                        <Text style={styles.cardDesc}>{t('company.discoverNewProductsAndUpgrade')}</Text>
                     </View>
                     <Text style={styles.chevron}>›</Text>
                 </Pressable>
@@ -57,14 +58,15 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
 const TechTreeView = () => (
     <View style={styles.placeholderContainer}>
         <Text style={styles.placeholderIcon}>🌳</Text>
-        <Text style={styles.placeholderTitle}>Innovation Tree</Text>
-        <Text style={styles.placeholderText}>Coming Soon</Text>
-        <Text style={styles.placeholderSub}>Unlock the future of technology.</Text>
+        <Text style={styles.placeholderTitle}>{t('company.innovationTree')}</Text>
+        <Text style={styles.placeholderText}>{t('company.comingSoon')}</Text>
+        <Text style={styles.placeholderSub}>{t('company.unlockTheFutureOfTechnology')}</Text>
     </View>
 );
 
 // --- MAIN SCREEN ---
 const ResearchScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [activeTab, setActiveTab] = useState<TabType>('HUB');

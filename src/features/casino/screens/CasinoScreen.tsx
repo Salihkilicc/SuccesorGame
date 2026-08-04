@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +13,7 @@ import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CasinoScreen = () => {
+    useLocale();
   const navigation = useNavigation<any>();
   const { money } = useStatsStore();
 
@@ -58,36 +60,36 @@ const CasinoScreen = () => {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {/* 2. GAME LOBBY */}
           <View style={styles.gameSection}>
-            <Text style={styles.sectionHeader}>HIGH ROLLER SUITE</Text>
+            <Text style={styles.sectionHeader}>{t('ui.highRollerSuite')}</Text>
 
             {/* BLACKJACK */}
             <GameRoomCard
-              title="Blackjack"
-              subtitle="High Stakes Tables"
+              title={t('ui.blackjack')}
+              subtitle={t('ui.highStakesTables')}
               image={require('../assets/blackjack_thumb.png')}
-              onPress={() => handleGamePress('BlackjackGame', { title: 'Blackjack 21' })}
+              onPress={() => handleGamePress('BlackjackGame', { title: t('ui.blackjack21') })}
             />
 
             {/* ROULETTE */}
             <GameRoomCard
-              title="Roulette"
-              subtitle="European & American"
+              title={t('ui.roulette')}
+              subtitle={t('ui.europeanAmerican')}
               image={require('../assets/roulette_thumb.png')}
-              onPress={() => handleGamePress('RouletteGame', { title: 'European Roulette' })}
+              onPress={() => handleGamePress('RouletteGame', { title: t('ui.europeanRoulette') })}
             />
 
             {/* SLOTS */}
             <GameRoomCard
-              title="Slots"
-              subtitle="Progressive Jackpots"
+              title={t('ui.slots')}
+              subtitle={t('ui.progressiveJackpots')}
               image={require('../assets/slots_thumb.png')}
-              onPress={() => handleGamePress('SlotsGame', { title: 'Slots' })}
+              onPress={() => handleGamePress('SlotsGame', { title: t('ui.slots') })}
             />
 
             {/* POKER */}
             <GameRoomCard
-              title="Poker"
-              subtitle="Texas Hold'em"
+              title={t('ui.poker')}
+              subtitle={t('ui.texasHoldEm')}
               image={require('../assets/poker_thumb.png')}
               onPress={() => handleGamePress('PokerGame', { title: "Texas Hold'em" })}
             />

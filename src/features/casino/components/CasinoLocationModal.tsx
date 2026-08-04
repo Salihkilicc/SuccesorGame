@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Platform } from 'react-native';
 import { CASINO_LOCATIONS, LocationId, CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
@@ -12,6 +13,7 @@ interface CasinoLocationModalProps {
 }
 
 const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLocations, onSelectLocation }: CasinoLocationModalProps) => {
+    useLocale();
     return (
         <Modal
             animationType="fade"
@@ -24,7 +26,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
 
                 <View style={styles.modalContent}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>TRAVEL TO...</Text>
+                        <Text style={styles.title}>{t('ui.travelTo')}</Text>
                         <Pressable onPress={onClose} style={styles.closeBtn}>
                             <Text style={styles.closeText}>✕</Text>
                         </Pressable>
@@ -70,7 +72,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
 
                                     {isSelected && (
                                         <View style={styles.badge}>
-                                            <Text style={styles.badgeText}>CURRENT</Text>
+                                            <Text style={styles.badgeText}>{t('ui.current')}</Text>
                                         </View>
                                     )}
                                 </Pressable>

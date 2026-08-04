@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, FlatList, Alert, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useProductManagement } from './useProductManagement';
@@ -48,17 +49,18 @@ interface ProductDef {
 }
 
 const PRODUCT_DEFINITIONS: ProductDef[] = [
-    { id: 'accessories', label: 'Electronic Accessories', type: 'Electronic Accessories', estCost: '$5-$15', capacityWeight: 1 },
-    { id: 'myphone', label: 'MyPhone', type: 'MyPhone', req: { category: 'hardware', level: 1 }, estCost: '$250-$400', capacityWeight: 2 },
-    { id: 'mypad', label: 'MyPad', type: 'MyPad', req: { category: 'hardware', level: 2 }, estCost: '$150-$250', capacityWeight: 3 },
-    { id: 'mymac', label: 'MyMac', type: 'MyMac', req: { category: 'hardware', level: 3 }, estCost: '$400-$700', capacityWeight: 5 },
-    { id: 'mywatch', label: 'MyWatch', type: 'MyWatch', req: { category: 'hardware', level: 4 }, estCost: '$50-$100', capacityWeight: 1 },
-    { id: 'mypods', label: 'MyPods', type: 'MyPods', req: { category: 'hardware', level: 4 }, estCost: '$30-$60', capacityWeight: 1 },
-    { id: 'mycar', label: 'MyCar', type: 'MyCar', req: { category: 'future', level: 2 }, estCost: '$25k-$35k', capacityWeight: 50 },
-    { id: 'myvision', label: 'MyVision', type: 'MyVision', req: { category: 'future', level: 3 }, estCost: '$1.5k-$2.5k', capacityWeight: 5 },
+    { id: 'accessories', label: t('product.electronicAccessories'), type: 'Electronic Accessories', estCost: '$5-$15', capacityWeight: 1 },
+    { id: 'myphone', label: t('product.myphone'), type: 'MyPhone', req: { category: 'hardware', level: 1 }, estCost: '$250-$400', capacityWeight: 2 },
+    { id: 'mypad', label: t('product.mypad'), type: 'MyPad', req: { category: 'hardware', level: 2 }, estCost: '$150-$250', capacityWeight: 3 },
+    { id: 'mymac', label: t('product.mymac'), type: 'MyMac', req: { category: 'hardware', level: 3 }, estCost: '$400-$700', capacityWeight: 5 },
+    { id: 'mywatch', label: t('product.mywatch'), type: 'MyWatch', req: { category: 'hardware', level: 4 }, estCost: '$50-$100', capacityWeight: 1 },
+    { id: 'mypods', label: t('product.mypods'), type: 'MyPods', req: { category: 'hardware', level: 4 }, estCost: '$30-$60', capacityWeight: 1 },
+    { id: 'mycar', label: t('product.mycar'), type: 'MyCar', req: { category: 'future', level: 2 }, estCost: '$25k-$35k', capacityWeight: 50 },
+    { id: 'myvision', label: t('product.myvision'), type: 'MyVision', req: { category: 'future', level: 3 }, estCost: '$1.5k-$2.5k', capacityWeight: 5 },
 ];
 
 const NewProductWizard = ({ visible, onClose }: Props) => {
+    useLocale();
     // ALL HOOKS MUST BE CALLED FIRST, UNCONDITIONALLY
     const [step, setStep] = useState(1);
     const [selectedDef, setSelectedDef] = useState<ProductDef | null>(null);
@@ -78,7 +80,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
             const currentLevel = techLevels[def.req.category] || 0;
             if (currentLevel < def.req.level) {
                 Alert.alert(
-                    'Investment Required',
+                    t('alert.investmentRequired'),
                     `Research ${def.req.category.charAt(0).toUpperCase() + def.req.category.slice(1)} Level ${def.req.level} to unlock ${def.label}.`
                 );
                 return;
@@ -94,7 +96,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
         if (!selectedDef) return;
 
         if (companyCapital < 50_000) {
-            Alert.alert('Insufficient Funds', 'You need $50,000 for market research.');
+            Alert.alert(t('alert.insufficientFunds'), t('alert.youNeed50000For'));
             return;
         }
 
@@ -196,7 +198,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                 <Pressable
                                     onPress={() => {
                                         if (isActiveOwned) {
-                                            Alert.alert('Limit Reached', 'You already have an active product line of this type. Please retire the existing one to launch a new version.');
+                                            Alert.alert(t('alert.limitReached'), t('alert.youAlreadyHaveAnActive'));
                                             return;
                                         }
                                         handleSelectProduct(item)
@@ -211,7 +213,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                 >
                                     <View>
                                         <Text style={[styles.cardTitle, (locked || isActiveOwned) && styles.textLocked]}>{item.label}</Text>
-                                        {isActiveOwned && <Text style={styles.activeLabel}>ACTIVE</Text>}
+                                        {isActiveOwned && <Text style={styles.activeLabel}>{t('product.active')}</Text>}
                                         {!locked && !isActiveOwned && (
                                             <View style={{ marginTop: 4 }}>
                                                 <Text style={styles.metaText}>{item.estCost}</Text>
@@ -233,19 +235,19 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                 {step === 2 && selectedDef && (
                     <View style={{ gap: 16, flex: 1 }}>
                         <SectionCard
-                            title="Research Quote"
+                            title={t('product.researchQuote')}
                             rightText="$50,000"
                         />
 
                         {!marketResearched ? (
                             <View style={{ marginTop: 'auto', gap: 8 }}>
                                 <GameButton
-                                    title="Perform Analysis"
+                                    title={t('product.performAnalysis')}
                                     variant="primary"
                                     onPress={handleMarketSearch}
                                 />
                                 <GameButton
-                                    title="Back"
+                                    title={t('product.back')}
                                     variant="secondary"
                                     onPress={handleBack}
                                 />
@@ -257,14 +259,14 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                     {currentMarketData && (
                                         <View style={{ gap: 12 }}>
                                             <View>
-                                                <Text style={styles.statLabel}>Demand</Text>
+                                                <Text style={styles.statLabel}>{t('product.demand')}</Text>
                                                 <View style={styles.barBg}>
                                                     <View style={[styles.barFill, { width: `${currentMarketData.demand}%`, backgroundColor: theme.colors.success }]} />
                                                 </View>
                                                 <Text style={styles.statValue}>{currentMarketData.demand}%</Text>
                                             </View>
                                             <View>
-                                                <Text style={styles.statLabel}>Competition</Text>
+                                                <Text style={styles.statLabel}>{t('product.competition2')}</Text>
                                                 <View style={styles.barBg}>
                                                     <View style={[styles.barFill, { width: `${currentMarketData.competition}%`, backgroundColor: theme.colors.danger }]} />
                                                 </View>
@@ -282,7 +284,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                         style={{ backgroundColor: '#4CAF50', borderColor: '#4CAF50' }} // Custom override for success green
                                     />
                                     <GameButton
-                                        title="Back"
+                                        title={t('product.back')}
                                         variant="secondary"
                                         onPress={handleBack}
                                     />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -9,6 +10,7 @@ import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 
 const RouletteGameScreen = () => {
+    useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
   const initialBet = route.params?.betAmount;
@@ -73,7 +75,7 @@ const RouletteGameScreen = () => {
 
         {/* BETTING TABLE */}
         <View style={[styles.tableCard, { borderColor: currentLocation.theme.secondary }]}>
-          <Text style={styles.tableTitle}>PLACE YOUR BETS</Text>
+          <Text style={styles.tableTitle}>{t('ui.placeYourBets')}</Text>
           <View style={styles.betGrid}>
             {renderBetButton('RED', 'RED')}
             {renderBetButton('BLACK', 'BLACK')}
@@ -98,7 +100,7 @@ const RouletteGameScreen = () => {
 
           <View style={styles.bottomControls}>
             <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>SELECTED CHIP</Text>
+              <Text style={styles.betLabel}>{t('ui.selectedChip')}</Text>
               <Text style={styles.betValueText}>${chip.toLocaleString()}</Text>
             </View>
 
@@ -110,7 +112,7 @@ const RouletteGameScreen = () => {
                 { backgroundColor: currentLocation.theme.primary },
                 pressed && styles.spinButtonPressed
               ]}>
-              <Text style={styles.spinText}>SPIN WHEEL</Text>
+              <Text style={styles.spinText}>{t('ui.spinWheel')}</Text>
             </Pressable>
           </View>
         </View>

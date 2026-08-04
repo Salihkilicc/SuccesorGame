@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
 import GameModal from '../../../components/common/GameModal';
@@ -25,6 +26,7 @@ const CasinoBetModal = ({
     onClose,
     onPlay,
 }: Props) => {
+    useLocale();
     const [betAmount, setBetAmount] = useState(minBet);
 
     const adjustBet = (delta: number) => {
@@ -44,7 +46,7 @@ const CasinoBetModal = ({
             visible={visible}
             onClose={onClose}
             title={gameTitle}
-            subtitle="Place your bet"
+            subtitle={t('ui.placeYourBet')}
         >
             <View style={styles.infoRow}>
                 <Text style={styles.limitText}>Min: ${minBet.toLocaleString()}</Text>
@@ -52,7 +54,7 @@ const CasinoBetModal = ({
             </View>
 
             <View style={styles.betDisplay}>
-                <Text style={styles.betLabel}>Current Bet</Text>
+                <Text style={styles.betLabel}>{t('ui.currentBet')}</Text>
                 <Text style={styles.betValue}>${betAmount.toLocaleString()}</Text>
             </View>
 
@@ -65,21 +67,21 @@ const CasinoBetModal = ({
                     <GameButton title="+$10K" onPress={() => adjustBet(STEP * 2)} variant="secondary" style={styles.adjustButton} textStyle={styles.adjustBtnText} />
                 </View>
                 <View style={styles.buttonRow}>
-                    <GameButton title="Min" onPress={() => setBetAmount(minBet)} variant="ghost" style={styles.presetButton} />
+                    <GameButton title={t('ui.min')} onPress={() => setBetAmount(minBet)} variant="ghost" style={styles.presetButton} />
                     <GameButton title="$50K" onPress={() => setBetAmount(50_000)} variant="ghost" style={styles.presetButton} />
-                    <GameButton title="Max" onPress={() => setBetAmount(maxBet)} variant="ghost" style={styles.presetButton} />
+                    <GameButton title={t('ui.max')} onPress={() => setBetAmount(maxBet)} variant="ghost" style={styles.presetButton} />
                 </View>
             </View>
 
             <GameButton
-                title="PLAY"
+                title={t('ui.play2')}
                 onPress={() => onPlay(betAmount)}
                 variant="primary"
                 style={{ marginTop: 24 }}
             />
 
             <GameButton
-                title="Cancel"
+                title={t('ui.cancel')}
                 onPress={onClose}
                 variant="ghost"
                 style={{ marginTop: 8 }}

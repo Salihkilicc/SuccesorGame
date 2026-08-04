@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, ScrollView, Pressable, SafeAreaView, Dimensions, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import BrowserHeader from './BrowserHeader';
@@ -18,6 +19,7 @@ interface CartModalProps {
 }
 
 const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToCheckout, onHomePress }) => {
+    useLocale();
     const { cart, removeFromCart } = useAssetStore();
     const { money } = useStatsStore();
 
@@ -78,12 +80,10 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                 {cart.length === 0 ? (
                     <View style={styles.emptyCartContainer}>
                         <Text style={styles.emptyCartEmoji}>🛒</Text>
-                        <Text style={styles.emptyCartTitle}>Your LuxeNet Cart is empty</Text>
-                        <Text style={styles.emptyCartText}>
-                            Check your Saved for later items or continue shopping.
-                        </Text>
+                        <Text style={styles.emptyCartTitle}>{t('ui.yourLuxenetCartIsEmpty')}</Text>
+                        <Text style={styles.emptyCartText}>{t('ui.checkYourSavedForLater')}</Text>
                         <Pressable onPress={onClose} style={styles.continueButton}>
-                            <Text style={styles.continueButtonText}>Continue Shopping</Text>
+                            <Text style={styles.continueButtonText}>{t('ui.continueShopping')}</Text>
                         </Pressable>
                     </View>
                 ) : (
@@ -108,7 +108,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                                     <View style={styles.itemDetails}>
                                         <Text style={styles.itemTitle} numberOfLines={2}>{item.name}</Text>
                                         <Text style={styles.itemPrice}>{formatCurrency(item.price)}</Text>
-                                        <Text style={styles.inStockText}>In Stock</Text>
+                                        <Text style={styles.inStockText}>{t('ui.inStock')}</Text>
                                         <Text style={styles.soldByText}>
                                             Sold by: <Text style={{ fontWeight: '600' }}>{item.website || 'LuxeNet Certified'}</Text>
                                         </Text>
@@ -121,15 +121,15 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                                 {/* Actions Row */}
                                 <View style={styles.itemActions}>
                                     <Pressable style={styles.actionButton} onPress={() => removeFromCart(item.id)}>
-                                        <Text style={styles.actionText}>Delete</Text>
+                                        <Text style={styles.actionText}>{t('ui.delete')}</Text>
                                     </Pressable>
                                     <View style={styles.divider} />
                                     <Pressable style={styles.actionButton}>
-                                        <Text style={styles.actionText}>Save for later</Text>
+                                        <Text style={styles.actionText}>{t('ui.saveForLater')}</Text>
                                     </Pressable>
                                     <View style={styles.divider} />
                                     <Pressable style={styles.actionButton}>
-                                        <Text style={styles.actionText}>Compare</Text>
+                                        <Text style={styles.actionText}>{t('ui.compare')}</Text>
                                     </Pressable>
                                 </View>
                             </View>
@@ -137,7 +137,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
 
                         {/* Order Summary */}
                         <View style={styles.summaryCard}>
-                            <Text style={styles.summaryTitle}>Order Summary</Text>
+                            <Text style={styles.summaryTitle}>{t('ui.orderSummary')}</Text>
 
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>Subtotal ({cart.length} items):</Text>
@@ -145,17 +145,17 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Shipping & Handling:</Text>
+                                <Text style={styles.summaryLabel}>{t('ui.shippingHandling')}</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(shippingCost)}</Text>
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Luxury Tax (8.0%):</Text>
+                                <Text style={styles.summaryLabel}>{t('ui.luxuryTax80')}</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(luxuryTax)}</Text>
                             </View>
 
                             <View style={styles.totalRow}>
-                                <Text style={styles.totalLabel}>Order Total:</Text>
+                                <Text style={styles.totalLabel}>{t('ui.orderTotal')}</Text>
                                 <Text style={styles.totalValue}>{formatCurrency(orderTotal)}</Text>
                             </View>
                         </View>
@@ -169,7 +169,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                 {cart.length > 0 && (
                     <View style={styles.checkoutFooter}>
                         <View style={styles.footerTotalContainer}>
-                            <Text style={styles.footerTotalLabel}>Total</Text>
+                            <Text style={styles.footerTotalLabel}>{t('ui.total')}</Text>
                             <Text style={styles.footerTotalValue}>{formatCurrency(orderTotal)}</Text>
                         </View>
                         <Pressable

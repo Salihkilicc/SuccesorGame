@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -13,6 +14,7 @@ type Props = {
 };
 
 const RepayModal = ({ visible, onClose }: Props) => {
+    useLocale();
     const navigation = useNavigation<any>();
     const { companyCapital, update } = useStatsStore();
     const { loans, totalDebt, repayLoan } = useCorporateFinanceStore();
@@ -55,10 +57,10 @@ const RepayModal = ({ visible, onClose }: Props) => {
                 <View style={styles.backdrop}>
                     <View style={styles.centeredView}>
                         <View style={styles.container}>
-                            <Text style={styles.title}>Debt Free</Text>
-                            <Text style={styles.subtitle}>You have no corporate debt!</Text>
+                            <Text style={styles.title}>{t('finance.debtFree')}</Text>
+                            <Text style={styles.subtitle}>{t('finance.youHaveNoCorporateDebt')}</Text>
                             <Pressable onPress={onClose} style={styles.confirmButton}>
-                                <Text style={styles.confirmText}>Great!</Text>
+                                <Text style={styles.confirmText}>{t('finance.great')}</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -74,39 +76,39 @@ const RepayModal = ({ visible, onClose }: Props) => {
             <View style={styles.backdrop}>
                 <View style={styles.centeredView}>
                     <View style={styles.container}>
-                        <Text style={styles.title}>Repay Debt</Text>
+                        <Text style={styles.title}>{t('finance.repayDebt')}</Text>
                         <Text style={styles.subtitle}>
                             Total Debt: {formatMoney(totalDebt)} • Cash: {formatMoney(companyCapital)}
                         </Text>
 
                         <ScrollView style={styles.loansScroll} showsVerticalScrollIndicator={false}>
                             {loans.map((loan) => {
-                                const maxRepayable = Math.min(loan.remaining, companyCapital);
+                                const maxRepayable = Math.min(loan.balance, companyCapital);
 
                                 return (
                                     <View key={loan.id} style={styles.loanCard}>
                                         <View style={styles.loanHeader}>
                                             <View>
-                                                <Text style={styles.loanType}>{loan.type} Loan</Text>
-                                                <Text style={styles.loanRate}>{loan.interestRate}% APR</Text>
+                                                <Text style={styles.loanType}>{loan.name} Loan</Text>
+                                                <Text style={styles.loanRate}>{loan.rate}% APR</Text>
                                             </View>
                                             <View style={{ alignItems: 'flex-end' }}>
-                                                <Text style={styles.loanRemainingLabel}>Remaining</Text>
+                                                <Text style={styles.loanRemainingLabel}>{t('finance.remaining')}</Text>
                                                 <Text style={styles.loanRemaining}>
-                                                    {formatMoney(loan.remaining)}
+                                                    {formatMoney(loan.balance)}
                                                 </Text>
                                             </View>
                                         </View>
 
                                         <View style={styles.loanDetails}>
                                             <View style={styles.loanDetailItem}>
-                                                <Text style={styles.loanDetailLabel}>Monthly Payment</Text>
+                                                <Text style={styles.loanDetailLabel}>{t('finance.monthlyPayment')}</Text>
                                                 <Text style={styles.loanDetailValue}>
-                                                    {formatMoney(loan.monthlyPayment)}
+                                                    {formatMoney(((loan.balance * loan.rate) / 4))}
                                                 </Text>
                                             </View>
                                             <View style={styles.loanDetailItem}>
-                                                <Text style={styles.loanDetailLabel}>Can Repay</Text>
+                                                <Text style={styles.loanDetailLabel}>{t('finance.canRepay')}</Text>
                                                 <Text style={[styles.loanDetailValue, { color: '#90EE90' }]}>
                                                     {formatMoney(maxRepayable)}
                                                 </Text>
@@ -116,42 +118,40 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                         {/* Repayment Options */}
                                         <View style={styles.repayOptions}>
                                             {/* Partial Repayment (50%) */}
-                                            {maxRepayable >= loan.remaining * 0.5 && (
+                                            {maxRepayable >= loan.balance * 0.5 && (
                                                 <Pressable
                                                     style={({ pressed }) => [
                                                         styles.repayButton,
                                                         pressed && styles.repayButtonPressed
                                                     ]}
-                                                    onPress={() => handleRepay(loan.id, loan.remaining * 0.5)}
+                                                    onPress={() => handleRepay(loan.id, loan.balance * 0.5)}
                                                 >
-                                                    <Text style={styles.repayButtonLabel}>Pay 50%</Text>
+                                                    <Text style={styles.repayButtonLabel}>{t('finance.pay50')}</Text>
                                                     <Text style={styles.repayButtonValue}>
-                                                        {formatMoney(loan.remaining * 0.5)}
+                                                        {formatMoney(loan.balance * 0.5)}
                                                     </Text>
                                                 </Pressable>
                                             )}
 
                                             {/* Full Repayment */}
-                                            {maxRepayable >= loan.remaining && (
+                                            {maxRepayable >= loan.balance && (
                                                 <Pressable
                                                     style={({ pressed }) => [
                                                         styles.repayButton,
                                                         styles.repayButtonFull,
                                                         pressed && styles.repayButtonPressed
                                                     ]}
-                                                    onPress={() => handleRepay(loan.id, loan.remaining)}
+                                                    onPress={() => handleRepay(loan.id, loan.balance)}
                                                 >
-                                                    <Text style={[styles.repayButtonLabel, { color: '#000' }]}>
-                                                        Pay Full
-                                                    </Text>
+                                                    <Text style={[styles.repayButtonLabel, { color: '#000' }]}>{t('finance.payFull')}</Text>
                                                     <Text style={[styles.repayButtonValue, { color: '#000' }]}>
-                                                        {formatMoney(loan.remaining)}
+                                                        {formatMoney(loan.balance)}
                                                     </Text>
                                                 </Pressable>
                                             )}
 
                                             {/* Max Possible (if less than full) */}
-                                            {maxRepayable > 0 && maxRepayable < loan.remaining && (
+                                            {maxRepayable > 0 && maxRepayable < loan.balance && (
                                                 <Pressable
                                                     style={({ pressed }) => [
                                                         styles.repayButton,
@@ -159,7 +159,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                     ]}
                                                     onPress={() => handleRepay(loan.id, maxRepayable)}
                                                 >
-                                                    <Text style={styles.repayButtonLabel}>Pay Max</Text>
+                                                    <Text style={styles.repayButtonLabel}>{t('finance.payMax')}</Text>
                                                     <Text style={styles.repayButtonValue}>
                                                         {formatMoney(maxRepayable)}
                                                     </Text>
@@ -168,9 +168,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                         </View>
 
                                         {maxRepayable === 0 && (
-                                            <Text style={styles.insufficientText}>
-                                                Insufficient cash to repay
-                                            </Text>
+                                            <Text style={styles.insufficientText}>{t('finance.insufficientCashToRepay')}</Text>
                                         )}
                                     </View>
                                 );
@@ -178,7 +176,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                         </ScrollView>
 
                         <Pressable onPress={onClose} style={styles.closeButton}>
-                            <Text style={styles.closeText}>Close</Text>
+                            <Text style={styles.closeText}>{t('finance.close')}</Text>
                         </Pressable>
                     </View>
                 </View>

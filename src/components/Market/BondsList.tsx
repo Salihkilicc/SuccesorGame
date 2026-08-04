@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { BondCategory, SimpleBondItem } from './marketTypes';
@@ -8,40 +9,40 @@ type Props = {
 };
 
 const BONDS: SimpleBondItem[] = [
-  { id: 'gov-1', name: 'Saudi Gov 10y', years: 10, coupon: 4.4, risk: 'Low', category: 'government' },
-  { id: 'gov-2', name: 'British 7y', years: 7, coupon: 3.2, risk: 'Low', category: 'government' },
-  { id: 'gov-3', name: 'German 6y', years: 6, coupon: 2.8, risk: 'Very Low', category: 'government' },
-  { id: 'gov-4', name: 'Korean 4y', years: 4, coupon: 3.9, risk: 'Medium', category: 'government' },
-  { id: 'gov-5', name: 'Japan 5y', years: 5, coupon: 1.9, risk: 'Very Low', category: 'government' },
-  { id: 'gov-6', name: 'Union Treasury 10y', years: 10, coupon: 3.6, risk: 'Very Low', category: 'government' },
-  { id: 'gov-7', name: 'Canada 8y', years: 8, coupon: 3.4, risk: 'Low', category: 'government' },
-  { id: 'gov-8', name: 'Norway 12y', years: 12, coupon: 3.1, risk: 'Low', category: 'government' },
-  { id: 'gov-9', name: 'Australia 9y', years: 9, coupon: 3.7, risk: 'Low', category: 'government' },
-  { id: 'gov-10', name: 'Brazil 5y', years: 5, coupon: 5.2, risk: 'Medium', category: 'government' },
-  { id: 'gov-11', name: 'India 7y', years: 7, coupon: 5.9, risk: 'Medium', category: 'government' },
-  { id: 'gov-12', name: 'UAE 6y', years: 6, coupon: 4.1, risk: 'Low', category: 'government' },
-  { id: 'gov-13', name: 'Singapore 10y', years: 10, coupon: 2.6, risk: 'Very Low', category: 'government' },
-  { id: 'gov-14', name: 'France 11y', years: 11, coupon: 2.9, risk: 'Very Low', category: 'government' },
-  { id: 'gov-15', name: 'Turkey 4y', years: 4, coupon: 7.8, risk: 'Medium-High', category: 'government' },
-  { id: 'local-1', name: 'New York 8y', years: 8, coupon: 4.4, risk: 'Low', category: 'local' },
-  { id: 'local-2', name: 'Miami 9y', years: 9, coupon: 4.8, risk: 'Low', category: 'local' },
-  { id: 'local-3', name: 'Dallas 10y', years: 10, coupon: 5, risk: 'Medium', category: 'local' },
-  { id: 'local-4', name: 'Seattle 3y', years: 3, coupon: 2.1, risk: 'Very Low', category: 'local' },
-  { id: 'local-5', name: 'Denver 6y', years: 6, coupon: 3.7, risk: 'Low', category: 'local' },
-  { id: 'corp-1', name: 'GreenTooth Energy', years: 6, coupon: 26.8, risk: 'High', category: 'corporate' },
-  { id: 'corp-2', name: 'Volta Industrial', years: 10, coupon: 18.4, risk: 'High', category: 'corporate' },
-  { id: 'corp-3', name: 'TechNova Corp', years: 8, coupon: 14.2, risk: 'Medium-High', category: 'corporate' },
-  { id: 'corp-4', name: 'Apex Robotics', years: 5, coupon: 12.6, risk: 'Medium', category: 'corporate' },
-  { id: 'corp-5', name: 'BlueOcean Freight', years: 7, coupon: 9.4, risk: 'Medium', category: 'corporate' },
-  { id: 'corp-6', name: 'Silverline Media', years: 4, coupon: 8.1, risk: 'Medium', category: 'corporate' },
-  { id: 'corp-7', name: 'Quantum Motors', years: 9, coupon: 16.8, risk: 'High', category: 'corporate' },
-  { id: 'corp-8', name: 'Helios Pharma', years: 6, coupon: 11.2, risk: 'Medium-High', category: 'corporate' },
+  { id: 'gov-1', name: t('market.saudiGov10y'), years: 10, coupon: 4.4, risk: 'Low', category: 'government' },
+  { id: 'gov-2', name: t('market.british7y'), years: 7, coupon: 3.2, risk: 'Low', category: 'government' },
+  { id: 'gov-3', name: t('market.german6y'), years: 6, coupon: 2.8, risk: 'Very Low', category: 'government' },
+  { id: 'gov-4', name: t('market.korean4y'), years: 4, coupon: 3.9, risk: 'Medium', category: 'government' },
+  { id: 'gov-5', name: t('market.japan5y'), years: 5, coupon: 1.9, risk: 'Very Low', category: 'government' },
+  { id: 'gov-6', name: t('market.unionTreasury10y'), years: 10, coupon: 3.6, risk: 'Very Low', category: 'government' },
+  { id: 'gov-7', name: t('market.canada8y'), years: 8, coupon: 3.4, risk: 'Low', category: 'government' },
+  { id: 'gov-8', name: t('market.norway12y'), years: 12, coupon: 3.1, risk: 'Low', category: 'government' },
+  { id: 'gov-9', name: t('market.australia9y'), years: 9, coupon: 3.7, risk: 'Low', category: 'government' },
+  { id: 'gov-10', name: t('market.brazil5y'), years: 5, coupon: 5.2, risk: 'Medium', category: 'government' },
+  { id: 'gov-11', name: t('market.india7y'), years: 7, coupon: 5.9, risk: 'Medium', category: 'government' },
+  { id: 'gov-12', name: t('market.uae6y'), years: 6, coupon: 4.1, risk: 'Low', category: 'government' },
+  { id: 'gov-13', name: t('market.singapore10y'), years: 10, coupon: 2.6, risk: 'Very Low', category: 'government' },
+  { id: 'gov-14', name: t('market.france11y'), years: 11, coupon: 2.9, risk: 'Very Low', category: 'government' },
+  { id: 'gov-15', name: t('market.turkey4y'), years: 4, coupon: 7.8, risk: 'Medium-High', category: 'government' },
+  { id: 'local-1', name: t('market.newYork8y'), years: 8, coupon: 4.4, risk: 'Low', category: 'local' },
+  { id: 'local-2', name: t('market.miami9y'), years: 9, coupon: 4.8, risk: 'Low', category: 'local' },
+  { id: 'local-3', name: t('market.dallas10y'), years: 10, coupon: 5, risk: 'Medium', category: 'local' },
+  { id: 'local-4', name: t('market.seattle3y'), years: 3, coupon: 2.1, risk: 'Very Low', category: 'local' },
+  { id: 'local-5', name: t('market.denver6y'), years: 6, coupon: 3.7, risk: 'Low', category: 'local' },
+  { id: 'corp-1', name: t('market.greentoothEnergy'), years: 6, coupon: 26.8, risk: 'High', category: 'corporate' },
+  { id: 'corp-2', name: t('market.voltaIndustrial'), years: 10, coupon: 18.4, risk: 'High', category: 'corporate' },
+  { id: 'corp-3', name: t('market.technovaCorp'), years: 8, coupon: 14.2, risk: 'Medium-High', category: 'corporate' },
+  { id: 'corp-4', name: t('market.apexRobotics'), years: 5, coupon: 12.6, risk: 'Medium', category: 'corporate' },
+  { id: 'corp-5', name: t('market.blueoceanFreight'), years: 7, coupon: 9.4, risk: 'Medium', category: 'corporate' },
+  { id: 'corp-6', name: t('market.silverlineMedia'), years: 4, coupon: 8.1, risk: 'Medium', category: 'corporate' },
+  { id: 'corp-7', name: t('market.quantumMotors'), years: 9, coupon: 16.8, risk: 'High', category: 'corporate' },
+  { id: 'corp-8', name: t('market.heliosPharma'), years: 6, coupon: 11.2, risk: 'Medium-High', category: 'corporate' },
 ];
 
 const SUB_CATEGORIES: { label: string; value: BondCategory }[] = [
-  { label: 'Government Bonds', value: 'government' },
-  { label: 'Local Bonds', value: 'local' },
-  { label: 'Corporate Bonds', value: 'corporate' },
+  { label: t('market.governmentBonds'), value: 'government' },
+  { label: t('market.localBonds'), value: 'local' },
+  { label: t('market.corporateBonds'), value: 'corporate' },
 ];
 
 const BondsList = ({ onSelect }: Props) => {

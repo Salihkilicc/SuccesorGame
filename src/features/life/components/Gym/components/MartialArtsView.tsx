@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { MartialArtDiscipline } from '../useGymSystem';
@@ -20,6 +21,7 @@ const MartialArtsView = ({
     onStartMartialArts,
     onBack,
 }: MartialArtsViewProps) => {
+    useLocale();
 
     const getBeltColor = (level: number) => {
         const colors = ['#C0C0C0', '#FF6F00', '#FF6F00', '#FF6F00', '#FF6F00', '#FF6F00', '#000000'];
@@ -36,7 +38,7 @@ const MartialArtsView = ({
         <View style={styles.subViewContainer}>
             <Text style={styles.subTitle}>{selectedMartialArt?.toUpperCase()} TRAINING</Text>
             <View style={styles.beltDisplay}>
-                <Text style={styles.beltLabel}>CURRENT BELT</Text>
+                <Text style={styles.beltLabel}>{t('life.currentBelt')}</Text>
                 <Text style={styles.beltName}>{BELT_NAMES[currentLevel]}</Text>
                 <View style={[styles.beltVisual, { backgroundColor: getBeltColor(currentLevel) }]} />
             </View>

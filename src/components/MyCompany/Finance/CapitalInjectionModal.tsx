@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
@@ -7,6 +8,7 @@ import { formatMoney } from '../../../core/utils';
 interface Props { visible: boolean; onClose: () => void; }
 
 const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
+    useLocale();
     const { money } = useStatsStore();
     const { injectCapital } = useCorporateFinanceStore();
     const [percent, setPercent] = useState<number>(10);
@@ -24,14 +26,14 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
             <View style={styles.overlay}>
                 <View style={styles.container}>
                     <Text style={styles.title}>🏦 Capital Injection</Text>
-                    <Text style={styles.subtitle}>Transfer Personal Wealth</Text>
+                    <Text style={styles.subtitle}>{t('finance.transferPersonalWealth')}</Text>
 
                     <View style={styles.balanceCard}>
-                        <Text style={styles.label}>AVAILABLE CASH</Text>
+                        <Text style={styles.label}>{t('finance.availableCash')}</Text>
                         <Text style={styles.balance}>{formatMoney(money)}</Text>
                     </View>
 
-                    <Text style={styles.sectionTitle}>Select Amount</Text>
+                    <Text style={styles.sectionTitle}>{t('finance.selectAmount')}</Text>
                     <View style={styles.grid}>
                         {[5, 10, 15, 20, 25, 30, 40, 50].map((p) => (
                             <TouchableOpacity key={p} onPress={() => setPercent(p)}
@@ -42,13 +44,13 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
                     </View>
 
                     <View style={styles.preview}>
-                        <Text style={styles.label}>Injecting:</Text>
+                        <Text style={styles.label}>{t('finance.injecting')}</Text>
                         <Text style={styles.previewAmount}>{formatMoney(amount)}</Text>
                     </View>
 
                     <View style={styles.actions}>
-                        <TouchableOpacity onPress={onClose} style={styles.cancelBtn}><Text style={styles.btnText}>Cancel</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={handleConfirm} style={styles.confirmBtn}><Text style={[styles.btnText, { color: 'black' }]}>CONFIRM</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={onClose} style={styles.cancelBtn}><Text style={styles.btnText}>{t('finance.cancel')}</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={handleConfirm} style={styles.confirmBtn}><Text style={[styles.btnText, { color: 'black' }]}>{t('finance.confirm')}</Text></TouchableOpacity>
                     </View>
                 </View>
             </View>

@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { t, useLocale } from '../../../core/i18n';
 import React from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
@@ -63,6 +64,7 @@ const Row = ({
 };
 
 const FinancialReportScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     // Eski kayitlarda yeni alanlar olmayabilir — normalize et.
     const rawReport = useGameStore(state => state.lastQuarterReport);
@@ -76,7 +78,7 @@ const FinancialReportScreen = () => {
                 <Text style={styles.backTxt}>←</Text>
             </Pressable>
             <View>
-                <Text style={styles.headerTitle}>Financial Report</Text>
+                <Text style={styles.headerTitle}>{t('company.financialReport')}</Text>
                 <Text style={styles.headerSub}>{report ? report.periodLabel : 'No data yet'}</Text>
             </View>
         </View>
@@ -94,9 +96,9 @@ const FinancialReportScreen = () => {
                         </Text>
                     </View>
                     <View style={styles.card}>
-                        <Text style={styles.cardTitle}>Current Balances</Text>
-                        <Row label="Company Capital" amount={companyCapital || 0} />
-                        <Row label="Personal Cash" amount={money || 0} />
+                        <Text style={styles.cardTitle}>{t('company.currentBalances')}</Text>
+                        <Row label={t('company.companyCapital')} amount={companyCapital || 0} />
+                        <Row label={t('company.personalCash')} amount={money || 0} />
                     </View>
                 </ScrollView>
                 <CrystalNavBar activeTab="Company" variant="dark" hideDots />
@@ -113,7 +115,7 @@ const FinancialReportScreen = () => {
 
                 {/* Ozet */}
                 <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FFD700' : theme.colors.error }]}>
-                    <Text style={styles.heroLabel}>NET INCOME</Text>
+                    <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
                     <Text
                         style={[
                             styles.heroValue,
@@ -129,68 +131,91 @@ const FinancialReportScreen = () => {
 
                 {/* Gelir tablosu */}
                 <CollapsibleSection
-                    title="INCOME STATEMENT"
-                    note="Where every dollar went, line by line"
-                    info="Revenue minus the cost of making your goods gives Gross Profit. Subtract operating costs for EBIT, then interest, and what remains is Net Income."
+                    title={t('company.incomeStatement')}
+                    note={t('company.whereEveryDollarWentLine')}
+                    info={t('company.revenueMinusTheCostOf')}
                     summary={formatSignedMoney(report.netProfit)}
                     summaryColor={report.netProfit >= 0 ? theme.colors.success : theme.colors.error}
                 >
 
                     <Row
-                        label="Revenue"
+                        label={t('company.revenue')}
                         amount={report.revenue}
                         explanation={`${formatNumber(report.unitsSold)} units sold this quarter.`}
                     />
                     <Row
-                        label="Cost of Goods Sold"
+                        label={t('company.costOfGoodsSold')}
                         amount={e.cogs}
                         negative
                         explanation={EXPENSE_EXPLANATIONS.cogs}
                     />
-                    <Row label="Gross Profit" amount={report.grossProfit} subtotal />
+                    <Row label={t('company.grossProfit')} amount={report.grossProfit} subtotal />
 
-                    <Text style={styles.groupLabel}>OPERATING EXPENSES</Text>
-                    <Row label="Marketing" amount={e.marketing} negative explanation={EXPENSE_EXPLANATIONS.marketing} />
-                    <Row label="Storage" amount={e.storage} negative explanation={EXPENSE_EXPLANATIONS.storage} />
+                    <Text style={styles.groupLabel}>{t('company.operatingExpenses')}</Text>
+                    <Row label={t('company.marketing')} amount={e.marketing} negative explanation={EXPENSE_EXPLANATIONS.marketing} />
+                    <Row label={t('company.storage')} amount={e.storage} negative explanation={EXPENSE_EXPLANATIONS.storage} />
                     <Row
-                        label="Factory Overhead"
+                        label={t('company.factoryOverhead')}
                         amount={e.factoryOverhead}
                         negative
                         explanation={EXPENSE_EXPLANATIONS.factoryOverhead}
                     />
-                    <Row label="Research & Development" amount={e.rnd} negative explanation={EXPENSE_EXPLANATIONS.rnd} />
-                    <Row label="Fixed Costs" amount={e.fixed} negative explanation={EXPENSE_EXPLANATIONS.fixed} />
+                    <Row label={t('company.researchDevelopment')} amount={e.rnd} negative explanation={EXPENSE_EXPLANATIONS.rnd} />
+                    <Row label={t('company.fixedCosts')} amount={e.fixed} negative explanation={EXPENSE_EXPLANATIONS.fixed} />
 
-                    <Row label="Operating Income (EBIT)" amount={report.ebit} subtotal />
-                    <Row label="Interest" amount={e.interest} negative explanation={EXPENSE_EXPLANATIONS.interest} />
-                    <Row label="Net Income" amount={report.netProfit} emphasis />
+                    <Row label={t('company.operatingIncomeEbit')} amount={report.ebit} subtotal />
+                    <Row label={t('company.interest')} amount={e.interest} negative explanation={EXPENSE_EXPLANATIONS.interest} />
+                    <Row label={t('company.netIncome2')} amount={report.netProfit} emphasis />
 
-                    <Text style={styles.footnote}>
-                        Employee wages are not charged by the simulation yet, so they do not appear here.
-                    </Text>
+                    {/* NAKIT MUTABAKATI — ceyrek raporuyla AYNI mantik.
+                        Anapara odemesi gider degildir (kari dusurmez) ama
+                        nakit goturur. Ikisini ayirmadan "karliyim ama param
+                        yok" durumu oyuncuya hic aciklanamiyordu. */}
+                    {(report.principalRepaid ?? 0) > 0 && (
+                        <>
+                            <Row
+                                label={t('company.loanPrincipalRepaid')}
+                                amount={report.principalRepaid ?? 0}
+                                negative
+                                explanation={
+                                    'Not an expense — it does not reduce profit. It pays down what you ' +
+                                    'owe, so your debt falls by the same amount. But the cash leaves ' +
+                                    'the account all the same.'
+                                }
+                            />
+                            <Row
+                                label={t('company.changeInCompanyCash')}
+                                amount={report.netProfit - (report.principalRepaid ?? 0)}
+                                emphasis
+                                explanation={'Net income minus principal repaid.'}
+                            />
+                        </>
+                    )}
+
+                    <Text style={styles.footnote}>{t('company.employeeWagesAreNotCharged')}</Text>
                 </CollapsibleSection>
 
                 {/* Operasyon */}
                 <CollapsibleSection
-                    title="OPERATIONS"
-                    note="How much you built and how much of it moved"
-                    info="Sell-through is the share of available goods that actually sold. Below 100% means you built more than the market wanted."
+                    title={t('company.operations')}
+                    note={t('company.howMuchYouBuiltAnd')}
+                    info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
                     summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#E57373'}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
-                            <Text style={styles.opsLabel}>Produced</Text>
+                            <Text style={styles.opsLabel}>{t('company.produced')}</Text>
                             <Text style={styles.opsValue}>{formatNumber(report.unitsProduced)}</Text>
                         </View>
                         <View style={styles.opsCell}>
-                            <Text style={styles.opsLabel}>Sold</Text>
+                            <Text style={styles.opsLabel}>{t('company.sold')}</Text>
                             <Text style={[styles.opsValue, { color: theme.colors.success }]}>
                                 {formatNumber(report.unitsSold)}
                             </Text>
                         </View>
                         <View style={styles.opsCell}>
-                            <Text style={styles.opsLabel}>Sell-through</Text>
+                            <Text style={styles.opsLabel}>{t('company.sellThrough')}</Text>
                             <Text
                                 style={[
                                     styles.opsValue,
@@ -201,7 +226,7 @@ const FinancialReportScreen = () => {
                             </Text>
                         </View>
                         <View style={styles.opsCell}>
-                            <Text style={styles.opsLabel}>In Stock</Text>
+                            <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
                             <Text style={[styles.opsValue, { color: '#FFB74D' }]}>
                                 {formatNumber(report.endingInventory)}
                             </Text>
@@ -215,23 +240,23 @@ const FinancialReportScreen = () => {
 
                 {/* Urun tablosu */}
                 <CollapsibleSection
-                    title="PRODUCT PERFORMANCE"
-                    note="Per-product demand, sales and margin"
-                    info="Products in the same category compete for the same fixed market — including against your own other products."
+                    title={t('company.productPerformance')}
+                    note={t('company.perProductDemandSalesAnd')}
+                    info={t('company.productsInTheSameCategory')}
                     summary={`${report.products.length}`}
                     summaryColor="#9E9E9E"
                 >
 
                     <View style={styles.tableHeader}>
-                        <Text style={[styles.tableHeadText, { flex: 2 }]}>Product</Text>
-                        <Text style={[styles.tableHeadText, styles.center]}>Prod.</Text>
-                        <Text style={[styles.tableHeadText, styles.center]}>Sold</Text>
-                        <Text style={[styles.tableHeadText, styles.center]}>Stock</Text>
-                        <Text style={[styles.tableHeadText, { flex: 1.5, textAlign: 'right' }]}>Profit</Text>
+                        <Text style={[styles.tableHeadText, { flex: 2 }]}>{t('company.product')}</Text>
+                        <Text style={[styles.tableHeadText, styles.center]}>{t('company.prod')}</Text>
+                        <Text style={[styles.tableHeadText, styles.center]}>{t('company.sold')}</Text>
+                        <Text style={[styles.tableHeadText, styles.center]}>{t('company.stock')}</Text>
+                        <Text style={[styles.tableHeadText, { flex: 1.5, textAlign: 'right' }]}>{t('company.profit')}</Text>
                     </View>
 
                     {report.products.length === 0 ? (
-                        <Text style={styles.emptyText}>No active products.</Text>
+                        <Text style={styles.emptyText}>{t('company.noActiveProducts')}</Text>
                     ) : (
                         report.products.map(p => (
                             <View key={p.id}>
@@ -267,17 +292,17 @@ const FinancialReportScreen = () => {
 
                 {/* Bakiyeler */}
                 <CollapsibleSection
-                    title="BALANCES"
-                    note="Where you stand at the end of the quarter"
-                    info="Company Capital funds the business. Personal Cash is yours. The two are separate on purpose."
+                    title={t('company.balances')}
+                    note={t('company.whereYouStandAtThe')}
+                    info={t('company.companyCapitalFundsTheBusiness2')}
                     summary={formatMoney(report.endingCapital)}
                     summaryColor="#FFFFFF"
                     defaultOpen
                 >
-                    <Row label="Company Capital" amount={report.endingCapital} />
-                    <Row label="Personal Cash" amount={report.endingCash} />
+                    <Row label={t('company.companyCapital')} amount={report.endingCapital} />
+                    <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
-                        <Text style={styles.label}>Research Points</Text>
+                        <Text style={styles.label}>{t('company.researchPoints')}</Text>
                         <Text style={[styles.value, { color: '#BA68C8' }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>

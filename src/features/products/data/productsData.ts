@@ -2,6 +2,19 @@ export type ProductStatus = 'locked' | 'active' | 'retired';
 export type ProductCategory = 'phone' | 'computer' | 'watch' | 'other';
 
 export interface Product {
+    /**
+     * Yumusatilmis kiyas pazarlama butcesi. Motor her ceyrek gunceller;
+     * ekran da bunu okur ki gordugun esik ile motorun kullandigi ayni
+     * olsun. Bkz. core/market/attraction.ts
+     */
+    benchmarkSmoothed?: number;
+    // --- FASON URETIM (bkz. core/market/contract.ts) ---
+    /** Fason uretici kimligi. Bos ise yalnizca kendi tesisinde uretilir. */
+    contractPartnerId?: string;
+    /** Bu ceyrek fasoncuya verilen siparis adedi. Kendi kapasiteni KULLANMAZ. */
+    contractUnits?: number;
+    /** Bu fasoncuyla sozlesme acilis bedeli odendi mi */
+    contractSetupPaid?: boolean;
   id: string;
   name: string;
   icon: string;

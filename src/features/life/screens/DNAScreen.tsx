@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, ScrollView, Pressable, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -60,7 +61,7 @@ const LuxuryBar = () => {
 
     return (
         <View style={[styles.card, styles.luxuryCard]}>
-            <SectionHeader title="LUXURY LIFESTYLE" icon="💎" />
+            <SectionHeader title={t('life.luxuryLifestyle')} icon="💎" />
             <View style={styles.luxuryContent}>
                 <View style={styles.luxuryProgressRow}>
                     <Text style={styles.luxuryValue}>{formatCurrency(netWorth)}</Text>
@@ -87,6 +88,7 @@ const LuxuryBar = () => {
 };
 
 const DNAScreen = () => {
+    useLocale();
     const navigation = useNavigation();
 
     const {
@@ -174,7 +176,7 @@ const DNAScreen = () => {
                             <MaterialCommunityIcons name="arrow-left" size={22} color="#D4AF37" />
                         </Pressable>
                         <View style={styles.headerTextBlock}>
-                            <Text style={styles.headerTitle}>DNA & STATS</Text>
+                            <Text style={styles.headerTitle}>{t('life.dnaStats')}</Text>
                             <View style={styles.headerAccent} />
                         </View>
                     </View>
@@ -186,18 +188,18 @@ const DNAScreen = () => {
 
                         {/* 🛡️ SECURITY */}
                         <View style={styles.card}>
-                            <SectionHeader title="Security & Safety" icon="🛡️" />
-                            <ProgressBar label="Digital Shield" value={getEffective(security?.digital, secBuffs.digital)} color="#3498db" icon="💻" buff={getBuffString(secBuffs.digital)} />
-                            <ProgressBar label="Bodyguard / Armor" value={getEffective(securityLevel, secBuffs.personal)} color="#e74c3c" icon="🥋" buff={getBuffString(secBuffs.personal)} />
-                            <ProgressBar label="Police Heat" value={suspicion} color={getHeatColor(suspicion)} icon="🚨" />
+                            <SectionHeader title={t('life.securitySafety')} icon="🛡️" />
+                            <ProgressBar label={t('life.digitalShield')} value={getEffective(security?.digital, secBuffs.digital)} color="#3498db" icon="💻" buff={getBuffString(secBuffs.digital)} />
+                            <ProgressBar label={t('life.bodyguardArmor')} value={getEffective(securityLevel, secBuffs.personal)} color="#e74c3c" icon="🥋" buff={getBuffString(secBuffs.personal)} />
+                            <ProgressBar label={t('life.policeHeat')} value={suspicion} color={getHeatColor(suspicion)} icon="🚨" />
                         </View>
 
                         {/* 👊 COMBAT */}
                         <View style={styles.card}>
-                            <SectionHeader title="Combat Mastery" icon="👊" />
+                            <SectionHeader title={t('life.combatMastery')} icon="👊" />
                             <View style={styles.skillRow}>
                                 <View>
-                                    <Text style={styles.skillName}>Self Defense</Text>
+                                    <Text style={styles.skillName}>{t('life.selfDefense')}</Text>
                                     <Text style={styles.skillDetail}>{martialArtsDisplay}</Text>
                                     <Text style={styles.skillDetail}>
                                         Security Boost: <Text style={{ fontWeight: 'bold', color: '#2ecc71' }}>+{securityLevel}%</Text>
@@ -210,35 +212,35 @@ const DNAScreen = () => {
                                     <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>{beltTitle}</Text>
                                 </View>
                             </View>
-                            <ProgressBar label="Fatigue Level" value={fatigue} max={100} color={fatigue > 80 ? '#e74c3c' : '#2ecc71'} icon="⚡" />
+                            <ProgressBar label={t('life.fatigueLevel')} value={fatigue} max={100} color={fatigue > 80 ? '#e74c3c' : '#2ecc71'} icon="⚡" />
                         </View>
 
                         {/* 🕸️ REPUTATION */}
                         <View style={styles.card}>
-                            <SectionHeader title="Reputation Network" icon="🕸️" />
-                            <ProgressBar label="Casino (VIP)" value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E91E63" icon="🎰" buff={getBuffString(repBuffs.casino)} />
-                            <ProgressBar label="Street (Cred)" value={getEffective(reputation?.street, repBuffs.street)} color="#c0392b" icon="🗡️" buff={getBuffString(repBuffs.street)} />
-                            <ProgressBar label="Business (Trust)" value={getEffective(reputation?.business, repBuffs.business)} color="#2980b9" icon="💼" buff={getBuffString(repBuffs.business)} />
-                            <ProgressBar label="High Society" value={getEffective(reputation?.social, repBuffs.social)} color="#8e44ad" icon="🥂" buff={getBuffString(repBuffs.social)} />
+                            <SectionHeader title={t('life.reputationNetwork')} icon="🕸️" />
+                            <ProgressBar label={t('life.casinoVip')} value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E91E63" icon="🎰" buff={getBuffString(repBuffs.casino)} />
+                            <ProgressBar label={t('life.streetCred')} value={getEffective(reputation?.street, repBuffs.street)} color="#c0392b" icon="🗡️" buff={getBuffString(repBuffs.street)} />
+                            <ProgressBar label={t('life.businessTrust')} value={getEffective(reputation?.business, repBuffs.business)} color="#2980b9" icon="💼" buff={getBuffString(repBuffs.business)} />
+                            <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#8e44ad" icon="🥂" buff={getBuffString(repBuffs.social)} />
                         </View>
 
                         {/* 🧬 GENETICS */}
                         <View style={styles.card}>
-                            <SectionHeader title="Core Genetics" icon="🧬" />
-                            <ProgressBar label="Intellect" value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#9b59b6" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
-                            <ProgressBar label="Charm" value={getEffective(attributes?.charm, attrBuffs.charm)} color="#e91e63" icon="👄" buff={getBuffString(attrBuffs.charm)} />
-                            <ProgressBar label="Looks" value={getEffective(attributes?.looks, attrBuffs.looks)} color="#f1c40f" icon="✨" buff={getBuffString(attrBuffs.looks)} />
-                            <ProgressBar label="Strength" value={getEffective(attributes?.strength, attrBuffs.strength)} color="#e74c3c" icon="💪" buff={getBuffString(attrBuffs.strength)} />
+                            <SectionHeader title={t('life.coreGenetics')} icon="🧬" />
+                            <ProgressBar label={t('life.intellect')} value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#9b59b6" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
+                            <ProgressBar label={t('life.charm')} value={getEffective(attributes?.charm, attrBuffs.charm)} color="#e91e63" icon="👄" buff={getBuffString(attrBuffs.charm)} />
+                            <ProgressBar label={t('life.looks')} value={getEffective(attributes?.looks, attrBuffs.looks)} color="#f1c40f" icon="✨" buff={getBuffString(attrBuffs.looks)} />
+                            <ProgressBar label={t('life.strength')} value={getEffective(attributes?.strength, attrBuffs.strength)} color="#e74c3c" icon="💪" buff={getBuffString(attrBuffs.strength)} />
                         </View>
 
                         {/* 🎭 PERSONALITY */}
                         <View style={styles.card}>
-                            <SectionHeader title="Personality Traits" icon="🎭" />
-                            <ProgressBar label="Ambition" value={personality?.ambition} color="#FFC107" icon="🔥" />
-                            <ProgressBar label="Risk Appetite" value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
-                            <ProgressBar label="Strategic Sense" value={personality?.strategicSense ?? 50} color="#3498db" icon="♟️" />
-                            <ProgressBar label="Morality" value={personality?.morality} color="#8BC34A" icon="😇" />
-                            <ProgressBar label="Luck" value={hidden?.luck} color="#10b981" icon="🍀" />
+                            <SectionHeader title={t('life.personalityTraits')} icon="🎭" />
+                            <ProgressBar label={t('life.ambition')} value={personality?.ambition} color="#FFC107" icon="🔥" />
+                            <ProgressBar label={t('life.riskAppetite')} value={personality?.riskAppetite} color="#FF5722" icon="🎲" />
+                            <ProgressBar label={t('life.strategicSense')} value={personality?.strategicSense ?? 50} color="#3498db" icon="♟️" />
+                            <ProgressBar label={t('life.morality')} value={personality?.morality} color="#8BC34A" icon="😇" />
+                            <ProgressBar label={t('life.luck')} value={hidden?.luck} color="#10b981" icon="🍀" />
                         </View>
 
                         <View style={{ height: 40 }} />

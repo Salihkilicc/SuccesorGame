@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 
@@ -8,15 +9,16 @@ type GymResultViewProps = {
 };
 
 const GymResultView = ({ lastResult, onClose }: GymResultViewProps) => {
+    useLocale();
     return (
         <View style={styles.subViewContainer}>
-            <Text style={styles.resultTitle}>WORKOUT COMPLETE!</Text>
+            <Text style={styles.resultTitle}>{t('life.workoutComplete2')}</Text>
             {lastResult && (
                 <>
                     <Text style={styles.resultMessage}>{lastResult.message || 'Great session!'}</Text>
                     {lastResult.enjoyment !== undefined && (
                         <View style={styles.enjoymentBar}>
-                            <Text style={styles.enjoymentLabel}>ENJOYMENT</Text>
+                            <Text style={styles.enjoymentLabel}>{t('life.enjoyment')}</Text>
                             <View style={styles.barBg}>
                                 <View style={[styles.barFill, { width: `${lastResult.enjoyment}%` }]} />
                             </View>
@@ -34,7 +36,7 @@ const GymResultView = ({ lastResult, onClose }: GymResultViewProps) => {
                 onPress={onClose}
                 style={styles.doneBtn}
                 activeOpacity={0.7}>
-                <Text style={styles.doneText}>CONTINUE</Text>
+                <Text style={styles.doneText}>{t('life.continue')}</Text>
             </TouchableOpacity>
         </View>
     );

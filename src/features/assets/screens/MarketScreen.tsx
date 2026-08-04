@@ -1,6 +1,7 @@
 // dosya: src/screens/Assets/Market/MarketScreen.tsx
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useEventStore } from '../../../core/store';
@@ -43,21 +44,22 @@ function isStock(item: MarketItem): item is StockItem {
 
 // --- TABS & CONFIG ---
 const MAIN_TABS: TabOption<TabKey>[] = [
-  { key: 'stocks', label: 'Stocks' },
-  { key: 'crypto', label: 'Crypto' },
-  { key: 'bonds', label: 'Bonds' },
-  { key: 'funds', label: 'Funds' },
+  { key: 'stocks', label: t('company.stocks') },
+  { key: 'crypto', label: t('company.crypto') },
+  { key: 'bonds', label: t('company.bonds') },
+  { key: 'funds', label: t('company.funds') },
 ];
 
 type StockCategory = 'Technology' | 'Industrial' | 'Finance' | 'Health';
 const STOCK_SUB_TABS: TabOption<StockCategory>[] = [
-  { key: 'Technology', label: 'Technology' },
-  { key: 'Health', label: 'Health' },
-  { key: 'Industrial', label: 'Industrial' },
-  { key: 'Finance', label: 'Finance' },
+  { key: 'Technology', label: t('company.technology') },
+  { key: 'Health', label: t('company.health') },
+  { key: 'Industrial', label: t('company.industrial') },
+  { key: 'Finance', label: t('company.finance') },
 ];
 
 const MarketScreen = () => {
+    useLocale();
   const navigation = useNavigation<any>();
   const [selectedTab, setSelectedTab] = useState<TabKey>('stocks');
   const [stockCategory, setStockCategory] = useState<StockCategory>('Technology');
@@ -113,8 +115,8 @@ const MarketScreen = () => {
       backgroundColor="#000000"
     >
       <AppScreen
-        title="MARKET"
-        subtitle="Financial Instruments"
+        title={t('company.market')}
+        subtitle={t('company.financialInstruments')}
         leftNode={<BackButton navigation={navigation} />}
         compact
       >
@@ -139,7 +141,7 @@ const MarketScreen = () => {
                 {/* TAB SECTION: Premium glass container */}
                 <View style={styles.tabSection}>
                   <View style={styles.tabSectionAccent} />
-                  <Text style={styles.tabSectionLabel}>BROWSE MARKET</Text>
+                  <Text style={styles.tabSectionLabel}>{t('company.browseMarket')}</Text>
 
                   {/* ROW 1: Main Tabs */}
                   <CategoryTabs
@@ -229,7 +231,7 @@ const PortfolioCard = ({
 }) => (
   <View style={styles.portfolioCard}>
     <View style={styles.portfolioHeader}>
-      <Text style={styles.portfolioLabel}>Total Investments</Text>
+      <Text style={styles.portfolioLabel}>{t('company.totalInvestments')}</Text>
       <Text style={styles.portfolioValue}>{formatMoney(investmentsValue)}</Text>
     </View>
     <View style={styles.portfolioActions}>
@@ -248,7 +250,7 @@ const PortfolioCard = ({
             styles.liquidateButton,
             pressed && styles.liquidateButtonPressed
           ]}>
-          <Text style={styles.liquidateButtonText}>Liquidate All</Text>
+          <Text style={styles.liquidateButtonText}>{t('company.liquidateAll')}</Text>
         </Pressable>
       )}
     </View>
@@ -269,7 +271,7 @@ const MarketEventFooter = () => {
     <View style={styles.eventCard}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs }}>
         <Text style={styles.eventIcon}>📈</Text>
-        <Text style={styles.sectionTitle}>Today&apos;s Market Event</Text>
+        <Text style={styles.sectionTitle}>{t('company.todayAposSMarketEvent')}</Text>
       </View>
       <Text style={styles.eventText}>
         {lastMarketEvent ?? 'Bugün henüz özel bir market olayı yaşanmadı.'}
@@ -277,7 +279,7 @@ const MarketEventFooter = () => {
       <Pressable
         onPress={() => void triggerEvent('market')}
         style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}>
-        <Text style={styles.secondaryButtonText}>Trigger Market Event</Text>
+        <Text style={styles.secondaryButtonText}>{t('company.triggerMarketEvent')}</Text>
       </Pressable>
     </View>
   );

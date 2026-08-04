@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { RegionCode } from '../data/nightOutVenues';
@@ -17,17 +18,18 @@ type RegionInfo = {
 };
 
 const REGIONS: RegionInfo[] = [
-    { code: 'USA', name: 'North America', emoji: '🗽', venueCount: 5, isLocal: true },
-    { code: 'EUROPE', name: 'Europe', emoji: '🇪🇺', venueCount: 4 },
-    { code: 'ASIA', name: 'Asia', emoji: '⛩️', venueCount: 3 },
-    { code: 'AFRICA', name: 'Africa', emoji: '🦁', venueCount: 2 },
+    { code: 'USA', name: t('life.northAmerica'), emoji: '🗽', venueCount: 5, isLocal: true },
+    { code: 'EUROPE', name: t('life.europe'), emoji: '🇪🇺', venueCount: 4 },
+    { code: 'ASIA', name: t('life.asia'), emoji: '⛩️', venueCount: 3 },
+    { code: 'AFRICA', name: t('life.africa'), emoji: '🦁', venueCount: 2 },
 ];
 
 const RegionSelectView = ({ selectedRegion, onSelectRegion }: RegionSelectViewProps) => {
+    useLocale();
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            <Text style={styles.header}>Choose Your Destination</Text>
-            <Text style={styles.subheader}>Where do you want to go tonight?</Text>
+            <Text style={styles.header}>{t('life.chooseYourDestination')}</Text>
+            <Text style={styles.subheader}>{t('life.whereDoYouWantTo')}</Text>
 
             <View style={styles.grid}>
                 {REGIONS.map((region) => {

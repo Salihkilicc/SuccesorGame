@@ -8,6 +8,8 @@ import { FEATURES } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
+import { advanceBrand, brandFromAcquisition, brandStabilityFactor } from '../market/brand';
+import { advanceCompetitors } from '../market/competitors';
 import {
   availableStandardUnits,
   effectiveCapacity,
@@ -48,14 +50,27 @@ import { usePlayerStore } from './usePlayerStore';
 import { useProductStore } from './useProductStore';
 import { useRelationshipStore } from './useRelationshipStore';
 import { useStatsStore } from './useStatsStore';
+import { blendedQuality, getPartner, quoteContractOrder } from '../market/contract';
+import {
+  FINANCING_SIGNALS,
+  applyTax,
+  checkCapacityBreach,
+  leverageVolatilityMultiplier,
+} from '../market/credit';
 import {
   TOTAL_SHARES_DEFAULT,
   applySentiment,
   companyValuation,
+  decaySentiment,
   ownershipPercent,
   priceChangePercent,
   sharePrice as equitySharePrice,
+  smoothPrice,
+  trailingTotal,
+  updateEarningsPower,
+  volatilityDamping,
 } from '../market/equity';
+import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { useUserStore } from './useUserStore';
 import * as AchievementChecker from '../../achievements/checker';
 
@@ -79,7 +94,14 @@ const LOW_MORALE_REASONS = [
 
 // UI Tarafının beklediği sonuç tipi
 export type EconomyResult = {
-  status: 'active' | 'bankrupt';
+  /**
+   * Ceyregin sonucu.
+   *   bankrupt -> sermaye negatife dustu
+   *   removed  -> kurul seni CEO'luktan aldi (bkz. governance.ts)
+   * Ikisi de simdilik oyunu bitirir. Gorevden alinmanin ayri bir devam
+   * yolu (hissedar olarak kalma, geri donus mucadelesi) sonra yazilacak.
+   */
+  status: 'active' | 'bankrupt' | 'removed';
   reason?: string;
   data: {
     reportTotalProduction: number;
@@ -172,6 +194,31 @@ export const initialGameState: GameState = {
   lastQuarterReport: null,
 };
 
+/**
+ * SATIN ALMA BUFF'LARI — artik gercekten okunuyor.
+ *
+ * `getAcquisitionBuffs` bir ekran hook'unda duruyordu ve MOTOR HIC
+ * OKUMUYORDU. Yani "Ar-Ge Hizi +%15", "Uretim Maliyeti -%10" gibi
+ * satin alma odulleri oyunda hicbir sey yapmiyordu.
+ */
+const subsidiaryBuffs = (): {
+  rndSpeed: number; productionCost: number; marketingBoost: number; loanInterest: number;
+} => {
+  const acc = { rndSpeed: 0, productionCost: 0, marketingBoost: 0, loanInterest: 0 };
+  try {
+    const subs = require('../store/useUserStore').useUserStore.getState().subsidiaries || [];
+    subs.forEach((sub: any) => {
+      const b = sub?.acquisitionBuff;
+      if (!b) return;
+      if (b.type === 'R_AND_D_SPEED') acc.rndSpeed += b.value;
+      else if (b.type === 'PRODUCTION_COST') acc.productionCost += b.value;
+      else if (b.type === 'MARKETING_BOOST') acc.marketingBoost += b.value;
+      else if (b.type === 'LOAN_INTEREST') acc.loanInterest += b.value;
+    });
+  } catch { /* buff okunamadi */ }
+  return acc;
+};
+
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
@@ -254,6 +301,7 @@ export const useGameStore = create<GameStore>()(
         //  kurali kendiliginden isler.
         // ==================================================================
         const brandValueRaw = stats.brandValue ?? 0;
+        const marketingBuffPre = Math.min(1, Math.max(0, subsidiaryBuffs().marketingBoost));
         const isBuilding = !!stats.facilityBuild;
         const tier = getTier(stats.facilityTier);
         const salaryRatio = stats.salaryRatio ?? 1;
@@ -285,7 +333,15 @@ export const useGameStore = create<GameStore>()(
           // dusuk moral dusurur. Sinirsizken 22 kisiden 3.842'ye tek
           // ceyrekte ciklabiliyordu.
           const cap = hiringCap(headcount, brandValueRaw, currentMorale) * Math.max(1, quarters);
-          const wanted = targetHeadcount - headcount;
+
+          // ONEMLI: gelecek ceyrek de insan kaybedecegiz. Ise alim bir
+          // ceyrek gecikmeli oldugu icin sadece bugunku acigi kapatirsak
+          // hedefe HIC ulasamayiz — 48 hedefte sonsuza kadar 47'de kaliriz.
+          // Gercek IK planlamasi da devir hizini onceden hesaba katar.
+          const expectedChurn = Math.ceil(
+            targetHeadcount * attritionRate(currentMorale, salaryRatio),
+          );
+          const wanted = targetHeadcount - headcount + expectedChurn;
           queuedHires = Math.min(wanted, cap);
           hiresBlocked = Math.max(0, wanted - queuedHires);
           hiringCost = queuedHires * hiringFee(tier.level, salaryRatio);
@@ -368,7 +424,15 @@ export const useGameStore = create<GameStore>()(
 
           // KIYAS BUTCE: kategorinin tabani ile urunun GECEN CEYREK cirosunun
           // %25'inin buyugu. Buyudukce ayni butce daha az ses getirir.
-          const benchmarks = group.map(p => marketingBenchmark(market, p.revenue || 0));
+          // Kiyas ANINDA degil KADEMELI hareket eder — lansmandan sonraki
+          // ceyrekte uc kat ziplamasin diye. Deger urunde saklanir ki
+          // ekran da ayni sayiyi gostersin.
+          const benchmarks = group.map(p =>
+            marketingBenchmark(market, p.revenue || 0, p.benchmarkSmoothed),
+          );
+          group.forEach((p, i) => {
+            useProductStore.getState().updateProduct(p.id, { benchmarkSmoothed: benchmarks[i] });
+          });
 
           const breakdowns = group.map((p, i) =>
             computeAttraction(
@@ -376,11 +440,27 @@ export const useGameStore = create<GameStore>()(
                 sellingPrice: p.sellingPrice || p.suggestedPrice,
                 suggestedPrice: p.suggestedPrice,
                 // Pazarlama artik CEYREKLIK BUTCE (birim basina degil).
-                marketingBudget: p.marketingBudget || 0,
+                // Satin alma buff'i butceyi daha etkili kilar (MARKETING_BOOST).
+                marketingBudget: (p.marketingBudget || 0) * (1 + marketingBuffPre),
                 benchmark: benchmarks[i],
                 // KALITE TAVANI: Ar-Ge'de seviye 9'u kesfetmis olabilirsin
                 // ama atolyede uretemezsin. Tesis kademesi tavani koyar.
-                qualityLevel: Math.min(p.qualityLevel || 1, tier.qualityCeiling),
+                // KALITE TAVANI iki yerden gelir: kendi tesisin ve —
+                // fason kullaniyorsan — fasoncunun hatti. Hepsi ayni
+                // kutuda ayni markayla satildigi icin musterinin gordugu
+                // kalite HACIM AGIRLIKLI ORTALAMADIR. Ucuz fasoncuya cok
+                // is verirsen urunun algilanan kalitesi duser.
+                qualityLevel: (() => {
+                  const own = Math.min(p.qualityLevel || 1, tier.qualityCeiling);
+                  const cp = getPartner(p.contractPartnerId);
+                  if (!cp) return own;
+                  return blendedQuality(
+                    resolveTargetUnits(p, effectiveHeadcount, tier.level, isBuilding),
+                    own,
+                    p.contractUnits || 0,
+                    cp.qualityCeiling,
+                  );
+                })(),
                 brandValue,
                 marketDemand: p.marketDemand ?? 50,
               },
@@ -393,6 +473,39 @@ export const useGameStore = create<GameStore>()(
             market,
             acquiredStockIds,
           );
+
+          // ==============================================================
+          //  RAKIPLERI BIR CEYREK ILERLET
+          // ==============================================================
+          //  Rakip paylari SABIT sayilardi: Pear Inc. %31 idi ve on yil
+          //  sonra da %31 olacakti. Pazar canli bir yer degil duvar
+          //  kagidiydi, ve pazarda dovdugun rakibin hissesi yukselmeye
+          //  devam edebiliyordu.
+          //
+          //  Artik guclu rakip zayiftan pay alir, senin aldigin pay
+          //  hepsinden ORANTILI cikar, ve her rakibin borsa cipasi kendi
+          //  payiyla birlikte hareket eder. Rekabet dongusu boylece
+          //  kapaniyor: pazarda dovdugun sirketi sonra ucuza alirsin.
+          //  Bkz. core/market/competitors.ts
+          // ==============================================================
+          {
+            const mkStore = useMarketStore.getState();
+            const playerShareHere = shares.reduce((sum: number, v: number) => sum + v, 0);
+            const liveInputs = (market.competitors || [])
+              .filter((c: any) => !acquiredStockIds.includes(c.stockId))
+              .map((c: any) => ({
+                stockId: c.stockId,
+                share: mkStore.competitorShares[c.stockId] ?? c.share,
+                strength: c.strength ?? 50,
+              }));
+            const baselines: Record<string, number> = {};
+            (market.competitors || []).forEach((c: any) => { baselines[c.stockId] = c.share; });
+
+            const advanced = advanceCompetitors(liveInputs, playerShareHere, baselines);
+            const nextShares = { ...mkStore.competitorShares };
+            advanced.forEach(c => { nextShares[c.stockId] = c.share; });
+            useMarketStore.setState({ competitorShares: nextShares });
+          }
 
           group.forEach((p, i) => {
             marketDemandByProduct[p.id] = {
@@ -434,6 +547,15 @@ export const useGameStore = create<GameStore>()(
 
         /** Bu ceyrek gercekten kullanilan standart birim — kullanim orani icin */
         let usedStandard = 0;
+        /** Fasoncuya odenen toplam tutar (kurulum bedelleri dahil) */
+        let contractSpend = 0;
+        /** Fasondan gelen toplam saglam adet — raporda gostermek icin */
+        let contractUnitsTotal = 0;
+
+        // Satin alma buff'lari — uretim maliyetini dusurur (PRODUCTION_COST).
+        // Bu buff'lar bugune kadar bir ekran hook'unda duruyor ve motor
+        // tarafindan HIC OKUNMUYORDU.
+        const costBuff = Math.min(0.5, Math.max(0, subsidiaryBuffs().productionCost));
 
         // Loop through each active product and calculate financials
         const updatedProducts: any[] = [];
@@ -461,8 +583,42 @@ export const useGameStore = create<GameStore>()(
               0.5,
               1 - (1 - tier.yieldRate) * scrapMultiplier(currentMorale),
             );
-            const quarterlyProduction = Math.floor(attemptedUnits * effectiveYield);
-            const scrappedUnits = attemptedUnits - quarterlyProduction;
+            const ownProduction = Math.floor(attemptedUnits * effectiveYield);
+            const scrappedUnits = attemptedUnits - ownProduction;
+
+            // ==============================================================
+            //  FASON URETIM — kendi kapasiteni HIC kullanmaz
+            // ==============================================================
+            //  Kapasite duvarinin etrafindan dolasmanin yolu. Bedeli:
+            //  birim maliyet %30-60 daha yuksek ve fasoncunun kalite
+            //  tavani senin ustune bir tavan koyar. Yani buyume hizini
+            //  parayla satin alirsin, marjindan odersin.
+            //
+            //  Not: fasonun firesi FASONCUNUN oranidir, senin moraline
+            //  bagli degildir — onlarin ekibi, onlarin sorunu.
+            // ==============================================================
+            const partner = getPartner(product.contractPartnerId);
+            const contractOrder = partner
+              ? quoteContractOrder(
+                  partner,
+                  (product.contractUnits || 0) * Math.max(1, quarters),
+                  unitCost * (1 - costBuff),
+                )
+              : null;
+
+            if (partner && contractOrder && contractOrder.units > 0) {
+              contractSpend += contractOrder.cost;
+              contractUnitsTotal += contractOrder.goodUnits;
+              // Sozlesme acilis bedeli — kalip, hat kurulumu, denetim.
+              // Yalnizca BIR KEZ, ilk sipariste.
+              if (!product.contractSetupPaid) {
+                contractSpend += partner.setupCost;
+                useProductStore.getState().updateProduct(product.id, { contractSetupPaid: true });
+              }
+            }
+
+            const contractGood = contractOrder?.goodUnits ?? 0;
+            const quarterlyProduction = ownProduction + contractGood;
 
             // 2. INVENTORY FIRST SALES LOGIC
             // Total Supply = Existing Inventory + Quarterly Production
@@ -520,7 +676,9 @@ export const useGameStore = create<GameStore>()(
             const productRevenue = sellingPrice * quarterlySales;
             // COGS DENENEN adet uzerinden — fireye giden urunun maliyeti de
             // sana ait. Kademe carpani olcek ekonomisini yansitir.
-            const productCOGS = unitCost * attemptedUnits * tier.unitCostMultiplier;
+            // Satin alma buff'i birim maliyeti dusurur (PRODUCTION_COST).
+            const productCOGS =
+              unitCost * attemptedUnits * tier.unitCostMultiplier * (1 - costBuff);
 
             totalRevenue += productRevenue;
             totalCOGS += productCOGS;
@@ -612,7 +770,8 @@ export const useGameStore = create<GameStore>()(
         if (quarters > 0) {
           for (let i = 0; i < quarters; i++) {
             const { rpAwarded } = useLaboratoryStore.getState().processQuarter(() => { });
-            rndRPGenerated += rpAwarded;
+            // Satin alma buff'i arastirmayi hizlandirir (R_AND_D_SPEED).
+            rndRPGenerated += Math.round(rpAwarded * (1 + subsidiaryBuffs().rndSpeed));
           }
 
         }
@@ -621,7 +780,151 @@ export const useGameStore = create<GameStore>()(
         // 4. OTHER EXPENSES
         const monthlyFixedExpenses = 5000;
         const totalFixedExpenses = monthlyFixedExpenses * months;
-        const interestExpense = (stats.companyDebtTotal || 0) * 0.05 * (months / 12);
+        // ==================================================================
+        //  BORÇ FAİZİ — artık gerçek kredilerden ve kredi skorundan
+        // ==================================================================
+        //  ONCEDEN SABIT %5 IDI: `companyDebtTotal * 0.05`. Yani
+        //  `getInterestRate()` (kredi skoruna gore %3-%15 arasi degisen
+        //  oran) HIC KULLANILMIYORDU, alinan bireysel krediler
+        //  (`payMonthlyInterests`) hic islenmiyordu ve kredi skoru
+        //  (`refreshCreditScore`) hic tazelenmiyordu.
+        //
+        //  Sonuc: bankacilik ekrani vardi ama oyunda hicbir karsiligi
+        //  yoktu — kredi cekmek de, skoru duzeltmek de bir sey degistirmiyordu.
+        // ==================================================================
+        // ==================================================================
+        //  BORÇ SERVİSİ — faiz VE anapara
+        // ==================================================================
+        //  Artik tek yerden: her kredi ayri ayri islenir, odeme faiz ve
+        //  anapara olarak ayrisir, bakiye gercekten erir, vade dolunca
+        //  kredi kapanir.
+        //
+        //  Eski `payMonthlyInterests` parayi aliyor ama bakiyeyi
+        //  azaltmiyordu — sonsuza kadar odersin, borc yerinde dururdu.
+        //  Bkz. core/market/credit.ts -> serviceLoanQuarter
+        // ==================================================================
+        const finance = useCorporateFinanceStore.getState();
+        const debtService = finance.serviceDebtQuarter(Math.max(1, quarters));
+
+        // Faiz gideri kar/zarara girer; ANAPARA girmez (bilanco hareketi).
+        // Bu ayrim onemli: anaparayi gider yazmak kari iki kez dusururdu.
+        const interestExpense = debtService.interest;
+        const principalRepaid = debtService.principal;
+        const loanPayments = 0;
+
+        // Sozlesme ihlali sayacini ilerlet ve kademeyi al.
+        const distress = finance.advanceDistress();
+
+        // ==================================================================
+        //  KAPASİTE AŞIMI VE ZORUNLU VARLIK SATIŞI
+        // ==================================================================
+        //  Bankalar EBITDA'ya borc verir. Insaat EBITDA'yi dusurunce
+        //  borclanma kapasiten de duser — limitindeysen tam uretimin
+        //  dustugu ceyrekte "borcun bir kismini geri ver" derler.
+        //
+        //  Bir yildir ihlaldeysen is varlik satisina kadar gider: once
+        //  istirak satilir, yoksa tesis kademesi dusurulur. Oyun bitmez
+        //  ama agir yara alirsin.
+        // ==================================================================
+        const capacityBreach = checkCapacityBreach(
+          stats.companyDebtTotal || 0,
+          finance.getAssessment(),
+          isBuilding,
+        );
+
+        let forcedSaleProceeds = 0;
+        let forcedSaleNote = '';
+
+        // ------------------------------------------------------------------
+        //  DUZELTME: kapasite asimi VARLIK SATTIRMAMALI
+        // ------------------------------------------------------------------
+        //  Bu kosul `distress.mustSellAssets || capacityBreach` idi ve
+        //  BEN YAZDIM. capacityBreach bir NESNE donuyor, yani hep dogru
+        //  sayiliyordu: borcun kazancinin ustundeyse HER CEYREK en kucuk
+        //  istirakin satiliyordu.
+        //
+        //  Oyuncu StartApp IO'yu aldi, bir sonraki ceyrek sirket yeniden
+        //  borsada satin alinabilir haldeydi. Sebep buydu — en ucuz
+        //  istirak oldugu icin ilk o gidiyordu.
+        //
+        //  Dogrusu ikisi AYRI siddet: kapasite asimi NAKIT ister (banka
+        //  borcun bir kismini geri cagirir), varlik satisi ise bir yil
+        //  ihlalde kalmanin sonucudur. Gercek hayatta da boyle kademelenir.
+        // ------------------------------------------------------------------
+        if (capacityBreach && !distress.mustSellAssets) {
+          // Yalnizca nakitten geri odeme. Varliga dokunulmaz.
+          const cashNow = useStatsStore.getState().companyCapital || 0;
+          const demanded = Math.min(cashNow, capacityBreach.demandedRepayment);
+          const firstLoan = useCorporateFinanceStore.getState().loans[0];
+          if (demanded > 0 && firstLoan) {
+            useCorporateFinanceStore.getState().repayLoan(firstLoan.id, demanded, (n: number) => {
+              const st = useStatsStore.getState();
+              st.update({ companyCapital: (st.companyCapital || 0) - n });
+            });
+          }
+        }
+
+        if (distress.mustSellAssets) {
+          const fin2 = useCorporateFinanceStore.getState();
+          const subs = fin2.subsidiaries;
+
+          if (subs.length > 0) {
+            // En kucuk istiraki elden cikar — en az zarar veren cikis.
+            const smallest = [...subs].sort((a, b) => a.valuation - b.valuation)[0];
+            const before = useStatsStore.getState().companyCapital || 0;
+            fin2.sellSubsidiary(smallest.id);
+            forcedSaleProceeds = (useStatsStore.getState().companyCapital || 0) - before;
+            forcedSaleNote = `Lenders forced the sale of ${smallest.name}.`;
+          } else if (tier.level > 1) {
+            // Istirak yoksa uretim kabiliyetinden feragat edilir.
+            const soldTier = getTier(tier.level - 1);
+            forcedSaleProceeds = (tier.upgradeCost || 0) * 0.4;
+            useStatsStore.getState().update({
+              facilityTier: soldTier.level,
+              companyCapital: (useStatsStore.getState().companyCapital || 0) + forcedSaleProceeds,
+            });
+            forcedSaleNote =
+              `Lenders forced you to sell production capacity. You are back to ${soldTier.name}.`;
+          }
+
+          // Gelen para dogrudan borc kapatmaya gider.
+          if (forcedSaleProceeds > 0) {
+            const first = useCorporateFinanceStore.getState().loans[0];
+            if (first) {
+              useCorporateFinanceStore.getState().repayLoan(first.id, forcedSaleProceeds, (n: number) => {
+                const st = useStatsStore.getState();
+                st.update({ companyCapital: (st.companyCapital || 0) - n });
+              });
+            }
+          }
+        }
+
+        // NOT DUSUSU VE IHLAL PIYASADA FIYATLANIR.
+        // Not degisimleri gercek hayatta hisseyi oynatir; ihlal duyurusu
+        // ise alacaklilarin direksiyona gectigini ilan eder.
+        const prevRating = stats.creditRatingPrev || '';
+        const nowRating = finance.getAssessment().rating;
+        const order = ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'D'];
+        const notches = prevRating
+          ? order.indexOf(nowRating) - order.indexOf(prevRating)
+          : 0;
+        if (notches > 0) {
+          const hit = FINANCING_SIGNALS.rating_downgrade.impactPercent * notches;
+          useEquityStore.setState(st => ({
+            marketMultiplier: Math.max(0.3, st.marketMultiplier * (1 + hit / 100)),
+          }));
+        }
+        if (distress.stage === 'breach' && (stats.creditRatingPrev || '') !== '') {
+          const hit = FINANCING_SIGNALS.covenant_breach.impactPercent;
+          useEquityStore.setState(st => ({
+            marketMultiplier: Math.max(0.3, st.marketMultiplier * (1 + hit / 100)),
+          }));
+        }
+        // Ihlaldeyken bankalar mevcut borca ceza faizi bindirir.
+        const penaltyInterest =
+          (stats.companyDebtTotal || 0) * (distress.penaltyRate || 0) * (months / 12);
+
+        finance.refreshCreditScore();
 
         // 4b. PARTNER UPKEEP COST (Deep Persona System)
         const partner = useUserStore.getState().partner;
@@ -636,6 +939,7 @@ export const useGameStore = create<GameStore>()(
         // 5. CALCULATE NET PROFIT/LOSS
         const totalExpenses =
           totalCOGS +
+          contractSpend +
           totalMarketingCost +
           totalStorageCost +
           factoryOverhead +
@@ -644,11 +948,33 @@ export const useGameStore = create<GameStore>()(
           severanceCost +
           rndSalaryCost +
           totalFixedExpenses +
-          interestExpense;
-        const netProfit = totalRevenue - totalExpenses;
+          interestExpense +
+          penaltyInterest +
+          loanPayments;
+        // ==================================================================
+        //  KURUMLAR VERGİSİ VE BORÇ KALKANI
+        // ==================================================================
+        //  Faiz vergiden DUSER, temettu dusmez. Borcun ozkaynaktan gercekten
+        //  ucuz olmasinin sebebi budur. Oyunda vergi hic yoktu; o yuzden
+        //  borc yalnizca risk tasiyor, avantaji gorunmuyordu.
+        //
+        //  Zarar mahsubu da var: zarar eden ceyrekte vergi yok ve zarar
+        //  ileriye tasinip sonraki karli ceyreklerde dusuluyor.
+        //  Bkz. core/market/credit.ts -> applyTax
+        // ==================================================================
+        const pretaxProfit = totalRevenue - totalExpenses;
+        const taxResult = applyTax(
+          pretaxProfit + interestExpense + penaltyInterest, // EBIT tabani
+          interestExpense + penaltyInterest,
+          stats.lossCarryforward || 0,
+        );
+        const netProfit = taxResult.netProfit;
 
         // 6. UPDATE CAPITAL
-        const newCompanyCapital = (stats.companyCapital || 0) + netProfit;
+        // Anapara geri odemesi kardan degil NAKITTEN cikar — bilanco
+        // hareketidir, gider degildir. Gider yazsaydik kari iki kez
+        // dusurmus olurduk.
+        const newCompanyCapital = (stats.companyCapital || 0) + netProfit - principalRepaid;
 
         // 7. PLAYER FINANCIALS (Using Quarterly Economy Engine)
         // Calculate quarterly finances once and apply to player cash
@@ -686,7 +1012,9 @@ export const useGameStore = create<GameStore>()(
           ? activeQualities.reduce((a: number, b: number) => a + b, 0) / activeQualities.length
           : 1;
 
-        const brandResult = updateBrand({
+        // Pazarlama/kalite bacagi hala attraction.ts'te; artik markanin
+        // TEK kaynagi degil, dort kaynaktan biri. Bkz. core/market/brand.ts
+        const marketingBrand = updateBrand({
           currentBrand: brandValue,
           unitsSold: totalSales,
           unmetDemand: totalUnmetDemand,
@@ -697,6 +1025,47 @@ export const useGameStore = create<GameStore>()(
           // kademeden gelir ki buyurken kendi basarin seni cezalandirmasin.
           brandCeiling: tier.brandCeiling,
           brandFloor: tier.brandFloor,
+        });
+
+        // ==================================================================
+        //  MARKA — dört kaynaktan beslenir, tek kapıdan geçer
+        // ==================================================================
+        //  Once markayi YALNIZCA pazarlama butcesi insa ediyordu. Oyuncu
+        //  "en onemli mekanik bu ama artisini cozemedim" dedi — hakliydi,
+        //  cunku marka tek yonlu bir borudan ibaretti.
+        //
+        //  Artik: pazarlama + PAZAR PAYI + zaman + DEVRALMA.
+        //
+        //  Pazar payi bacagi geri besleme dongusunu kapatiyor: pay aldikca
+        //  marka buyur, marka buyudukce pay almak kolaylasir. Oyunun
+        //  bilesik buyume motoru bu — ve tesis tavani da tam bu yuzden var,
+        //  yoksa dongu kendini besleyip oyunu bitirir.
+        // ==================================================================
+        const totalPlayerShare = productBreakdownList.reduce(
+          (sum, p) => sum + (p.marketShare || 0), 0,
+        ) / Math.max(1, new Set(productBreakdownList.map(p => p.category)).size);
+
+        const brandResult = advanceBrand({
+          currentBrand: brandValue,
+          marketingDelta: marketingBrand.newBrand - brandValue,
+          totalMarketShare: totalPlayerShare,
+          profitable: netProfit > 0,
+          // Bu ceyrek kapanan devralmalarin marka katkisi
+          acquisitionGain: (() => {
+            const subs = useCorporateFinanceStore.getState().subsidiaries;
+            const fresh = subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1);
+            return fresh.reduce(
+              (sum, x) => sum + brandFromAcquisition(
+                x.deal?.fairValue || x.valuation || 0,
+                stats.companyValue || 1,
+                !!x.deal?.hostile,
+                brandValue,
+              ),
+              0,
+            );
+          })(),
+          ceiling: tier.brandCeiling,
+          floor: tier.brandFloor,
         });
 
         // ------------------------------------------------------------------
@@ -760,17 +1129,23 @@ export const useGameStore = create<GameStore>()(
           cogs: totalCOGS,
           marketing: totalMarketingCost,
           storage: totalStorageCost,
+          // Fasoncuya odenen — sipariş bedeli + bir kerelik hat kurulumu.
+          // COGS'tan AYRI tutuluyor: oyuncunun "kendi hattim mi ucuz,
+          // fason mu" sorusunu cevaplayabilmesi icin gorunur olmali.
+          contractManufacturing: contractSpend,
           factoryOverhead,
           wages: wageCost,
           hiring: hiringCost,
           severance: severanceCost,
           rnd: rndSalaryCost,
           fixed: totalFixedExpenses,
-          interest: interestExpense,
+          interest: interestExpense + penaltyInterest,
+          tax: taxResult.tax,
         };
 
         const grossProfit = totalRevenue - totalCOGS;
         const operatingExpenses =
+          contractSpend +
           totalMarketingCost +
           totalStorageCost +
           factoryOverhead +
@@ -779,7 +1154,31 @@ export const useGameStore = create<GameStore>()(
           severanceCost +
           rndSalaryCost +
           totalFixedExpenses;
-        const ebit = grossProfit - operatingExpenses;
+        // ==================================================================
+        //  İŞTİRAKLERİN KENDİ PERFORMANSI
+        // ==================================================================
+        //  `evaluateSubsidiaries` yazilmisti ama HIC CAGRILMIYORDU: satin
+        //  aldigin sirketlerin degeri ve stratejisi donmus duruyordu.
+        // ==================================================================
+        useCorporateFinanceStore.getState().evaluateSubsidiaries();
+
+        // ==================================================================
+        //  DEVRALMALARIN ÇEYREKLİK ETKİSİ
+        // ==================================================================
+        //  Satin alma artik tek seferlik bir islem degil, CEYREKLERE YAYILAN
+        //  bir surec. Once entegrasyon maliyeti gelir, sonra hedefin kari
+        //  yavas yavas akar, en son sinerji oturur. Hedef kazandirmiyorsa
+        //  8. ceyrekte serefiye silinir.
+        //
+        //  Etki EBIT uzerinden gecer, EBIT kazanc gucune, o da degerlemeye
+        //  ve hisse fiyatina. Ayri bir "hisse etkisi" formulu YOK.
+        //  Bkz. core/market/mergers.ts
+        // ==================================================================
+        const dealEffect = useCorporateFinanceStore
+          .getState()
+          .processAcquisitionsQuarter(Math.max(1, quarters));
+
+        const ebit = grossProfit - operatingExpenses + dealEffect.netEbit;
 
         const totalAvailableGoods = totalBeginningStock + totalProduction;
         const yearsElapsed = Math.floor((get().currentMonth - 1 + months) / 12);
@@ -819,14 +1218,36 @@ export const useGameStore = create<GameStore>()(
           totalUnmetDemand,
           brandValue: brandResult.newBrand,
           brandChange: brandResult.change,
-          brandMaintenance: brandResult.maintenance,
+          brandMaintenance: marketingBrand.maintenance,
           brandCeiling: tier.brandCeiling,
+
+          // --- Borclanma ---
+          creditRating: finance.getAssessment().rating,
+          leverage: finance.getAssessment().leverage,
+          coverage: finance.getAssessment().coverage,
+          principalRepaid,
+          covenantBreach: distress.stage !== 'healthy' && distress.stage !== 'watch',
+          distressMessage: forcedSaleNote
+            ? `${distress.message} ${forcedSaleNote}`
+            : capacityBreach
+              ? capacityBreach.message
+              : distress.message,
+          forcedSaleProceeds,
+          lossCarryforward: taxResult.lossCarryforward,
+
+          // --- Devralmalar ---
+          acquisitionEbit: dealEffect.netEbit,
+          acquisitionEarnings: dealEffect.earnings,
+          acquisitionIntegration: dealEffect.integrationCost,
+          acquisitionSynergy: dealEffect.synergy,
+          acquisitionImpairment: dealEffect.impairment,
 
           // --- Tesis ve kadro ---
           facilityTier: tier.level,
           facilityName: tier.name,
           facilityCapacity: Math.floor(tier.capacity * Math.max(1, quarters)),
           capacityUsed: Math.floor(usedStandard),
+          contractUnits: contractUnitsTotal,
           utilization: standardCapacity > 0 ? (usedStandard / standardCapacity) * 100 : 0,
           isRetooling: isBuilding,
           buildTargetTier: stats.facilityBuild?.targetTier,
@@ -851,6 +1272,9 @@ export const useGameStore = create<GameStore>()(
         };
 
         set(state => ({ ...state, lastQuarterReport: quarterReport }));
+
+
+
 
 
 
@@ -902,19 +1326,68 @@ export const useGameStore = create<GameStore>()(
         const capShares = capTable.totalShares || TOTAL_SHARES_DEFAULT;
         const playerShares = capTable.playerShareCount ?? 0;
 
+        // TTM: son dort ceyregin toplami. Bu ceyregi listeye ekle.
+        const revHistory = [...(stats.revenueHistory ?? []), totalRevenue].slice(-4);
+        const ebitHistory = [...(stats.ebitHistory ?? []), ebit].slice(-4);
+
+        // KAZANC GUCU: piyasa gerceklesen kari degil, beklenen kazanc
+        // gucunu fiyatlar. Ham TTM iki buyuk sayinin farki oldugu icin
+        // asiri gurultuludur; ciro %10 oynayinca kar %50 oynayabilir.
+        // Bkz. core/market/equity.ts -> updateEarningsPower
+        const earningsPower = updateEarningsPower(
+          stats.earningsPower || null,
+          trailingTotal(ebitHistory),
+        );
+
+        const isPublicNow = !!stats.isPublic;
         const valuation = companyValuation({
+          // Tesis + laboratuvar + istirakler. Karli sirkette hicbir etkisi
+          // yok (kazanc carpani zaten buyuk); yalnizca zorda olani korur.
+          tangibleAssets: (() => {
+            const t = getTier(useStatsStore.getState().facilityTier || 1);
+            const plant = (t.upgradeCost || 0) * 1.6;
+            const subs = useCorporateFinanceStore.getState().subsidiaries
+              .reduce((sum, x) => sum + (x.valuation || 0), 0);
+            return plant + subs;
+          })(),
           cash: newCompanyCapital,
-          quarterRevenue: totalRevenue,
-          quarterEbit: ebit,
+          ttmRevenue: trailingTotal(revHistory),
+          ttmEbit: earningsPower,
           debt: stats.companyDebtTotal || 0,
-          isPublic: !!stats.isPublic,
+          isPublic: isPublicNow,
           brandValue: brandResult.newBrand,
         }).total;
 
-        const rawPrice = equitySharePrice(valuation, capShares);
-        // Kucuk bir piyasa duygusu bandi (±%3). Asil surukleyici performans.
-        const newSharePrice = applySentiment(rawPrice);
-        const prevPrice = stats.companySharePrice || stats.previousSharePrice || rawPrice;
+        // Piyasa duygusu carpani her ceyrek 1.0'a dogru soner. IPO coskusu
+        // veya seyreltme panigi kalici degildir — once sonumleme yoktu ve
+        // halka arzdan sonra fiyat sonsuza kadar sisik kaliyordu.
+        const equity = useEquityStore.getState();
+        const nextMultiplier = decaySentiment(equity.marketMultiplier ?? 1);
+        useEquityStore.setState({ marketMultiplier: nextMultiplier });
+
+        const fairPrice = equitySharePrice(valuation, capShares) * nextMultiplier;
+        const prevPrice = stats.companySharePrice || stats.previousSharePrice || fairPrice;
+
+        // Piyasa yeni bilgiyi aninda tam fiyatlamaz. Ozel sirket yavas
+        // (deger ancak turlarda guncellenir), halka acik hizli + duygu bandi.
+        //
+        // OLCEK DE ONEMLI: dev sirket kucuk sirket gibi oynamaz. Cesitlenme,
+        // likidite ve kurumsal sahiplik soku yutar. Bkz. volatilityDamping.
+        // KALDIRAC HISSEYI DAHA OYNAK YAPAR.
+        // Faaliyet kari oynadiginda sabit faiz gideri dususu buyutur —
+        // finansta "kaldiracli beta". Yani borcun bedeli yalnizca faiz
+        // degil, her ceyregin daha sert gecmesi.
+        const assessment = finance.getAssessment();
+        const leverageVol = leverageVolatilityMultiplier(assessment.leverage);
+        // Sonumlemeyi kaldirac oraninda ZAYIFLATARAK oynakligi artir.
+        // MARKA ISTIKRAR SAGLAR: guclu markali sirketin hissesi daha az
+        // oynar, cunku yatirimci kotu ceyregi "gecici" diye okur. Finansta
+        // "kalite primi" denir. leverageVol ile ters yonde calisir.
+        const brandStability = brandStabilityFactor(brandResult.newBrand);
+        const marketCap = valuation / (leverageVol * brandStability);
+        let newSharePrice = smoothPrice(prevPrice, fairPrice, isPublicNow, marketCap);
+        if (isPublicNow) newSharePrice = applySentiment(newSharePrice, Math.random(), marketCap);
+
         const changePercent = priceChangePercent(prevPrice, newSharePrice);
 
         const ownership = ownershipPercent(playerShares, capShares);
@@ -930,7 +1403,197 @@ export const useGameStore = create<GameStore>()(
           companyDailyChange: changePercent,
           companyOwnership: ownership,
           netWorth: newPlayerCash + valuation * (ownership / 100),
+          revenueHistory: revHistory,
+          ebitHistory: ebitHistory,
+          earningsPower,
+          lossCarryforward: taxResult.lossCarryforward,
+          creditRatingPrev: nowRating,
         });
+
+        // ==================================================================
+        //  KURUL TEPKİSİ
+        // ==================================================================
+        //  `evaluatePlayerAction` yazilmisti ama HIC CAGRILMIYORDU: kurul
+        //  uyeleri oyuncunun ne yaptigina hic tepki vermiyordu, guven
+        //  seviyeleri baslangictaki degerde donmus kaliyordu.
+        //
+        //  Artik her ceyrek, o ceyrekte yaptigin en belirgin hamle kurula
+        //  bildirilir. Nakit yigmak da bir karardir ve kurul bundan
+        //  hoslanmaz — gercek hayatta da hissedarlar atil sermayeden
+        //  sikayet eder.
+        // ==================================================================
+        //  ARTIK TAHMIN YOK.
+        //
+        //  Once motor "en belirgin hamle neydi" diye TAHMIN edip dort
+        //  secenekten birini yolluyordu. O ceyrekte tefeciden borc almis,
+        //  200 kisi cikarmis ve halka acilmis olabilirsin — kurul yalnizca
+        //  'ACQUISITION' duyuyordu.
+        //
+        //  Simdi her hamle KENDI BUYUKLUGUYLE bildiriliyor. Buyukluk
+        //  sirketin olcegine gore normalize: "kac dolar" degil, "senin
+        //  icin ne kadar buyuk bir hamleydi".
+        try {
+          const shStore = require('../../features/shareholders/stores/useShareholderStore')
+            .useShareholderStore;
+          const sh = shStore.getState();
+
+          // Baglam: ayni hamle farkli durumda farkli okunur.
+          const fmtMoney = require('../utils').formatMoney;
+          const priceHist = useEquityStore.getState().priceHistory || [];
+          const peak = priceHist.length ? Math.max(...priceHist, newSharePrice) : newSharePrice;
+          const boardCtx = {
+            profitable: netProfit > 0,
+            leverage: assessment.leverage === Infinity ? 99 : assessment.leverage,
+            inBreach: assessment.inBreach,
+            lossStreak: netProfit > 0 ? 0 : ((stats as any).lossStreak || 0) + 1,
+            priceVsPeak: peak > 0 ? newSharePrice / peak : 1,
+          };
+
+          const events: { kind: string; magnitude: number; label: string }[] = [];
+          const scale = Math.max(1, Math.abs(totalRevenue) || 1);
+
+          // --- Ceyregin sonucu her zaman bildirilir
+          if (netProfit > 0) {
+            events.push({
+              kind: 'quarter_profit',
+              magnitude: Math.min(1, netProfit / scale * 4),
+              label: `Profitable quarter: ${fmtMoney(netProfit)}`,
+            });
+          } else {
+            events.push({
+              kind: 'quarter_loss',
+              magnitude: Math.min(1, Math.abs(netProfit) / scale * 4),
+              label: `Loss of ${fmtMoney(Math.abs(netProfit))}`,
+            });
+          }
+
+          // --- Devralma
+          if (dealEffect.netEbit !== 0) {
+            events.push({
+              kind: 'acquisition',
+              magnitude: Math.min(1, Math.abs(dealEffect.netEbit) / scale * 3),
+              label: 'An acquisition moved through the books this quarter',
+            });
+          }
+
+          // --- Temettu / ikramiye
+          if (get().bonusDistributedThisQuarter) {
+            events.push({
+              kind: 'dividend',
+              magnitude: 0.6,
+              label: 'Cash was paid out to shareholders',
+            });
+          }
+
+          // --- Isten cikarma: kadronun yuzdesi olarak
+          if (laidOff > 0 && headcount > 0) {
+            events.push({
+              kind: 'layoffs',
+              magnitude: Math.min(1, laidOff / Math.max(1, headcount + laidOff) * 2),
+              label: `${laidOff} people were let go`,
+            });
+          }
+
+          // --- Tesis yatirimi
+          if (nextBuild && !stats.facilityBuild) {
+            events.push({
+              kind: 'capex',
+              magnitude: 0.7,
+              label: 'A major plant investment was committed',
+            });
+          }
+
+          // --- Fason kaymasi: uretimin ne kadari disarida
+          if (contractUnitsTotal > 0 && totalProduction > 0) {
+            const share = contractUnitsTotal / totalProduction;
+            if (share > 0.15) {
+              events.push({
+                kind: 'outsourcing',
+                magnitude: Math.min(1, share),
+                label: `${(share * 100).toFixed(0)}% of production is now outsourced`,
+              });
+            }
+          }
+
+          // --- Sozlesme ve not
+          if (assessment.inBreach) {
+            events.push({ kind: 'covenant_breach', magnitude: 1, label: 'The company breached its covenants' });
+          }
+          if ((stats as any).creditRatingPrev && (stats as any).creditRatingPrev !== assessment.rating) {
+            const order = ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'D'];
+            if (order.indexOf(assessment.rating) > order.indexOf((stats as any).creditRatingPrev)) {
+              events.push({
+                kind: 'rating_downgrade',
+                magnitude: 0.8,
+                label: `Credit rating fell to ${assessment.rating}`,
+              });
+            }
+          }
+
+          // --- Atil nakit: hicbir sey yapmamak da bir karardir
+          const idleCash = (useStatsStore.getState().companyCapital || 0);
+          if (events.length === 1 && idleCash > scale * 2) {
+            events.push({
+              kind: 'hold_cash',
+              magnitude: Math.min(1, idleCash / (scale * 6)),
+              label: 'Cash is piling up and nothing is being done with it',
+            });
+          }
+
+          sh.resetQuarterlyBoard();
+          events.forEach(e => sh.applyBoardEvent(e as any, boardCtx));
+
+          // --- Vadesi gelen sozler
+          // ----------------------------------------------------------------
+          //  SÖZLER — beş tür var, önce YALNIZCA BİRİ kontrol ediliyordu
+          // ----------------------------------------------------------------
+          //  Yani bir uye kurul koltugu ya da seyreltmeme sozu istediyse ve
+          //  sen soz verdiysen, o soz bir sonraki ceyrekte OTOMATIK
+          //  BOZULMUS sayiliyordu — hicbir sey yapmasan bile −25 guven.
+          //  Oyuncuyu tutabilecegi bir sozu tutmadigi icin cezalandiran
+          //  bir hataydi. Artik besi de gercekten olculuyor.
+          // ----------------------------------------------------------------
+          const keptKinds: string[] = [];
+          if (get().bonusDistributedThisQuarter) keptKinds.push('dividend_next');
+
+          const capNow = require('../../features/shareholders/stores/useShareholderStore')
+            .useShareholderStore.getState();
+          // Seyreltmeme sozu: toplam hisse artmadiysa tutulmustur.
+          if ((stats.totalSharesPrev ?? capNow.totalShares) >= capNow.totalShares) {
+            keptKinds.push('no_dilution');
+          }
+          // Borc azaltma sozu: bu ceyrek borc gercekten dustuyse.
+          if ((useStatsStore.getState().companyDebtTotal || 0) < (stats.companyDebtTotal || 0)) {
+            keptKinds.push('reduce_debt');
+          }
+          // Koltuk ve hisse verme sozleri ANINDA yerine getirilir (verilmis
+          // ya da verilmemistir), o yuzden verildikleri anda kapanirlar —
+          // burada ayrica olculmezler.
+          keptKinds.push('board_seat', 'share_grant');
+
+          sh.settlePromises(quarterIndex, keptKinds as any, boardCtx);
+
+          useStatsStore.getState().update({ totalSharesPrev: capNow.totalShares } as any);
+
+          // ================================================================
+          //  GUVENSIZLIK OYU
+          // ================================================================
+          //  Uc kosul BIRDEN gerekiyor: cogunlugu kaybetmis olacaksin,
+          //  kurul guveni cokmus olacak VE performans kotu olacak. Tek
+          //  bir kotu ceyrek kimseyi koltugundan etmemeli — gorevden
+          //  alinma uzun sure ihmal edilmis bir iliskinin sonucudur.
+          // ================================================================
+          const nc = shStore.getState().runNoConfidence(boardCtx);
+          if (nc.called) {
+            useStatsStore.getState().update({
+              distressMessage: nc.result?.summary,
+            } as any);
+          }
+
+          useStatsStore.getState().update({
+            lossStreak: boardCtx.lossStreak,
+          } as any);
+        } catch (err) { console.warn('[Board] quarterly governance failed', err); }
 
 
 
@@ -1113,7 +1776,15 @@ export const useGameStore = create<GameStore>()(
 
         // 9. Sonucu UI'ın beklediği formatta döndür
         const result: EconomyResult = {
-          status: newCompanyCapital < 0 ? 'bankrupt' : 'active',
+          status: (() => {
+            // Kurul seni indirdiyse sirket ayakta olsa bile oyun biter.
+            try {
+              const removed = require('../../features/shareholders/stores/useShareholderStore')
+                .useShareholderStore.getState().ceoRemoved;
+              if (removed) return 'removed' as const;
+            } catch { /* kurul durumu okunamadi */ }
+            return newCompanyCapital < 0 ? 'bankrupt' as const : 'active' as const;
+          })(),
           reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,
           data: {
             // Rapor verileri (Dynamic calculations)

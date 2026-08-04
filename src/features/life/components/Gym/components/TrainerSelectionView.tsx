@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { TrainerId, TRAINERS } from '../useGymSystem';
@@ -10,9 +11,10 @@ type TrainerSelectionViewProps = {
 };
 
 const TrainerSelectionView = ({ trainerId, onHireTrainer, onBack }: TrainerSelectionViewProps) => {
+    useLocale();
     return (
         <View style={styles.subViewContainer}>
-            <Text style={styles.subTitle}>SELECT TRAINER</Text>
+            <Text style={styles.subTitle}>{t('life.selectTrainer')}</Text>
             <View style={styles.list}>
                 {(['sarah', 'marcus', 'ken'] as TrainerId[]).map((id) => {
                     const trainer = TRAINERS[id];

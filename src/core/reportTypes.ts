@@ -71,6 +71,12 @@ export interface ExpenseLines {
     marketing: number;
     /** Satılamayan stoğun depolama maliyeti (birim başına $5/çeyrek) */
     storage: number;
+    /**
+     * Fason üreticiye ödenen. Sipariş bedeli + bir kerelik hat kurulumu.
+     * COGS'tan ayrı durur ki "kendi hattım mı ucuz, fason mu" sorusu
+     * gelir tablosundan doğrudan okunabilsin.
+     */
+    contractManufacturing: number;
     /** Tesisin çeyreklik sabit işletme gideri — üretsen de üretmesen de */
     factoryOverhead: number;
     /** Üretim personelinin maaşı */
@@ -83,8 +89,10 @@ export interface ExpenseLines {
     rnd: number;
     /** Genel sabit giderler */
     fixed: number;
-    /** Şirket borcunun faizi */
+    /** Şirket borcunun faizi (sözleşme ihlali cezası dahil) */
     interest: number;
+    /** Kurumlar vergisi. Faiz matrahtan düştüğü için borç bunu azaltır. */
+    tax: number;
 }
 
 /**
@@ -152,6 +160,36 @@ export interface QuarterReport {
     /** Tesis kademesinin marka tavani — burada takilirsan sorun uretimde */
     brandCeiling: number;
 
+    // --- Borçlanma (bkz. core/market/credit.ts) ---
+    /** Harf notu — nakit akisindan gelir, degerlemeden degil */
+    creditRating?: string;
+    /** Borc / yillik EBITDA */
+    leverage?: number;
+    /** EBIT / yillik faiz */
+    coverage?: number;
+    /** Bu ceyrek odenen anapara (gider degil, bilanco hareketi) */
+    principalRepaid?: number;
+    /** Sozlesme ihlali var mi */
+    covenantBreach?: boolean;
+    /** Temerrut kademesinin mesaji */
+    distressMessage?: string;
+    /** Ileriye tasinan zarar */
+    lossCarryforward?: number;
+    /** Alacaklilarin zorladigi varlik satisindan gelen tutar */
+    forcedSaleProceeds?: number;
+
+    // --- Devralmalar (bkz. core/market/mergers.ts) ---
+    /** Devralmalarin bu ceyrekki net EBIT etkisi */
+    acquisitionEbit?: number;
+    /** Hedeflerin sana gecen kari */
+    acquisitionEarnings?: number;
+    /** Entegrasyon gideri */
+    acquisitionIntegration?: number;
+    /** Gerceklesen sinerji */
+    acquisitionSynergy?: number;
+    /** Serefiye deger dusuklugu */
+    acquisitionImpairment?: number;
+
     // --- Tesis ve kadro ---
     /** Kademe numarasi (1-11) */
     facilityTier: number;
@@ -162,6 +200,8 @@ export interface QuarterReport {
     capacityUsed: number;
     /** capacityUsed / kullanilabilir kapasite (yuzde) */
     utilization: number;
+    /** Bu ceyrek fasondan gelen saglam adet — kendi kapasiteni kullanmaz */
+    contractUnits?: number;
     /** Insaat suruyor mu — evetse kapasite %65'e dusmustur */
     isRetooling: boolean;
     buildTargetTier?: number;
@@ -202,8 +242,8 @@ export const EMPTY_QUARTER_REPORT: QuarterReport = {
     months: 0,
     revenue: 0,
     expenses: {
-        cogs: 0, marketing: 0, storage: 0, factoryOverhead: 0,
-        wages: 0, hiring: 0, severance: 0, rnd: 0, fixed: 0, interest: 0,
+        cogs: 0, marketing: 0, storage: 0, contractManufacturing: 0, factoryOverhead: 0,
+        wages: 0, hiring: 0, severance: 0, rnd: 0, fixed: 0, interest: 0, tax: 0,
     },
     totalExpenses: 0,
     grossProfit: 0,
@@ -231,6 +271,11 @@ export const EMPTY_QUARTER_REPORT: QuarterReport = {
     brandChange: 0,
     brandMaintenance: 0,
     brandCeiling: 100,
+    acquisitionEbit: 0,
+    acquisitionEarnings: 0,
+    acquisitionIntegration: 0,
+    acquisitionSynergy: 0,
+    acquisitionImpairment: 0,
 
     facilityTier: 1,
     facilityName: 'Workshop',
@@ -293,6 +338,7 @@ export const normalizeQuarterReport = (
  * Motor formulu degisirse buradaki metin de degismeli.
  */
 export const EXPENSE_EXPLANATIONS: Record<keyof ExpenseLines, string> = {
+    contractManufacturing: 'Paid to a third-party factory. Costs 30-60% more per unit than your own line, but needs no construction and no capacity. The fast way to grow, not the cheap one.',
     cogs: 'Charged on units PRODUCED, not sold. Overproduce and you burn cash on goods sitting in a warehouse.',
     wages: 'Production headcount, charged every quarter whether the line runs or not. This is why hiring is a real decision and not a free lever.',
     hiring: 'Recruiting, onboarding and equipping new people — roughly 25% of a year of their pay. New hires arrive next quarter and work at half speed for their first one.',
@@ -302,5 +348,6 @@ export const EXPENSE_EXPLANATIONS: Record<keyof ExpenseLines, string> = {
     factoryOverhead: 'Your facility\'s fixed running cost, paid whether the line runs or not. This is the line that punishes idle capacity — a bigger tier is cheaper per unit but brutal if you cannot fill it.',
     rnd: '$500K per researcher per quarter. Buys Research Points, which is the only way to improve products.',
     fixed: 'General running costs. Independent of how much you produce.',
-    interest: 'Interest on outstanding company debt.',
+    interest: 'Interest on outstanding debt, at the rate your credit rating earns you. If you have breached a covenant, the penalty rate is in here too.',
+    tax: 'Corporate tax on profit after interest. Because interest is deductible, borrowing lowers this line — that is the tax shield, and it is why debt is genuinely cheaper than equity. A loss-making quarter pays nothing, and the loss carries forward against future profits.',
 };

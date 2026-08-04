@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';
 import GameButton from '../../../common/GameButton';
@@ -9,12 +10,13 @@ interface Props {
 }
 
 const ProductPricingSection = ({ price, onPriceChange }: Props) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>PRICING STRATEGY</Text>
+            <Text style={styles.sectionTitle}>{t('product.pricingStrategy')}</Text>
 
             <View style={styles.card}>
-                <Text style={styles.label}>Sale Price</Text>
+                <Text style={styles.label}>{t('product.salePrice')}</Text>
                 <View style={styles.row}>
                     <Text style={styles.priceDisplay}>${price}</Text>
                     <View style={styles.controls}>

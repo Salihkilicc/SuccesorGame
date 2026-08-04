@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
 import { useStatsStore } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
@@ -12,6 +13,7 @@ export type LoanModalProps = {
 const OPTIONS = [5_000_000, 10_000_000, 20_000_000] as const;
 
 const LoanModal = ({ visible, onClose }: LoanModalProps) => {
+    useLocale();
   const { money, companyDebt, setField } = useStatsStore();
 
   const handleLoan = (amount: number) => {
@@ -26,8 +28,8 @@ const LoanModal = ({ visible, onClose }: LoanModalProps) => {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
-          <Text style={styles.title}>Take Loan</Text>
-          <Text style={styles.subtitle}>Kısa vadeli veya uzun vadeli kredi al.</Text>
+          <Text style={styles.title}>{t('action.takeLoan')}</Text>
+          <Text style={styles.subtitle}>{t('action.kSaVadeliVeyaUzun')}</Text>
           <View style={styles.options}>
             {OPTIONS.map(amount => (
               <Pressable
@@ -47,7 +49,7 @@ const LoanModal = ({ visible, onClose }: LoanModalProps) => {
               styles.closeButton,
               pressed && styles.closeButtonPressed,
             ]}>
-            <Text style={styles.closeText}>Close</Text>
+            <Text style={styles.closeText}>{t('action.close')}</Text>
           </Pressable>
         </View>
       </View>

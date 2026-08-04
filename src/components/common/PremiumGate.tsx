@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import {View, Text, StyleSheet} from 'react-native';
 
 type Props = {
@@ -8,13 +9,14 @@ type Props = {
 };
 
 const PremiumGate = ({hasPremium, fallback, children}: Props) => {
+    useLocale();
   if (hasPremium) {
     return <>{children}</>;
   }
 
   return (
     <View style={styles.fallbackContainer}>
-      {fallback ?? <Text style={styles.fallbackText}>Premium Required</Text>}
+      {fallback ?? <Text style={styles.fallbackText}>{t('ui.premiumRequired')}</Text>}
     </View>
   );
 };

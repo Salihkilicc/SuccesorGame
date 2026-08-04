@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Modal, Animated } from 'react-native';
 import { theme } from '../../../core/theme';
 import { Shareholder } from '../../../core/store/useStatsStore';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
+    useLocale();
     const { money, GIFTS, result, sendGift, resetResult } = useGiftLogic(shareholder);
     const appreciationAnim = useRef(new Animated.Value(0)).current;
 
@@ -44,7 +46,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                         <Text style={styles.resultMessage}>{shareholder.name} loved the {result.giftName}!</Text>
 
                         <View style={styles.appreciationCard}>
-                            <Text style={styles.appreciationLabel}>Relationship Improvement</Text>
+                            <Text style={styles.appreciationLabel}>{t('equity.relationshipImprovement')}</Text>
                             <View style={styles.barContainer}>
                                 <View style={[styles.barBg, { width: '100%' }]}>
                                     <View style={[styles.barFill, { width: `${relationship}%` }]} />
@@ -66,13 +68,13 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                         </View>
 
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
-                            <Text style={styles.closeBtnText}>Close</Text>
+                            <Text style={styles.closeBtnText}>{t('equity.close')}</Text>
                         </Pressable>
                     </View>
                 ) : (
                     <View style={styles.content}>
                         <View style={styles.header}>
-                            <Text style={styles.title}>Send Gift</Text>
+                            <Text style={styles.title}>{t('equity.sendGift')}</Text>
                             <View style={styles.walletBadge}>
                                 <Text style={styles.walletText}>💰 {formatMoney(money)}</Text>
                             </View>
@@ -97,7 +99,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                         </View>
 
                         <Pressable style={styles.cancelBtn} onPress={handleClose}>
-                            <Text style={styles.cancelText}>Cancel</Text>
+                            <Text style={styles.cancelText}>{t('equity.cancel')}</Text>
                         </Pressable>
                     </View>
                 )}

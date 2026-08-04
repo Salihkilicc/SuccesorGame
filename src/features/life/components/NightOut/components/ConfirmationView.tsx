@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { Venue } from '../data/nightOutVenues';
@@ -12,9 +13,10 @@ type ConfirmationViewProps = {
 };
 
 const ConfirmationView = ({ venue, travelCost, totalCost, onConfirm, onCancel }: ConfirmationViewProps) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Confirm Your Night</Text>
+            <Text style={styles.header}>{t('life.confirmYourNight')}</Text>
 
             {/* Venue Summary */}
             <View style={[styles.venueCard, { borderColor: venue.themeColor }]}>
@@ -33,17 +35,17 @@ const ConfirmationView = ({ venue, travelCost, totalCost, onConfirm, onCancel }:
                 {/* Cost Breakdown */}
                 <View style={styles.breakdown}>
                     <View style={styles.breakdownRow}>
-                        <Text style={styles.breakdownLabel}>Entry Fee</Text>
+                        <Text style={styles.breakdownLabel}>{t('life.entryFee')}</Text>
                         <Text style={styles.breakdownValue}>${venue.entryFee.toLocaleString()}</Text>
                     </View>
                     {travelCost > 0 && (
                         <View style={styles.breakdownRow}>
-                            <Text style={styles.breakdownLabel}>Travel</Text>
+                            <Text style={styles.breakdownLabel}>{t('life.travel')}</Text>
                             <Text style={styles.breakdownValue}>${travelCost.toLocaleString()}</Text>
                         </View>
                     )}
                     <View style={[styles.breakdownRow, styles.totalRow]}>
-                        <Text style={styles.totalLabel}>Total Cost</Text>
+                        <Text style={styles.totalLabel}>{t('life.totalCost2')}</Text>
                         <Text style={styles.totalValue}>${totalCost.toLocaleString()}</Text>
                     </View>
                 </View>
@@ -58,7 +60,7 @@ const ConfirmationView = ({ venue, travelCost, totalCost, onConfirm, onCancel }:
                         { backgroundColor: venue.themeColor },
                         pressed && styles.buttonPressed,
                     ]}>
-                    <Text style={styles.confirmButtonText}>Confirm Night Out</Text>
+                    <Text style={styles.confirmButtonText}>{t('life.confirmNightOut')}</Text>
                 </Pressable>
 
                 <Pressable
@@ -67,7 +69,7 @@ const ConfirmationView = ({ venue, travelCost, totalCost, onConfirm, onCancel }:
                         styles.cancelButton,
                         pressed && styles.buttonPressed,
                     ]}>
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={styles.cancelButtonText}>{t('life.cancel')}</Text>
                 </Pressable>
             </View>
         </View>

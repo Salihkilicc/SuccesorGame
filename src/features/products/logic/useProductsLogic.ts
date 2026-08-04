@@ -12,7 +12,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 
 export const useProductsLogic = () => {
     const { researchPoints = 1000, employeeCount } = useStatsStore();
-    const { products, setProducts, updateProduct, upgradeProductQuality, optimizeProductionLine } = useProductStore();
+    const { products, setProducts, updateProduct, discontinueProduct, upgradeProductQuality, optimizeProductionLine } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -86,18 +86,40 @@ export const useProductsLogic = () => {
         updateProduct(id, updates);
     };
 
+    /**
+     * Urunu hattan cikarir.
+     *
+     * ONCE: sadece `status: 'retired'` yaziyordu. Urun listede kaliyor,
+     * yer kapliyor ve BIR DAHA ACILAMIYORDU. Pazari kucuk bir urunu
+     * birakip sonra tekrar denemek imkansizdi.
+     *
+     * SIMDI: urun silinir, teknoloji yeniden kilitlenir. Tekrar acmak
+     * RP ve nakit ister — vazgecmenin bedeli var ama kapi kapanmiyor.
+     */
     const retireProduct = (id: string) => {
-        Alert.alert('Retire Product', 'Stop production permanently?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Retire',
-                style: 'destructive',
-                onPress: () => {
-                    updateProduct(id, { status: 'retired' });
-                    closeModal();
-                }
-            }
-        ]);
+        const product = products.find((p: Product) => p.id === id);
+        const stock = product?.inventory || 0;
+
+        Alert.alert(
+            'Discontinue Product',
+            `Take ${product?.name || 'this product'} off the line for good.\n\n` +
+            (stock > 0
+                ? `${stock.toLocaleString()} units still in the warehouse will be written off.\n\n`
+                : '') +
+            'The technology goes back to locked. You can bring it back later, but you will pay the research and cash cost again.',
+            [
+                { text: 'Keep it', style: 'cancel' },
+                {
+                    text: 'Discontinue',
+                    style: 'destructive',
+                    onPress: () => {
+                        const result = discontinueProduct(id);
+                        if (!result.success) Alert.alert('Error', result.message);
+                        closeModal();
+                    },
+                },
+            ]
+        );
     };
 
     const getInsightTip = (product: Product) => {

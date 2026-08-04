@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';
 import GameButton from '../../../common/GameButton';
@@ -11,13 +12,14 @@ interface Props {
 }
 
 const ProductMarketSection = ({ researched, demand, competition, onResearch }: Props) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>MARKET INTELLIGENCE</Text>
+            <Text style={styles.sectionTitle}>{t('product.marketIntelligence')}</Text>
 
             {!researched ? (
                 <GameButton
-                    title="Perform Market Search ($50k)"
+                    title={t('product.performMarketSearch50k')}
                     variant="primary"
                     onPress={onResearch}
                 />
@@ -25,7 +27,7 @@ const ProductMarketSection = ({ researched, demand, competition, onResearch }: P
                 <View style={styles.statsCard}>
                     <View style={styles.statRow}>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.statLabel}>Demand</Text>
+                            <Text style={styles.statLabel}>{t('product.demand')}</Text>
                             <View style={styles.barBg}>
                                 <View style={[styles.barFill, { width: `${demand}%`, backgroundColor: theme.colors.success }]} />
                             </View>
@@ -35,7 +37,7 @@ const ProductMarketSection = ({ researched, demand, competition, onResearch }: P
 
                     <View style={styles.statRow}>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.statLabel}>Competition</Text>
+                            <Text style={styles.statLabel}>{t('product.competition2')}</Text>
                             <View style={styles.barBg}>
                                 <View style={[styles.barFill, { width: `${competition}%`, backgroundColor: theme.colors.danger }]} />
                             </View>

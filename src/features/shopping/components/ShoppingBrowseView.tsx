@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     ScrollView,
@@ -31,10 +32,10 @@ type BrandConfig = {
 };
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
-    Velocity: { name: 'Velocity Motors', color: '#E60000', emoji: '🏎️' },
-    Dynasty8: { name: 'Dynasty 8', color: '#3A86FF', emoji: '🏠' },
-    Luxe: { name: 'Luxe Vault', color: '#7209B7', emoji: '💎' },
-    Elitas: { name: 'Elitas Travel', color: '#FF3366', emoji: '✈️' },
+    Velocity: { name: t('ui.velocityMotors'), color: '#E60000', emoji: '🏎️' },
+    Dynasty8: { name: t('ui.dynasty8'), color: '#3A86FF', emoji: '🏠' },
+    Luxe: { name: t('ui.luxeVault'), color: '#7209B7', emoji: '💎' },
+    Elitas: { name: t('ui.elitasTravel'), color: '#FF3366', emoji: '✈️' },
 };
 
 const ShoppingBrowseView = ({
@@ -43,6 +44,7 @@ const ShoppingBrowseView = ({
     onCartPress,
     onHomePress,
 }: ShoppingBrowseViewProps) => {
+    useLocale();
     const { addToCart, isOwned, cart } = useAssetStore();
     const brandConfig = BRAND_CONFIGS[website] || BRAND_CONFIGS.Velocity;
 
@@ -89,7 +91,7 @@ const ShoppingBrowseView = ({
             <View style={[styles.header, { backgroundColor: brandConfig.color }]}>
                 <Pressable onPress={onBack} style={styles.backButton}>
                     <Text style={styles.backIcon}>←</Text>
-                    <Text style={styles.backText}>Back</Text>
+                    <Text style={styles.backText}>{t('ui.back')}</Text>
                 </Pressable>
                 <View style={styles.headerCenter}>
                     <Text style={styles.brandEmoji}>{brandConfig.emoji}</Text>
@@ -112,7 +114,7 @@ const ShoppingBrowseView = ({
             >
                 {items.length === 0 ? (
                     <View style={styles.emptyState}>
-                        <Text style={styles.emptyText}>No items available</Text>
+                        <Text style={styles.emptyText}>{t('ui.noItemsAvailable')}</Text>
                     </View>
                 ) : (
                     <View style={styles.grid}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -11,6 +12,7 @@ interface GameRoomCardProps {
 }
 
 export const GameRoomCard = ({ title, subtitle, image, onPress, locked = false }: GameRoomCardProps) => {
+    useLocale();
     return (
         <Pressable
             onPress={locked ? undefined : onPress}
@@ -34,11 +36,11 @@ export const GameRoomCard = ({ title, subtitle, image, onPress, locked = false }
 
                 {!locked ? (
                     <View style={styles.playButton}>
-                        <Text style={styles.playText}>PLAY</Text>
+                        <Text style={styles.playText}>{t('ui.play2')}</Text>
                     </View>
                 ) : (
                     <View style={styles.lockBadge}>
-                        <Text style={styles.lockText}>COMING SOON</Text>
+                        <Text style={styles.lockText}>{t('ui.comingSoon')}</Text>
                     </View>
                 )}
             </View>

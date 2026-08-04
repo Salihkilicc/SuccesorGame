@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
 import { theme } from '../../../core/theme';
 import { SHOPS } from '../data/shoppingRegistry';
@@ -13,8 +14,8 @@ const ADS = [
     {
         id: 'ad_velocity',
         shopId: 'shop_velocity_motors',
-        title: 'Velocity Motors',
-        subtitle: 'Start Your Legacy',
+        title: t('ui.velocityMotors'),
+        subtitle: t('ui.startYourLegacy'),
         cta: 'Drive Now →',
         color: '#E74C3C',
         emoji: '🏎️',
@@ -22,8 +23,8 @@ const ADS = [
     {
         id: 'ad_dynasty',
         shopId: 'shop_dynasty8',
-        title: 'Dynasty 8',
-        subtitle: 'Live Above the Clouds',
+        title: t('ui.dynasty8'),
+        subtitle: t('ui.liveAboveTheClouds'),
         cta: 'View Estates →',
         color: '#2C3E50',
         emoji: '🏠',
@@ -31,8 +32,8 @@ const ADS = [
     {
         id: 'ad_poseidon',
         shopId: 'shop_poseidon_yards',
-        title: 'Poseidon Yards',
-        subtitle: 'Summer Sale: Conquer the Ocean',
+        title: t('ui.poseidonYards'),
+        subtitle: t('ui.summerSaleConquerTheOcean'),
         cta: 'Set Sail →',
         color: '#3498DB',
         emoji: '⛵',
@@ -40,9 +41,10 @@ const ADS = [
 ];
 
 const AdBannerCarousel = ({ onPressBanner }: AdBannerCarouselProps) => {
+    useLocale();
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>Featured</Text>
+            <Text style={styles.sectionTitle}>{t('ui.featured')}</Text>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -33,6 +34,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     member,
     onClose,
 }) => {
+    useLocale();
     const navigation = useNavigation<any>();
     // ============================================================================
     // STATE
@@ -286,7 +288,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         {/* Trust Bar */}
                         <View style={styles.trustContainer}>
                             <View style={styles.trustLabelRow}>
-                                <Text style={styles.trustLabel}>Trust</Text>
+                                <Text style={styles.trustLabel}>{t('equity.trust')}</Text>
                                 <Text style={styles.trustValue}>{member.trust}%</Text>
                             </View>
                             <View style={styles.trustBarBg}>
@@ -314,17 +316,13 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             style={[styles.tab, activeTab === 'relations' && styles.tabActive]}
                             onPress={() => setActiveTab('relations')}
                         >
-                            <Text style={[styles.tabText, activeTab === 'relations' && styles.tabTextActive]}>
-                                Relations
-                            </Text>
+                            <Text style={[styles.tabText, activeTab === 'relations' && styles.tabTextActive]}>{t('equity.relations')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.tab, activeTab === 'trade' && styles.tabActive]}
                             onPress={() => setActiveTab('trade')}
                         >
-                            <Text style={[styles.tabText, activeTab === 'trade' && styles.tabTextActive]}>
-                                Trade
-                            </Text>
+                            <Text style={[styles.tabText, activeTab === 'trade' && styles.tabTextActive]}>{t('equity.trade')}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -339,7 +337,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {/* Ask for Advice */}
                                 <TouchableOpacity style={styles.actionButton} onPress={handleAskAdvice}>
                                     <Text style={styles.actionButtonIcon}>💬</Text>
-                                    <Text style={styles.actionButtonText}>Ask for Advice</Text>
+                                    <Text style={styles.actionButtonText}>{t('equity.askForAdvice')}</Text>
                                 </TouchableOpacity>
 
                                 {/* Advice Bubble */}
@@ -364,7 +362,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 >
                                     <Text style={styles.actionButtonIcon}>🎁</Text>
                                     <View style={styles.actionButtonContent}>
-                                        <Text style={styles.actionButtonText}>Send Gift</Text>
+                                        <Text style={styles.actionButtonText}>{t('equity.sendGift')}</Text>
                                         <Text style={styles.actionButtonSubtext}>$10,000 • +5 Trust</Text>
                                     </View>
                                 </TouchableOpacity>
@@ -376,7 +374,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 >
                                     <Text style={styles.actionButtonIcon}>🍽️</Text>
                                     <View style={styles.actionButtonContent}>
-                                        <Text style={styles.actionButtonText}>Host Dinner</Text>
+                                        <Text style={styles.actionButtonText}>{t('equity.hostDinner')}</Text>
                                         <Text style={styles.actionButtonSubtext}>$100,000 • +15 Trust</Text>
                                     </View>
                                 </TouchableOpacity>
@@ -392,9 +390,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                             setOfferPremium(0);
                                         }}
                                     >
-                                        <Text style={[styles.modeButtonText, tradeMode === 'buy' && styles.modeButtonTextActive]}>
-                                            BUY
-                                        </Text>
+                                        <Text style={[styles.modeButtonText, tradeMode === 'buy' && styles.modeButtonTextActive]}>{t('equity.buy')}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[styles.modeButton, tradeMode === 'sell' && styles.modeButtonSellActive]}
@@ -403,15 +399,13 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                             setOfferPremium(0);
                                         }}
                                     >
-                                        <Text style={[styles.modeButtonText, tradeMode === 'sell' && styles.modeButtonTextActive]}>
-                                            SELL
-                                        </Text>
+                                        <Text style={[styles.modeButtonText, tradeMode === 'sell' && styles.modeButtonTextActive]}>{t('equity.sell')}</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 {/* Current Stock Price Info */}
                                 <View style={{ backgroundColor: '#2C2C2E', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
-                                    <Text style={{ fontSize: 14, color: '#8E8E93', marginBottom: 4 }}>Current Stock Price</Text>
+                                    <Text style={{ fontSize: 14, color: '#8E8E93', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
                                     <Text style={{ fontSize: 24, fontWeight: '800', color: '#30D158' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
@@ -422,7 +416,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                 {/* Amount Stepper */}
                                 <View style={styles.stepperContainer}>
-                                    <Text style={styles.stepperLabel}>Share Amount</Text>
+                                    <Text style={styles.stepperLabel}>{t('equity.shareAmount')}</Text>
                                     <View style={styles.stepperRow}>
                                         <TouchableOpacity
                                             style={[styles.stepperButton, shareCount <= 10_000 && styles.stepperButtonDisabled]}
@@ -453,7 +447,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                 {/* Stepper UI */}
                                 <View style={styles.stepperContainer}>
-                                    <Text style={styles.stepperLabel}>Total Cost (Premium)</Text>
+                                    <Text style={styles.stepperLabel}>{t('equity.totalCostPremium')}</Text>
                                     <View style={styles.stepperRow}>
                                         <TouchableOpacity
                                             style={[styles.stepperButton, offerPremium <= -20 && styles.stepperButtonDisabled]}

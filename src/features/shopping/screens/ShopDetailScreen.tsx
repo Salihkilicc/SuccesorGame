@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, FlatList, SafeAreaView, StyleSheet, Text, Pressable } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -8,6 +9,7 @@ import { useEncounterSystem } from '../../../features/love/components/useEncount
 import { EncounterModal } from '../../../components';
 
 const ShopDetailScreen = () => {
+    useLocale();
     const route = useRoute<any>();
     const navigation = useNavigation();
     const { shopId } = route.params;
@@ -32,9 +34,9 @@ const ShopDetailScreen = () => {
     if (!shop) {
         return (
             <View style={styles.center}>
-                <Text style={styles.errorText}>Shop not found</Text>
+                <Text style={styles.errorText}>{t('ui.shopNotFound')}</Text>
                 <Pressable onPress={() => navigation.goBack()} style={styles.goBackBtn}>
-                    <Text style={styles.goBackText}>Go Back</Text>
+                    <Text style={styles.goBackText}>{t('ui.goBack')}</Text>
                 </Pressable>
             </View>
         );

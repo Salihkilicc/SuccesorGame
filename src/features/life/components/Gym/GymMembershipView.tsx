@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const GymMembershipView = () => {
+    useLocale();
     const { data, actions, activeView, isVisible } = useGymSystem();
     const {
         membership,
@@ -48,7 +50,7 @@ const GymMembershipView = () => {
     const cards = [
         {
             id: 'STANDARD' as MembershipTier,
-            title: 'STANDARD',
+            title: t('life.standard'),
             price: `$${prices.STANDARD.annual.toLocaleString()}/yr`,
             color: '#C0C0C0',
             features: ['Access to Equipment', 'Basic Classes', 'Locker Room'],
@@ -56,7 +58,7 @@ const GymMembershipView = () => {
         },
         {
             id: 'TITANIUM' as MembershipTier,
-            title: 'TITANIUM',
+            title: t('life.titanium'),
             price: `$${prices.TITANIUM.annual.toLocaleString()}/yr`,
             color: '#FF6F00',
             features: ['Grandmaster Trainers', '2x Workout Gains', 'Private Spa Access', 'Networking Events'],
@@ -75,8 +77,8 @@ const GymMembershipView = () => {
                             <Text style={styles.backText}>← Back</Text>
                         </TouchableOpacity>
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.title}>MEMBERSHIP</Text>
-                            <Text style={styles.subtitle}>Elevate your status</Text>
+                            <Text style={styles.title}>{t('life.membership2')}</Text>
+                            <Text style={styles.subtitle}>{t('life.elevateYourStatus')}</Text>
                         </View>
                         <View style={{ width: 60 }} />
                     </View>
@@ -90,7 +92,7 @@ const GymMembershipView = () => {
                                 <View key={item.id} style={[styles.membershipCard, { borderColor: item.color }]}>
                                     <View style={[styles.cardHeader, { backgroundColor: item.color }]}>
                                         <Text style={styles.cardTitle}>{item.title}</Text>
-                                        {isOwned && <Text style={styles.ownedBadge}>CURRENT</Text>}
+                                        {isOwned && <Text style={styles.ownedBadge}>{t('life.current')}</Text>}
                                     </View>
 
                                     <View style={styles.cardContent}>

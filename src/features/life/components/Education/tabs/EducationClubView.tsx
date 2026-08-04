@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import {
     View,
     Text,
@@ -40,6 +41,7 @@ const generateMemberAvatars = () => {
 // ========================================
 
 export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) => {
+    useLocale();
     const navigation = useNavigation();
     const { activeClub, joinClub, leaveClub, closeEducation } = useEducationSystem();
 
@@ -49,9 +51,9 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                 'Leave Club?',
                 `Are you sure you want to leave ${CLUB_DATA[clubType].name}?`,
                 [
-                    { text: 'Cancel', style: 'cancel' },
+                    { text: t('life.cancel'), style: 'cancel' },
                     {
-                        text: 'Leave',
+                        text: t('life.leave'),
                         style: 'destructive',
                         onPress: () => {
                             leaveClub();
@@ -66,9 +68,9 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                     'Switch Clubs?',
                     `Leave ${CLUB_DATA[activeClub].name} and join ${CLUB_DATA[clubType].name}?`,
                     [
-                        { text: 'Cancel', style: 'cancel' },
+                        { text: t('life.cancel'), style: 'cancel' },
                         {
-                            text: 'Switch',
+                            text: t('life.switch'),
                             onPress: () => {
                                 joinClub(clubType);
                                 Alert.alert('Joined!', `Welcome to ${CLUB_DATA[clubType].name}!`);
@@ -94,8 +96,8 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                         <Text style={styles.backText}>← Back</Text>
                     </TouchableOpacity>
                     <View style={styles.headerTitleContainer}>
-                        <Text style={styles.title}>Student Clubs</Text>
-                        <Text style={styles.subtitle}>Elite Societies</Text>
+                        <Text style={styles.title}>{t('life.studentClubs')}</Text>
+                        <Text style={styles.subtitle}>{t('life.eliteSocieties')}</Text>
                     </View>
                     <View style={{ width: 60 }} />
                 </View>
@@ -118,14 +120,14 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                                 <View style={styles.clubHeader}>
                                     <View style={styles.clubTitleSection}>
                                         <Text style={styles.clubName}>{club.name}</Text>
-                                        {isActive && <Text style={styles.activeBadge}>ACTIVE</Text>}
+                                        {isActive && <Text style={styles.activeBadge}>{t('life.active')}</Text>}
                                     </View>
                                     <Text style={styles.clubDescription}>{club.description}</Text>
                                 </View>
 
                                 {/* Buff Info */}
                                 <View style={styles.buffSection}>
-                                    <Text style={styles.buffLabel}>Quarterly Benefit:</Text>
+                                    <Text style={styles.buffLabel}>{t('life.quarterlyBenefit')}</Text>
                                     <Text style={styles.buffText}>
                                         +{club.buffAmount} {club.buffStat.charAt(0).toUpperCase() + club.buffStat.slice(1)} per Quarter
                                     </Text>
@@ -133,7 +135,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 
                                 {/* Members Section */}
                                 <View style={styles.membersSection}>
-                                    <Text style={styles.membersLabel}>Members:</Text>
+                                    <Text style={styles.membersLabel}>{t('life.members')}</Text>
                                     <View style={styles.avatarsContainer}>
                                         {members.map((initials, index) => (
                                             <View key={index} style={styles.avatar}>

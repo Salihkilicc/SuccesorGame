@@ -1,6 +1,7 @@
 // src/features/casino/screens/SlotsGameScreen.tsx
 
 import React, { useEffect, useState, useRef } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Pressable, ScrollView, StyleSheet, Text, View, Dimensions, Animated, Easing } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppScreen from '../../../components/layout/AppScreen';
@@ -17,6 +18,7 @@ import CasinoHeader from '../components/CasinoHeader';
 const { width } = Dimensions.get('window');
 
 const SlotsGameScreen = () => {
+    useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
   const variant: SlotVariant = route.params?.variant ?? 'street_fighter';
@@ -88,13 +90,11 @@ const SlotsGameScreen = () => {
       {/* BIG WIN OVERLAY */}
       {showResult && lastResult?.type === 'win' && (
         <Pressable style={styles.winOverlay} onPress={actions.hideResult}>
-          <Animated.Text style={[styles.bigWinText, { transform: [{ scale: winScale }], opacity: winOpacity }]}>
-            BIG WIN!
-          </Animated.Text>
+          <Animated.Text style={[styles.bigWinText, { transform: [{ scale: winScale }], opacity: winOpacity }]}>{t('ui.bigWin')}</Animated.Text>
           <Animated.Text style={[styles.winAmount, { transform: [{ scale: winScale }], opacity: winOpacity }]}>
             +${lastResult.amount.toLocaleString()}
           </Animated.Text>
-          <Text style={styles.tapToCloseText}>Tap screen to continue</Text>
+          <Text style={styles.tapToCloseText}>{t('ui.tapScreenToContinue')}</Text>
         </Pressable>
       )}
 
@@ -142,7 +142,7 @@ const SlotsGameScreen = () => {
 
           <View style={styles.bottomControls}>
             <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>TOTAL BET</Text>
+              <Text style={styles.betLabel}>{t('ui.totalBet')}</Text>
               <Text style={styles.betValueText}>${bet.toLocaleString()}</Text>
             </View>
 

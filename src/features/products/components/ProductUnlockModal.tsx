@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { UnlockableProduct } from '../data/unlockableProductsData';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
+    useLocale();
     const { unlockProduct } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
     const { companyCapital, update: updateStats } = useStatsStore();
@@ -35,7 +37,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 
     const handleUnlock = () => {
         if (product.isUnlocked) {
-            Alert.alert('Already Unlocked', 'This product has already been unlocked.');
+            Alert.alert(t('alert.alreadyUnlocked'), t('alert.thisProductHasAlreadyBeen'));
             return;
         }
 
@@ -45,10 +47,27 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
             companyCapital,
             (amount: number) => spendRP(amount),
             (amount: number) => {
-                updateStats({
-                    companyCapital: companyCapital - amount,
-                    companyValue: (useStatsStore.getState().companyValue || 0) * (1 + product.stockBoost / 100)
-                });
+                // ----------------------------------------------------------
+                //  ONCE `companyValue`I DOGRUDAN YAZIYORDU VE SILINIYORDU.
+                //
+                //  Motor her ceyrek degerlemeyi TEMEL VERILERDEN yeniden
+                //  hesapliyor (nakit + kazanc carpani + ciro carpani - borc).
+                //  Yani buraya elle yazilan boost bir sonraki ceyrekte
+                //  buhar oluyordu. Oyuncu "urun cikarmanin yazdigi gibi bir
+                //  hisse etkisi yok" dedi — dogru gormus.
+                //
+                //  Yeni urun duyurusu bir TEMEL VERI degil, bir BEKLENTIDIR.
+                //  O yuzden diger sinyaller gibi piyasa duygusu carpanindan
+                //  gecer: kalicidir ve zamanla soner.
+                // ----------------------------------------------------------
+                updateStats({ companyCapital: companyCapital - amount });
+                try {
+                    const eq = require('../../finance/stores/useEquityStore').useEquityStore;
+                    const cur = eq.getState().marketMultiplier || 1;
+                    eq.setState({
+                        marketMultiplier: Math.min(2.2, cur * (1 + product.stockBoost / 100)),
+                    });
+                } catch { /* piyasa sinyali uygulanamadi */ }
             }
         );
 
@@ -56,10 +75,10 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
             Alert.alert(
                 '🎉 Success!',
                 `${product.name} has been unlocked!\n\nStock Boost: +${product.stockBoost}%`,
-                [{ text: 'Continue', onPress: onClose }]
+                [{ text: t('product.continue'), onPress: onClose }]
             );
         } else {
-            Alert.alert('Cannot Unlock', result.message);
+            Alert.alert(t('alert.cannotUnlock'), result.message);
         }
     };
 
@@ -87,18 +106,18 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 
                     {/* Financials */}
                     <View style={styles.financialsContainer}>
-                        <Text style={styles.sectionTitle}>Estimated Financials</Text>
+                        <Text style={styles.sectionTitle}>{t('product.estimatedFinancials')}</Text>
                         <View style={styles.financialsGrid}>
                             <View style={styles.financialItem}>
-                                <Text style={styles.financialLabel}>Unit Cost</Text>
+                                <Text style={styles.financialLabel}>{t('product.unitCost')}</Text>
                                 <Text style={styles.financialValue}>{formatCurrency(product.baseUnitCost)}</Text>
                             </View>
                             <View style={styles.financialItem}>
-                                <Text style={styles.financialLabel}>Selling Price</Text>
+                                <Text style={styles.financialLabel}>{t('product.sellingPrice')}</Text>
                                 <Text style={styles.financialValue}>{formatCurrency(product.baseSellingPrice)}</Text>
                             </View>
                             <View style={styles.financialItem}>
-                                <Text style={styles.financialLabel}>Stock Boost</Text>
+                                <Text style={styles.financialLabel}>{t('product.stockBoost')}</Text>
                                 <Text style={[styles.financialValue, { color: theme.colors.success }]}>
                                     +{product.stockBoost}%
                                 </Text>
@@ -108,17 +127,17 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 
                     {/* Cost Display */}
                     <View style={styles.costContainer}>
-                        <Text style={styles.costTitle}>Development Cost</Text>
+                        <Text style={styles.costTitle}>{t('product.developmentCost')}</Text>
                         <View style={styles.costRow}>
                             <View style={[styles.costBadge, totalRP < product.unlockRPCost && styles.costBadgeInsufficient]}>
-                                <Text style={styles.costLabel}>Research Points</Text>
+                                <Text style={styles.costLabel}>{t('product.researchPoints')}</Text>
                                 <Text style={styles.costValue}>{formatRP(product.unlockRPCost)}</Text>
                                 <Text style={styles.costAvailable}>
                                     Available: {formatRP(totalRP)}
                                 </Text>
                             </View>
                             <View style={[styles.costBadge, companyCapital < product.unlockCashCost && styles.costBadgeInsufficient]}>
-                                <Text style={styles.costLabel}>Capital</Text>
+                                <Text style={styles.costLabel}>{t('product.capital')}</Text>
                                 <Text style={styles.costValue}>{formatCurrency(product.unlockCashCost)}</Text>
                                 <Text style={styles.costAvailable}>
                                     Available: {formatCurrency(companyCapital)}

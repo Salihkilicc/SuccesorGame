@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, ActivityIndicator, Animated } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -9,6 +10,7 @@ interface PaymentProcessingModalProps {
 }
 
 const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible, amount, onComplete }) => {
+    useLocale();
     const [step, setStep] = useState(0);
     const [statusText, setStatusText] = useState('Connecting to Swiss Bank Secure Server...');
     const [showSuccess, setShowSuccess] = useState(false);
@@ -25,9 +27,9 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 
             // Sequence Timing
             const sequence = [
-                { time: 1000, text: 'Verifying Biometric ID...' },
-                { time: 2500, text: 'Authorizing Large Asset Transfer...' },
-                { time: 4000, text: 'Transaction Approved.' }
+                { time: 1000, text: t('ui.verifyingBiometricId') },
+                { time: 2500, text: t('ui.authorizingLargeAssetTransfer') },
+                { time: 4000, text: t('ui.transactionApproved') }
             ];
 
             const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -88,8 +90,8 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
                         <Animated.View style={[styles.checkmarkCircle, { transform: [{ scale: scaleAnim }] }]}>
                             <Text style={styles.checkmarkIcon}>✅</Text>
                         </Animated.View>
-                        <Text style={styles.successText}>Payment Successful</Text>
-                        <Text style={styles.subtitleText}>Assets transferred to your name.</Text>
+                        <Text style={styles.successText}>{t('ui.paymentSuccessful')}</Text>
+                        <Text style={styles.subtitleText}>{t('ui.assetsTransferredToYourName')}</Text>
                     </View>
                 )}
             </View>

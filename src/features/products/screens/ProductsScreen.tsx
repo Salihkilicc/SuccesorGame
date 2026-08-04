@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -9,6 +10,7 @@ import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney } from '../../../core/utils';
 
 const ProductsScreen = () => {
+    useLocale();
   const navigation = useNavigation<any>();
   const {
     activeProducts,
@@ -27,7 +29,7 @@ const ProductsScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backText}>←</Text></Pressable>
-        <Text style={styles.title}>Product Lines</Text>
+        <Text style={styles.title}>{t('product.productLines')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -39,7 +41,7 @@ const ProductsScreen = () => {
             <Pressable key={prod.id} style={styles.activeCard} onPress={() => actions.openDetailModal(prod)}>
               <View style={styles.activeHeader}>
                 <Text style={styles.activeIcon}>{prod.icon}</Text>
-                <View style={styles.statusBadge}><Text style={styles.statusText}>ACTIVE</Text></View>
+                <View style={styles.statusBadge}><Text style={styles.statusText}>{t('product.active')}</Text></View>
               </View>
               <Text style={styles.activeName}>{prod.name}</Text>
               <Text style={styles.activeProfit}>Prod: {prod.productionLevel}%</Text>
@@ -56,12 +58,12 @@ const ProductsScreen = () => {
           >
             <Text style={{ fontSize: 30 }}>⚛️</Text>
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ color: theme.colors.accent, fontWeight: '700', fontSize: 13, textAlign: 'center' }}>Discover New Tech</Text>
-              <Text style={{ color: theme.colors.textMuted, fontSize: 10, marginTop: 4 }}>Go to R&D Lab</Text>
+              <Text style={{ color: theme.colors.accent, fontWeight: '700', fontSize: 13, textAlign: 'center' }}>{t('product.discoverNewTech')}</Text>
+              <Text style={{ color: theme.colors.textMuted, fontSize: 10, marginTop: 4 }}>{t('product.goToRDLab')}</Text>
             </View>
           </Pressable>
 
-          {activeProducts.length === 0 && <Text style={styles.emptyText}>No active products yet. Start by discovering tech!</Text>}
+          {activeProducts.length === 0 && <Text style={styles.emptyText}>{t('product.noActiveProductsYetStart')}</Text>}
         </View>
 
         {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}

@@ -2,6 +2,38 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';
 import { useEquityStore } from './useEquityStore';
+import {
+    CreditAssessment,
+    LoanKind,
+    DistressState,
+    EXTENDED_LOAN_PRODUCTS,
+    LOAN_PRODUCTS,
+    assessCollateral,
+    quoteMezzanine,
+    LoanRecord,
+    assessCredit,
+    assessDistress,
+    productRate,
+    ratingAtLeast,
+    serviceLoanQuarter,
+    FINANCING_SIGNALS,
+    FinancingEvent,
+    FinancingSignal,
+    signalForLoan,
+} from '../../../core/market/credit';
+import {
+    AcquisitionDeal,
+    FinancingMethod,
+    TargetRisk,
+    advanceDeal,
+    announcementImpact,
+    dealQuarterEffect,
+    estimateTargetEbit,
+    quoteAcquisition,
+    quoteDivestiture,
+    quoteFinancing,
+} from '../../../core/market/mergers';
+import { directorFromAcquisition } from '../../../core/market/governance';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney } from '../../../core/utils';
 
@@ -64,24 +96,50 @@ export interface Subsidiary {
     sector: string;
     valuation: number;
     acquiredAt: number;
+    /**
+     * DEVRALMANIN FINANSAL KAYDI.
+     *
+     * Once satin alma tek satirlik bir islemdi: parayi ode, listeye
+     * eklensin. Hisseye tek etkisi kasadan cikan nakitti — prim odemenin
+     * bedeli yoktu, hedefin kari senin karina hic girmiyordu, entegrasyon
+     * diye bir sey yoktu.
+     *
+     * Artik her islem bir kayit tasir ve her ceyrek islenir.
+     * Bkz. core/market/mergers.ts
+     */
+    deal?: AcquisitionDeal;
     strategy: SubsidiaryStrategy;
     lastChangePercent: number; // For UI display (e.g. +12.5%)
     history: number[];
 }
 
 export interface CorporateFinanceState {
-    loans: Loan[];
+    loans: LoanRecord[];
+    /** GOSTERIMLIK skor — gercek olcut harf notudur */
     creditScore: number;
     totalDebt: number;
+    /** Ust uste kac ceyrektir sozlesme ihlalinde */
+    quartersInBreach: number;
     subsidiaries: Subsidiary[];
 
     // Actions
-    refreshCreditScore: (valuation: number, cash: number) => void;
+    /** ESKI — not artik nakit akisindan geliyor. Sadece gosterimlik skor. */
+    refreshCreditScore: (valuation?: number, cash?: number) => void;
+    /** Not, faiz, kapasite ve sozlesme durumu — TEK KAYNAK */
+    getAssessment: () => CreditAssessment;
     getInterestRate: () => number;
+    /** Varliga dayali borclanma kapasitesi (bkz. credit.ts assessCollateral) */
+    getCollateral: () => ReturnType<typeof assessCollateral>;
+    /** Mezzanine teklifi — odeyemezsen hisseye doner */
+    getMezzanine: (amount: number) => ReturnType<typeof quoteMezzanine>;
+    /** Ceyreklik borc servisi: faiz + anapara. Motor cagirir. */
+    serviceDebtQuarter: (quarters: number) => { interest: number; principal: number; total: number };
+    getDistress: () => DistressState;
+    advanceDistress: () => DistressState;
     takeLoan: (
         amount: number,
         valuation: number,
-        loanType: 'Bank' | 'Bonds' | 'Shark',
+        loanType: LoanKind,
         baseRate: number,
         addCashFn: (amount: number) => void
     ) => { success: boolean; message: string };
@@ -90,6 +148,11 @@ export interface CorporateFinanceState {
         amount: number,
         spendCashFn: (amount: number) => void
     ) => { success: boolean; message: string };
+    /**
+     * EMEKLIYE AYRILDI — cagirmayin.
+     * Parayi aliyor ama bakiyeyi azaltmiyordu; kredi hic kapanmiyordu.
+     * Yerine: serviceDebtQuarter
+     */
     payMonthlyInterests: (spendCashFn: (amount: number) => void) => {
         totalPayment: number;
         success: boolean;
@@ -99,7 +162,51 @@ export interface CorporateFinanceState {
     getMonthlyInterestTotal: () => number;
 
     // Subsidiary Actions
-    acquireCompany: (company: any, price: number) => void;
+    acquireCompany: (company: any, price: number, deal?: AcquisitionDeal) => void;
+
+    /**
+     * TEK KAPI — her devralma buradan gecer.
+     *
+     * ONCEDEN UC AYRI YOL VARDI ve ucu de farkli sey yapiyordu:
+     *
+     *   1) useMarketStore.acquireCompany
+     *      KISISEL cuzdandan harciyordu (spendMoney), sonucu
+     *      useUserStore.subsidiaries'e yaziyordu. Hicbir ekrandan
+     *      cagrilmiyordu ama duruyordu.
+     *
+     *   2) useStatsStore.addAcquisition
+     *      NegotiationModal kullaniyordu. Parayi elle dusuyor, kaydi
+     *      statsStore.acquisitions'a yaziyordu. Motor ORAYA BAKMADIGI
+     *      icin: pazar payi gecmiyor, hedefin kari EBIT'e girmiyor,
+     *      entegrasyon ve sinerji hic islemiyordu. Yani pazarlikla
+     *      alinan sirket oyunda hicbir sey yapmiyordu.
+     *
+     *   3) useCorporateFinanceStore.acquireCompany
+     *      Gercek olan. AcquisitionModal kullaniyordu.
+     *
+     *   Ayrica satin alma BUFF'lari (Ar-Ge hizi, uretim maliyeti...)
+     *   useUserStore.subsidiaries'ten okunuyordu — yani yalnizca
+     *   1. yolun yazdigi yerden. O yol hic cagrilmadigi icin buff'lar
+     *   HIC CALISMIYORDU.
+     *
+     * Artik hepsi bu fonksiyona baglidir. Yeni bir devralma ekrani
+     * yazacaksan bunu cagir, kendi yolunu acma.
+     */
+    executeAcquisition: (input: {
+        target: { id: string; name: string; marketCap: number; risk?: string; category?: string; sector?: string; acquisitionBuff?: any };
+        hostile: boolean;
+        financing: FinancingMethod;
+        /** Pazarlikla belirlenen fiyat — verilmezse standart prim uygulanir */
+        negotiatedPrice?: number;
+    }) => { success: boolean; message: string; announcementImpact: number };
+    /** Tum devralmalarin bu ceyrekki toplam EBIT etkisi. Motor cagirir. */
+    processAcquisitionsQuarter: (quarters: number) => {
+        netEbit: number;
+        integrationCost: number;
+        synergy: number;
+        earnings: number;
+        impairment: number;
+    };
     sellSubsidiary: (id: string) => void;
     updateSubsidiaryStrategy: (id: string, newStrategy: SubsidiaryStrategy) => void;
     evaluateSubsidiaries: () => void;
@@ -113,137 +220,435 @@ export interface CorporateFinanceState {
     attemptToSellCompany: (id: string, askingPrice: number) => { success: boolean; msg?: string; price?: number };
 }
 
+/**
+ * Kurul uyesinden alinan borcun ortulu faiz orani.
+ * Sozlesmesinde yazili bir faiz yok — teminat hisselerin ve vade sert.
+ * Ama oyunun borc terazisinde bir maliyeti olmali, yoksa "bedava borc"
+ * kapisi acik kalirdi.
+ */
+const SHARK_IMPLIED_RATE = 0.30;
+
+/** Kurul uyelerinden alinan aktif borclarin toplami. */
+const sharkLoanTotal = (): number => {
+    try {
+        const sh = require('../../shareholders/stores/useShareholderStore')
+            .useShareholderStore.getState();
+        return (sh.sharkLoans || [])
+            .filter((l: any) => l.isActive)
+            .reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+    } catch {
+        return 0;
+    }
+};
+
+/**
+ * Bir finansman hamlesinin hisseye sinyal etkisini uygular.
+ *
+ * Borc kendi basina hisseyi dusurmez — degerleme zaten borcu duser.
+ * Buradaki sey ayri: piyasanin hamleyi nasil okudugu. Ayni parayi
+ * bankadan mi tefeciden mi buldugun, ne kadar buldugun kadar onemli.
+ */
+const applyFinancingSignal = (event: FinancingEvent): FinancingSignal => {
+    const signal = FINANCING_SIGNALS[event];
+    try {
+        require('./useEquityStore').useEquityStore.setState((st: any) => ({
+            marketMultiplier: Math.max(
+                0.3,
+                st.marketMultiplier * (1 + signal.impactPercent / 100),
+            ),
+        }));
+    } catch { /* piyasa tepkisi uygulanamadi */ }
+    return signal;
+};
+
 const MAX_LEVERAGE = 0.8; // 80% of Valuation
 const RISK_THRESHOLD = 0.5; // 50% triggers market penalty
+
+
+/**
+ * ============================================================================
+ *  KURUL KAPISI — buyuk kararlar buradan gecer
+ * ============================================================================
+ *  Oyuncunun kurali: "hisselerin %50'den az ise cogu sey zaten direkt
+ *  kurula sorulmali". Cogunluktayken yalnizca gercekten buyuk kararlar
+ *  oya gider; cogunlugu kaybettigin an her sey degisir.
+ *
+ *  Bu fonksiyon TEK KAPI: hem kredi hem devralma buradan geciyor ki
+ *  ileride yeni bir karar turu eklendiginde iki ayri onay yolu
+ *  olusmasin. (Bu projede ayni hatayi yedi kez gorduk.)
+ *
+ *  Donen deger `null` ise karar serbest; degilse oylama sonucudur.
+ */
+export const boardGate = (
+    kind: 'acquisition' | 'debt' | 'mezzanine' | 'dilution' | 'ipo' | 'dividend' | 'buyback' | 'capex' | 'divestiture',
+    amount: number,
+    title: string,
+    hostile = false,
+): { needed: boolean; passed: boolean; reason: string; result?: any } => {
+    try {
+        const sh = require('../../shareholders/stores/useShareholderStore').useShareholderStore;
+        const stats = useStatsStore.getState();
+        const proposal = {
+            kind, amount, title, hostile,
+            valuation: stats.companyValue || 0,
+        };
+
+        const check = sh.getState().needsVote(proposal);
+        if (!check.required) return { needed: false, passed: true, reason: check.reason };
+
+        const fin = useCorporateFinanceStore.getState();
+        const a = fin.getAssessment();
+        const ctx = {
+            profitable: ((stats as any).lossStreak || 0) === 0,
+            leverage: a.leverage === Infinity ? 99 : a.leverage,
+            inBreach: a.inBreach,
+            lossStreak: (stats as any).lossStreak || 0,
+            priceVsPeak: 1,
+        };
+
+        const result = sh.getState().holdVote(proposal, ctx);
+        return {
+            needed: true,
+            passed: result.passed,
+            reason: result.summary,
+            result,
+        };
+    } catch (err) {
+        console.warn('[boardGate] vote failed, allowing', err);
+        return { needed: false, passed: true, reason: '' };
+    }
+};
 
 export const useCorporateFinanceStore = create<CorporateFinanceState>()(
     persist(
         (set, get) => ({
-            loans: [],
+            loans: [] as LoanRecord[],
             creditScore: 750,
             totalDebt: 0,
+            quartersInBreach: 0,
             subsidiaries: [],
 
             // --- CREDIT SCORE & LOAN LOGIC (PRESERVED) ---
 
-            refreshCreditScore: (valuation, cash) => {
-                const { totalDebt } = get();
-                // Base Score: 600
-                let score = 600;
-                // Valuation Bonus: +5 per $1M
-                score += (valuation / 1_000_000) * 5;
-                // Debt-to-Cash Penalty: -50 per ratio point
-                if (cash > 0) {
-                    const debtToCash = totalDebt / cash;
-                    score -= debtToCash * 50;
+            /**
+             * ESKI TUKETICI SKORU — emekliye ayrildi.
+             *
+             * Formul `600 + degerleme/1M x 5` idi; ~50 milyon dolarin
+             * ustundeki HER sirket 850 puan ve %3 faiz aliyordu. Yani
+             * skor erken oyundan sonra olu bir sayiydi ve buyumek
+             * otomatik olarak ucuz para getiriyordu.
+             *
+             * Artik not NAKIT AKISINDAN gelir (kaldirac ve faiz
+             * karsilama). Bkz. core/market/credit.ts -> assessCredit
+             * Bu fonksiyon yalnizca eski cagrilar patlamasin diye durur
+             * ve gosterimlik skoru nottan turetir.
+             */
+            refreshCreditScore: () => {
+                const a = get().getAssessment();
+                const scoreByRating: Record<string, number> = {
+                    AAA: 830, AA: 790, A: 750, BBB: 700, BB: 640, B: 570, CCC: 480, D: 350,
+                };
+                set({ creditScore: scoreByRating[a.rating] ?? 600 });
+            },
+
+            /**
+             * KREDI DEGERLENDIRMESI — tek kaynak.
+             * Not, faiz orani, borclanma kapasitesi ve sozlesme durumu
+             * hep buradan cikar.
+             */
+            getAssessment: () => {
+                const { totalDebt, loans } = get();
+                let stats: any = {};
+                try {
+                    stats = useStatsStore.getState();
+                } catch { /* test ortami */ }
+
+                // TTM EBITDA ve EBIT motorun sakladigi gecmisten.
+                const ebitHist: number[] = stats.ebitHistory ?? [];
+                const annualEbit = ebitHist.length
+                    ? ebitHist.slice(-4).reduce((a: number, b: number) => a + b, 0) *
+                      (4 / Math.min(4, ebitHist.length))
+                    : 0;
+                // Oyunda amortisman ayri bir kalem degil; EBITDA'yi EBIT'in
+                // biraz ustunde kabul ediyoruz (tesis opex'inin bir kismi).
+                const annualEbitda = annualEbit * 1.15;
+
+                let annualInterest = loans.reduce(
+                    (sum, l) => sum + l.balance * l.rate, 0,
+                );
+
+                // KURUL UYESINDEN ALINAN BORCLAR DA BORCTUR.
+                //
+                // `shareholderStore.sharkLoans` ayri bir sistemdi ve
+                // kaldirac/covenant hesabina HIC girmiyordu: Marcus'tan
+                // borc alip kredi notunu hic bozmadan devam edebiliyordun.
+                // Teminat/haciz mekanigi orada kaliyor (hisselerine el
+                // konur — bankadan borc almaktan farkli bir hikaye), ama
+                // borcun kendisi artik ayni terazide.
+                const sharkDebt = sharkLoanTotal();
+                annualInterest += sharkDebt * SHARK_IMPLIED_RATE;
+
+                return assessCredit(
+                    totalDebt + sharkDebt,
+                    annualEbitda,
+                    annualEbit,
+                    annualInterest,
+                );
+            },
+
+            getInterestRate: () => get().getAssessment().rate,
+
+            /**
+             * VARLIGA DAYALI kapasite. Kazanctan bagimsizdir: tesisin ve
+             * istiraklerin duruyorsa banka onlara borc verir. Bedeli,
+             * odeyemezsen pazarliksiz haciz.
+             */
+            getCollateral: () => {
+                const stats = useStatsStore.getState();
+                const tierValue = (() => {
+                    const { getTier } = require('../../../core/market/capacity');
+                    const t = getTier(stats.facilityTier || 1);
+                    // Defter degeri: bu kademeye gelmek icin odenenin kabaca toplami.
+                    return (t.upgradeCost || 0) * 1.6;
+                })();
+                const subs = get().subsidiaries.reduce((sum, x) => sum + (x.valuation || 0), 0);
+                const securedDebt = get().loans
+                    .filter(l => l.kind === 'secured')
+                    .reduce((sum, l) => sum + l.balance, 0);
+                return assessCollateral(
+                    {
+                        facilityValue: tierValue,
+                        subsidiaryValue: subs,
+                        inventoryValue: 0,
+                    },
+                    securedDebt,
+                );
+            },
+
+            /**
+             * MEZZANINE teklifi — para degil, kontrol uzerine opsiyon
+             * satiyorsun. Odeyemezsen borc hisseye doner ve alacakli
+             * kurula girer.
+             */
+            getMezzanine: (amount: number) => {
+                const stats = useStatsStore.getState();
+                const sh = require('../../shareholders/stores/useShareholderStore').useShareholderStore.getState();
+                const existing = get().loans
+                    .filter(l => l.kind === 'mezzanine')
+                    .reduce((sum, l) => sum + l.balance, 0);
+                return quoteMezzanine(
+                    stats.companyValue || 0,
+                    sh.totalShares || 10_000_000,
+                    amount,
+                    existing,
+                );
+            },
+
+            /**
+             * KREDI AL.
+             *
+             * Kapasite artik DEGERLEMEDEN degil KAZANCTAN turetiliyor:
+             * bankalar nakit akisina borc verir, hayale degil.
+             */
+            takeLoan: (amount, _valuation, loanType, _baseRate, addCashFn) => {
+                const a = get().getAssessment();
+                const distress = get().getDistress();
+
+                if (!distress.canBorrow) {
+                    return { success: false, message: distress.message };
                 }
-                // Clamp between 300-850
-                score = Math.max(300, Math.min(850, score));
-                set({ creditScore: Math.round(score) });
-            },
 
-            getInterestRate: () => {
-                const { creditScore } = get();
-                if (creditScore >= 800) return 0.03; // 3%
-                if (creditScore >= 700) return 0.05; // 5%
-                if (creditScore >= 600) return 0.08; // 8%
-                if (creditScore >= 500) return 0.12; // 12%
-                return 0.15; // 15%
-            },
+                const allProducts = [...LOAN_PRODUCTS, ...EXTENDED_LOAN_PRODUCTS];
+                const product =
+                    allProducts.find(pr => pr.kind === loanType) ?? LOAN_PRODUCTS[1];
 
-            takeLoan: (amount, valuation, loanType, baseRate, addCashFn) => {
-                const { totalDebt, loans, refreshCreditScore } = get();
-
-                // Check Max Leverage (80% of Valuation)
-                const newDebt = totalDebt + amount;
-                const leverage = newDebt / valuation;
-
-                if (leverage > MAX_LEVERAGE) {
+                if (product.requiresPublic && !useStatsStore.getState().isPublic) {
+                    return { success: false, message: 'Bonds require a public listing.' };
+                }
+                if (product.minRating && !ratingAtLeast(a.rating, product.minRating)) {
                     return {
                         success: false,
-                        message: `Leverage limit exceeded! Max debt: ${formatMoney(Math.floor(valuation * MAX_LEVERAGE))}`
+                        message: `Bonds need at least ${product.minRating}. You are ${a.rating}.`,
+                    };
+                }
+                // ------------------------------------------------------------
+                //  KATMANLI KAPASITE
+                // ------------------------------------------------------------
+                //  Oyuncu hakliydi: "100M kapasite yaziyor, 6M cekebiliyorum".
+                //  Ama cozum kazanc kapasitesini sismek degil — o dogruydu.
+                //  Cozum, gercek hayatta oldugu gibi UST KATMANLARI acmak:
+                //
+                //    kazanc  -> en ucuz, en kucuk
+                //    varlik  -> daha buyuk, teminat karsiligi (haciz riski)
+                //    mezzanine -> en buyuk, sirketin kendisi karsiligi
+                //
+                //  Boylece her zaman bir yol var, ama her yolun kendi
+                //  bedeli var. Karar oyuncunun.
+                // ------------------------------------------------------------
+                if (product.kind === 'secured') {
+                    const col = get().getCollateral();
+                    if (amount > col.headroom) {
+                        return {
+                            success: false,
+                            message:
+                                `Your pledgeable assets support ${formatMoney(col.capacity)}. ` +
+                                `${formatMoney(col.used)} is already pledged, leaving ` +
+                                `${formatMoney(col.headroom)}. Build or buy more, and this grows.`,
+                        };
+                    }
+                } else if (product.kind === 'mezzanine') {
+                    const mz = get().getMezzanine(amount);
+                    if (amount > mz.maxAmount) {
+                        return {
+                            success: false,
+                            message:
+                                `Mezzanine tops out at 35% of your valuation — ` +
+                                `${formatMoney(mz.maxAmount)} more.`,
+                        };
+                    }
+                } else if (amount > a.headroom) {
+                    return {
+                        success: false,
+                        message:
+                            `Your earnings support ${formatMoney(a.debtCapacity)} of debt. ` +
+                            `You already carry ${formatMoney(get().totalDebt)}, so you can raise ` +
+                            `${formatMoney(a.headroom)} this way. Asset-backed and mezzanine ` +
+                            `facilities go further — at a price.`,
                     };
                 }
 
-                // Calculate Monthly Payment (Simple Interest, 12-month term)
-                const annualRate = baseRate / 100;
-                const monthlyRate = annualRate / 12;
-                const term = 12; // 12 months
-                const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) /
-                    (Math.pow(1 + monthlyRate, term) - 1);
+                // ------------------------------------------------------------
+                //  KURUL ONAYI
+                // ------------------------------------------------------------
+                //  Mezzanine HER ZAMAN oya gider — alacakli kurula girecek,
+                //  yani oyuncu baskalarinin masasina birini oturtuyor.
+                //  Buyuk borc da degerlemenin %20'sini asinca oya gider.
+                // ------------------------------------------------------------
+                const gateKind = product.kind === 'mezzanine' ? 'mezzanine' : 'debt';
+                const gate = boardGate(gateKind, amount, `${product.name}: ${formatMoney(amount)}`);
+                if (gate.needed && !gate.passed) {
+                    return { success: false, message: `The board blocked it. ${gate.reason}` };
+                }
 
-                const newLoan: Loan = {
-                    id: `LOAN_${Date.now()}`,
+                const rate = productRate(product, a);
+                const loan: LoanRecord = {
+                    id: `LOAN_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                    kind: product.kind,
+                    name: product.name,
                     principal: amount,
-                    interestRate: baseRate,
-                    monthlyPayment: monthlyPayment,
-                    remaining: amount,
-                    type: loanType,
-                    originationDate: Date.now()
+                    balance: amount,
+                    rate,
+                    quartersRemaining: product.termQuarters,
+                    termQuarters: product.termQuarters,
+                    prepaymentPenalty: product.prepaymentPenalty,
+                    delinquent: false,
                 };
 
                 addCashFn(amount);
+                const newTotal = get().totalDebt + amount;
+                set({ loans: [...get().loans, loan], totalDebt: newTotal });
 
-                set({
-                    loans: [...loans, newLoan],
-                    totalDebt: newDebt
-                });
+                // TEK BORC SAYISI: statsStore ile senkron tut.
+                useStatsStore.getState().update({ companyDebtTotal: newTotal });
 
-                refreshCreditScore(valuation, 0);
-
-                if (leverage > RISK_THRESHOLD) {
-                    useEquityStore.setState({ marketMultiplier: 0.9 });
-                }
+                // Piyasa hamleyi okur: saglikli notla ucuz borc guven
+                // sinyalidir, %35'ten borclanmak felakettir.
+                const signal = applyFinancingSignal(signalForLoan(product.kind, a));
 
                 return {
                     success: true,
-                    message: `Loan approved! ${formatMoney(amount)} at ${baseRate}% APR`
+                    message:
+                        `${product.name}: ${formatMoney(amount)} at ${(rate * 100).toFixed(1)}%.\n\n` +
+                        `${signal.message} (${signal.impactPercent >= 0 ? '+' : ''}${signal.impactPercent.toFixed(1)}% on the share price)`,
                 };
             },
 
             repayLoan: (id, amount, spendCashFn) => {
                 const { loans, totalDebt } = get();
                 const loan = loans.find(l => l.id === id);
-                if (!loan) {
-                    return { success: false, message: 'Loan not found' };
-                }
+                if (!loan) return { success: false, message: 'Loan not found.' };
 
-                const actualPayment = Math.min(amount, loan.remaining);
-                spendCashFn(actualPayment);
+                const payment = Math.min(amount, loan.balance);
+                // Erken kapatma cezasi — vadeli kredide sozlesme boyle.
+                const penalty = payment * (loan.prepaymentPenalty || 0);
+                spendCashFn(payment + penalty);
 
-                const updatedRemaining = loan.remaining - actualPayment;
+                const balance = loan.balance - payment;
+                const newTotal = Math.max(0, totalDebt - payment);
 
-                if (updatedRemaining <= 0) {
-                    set({
-                        loans: loans.filter(l => l.id !== id),
-                        totalDebt: totalDebt - loan.remaining
-                    });
-                    return {
-                        success: true,
-                        message: `Loan fully repaid! Credit score boosted.`
-                    };
-                } else {
-                    set({
-                        loans: loans.map(l =>
-                            l.id === id ? { ...l, remaining: updatedRemaining } : l
-                        ),
-                        totalDebt: totalDebt - actualPayment
-                    });
-                    return {
-                        success: true,
-                        message: `Paid ${formatMoney(actualPayment)}. Remaining: ${formatMoney(updatedRemaining)}`
-                    };
-                }
+                set({
+                    loans: balance <= 0.01
+                        ? loans.filter(l => l.id !== id)
+                        : loans.map(l => (l.id === id ? { ...l, balance } : l)),
+                    totalDebt: newTotal,
+                });
+                useStatsStore.getState().update({ companyDebtTotal: newTotal });
+
+                applyFinancingSignal('debt_repaid');
+
+                return {
+                    success: true,
+                    message: balance <= 0.01
+                        ? `${loan.name} repaid in full.${penalty > 0 ? ` Prepayment fee ${formatMoney(penalty)}.` : ''}`
+                        : `Paid ${formatMoney(payment)}. ${formatMoney(balance)} remaining.`,
+                };
             },
 
-            payMonthlyInterests: (spendCashFn) => {
-                const { loans } = get();
-                const totalPayment = loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
+            /**
+             * ÇEYREKLİK BORÇ SERVİSİ — motor cagirir.
+             *
+             * ESKI `payMonthlyInterests` PARAYI ALIYOR AMA BAKIYEYI
+             * AZALTMIYORDU: sonsuza kadar odersin, borc yerinde dururdu.
+             * Artik odeme faiz ve anapara olarak ayrisir, bakiye erir,
+             * vade dolunca kredi kapanir.
+             */
+            serviceDebtQuarter: (quarters) => {
+                const q = Math.max(1, quarters);
+                // Kurul uyesi borclarinin faizi de her ceyrek gider yazilir.
+                // Anaparasi vadesinde tek seferde odenir (bkz. useDebtEnforcer),
+                // o yuzden burada yalnizca faiz isleniyor.
+                let interest = sharkLoanTotal() * (SHARK_IMPLIED_RATE / 4) * q;
+                let principal = 0;
+                let loans = get().loans;
 
-                if (totalPayment > 0) {
-                    spendCashFn(totalPayment);
+                for (let i = 0; i < q; i++) {
+                    const next: LoanRecord[] = [];
+                    loans.forEach(loan => {
+                        const r = serviceLoanQuarter(loan);
+                        interest += r.interest;
+                        principal += r.principalPaid;
+                        if (!r.closed) next.push(r.loan);
+                    });
+                    loans = next;
                 }
-                return { totalPayment, success: true };
+
+                const newTotal = loans.reduce((sum, l) => sum + l.balance, 0);
+                set({ loans, totalDebt: newTotal });
+                useStatsStore.getState().update({ companyDebtTotal: newTotal });
+
+                return { interest, principal, total: interest + principal };
+            },
+
+            /** Sozlesme ihlali ve temerrut kademesi. */
+            payMonthlyInterests: () => {
+                console.warn(
+                    '[Finance] payMonthlyInterests is retired — it never reduced the balance. ' +
+                    'Use serviceDebtQuarter instead.'
+                );
+                return { totalPayment: 0, success: false };
+            },
+
+            getDistress: () => {
+                const a = get().getAssessment();
+                return assessDistress(a, get().quartersInBreach || 0);
+            },
+
+            /** Motor her ceyrek cagirir: ihlal sayacini ilerletir. */
+            advanceDistress: () => {
+                const a = get().getAssessment();
+                const next = a.inBreach ? (get().quartersInBreach || 0) + 1 : 0;
+                set({ quartersInBreach: next });
+                return assessDistress(a, Math.max(0, next - 1));
             },
 
             getBorrowingCapacity: (valuation) => {
@@ -260,12 +665,12 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
             getMonthlyInterestTotal: () => {
                 const { loans } = get();
-                return loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
+                return loans.reduce((sum, l) => sum + (l.balance * l.rate) / 12, 0);
             },
 
             // --- SUBSIDIARY SYSTEM (NEW LOGIC) ---
 
-            acquireCompany: (company, price) => {
+            acquireCompany: (company, price, deal) => {
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
 
                 if (companyCapital < price) {
@@ -283,7 +688,8 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     acquiredAt: price,
                     strategy: { marketing: 2, rnd: 3, production: 3, workforce: 2 }, // Default Strategy
                     lastChangePercent: 0,
-                    history: []
+                    history: [],
+                    deal,
                 };
 
                 set((state) => ({
@@ -291,20 +697,223 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 }));
             },
 
+            /**
+             * Her ceyrek tum devralmalari bir adim ilerletir ve toplam
+             * EBIT etkisini dondurur.
+             *
+             * Etki TEK BIR ANDA degil ceyreklere yayilir:
+             *   - entegrasyon maliyeti once gelir (ilk 4 ceyrek)
+             *   - hedefin kari yavas yavas sana gecer
+             *   - sinerji en yavas gelen (6 ceyrek)
+             *   - hedef hala kazandirmiyorsa 8. ceyrekte serefiye silinir
+             */
+            processAcquisitionsQuarter: (quarters) => {
+                const { subsidiaries } = get();
+                let netEbit = 0, integrationCost = 0, synergy = 0, earnings = 0, impairment = 0;
+
+                const updated = subsidiaries.map(sub => {
+                    if (!sub.deal) return sub;
+                    const q = Math.max(1, quarters);
+                    let deal = sub.deal;
+                    for (let i = 0; i < q; i++) {
+                        const eff = dealQuarterEffect(deal);
+                        netEbit += eff.netEbit;
+                        integrationCost += eff.integrationCost;
+                        synergy += eff.synergy;
+                        earnings += eff.earningsContribution;
+                        impairment += eff.impairment;
+                        deal = advanceDeal(deal, 1);
+                    }
+                    return { ...sub, deal };
+                });
+
+                set({ subsidiaries: updated });
+                return { netEbit, integrationCost, synergy, earnings, impairment };
+            },
+
+            /**
+             * ELDEN CIKARMA.
+             *
+             * ESKIDEN ODEDIGIN FIYATIN TAMAMINI GERI VERIYORDU. Yani
+             * dusmanca devralip hemen satarak primi bedavaya geri
+             * aliyordun — devralma risksiz bir denemeye donusuyordu.
+             *
+             * Artik bugunku ADIL degerden, ustune satis iskontosuyla
+             * satiyorsun. Kotu bir islemden cikmanin bedeli var.
+             * Bkz. core/market/mergers.ts -> quoteDivestiture
+             */
+            executeAcquisition: ({ target, hostile, financing, negotiatedPrice }) => {
+                const stats = useStatsStore.getState();
+                const acquirerValuation = stats.companyValue || 0;
+                const risk = (target.risk as TargetRisk) || 'Medium';
+
+                // 1) Teklif — pazarlik varsa fiyati o belirler, kalan
+                //    hesaplar (prim, entegrasyon, sinerji) yine ayni yerden.
+                const base = quoteAcquisition(target.marketCap, risk, hostile, acquirerValuation);
+                const price = negotiatedPrice ?? base.price;
+                const premium = Math.max(0, price - target.marketCap);
+
+                // 2) Finansman
+                const shStore = require('../../shareholders/stores/useShareholderStore').useShareholderStore;
+                const cap = shStore.getState();
+                const fin = quoteFinancing(
+                    financing, price, stats.companyCapital || 0, acquirerValuation,
+                    stats.companyDebtTotal || 0, stats.companySharePrice || 0,
+                    cap.totalShares, cap.playerShareCount, get().getInterestRate(),
+                );
+                if (!fin.feasible) {
+                    return { success: false, message: fin.reason || 'Cannot finance this deal.', announcementImpact: 0 };
+                }
+
+                // ------------------------------------------------------------
+                //  2b) KURUL ONAYI
+                // ------------------------------------------------------------
+                //  Degerlemenin %25'ini asan devralmalar oya gider; %50'nin
+                //  altindaysan HER devralma oya gider. Dusmanca teklifler
+                //  kurulu ayrica tedirgin eder (pahali, dagitici, riskli).
+                //
+                //  Bu kontrol FINANSMANDAN SONRA, PARA ODENMEDEN ONCE
+                //  duruyor: teklifin gercekten yapilabilir oldugunu bilmeden
+                //  kurula sormanin anlami yok, ama para cikmadan da
+                //  reddedilebilmeli.
+                // ------------------------------------------------------------
+                const gate = boardGate(
+                    'acquisition', price,
+                    `${hostile ? 'Hostile bid' : 'Acquisition'}: ${target.name}`,
+                    hostile,
+                );
+                if (gate.needed && !gate.passed) {
+                    return {
+                        success: false,
+                        message: `The board voted it down. ${gate.reason}`,
+                        announcementImpact: 0,
+                    };
+                }
+
+                // 3) Bedeli ode
+                if (fin.method === 'cash') {
+                    useStatsStore.getState().setCompanyCapital((stats.companyCapital || 0) - price);
+                } else if (fin.method === 'debt') {
+                    useStatsStore.getState().update({
+                        companyDebtTotal: (stats.companyDebtTotal || 0) + fin.debtRaised,
+                    });
+                } else {
+                    shStore.setState((st: any) => ({ totalShares: st.totalShares + fin.sharesIssued }));
+                }
+
+                // ------------------------------------------------------------
+                //  3b) HEDEFIN KURUCUSU KURULA KATILIR (dostane devralmada)
+                // ------------------------------------------------------------
+                //  Kurul bugune kadar YALNIZCA basarisizlikla buyuyordu:
+                //  tefeciden borc alip odeyememek. Iyi giden bir oyuncunun
+                //  kurulu ilk gunku haliyle donuyordu.
+                //
+                //  Artik her dostane devralma masaya bir kisi daha oturtuyor
+                //  ve senin payin bir tik eriyor. Dusmanca devralmada kimse
+                //  gelmez — ama %35 prim odersin.
+                //
+                //  Yani ucuz yol seni yavasca kontrolden eder. Yeterince
+                //  buyurse bir gun %50'nin altina dusersin ve kurul sistemi
+                //  tam orada devreye girer: BUYUMENIN KENDISI bir risk.
+                // ------------------------------------------------------------
+                const incoming = directorFromAcquisition(
+                    target.name, price, acquirerValuation,
+                    shStore.getState().totalShares, risk, hostile,
+                );
+                if (incoming) {
+                    shStore.setState((st: any) => ({
+                        totalShares: st.totalShares + incoming.shareCount,
+                        members: [...st.members, {
+                            id: `DIR_${target.id}_${Date.now()}`,
+                            name: incoming.name,
+                            shareCount: incoming.shareCount,
+                            trait: incoming.trait,
+                            trust: incoming.trust,
+                            isHostile: false,
+                            origin: 'Investor' as const,
+                        }],
+                    }));
+                    shStore.getState().recalculateBoardMood();
+                }
+
+                // 4) Istirak kaydi + M&A anlasmasi
+                const deal: AcquisitionDeal = {
+                    id: target.id,
+                    name: target.name,
+                    price,
+                    fairValue: target.marketCap,
+                    premium,
+                    targetAnnualEbit: estimateTargetEbit(target.marketCap, risk),
+                    quartersSinceClose: 0,
+                    goodwill: premium,
+                    impaired: false,
+                    hostile,
+                };
+
+                set(state => ({
+                    subsidiaries: [...state.subsidiaries, {
+                        id: target.id,
+                        name: target.name,
+                        sector: target.sector || target.category || 'Conglomerate',
+                        valuation: price,
+                        acquiredAt: price,
+                        strategy: { marketing: 2, rnd: 3, production: 3, workforce: 2 },
+                        lastChangePercent: 0,
+                        history: [],
+                        deal,
+                    }],
+                }));
+
+                // 5) BUFF'LARI YAZ.
+                //    Buff'lar useUserStore.subsidiaries'ten okunuyor ve oraya
+                //    yalnizca hic cagrilmayan bir yol yaziyordu; yani satin
+                //    alma buff'lari bugune kadar HIC CALISMADI.
+                if (target.acquisitionBuff) {
+                    try {
+                        require('../../../core/store/useUserStore').useUserStore
+                            .getState()
+                            .addSubsidiary({
+                                id: target.id,
+                                name: target.name,
+                                category: target.category,
+                                acquisitionBuff: target.acquisitionBuff,
+                            });
+                    } catch { /* buff yazilamadi, islem yine de gecerli */ }
+                }
+
+                // 6) Duyuru tepkisi
+                const impact = announcementImpact(
+                    premium, acquirerValuation,
+                    acquirerValuation > 0 ? price / acquirerValuation : 1,
+                    hostile,
+                );
+                try {
+                    const eq = require('./useEquityStore').useEquityStore;
+                    eq.setState((st: any) => ({
+                        marketMultiplier: Math.max(0.4, st.marketMultiplier * (1 + impact / 100)),
+                    }));
+                } catch { /* piyasa tepkisi uygulanamadi */ }
+
+                return {
+                    success: true,
+                    message: `${target.name} acquired for ${formatMoney(price)}.`,
+                    announcementImpact: impact,
+                };
+            },
+
             sellSubsidiary: (id) => {
                 const { subsidiaries } = get();
                 const subsidiary = subsidiaries.find(s => s.id === id);
-
-                if (!subsidiary) {
-                    console.warn('[FinanceStore] Subsidiary not found for sale');
-                    return;
-                }
+                if (!subsidiary) return;
 
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
-                setCompanyCapital(companyCapital + subsidiary.valuation);
+                const proceeds = subsidiary.deal
+                    ? quoteDivestiture(subsidiary.deal).proceeds
+                    : subsidiary.valuation * 0.85;
 
-                set((state) => ({
-                    subsidiaries: state.subsidiaries.filter(s => s.id !== id)
+                setCompanyCapital(companyCapital + proceeds);
+                set(state => ({
+                    subsidiaries: state.subsidiaries.filter(s => s.id !== id),
                 }));
             },
 
@@ -439,6 +1048,15 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 subtractMoney(amount);
                 setCompanyCapital(companyCapital + amount);
+
+                // KURUCUNUN KENDI PARASINI KOYMASI en guclu olumlu
+                // sinyaldir. Finansta "skin in the game" denir; iceriden
+                // alim, piyasanin en cok guvendigi isarettir.
+                //
+                // DIKKAT: bu satir `return`DEN SONRA duruyordu, yani HIC
+                // CALISMIYORDU. Sermaye enjeksiyonunun +%4 hisse etkisi
+                // yazildigi gunden beri hic uygulanmamis.
+                applyFinancingSignal('capital_injection');
 
                 return {
                     success: true,

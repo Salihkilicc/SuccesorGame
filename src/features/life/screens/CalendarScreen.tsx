@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useRef } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -137,7 +138,7 @@ const MonthBlock = ({ year, monthIndex, eventMap, todayKey, onDayPress, isCurren
                 </Text>
                 {isCurrentMonth && (
                     <View style={styles.currentMonthBadge}>
-                        <Text style={styles.currentMonthBadgeText}>NOW</Text>
+                        <Text style={styles.currentMonthBadgeText}>{t('life.now')}</Text>
                     </View>
                 )}
             </View>
@@ -179,6 +180,7 @@ const MonthBlock = ({ year, monthIndex, eventMap, todayKey, onDayPress, isCurren
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 const CalendarScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const { events } = useCalendarStore();
     const insets = useSafeAreaInsets();
@@ -220,7 +222,7 @@ const CalendarScreen = () => {
                     </Pressable>
 
                     <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>CALENDAR</Text>
+                        <Text style={styles.headerTitle}>{t('life.calendar')}</Text>
                         <View style={styles.headerAccent} />
                     </View>
                 </View>
@@ -292,7 +294,7 @@ const CalendarScreen = () => {
                                 onPress={() => setSelectedEvent(null)}
                                 style={({ pressed }) => [styles.modalDismiss, pressed && { opacity: 0.7 }]}
                             >
-                                <Text style={styles.modalDismissText}>DISMISS</Text>
+                                <Text style={styles.modalDismissText}>{t('life.dismiss')}</Text>
                             </Pressable>
                         </View>
                     </Pressable>

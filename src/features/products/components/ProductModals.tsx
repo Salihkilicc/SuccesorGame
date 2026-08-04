@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { Product } from '../data/productsData';
@@ -6,7 +7,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import { getMarket } from '../../../core/market/productMarkets';
+import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
 import {
     computeAttraction,
     computeShares,
@@ -14,7 +15,15 @@ import {
     marketingBenchmark,
     shareOfVoice,
 } from '../../../core/market/attraction';
-import { maxUnitsPerQuarter, resolveTargetUnits } from '../../../core/market/production';
+import { maxUnitsPerQuarter, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
+import {
+    CONTRACT_PARTNERS,
+    availablePartners,
+    contractShare,
+    getPartner,
+    marginComparison,
+    quoteContractOrder,
+} from '../../../core/market/contract';
 import { getTier, utilizationVerdict, UTILIZATION_NOTES } from '../../../core/market/capacity';
 import InfoDot from '../../../components/common/InfoDot';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
@@ -42,7 +51,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
                     </View>
 
                     <View style={styles.statRow}>
-                        <Text style={styles.label}>Unlock Cost (R&D)</Text>
+                        <Text style={styles.label}>{t('product.unlockCostRD')}</Text>
                         <Text style={styles.valueAccent}>{product.rndCost}</Text>
                     </View>
 
@@ -50,40 +59,40 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
                         <View style={styles.analysisBox}>
                             <Text style={styles.sectionHeader}>📊 Market Analysis</Text>
                             <View style={styles.statRow}>
-                                <Text style={styles.label}>Market Demand</Text>
+                                <Text style={styles.label}>{t('product.marketDemand')}</Text>
                                 <Text style={styles.value}>{product.marketDemand}%</Text>
                             </View>
                             {/* Demand Bar */}
                             <View style={styles.barBg}><View style={[styles.barFill, { width: `${product.marketDemand}%` }]} /></View>
 
                             <View style={styles.statRow}>
-                                <Text style={styles.label}>Competition</Text>
+                                <Text style={styles.label}>{t('product.competition2')}</Text>
                                 <Text style={[styles.value, { color: theme.colors.warning }]}>{product.competition}</Text>
                             </View>
                             <View style={styles.statRow}>
-                                <Text style={styles.label}>Est. Base Cost</Text>
+                                <Text style={styles.label}>{t('product.estBaseCost')}</Text>
                                 <Text style={styles.value}>${product.baseProductionCost}</Text>
                             </View>
                         </View>
                     ) : (
                         <View style={styles.blurBox}>
                             <Text style={styles.blurText}>??? Market Data Hidden ???</Text>
-                            <Text style={styles.blurSubText}>Run analysis to reveal</Text>
+                            <Text style={styles.blurSubText}>{t('product.runAnalysisToReveal')}</Text>
                         </View>
                     )}
 
                     <View style={styles.actions}>
                         {!isAnalyzed ? (
                             <Pressable style={styles.btnPrimary} onPress={onAnalyze}>
-                                <Text style={styles.btnText}>Perform Market Analysis</Text>
+                                <Text style={styles.btnText}>{t('product.performMarketAnalysis')}</Text>
                             </Pressable>
                         ) : (
                             <Pressable style={styles.btnSuccess} onPress={onLaunch}>
-                                <Text style={styles.btnText}>LAUNCH PRODUCT</Text>
+                                <Text style={styles.btnText}>{t('product.launchProduct')}</Text>
                             </Pressable>
                         )}
                         <Pressable style={styles.btnGhost} onPress={onClose}>
-                            <Text style={styles.ghostText}>Cancel</Text>
+                            <Text style={styles.ghostText}>{t('product.cancel')}</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -95,6 +104,8 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
 export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity }: any) => {
+    // Dil degisince yeniden ciz.
+    useLocale();
     // 1. Get live product from store to ensure reactivity
     const product = useProductStore((state) =>
         state.products.find((p) => p.id === initialProduct?.id)
@@ -114,16 +125,14 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const [productionUnits, setProductionUnits] = useState(() =>
         resolveTargetUnits(product, totalCapacity || 0, facilityTierAtMount, isRetoolingAtMount),
     );
-    // Pazarlama artik CEYREKLIK BUTCE. Eski kayitlarda birim basina tutuluyordu;
-    // tasima: eski birim tutari x mevcut uretim hedefi.
-    const [marketing, setMarketing] = useState(() => {
-        if (typeof product.marketingBudget === 'number') return product.marketingBudget;
-        const legacyPerUnit = product.marketingSpendPerUnit || 0;
-        if (legacyPerUnit > 0) {
-            return Math.round(legacyPerUnit * resolveTargetUnits(product, totalCapacity || 0, facilityTierAtMount, isRetoolingAtMount));
-        }
-        return 0;
-    });
+    // Pazarlama CEYREKLIK BUTCE. Eski kayitlarin tasimasi ARTIK BURADA
+    // DEGIL — store yuklenirken bir kez yapiliyor (useProductStore).
+    // Burada yapildiginda her acilista yeniden hesaplaniyordu ve deger
+    // kendiliginden buyuyordu.
+    const [marketing, setMarketing] = useState(product.marketingBudget || 0);
+    // ---- FASON URETIM (bkz. core/market/contract.ts) ----
+    const [partnerId, setPartnerId] = useState<string>(product.contractPartnerId || '');
+    const [contractUnits, setContractUnits] = useState(product.contractUnits || 0);
     const displayName = product.name;
 
     const processLevel = product.processLevel || 1;
@@ -136,8 +145,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // RP ediyordu — tum tech tree'nin toplamindan fazla.
     // Artik karmasikligin KAREKOKUNE bagli: buyuk urun daha pahali ama
     // ucuncu dereceden degil.
-    const getUpgradeCost = (level: number) =>
-        Math.floor(Math.sqrt(Math.max(1, complexity)) * 2_150 * Math.pow(1.55, level));
+    // TEK KAYNAK — kasanin cektigi ile birebir ayni (core/market/production.ts)
+    const getUpgradeCost = (level: number) => productUpgradeRP(complexity, level);
 
     const processUpgradeRP = getUpgradeCost(processLevel);
     const qualityUpgradeRP = getUpgradeCost(qualityLevel);
@@ -153,9 +162,17 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
     const handleSave = () => {
         onUpdate(product.id, {
-            // Adet olarak kaydediyoruz; productionLevel artik yazilmiyor.
-            productionUnits: Math.min(productionUnits, maxUnits),
+            // OYUNCUNUN NIYETINI kaydet, kapasiteye KIRPMA.
+            //
+            // Once burada `Math.min(productionUnits, maxUnits)` vardi ve
+            // maxUnits her ceyrek moral/kadro/insaat ile oynadigi icin
+            // ekrani her acip kaydettiginde uretim hedefin bir tik geri
+            // gidiyordu. Kirpma motorun isi: hedefini korur, o ceyrek
+            // neyi uretebiliyorsa onu uretir.
+            productionUnits,
             marketingBudget: marketing,
+            contractPartnerId: partnerId || undefined,
+            contractUnits: partnerId ? contractUnits : 0,
             // Eski alan artik yazilmiyor; sifirlanarak tasima tamamlaniyor.
             marketingSpendPerUnit: 0,
         });
@@ -167,7 +184,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
-            Alert.alert('Error', result.message);
+            Alert.alert(t('alert.error'), result.message);
         }
     };
 
@@ -176,7 +193,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
-            Alert.alert('Error', result.message);
+            Alert.alert(t('alert.error'), result.message);
         }
     };
 
@@ -215,11 +232,32 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // Bar adimi: kapasitenin %5'i, en az 1
     const unitStep = Math.max(1, Math.round(maxUnits * 0.05));
 
+    // ---- FASON URETIM ----------------------------------------------------
+    //  Kapasite duvarinin etrafindan dolasmanin yolu. Kendi kapasiteni
+    //  KULLANMAZ, ama birim maliyeti %30-60 daha yuksek ve fasoncunun
+    //  kalite tavani senin ustune bir tavan koyar.
+    const openPartners = availablePartners(brandValue);
+    const chosenPartner = getPartner(partnerId);
+    const contractQuote = chosenPartner
+        ? quoteContractOrder(chosenPartner, contractUnits, currentUnitCost)
+        : null;
+    const margins = chosenPartner
+        ? marginComparison(product.sellingPrice || product.suggestedPrice || 0, currentUnitCost, chosenPartner)
+        : null;
+    const contractStep = chosenPartner
+        ? Math.max(1, Math.round(chosenPartner.maxOrder * 0.02))
+        : 1000;
+    const outsourcedPercent = contractShare(willBuild, contractQuote?.units || 0);
+
     // ---- PAZARLAMA ESIKLERI ---------------------------------------------
     // Kiyas butce: kategorinin tabani ile bu urunun gecen ceyrek cirosunun
     // %25'inin buyugu. Buyudukce esik de buyur, ayni butce az gelmeye baslar.
     const effectivePrice = product.sellingPrice || product.suggestedPrice || 1;
-    const benchmark = market ? marketingBenchmark(market, product.revenue || 0) : 1;
+    // Motorun kullandigi AYNI yumusatilmis kiyas. Urunde saklandigi icin
+    // ekranda gordugun esik ile ceyrek sonunda uygulanan esik ayni.
+    const benchmark = market
+        ? marketingBenchmark(market, product.revenue || 0, product.benchmarkSmoothed)
+        : 1;
     // Marka bakim esigi: kiyasin %35'i. Altinda marka erir, ustunde birikir.
     const maintenancePoint = Math.round(benchmark * 0.35);
     // Bar tavani kiyasin 3 kati: orada ses payi ~%75, otesi bosa para.
@@ -294,10 +332,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
                         {/* R&D UPGRADES SECTION - COMPACT DESIGN */}
                         <CollapsibleSection
-                            title="R&D UPGRADES"
-                            note="Spend Research Points to cut cost or raise quality"
-                            info="Optimizing the process lowers your unit cost. Raising quality increases the product's appeal, which directly increases your market share."
-                            infoDetail="Each level costs more than the last, so upgrades get progressively harder."
+                            title={t('product.rDUpgrades')}
+                            note={t('product.spendResearchPointsToCut')}
+                            info={t('product.optimizingTheProcessLowersYour')}
+                            infoDetail={t('product.eachLevelCostsMoreThan')}
                             summary={`${formatNumberShared(totalRP)} RP`}
                             summaryColor="#BA68C8"
                         >
@@ -306,7 +344,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             {/* Optimize Process (Cost) */}
                             <View style={styles.upgradeCardCompact}>
                                 <View style={styles.upgradeContentCompact}>
-                                    <Text style={styles.upgradeLabel}>Optimize Process</Text>
+                                    <Text style={styles.upgradeLabel}>{t('product.optimizeProcess')}</Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
                                         <Text style={styles.heroValue}>${currentUnitCost}</Text>
                                         <Text style={{ color: theme.colors.accent, fontWeight: 'bold' }}>(-2%)</Text>
@@ -332,7 +370,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             {/* Improve Quality (Price) */}
                             <View style={styles.upgradeCardCompact}>
                                 <View style={styles.upgradeContentCompact}>
-                                    <Text style={styles.upgradeLabel}>Improve Quality</Text>
+                                    <Text style={styles.upgradeLabel}>{t('product.improveQuality')}</Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
                                         <Text style={styles.heroValue}>${product.sellingPrice || product.suggestedPrice}</Text>
                                         <Text style={{ color: theme.colors.success, fontWeight: 'bold' }}>(+3%)</Text>
@@ -361,10 +399,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             sorusunu tek bakista cevaplasin. */}
                         <View style={styles.controlGroup}>
                             <View style={styles.controlHeader}>
-                                <Text style={styles.controlTitle}>Production</Text>
+                                <Text style={styles.controlTitle}>{t('product.production')}</Text>
                                 <InfoDot
-                                    title="Production"
-                                    text="Your factories can build a limited number of units each quarter. More complex products take longer, so the same team builds far fewer of them."
+                                    title={t('product.production')}
+                                    text={t('product.yourFactoriesCanBuildA')}
                                     detail={`Max for this product: ${formatNumber(maxUnits)} units per quarter with ${formatNumber(employeeCount)} employees.`}
                                 />
                             </View>
@@ -427,11 +465,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                             <View style={styles.compareRow}>
                                 <View>
-                                    <Text style={styles.compareLabel}>You will build</Text>
+                                    <Text style={styles.compareLabel}>{t('product.youWillBuild')}</Text>
                                     <Text style={styles.compareValue}>{formatNumber(willBuild)}</Text>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={styles.compareLabel}>Market wants</Text>
+                                    <Text style={styles.compareLabel}>{t('product.marketWants')}</Text>
                                     <Text style={[styles.compareValue, { color: '#7FB3FF' }]}>
                                         {formatNumber(expectedDemand)}
                                     </Text>
@@ -450,17 +488,24 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     cost $5 each per quarter to store.
                                 </Text>
                             ) : (
-                                <Text style={styles.okLine}>Supply is close to demand.</Text>
+                                <Text style={styles.okLine}>{t('product.supplyIsCloseToDemand')}</Text>
                             )}
 
                             {/* Talebe esitle */}
-                            {expectedDemand > 0 && (
+                            {/* Stok zaten talebi karsiliyorsa dugme 0 gosteriyordu
+                                ve bozuk gibi duruyordu. Artik sebebini yaziyor. */}
+                            {expectedDemand > 0 && neededUnits <= 0 && (
+                                <Text style={styles.matchNote}>
+                                    {t('product.enoughStock', { units: formatNumber(product.inventory || 0) })}
+                                </Text>
+                            )}
+                            {expectedDemand > 0 && neededUnits > 0 && (
                                 <Pressable
                                     style={styles.matchBtn}
                                     onPress={() => setProductionUnits(Math.min(maxUnits, neededUnits))}
                                 >
                                     <Text style={styles.matchBtnText}>
-                                        Match demand — build {formatNumber(Math.min(maxUnits, neededUnits))}
+                                        {t('product.matchDemand', { units: formatNumber(Math.min(maxUnits, neededUnits)) })}
                                     </Text>
                                 </Pressable>
                             )}
@@ -489,15 +534,197 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             )}
                         </View>
 
+                        {/* ══ BU URUN NEDEN BU KADAR KAZANIYOR ══
+                            Oyuncunun en cok sordugu sey: "Smart Speaker 200
+                            bin, Auto-Drone 2 milyon kazandiriyor, neden?"
+                            Cevap adet degil DOLAR — kategorinin buyuklugu ve
+                            urunun kapasite tuketimi. */}
+                        {market && (
+                            <CollapsibleSection
+                                title={t('product.whyThisProductEarnsWhat')}
+                                note={t('product.categorySizeCapacityCostAnd')}
+                                info={t('product.twoProductsCanHaveThe')}
+                                summary={market.category}
+                            >
+                                <View style={styles.whyRow}>
+                                    <Text style={styles.whyLabel}>{t('product.categoryMarket')}</Text>
+                                    <Text style={styles.whyValue}>
+                                        {formatNumber(market.sizeUnitsPerQuarter)} units ·{' '}
+                                        {formatMoney(marketDollarSize(market))} per quarter
+                                    </Text>
+                                </View>
+                                <View style={styles.whyRow}>
+                                    <Text style={styles.whyLabel}>{t('product.yourShareHere')}</Text>
+                                    <Text style={styles.whyValue}>{formatPercent(projectedShare)}</Text>
+                                </View>
+                                <View style={styles.whyRow}>
+                                    <Text style={styles.whyLabel}>{t('product.capacityPerUnit')}</Text>
+                                    <Text style={styles.whyValue}>
+                                        {(complexity / 50).toFixed(2)} standard units
+                                    </Text>
+                                </View>
+                                <View style={styles.whyRow}>
+                                    <Text style={styles.whyLabel}>{t('product.revenuePerCapacityUnit')}</Text>
+                                    <Text style={styles.whyValue}>
+                                        {formatMoney(Math.round(effectivePrice / Math.max(0.01, complexity / 50)))}
+                                    </Text>
+                                </View>
+
+                                <Text style={styles.whyNote}>
+                                    Every product returns roughly the same revenue per unit of capacity —
+                                    a cheap speaker uses very little of the line, an industrial arm uses a
+                                    lot. What actually decides your earnings is which category you are in:
+                                    the same share is worth far more in a category with a bigger dollar
+                                    market. That is why moving up the tech tree matters more than
+                                    optimising a small product.
+                                </Text>
+
+                                <View style={styles.whyTable}>
+                                    {marketsByValue().map(({ market: m, dollarSize }) => (
+                                        <View
+                                            key={m.category}
+                                            style={[
+                                                styles.whyTableRow,
+                                                m.category === market.category && styles.whyTableRowActive,
+                                            ]}
+                                        >
+                                            <Text style={styles.whyTableName}>{m.category}</Text>
+                                            <Text style={styles.whyTableValue}>
+                                                {formatMoney(dollarSize)}/qtr
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            </CollapsibleSection>
+                        )}
+
+                        {/* ══ FASON URETIM ══
+                            Make-or-buy karari. Kendi hattin ucuz ama
+                            yavas; fason hizli ama pahali. */}
+                        <View style={styles.controlGroup}>
+                            <View style={styles.controlHeader}>
+                                <Text style={styles.controlTitle}>{t('product.contractMfg')}</Text>
+                            </View>
+                            <Text style={styles.contractHint}>
+                                {t('product.contractHint')}
+                            </Text>
+
+                            <View style={styles.partnerRow}>
+                                <Pressable
+                                    style={[styles.partnerChip, !partnerId && styles.partnerChipActive]}
+                                    onPress={() => { setPartnerId(''); setContractUnits(0); }}
+                                >
+                                    <Text style={[styles.partnerName, !partnerId && styles.partnerNameActive]}>
+                                        {t('product.inHouseOnly')}
+                                    </Text>
+                                </Pressable>
+                                {openPartners.map(pt => (
+                                    <Pressable
+                                        key={pt.id}
+                                        style={[styles.partnerChip, partnerId === pt.id && styles.partnerChipActive]}
+                                        onPress={() => setPartnerId(pt.id)}
+                                    >
+                                        <Text style={[styles.partnerName, partnerId === pt.id && styles.partnerNameActive]}>
+                                            {pt.name}
+                                        </Text>
+                                        <Text style={styles.partnerMeta}>
+                                            ×{pt.costMultiplier.toFixed(2)} cost · quality ≤{pt.qualityCeiling}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </View>
+
+                            {CONTRACT_PARTNERS.filter(pt => brandValue < pt.minBrand).map(pt => (
+                                <Text key={pt.id} style={styles.partnerLocked}>
+                                    🔒 {pt.name} — needs brand {pt.minBrand} (you have {Math.round(brandValue)})
+                                </Text>
+                            ))}
+
+                            {!!chosenPartner && (
+                                <>
+                                    <Text style={styles.contractDesc}>{chosenPartner.description}</Text>
+
+                                    <View style={styles.contractStepper}>
+                                        <Pressable
+                                            style={styles.stepBtn}
+                                            onPress={() => setContractUnits(Math.max(0, contractUnits - contractStep))}
+                                        >
+                                            <Text style={styles.stepBtnText}>−</Text>
+                                        </Pressable>
+                                        <View style={styles.contractValueBox}>
+                                            <Text style={styles.contractValue}>
+                                                {formatNumber(contractUnits)}
+                                            </Text>
+                                            <Text style={styles.contractUnitLabel}>units / quarter</Text>
+                                        </View>
+                                        <Pressable
+                                            style={styles.stepBtn}
+                                            onPress={() =>
+                                                setContractUnits(
+                                                    Math.min(chosenPartner.maxOrder, contractUnits + contractStep),
+                                                )
+                                            }
+                                        >
+                                            <Text style={styles.stepBtnText}>+</Text>
+                                        </Pressable>
+                                    </View>
+
+                                    {!!contractQuote?.note && (
+                                        <Text style={styles.contractWarn}>⚠️ {contractQuote.note}</Text>
+                                    )}
+
+                                    {!!margins && (
+                                        <View style={styles.contractCompare}>
+                                            <View style={styles.cmRow}>
+                                                <Text style={styles.cmLabel}>{t('product.marginInHouse')}</Text>
+                                                <Text style={styles.compareGood}>
+                                                    {formatMoney(margins.ownMargin)} / unit
+                                                </Text>
+                                            </View>
+                                            <View style={styles.cmRow}>
+                                                <Text style={styles.cmLabel}>{t('product.marginOutsourced')}</Text>
+                                                <Text style={styles.compareBad}>
+                                                    {formatMoney(margins.contractMargin)} / unit
+                                                </Text>
+                                            </View>
+                                            <View style={styles.cmRow}>
+                                                <Text style={styles.cmLabel}>{t('product.orderCosts')}</Text>
+                                                <Text style={styles.cmValue}>
+                                                    {formatMoney(contractQuote?.cost || 0)}
+                                                    {!product.contractSetupPaid &&
+                                                        ` + ${formatMoney(chosenPartner.setupCost)} setup`}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.cmRow}>
+                                                <Text style={styles.cmLabel}>{t('product.outsourcedShare')}</Text>
+                                                <Text style={styles.cmValue}>
+                                                    {outsourcedPercent.toFixed(0)}% of your units
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {qualityLevel > chosenPartner.qualityCeiling && (
+                                        <Text style={styles.contractWarn}>
+                                            ⚠️ {t('product.qualityCapWarn', {
+                                                quality: qualityLevel,
+                                                ceiling: chosenPartner.qualityCeiling,
+                                            })}
+                                        </Text>
+                                    )}
+                                </>
+                            )}
+                        </View>
+
                         {/* ══ PAZARLAMA ══
                             Artik CEYREKLIK BUTCE. Barda iki isaret var:
                             bakim esigi (markanin yerinde kaldigi nokta) ve
                             kiyas butce (ses payinin %50 oldugu nokta). */}
                         <View style={styles.controlGroup}>
                             <View style={styles.controlHeader}>
-                                <Text style={styles.controlTitle}>Marketing Budget</Text>
+                                <Text style={styles.controlTitle}>{t('product.marketingBudget')}</Text>
                                 <InfoDot
-                                    title="Marketing Budget"
+                                    title={t('product.marketingBudget')}
                                     text="A fixed amount you spend every quarter, whether you sell anything or not. What matters is not the number itself but how it compares to what the market spends. Match the benchmark and you own about half the attention in your category."
                                     detail={`Benchmark for this product: ${formatMoney(benchmark)} per quarter. It grows with your own revenue, so defending a large share costs more than winning a small one. Brand maintenance level: ${formatMoney(maintenancePoint)} — spend below that and Brand Value erodes.`}
                                 />
@@ -607,16 +834,16 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         {market && (
                             <View style={styles.previewBox}>
                                 <View style={styles.controlHeader}>
-                                    <Text style={styles.previewTitle}>Projected Result</Text>
+                                    <Text style={styles.previewTitle}>{t('product.projectedResult')}</Text>
                                     <InfoDot
-                                        title="Projected Result"
-                                        text="What these settings are expected to produce next quarter, based on the same math the simulation uses."
+                                        title={t('product.projectedResult')}
+                                        text={t('product.whatTheseSettingsAreExpected')}
                                         detail="It is an estimate — morale problems and competitor moves can still change the outcome."
                                     />
                                 </View>
                                 <View style={styles.previewRow}>
                                     <View style={styles.previewCell}>
-                                        <Text style={styles.previewLabel}>Market Share</Text>
+                                        <Text style={styles.previewLabel}>{t('product.marketShare')}</Text>
                                         <Text style={styles.previewValue}>
                                             {projectedShare < 1
                                                 ? `${projectedShare.toFixed(3)}%`
@@ -624,13 +851,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         </Text>
                                     </View>
                                     <View style={styles.previewCell}>
-                                        <Text style={styles.previewLabel}>Units Sold</Text>
+                                        <Text style={styles.previewLabel}>{t('product.unitsSold')}</Text>
                                         <Text style={[styles.previewValue, { color: '#4CAF50' }]}>
                                             {formatNumber(expectedSales)}
                                         </Text>
                                     </View>
                                     <View style={styles.previewCell}>
-                                        <Text style={styles.previewLabel}>Gross Margin</Text>
+                                        <Text style={styles.previewLabel}>{t('product.grossMargin')}</Text>
                                         <Text
                                             style={[
                                                 styles.previewValue,
@@ -652,7 +879,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         </View>
 
                         <Pressable style={styles.btnPrimary} onPress={handleSave}>
-                            <Text style={styles.btnText}>Save Changes</Text>
+                            <Text style={styles.btnText}>{t('product.saveChanges')}</Text>
                         </Pressable>
 
                         {/* Change Product Name Button */}
@@ -661,7 +888,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         </Pressable>
 
                         <Pressable style={styles.btnDanger} onPress={() => onRetire(product.id)}>
-                            <Text style={styles.btnText}>Retire Product</Text>
+                            <Text style={styles.btnText}>{t('product.retireProduct')}</Text>
                         </Pressable>
                     </ScrollView>
                 </View>
@@ -744,6 +971,19 @@ const styles = StyleSheet.create({
     // Kiyas butce isareti — bakim esiginden ayirt edilsin diye farkli renk
     mktMarkerBenchmark: { backgroundColor: '#7FB3FF', width: 2, height: 14 },
     mktScale: { color: '#6E6E6E', fontSize: 9.5, marginTop: 6 },
+
+    whyRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5 },
+    whyLabel: { color: '#8A8A8A', fontSize: 11.5 },
+    whyValue: { color: theme.colors.textPrimary, fontSize: 11.5, fontWeight: '700' },
+    whyNote: { color: '#8A8A8A', fontSize: 11, lineHeight: 16, marginTop: 10 },
+    whyTable: { marginTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)', paddingTop: 8 },
+    whyTableRow: {
+        flexDirection: 'row', justifyContent: 'space-between',
+        paddingVertical: 5, paddingHorizontal: 8, borderRadius: 6,
+    },
+    whyTableRowActive: { backgroundColor: 'rgba(76,175,80,0.12)' },
+    whyTableName: { color: '#B0B0B0', fontSize: 11 },
+    whyTableValue: { color: '#B0B0B0', fontSize: 11, fontWeight: '700' },
 
     previewBox: {
         backgroundColor: 'rgba(127,179,255,0.07)',
@@ -835,6 +1075,35 @@ const styles = StyleSheet.create({
     insightText: { color: '#E2E8F0', fontSize: 13 },
     rdSection: { marginBottom: 20 },
     sectionTitle: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 12 },
+    matchNote: { fontSize: 11, color: '#8A9BA8', lineHeight: 16, marginTop: 8 },
+    contractHint: { fontSize: 11, color: '#8A9BA8', marginBottom: 10 },
+    contractDesc: { fontSize: 11, color: '#8A9BA8', fontStyle: 'italic', marginTop: 10, marginBottom: 4 },
+    partnerRow: { gap: 8 },
+    partnerChip: {
+        backgroundColor: '#2A2D35', borderRadius: 10, padding: 10,
+        borderWidth: 2, borderColor: 'transparent',
+    },
+    partnerChipActive: { borderColor: '#FFD700', backgroundColor: '#1C1C1E' },
+    partnerName: { fontSize: 13, color: '#8A9BA8', fontWeight: '700' },
+    partnerNameActive: { color: '#FFF' },
+    partnerMeta: { fontSize: 10, color: '#6B7A88', marginTop: 2 },
+    partnerLocked: { fontSize: 10, color: '#6B7A88', marginTop: 6 },
+    contractStepper: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 },
+    contractValueBox: { flex: 1, alignItems: 'center' },
+    contractValue: { fontSize: 20, fontWeight: '800', color: '#FFF' },
+    contractUnitLabel: { fontSize: 10, color: '#8A9BA8' },
+    stepBtn: {
+        width: 44, height: 44, borderRadius: 10, backgroundColor: '#2A2D35',
+        alignItems: 'center', justifyContent: 'center',
+    },
+    stepBtnText: { fontSize: 22, color: '#FFD700', fontWeight: '800' },
+    contractCompare: { backgroundColor: '#2A2D35', borderRadius: 10, padding: 12, marginTop: 12, gap: 8 },
+    cmRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    cmLabel: { fontSize: 12, color: '#8A9BA8' },
+    cmValue: { fontSize: 12, color: '#FFF', fontWeight: '700' },
+    compareGood: { fontSize: 12, color: '#4ADE80', fontWeight: '700' },
+    compareBad: { fontSize: 12, color: '#FFB020', fontWeight: '700' },
+    contractWarn: { fontSize: 11, color: '#ffdd57', marginTop: 8, fontWeight: '600' },
 
     // COMPACT UPGRADE CARD STYLES
     upgradeCardCompact: {

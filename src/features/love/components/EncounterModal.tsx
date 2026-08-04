@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     Modal,
     View,
@@ -62,6 +63,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
     onDate,
     isEmbedded = false,
 }) => {
+    useLocale();
     const [fadeAnim] = useState(new Animated.Value(0));
 
     useEffect(() => {
@@ -137,7 +139,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                         {/* Personality Trait */}
                         {deepPartner?.personality?.label && (
                             <View style={styles.traitRow}>
-                                <Text style={styles.traitLabel}>Trait:</Text>
+                                <Text style={styles.traitLabel}>{t('love.trait')}</Text>
                                 <Text style={styles.traitValue}>
                                     {deepPartner.personality.label}
                                 </Text>
@@ -149,7 +151,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                             <View style={styles.costContainer}>
                                 <Text style={styles.costIcon}>💰</Text>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={styles.costLabel}>Monthly Upkeep</Text>
+                                    <Text style={styles.costLabel}>{t('love.monthlyUpkeep')}</Text>
                                     <Text style={styles.costValue}>
                                         ${deepPartner.finances.monthlyCost.toLocaleString()}/mo
                                     </Text>
@@ -181,7 +183,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                 activeOpacity={0.8}
                             >
                                 <Text style={styles.hookupButtonText}>🔥 Hookup</Text>
-                                <Text style={styles.hookupSubtext}>No strings attached</Text>
+                                <Text style={styles.hookupSubtext}>{t('love.noStringsAttached')}</Text>
                             </TouchableOpacity>
                         </View>
 

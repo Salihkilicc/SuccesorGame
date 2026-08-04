@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -27,6 +28,7 @@ const ForecastDay = ({ item, isFirst }: { item: DailyForecast; isFirst: boolean 
 );
 
 const WeatherScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const { temperature, condition, forecast, unit, toggleUnit, loading, error } = useWeatherLogic();
 
@@ -48,7 +50,7 @@ const WeatherScreen = () => {
                         activeOpacity={0.7}
                     >
                         <MaterialCommunityIcons name="arrow-left" size={24} color="rgba(255,255,255,0.8)" />
-                        <Text style={styles.backLabel}>Home</Text>
+                        <Text style={styles.backLabel}>{t('life.home')}</Text>
                     </TouchableOpacity>
 
                     {/* Unit Toggle Button */}
@@ -64,14 +66,14 @@ const WeatherScreen = () => {
                 </View>
 
                 {/* Header Title */}
-                <Text style={styles.appTitle}>WEATHER</Text>
+                <Text style={styles.appTitle}>{t('life.weather')}</Text>
 
                 {/* Main Content */}
                 <View style={styles.mainContent}>
                     {loading ? (
                         <View style={styles.centerBox}>
                             <ActivityIndicator size="large" color="rgba(100,180,255,0.9)" />
-                            <Text style={styles.statusText}>Detecting location…</Text>
+                            <Text style={styles.statusText}>{t('life.detectingLocation')}</Text>
                         </View>
                     ) : error ? (
                         <View style={styles.centerBox}>

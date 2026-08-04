@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import {
     View,
     Text,
@@ -51,6 +52,7 @@ const TAB_LABELS: Record<TabType, string> = {
 // ========================================
 
 export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = ({ onBack, initialTab = 'Undergraduate' }) => {
+    useLocale();
     const navigation = useNavigation();
     const { activeDegree, activeCertificate, completedDegrees, enroll, checkPrerequisites, closeEducation } = useEducationSystem();
     const [selectedTab, setSelectedTab] = useState<TabType>(initialTab);
@@ -123,9 +125,9 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
             'Confirm Enrollment',
             `Enroll in ${label}?\n\nDuration: ${durationDisplay}\nCost: ${costDisplay}${warningMsg}`,
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('life.cancel'), style: 'cancel' },
                 {
-                    text: 'Enroll',
+                    text: t('life.enroll'),
                     onPress: () => {
                         enroll(id as any, selectedTab);
                         Alert.alert('Enrolled!', `You are now studying ${label}`);
@@ -153,11 +155,11 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
 
                             <View style={styles.cardDetails}>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.duration')}</Text>
                                     <Text style={styles.detailValue}>{cert.duration}</Text>
                                 </View>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.cost')}</Text>
                                     <Text style={styles.detailValue}>{formatMoney(cert.cost)}</Text>
                                 </View>
                             </View>
@@ -211,11 +213,11 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
 
                             <View style={styles.cardDetails}>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.duration')}</Text>
                                     <Text style={styles.detailValue}>{masters.duration}</Text>
                                 </View>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.cost')}</Text>
                                     <Text style={styles.detailValue}>{formatMoney(masters.cost)}</Text>
                                 </View>
                             </View>
@@ -284,15 +286,15 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
 
                             <View style={styles.cardDetails}>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.duration')}</Text>
                                     <Text style={styles.detailValue}>{phd.duration / 4} Years ({phd.duration} Quarters)</Text>
                                 </View>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.cost')}</Text>
                                     <Text style={styles.detailValue}>{formatMoney(phd.cost)}</Text>
                                 </View>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Boosts:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.boosts')}</Text>
                                     <Text style={styles.detailValue}>
                                         {parentMajor.relatedStat.charAt(0).toUpperCase() + parentMajor.relatedStat.slice(1)}
                                         {getMajorIcon(phd.parentMajor) || getStatIcon(parentMajor.relatedStat)}
@@ -334,11 +336,11 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
 
                             <View style={styles.cardDetails}>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Duration:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.duration')}</Text>
                                     <Text style={styles.detailValue}>{programDetails.duration}</Text>
                                 </View>
                                 <View style={styles.detailRow}>
-                                    <Text style={styles.detailLabel}>Cost:</Text>
+                                    <Text style={styles.detailLabel}>{t('life.cost')}</Text>
                                     <Text style={styles.detailValue}>{cost}</Text>
                                 </View>
                             </View>
@@ -379,8 +381,8 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                         <Text style={styles.backText}>← Back</Text>
                     </TouchableOpacity>
                     <View style={styles.headerTitleContainer}>
-                        <Text style={styles.title}>Academic Programs</Text>
-                        <Text style={styles.subtitle}>Choose Your Path</Text>
+                        <Text style={styles.title}>{t('life.academicPrograms')}</Text>
+                        <Text style={styles.subtitle}>{t('life.chooseYourPath')}</Text>
                     </View>
                     <View style={{ width: 60 }} />
                 </View>

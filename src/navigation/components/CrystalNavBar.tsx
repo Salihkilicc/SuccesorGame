@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Platform, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur';
@@ -40,13 +41,13 @@ const NAV_ITEMS: Array<{
     activeFor: string;
     feature?: keyof typeof FEATURES;
 }> = [
-        { key: 'home', label: 'Home', icon: 'home-outline', target: 'Home', activeFor: 'Home' },
+        { key: 'home', label: t('nav.home'), icon: 'home-outline', target: 'Home', activeFor: 'Home' },
         // target 'stats' özel: navigasyon yapmaz, stat modunu açar.
-        { key: 'stats', label: 'Stats', icon: 'chart-bar', target: 'stats', activeFor: '' },
+        { key: 'stats', label: t('nav.stats'), icon: 'chart-bar', target: 'stats', activeFor: '' },
         // Contacts (ilişkiler) rafa kaldırıldı; yerini şirket aldı.
-        { key: 'contacts', label: 'Contacts', icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
-        { key: 'company', label: 'Company', icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
-        { key: 'profile', label: 'Profile', icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
+        { key: 'contacts', label: t('nav.contacts'), icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
+        { key: 'company', label: t('nav.company'), icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
+        { key: 'profile', label: t('nav.profile'), icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
     ];
 
 const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]);

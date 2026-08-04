@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -32,6 +33,7 @@ const TravelExperienceModal = ({
     onComplete,
     onHomePress,
 }: TravelExperienceModalProps) => {
+    useLocale();
 
     const {
         currentNarrative,
@@ -62,7 +64,7 @@ const TravelExperienceModal = ({
                         <View style={styles.header}>
                             <Text style={styles.headerEmoji}>{spot.emoji}</Text>
                             <Text style={styles.headerTitle}>{spot.name}</Text>
-                            <Text style={styles.headerSubtitle}>En Route</Text>
+                            <Text style={styles.headerSubtitle}>{t('life.enRoute')}</Text>
                         </View>
 
                         {/* Progress Bar */}
@@ -122,7 +124,7 @@ const TravelExperienceModal = ({
                         {/* Completion Screen */}
                         <View style={styles.completionHeader}>
                             <Text style={styles.completionEmoji}>{spot.emoji}</Text>
-                            <Text style={styles.completionTitle}>Trip Complete!</Text>
+                            <Text style={styles.completionTitle}>{t('life.tripComplete')}</Text>
                         </View>
 
                         <View style={styles.narrativeBox}>

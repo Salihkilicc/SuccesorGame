@@ -19,6 +19,7 @@
 // ============================================================================
 
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Switch } from 'react-native';
 import { theme } from '../../../core/theme';
 import GameModal from '../../common/GameModal';
@@ -51,6 +52,7 @@ interface Props {
 }
 
 const EmployeesModule = ({ visible, onClose }: Props) => {
+    useLocale();
     const employeeCount = useStatsStore(s => s.employeeCount);
     const facilityTier = useStatsStore(s => s.facilityTier);
     const salaryRatio = useStatsStore(s => s.salaryRatio);
@@ -80,12 +82,12 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
         const shock = payCutShock(salaryRatio, clamped);
         if (shock > 0) {
             Alert.alert(
-                'Cut pay?',
+                t('alert.cutPay'),
                 `Raising pay is easy; taking it back is not. This will cost ${shock} morale points ` +
                 `immediately, on top of the lower level your pay will sustain.`,
                 [
-                    { text: 'Never mind', style: 'cancel' },
-                    { text: 'Cut anyway', style: 'destructive', onPress: () => setSalaryRatio(clamped) },
+                    { text: t('ui.neverMind'), style: 'cancel' },
+                    { text: t('ui.cutAnyway'), style: 'destructive', onPress: () => setSalaryRatio(clamped) },
                 ],
             );
             return;
@@ -95,26 +97,26 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
     const handleEvent = (id: string) => {
         const result = organizeEvent(id);
-        if (!result.success) Alert.alert('Cannot host', result.message);
+        if (!result.success) Alert.alert(t('alert.cannotHost'), result.message);
     };
 
     const bonusCost = Math.max(0, lastQuarterProfit) * 0.05;
     const canBonus = !bonusDistributed && lastQuarterProfit > 0 && companyCapital >= bonusCost;
 
     return (
-        <GameModal visible={visible} onClose={onClose} title="Team">
+        <GameModal visible={visible} onClose={onClose} title={t('ui.team')}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* ══ MORAL ŞERİDİ ══ */}
                 <View style={styles.stripe}>
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>MORALE</Text>
+                        <Text style={styles.label}>{t('ui.morale')}</Text>
                         <Text style={styles.big}>{morale.toFixed(0)}</Text>
                         <Text style={styles.sub}>
                             Pay alone sustains {target.toFixed(0)}
                         </Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.label}>OUTPUT</Text>
+                        <Text style={styles.label}>{t('ui.output')}</Text>
                         <Text style={[styles.big, { color: efficiency >= 1 ? '#4CAF50' : '#FFB74D' }]}>
                             ×{efficiency.toFixed(2)}
                         </Text>
@@ -134,8 +136,8 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
                 {/* ══ MAAŞ ══ */}
                 <CollapsibleSection
-                    title="PAY"
-                    note="What you pay against the market rate"
+                    title={t('ui.pay')}
+                    note={t('ui.whatYouPayAgainstThe')}
                     info={WORKFORCE_EXPLANATIONS.salaryRatio}
                     infoDetail={`Market rate for a ${tier.name} is ${formatMoney(market)} per person per quarter. You are paying ${formatMoney(perPerson)}.`}
                     summary={`${Math.round(salaryRatio * 100)}%`}
@@ -179,8 +181,8 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
                 {/* ══ ETKİNLİKLER ══ */}
                 <CollapsibleSection
-                    title="TEAM EVENTS"
-                    note="Priced per person — they never get cheap"
+                    title={t('ui.teamEvents')}
+                    note={t('ui.pricedPerPersonTheyNever')}
                     info={WORKFORCE_EXPLANATIONS.events}
                     summary={`${eventsHosted} / ${MAX_EVENTS_PER_QUARTER}`}
                 >
@@ -211,8 +213,8 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
                 {/* ══ İKRAMİYE ══ */}
                 <CollapsibleSection
-                    title="BONUS"
-                    note="Share last quarter's profit"
+                    title={t('ui.bonus')}
+                    note={t('ui.shareLastQuarterSProfit')}
                     summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
                     summaryColor={canBonus ? '#4CAF50' : '#8A8A8A'}
                 >
@@ -238,8 +240,8 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                 <View style={styles.overtimeBox}>
                     <View style={{ flex: 1 }}>
                         <View style={styles.rowTight}>
-                            <Text style={styles.otTitle}>OVERTIME</Text>
-                            <InfoDot title="Overtime" text={WORKFORCE_EXPLANATIONS.overtime} />
+                            <Text style={styles.otTitle}>{t('ui.overtime')}</Text>
+                            <InfoDot title={t('ui.overtime2')} text={WORKFORCE_EXPLANATIONS.overtime} />
                         </View>
                         <Text style={styles.sub}>
                             Runs to {Math.round(OVERTIME_MAX_RATIO * 100)}% of capacity · wages ×1.5 ·

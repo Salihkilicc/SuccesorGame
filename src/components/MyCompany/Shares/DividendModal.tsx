@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { t, useLocale } from '../../../core/i18n';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDividendLogic } from '../../../features/finance/hooks/useDividendLogic';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice } from '../../../core/utils';
+import { DIVIDEND_TAX } from '../../../core/market/equity';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 
 interface Props {
@@ -12,6 +14,8 @@ interface Props {
 }
 
 const DividendModal = ({ visible, onClose }: Props) => {
+    // Dil degisince yeniden ciz. Bu satir olmadan ekran eski dilde donar.
+    useLocale();
     const navigation = useNavigation<any>();
     // Hisse basi temettu hesabi icin gercek hisse sayisi gerekli.
     const totalShares = useShareholderStore(state => state.totalShares);
@@ -24,14 +28,20 @@ const DividendModal = ({ visible, onClose }: Props) => {
         remainingCapital,
         playerSharePercentage,
         isRisky,
+        lastQuarterProfit,
+        perShare,
+        annualYieldPercent,
+        fundedFromReserves,
+        affordable,
         handleConfirm
     } = useDividendLogic(visible, onClose);
 
     // Stepper handler - clamps between 1% and 50%
+    // Dagitim orani %0-100: karin ne kadarini dagittigin.
+    // Eskiden %1-50 idi ama o NAKDIN yuzdesiydi, tamamen baska bir sey.
     const adjustPercent = (delta: number) => {
         const newValue = dividendPercentage + delta;
-        const clampedValue = Math.min(50, Math.max(1, newValue));
-        setDividendPercentage(clampedValue);
+        setDividendPercentage(Math.min(100, Math.max(0, newValue)));
     };
 
     const handleHomePress = () => {
@@ -47,23 +57,62 @@ const DividendModal = ({ visible, onClose }: Props) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <View style={styles.centeredView}>
+                {/* ------------------------------------------------------------
+                    KAYDIRMA + HER ZAMAN ERISILEBILIR CIKIS
+                    ------------------------------------------------------------
+                    Bu ekran sabit yukseklikli bir View'daydi ve icerik ekrandan
+                    tasiyordu: ne kaydirilabiliyor ne de alttaki iptal dugmesine
+                    ulasilabiliyordu. BorrowModal'da da ayni sey olmustu.
+
+                    Cozum ayni: govde ScrollView, cikis dugmesi govdenin DISINDA.
+                   ------------------------------------------------------------ */}
+                <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+                <View style={styles.centeredView} pointerEvents="box-none">
                     <View style={styles.card}>
                         {/* Header */}
-                        <Text style={styles.title}>Distribute Dividends</Text>
-                        <Text style={styles.subtitle}>Reward shareholders with profits</Text>
+                        <View style={styles.titleRow}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.title}>{t('dividend.title')}</Text>
+                                <Text style={styles.subtitle}>{t('dividend.subtitle')}</Text>
+                            </View>
+                            <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
+                                <Text style={styles.closeText}>✕</Text>
+                            </Pressable>
+                        </View>
 
-                        {/* Available Cash */}
+                        <ScrollView
+                            style={styles.body}
+                            contentContainerStyle={{ paddingBottom: 8 }}
+                            showsVerticalScrollIndicator
+                        >
+
+                        {/* Kar — temettunun kaynagi. Nakit degil. */}
                         <View style={styles.cashCard}>
-                            <Text style={styles.cashLabel}>Available Company Cash</Text>
-                            <Text style={styles.cashValue}>
-                                {formatMoney(availableCash)}
+                            <Text style={styles.cashLabel}>{t('dividend.lastQuarterProfit')}</Text>
+                            <Text style={[
+                                styles.cashValue,
+                                lastQuarterProfit <= 0 && { color: '#FF453A' },
+                            ]}>
+                                {formatMoney(lastQuarterProfit)}
+                            </Text>
+                            <Text style={styles.cashHint}>
+                                Cash on hand {formatMoney(availableCash)}
                             </Text>
                         </View>
 
+                        {fundedFromReserves && (
+                            <View style={styles.flagBox}>
+                                <Text style={styles.flagText}>
+                                    You did not make a profit last quarter. Paying a dividend now
+                                    means paying out of reserves — investors read that as a company
+                                    buying goodwill it cannot afford.
+                                </Text>
+                            </View>
+                        )}
+
                         {/* Stepper Interface */}
                         <View style={styles.stepperSection}>
-                            <Text style={styles.label}>Distribution Percentage</Text>
+                            <Text style={styles.label}>{t('dividend.payoutRatio')}</Text>
                             <View style={styles.stepperContainer}>
                                 {/* Decrease Button */}
                                 <TouchableOpacity
@@ -83,7 +132,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                 {/* Display */}
                                 <View style={styles.valueContainer}>
                                     <Text style={styles.valueText}>{dividendPercentage}%</Text>
-                                    <Text style={styles.labelSmall}>OF CASH RESERVES</Text>
+                                    <Text style={styles.labelSmall}>{t('dividend.ofCashReserves')}</Text>
                                 </View>
 
                                 {/* Increase Button */}
@@ -131,32 +180,36 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         {/* Distribution Info Display */}
                         <View style={styles.infoSection}>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>Total Payout</Text>
+                                <Text style={styles.infoLabel}>{t('dividend.totalPayout')}</Text>
                                 <Text style={styles.infoValue}>
                                     {formatMoney(distributionAmount)}
                                 </Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>
-                                    Dividend Per Share
-                                </Text>
+                                <Text style={styles.infoLabel}>{t('equity.dividendPerShare')}</Text>
                                 {/* HATA DUZELTMESI: eskiden sabit 1.000.000'a bolunuyordu.
                                     Toplam hisse 10.000.000 oldugu icin hisse basi temettu
                                     10 KAT fazla gorunuyordu. Artik gercek hisse sayisina bolunuyor.
                                     Kaynak: features/shareholders/stores/useShareholderStore.ts (TOTAL_SHARES) */}
-                                <Text style={styles.infoValue}>
-                                    {formatPrice(distributionAmount / (totalShares || 10_000_000))}
-                                </Text>
+                                <Text style={styles.infoValue}>{formatPrice(perShare)}</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>Remaining Capital</Text>
+                                <Text style={styles.infoLabel}>{t('dividend.remainingCapital')}</Text>
                                 <Text style={[
                                     styles.infoValue,
                                     { color: isRisky ? '#FF453A' : '#FFFFFF' }
                                 ]}>
                                     {formatMoney(remainingCapital)}
+                                </Text>
+                            </View>
+
+                            {/* Getiri — yatirimcinin gercekten baktigi sayi */}
+                            <View style={styles.yieldRow}>
+                                <Text style={styles.yieldLabel}>{t('dividend.annualYield')}</Text>
+                                <Text style={styles.yieldValue}>
+                                    {annualYieldPercent.toFixed(2)}%
                                 </Text>
                             </View>
                         </View>
@@ -165,13 +218,13 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         <View style={styles.profitHighlight}>
                             <Text style={styles.profitLabel}>💰 You Receive</Text>
                             <Text style={styles.profitAmount}>
-                                {formatMoney(playerDividend)}
+                                {formatMoney(playerDividend * (1 - DIVIDEND_TAX))}
                             </Text>
                             <Text style={styles.profitNote}>
                                 Based on your {playerSharePercentage.toFixed(1)}% ownership
                             </Text>
                             <View style={styles.profitBadge}>
-                                <Text style={styles.profitBadgeText}>Added to personal wallet</Text>
+                                <Text style={styles.profitBadgeText}>{t('dividend.addedToWallet')}</Text>
                             </View>
                         </View>
 
@@ -184,21 +237,23 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             </View>
                         )}
 
-                        {/* Buttons */}
+                        </ScrollView>
+
+                        {/* Buttons — ScrollView DISINDA, her zaman gorunur */}
                         <View style={styles.buttonRow}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
                                 onPress={onClose}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.distributeButton}
                                 onPress={handleConfirm}
                                 activeOpacity={0.7}
                             >
-                                <Text style={styles.distributeButtonText}>Distribute Profits</Text>
+                                <Text style={styles.distributeButtonText}>{t('dividend.distribute')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -212,6 +267,21 @@ const DividendModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
+    cashHint: { color: '#8A8A8A', fontSize: 11, marginTop: 4 },
+    flagBox: {
+        backgroundColor: 'rgba(255,69,58,0.10)', borderRadius: 12,
+        borderWidth: 1, borderColor: 'rgba(255,69,58,0.30)',
+        padding: 12, marginBottom: 12,
+    },
+    flagText: { color: '#FF9F9F', fontSize: 11.5, lineHeight: 16 },
+    yieldRow: {
+        flexDirection: 'row', justifyContent: 'space-between',
+        paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
+        marginTop: 8,
+    },
+    yieldLabel: { color: '#8A8A8A', fontSize: 11.5 },
+    yieldValue: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '700' },
+
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -229,8 +299,17 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '100%',
         maxWidth: 400,
+        // Ekranin en fazla %80'i; gerisi kaydirilir.
+        maxHeight: '80%',
         marginBottom: 80, // Space for Bottom Bar
     },
+    body: { flexGrow: 0, flexShrink: 1 },
+    titleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
+    closeBtn: {
+        width: 32, height: 32, borderRadius: 16,
+        backgroundColor: '#2A2D35', alignItems: 'center', justifyContent: 'center',
+    },
+    closeText: { color: '#8A9BA8', fontSize: 16, fontWeight: '700' },
     title: {
         fontSize: 22,
         fontWeight: '700',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import PremiumBadge from '../../../components/common/PremiumBadge';
 import SectionCard from '../../../components/common/SectionCard';
@@ -27,10 +28,10 @@ const ROOMS: Array<{
   minCharisma?: number;
   flavor?: string;
 }> = [
-    { id: 'standard', label: 'Standard Room', minBet: '$1K', emoji: '🎰', flavor: 'Casual bets & chill vibe.' },
+    { id: 'standard', label: t('ui.standardRoom'), minBet: '$1K', emoji: '🎰', flavor: 'Casual bets & chill vibe.' },
     {
       id: 'high',
-      label: 'High Roller',
+      label: t('ui.highRoller'),
       minBet: '$10K',
       emoji: '🔥',
       minNetWorth: MIN_HIGH_NET_WORTH,
@@ -39,7 +40,7 @@ const ROOMS: Array<{
     },
     {
       id: 'vip',
-      label: 'VIP Room',
+      label: t('ui.vipRoom'),
       minBet: '$50K — premium required',
       emoji: '💎',
       requiresPremium: true,
@@ -47,7 +48,7 @@ const ROOMS: Array<{
     },
     {
       id: 'ultra',
-      label: 'Ultra VIP',
+      label: t('ui.ultraVip'),
       minBet: '$250K — premium + $1M NW',
       emoji: '🃏',
       requiresPremium: true,

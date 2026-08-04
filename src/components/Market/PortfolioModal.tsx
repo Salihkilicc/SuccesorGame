@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import {
   View,
   Text,
@@ -19,6 +20,7 @@ interface PortfolioModalProps {
 }
 
 const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => {
+    useLocale();
   const { getPortfolioList } = useAssetsLogic();
   const { buyAsset, sellAsset } = useMarketStore();
   const portfolioList = getPortfolioList();
@@ -28,7 +30,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
       'Buy Stock',
       `How many shares of ${symbol} would you like to buy at ${formatPrice(currentPrice)}?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('market.cancel'), style: 'cancel' },
         {
           text: 'Buy',
           onPress: (quantity?: string) => {
@@ -49,9 +51,9 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
       'Sell Stock',
       `How many shares of ${symbol} would you like to sell at ${formatPrice(currentPrice)}? (Max: ${maxQuantity})`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('market.cancel'), style: 'cancel' },
         {
-          text: 'Sell',
+          text: t('market.sell'),
           onPress: (quantity?: string) => {
             const qty = parseInt(quantity || '0', 10);
             if (qty > 0 && qty <= maxQuantity) {
@@ -116,7 +118,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
         <View style={styles.modalContainer}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>My Portfolio</Text>
+              <Text style={styles.title}>{t('market.myPortfolio')}</Text>
               <Text style={styles.totalValue}>Total Value: {formatMoney(totalValue)}</Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeButton}>
@@ -126,8 +128,8 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
 
           {portfolioList.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No active investments</Text>
-              <Text style={styles.emptySubtext}>Buy stocks from the market to get started</Text>
+              <Text style={styles.emptyText}>{t('market.noActiveInvestments')}</Text>
+              <Text style={styles.emptySubtext}>{t('market.buyStocksFromTheMarket')}</Text>
             </View>
           ) : (
             <FlatList

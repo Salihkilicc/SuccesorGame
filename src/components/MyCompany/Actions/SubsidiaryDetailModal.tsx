@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) => {
+    useLocale();
     const navigation = useNavigation<any>();
     const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
     const [isSellModalVisible, setSellModalVisible] = useState(false);
@@ -131,14 +133,14 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
                         {/* KPI Dashboard */}
                         <View style={styles.kpiContainer}>
                             <View style={styles.kpiItem}>
-                                <Text style={styles.kpiLabel}>VALUATION</Text>
+                                <Text style={styles.kpiLabel}>{t('action.valuation')}</Text>
                                 <Text style={styles.kpiValue}>
                                     {formatMoney(company.valuation)}
                                 </Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.kpiItem}>
-                                <Text style={styles.kpiLabel}>LAST Q CHANGE</Text>
+                                <Text style={styles.kpiLabel}>{t('action.lastQChange')}</Text>
                                 <Text style={[styles.kpiValue, { color: isPositive ? '#30D158' : '#FF453A' }]}>
                                     {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
                                 </Text>
@@ -147,7 +149,7 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
 
                         {/* Strategy Section */}
                         <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Corporate Strategy</Text>
+                            <Text style={styles.sectionTitle}>{t('action.corporateStrategy')}</Text>
                             <View style={[styles.pointsBadge, remainingPoints === 0 && { backgroundColor: '#30D158' }]}>
                                 <Text style={[styles.pointsText, remainingPoints === 0 && { color: '#000' }]}>
                                     {remainingPoints} Points Available
@@ -175,10 +177,10 @@ export const SubsidiaryDetailModal = ({ visible, companyId, onClose }: Props) =>
                     {/* Footer */}
                     <View style={styles.footer}>
                         <TouchableOpacity style={styles.sellBtn} onPress={() => setSellModalVisible(true)}>
-                            <Text style={styles.sellBtnText}>SELL COMPANY</Text>
+                            <Text style={styles.sellBtnText}>{t('action.sellCompany')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-                            <Text style={styles.saveBtnText}>CONFIRM STRATEGY</Text>
+                            <Text style={styles.saveBtnText}>{t('action.confirmStrategy')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

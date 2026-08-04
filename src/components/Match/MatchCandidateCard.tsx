@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import {View, Text, StyleSheet} from 'react-native';
 import type {MatchCandidate} from './useMatchSystem';
 
@@ -6,20 +7,23 @@ type Props = {
   candidate: MatchCandidate;
 };
 
-const MatchCandidateCard = ({candidate}: Props) => (
+const MatchCandidateCard = ({candidate}: Props) => {
+    useLocale();
+    return (
   <View style={styles.card}>
     <View style={styles.photoPlaceholder}>
-      <Text style={styles.photoText}>Fotoğraf</Text>
+      <Text style={styles.photoText}>{t('ui.fotoRaf')}</Text>
     </View>
     <View style={styles.info}>
       <Text style={styles.name}>
         {candidate.name} {candidate.age ? `• ${candidate.age}` : ''}
       </Text>
-      <Text style={styles.meta}>Attractiveness: High</Text>
+      <Text style={styles.meta}>{t('ui.attractivenessHigh')}</Text>
       <Text style={styles.meta}>{candidate.bio ?? 'Enerjik ve sosyal biri.'}</Text>
     </View>
   </View>
-);
+    );
+};
 
 export default MatchCandidateCard;
 

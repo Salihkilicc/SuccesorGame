@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { useBlackMarketSystem } from './useBlackMarketSystem';
 import { BlackMarketCategory } from './blackMarketData';
@@ -14,6 +15,7 @@ interface BlackMarketHubViewProps {
 // --- COMPONENT ---
 
 export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCategory, onClose }) => {
+    useLocale();
     const { data } = useBlackMarketSystem();
     const { money } = useStatsStore();
 
@@ -48,10 +50,10 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
     });
 
     const categories: { id: BlackMarketCategory, label: string, icon: string, color: string }[] = [
-        { id: 'art_antique', label: 'Fine Arts & Antiques', icon: '🏛️', color: '#f59e0b' },
-        { id: 'weapon', label: 'Weapons & Defense', icon: '🔫', color: '#ef4444' },
-        { id: 'jewelry', label: 'Jewelry & Gems', icon: '💎', color: '#06b6d4' },
-        { id: 'substance', label: 'Prohibited Substances', icon: '🧪', color: '#a855f7' }
+        { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#f59e0b' },
+        { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#ef4444' },
+        { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#06b6d4' },
+        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#a855f7' }
     ];
 
     const getRepTitle = (rep: number) => {
@@ -66,8 +68,8 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
             {/* Header */}
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>THE BLACK MARKET</Text>
-                <Text style={styles.headerSubtitle}>Encrypted Connection Established...</Text>
+                <Text style={styles.headerTitle}>{t('life.theBlackMarket')}</Text>
+                <Text style={styles.headerSubtitle}>{t('life.encryptedConnectionEstablished')}</Text>
             </View>
 
             {/* Status Bars */}
@@ -93,7 +95,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                         />
                     </View>
                     {data.suspicion > 80 && (
-                        <Text style={styles.warningText}>RAID IMMINENT!</Text>
+                        <Text style={styles.warningText}>{t('life.raidImminent')}</Text>
                     )}
                 </View>
 
@@ -121,7 +123,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
 
                 {/* Money */}
                 <View style={styles.moneyContainer}>
-                    <Text style={styles.moneyLabel}>AVAILABLE CASH:</Text>
+                    <Text style={styles.moneyLabel}>{t('life.availableCash')}</Text>
                     <Text style={styles.moneyValue}>${money.toLocaleString()}</Text>
                 </View>
             </View>
@@ -149,7 +151,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                 </Text>
 
                 <TouchableOpacity onPress={onClose} style={styles.disconnectButton}>
-                    <Text style={styles.disconnectButtonText}>DISCONNECT LINK</Text>
+                    <Text style={styles.disconnectButtonText}>{t('life.disconnectLink')}</Text>
                 </TouchableOpacity>
             </View>
         </View>

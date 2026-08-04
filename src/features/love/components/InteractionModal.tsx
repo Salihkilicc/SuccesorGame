@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -10,6 +11,7 @@ export type InteractionModalProps = {
 };
 
 const InteractionModal = ({ visible, onClose, title, children }: InteractionModalProps) => {
+    useLocale();
     return (
         <Modal
             visible={visible}
@@ -27,7 +29,7 @@ const InteractionModal = ({ visible, onClose, title, children }: InteractionModa
                     <Pressable
                         onPress={onClose}
                         style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}>
-                        <Text style={styles.closeText}>Close</Text>
+                        <Text style={styles.closeText}>{t('love.close')}</Text>
                     </Pressable>
                 </Pressable>
             </Pressable>

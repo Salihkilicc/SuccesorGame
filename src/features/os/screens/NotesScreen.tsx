@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -44,6 +45,7 @@ type NoteCardProps = {
 };
 
 const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
+    useLocale();
     const preview = note.content.trim().replace(/\n/g, ' ').slice(0, 90);
 
     const handleDelete = () => {
@@ -51,9 +53,9 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
             'Delete Note',
             'Are you sure you want to delete this note?',
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('os.cancel'), style: 'cancel' },
                 {
-                    text: 'Delete',
+                    text: t('os.delete'),
                     style: 'destructive',
                     onPress: () => onDelete(note.id),
                 },
@@ -144,7 +146,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                     style={({ pressed }) => [styles.editorHeaderBtn, pressed && { opacity: 0.6 }]}
                 >
                     <MaterialCommunityIcons name="arrow-left" size={22} color="#C5A059" />
-                    <Text style={styles.editorHeaderBtnText}>Notes</Text>
+                    <Text style={styles.editorHeaderBtnText}>{t('os.notes')}</Text>
                 </Pressable>
 
                 <Pressable
@@ -160,7 +162,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                     />
-                    <Text style={styles.editorSaveBtnText}>SAVE</Text>
+                    <Text style={styles.editorSaveBtnText}>{t('os.save')}</Text>
                 </Pressable>
             </View>
 
@@ -172,7 +174,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 style={styles.editorTitleInput}
                 value={title}
                 onChangeText={setTitle}
-                placeholder="Title"
+                placeholder={t('os.title')}
                 placeholderTextColor="#3A3A52"
                 returnKeyType="next"
                 onSubmitEditing={() => contentRef.current?.focus()}
@@ -190,7 +192,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 style={styles.editorContentInput}
                 value={content}
                 onChangeText={setContent}
-                placeholder="Start writing your note..."
+                placeholder={t('os.startWritingYourNote')}
                 placeholderTextColor="#2E2E46"
                 multiline
                 textAlignVertical="top"
@@ -212,7 +214,7 @@ const EmptyState = ({ onNew }: { onNew: () => void }) => (
         >
             <MaterialCommunityIcons name="note-text-outline" size={44} color="#C5A059" />
         </LinearGradient>
-        <Text style={styles.emptyTitle}>No Notes Yet</Text>
+        <Text style={styles.emptyTitle}>{t('os.noNotesYet')}</Text>
         <Text style={styles.emptySubtitle}>
             Tap the + button to create{'\n'}your first note.
         </Text>
@@ -220,7 +222,7 @@ const EmptyState = ({ onNew }: { onNew: () => void }) => (
             style={({ pressed }) => [styles.emptyAction, pressed && { opacity: 0.7 }]}
             onPress={onNew}
         >
-            <Text style={styles.emptyActionText}>New Note</Text>
+            <Text style={styles.emptyActionText}>{t('os.newNote')}</Text>
         </Pressable>
     </View>
 );
@@ -322,7 +324,7 @@ const NotesScreen = () => {
                     </Pressable>
 
                     <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>NOTES</Text>
+                        <Text style={styles.headerTitle}>{t('os.notes2')}</Text>
                         <View style={styles.headerAccent} />
                     </View>
 

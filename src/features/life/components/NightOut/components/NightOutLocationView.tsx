@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 // 5 tane ../ koyuyoruz
 import { theme } from '../../../../../core/theme';
@@ -11,9 +12,10 @@ type NightOutLocationViewProps = {
 };
 
 const NightOutLocationView = ({ clubs, selectedClub, onSelectClub }: NightOutLocationViewProps) => {
+    useLocale();
     return (
         <>
-            <Text style={styles.sectionHeader}>DESTINATION</Text>
+            <Text style={styles.sectionHeader}>{t('life.destination')}</Text>
             <View style={styles.optionsGrid}>
                 {clubs.map(club => {
                     const isSelected = selectedClub.id === club.id;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const IPOWarningModal = ({ visible, onClose }: Props) => {
+    useLocale();
     const { companyValue, performIPO } = useStatsStore();
 
     const valuationIncrease = companyValue * 0.4;
@@ -26,7 +28,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
         performIPO();
         onClose();
         Alert.alert(
-            'IPO Successful!',
+            t('alert.ipoSuccessful'),
             `Your company is now publicly traded. Valuation increased by ${formatMoney(valuationIncrease)} and you received ${formatMoney(cashInjection)} in capital.`
         );
     };
@@ -38,24 +40,22 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                     <Text style={styles.title}>⚠️ IPO Warning</Text>
 
                     <View style={styles.warningBox}>
-                        <Text style={styles.warningText}>
-                            Going public is irreversible. Investors will demand profits.
-                        </Text>
+                        <Text style={styles.warningText}>{t('equity.goingPublicIsIrreversibleInvestors')}</Text>
                         <Text style={styles.warningBullet}>• Stock price fluctuations</Text>
                         <Text style={styles.warningBullet}>• Investor pressure</Text>
                         <Text style={styles.warningBullet}>• Market volatility</Text>
                     </View>
 
                     <View style={styles.projectionBox}>
-                        <Text style={styles.projectionTitle}>Projected Benefits:</Text>
+                        <Text style={styles.projectionTitle}>{t('equity.projectedBenefits')}</Text>
                         <View style={styles.projectionRow}>
-                            <Text style={styles.projectionLabel}>Valuation Increase</Text>
+                            <Text style={styles.projectionLabel}>{t('equity.valuationIncrease')}</Text>
                             <Text style={styles.projectionValue}>
                                 +{formatMoney(valuationIncrease)} (+40%)
                             </Text>
                         </View>
                         <View style={styles.projectionRow}>
-                            <Text style={styles.projectionLabel}>Cash Injection</Text>
+                            <Text style={styles.projectionLabel}>{t('equity.cashInjection')}</Text>
                             <Text style={styles.projectionValue}>
                                 +{formatMoney(cashInjection)}
                             </Text>
@@ -70,7 +70,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                                 styles.btnCancel,
                                 pressed && styles.btnPressed,
                             ]}>
-                            <Text style={styles.btnText}>Cancel</Text>
+                            <Text style={styles.btnText}>{t('equity.cancel')}</Text>
                         </Pressable>
                         <Pressable
                             onPress={handleConfirm}
@@ -79,7 +79,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                                 styles.btnConfirm,
                                 pressed && styles.btnPressed,
                             ]}>
-                            <Text style={[styles.btnText, { color: '#000' }]}>Go Public</Text>
+                            <Text style={[styles.btnText, { color: '#000' }]}>{t('equity.goPublic')}</Text>
                         </Pressable>
                     </View>
                 </View>

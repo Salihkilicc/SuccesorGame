@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleBondItem } from './marketTypes';
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
+    useLocale();
   const [amount, setAmount] = useState('100000');
 
   if (!bond) return null;
@@ -42,7 +44,7 @@ const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.inputLabel}>Buy Amount</Text>
+            <Text style={styles.inputLabel}>{t('market.buyAmount')}</Text>
             <TextInput
               value={amount}
               onChangeText={setAmount}
@@ -59,7 +61,7 @@ const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
               setAmount('');
             }}
             style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
-            <Text style={styles.buyText}>Buy</Text>
+            <Text style={styles.buyText}>{t('market.buy')}</Text>
           </Pressable>
         </View>
       </View>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 
@@ -19,6 +20,7 @@ const FitnessConfigView = ({
     onStartFitness,
     onBack,
 }: FitnessConfigViewProps) => {
+    useLocale();
     const CONFIGS: Record<string, string[]> = {
         cardio: ['15 Minutes', '30 Minutes', '1 Hour', '2 Hours'],
         hypertrophy: ['Light', 'Medium', 'Heavy', 'Till Failure'],
@@ -36,7 +38,7 @@ const FitnessConfigView = ({
     return (
         <View style={styles.subViewContainer}>
             <Text style={styles.subTitle}>{selectedFitness?.toUpperCase()} SETUP</Text>
-            <Text style={styles.configLabel}>SELECT INTENSITY/DURATION</Text>
+            <Text style={styles.configLabel}>{t('life.selectIntensityDuration')}</Text>
             <View style={styles.optionsList}>
                 {options.map((opt, idx) => (
                     <TouchableOpacity

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
     View,
     Text,
@@ -16,25 +17,26 @@ interface Props {
 
 const TOOLTIP_CONTENT: Record<string, { title: string; description: string }> = {
     IPO: {
-        title: 'Initial Public Offering',
-        description: 'Selling shares to the public for the first time. Provides significant capital but subjects your company to market volatility and investor pressure. This action is irreversible.',
+        title: t('equity.initialPublicOffering'),
+        description: t('equity.sellingSharesToThePublic'),
     },
     Dilution: {
-        title: 'Share Dilution',
-        description: 'Issuing new shares to raise capital. This reduces your ownership percentage but increases company cash reserves. Use this when you need capital for expansion.',
+        title: t('equity.shareDilution'),
+        description: t('equity.issuingNewSharesToRaise'),
     },
     Dividend: {
-        title: 'Dividend Payment',
-        description: 'Distributing profits to shareholders based on their ownership percentage. Your share will be transferred from company capital to your personal wallet.',
+        title: t('equity.dividendPayment'),
+        description: t('equity.distributingProfitsToShareholdersBased'),
     },
     'Stock Split': {
-        title: 'Stock Split',
-        description: 'Dividing existing shares to lower the price per share. For example, 1 share at $1,000 becomes 10 shares at $100. This makes shares more accessible but doesn\'t change company value.',
+        title: t('equity.stockSplit'),
+        description: t('equity.dividingExistingSharesToLower'),
     },
 };
 
 const InfoTooltipModal = ({ visible, term, onClose }: Props) => {
-    const content = TOOLTIP_CONTENT[term] || { title: term, description: 'No information available.' };
+    useLocale();
+    const content = TOOLTIP_CONTENT[term] || { title: term, description: t('equity.noInformationAvailable') };
 
     return (
         <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
@@ -48,7 +50,7 @@ const InfoTooltipModal = ({ visible, term, onClose }: Props) => {
                             styles.btn,
                             pressed && styles.btnPressed,
                         ]}>
-                        <Text style={styles.btnText}>Got it</Text>
+                        <Text style={styles.btnText}>{t('equity.gotIt')}</Text>
                     </Pressable>
                 </View>
             </View>

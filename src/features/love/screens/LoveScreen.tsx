@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, Text, Pressable, StyleSheet, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +34,7 @@ type ModalType = 'partner' | 'family' | 'friend' | 'ex' | null;
 type SubmenuType = 'gift' | 'propose' | 'text' | 'breakup_confirm' | 'breakup_result' | null;
 
 const LoveScreen = () => {
+    useLocale();
   const navigation = useNavigation<LoveScreenProp>();
   const {
     partner, family, friends, exes,
@@ -198,7 +200,7 @@ const LoveScreen = () => {
         Alert.alert("Are you sure?", "This will severely damage your relationship.", [
           { text: "No", style: "cancel" },
           {
-            text: "Do it", style: 'destructive', onPress: () => {
+            text: t('love.doIt'), style: 'destructive', onPress: () => {
               setFeedback("You had a huge fight!");
               updatePartnerLove(-25);
             }
@@ -421,7 +423,7 @@ const LoveScreen = () => {
     if (submenu === 'gift') {
       return (
         <View style={{ gap: 12 }}>
-          <Text style={styles.modalSubtitle}>Select a Gift</Text>
+          <Text style={styles.modalSubtitle}>{t('love.selectAGift')}</Text>
           {GIFTS.map((g, i) => (
             <Pressable key={i} style={styles.actionButton} onPress={() => handleBuyGift(g)}>
               <Text style={styles.actionButtonText}>{g.name}</Text>
@@ -429,7 +431,7 @@ const LoveScreen = () => {
             </Pressable>
           ))}
           <Pressable style={[styles.actionButton, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]} onPress={() => setSubmenu(null)}>
-            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>Back</Text>
+            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>{t('love.back')}</Text>
           </Pressable>
         </View>
       );
@@ -442,7 +444,7 @@ const LoveScreen = () => {
         return (
           <View style={{ alignItems: 'center', gap: 16, padding: 20 }}>
             <Text style={{ fontSize: 60 }}>🥀</Text>
-            <Text style={[styles.modalSubtitle, { color: theme.colors.danger }]}>IT'S OVER</Text>
+            <Text style={[styles.modalSubtitle, { color: theme.colors.danger }]}>{t('love.itSOver')}</Text>
             <Text style={{ color: theme.colors.textPrimary, textAlign: 'center' }}>
               You have ended your relationship with {partner.name}.
             </Text>
@@ -461,7 +463,7 @@ const LoveScreen = () => {
                 closeModal();
               }}
             >
-              <Text style={styles.actionButtonText}>Leave</Text>
+              <Text style={styles.actionButtonText}>{t('love.leave')}</Text>
             </Pressable>
           </View>
         );
@@ -470,7 +472,7 @@ const LoveScreen = () => {
       return (
         <View style={{ gap: 16, padding: 10, backgroundColor: 'rgba(255,0,0,0.05)', borderRadius: 12 }}>
           <Text style={{ fontSize: 40, textAlign: 'center' }}>💔</Text>
-          <Text style={[styles.modalSubtitle, { textAlign: 'center', color: theme.colors.danger }]}>WARNING</Text>
+          <Text style={[styles.modalSubtitle, { textAlign: 'center', color: theme.colors.danger }]}>{t('love.warning')}</Text>
           <Text style={{ textAlign: 'center', color: theme.colors.textSecondary }}>
             Are you sure you want to end this?
             {partner.isMarried && !partner.hasPrenup && (
@@ -488,13 +490,13 @@ const LoveScreen = () => {
             style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
             onPress={() => setSubmenu('breakup_result')}
           >
-            <Text style={[styles.actionButtonText, { color: 'white' }]}>Yes, It's Over</Text>
+            <Text style={[styles.actionButtonText, { color: 'white' }]}>{t('love.yesItSOver')}</Text>
           </Pressable>
           <Pressable
             style={[styles.actionButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]}
             onPress={() => setSubmenu(null)}
           >
-            <Text style={styles.actionButtonText}>Cancel</Text>
+            <Text style={styles.actionButtonText}>{t('love.cancel')}</Text>
           </Pressable>
         </View>
       );
@@ -535,13 +537,13 @@ const LoveScreen = () => {
     return (
       <View style={styles.grid}>
         {[
-          { label: 'Gift', desc: 'Show your love', emoji: '🎁', action: 'Gift', color: '#F59E0B' },
-          { label: 'Compliment', desc: 'Lift her spirits', emoji: '💬', action: 'Compliment', color: '#38BDF8' },
-          { label: 'Break Up', desc: 'End things here', emoji: '💔', action: 'Break Up', danger: true, color: '#EF4444' },
-          { label: 'Elope', desc: 'Secret wedding', emoji: '🏃', action: 'Elope', color: '#A855F7' },
-          { label: 'Birth Control', desc: 'Plan ahead', emoji: '💊', action: 'Birth Control', color: '#22C55E' },
-          { label: 'Counseling', desc: 'Save the bond', emoji: '🗣️', action: 'Counseling', color: '#6366F1' },
-          { label: 'Insult', desc: 'Risky move', emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
+          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#F59E0B' },
+          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#38BDF8' },
+          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#EF4444' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#A855F7' },
+          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#22C55E' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#6366F1' },
+          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
         ].map((btn) => (
           <Pressable
             key={btn.action}
@@ -573,9 +575,7 @@ const LoveScreen = () => {
           <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#EF4444' + '22' : '#EC4899' + '22', borderColor: alreadyMadeLove ? '#EF4444' + '55' : '#EC4899' + '55' }]}>
             <Text style={styles.gridTileEmoji}>💗</Text>
           </View>
-          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#EF4444' }]}>
-            Make Love
-          </Text>
+          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#EF4444' }]}>{t('love.makeLove')}</Text>
           <Text style={styles.gridTileDesc}>
             {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
           </Text>
@@ -585,7 +585,7 @@ const LoveScreen = () => {
         {satisfaction !== null && (
           <View style={styles.satisfactionContainer}>
             <View style={styles.satisfactionHeader}>
-              <Text style={styles.satisfactionLabel}>Satisfaction</Text>
+              <Text style={styles.satisfactionLabel}>{t('love.satisfaction')}</Text>
               <Text style={[styles.satisfactionValue, { color: getSatisfactionColor(satisfaction) }]}>
                 {satisfaction}%
               </Text>
@@ -617,8 +617,8 @@ const LoveScreen = () => {
             <View style={[styles.gridTileIcon, { backgroundColor: '#FACC15' + '22', borderColor: '#FACC15' + '55' }]}>
               <Text style={styles.gridTileEmoji}>💍</Text>
             </View>
-            <Text style={styles.gridTileLabel}>Propose</Text>
-            <Text style={styles.gridTileDesc}>Pop the question</Text>
+            <Text style={styles.gridTileLabel}>{t('love.propose')}</Text>
+            <Text style={styles.gridTileDesc}>{t('love.popTheQuestion')}</Text>
           </Pressable>
         )}
       </View>
@@ -637,7 +637,7 @@ const LoveScreen = () => {
             </Pressable>
           ))}
           <Pressable style={[styles.actionButton, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]} onPress={() => setSubmenu(null)}>
-            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>Back</Text>
+            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>{t('love.back')}</Text>
           </Pressable>
         </View>
       );
@@ -645,10 +645,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: 'Spend Time Together', desc: 'Quality time boosts bond', emoji: '☕', action: 'Spend Time', color: '#F59E0B' },
-          { label: 'Compliment', desc: 'Positive words go far', emoji: '💬', action: 'Compliment', color: '#38BDF8' },
-          { label: 'Send a Gift', desc: 'Money talks', emoji: '🎁', action: 'Gift', color: '#22C55E' },
-          { label: 'Insult', desc: 'This will hurt', emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
+          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#F59E0B' },
+          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#38BDF8' },
+          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#22C55E' },
+          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -684,7 +684,7 @@ const LoveScreen = () => {
             </Pressable>
           ))}
           <Pressable style={[styles.actionButton, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]} onPress={() => setSubmenu(null)}>
-            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>Back</Text>
+            <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>{t('love.back')}</Text>
           </Pressable>
         </View>
       );
@@ -693,10 +693,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: 'Text Her', desc: 'Send a message', emoji: '📱', action: 'Text Her', color: '#38BDF8' },
-          { label: 'Go on Vacation', desc: 'Coming soon', emoji: '✈️', action: 'Go Vacation', color: '#6366F1' },
-          { label: 'Stalk Her', desc: 'Check her socials', emoji: '👁️', action: 'Stalk Her', color: '#A855F7' },
-          { label: 'Start Dating Again', desc: 'Rekindle the flame', emoji: '🔥', action: 'Start Dating Again', color: '#F59E0B' },
+          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#38BDF8' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#6366F1' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#A855F7' },
+          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#F59E0B' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -748,7 +748,7 @@ const LoveScreen = () => {
           </Pressable>
 
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>CONTACTS</Text>
+            <Text style={styles.headerTitle}>{t('love.contacts')}</Text>
             <View style={styles.headerAccent} />
           </View>
 
@@ -769,7 +769,7 @@ const LoveScreen = () => {
 
           {/* 3. Family Section — extracted component */}
           <RelationshipList
-            title="Family"
+            title={t('love.family')}
             count={totalFamilyCount}
             type="family"
             emptyText="No family members yet."
@@ -781,7 +781,7 @@ const LoveScreen = () => {
           {/* 4. Friends Section — extracted component */}
           {friends && friends.length > 0 && (
             <RelationshipList
-              title="Friends"
+              title={t('love.friends')}
               count={friends.length}
               type="friend"
               emptyText="No friends yet."
@@ -792,7 +792,7 @@ const LoveScreen = () => {
 
           {/* 5. Exes Section — extracted component */}
           <RelationshipList
-            title="Exes / Past"
+            title={t('love.exesPast')}
             count={exes.length}
             type="ex"
             emptyText="No past relationships recorded."

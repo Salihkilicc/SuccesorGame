@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +25,7 @@ const formatMoney = (value: number = 0): string => formatMoneyExact(value);
 const formatRP = (value: number): string => `${formatNumber(value)} RP`;
 
 const LaboratoryScreen = () => {
+    useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
 
@@ -91,9 +93,9 @@ const LaboratoryScreen = () => {
             const toHire = tempCount - researcherCount;
             const result = hireResearchers(toHire, companyCapital, deductCapital);
             if (result.success) {
-                Alert.alert('Hiring Complete', `Successfully hired ${toHire} researchers.`);
+                Alert.alert(t('alert.hiringComplete'), `Successfully hired ${toHire} researchers.`);
             } else {
-                Alert.alert('Error', result.message);
+                Alert.alert(t('alert.error'), result.message);
                 // Reset temp count on failure
                 setTempCount(researcherCount);
             }
@@ -101,14 +103,14 @@ const LaboratoryScreen = () => {
             // Firing
             const toFire = researcherCount - tempCount;
             fireResearchers(toFire);
-            Alert.alert('Headcount Reduced', `Reduced research staff by ${toFire}.`);
+            Alert.alert(t('alert.headcountReduced'), `Reduced research staff by ${toFire}.`);
         }
     };
 
     if (!facility) {
         return (
             <View style={styles.container}>
-                <Text style={styles.errorText}>Invalid facility tier</Text>
+                <Text style={styles.errorText}>{t('company.invalidFacilityTier')}</Text>
             </View>
         );
     }
@@ -124,7 +126,7 @@ const LaboratoryScreen = () => {
                     <Text style={styles.backText}>←</Text>
                 </Pressable>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.headerTitle}>R&D Laboratory</Text>
+                    <Text style={styles.headerTitle}>{t('company.rDLaboratory')}</Text>
                     <Text style={styles.headerSubtitle}>Target Output: +{formatRP(quarterlyRP)}/q</Text>
                 </View>
                 <View style={styles.rpBadge}>
@@ -203,7 +205,7 @@ const LaboratoryScreen = () => {
 
                 {/* MANUAL CONTROLS */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Staffing Controls</Text>
+                    <Text style={styles.cardTitle}>{t('company.staffingControls')}</Text>
 
                     {/* Yuzdelik kontroller KALDIRILDI.
                         ±%5 / ±%10 mevcut sayinin yuzdesiydi, yani sayi
@@ -233,9 +235,9 @@ const LaboratoryScreen = () => {
                     {/* Summary & Confirm */}
                     <View style={styles.confirmSection}>
                         <View style={styles.costInfo}>
-                            <Text style={styles.costLabel}>Est. Quarterly Expenses</Text>
+                            <Text style={styles.costLabel}>{t('company.estQuarterlyExpenses')}</Text>
                             <Text style={styles.costValue}>{formatMoney(quarterlyCost)}</Text>
-                            <Text style={styles.costSource}>Deducted from Capital</Text>
+                            <Text style={styles.costSource}>{t('company.deductedFromCapital')}</Text>
                             {immediateCost > 0 && (
                                 <Text style={[styles.immediateCost, !canAfford && styles.textDanger]}>
                                     Initial Cost: {formatMoney(immediateCost)}
@@ -261,17 +263,17 @@ const LaboratoryScreen = () => {
 
                 {/* STATS CARD */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Quarterly Economics</Text>
+                    <Text style={styles.cardTitle}>{t('company.quarterlyEconomics')}</Text>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Total Salary Cost:</Text>
+                        <Text style={styles.statLabel}>{t('company.totalSalaryCost')}</Text>
                         <Text style={[styles.statValue, styles.statDanger]}>{formatMoney(quarterlyCost)}</Text>
                     </View>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Total RP Output:</Text>
+                        <Text style={styles.statLabel}>{t('company.totalRpOutput')}</Text>
                         <Text style={[styles.statValue, styles.statSuccess]}>+{formatRP(quarterlyRP)}</Text>
                     </View>
                     <View style={styles.statRow}>
-                        <Text style={styles.statLabel}>Available Capital:</Text>
+                        <Text style={styles.statLabel}>{t('company.availableCapital')}</Text>
                         <Text style={[styles.statValue, { color: '#FFFFFF' }]}>{formatMoney(companyCapital)}</Text>
                     </View>
                 </View>

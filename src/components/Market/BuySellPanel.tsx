@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { useStatsStore, useMarketStore } from '../../core/store';
 import { theme } from '../../core/theme';
@@ -11,6 +12,7 @@ type BuySellPanelProps = {
 };
 
 const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
+    useLocale();
   const { money } = useStatsStore();
   const { buyAsset, sellAsset, holdings } = useMarketStore();
   const [qty, setQty] = useState<number>(1);
@@ -49,7 +51,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Trade</Text>
+      <Text style={styles.title}>{t('market.trade')}</Text>
 
       {/* Owned Indicator */}
       {ownedQty > 0 && (
@@ -99,7 +101,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
             (ownedQty < qty) && styles.disabledButton,
             pressed && styles.buttonPressed,
           ]}>
-          <Text style={styles.sellText}>SELL</Text>
+          <Text style={styles.sellText}>{t('market.sell')}</Text>
         </Pressable>
         <Pressable
           onPress={handleBuy}
@@ -108,7 +110,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
             styles.buyButton,
             pressed && styles.buttonPressed,
           ]}>
-          <Text style={styles.buyText}>BUY</Text>
+          <Text style={styles.buyText}>{t('market.buy2')}</Text>
         </Pressable>
       </View>
     </View>

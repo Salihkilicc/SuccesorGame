@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 
@@ -53,13 +54,14 @@ const SanctuaryMenuGrid = ({
     onBuyMembership,
     isVIPMember,
 }: SanctuaryMenuGridProps) => {
+    useLocale();
     return (
         <View style={styles.grid}>
             {/* VIP MEMBERSHIP CARD */}
             {!isVIPMember && (
                 <HubCard
                     icon="👑"
-                    title="VIP Platinum Access"
+                    title={t('life.vipPlatinumAccess')}
                     subtitle="$20,000 - FREE Massages This Quarter"
                     onPress={onBuyMembership}
                     isVIP
@@ -69,34 +71,34 @@ const SanctuaryMenuGrid = ({
                 <View style={styles.vipActiveBanner}>
                     <Text style={styles.vipActiveIcon}>👑</Text>
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.vipActiveTitle}>VIP Platinum Member</Text>
-                        <Text style={styles.vipActiveText}>All massages are FREE this quarter!</Text>
+                        <Text style={styles.vipActiveTitle}>{t('life.vipPlatinumMember')}</Text>
+                        <Text style={styles.vipActiveText}>{t('life.allMassagesAreFreeThis')}</Text>
                     </View>
                 </View>
             )}
 
             <HubCard
                 icon="💈"
-                title="Grooming Lounge"
-                subtitle="Hair, Beard & Style"
+                title={t('life.groomingLounge')}
+                subtitle={t('life.hairBeardStyle')}
                 onPress={onOpenGrooming}
             />
             <HubCard
                 icon="💆"
-                title="Royal Massage"
-                subtitle="Thai, Deep Tissue & More"
+                title={t('life.royalMassage')}
+                subtitle={t('life.thaiDeepTissueMore')}
                 onPress={onOpenMassage}
             />
             <HubCard
                 icon="☀️"
-                title="Sun Studio"
-                subtitle="Tanning & Skin Care"
+                title={t('life.sunStudio2')}
+                subtitle={t('life.tanningSkinCare')}
                 onPress={onOpenSunStudio}
             />
             <HubCard
                 icon="💉"
-                title="Plastic Surgery Clinic"
-                subtitle="High Risk, High Reward"
+                title={t('life.plasticSurgeryClinic')}
+                subtitle={t('life.highRiskHighReward')}
                 isDanger
                 onPress={onOpenSurgery}
             />

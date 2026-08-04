@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { TravelMethod } from '../useNightOutSystem';
@@ -18,14 +19,15 @@ const TravelMethodView = ({
     isHangarOpen,
     setIsHangarOpen
 }: TravelMethodViewProps) => {
+    useLocale();
 
     // If Hangar is open, show list of user's jets
     if (isHangarOpen) {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, { color: '#C8B6FF' }]}>PRIVATE HANGAR</Text>
-                    <Text style={styles.subtitle}>Select your aircraft</Text>
+                    <Text style={[styles.title, { color: '#C8B6FF' }]}>{t('life.privateHangar')}</Text>
+                    <Text style={styles.subtitle}>{t('life.selectYourAircraft')}</Text>
                 </View>
 
                 <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -40,19 +42,19 @@ const TravelMethodView = ({
                                 <Text style={{ fontSize: 32 }}>🛩️</Text>
                             </View>
                             <View style={styles.jetListInfo}>
-                                <Text style={styles.jetListName}>My Private Jet</Text>
-                                <Text style={styles.jetListDesc}>Ready for takeoff</Text>
+                                <Text style={styles.jetListName}>{t('life.myPrivateJet')}</Text>
+                                <Text style={styles.jetListDesc}>{t('life.readyForTakeoff')}</Text>
                             </View>
                             <View style={styles.jetListCost}>
                                 <Text style={styles.costText}>$5,000</Text>
-                                <Text style={styles.fuelText}>FUEL</Text>
+                                <Text style={styles.fuelText}>{t('life.fuel')}</Text>
                             </View>
                         </Pressable>
                     ) : (
                         <View style={styles.emptyState}>
                             <Text style={styles.emptyEmoji}>🔒</Text>
-                            <Text style={styles.emptyTitle}>Hangar Empty</Text>
-                            <Text style={styles.emptyText}>Purchase a private jet in Shopping to access the hangar.</Text>
+                            <Text style={styles.emptyTitle}>{t('life.hangarEmpty')}</Text>
+                            <Text style={styles.emptyText}>{t('life.purchaseAPrivateJetIn')}</Text>
                         </View>
                     )}
                 </ScrollView>
@@ -63,8 +65,8 @@ const TravelMethodView = ({
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>SELECT TRAVEL</Text>
-                <Text style={styles.subtitle}>Choose your flight</Text>
+                <Text style={styles.title}>{t('life.selectTravel')}</Text>
+                <Text style={styles.subtitle}>{t('life.chooseYourFlight')}</Text>
             </View>
 
             <View style={styles.grid}>
@@ -75,7 +77,7 @@ const TravelMethodView = ({
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
                         <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
-                            <Text style={styles.badgeText}>Rep -1 📉</Text>
+                            <Text style={styles.badgeText}>{t('life.rep1')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -91,7 +93,7 @@ const TravelMethodView = ({
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🛫</Text>
                         <View style={[styles.badge, { backgroundColor: '#C8B6FF' }]}>
-                            <Text style={styles.badgeText}>Rep 0</Text>
+                            <Text style={styles.badgeText}>{t('life.rep0')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -107,7 +109,7 @@ const TravelMethodView = ({
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
                         <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
-                            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>Rep +1 📈</Text>
+                            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -125,7 +127,7 @@ const TravelMethodView = ({
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={[styles.cardTitle, { color: '#C8B6FF' }]}>MY{'\n'}HANGAR</Text>
-                        <Text style={styles.hangarAction}>Use Own Jet →</Text>
+                        <Text style={styles.hangarAction}>{t('life.useOwnJet')}</Text>
                     </View>
                 </Pressable>
             </View>

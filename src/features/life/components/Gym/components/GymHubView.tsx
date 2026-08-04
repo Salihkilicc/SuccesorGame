@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import { useGymSystem, type MartialArtStyle, BELT_TITLES, type BeltRank } from '../useGymSystem';
@@ -24,6 +25,7 @@ const GymHubView = ({
     onOpenTrainer,
     onOpenSupplements,
 }: GymHubViewProps) => {
+    useLocale();
     const { gymState, bodyType, fatigue } = useGymSystem();
 
     // Get highest martial arts rank for display
@@ -42,7 +44,7 @@ const GymHubView = ({
             {/* Fatigue Display - Battery Style */}
             <View style={styles.statsCard}>
                 <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Energy</Text>
+                    <Text style={styles.statLabel}>{t('life.energy')}</Text>
                     <View style={styles.batteryContainer}>
                         <View style={styles.batteryBody}>
                             {/* Segments */}
@@ -74,13 +76,13 @@ const GymHubView = ({
             </View>
 
             {/* FITNESS & BODY */}
-            <Text style={styles.sectionTitle}>FITNESS & BODY</Text>
+            <Text style={styles.sectionTitle}>{t('life.fitnessBody')}</Text>
             <View style={styles.grid}>
                 {[
-                    { key: 'cardio', icon: '🏃', label: 'Cardio' },
-                    { key: 'hypertrophy', icon: '💪', label: 'Hypertrophy' },
-                    { key: 'calisthenics', icon: '🤸', label: 'Calisthenics' },
-                    { key: 'yoga', icon: '🧘', label: 'Yoga' },
+                    { key: 'cardio', icon: '🏃', label: t('life.cardio') },
+                    { key: 'hypertrophy', icon: '💪', label: t('life.hypertrophy') },
+                    { key: 'calisthenics', icon: '🤸', label: t('life.calisthenics') },
+                    { key: 'yoga', icon: '🧘', label: t('life.yoga') },
                 ].map(item => (
                     <TouchableOpacity
                         key={item.key}
@@ -94,7 +96,7 @@ const GymHubView = ({
             </View>
 
             {/* MARTIAL ARTS */}
-            <Text style={styles.sectionTitle}>MARTIAL ARTS</Text>
+            <Text style={styles.sectionTitle}>{t('life.martialArts')}</Text>
             <View style={styles.maList}>
                 {(['boxing', 'mma', 'muaythai', 'bjj', 'karate'] as MartialArtStyle[]).map(art => {
                     const rank = gymState.martialArts[art] || 0;
@@ -117,7 +119,7 @@ const GymHubView = ({
             </View>
 
             {/* MODIFIERS */}
-            <Text style={styles.sectionTitle}>MODIFIERS</Text>
+            <Text style={styles.sectionTitle}>{t('life.modifiers')}</Text>
 
             <TouchableOpacity
                 onPress={onOpenTrainer}
@@ -129,7 +131,7 @@ const GymHubView = ({
                             ? `TRAINER: ${gymState.trainerId.toUpperCase()}`
                             : 'SELECT PERSONAL TRAINER'}
                     </Text>
-                    {gymState.trainerId && <Text style={styles.changeText}>CHANGE ↻</Text>}
+                    {gymState.trainerId && <Text style={styles.changeText}>{t('life.change')}</Text>}
                 </View>
             </TouchableOpacity>
 
@@ -137,7 +139,7 @@ const GymHubView = ({
                 onPress={onOpenSupplements}
                 style={styles.modifierBtn}
                 activeOpacity={0.7}>
-                <Text style={styles.modLabel}>LOCKER ROOM (SUPPLEMENTS)</Text>
+                <Text style={styles.modLabel}>{t('life.lockerRoomSupplements')}</Text>
             </TouchableOpacity>
         </ScrollView>
     );

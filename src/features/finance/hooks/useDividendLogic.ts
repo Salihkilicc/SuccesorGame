@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { useGameStore } from '../../../core/store/useGameStore';
+import { quoteDividend } from '../../../core/market/equity';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../stores/useEquityStore';
 import { formatMoney } from '../../../core/utils';
@@ -16,6 +18,16 @@ export interface DividendLogicResult {
     remainingCapital: number;
     playerSharePercentage: number;
     isRisky: boolean;
+    /** Temettunun kaynagi: gecen ceyregin kari */
+    lastQuarterProfit: number;
+    /** Hisse basina dagitilan */
+    perShare: number;
+    /** Yillik temettu getirisi (yuzde) */
+    annualYieldPercent: number;
+    /** Kar yokken dagitiliyor mu — kirmizi bayrak */
+    fundedFromReserves: boolean;
+    /** Nakit yetiyor mu */
+    affordable: boolean;
 
     // Actions
     handleConfirm: () => void;
@@ -52,19 +64,37 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
         }
     }, [visible]);
 
-    // Financial Calculations
-    // Distribution is % of Company Capital
-    const distributionAmount = (companyCapital * dividendPercentage) / 100;
+    // ------------------------------------------------------------------
+    //  TEMETTU ARTIK KARIN YUZDESI, NAKDIN DEGIL
+    // ------------------------------------------------------------------
+    //  Eskiden "sermayenin %10'unu dagit" idi. O bir temettu degil,
+    //  kismi tasfiyedir: kar etmeyen bir sirket bile kasasini bosaltip
+    //  dagitabiliyordu. Gercek sirketler KARDAN dagitir; dagitim orani
+    //  olgunluk isaretidir, zarardayken dagitmak ise kirmizi bayraktir.
+    //  Bkz. core/market/equity.ts -> quoteDividend
+    // ------------------------------------------------------------------
+    const lastQuarterProfit = useGameStore(state => state.lastQuarterProfit) || 0;
+    const sharePriceNow = useStatsStore(state => state.companySharePrice || 0);
+    const playerShares = useEquityStore(state => state.playerShares);
 
-    // Effect on Company
+    const quote = quoteDividend(
+        dividendPercentage / 100,
+        lastQuarterProfit,
+        companyCapital,
+        totalShares,
+        playerShares,
+        sharePriceNow,
+    );
+
+    const distributionAmount = quote.total;
     const remainingCapital = companyCapital - distributionAmount;
-
-    // Effect on Player (preview - actual will come from equity store)
     const playerSharePercentage = getPlayerOwnership();
-    const playerDividend = (distributionAmount * playerSharePercentage) / 100;
+    const playerDividend = quote.playerCut;
 
-    // Risk Check: Warn if remaining capital < 20% of CURRENT capital
-    const isRisky = remainingCapital < (companyCapital * 0.2);
+    // Kasanin beste birinden fazlasini goturuyorsa veya kar yokken
+    // dagitiliyorsa uyar.
+    const isRisky =
+        quote.fundedFromReserves || remainingCapital < companyCapital * 0.2;
 
     // Actions
     const handleConfirm = () => {
@@ -73,8 +103,7 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
             return;
         }
 
-        // Calculate amount per share for equity store
-        const amountPerShare = distributionAmount / totalShares;
+        const amountPerShare = quote.perShare;
 
         // Execute dividend distribution via Equity Store
         const result = useEquityStore.getState().distributeDividend(
@@ -91,9 +120,16 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
             remaining: companyCapital - result.totalRequired
         });
 
+        // Brut/net/vergi AYRI gosterilir. Once yalnizca tek bir rakam
+        // vardi ve oyuncu kasasindaki degisimle eslestiremiyordu.
         Alert.alert(
-            "Success",
-            `${formatMoney(result.playerPortion)} Dividend Paid!`,
+            'Dividend paid',
+            `The company paid out ${formatMoney(result.totalRequired)} in total.\n\n` +
+            `Your share: ${formatMoney(result.playerGross)}\n` +
+            `Dividend tax: −${formatMoney(result.tax)}\n` +
+            `Into your personal account: ${formatMoney(result.playerPortion)}\n\n` +
+            `The company already paid corporate tax on this profit — you are taxed on it ` +
+            `a second time. That is why buybacks are often the cheaper way to return cash.`,
             [
                 {
                     text: "OK",
@@ -116,6 +152,12 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
         remainingCapital,
         playerSharePercentage,
         isRisky,
+        // Yeni: yatirimcinin gercekten baktigi sayilar
+        lastQuarterProfit,
+        perShare: quote.perShare,
+        annualYieldPercent: quote.annualYieldPercent,
+        fundedFromReserves: quote.fundedFromReserves,
+        affordable: quote.affordable,
         handleConfirm
     };
 };

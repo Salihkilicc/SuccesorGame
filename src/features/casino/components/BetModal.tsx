@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { StyleSheet, View, Text } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import type { RoomId } from './RoomSelector';
@@ -21,6 +22,7 @@ const MIN_BETS: Record<RoomId, number> = {
 };
 
 const BetModal = ({ visible, roomId, onClose, onBetResult }: BetModalProps) => {
+    useLocale();
   const { money, setField } = useStatsStore();
   const { hidden, personality } = usePlayerStore();
   const luck = hidden.luck;
@@ -93,12 +95,12 @@ const BetModal = ({ visible, roomId, onClose, onBetResult }: BetModalProps) => {
       </View>
 
       <GameButton
-        title="Close"
+        title={t('ui.close')}
         onPress={onClose}
         variant="ghost"
         style={styles.closeButton}
       />
-      <Text style={styles.helper}>Feeling lucky? Play smart, keep your rep high.</Text>
+      <Text style={styles.helper}>{t('ui.feelingLuckyPlaySmartKeep')}</Text>
     </GameModal>
   );
 };

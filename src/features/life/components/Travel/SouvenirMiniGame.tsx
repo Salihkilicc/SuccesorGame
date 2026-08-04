@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -20,6 +21,7 @@ type SouvenirMiniGameProps = {
 const BOXES = Array.from({ length: 12 }, (_, i) => i);
 
 const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: SouvenirMiniGameProps) => {
+    useLocale();
     const [selectedBox, setSelectedBox] = useState<number | null>(null);
     const [winningBox] = useState(Math.floor(Math.random() * 12));
     const [showResult, setShowResult] = useState(false);
@@ -67,7 +69,7 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
         >
             <View style={styles.backdrop}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>LOCAL MARKET</Text>
+                    <Text style={styles.title}>{t('life.localMarket')}</Text>
                     <Text style={styles.subtitle}>
                         {!showResult
                             ? 'Pick a suitcase. One contains a rare souvenir!'
@@ -119,8 +121,8 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
                             ) : (
                                 <>
                                     <Text style={styles.resultEmoji}>🧲</Text>
-                                    <Text style={styles.resultTitle}>Tourist Magnet</Text>
-                                    <Text style={styles.resultDescription}>Maybe next trip...</Text>
+                                    <Text style={styles.resultTitle}>{t('life.touristMagnet')}</Text>
+                                    <Text style={styles.resultDescription}>{t('life.maybeNextTrip')}</Text>
                                 </>
                             )}
                         </View>

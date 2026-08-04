@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { useStatsStore } from '../../core/store';
 import { formatMoney } from '../../core/utils';
@@ -9,19 +10,20 @@ import { formatMoney } from '../../core/utils';
 const formatLargeMoney = (value: number) => formatMoney(value);
 
 const FinancialSummary = () => {
+    useLocale();
   const { companyDebt, companyOwnership } = useStatsStore();
 
   const rows = [
-    { label: 'Daily Revenue', value: '$650K' },
-    { label: 'Daily Expenses', value: '$220K' },
-    { label: 'Daily Profit', value: '$430K' },
-    { label: 'Debt', value: formatLargeMoney(companyDebt) },
-    { label: 'Ownership', value: `${companyOwnership}%` },
+    { label: t('ui.dailyRevenue'), value: '$650K' },
+    { label: t('ui.dailyExpenses'), value: '$220K' },
+    { label: t('ui.dailyProfit'), value: '$430K' },
+    { label: t('ui.debt'), value: formatLargeMoney(companyDebt) },
+    { label: t('ui.ownership'), value: `${companyOwnership}%` },
   ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Financial Summary</Text>
+      <Text style={styles.title}>{t('ui.financialSummary')}</Text>
       <View style={styles.list}>
         {rows.map(row => (
           <View key={row.label} style={styles.row}>

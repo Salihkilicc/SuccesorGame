@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { theme } from '../../core/theme';
 import type { SimpleStockItem } from './marketTypes';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
+    useLocale();
   const [shares, setShares] = useState('10');
 
   if (!stock) return null;
@@ -63,7 +65,7 @@ const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.inputLabel}>How Many Shares?</Text>
+            <Text style={styles.inputLabel}>{t('market.howManyShares')}</Text>
             <TextInput
               value={shares}
               onChangeText={setShares}
@@ -80,7 +82,7 @@ const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
               setShares('');
             }}
             style={({ pressed }) => [styles.buyButton, pressed && styles.buyButtonPressed]}>
-            <Text style={styles.buyText}>Buy Shares</Text>
+            <Text style={styles.buyText}>{t('market.buyShares')}</Text>
           </Pressable>
         </View>
       </View>

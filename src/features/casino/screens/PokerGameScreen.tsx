@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
@@ -9,6 +10,7 @@ import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 
 const PokerGameScreen = () => {
+    useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
   const initialBet = route.params?.betAmount ?? 10_000;
@@ -62,7 +64,7 @@ const PokerGameScreen = () => {
 
         {/* BOARD */}
         <View style={[styles.boardCard, { borderColor: currentLocation.theme.secondary }]}>
-          <Text style={styles.sectionLabel}>COMMUNITY CARDS</Text>
+          <Text style={styles.sectionLabel}>{t('ui.communityCards')}</Text>
           <View style={styles.cardRow}>
             {board.slice(0, revealedBoard).map((card, idx) => renderCard(card, idx))}
             {Array.from({ length: 5 - revealedBoard }).map((_, idx) => (
@@ -73,7 +75,7 @@ const PokerGameScreen = () => {
 
         {/* PLAYER HAND */}
         <View style={[styles.tableCard, { borderColor: currentLocation.theme.primary }]}>
-          <Text style={styles.sectionLabel}>YOUR HAND</Text>
+          <Text style={styles.sectionLabel}>{t('ui.yourHand')}</Text>
           <View style={styles.cardRow}>{playerHand.map((card, idx) => renderCard(card, idx))}</View>
         </View>
 
@@ -96,7 +98,7 @@ const PokerGameScreen = () => {
 
           <View style={styles.bottomControls}>
             <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>TOTAL BET</Text>
+              <Text style={styles.betLabel}>{t('ui.totalBet')}</Text>
               <Text style={styles.betValueText}>${currentBet.toLocaleString()}</Text>
             </View>
 
@@ -107,7 +109,7 @@ const PokerGameScreen = () => {
                   onPress={actions.handleRegame}
                   style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}
                 >
-                  <Text style={styles.secondaryText}>FOLD</Text>
+                  <Text style={styles.secondaryText}>{t('ui.fold')}</Text>
                 </Pressable>
               )}
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     View,
     Text,
@@ -119,6 +120,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     // Render item card
     const renderItemCard = (item: BlackMarketItem) => {
+    useLocale();
         const isLocked = data.streetRep < item.repRequired;
         const isDrug = item.isDrug || false;
 
@@ -202,7 +204,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
                     ]}
                 >
                     <Text style={styles.title}>⚠️ BLACK MARKET ⚠️</Text>
-                    <Text style={styles.subtitle}>Underground Trade Network</Text>
+                    <Text style={styles.subtitle}>{t('life.undergroundTradeNetwork')}</Text>
                 </Animated.View>
             </View>
 

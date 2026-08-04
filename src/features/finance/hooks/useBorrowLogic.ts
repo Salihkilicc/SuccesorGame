@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { useCorporateFinanceStore } from '../stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney } from '../../../core/utils';
 
@@ -66,14 +67,28 @@ export const useBorrowLogic = (
             return;
         }
 
-        // Execute Store Action
-        borrowCapital(amount, rate);
+        // TEK KAPI — amortisman, vade, not ve sozlesme burada.
+        // Once `borrowCapital` cagriliyordu: nakit ekliyor ama kredi
+        // kaydi olusturmuyordu, yani taksit hic kesilmiyordu.
+        const result = useCorporateFinanceStore.getState().takeLoan(
+            amount,
+            0,
+            'term',
+            0,
+            (n: number) => {
+                const st = useStatsStore.getState();
+                st.update({ companyCapital: (st.companyCapital || 0) + n });
+            },
+        );
 
-        console.log('[BorrowLogic] Borrowed:', { amount, rate });
+        if (!result.success) {
+            Alert.alert('Loan Declined', result.message);
+            return;
+        }
 
         Alert.alert(
             "Loan Approved",
-            `${formatMoney(amount)} added to company capital.`,
+            result.message,
             [
                 {
                     text: "OK",

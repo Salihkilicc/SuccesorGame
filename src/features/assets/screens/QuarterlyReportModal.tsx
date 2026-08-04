@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import {
   Modal,
   Pressable,
@@ -101,14 +102,14 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   if (r.unitsProduced === 0) {
     notes.push({
       tone: 'warn',
-      text: 'You produced nothing this quarter. Set a production level on a product to start manufacturing.',
+      text: t('company.youProducedNothingThisQuarter'),
     });
   }
 
   if (r.unitsProduced > 0 && r.sellThrough < 50) {
     notes.push({
       tone: 'bad',
-      text: `Only ${formatPercent(r.sellThrough)} of your available goods sold. The rest became inventory — you paid to build it, and now you pay to store it.`,
+      text: t('obs.onlyVOfYour', { v1: formatPercent(r.sellThrough) }),
     });
   }
 
@@ -117,117 +118,148 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
     const missRate = r.totalMarketDemand > 0 ? (r.totalUnmetDemand / r.totalMarketDemand) * 100 : 0;
     notes.push({
       tone: 'bad',
-      text: `You ran out of stock. The market wanted ${formatNumber(r.totalMarketDemand)} units but you could only supply ${formatNumber(r.unitsSold)}. ${formatNumber(r.totalUnmetDemand)} customers (${formatPercent(missRate)}) went to a competitor.`,
+      text: t('obs.youRanOutOf', { v1: formatNumber(r.totalMarketDemand), v2: formatNumber(r.unitsSold), v3: formatNumber(r.totalUnmetDemand), v4: formatPercent(missRate) }),
     });
   }
 
   if (r.brandChange < -0.5) {
     notes.push({
       tone: 'bad',
-      text: `Brand Value fell ${Math.abs(r.brandChange).toFixed(1)} points to ${r.brandValue}. Holding it steady takes about ${formatMoney(r.brandMaintenance ?? 0)} of marketing per quarter, and that number grows with your revenue. A weaker brand means a smaller share of every market you compete in.`,
+      text: t('obs.brandValueFellV', { v1: Math.abs(r.brandChange).toFixed(1), v2: r.brandValue, v3: formatMoney(r.brandMaintenance ?? 0) }),
     });
   } else if (r.brandChange > 0.5) {
     notes.push({
       tone: 'good',
-      text: `Brand Value rose ${r.brandChange.toFixed(1)} points to ${r.brandValue}. This lifts your share in every category.`,
+      text: t('obs.brandValueRoseV', { v1: r.brandChange.toFixed(1), v2: r.brandValue }),
     });
   }
 
   if (r.isRetooling) {
     notes.push({
       tone: 'warn',
-      text: `Your facility is being upgraded, so it ran at 65% capacity. Output is down on purpose — it comes back, and grows, when the build lands${r.buildQuartersRemaining ? ` in ${r.buildQuartersRemaining} quarter(s)` : ''}.`,
+      text: t('obs.yourFacilityIsBeing', { v1: r.buildQuartersRemaining ?? 0 }),
     });
   }
 
   if (r.headcount < r.crewRequired) {
     notes.push({
       tone: 'warn',
-      text: `You are ${formatNumber(r.crewRequired - r.headcount)} people short of the crew this facility needs. The plant is there; nobody is running part of it.`,
+      text: t('obs.youAreVPeople', { v1: formatNumber(r.crewRequired - r.headcount) }),
     });
   }
 
   if (r.utilization > 0 && r.utilization < 60) {
     notes.push({
       tone: 'bad',
-      text: `Capacity utilization was only ${formatPercent(r.utilization)}. You are paying facility overhead and wages for a line you are not using.`,
+      text: t('obs.capacityUtilizationWasOnly', { v1: formatPercent(r.utilization) }),
     });
   }
 
   if (r.brandCeiling && r.brandValue >= r.brandCeiling - 0.5) {
     notes.push({
       tone: 'warn',
-      text: `Brand Value has hit the ceiling for a ${r.facilityName} (${r.brandCeiling}). More marketing will not move it — the limit is what you can manufacture, not what you can say.`,
+      text: t('obs.brandValueHasHit', { v1: r.facilityName, v2: r.brandCeiling }),
     });
   }
 
   if ((r.hiresBlocked ?? 0) > 0) {
     notes.push({
       tone: 'warn',
-      text: `You asked for ${formatNumber((r.hiresQueued ?? 0) + (r.hiresBlocked ?? 0))} new people but could only recruit ${formatNumber(r.hiresQueued)}. You cannot absorb more than about a quarter of your headcount at once — a stronger brand and better morale would raise that ceiling.`,
+      text: t('obs.youAskedForV', { v1: formatNumber((r.hiresQueued ?? 0) + (r.hiresBlocked ?? 0)), v2: formatNumber(r.hiresQueued) }),
     });
   }
 
   if ((r.moraleChange ?? 0) < -2) {
     notes.push({
       tone: 'bad',
-      text: `Morale fell ${Math.abs(r.moraleChange ?? 0).toFixed(1)} points to ${r.employeeMorale.toFixed(0)}. At ${Math.round((r.salaryRatio ?? 1) * 100)}% of market pay it settles around ${r.moraleWageTarget ?? 70}. Morale is not a threshold: it multiplies your output by ${(r.moraleEfficiency ?? 1).toFixed(2)} and raises defects.`,
+      text: t('obs.moraleFellVPoints', { v1: Math.abs(r.moraleChange ?? 0).toFixed(1), v2: r.employeeMorale.toFixed(0), v3: Math.round((r.salaryRatio ?? 1) * 100), v4: r.moraleWageTarget ?? 70, v5: (r.moraleEfficiency ?? 1).toFixed(2) }),
     });
   }
 
   if (r.overtime) {
     notes.push({
       tone: 'warn',
-      text: 'Overtime was running. You got extra units, paid 1.5× for the hours, and lost morale. Fine for a spike — expensive as a habit.',
+      text: t('company.overtimeWasRunningYouGot'),
+    });
+  }
+
+  if ((r.acquisitionImpairment ?? 0) > 0) {
+    notes.push({
+      tone: 'bad',
+      text: t('obs.youWroteOffV', { v1: formatMoney(r.acquisitionImpairment ?? 0) }),
+    });
+  } else if ((r.acquisitionEbit ?? 0) < 0) {
+    notes.push({
+      tone: 'warn',
+      text: t('obs.acquisitionsCostYouV', { v1: formatMoney(Math.abs(r.acquisitionEbit ?? 0)) }),
+    });
+  } else if ((r.acquisitionEbit ?? 0) > 0) {
+    notes.push({
+      tone: 'good',
+      text: t('obs.acquisitionsAddedVTo', { v1: formatMoney(r.acquisitionEbit ?? 0), v2: formatMoney(r.acquisitionSynergy ?? 0) }),
+    });
+  }
+
+  if (r.creditRating && ['BB', 'B', 'CCC', 'D'].includes(r.creditRating)) {
+    notes.push({
+      tone: r.creditRating === 'BB' ? 'warn' : 'bad',
+      text: t('obs.yourCreditRatingIs', { v1: r.creditRating, v2: (r.leverage ?? 0).toFixed(1), v3: (r.coverage ?? 0).toFixed(1) }),
+    });
+  }
+
+  if (r.covenantBreach) {
+    notes.push({
+      tone: 'bad',
+      text: r.distressMessage || 'You have breached a loan covenant. The banks have changed your terms.',
     });
   }
 
   if (r.layoffs > 0) {
     notes.push({
       tone: 'bad',
-      text: `You let ${formatNumber(r.layoffs)} people go. The severance is paid, but the morale damage lasts longer than the saving.`,
+      text: t('obs.youLetVPeople', { v1: formatNumber(r.layoffs) }),
     });
   }
 
   if (r.products.some(p => p.produced > 0 && (p.marketingBudget ?? 0) === 0)) {
     notes.push({
       tone: 'warn',
-      text: 'Some products have zero marketing spend. Marketing is one of the five things that decide your market share — without it, fewer customers ever consider you.',
+      text: t('company.someProductsHaveZeroMarketing'),
     });
   }
 
   if (r.totalExpenses > 0 && r.expenses.storage / r.totalExpenses > 0.1) {
     notes.push({
       tone: 'bad',
-      text: `Storage is ${formatPercent((r.expenses.storage / r.totalExpenses) * 100)} of your total costs. That is pure waste from overproduction.`,
+      text: t('obs.storageIsVOf', { v1: formatPercent((r.expenses.storage / r.totalExpenses) * 100) }),
     });
   }
 
   if (r.operationalSetback) {
     notes.push({
       tone: 'bad',
-      text: `Low morale (${Math.round(r.employeeMorale)}%) cost you ${formatNumber(r.lostUnits)} units of sales, worth ${formatMoney(r.lostRevenue)}.`,
+      text: t('obs.lowMoraleVCost', { v1: Math.round(r.employeeMorale), v2: formatNumber(r.lostUnits), v3: formatMoney(r.lostRevenue) }),
     });
   }
 
   if (r.revenue > 0 && r.grossMargin < 20) {
     notes.push({
       tone: 'warn',
-      text: `Gross margin is only ${formatPercent(r.grossMargin)}. Your production cost is close to your selling price.`,
+      text: t('obs.grossMarginIsOnly', { v1: formatPercent(r.grossMargin) }),
     });
   }
 
   if (r.netProfit > 0 && r.sellThrough >= 70) {
     notes.push({
       tone: 'good',
-      text: `Healthy quarter: ${formatPercent(r.sellThrough)} sell-through and ${formatPercent(r.netMargin)} net margin.`,
+      text: t('obs.healthyQuarterVSell', { v1: formatPercent(r.sellThrough), v2: formatPercent(r.netMargin) }),
     });
   }
 
   if (r.researchGained > 0) {
     notes.push({
       tone: 'good',
-      text: `Your researchers generated ${formatNumber(r.researchGained)} RP this quarter.`,
+      text: t('obs.yourResearchersGeneratedV', { v1: formatNumber(r.researchGained) }),
     });
   }
 
@@ -277,21 +309,21 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
 
           <View style={styles.productStats}>
             <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>Produced</Text>
+              <Text style={styles.productStatLabel}>{t('company.produced')}</Text>
               <Text style={styles.productStatValue}>{formatNumber(p.produced)}</Text>
             </View>
             <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>Sold</Text>
+              <Text style={styles.productStatLabel}>{t('company.sold')}</Text>
               <Text style={[styles.productStatValue, { color: '#4CAF50' }]}>{formatNumber(p.sold)}</Text>
             </View>
             <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>Unsold</Text>
+              <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
               <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#E57373' : '#9E9E9E' }]}>
                 {formatNumber(p.unsold)}
               </Text>
             </View>
             <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>Stock</Text>
+              <Text style={styles.productStatLabel}>{t('company.stock')}</Text>
               <Text style={[styles.productStatValue, { color: '#FFB74D' }]}>{formatNumber(p.stock)}</Text>
             </View>
           </View>
@@ -328,6 +360,8 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
 // ─── Ana bilesen ─────────────────────────────────────────────────────────────
 
 const QuarterlyReportModal = ({ visible, onClose }: Props) => {
+  // Dil degisince yeniden ciz.
+  useLocale();
   const { evaluateSubsidiaries } = useCorporateFinanceStore();
   // Eski kayitlarda yeni alanlar olmayabilir — normalize et, yoksa render patlar.
   const rawReport = useGameStore(state => state.lastQuarterReport);
@@ -344,10 +378,10 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
       <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
         <View style={styles.overlay}>
           <View style={styles.card}>
-            <Text style={styles.emptyText}>No quarter has been completed yet.</Text>
+            <Text style={styles.emptyText}>{t('company.noQuarterHasBeenCompleted')}</Text>
             <View style={styles.footerActions}>
               <Pressable style={styles.primaryButton} onPress={onClose}>
-                <Text style={styles.primaryButtonText}>Close</Text>
+                <Text style={styles.primaryButtonText}>{t('company.close')}</Text>
               </Pressable>
             </View>
           </View>
@@ -370,8 +404,8 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
             <View style={styles.headerCenter}>
-              <Text style={styles.headerTitle}>QUARTERLY REPORT</Text>
-              <Text style={styles.headerSubtitle}>Income Statement</Text>
+              <Text style={styles.headerTitle}>{t('company.quarterlyReport')}</Text>
+              <Text style={styles.headerSubtitle}>{t('company.incomeStatement')}</Text>
             </View>
             <View style={styles.periodBadge}>
               <Text style={styles.periodText}>{report.periodLabel}</Text>
@@ -382,7 +416,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* Net sonuc */}
             <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FFD700' : '#F44336' }]}>
-              <Text style={styles.heroLabel}>NET INCOME</Text>
+              <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
               <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#4CAF50' : '#F44336' }]}>
                 {formatSignedMoney(report.netProfit)}
               </Text>
@@ -393,45 +427,45 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* ══ GELIR TABLOSU ══ */}
             <CollapsibleSection
-              title="INCOME STATEMENT"
-              note="Where every dollar went, line by line"
-              info="A standard income statement. Revenue minus the cost of making your goods gives Gross Profit. Subtract operating costs to get EBIT, then interest, and what remains is Net Income."
-              infoDetail="Tap the ⓘ next to any line to see how that specific cost is calculated." 
+              title={t('company.incomeStatement2')}
+              note={t('company.whereEveryDollarWentLine')}
+              info={t('company.aStandardIncomeStatementRevenue')}
+              infoDetail={t('company.tapTheNextToAny')} 
               summary={formatSignedMoney(report.netProfit)}
               summaryColor={report.netProfit >= 0 ? '#4CAF50' : '#F44336'}
             >
               <View style={styles.statement}>
                 <StatementLine
-                  label="Revenue"
+                  label={t("report.revenue")}
                   amount={report.revenue}
                   explanation={`${formatNumber(report.unitsSold)} units sold.`}
                 />
                 <StatementLine
-                  label="Cost of Goods Sold"
+                  label={t("report.cogs")}
                   amount={e.cogs}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.cogs}
                   hint={`${formatNumber(report.unitsProduced)} units produced this quarter.`}
                 />
-                <StatementLine label="Gross Profit" amount={report.grossProfit} subtotal />
+                <StatementLine label={t("report.grossProfit")} amount={report.grossProfit} subtotal />
 
-                <Text style={styles.groupLabel}>OPERATING EXPENSES</Text>
+                <Text style={styles.groupLabel}>{t('company.operatingExpenses')}</Text>
 
                 <StatementLine
-                  label="Marketing"
+                  label={t("report.marketing")}
                   amount={e.marketing}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.marketing}
                 />
                 <StatementLine
-                  label="Storage"
+                  label={t("report.storage")}
                   amount={e.storage}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.storage}
                   hint={`${formatNumber(report.endingInventory)} units sitting in the warehouse.`}
                 />
                 <StatementLine
-                  label="Wages"
+                  label={t("report.wages")}
                   amount={e.wages}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.wages}
@@ -439,7 +473,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 />
                 {e.hiring > 0 && (
                   <StatementLine
-                    label="Hiring"
+                    label={t("report.hiring")}
                     amount={e.hiring}
                     negative
                     explanation={EXPENSE_EXPLANATIONS.hiring}
@@ -448,7 +482,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 )}
                 {e.severance > 0 && (
                   <StatementLine
-                    label="Severance"
+                    label={t("report.severance")}
                     amount={e.severance}
                     negative
                     explanation={EXPENSE_EXPLANATIONS.severance}
@@ -456,47 +490,129 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   />
                 )}
                 <StatementLine
-                  label="Facility Overhead"
+                  label={t("report.factoryOverhead")}
                   amount={e.factoryOverhead}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.factoryOverhead}
                   hint={`${report.facilityName} — paid whether the line runs or not.`}
                 />
                 <StatementLine
-                  label="Research & Development"
+                  label={t('company.researchDevelopment')}
                   amount={e.rnd}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.rnd}
                   hint={report.researchGained > 0 ? `Bought ${formatNumber(report.researchGained)} RP.` : undefined}
                 />
                 <StatementLine
-                  label="Fixed Costs"
+                  label={t("report.fixed")}
                   amount={e.fixed}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.fixed}
                 />
 
-                <StatementLine label="Operating Income (EBIT)" amount={report.ebit} subtotal />
+                {/* Devralmalar EBIT'e ayri bir satir olarak girer — oyuncu
+                    islemin gercekten katki mi yaptigini gorebilsin. */}
+                {(report.acquisitionEbit ?? 0) !== 0 && (
+                  <StatementLine
+                    label={t('company.acquisitions')}
+                    amount={report.acquisitionEbit ?? 0}
+                    explanation="What your acquisitions did to operating profit this quarter: their earnings coming through, minus integration costs, plus whatever synergies have arrived."
+                    hint={
+                      `Their profit ${formatMoney(report.acquisitionEarnings ?? 0)}` +
+                      ` · integration −${formatMoney(report.acquisitionIntegration ?? 0)}` +
+                      ` · synergy +${formatMoney(report.acquisitionSynergy ?? 0)}`
+                    }
+                  />
+                )}
+
+                {(report.acquisitionImpairment ?? 0) > 0 && (
+                  <StatementLine
+                    label={t('company.goodwillImpairment')}
+                    amount={report.acquisitionImpairment ?? 0}
+                    negative
+                    explanation="A target that still is not earning after two years. You are writing off what you overpaid — a public admission that the deal failed."
+                  />
+                )}
+
+                <StatementLine label={t('company.operatingIncomeEbit')} amount={report.ebit} subtotal />
                 <StatementLine
-                  label="Interest"
+                  label={t("report.interest")}
                   amount={e.interest}
                   negative
                   explanation={EXPENSE_EXPLANATIONS.interest}
                 />
-                <StatementLine label="Net Income" amount={report.netProfit} emphasis />
-              </View>
+                {(report.expenses.tax ?? 0) > 0 && (
+                  <StatementLine
+                    label={t("report.tax")}
+                    amount={report.expenses.tax}
+                    negative
+                    explanation={EXPENSE_EXPLANATIONS.tax}
+                  />
+                )}
 
-              <Text style={styles.footnote}>
-                Employee wages are not charged by the simulation yet, so they do not appear above.
-              </Text>
+                <StatementLine label={t("report.netIncome")} amount={report.netProfit} emphasis />
+
+                {/* ============================================================
+                    NAKİT MUTABAKATI — "borç profitte gözükmüyor"
+                    ============================================================
+                    Oyuncu hakliydi ama sebebi bir hata degil, MUHASEBEDIR:
+
+                      FAIZ  bir giderdir  -> kari dusurur (yukarida duruyor)
+                      ANAPARA gider DEGIL -> kari dusurmez, ama NAKIT GOTURUR
+
+                    Anapara odemesi bir bilanco hareketidir: borcun azalir,
+                    kasan azalir, servetin degismez. O yuzden gelir
+                    tablosunda yeri yoktur.
+
+                    Ama oyuncunun ekranda gordugu kar ile kasasindaki dusus
+                    birbirini tutmuyordu ve arasindaki farkin nereye gittigi
+                    HICBIR YERDE yazmiyordu. Motor hep dogru hesapliyordu
+                    (bkz. useGameStore: newCompanyCapital = ... - principalRepaid),
+                    yalnizca gorunmuyordu.
+
+                    Bu blok tam o farki kapatiyor. Gercek CEO'larin "karliyim
+                    ama param yok" dedigi yer de burasidir.
+                   ============================================================ */}
+                {(report.principalRepaid ?? 0) > 0 && (
+                  <>
+                    <View style={styles.cashDivider} />
+                    <Text style={styles.cashHeader}>{t("report.cashReconciliation")}</Text>
+                    <StatementLine
+                      label={t("report.principalRepaid")}
+                      amount={report.principalRepaid ?? 0}
+                      negative
+                      explanation={
+                        'Not an expense — it does not touch your profit. It pays down what you owe, ' +
+                        'so your debt falls by the same amount. But it leaves the bank account all ' +
+                        'the same. This is why a profitable company can still run out of cash.'
+                      }
+                    />
+                    <StatementLine
+                      label={t("report.cashChange")}
+                      amount={report.netProfit - (report.principalRepaid ?? 0)}
+                      emphasis
+                      explanation={
+                        'Net income minus principal repaid. This is the number your company balance ' +
+                        'actually moved by this quarter.'
+                      }
+                    />
+                    {report.netProfit > 0 &&
+                      report.netProfit - (report.principalRepaid ?? 0) < 0 && (
+                        <Text style={styles.cashWarn}>
+                          ⚠️ {t('report.profitButLostCash')}
+                        </Text>
+                      )}
+                  </>
+                )}
+              </View>
             </CollapsibleSection>
 
             {/* ══ PAZAR ══ */}
             <CollapsibleSection
-              title="MARKET"
-              note="What the market wanted vs what you could supply"
-              info="Each product category has a fixed market size. Your share of it is decided by five things: price, marketing, quality, brand and how appealing the product itself is."
-              infoDetail="Producing more does NOT create demand. If you build more than the market wants, it becomes inventory. If you build less, customers go to a rival." 
+              title={t("report.market")}
+              note={t('company.whatTheMarketWantedVs')}
+              info={t('company.eachProductCategoryHasA')}
+              infoDetail={t('company.producingMoreDoesNotCreate')} 
               summary={
                 report.totalUnmetDemand > 0
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
@@ -506,17 +622,17 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
             >
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Market Wanted</Text>
+                  <Text style={styles.opsLabel}>{t("report.marketWanted")}</Text>
                   <Text style={styles.opsValue}>{formatNumber(report.totalMarketDemand)}</Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>You Supplied</Text>
+                  <Text style={styles.opsLabel}>{t("report.youSupplied")}</Text>
                   <Text style={[styles.opsValue, { color: '#4CAF50' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Lost to Rivals</Text>
+                  <Text style={styles.opsLabel}>{t("report.lostToRivals")}</Text>
                   <Text
                     style={[
                       styles.opsValue,
@@ -527,7 +643,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   </Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Brand Value</Text>
+                  <Text style={styles.opsLabel}>{t("report.brandValue")}</Text>
                   <Text style={[styles.opsValue, { color: '#FFD700' }]}>
                     {report.brandValue}
                     <Text
@@ -551,24 +667,24 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* ══ OPERASYON ══ */}
             <CollapsibleSection
-              title="OPERATIONS"
-              note="How much you built and how much of it moved"
-              info="Sell-through is the share of available goods (opening stock plus this quarter's production) that actually sold. Below 100% means you built more than you could sell."
-              infoDetail="Unsold units carry into next quarter and cost $5 each per quarter to store." 
+              title={t('company.operations')}
+              note={t('company.howMuchYouBuiltAnd')}
+              info={t('company.sellThroughIsTheShare')}
+              infoDetail={t('company.unsoldUnitsCarryIntoNext')} 
               summary={`${formatPercent(report.sellThrough)} sold`}
               summaryColor={report.sellThrough >= 60 ? '#4CAF50' : '#E57373'}
             >
               {/* Tesis durumu — kapasite kullanimi oyuncunun bakacagi tek sayi */}
               <View style={styles.facilityBar}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.opsLabel}>FACILITY</Text>
+                  <Text style={styles.opsLabel}>{t('company.facility')}</Text>
                   <Text style={styles.facilityName}>
                     {report.facilityName}
                     {report.isRetooling ? '  · retooling' : ''}
                   </Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={styles.opsLabel}>UTILIZATION</Text>
+                  <Text style={styles.opsLabel}>{t('company.utilization')}</Text>
                   <Text
                     style={[
                       styles.facilityUtil,
@@ -586,7 +702,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Headcount</Text>
+                  <Text style={styles.opsLabel}>{t('company.headcount')}</Text>
                   <Text style={[
                     styles.opsValue,
                     report.headcount < report.crewRequired && { color: '#FFB74D' },
@@ -596,20 +712,20 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 {report.hiresArrived > 0 && (
                   <View style={styles.opsCell}>
-                    <Text style={styles.opsLabel}>Started</Text>
+                    <Text style={styles.opsLabel}>{t('company.started')}</Text>
                     <Text style={styles.opsValue}>+{formatNumber(report.hiresArrived)}</Text>
                   </View>
                 )}
                 {report.attrition > 0 && (
                   <View style={styles.opsCell}>
-                    <Text style={styles.opsLabel}>Left</Text>
+                    <Text style={styles.opsLabel}>{t('company.left')}</Text>
                     <Text style={[styles.opsValue, { color: '#E57373' }]}>
                       −{formatNumber(report.attrition)}
                     </Text>
                   </View>
                 )}
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Morale</Text>
+                  <Text style={styles.opsLabel}>{t('company.morale')}</Text>
                   <Text style={[
                     styles.opsValue,
                     { color: report.employeeMorale < 50 ? '#EF5350' : report.employeeMorale < 70 ? '#FFB74D' : '#4CAF50' },
@@ -625,17 +741,17 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Produced</Text>
+                  <Text style={styles.opsLabel}>{t('company.produced')}</Text>
                   <Text style={styles.opsValue}>{formatNumber(report.unitsProduced)}</Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Sold</Text>
+                  <Text style={styles.opsLabel}>{t('company.sold')}</Text>
                   <Text style={[styles.opsValue, { color: '#4CAF50' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>Sell-through</Text>
+                  <Text style={styles.opsLabel}>{t('company.sellThrough')}</Text>
                   <Text
                     style={[
                       styles.opsValue,
@@ -646,7 +762,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   </Text>
                 </View>
                 <View style={styles.opsCell}>
-                  <Text style={styles.opsLabel}>In Stock</Text>
+                  <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
                   <Text style={[styles.opsValue, { color: '#FFB74D' }]}>
                     {formatNumber(report.endingInventory)}
                   </Text>
@@ -656,9 +772,9 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* ══ NE OLDU — varsayilan olarak ACIK, ozeti bu bolum ══ */}
             <CollapsibleSection
-              title="WHAT HAPPENED"
-              note="Plain-language read of this quarter"
-              info="Automatic observations about what actually happened. These are statements of fact, not advice — the point is to help you connect your decisions to their results." 
+              title={t('company.whatHappened')}
+              note={t('company.plainLanguageReadOfThis')}
+              info={t('company.automaticObservationsAboutWhatActually')} 
               summary={`${observations.length}`}
               summaryColor="#9E9E9E"
               defaultOpen
@@ -688,14 +804,14 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* ══ URUNLER — her urun kendi icinde katlanir ══ */}
             <CollapsibleSection
-              title="PRODUCTS"
-              note="Per-product demand, sales and margin"
-              info="Tap any product to expand it. Products in the same category compete for the same market, including against each other." 
+              title={t('company.products')}
+              note={t('company.perProductDemandSalesAnd')}
+              info={t('company.tapAnyProductToExpand')} 
               summary={`${report.products.length}`}
               summaryColor="#9E9E9E"
             >
               {report.products.length === 0 ? (
-                <Text style={styles.emptyText}>No active products this quarter.</Text>
+                <Text style={styles.emptyText}>{t('company.noActiveProductsThisQuarter')}</Text>
               ) : (
                 report.products.map(p => <ProductRow key={p.id} p={p} />)
               )}
@@ -703,26 +819,26 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
             {/* ══ BAKIYELER ══ */}
             <CollapsibleSection
-              title="BALANCES"
-              note="Where you stand at the end of the quarter"
-              info="Company Capital funds the business. Personal Cash is yours. Research Points buy product upgrades and unlock new technology."
-              infoDetail="The two money pools are separate on purpose — a rich company does not make you rich." 
+              title={t('company.balances')}
+              note={t('company.whereYouStandAtThe')}
+              info={t('company.companyCapitalFundsTheBusiness')}
+              infoDetail={t('company.theTwoMoneyPoolsAre')} 
               summary={formatMoney(report.endingCapital)}
               summaryColor="#FFFFFF"
             >
               <View style={styles.balanceRow}>
                 <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>Company Capital</Text>
+                  <Text style={styles.balanceLabel}>{t('company.companyCapital')}</Text>
                   <Text style={styles.balanceValue}>{formatMoney(report.endingCapital)}</Text>
                 </View>
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>Personal Cash</Text>
+                  <Text style={styles.balanceLabel}>{t('company.personalCash')}</Text>
                   <Text style={styles.balanceValue}>{formatMoney(report.endingCash)}</Text>
                 </View>
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>Research Points</Text>
+                  <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
                   <Text style={[styles.balanceValue, { color: '#BA68C8' }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
@@ -737,7 +853,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
               onPress={onClose}
             >
-              <Text style={styles.primaryButtonText}>Continue</Text>
+              <Text style={styles.primaryButtonText}>{t('company.continue')}</Text>
             </Pressable>
           </View>
 
@@ -849,6 +965,25 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
+  cashDivider: {
+    height: 1,
+    backgroundColor: '#2A2D35',
+    marginVertical: 12,
+  },
+  cashHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#8A9BA8',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  cashWarn: {
+    fontSize: 11,
+    color: '#ffdd57',
+    fontWeight: '600',
+    marginTop: 8,
+    lineHeight: 16,
+  },
   footnote: { color: '#5C5C5C', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
 
   opsDelta: { fontSize: 11, color: '#8A8A8A', fontWeight: '600' },

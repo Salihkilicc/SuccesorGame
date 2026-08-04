@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -35,6 +36,7 @@ const TravelBookingModal = ({
     onClose,
     onHomePress,
 }: TravelBookingModalProps) => {
+    useLocale();
     if (!spot) return null;
 
     const totalCost = useMemo(() => {
@@ -84,11 +86,11 @@ const TravelBookingModal = ({
                     <View style={[styles.header, { backgroundColor: spot.color }]}>
                         <View style={styles.headerContent}>
                             <View style={styles.headerTop}>
-                                <Text style={styles.airlineText}>AIR SUCCESOR</Text>
+                                <Text style={styles.airlineText}>{t('life.airSuccesor')}</Text>
                                 <Text style={styles.headerIcon}>✈️</Text>
                             </View>
                             <View style={styles.destRow}>
-                                <Text style={styles.destCode}>HUB</Text>
+                                <Text style={styles.destCode}>{t('life.hub')}</Text>
                                 <View style={styles.flightLine}>
                                     <View style={styles.dot} />
                                     <View style={styles.line} />
@@ -110,13 +112,13 @@ const TravelBookingModal = ({
                     </View>
 
                     <ScrollView style={styles.content}>
-                        <Text style={styles.sectionTitle}>SELECT CLASS</Text>
+                        <Text style={styles.sectionTitle}>{t('life.selectClass')}</Text>
 
                         {renderClassOption('ECONOMY', 'Economy Class', 'Standard seating. Possible delays.', 'x1')}
                         {renderClassOption('BUSINESS', 'Business Class', 'Comfortable. Safe & On time.', 'x2')}
                         {renderClassOption('PRIVATE', 'Private Jet', 'Luxury. Max Enjoyment.', 'x5')}
 
-                        <Text style={styles.sectionTitle}>COMPANION</Text>
+                        <Text style={styles.sectionTitle}>{t('life.companion')}</Text>
                         <Pressable
                             style={[
                                 styles.partnerToggle,
@@ -143,19 +145,19 @@ const TravelBookingModal = ({
                     {/* Footer */}
                     <View style={styles.footer}>
                         <View>
-                            <Text style={styles.totalLabel}>TOTAL FARE</Text>
+                            <Text style={styles.totalLabel}>{t('life.totalFare')}</Text>
                             <Text style={styles.totalCost}>${totalCost.toLocaleString()}</Text>
                         </View>
                         <Pressable
                             style={[styles.bookButton, { backgroundColor: spot.color }]}
                             onPress={onConfirm}
                         >
-                            <Text style={styles.bookButtonText}>BOARD NOW</Text>
+                            <Text style={styles.bookButtonText}>{t('life.boardNow')}</Text>
                         </Pressable>
                     </View>
 
                     <Pressable style={styles.closeButton} onPress={onClose}>
-                        <Text style={styles.closeText}>CANCEL FLIGHT</Text>
+                        <Text style={styles.closeText}>{t('life.cancelFlight')}</Text>
                     </Pressable>
                 </View>
                 {/* Universal Crystal Navigation Bar */}

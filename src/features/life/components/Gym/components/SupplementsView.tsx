@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../../../../core/theme';
 
@@ -7,15 +8,16 @@ type SupplementsViewProps = {
 };
 
 const SupplementsView = ({ onBack }: SupplementsViewProps) => {
+    useLocale();
     return (
         <View style={styles.subViewContainer}>
-            <Text style={styles.subTitle}>LOCKER ROOM</Text>
-            <Text style={styles.subSubtitle}>Supplements & Boosters</Text>
+            <Text style={styles.subTitle}>{t('life.lockerRoom2')}</Text>
+            <Text style={styles.subSubtitle}>{t('life.supplementsBoosters')}</Text>
             <View style={styles.list}>
                 {[
-                    { name: 'Protein Shake', effect: '+5% Muscle Gains', icon: '🥛' },
-                    { name: 'Creatine', effect: '+10% Strength', icon: '💊' },
-                    { name: 'Pre-Workout', effect: '+15% Energy', icon: '⚡' },
+                    { name: t('life.proteinShake'), effect: '+5% Muscle Gains', icon: '🥛' },
+                    { name: t('life.creatine'), effect: '+10% Strength', icon: '💊' },
+                    { name: t('life.preWorkout'), effect: '+15% Energy', icon: '⚡' },
                 ].map(item => (
                     <TouchableOpacity key={item.name} style={styles.supplementCard} activeOpacity={0.7}>
                         <Text style={styles.supplementIcon}>{item.icon}</Text>

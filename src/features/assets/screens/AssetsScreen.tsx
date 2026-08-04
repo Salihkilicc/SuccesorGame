@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, StyleSheet, Pressable, Text, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +15,7 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 const AssetsScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const { cash, netWorth, report } = useAssetsLogic();
 
@@ -45,8 +47,8 @@ const AssetsScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.sideNode}>{backButton}</View>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.headerTitle}>ASSETS</Text>
-                        <Text style={styles.headerSubtitle}>Wealth Management</Text>
+                        <Text style={styles.headerTitle}>{t('company.assets')}</Text>
+                        <Text style={styles.headerSubtitle}>{t('company.wealthManagement')}</Text>
                     </View>
                     <View style={styles.sideNode} />
                 </View>
@@ -55,24 +57,24 @@ const AssetsScreen = () => {
                     {/* QUARTERLY FINANCIAL OVERVIEW */}
                     <View style={styles.glassCard}>
                         <View style={styles.cardHeader}>
-                            <Text style={styles.sectionTitle}>Quarterly Report</Text>
+                            <Text style={styles.sectionTitle}>{t('company.quarterlyReport2')}</Text>
                             <MaterialCommunityIcons name="finance" size={20} color="#888888" />
                         </View>
 
                         <View style={styles.summaryRow}>
                             <View style={styles.summaryCol}>
-                                <SummaryRow label="Net Worth" value={formatMoney(netWorth)} />
-                                <SummaryRow label="Cash" value={formatMoney(cash)} marginTop />
+                                <SummaryRow label={t('company.netWorth')} value={formatMoney(netWorth)} />
+                                <SummaryRow label={t('company.cash')} value={formatMoney(cash)} marginTop />
                             </View>
 
                             <View style={styles.summaryCol}>
                                 <SummaryRow
-                                    label="Income (Q)"
+                                    label={t('company.incomeQ')}
                                     value={formatMoney(report.totalIncome)}
                                     valueColor={theme.colors.success}
                                 />
                                 <SummaryRow
-                                    label="Expenses (Q)"
+                                    label={t('company.expensesQ')}
                                     value={formatMoney(report.totalExpenses)}
                                     valueColor={theme.colors.danger}
                                     marginTop
@@ -81,7 +83,7 @@ const AssetsScreen = () => {
                         </View>
 
                         <View style={styles.netFlowContainer}>
-                            <Text style={styles.netFlowLabel}>Net Flow</Text>
+                            <Text style={styles.netFlowLabel}>{t('company.netFlow')}</Text>
                             <Text style={[styles.netFlowValue, { color: report.netFlow >= 0 ? theme.colors.success : theme.colors.danger }]}>
                                 {report.netFlow >= 0 ? '+' : ''}{formatMoney(report.netFlow)}
                             </Text>
@@ -90,9 +92,9 @@ const AssetsScreen = () => {
                         {/* DETAIL BREAKDOWN */}
                         <View style={styles.divider} />
 
-                        <BreakdownSection title="Current Assets" items={report.assetsBreakdown} />
-                        <BreakdownSection title="Income Sources" items={report.incomeBreakdown} isIncome />
-                        <BreakdownSection title="Quarterly Expenses" items={report.expenseBreakdown} />
+                        <BreakdownSection title={t('company.currentAssets')} items={report.assetsBreakdown} />
+                        <BreakdownSection title={t('company.incomeSources')} items={report.incomeBreakdown} isIncome />
+                        <BreakdownSection title={t('company.quarterlyExpenses')} items={report.expenseBreakdown} />
                     </View>
                 </ScrollView>
 

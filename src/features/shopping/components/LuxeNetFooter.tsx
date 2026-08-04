@@ -1,4 +1,5 @@
 import React from 'react';
+import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../../core/theme';
 
@@ -7,6 +8,7 @@ interface LuxeNetFooterProps {
 }
 
 const LuxeNetFooter: React.FC<LuxeNetFooterProps> = ({ style }) => {
+    useLocale();
     return (
         <View style={[styles.container, style]}>
             {/* Divider Line */}
@@ -17,11 +19,11 @@ const LuxeNetFooter: React.FC<LuxeNetFooterProps> = ({ style }) => {
 
             {/* Links Row */}
             <View style={styles.linksRow}>
-                <Pressable><Text style={styles.linkText}>Privacy Policy</Text></Pressable>
+                <Pressable><Text style={styles.linkText}>{t('ui.privacyPolicy')}</Text></Pressable>
                 <Text style={styles.separator}>|</Text>
-                <Pressable><Text style={styles.linkText}>Terms of Service</Text></Pressable>
+                <Pressable><Text style={styles.linkText}>{t('ui.termsOfService')}</Text></Pressable>
                 <Text style={styles.separator}>|</Text>
-                <Pressable><Text style={styles.linkText}>Careers</Text></Pressable>
+                <Pressable><Text style={styles.linkText}>{t('ui.careers')}</Text></Pressable>
             </View>
 
             {/* Copyright */}

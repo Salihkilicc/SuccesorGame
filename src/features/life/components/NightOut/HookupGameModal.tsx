@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { t, useLocale } from '../../../../core/i18n';
 import {
     Modal,
     View,
@@ -35,6 +36,7 @@ const HookupGameModal = ({
     onSuccess,
     onFail,
 }: HookupGameModalProps) => {
+    useLocale();
     const [selectedStrategy, setSelectedStrategy] = useState<HookupStrategy | null>(null);
     const [showResult, setShowResult] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
@@ -107,7 +109,7 @@ const HookupGameModal = ({
                     <ClueSection text={scenario.clue} />
 
                     <View style={styles.choicesSection}>
-                        <Text style={styles.choicesLabel}>YOUR MOVE</Text>
+                        <Text style={styles.choicesLabel}>{t('life.yourMove')}</Text>
                         {shuffledOptions.map((option, index) => (
                             <OptionButton
                                 key={index}
@@ -142,7 +144,7 @@ const PartnerHeader = ({ partner }: { partner: Partner }) => (
 
 const ClueSection = ({ text }: { text: string }) => (
     <View style={styles.clueSection}>
-        <Text style={styles.clueLabel}>THE SITUATION</Text>
+        <Text style={styles.clueLabel}>{t('life.theSituation')}</Text>
         <View style={styles.clueBox}>
             <Text style={styles.clueText}>{text}</Text>
         </View>
