@@ -1900,4 +1900,5 @@ export const en: Record<string, string> = {
     'finance.needMoreCash': 'Need {v1} more',
     'finance.loanRepaid': 'Loan repaid',
     'finance.cannotRepay': 'Could not repay',
+    'board.openMember': '🎁 Gift · Dinner · Buy',
 };

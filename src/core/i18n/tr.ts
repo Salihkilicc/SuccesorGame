@@ -1901,4 +1901,5 @@ export const tr: Record<string, string> = {
     'finance.needMoreCash': '{v1} daha lazım',
     'finance.loanRepaid': 'Kredi kapandı',
     'finance.cannotRepay': 'Ödenemedi',
+    'board.openMember': '🎁 Hediye · Yemek · Al',
 };

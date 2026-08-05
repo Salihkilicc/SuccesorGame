@@ -266,17 +266,33 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                                 </Text>
                                             ))}
 
-                                            <Pressable
-                                                style={[styles.lobbyBtn, alreadyLobbied && styles.lobbyBtnDone]}
-                                                disabled={alreadyLobbied}
-                                                onPress={() => handleLobby(m.id, m.name)}
-                                            >
-                                                <Text style={styles.lobbyText}>
-                                                    {alreadyLobbied
-                                                        ? t('board.spokenAlready')
-                                                        : t('board.speakPrivately')}
-                                                </Text>
-                                            </Pressable>
+                                            {/* Two different conversations, so two
+                                                buttons. Tapping the name alone was
+                                                too easy to miss - the player pressed
+                                                "speak privately" expecting the
+                                                director's screen and got the lobby
+                                                flow instead. */}
+                                            <View style={styles.actionRow}>
+                                                <Pressable
+                                                    style={[styles.lobbyBtn, alreadyLobbied && styles.lobbyBtnDone]}
+                                                    disabled={alreadyLobbied}
+                                                    onPress={() => handleLobby(m.id, m.name)}
+                                                >
+                                                    <Text style={styles.lobbyText}>
+                                                        {alreadyLobbied
+                                                            ? t('board.spokenAlready')
+                                                            : t('board.speakPrivately')}
+                                                    </Text>
+                                                </Pressable>
+                                                <Pressable
+                                                    style={styles.openMemberBtn}
+                                                    onPress={() => setOpenMemberId(m.id)}
+                                                >
+                                                    <Text style={styles.openMemberText}>
+                                                        {t('board.openMember')}
+                                                    </Text>
+                                                </Pressable>
+                                            </View>
                                         </View>
                                     );
                                 })}
@@ -390,7 +406,10 @@ const styles = StyleSheet.create({
     trustBarBg: { height: 5, backgroundColor: '#1C1C1E', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
     promiseNote: { fontSize: 11, color: '#FFD700', marginTop: 8 },
-    lobbyBtn: { marginTop: 10, padding: 10, borderRadius: 8, backgroundColor: '#1C1C1E', alignItems: 'center' },
+    actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#2A2416', borderWidth: 1, borderColor: '#FFB020' },
+    openMemberText: { color: '#FFB020', fontSize: 12, fontWeight: '700' },
+    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#1C1C1E', alignItems: 'center' },
     lobbyBtnDone: { opacity: 0.4 },
     lobbyText: { fontSize: 12, color: '#FFD700', fontWeight: '700' },
 

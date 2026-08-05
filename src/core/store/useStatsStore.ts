@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { BRAND_INDEX_SCALE } from '../market/brand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProductStore } from './useProductStore';
@@ -309,7 +310,9 @@ export const initialStatsState: StatsState = {
   //
   //  Bilinmeyen bir kurucunun sirketisin: 8 ile basliyorsun.
   // ------------------------------------------------------------------
-  brandValue: 8,
+  // Brand is measured in POINTS now (share x 43.3), not on a 0-100 scale.
+  // 35 points is roughly 0.8% share - a small company that exists.
+  brandValue: 35,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,
 
@@ -930,6 +933,26 @@ export const useStatsStore = create<StatsStore>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // --------------------------------------------------------------
+          //  BRAND SCALE MIGRATION — 0-100 index -> points
+          // --------------------------------------------------------------
+          //  brandValue used to be a 0-100 index. It now holds points
+          //  (market share x 43.3), where 433 points = 10% share. Without
+          //  this conversion an existing save keeps its old number and the
+          //  game reads it as points, so a brand of 15 collapses to the
+          //  equivalent of 3.5 on the old scale - the player opens the game
+          //  and their reputation has silently fallen by 4.33x.
+          //
+          //  Detected by the absence of brandByCategory, which only exists
+          //  in the points era. The per-category map is seeded from the
+          //  converted figure so the category screens are not blank until
+          //  the first quarter closes.
+          // --------------------------------------------------------------
+          if (!state.brandByCategory || Object.keys(state.brandByCategory).length === 0) {
+            const asPoints = Math.round((state.brandValue ?? 8) * BRAND_INDEX_SCALE);
+            state.brandValue = asPoints;
+            state.brandByCategory = { Consumer: asPoints };
+          }
           // TASIMA: tesis kademesi eklenmeden onceki kayitlarda bu alanlar
           // yok. `undefined` kalirsa kapasite hesabi NaN uretir ve uretim
           // sessizce sifirlanir — bu yuzden burada dolduruluyor.
