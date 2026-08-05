@@ -6,6 +6,7 @@ import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
+import { brandIndex, BRAND_INDEX_SCALE } from '../../../core/market/brand';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
@@ -258,7 +259,21 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const employeeCount = totalCapacity || 0;
     // KATEGORI markasi — motor bunu kullaniyor (catBrand). Kurumsal marka
     // yalnizca yeni bir kategoriye girerken baslangic degeri verir.
-    const brandValue = useStatsStore(state => state.brandValue);
+    // ----------------------------------------------------------------------
+    //  POINTS vs INDEX — the scale change left this screen lying again
+    // ----------------------------------------------------------------------
+    //  stats.brandValue holds BRAND POINTS now (share x 43.3, so 160 is an
+    //  ordinary mid-game figure). This screen was handing those points
+    //  straight to computeAttraction and availablePartners, both of which
+    //  were written against a 0-100 brand:
+    //    - brandFactor clamps at 100, so every projection ran at maximum brand
+    //    - every contract partner unlocked at once (their gates are 0/25/60)
+    //
+    //  `brandPoints` is what the player sees; `brandValue` is what the engine
+    //  is given.
+    // ----------------------------------------------------------------------
+    const brandPoints = useStatsStore(state => state.brandValue);
+    const brandValue = brandIndex(brandPoints);
 
     // Kapasite artik tesis kademesinden gelir (core/market/capacity.ts).
     const facilityTier = useStatsStore(state => state.facilityTier);
@@ -776,7 +791,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                             {CONTRACT_PARTNERS.filter(pt => brandValue < pt.minBrand).map(pt => (
                                 <Text key={pt.id} style={styles.partnerLocked}>
-                                    🔒 {pt.name} — needs brand {pt.minBrand} (you have {Math.round(brandValue)})
+                                    🔒 {pt.name} — needs brand {Math.round(pt.minBrand * BRAND_INDEX_SCALE)} (you have {Math.round(brandPoints)})
                                 </Text>
                             ))}
 

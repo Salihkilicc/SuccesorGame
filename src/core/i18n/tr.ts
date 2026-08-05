@@ -1902,4 +1902,7 @@ export const tr: Record<string, string> = {
     'finance.loanRepaid': 'Kredi kapandı',
     'finance.cannotRepay': 'Ödenemedi',
     'board.openMember': '🎁 Hediye · Yemek · Al',
+    'mem.relPlus': 'İlişki +{v1}',
+    'mem.relMinus': 'İlişki −{v1}',
+    'mem.relNone': 'Ona etkisi yok',
 };

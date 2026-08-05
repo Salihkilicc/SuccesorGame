@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
+import { giftEffect } from '../../../core/market/governance';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
@@ -47,6 +48,31 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     }
 
     const memberPercent = totalShares > 0 ? (member.shareCount / totalShares) * 100 : 0;
+
+    // ----------------------------------------------------------------------
+    //  SHOW WHAT THIS GESTURE WILL ACTUALLY DO, FOR THIS PERSON
+    // ----------------------------------------------------------------------
+    //  The buttons carried fixed labels reading "+5 Trust" and "+15 Trust".
+    //  Both were wrong twice over: gestures move RELATIONSHIP, not trust, and
+    //  the amount depends entirely on who you are dealing with - dinner is +18
+    //  for Elena and +5 for Marcus, and a cash gift is -5 for Elena. A player
+    //  who took Marcus to dinner expecting +18 reasonably concluded it was
+    //  broken.
+    //
+    //  The preview runs the same function the action does, so the label cannot
+    //  drift from the behaviour.
+    // ----------------------------------------------------------------------
+    const govSelf = {
+        id: member.id, name: member.name, trait: member.trait as any,
+        trust: member.trust, shareCount: member.shareCount,
+        relationship: member.relationship ?? 50, motivation: member.motivation,
+    };
+    const giftPreview = giftEffect(govSelf, 'money', 1, member.gestureCount ?? 0);
+    const dinnerPreview = giftEffect(govSelf, 'legacy', 1, member.gestureCount ?? 0);
+    const fmtDelta = (d: number) =>
+        d > 0 ? t('mem.relPlus', { v1: String(d) })
+              : d < 0 ? t('mem.relMinus', { v1: String(Math.abs(d)) })
+              : t('mem.relNone');
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
@@ -338,7 +364,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🎁</Text>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
-                                <Text style={styles.actionEffect}>{t('equity.trust5')}</Text>
+                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#4ADE80' : '#FF6B6B' }]}>
+                                    {fmtDelta(giftPreview)}
+                                </Text>
                             </Pressable>
 
                             {/* Private Dinner */}
@@ -352,7 +380,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🍽️</Text>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
-                                <Text style={styles.actionEffect}>{t('equity.trust15')}</Text>
+                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#4ADE80' : '#FF6B6B' }]}>
+                                    {fmtDelta(dinnerPreview)}
+                                </Text>
                             </Pressable>
 
                             {/* Blackmail */}

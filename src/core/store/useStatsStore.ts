@@ -311,8 +311,9 @@ export const initialStatsState: StatsState = {
   //  Bilinmeyen bir kurucunun sirketisin: 8 ile basliyorsun.
   // ------------------------------------------------------------------
   // Brand is measured in POINTS now (share x 43.3), not on a 0-100 scale.
-  // 35 points is roughly 0.8% share - a small company that exists.
-  brandValue: 35,
+  // 26 points is 0.6% share - the player's own anchor for "a small company
+  // that has just started selling".
+  brandValue: 26,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,
 

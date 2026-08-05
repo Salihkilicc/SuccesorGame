@@ -246,8 +246,8 @@ const MyCompanyScreen = () => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
               <StatColumn
                 label={t('company.brandValue')}
-                value={`${(stats.brandValue ?? 0).toFixed(1)}/100`}
-                colorType={stats.brandValue >= 40 ? 'success' : 'default'}
+                value={`${Math.round(stats.brandValue ?? 0)}`}
+                colorType={(stats.brandValue ?? 0) >= 200 ? 'success' : 'default'}
               />
               <VerticalDivider />
               <StatColumn label={t('company.employees')} value={formatCompactNumber(stats.employeeCount)} />

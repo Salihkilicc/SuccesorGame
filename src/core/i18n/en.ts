@@ -1901,4 +1901,7 @@ export const en: Record<string, string> = {
     'finance.loanRepaid': 'Loan repaid',
     'finance.cannotRepay': 'Could not repay',
     'board.openMember': '🎁 Gift · Dinner · Buy',
+    'mem.relPlus': 'Relationship +{v1}',
+    'mem.relMinus': 'Relationship −{v1}',
+    'mem.relNone': 'No effect on them',
 };
