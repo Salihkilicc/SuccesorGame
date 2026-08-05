@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
+import MemberInteractionModal from './MemberInteractionModal';
 import { useStatsStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
@@ -63,6 +64,17 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 
     const companyValue = useStatsStore(s => s.companyValue);
     const [tab, setTab] = useState<'board' | 'log'>('board');
+    // ------------------------------------------------------------------
+    //  THE MEMBER SCREEN WAS UNREACHABLE
+    // ------------------------------------------------------------------
+    //  MemberInteractionModal - gifts, private dinners, buyout offers - was
+    //  referenced from NOWHERE in the app. The gesture system behind it was
+    //  written and wired to the store, and the player still could not open
+    //  it. Same class of bug as per-category brand: built, never surfaced.
+    //
+    //  Tapping a director now opens it.
+    // ------------------------------------------------------------------
+    const [openMemberId, setOpenMemberId] = useState<string | null>(null);
 
     const ownership = getPlayerOwnershipPercent();
     const hasControl = ownership >= CONTROL_THRESHOLD;
@@ -219,17 +231,25 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 
                                     return (
                                         <View key={m.id} style={styles.memberCard}>
-                                            <View style={styles.memberTop}>
-                                                <View style={{ flex: 1 }}>
-                                                    <Text style={styles.memberName}>{m.name}</Text>
-                                                    <Text style={styles.memberTrait}>
-                                                        {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
-                                                    </Text>
+                                            <Pressable onPress={() => setOpenMemberId(m.id)}>
+                                                <View style={styles.memberTop}>
+                                                    <View style={{ flex: 1 }}>
+                                                        <Text style={styles.memberName}>{m.name} ›</Text>
+                                                        <Text style={styles.memberTrait}>
+                                                            {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
+                                                        </Text>
+                                                    </View>
+                                                    <View style={{ alignItems: 'flex-end' }}>
+                                                        <Text style={[styles.memberTrust, { color: trustColor }]}>
+                                                            {m.trust}
+                                                        </Text>
+                                                        {/* Trust and relationship are different things - show both. */}
+                                                        <Text style={styles.memberRel}>
+                                                            {t('board.relShort', { v1: String(Math.round(m.relationship ?? 50)) })}
+                                                        </Text>
+                                                    </View>
                                                 </View>
-                                                <Text style={[styles.memberTrust, { color: trustColor }]}>
-                                                    {m.trust}
-                                                </Text>
-                                            </View>
+                                            </Pressable>
 
                                             <View style={styles.trustBarBg}>
                                                 <View
@@ -310,6 +330,13 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                     </ScrollView>
                 </View>
             </View>
+
+            {/* Director detail — gifts, dinners, buyout */}
+            <MemberInteractionModal
+                visible={!!openMemberId}
+                memberId={openMemberId || ''}
+                onClose={() => setOpenMemberId(null)}
+            />
         </Modal>
     );
 };
@@ -358,6 +385,7 @@ const styles = StyleSheet.create({
     memberTop: { flexDirection: 'row', alignItems: 'center' },
     memberName: { fontSize: 15, color: '#FFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: '#8A9BA8', marginTop: 2 },
+    memberRel: { fontSize: 9, color: '#7FB3FF', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
     trustBarBg: { height: 5, backgroundColor: '#1C1C1E', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },

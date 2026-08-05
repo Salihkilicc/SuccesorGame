@@ -116,9 +116,24 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         );
     };
 
+    // ----------------------------------------------------------------------
+    //  `member.shares` NEVER EXISTED
+    // ----------------------------------------------------------------------
+    //  BoardMember carries `shareCount` (an absolute count out of totalShares).
+    //  This screen read `member.shares` as a percentage in six places, so
+    //  every buyout figure on it was NaN. Nobody caught it because the screen
+    //  was unreachable - it is only being fixed now that tapping a director
+    //  actually opens it.
+    // ----------------------------------------------------------------------
+    const totalShares = useShareholderStore(st => st.totalShares);
+    const memberPercent = totalShares > 0 ? (member.shareCount / totalShares) * 100 : 0;
+    const playerPercent = useShareholderStore(st =>
+        st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
+    );
+
     // Buyout Logic
     const calculateOfferPrice = () => {
-        const basePrice = companySharePrice * (member.shares / 100) * 1_000_000; // Assuming 1M total shares
+        const basePrice = companySharePrice * member.shareCount;
         const premiumMultiplier = 1 + offerPremium / 100;
         return basePrice * premiumMultiplier;
     };
@@ -178,8 +193,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 `${member.name} has accepted your offer!\n\n` +
                 t('mem.offerAcceptedBody', {
                     v1: formatMoney(offerPrice),
-                    v2: member.shares.toFixed(1),
-                    v3: (member.shares + 65).toFixed(1),
+                    v2: memberPercent.toFixed(1),
+                    v3: (memberPercent + playerPercent).toFixed(1),
                 }),
                 [
                     { text: t('equity.cancel'), style: 'cancel' },
@@ -188,8 +203,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         onPress: () => {
                             // TODO: Implement actual share transfer
                             updateStats({ money: money - offerPrice });
-                            Alert.alert(t('mem.purchaseComplete'), t('mem.purchaseCompleteBody', { v1: member.shares.toFixed(1) }));
-                            console.log(`[Buyout] Purchased ${member.shares}% from ${member.name} for $${offerPrice}`);
+                            Alert.alert(t('mem.purchaseComplete'), t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }));
+                            console.log(`[Buyout] Purchased ${memberPercent.toFixed(1)}% from ${member.name} for $${offerPrice}`);
                             onClose();
                         },
                     },
@@ -229,7 +244,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 <View style={styles.statsRow}>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.shares')}</Text>
-                        <Text style={styles.statValue}>{member.shares.toFixed(1)}%</Text>
+                        <Text style={styles.statValue}>{memberPercent.toFixed(1)}%</Text>
                     </View>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.trust')}</Text>

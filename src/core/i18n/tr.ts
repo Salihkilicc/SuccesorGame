@@ -1876,4 +1876,5 @@ export const tr: Record<string, string> = {
     'brand.thisCategory': 'Bu pazardaki marka',
     'brand.corporateShort': 'şirket {v1}',
     'brand.perCategory': 'Pazarlara göre marka',
+    'board.relShort': 'ilişki {v1}',
 };

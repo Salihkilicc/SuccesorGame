@@ -1875,4 +1875,5 @@ export const en: Record<string, string> = {
     'brand.thisCategory': 'Brand here',
     'brand.corporateShort': 'company {v1}',
     'brand.perCategory': 'Brand by market',
+    'board.relShort': 'rel {v1}',
 };
