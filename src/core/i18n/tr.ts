@@ -1870,4 +1870,6 @@ export const tr: Record<string, string> = {
     'product.cannotBuildRetooling': 'Bu çeyrek üretemezsin — tesis yenileniyor. Talep var, kapasite yok.',
     'product.cannotBuildNoCrew': 'Bu çeyrek üretemezsin — hatta çalışan yok. Bu talebi kullanmak için personel al.',
     'product.matchDemandCapped': 'Kapasiteye kadar üret — {units} (talep üretebileceğinden fazla)',
+    'product.qualityQueued': '{v2} seviyenin sadece {v1} kadarı üretiliyor — {v3} daha yukarısını kaldırmıyor. Gerisi sırada bekliyor, tesisi büyütünce devreye girer.',
+    'product.acqCapacityLocked': '{v1} adetlik talebin var ama {v2} üretebiliyorsun. Satın aldığın pay, kapasite büyüdükçe açılır.',
 };

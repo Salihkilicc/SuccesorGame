@@ -8,7 +8,7 @@ import { FEATURES } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
-import { advanceBrand, brandFromAcquisition, brandStabilityFactor, corporateBrand, categoryStartingBrand } from '../market/brand';
+import { advanceBrand, brandFromAcquisition, brandStabilityFactor } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import { updateReachIndex } from '../market/attraction';
 import {
@@ -410,13 +410,18 @@ export const useGameStore = create<GameStore>()(
           byCategory.get(key)!.push(p);
         });
 
-        // KATEGORI MARKALARI: her pazarin kendi itibari var. Yeni bir
-        // kategoriye girerken kurumsal markanin bir kismi taban sayilir.
-        const brandMap: Record<string, number> = {
-          ...(useStatsStore.getState().brandByCategory || {}),
-        };
-        const catBrand = (cat: string): number =>
-          brandMap[cat] ?? categoryStartingBrand(brandValue);
+        // ------------------------------------------------------------------
+        //  ONE BRAND, NOT ONE PER CATEGORY
+        // ------------------------------------------------------------------
+        //  Per-category brand was built in the engine and NEVER SURFACED in
+        //  the UI - MyCompanyScreen and the market panel both only ever showed
+        //  the corporate roll-up. So the player saw a single brand number,
+        //  half a feature, and no way to tell the categories apart.
+        //
+        //  Decision: go back to one brand. Simpler to read, and the loop that
+        //  matters is preserved - realised market share feeds the brand
+        //  (brandFromMarketShare), so a bigger share still earns more brand.
+        // ------------------------------------------------------------------
 
         byCategory.forEach((group, category) => {
           const market = getMarket(category);
@@ -472,7 +477,7 @@ export const useGameStore = create<GameStore>()(
                 })(),
                 // KENDI kategorisinin markasi. Saglikta kazandigin itibar
                 // teknolojide isine yaramaz.
-                brandValue: catBrand(category),
+                brandValue,
                 marketDemand: p.marketDemand ?? 50,
               },
               market,
@@ -1101,77 +1106,28 @@ export const useGameStore = create<GameStore>()(
         const totalPlayerShare = Object.keys(soldByCategory)
           .reduce((sum, c) => sum + realizedShareOf(c), 0);
 
-        // ------------------------------------------------------------------
-        //  HER KATEGORININ MARKASI AYRI ILERLER
-        // ------------------------------------------------------------------
-        //  Devralma katkisi, satin alinan sirketin KENDI kategorisine
-        //  yazilir — teknoloji sirketi almak saglik markani buyutmez.
-        // ------------------------------------------------------------------
-        const acquisitionGainByCategory: Record<string, number> = {};
-        {
+        // Acquisition brand gain across every category this quarter.
+        const acquisitionGainTotal = (() => {
           const subs = useCorporateFinanceStore.getState().subsidiaries;
-          subs
-            .filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1)
-            .forEach(x => {
-              const cat = (x as any).category || (x as any).sector || 'Consumer';
-              acquisitionGainByCategory[cat] =
-                (acquisitionGainByCategory[cat] || 0) +
-                brandFromAcquisition(
-                  x.deal?.fairValue || x.valuation || 0,
-                  stats.companyValue || 1,
-                  !!x.deal?.hostile,
-                  catBrand(cat),
-                );
-            });
-        }
-
-        const nextBrandByCategory: Record<string, number> = { ...brandMap };
-        const categoriesTouched = new Set<string>([
-          ...Object.keys(soldByCategory),
-          ...Object.keys(acquisitionGainByCategory),
-          ...Object.keys(brandMap),
-        ]);
-
-        categoriesTouched.forEach(cat => {
-          const start = catBrand(cat);
-          const r = advanceBrand({
-            currentBrand: start,
-            // Pazarlamanin marka etkisi kategoriye pay oraninda dagilir.
-            marketingDelta:
-              (marketingBrand.newBrand - brandValue) *
-              (totalPlayerShare > 0 ? realizedShareOf(cat) / totalPlayerShare : 1),
-            totalMarketShare: realizedShareOf(cat),
-            profitable: netProfit > 0,
-            acquisitionGain: acquisitionGainByCategory[cat] || 0,
-            ceiling: tier.brandCeiling,
-            floor: tier.brandFloor,
-          });
-          nextBrandByCategory[cat] = r.newBrand;
-        });
-
-        // KURUMSAL MARKA: kategori markalarinin ciro agirlikli ortalamasi.
-        // Kategoriye bagli olmayan her sey bunu okur.
-        const corporate = corporateBrand(nextBrandByCategory, revenueByCategory);
+          const fresh = subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1);
+          return fresh.reduce(
+            (sum, x) => sum + brandFromAcquisition(
+              x.deal?.fairValue || x.valuation || 0,
+              stats.companyValue || 1,
+              !!x.deal?.hostile,
+              brandValue,
+            ),
+            0,
+          );
+        })();
 
         const brandResult = advanceBrand({
           currentBrand: brandValue,
-          marketingDelta: 0,
+          // Marketing and quality effect, straight from attraction.ts.
+          marketingDelta: marketingBrand.newBrand - brandValue,
           totalMarketShare: totalPlayerShare,
           profitable: netProfit > 0,
-          // Bu ceyrek kapanan devralmalarin marka katkisi
-          acquisitionGain: (() => {
-            const subs = useCorporateFinanceStore.getState().subsidiaries;
-            const fresh = subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1);
-            return fresh.reduce(
-              (sum, x) => sum + brandFromAcquisition(
-                x.deal?.fairValue || x.valuation || 0,
-                stats.companyValue || 1,
-                !!x.deal?.hostile,
-                brandValue,
-              ),
-              0,
-            );
-          })(),
+          acquisitionGain: acquisitionGainTotal,
           ceiling: tier.brandCeiling,
           floor: tier.brandFloor,
         });
@@ -1222,10 +1178,7 @@ export const useGameStore = create<GameStore>()(
         const nextTenure = blendTenure(avgTenure, headcount, arrivedHires, Math.max(1, quarters));
 
         useStatsStore.getState().update({
-          // Genel marka artik TUREV: kategori markalarinin ciro agirlikli
-          // ortalamasi. advanceBrand yalnizca rapor kalemleri icin cagrildi.
-          brandValue: corporate,
-          brandByCategory: nextBrandByCategory,
+          brandValue: brandResult.newBrand,
           employeeCount: headcount,
           incomingHires: queuedHires,
           facilityTier: nextTierLevel,
@@ -1466,7 +1419,7 @@ export const useGameStore = create<GameStore>()(
           ttmEbit: earningsPower,
           debt: stats.companyDebtTotal || 0,
           isPublic: isPublicNow,
-          brandValue: corporate,
+          brandValue: brandResult.newBrand,
           // Pay carpani: kazanc kalitesi. Bkz. core/market/equity.ts
           marketShare: totalPlayerShare,
         }).total;
@@ -1496,7 +1449,7 @@ export const useGameStore = create<GameStore>()(
         // MARKA ISTIKRAR SAGLAR: guclu markali sirketin hissesi daha az
         // oynar, cunku yatirimci kotu ceyregi "gecici" diye okur. Finansta
         // "kalite primi" denir. leverageVol ile ters yonde calisir.
-        const brandStability = brandStabilityFactor(corporate);
+        const brandStability = brandStabilityFactor(brandResult.newBrand);
         const marketCap = valuation / (leverageVol * brandStability);
         let newSharePrice = smoothPrice(prevPrice, fairPrice, isPublicNow, marketCap);
         if (isPublicNow) newSharePrice = applySentiment(newSharePrice, Math.random(), marketCap);

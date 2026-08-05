@@ -160,6 +160,19 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const displayName = product.name;
 
     const processLevel = product.processLevel || 1;
+    // ----------------------------------------------------------------------
+    //  OWNED QUALITY vs EFFECTIVE QUALITY
+    // ----------------------------------------------------------------------
+    //  The engine has always clamped quality to the facility ceiling
+    //  (Math.min(qualityLevel, tier.qualityCeiling)) - this screen did not.
+    //  With a tier-4 plant (ceiling 3) and a level-5 product the screen
+    //  projected 0.810% share while the engine delivered 0.609%. The player
+    //  bought upgrades that did nothing and the screen never said so.
+    //
+    //  `qualityLevel` is what you OWN; `effectiveQuality` is what the plant
+    //  can actually build. Anything above the ceiling is QUEUED - it is not
+    //  lost, it activates the moment the facility catches up.
+    // ----------------------------------------------------------------------
     const qualityLevel = product.qualityLevel || 1;
     const complexity = product.complexity || 50;
 
@@ -246,13 +259,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // KATEGORI markasi — motor bunu kullaniyor (catBrand). Kurumsal marka
     // yalnizca yeni bir kategoriye girerken baslangic degeri verir.
     const brandValue = useStatsStore(state => state.brandValue);
-    const categoryBrand = useStatsStore(
-        state => state.brandByCategory?.[initialProduct?.category ?? ''] ?? state.brandValue,
-    );
+
     // Kapasite artik tesis kademesinden gelir (core/market/capacity.ts).
     const facilityTier = useStatsStore(state => state.facilityTier);
     const isRetooling = useStatsStore(state => !!state.facilityBuild);
     const tier = getTier(facilityTier);
+    const effectiveQuality = Math.min(qualityLevel, tier.qualityCeiling);
+    const queuedQuality = Math.max(0, qualityLevel - effectiveQuality);
     const market = getMarket(product.category);
 
     const maxUnits = maxUnitsPerQuarter(employeeCount, complexity, facilityTier, isRetooling);
@@ -303,8 +316,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                 suggestedPrice: product.suggestedPrice,
                 marketingBudget: marketing,
                 benchmark,
-                qualityLevel,
-                brandValue: categoryBrand,
+                qualityLevel: effectiveQuality,
+                brandValue,
                 marketDemand: product.marketDemand ?? 50,
             },
             market,
@@ -372,7 +385,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         marketingBudget: p.marketingBudget || 0,
                         benchmark: b,
                         qualityLevel: Math.min(p.qualityLevel || 1, tier.qualityCeiling),
-                        brandValue: categoryBrand,
+                        brandValue,
                         marketDemand: p.marketDemand ?? 50,
                     },
                     market,
@@ -476,6 +489,16 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text style={{ color: theme.colors.success, fontWeight: 'bold' }}>(+3%)</Text>
                                     </View>
                                     <Text style={styles.hint}>Lvl {qualityLevel} ➜ {qualityLevel + 1}</Text>
+                                    {/* Owned but not yet buildable — queued, not lost. */}
+                                    {queuedQuality > 0 && (
+                                        <Text style={styles.queuedLine}>
+                                            {t('product.qualityQueued', {
+                                                v1: String(effectiveQuality),
+                                                v2: String(qualityLevel),
+                                                v3: tier.name,
+                                            })}
+                                        </Text>
+                                    )}
                                 </View>
                                 <Pressable
                                     style={[
@@ -1281,6 +1304,7 @@ const styles = StyleSheet.create({
     sliderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#2D3748', padding: 8, borderRadius: 8 },
     adjBtn: { width: 36, height: 36, backgroundColor: '#4A5568', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
     adjText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+    queuedLine: { fontSize: 10, color: '#FFB020', marginTop: 3, lineHeight: 14 },
     hint: { fontSize: 11, color: '#718096', marginTop: 4, textAlign: 'right' },
     realStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
     realStatsText: { color: '#A0AEC0', fontSize: 12, fontWeight: '600' },
