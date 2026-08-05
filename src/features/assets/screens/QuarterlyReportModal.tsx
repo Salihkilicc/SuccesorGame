@@ -1,4 +1,5 @@
 import React from 'react';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 import { t, useLocale } from '../../../core/i18n';
 import {
   Modal,
@@ -212,6 +213,22 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
       tone: 'bad',
       text: r.distressMessage || 'You have breached a loan covenant. The banks have changed your terms.',
     });
+  }
+
+  // ------------------------------------------------------------------
+  //  THE BOARD ASKED FOR SOMETHING
+  // ------------------------------------------------------------------
+  //  A demand was being raised every quarter and written to stats, and the
+  //  only place it appeared was inside the board room - so unless the player
+  //  happened to open that screen, a director asked them for something and
+  //  they never heard it. It belongs in the quarterly report, which is where
+  //  the game tells you what happened.
+  // ------------------------------------------------------------------
+  {
+    const demandNotice = useStatsStore.getState().boardDemandNotice as string | undefined;
+    if (demandNotice) {
+      notes.push({ tone: 'warn', text: demandNotice });
+    }
   }
 
   if (r.layoffs > 0) {

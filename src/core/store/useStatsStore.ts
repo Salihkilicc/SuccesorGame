@@ -96,6 +96,8 @@ export type StatsState = Record<StatKey, number> & {
    *  Sayisal union'a giremez, bilincli olarak ayri duruyor.
    *  Bkz. core/market/brand.ts -> corporateBrand */
   brandByCategory: Record<string, number>;
+  /** The board's open demand this quarter, already formatted for display. */
+  boardDemandNotice?: string;
   _hasHydrated: boolean;
   /** Gecen ceyregin kredi notu — not dususunu yakalamak icin */
   creditRatingPrev?: string;

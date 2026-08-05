@@ -327,6 +327,36 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     },
 ];
 
+
+// ============================================================================
+//  CHARACTER — what a director wants, and what they will not let go
+// ============================================================================
+//  The four starting directors are hand-written. Everyone who arrives later —
+//  a founder rolled into an acquisition, a lender who took a seat — needs a
+//  character too, or the gift filter reads them as money-motivated by default
+//  and they all behave identically.
+//
+//  Temperament decides it, which keeps it readable: a Shark wants money, a
+//  Visionary wants to be proved right, a Snake wants control.
+// ============================================================================
+const CHARACTER_BY_TRAIT: Record<string, { motivation: Motivation; petIssue?: PetIssue }> = {
+    Shark: { motivation: 'money', petIssue: 'headcount' },
+    Conservative: { motivation: 'safety', petIssue: 'debt' },
+    Aggressive: { motivation: 'vindication', petIssue: 'market_share' },
+    Visionary: { motivation: 'legacy', petIssue: 'rnd' },
+    Loyalist: { motivation: 'legacy' },
+    Snake: { motivation: 'control' },
+};
+
+/** Fills in a character for a director that does not have one yet. */
+export const characterFor = (m: { id?: string; trait?: string; motivation?: Motivation; petIssue?: PetIssue }) => {
+    if (m.motivation) return {};
+    const known = INITIAL_BOARD_MEMBERS.find(k => k.id === m.id);
+    if (known) return { motivation: known.motivation, petIssue: known.petIssue };
+    const byTrait = CHARACTER_BY_TRAIT[m.trait || 'Loyalist'] || CHARACTER_BY_TRAIT.Loyalist;
+    return { motivation: byTrait.motivation, petIssue: byTrait.petIssue };
+};
+
 // ============================================================================
 // ZUSTAND STORE
 // ============================================================================
@@ -1820,6 +1850,29 @@ export const useShareholderStore = create<ShareholderState>()(
         {
             name: 'shareholder-store',
             storage: createJSONStorage(() => zustandStorage),
+            // ------------------------------------------------------------------
+            //  MIGRATION — an existing save had no characters
+            // ------------------------------------------------------------------
+            //  motivation / petIssue / origin were added to the starting board,
+            //  but a save made before that carries members without them. The
+            //  gift filter would then read every director as money-motivated
+            //  and every backstory as blank — the character layer would simply
+            //  not exist for anyone already playing.
+            //
+            //  Known directors are matched by id; anyone else (acquired
+            //  founders, imposed lenders) gets a character derived from their
+            //  temperament, which is the same rule new arrivals use.
+            // ------------------------------------------------------------------
+            version: 2,
+            migrate: (persisted: any, from: number) => {
+                if (!persisted?.members) return persisted;
+                if (from >= 2) return persisted;
+                persisted.members = persisted.members.map((m: any) => ({
+                    ...m,
+                    ...characterFor(m),
+                }));
+                return persisted;
+            },
         }
     )
 );

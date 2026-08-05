@@ -241,10 +241,45 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         {trustStatus.label}
                     </Text>
                 </View>
+
+                {/* ------------------------------------------------------------
+                    WHO THIS PERSON IS
+                    ------------------------------------------------------------
+                    The gift system filters by motivation - cash insults a
+                    director who wants a legacy - but none of that was on
+                    screen, so choosing a gift was a coin flip rather than a
+                    decision. What they want and what they will not let go of
+                    are now stated plainly.
+                   ------------------------------------------------------------ */}
+                <View style={styles.characterCard}>
+                    <Text style={styles.characterLine}>
+                        {t('mem.wants')}{'  '}
+                        <Text style={styles.characterValue}>
+                            {t('data.motivation.' + (member.motivation || 'money'))}
+                        </Text>
+                    </Text>
+                    {member.petIssue && (
+                        <Text style={styles.characterLine}>
+                            {t('mem.neverLetsGo')}{'  '}
+                            <Text style={styles.characterValue}>
+                                {t('data.petIssue.' + member.petIssue)}
+                            </Text>
+                        </Text>
+                    )}
+                    <Text style={styles.characterHint}>
+                        {t('mem.giftHint.' + (member.motivation || 'money'))}
+                    </Text>
+                </View>
                 <View style={styles.statsRow}>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.shares')}</Text>
                         <Text style={styles.statValue}>{memberPercent.toFixed(1)}%</Text>
+                    </View>
+                    <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>{t('equity.relationship')}</Text>
+                        <Text style={[styles.statValue, { color: '#7FB3FF' }]}>
+                            {Math.round(member.relationship ?? 50)}
+                        </Text>
                     </View>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.trust')}</Text>
@@ -474,6 +509,10 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
+    characterCard: { backgroundColor: '#1C1F26', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterLine: { color: '#8A9BA8', fontSize: 11, marginBottom: 3 },
+    characterValue: { color: '#E8DCC0', fontWeight: '700' },
+    characterHint: { color: '#7FB3FF', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
         gap: 24,
