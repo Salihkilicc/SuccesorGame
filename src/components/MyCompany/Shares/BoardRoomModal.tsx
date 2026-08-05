@@ -55,6 +55,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
         lastVote,
         noConfidenceLevel,
         boardLog,
+        boardDemands,
         lobby,
         makePromise,
         getPlayerOwnershipPercent,
@@ -150,6 +151,23 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                             <Text style={[styles.moodValue, { color: moodColor }]}>{t(`board.stance.${boardStance}`)}</Text>
                         </View>
                     </View>
+
+                    {/* ------------------------------------------------
+                        AÇIK TALEP — kurulun SENDEN istedigi sey.
+                        ------------------------------------------------
+                        Bu kart, kurul masasini bir tabela olmaktan
+                        cikarip karsina birini oturtan sey. Cevap
+                        vermezsen guven kaybedersin.
+                       ------------------------------------------------ */}
+                    {(boardDemands || []).filter(d => d.status === 'open').map(d => (
+                        <View key={d.id} style={styles.demandCard}>
+                            <Text style={styles.demandTag}>{t('board.demandOpen').toUpperCase()}</Text>
+                            <Text style={styles.demandBody}>
+                                {t(`board.demand_${d.kind}`, { v1: d.raisedByName })}
+                            </Text>
+                            <Text style={styles.demandDue}>{t('board.demandDue', { v1: d.deadline })}</Text>
+                        </View>
+                    ))}
 
                     {/* ---- GUVENSIZLIK ERKEN UYARISI ---- */}
                     {noConfidenceLevel >= 2 && (
@@ -310,6 +328,11 @@ const styles = StyleSheet.create({
     controlNote: { fontSize: 11, color: '#B8C4D0', lineHeight: 16, marginTop: 6 },
     moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
     moodValue: { fontSize: 13, fontWeight: '800' },
+
+    demandCard: { backgroundColor: '#2A2416', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FFB020' },
+    demandTag: { fontSize: 10, color: '#FFB020', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
+    demandBody: { fontSize: 12, color: '#E8DCC0', lineHeight: 18, fontStyle: 'italic' },
+    demandDue: { fontSize: 10, color: '#8A9BA8', marginTop: 6, fontWeight: '700' },
 
     dangerCard: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FF6B6B' },
     dangerTitle: { fontSize: 13, color: '#FF6B6B', fontWeight: '800', marginBottom: 4 },

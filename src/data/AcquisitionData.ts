@@ -1,6 +1,5 @@
 export type Category = 'Media' | 'Technology' | 'Industrial' | 'Retail';
 
-
 export interface AcquisitionTarget {
     id: string;
     name: string;

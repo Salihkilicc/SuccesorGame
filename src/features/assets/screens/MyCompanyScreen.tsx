@@ -246,7 +246,7 @@ const MyCompanyScreen = () => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
               <StatColumn
                 label={t('company.brandValue')}
-                value={`${stats.brandValue}/100`}
+                value={`${(stats.brandValue ?? 0).toFixed(1)}/100`}
                 colorType={stats.brandValue >= 40 ? 'success' : 'default'}
               />
               <VerticalDivider />

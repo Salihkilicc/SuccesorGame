@@ -264,3 +264,53 @@ export const marketsByValue = (): { market: ProductMarket; dollarSize: number }[
     PRODUCT_MARKETS
         .map(m => ({ market: m, dollarSize: marketDollarSize(m) }))
         .sort((a, b) => b.dollarSize - a.dollarSize);
+
+// ============================================================================
+//  GIRIS ESIGI — HER PAZARIN KAPISI KENDI RAKIPLERINDEN DOGAR
+// ============================================================================
+//  Esik sayilarini elle yazmiyoruz. Her pazarin rakip gucu zaten veride
+//  duruyor: robotik/AI pazarinda rakipler 90-94 guctе ve pazar 34.000
+//  adet — dusuk hacimli, yuksek itibarli bir yer. Tuketicide en zayif
+//  rakip 22 guctе. Esigi rakip gucunden turetince merdiven kendiliginden
+//  dogru dizilir ve yeni kategori eklerken ayrica ayar gerekmez.
+//
+//  Kapidaki soru "bu sirket robotikte iyi mi" degil, "bu sirket ciddi
+//  mi" — o yuzden KURUMSAL markaya bakar, kategori markasina degil.
+// ============================================================================
+
+/** Bu gucun altindaki pazarlar herkese acik. Baslangic pazari buranin altinda. */
+export const ENTRY_STRENGTH_BASE = 58;
+/** Ortalama gucun esige donusum katsayisi. */
+export const ENTRY_STRENGTH_SLOPE = 3;
+/** Esik bu degeri gecemez — hicbir pazar tumden kapali olmasin. */
+export const ENTRY_BRAND_CAP = 65;
+
+/** Pazarin rakiplerinin ortalama gucu. */
+export const averageCompetitorStrength = (market: ProductMarket): number => {
+    const list = market.competitors || [];
+    if (list.length === 0) return 0;
+    return list.reduce((sum, c: any) => sum + (c.strength ?? 50), 0) / list.length;
+};
+
+/**
+ * Bu pazara girebilmek icin gereken KURUMSAL marka.
+ * Guclu ve doymus pazarlar itibar ister; genis ve dagilmis pazarlar istemez.
+ */
+export const entryBrandRequirement = (market: ProductMarket): number => {
+    const avg = averageCompetitorStrength(market);
+    const raw = (avg - ENTRY_STRENGTH_BASE) * ENTRY_STRENGTH_SLOPE;
+    return Math.max(0, Math.min(ENTRY_BRAND_CAP, raw));
+};
+
+/** Girebilir miyim? Ekranda hem cevabi hem gerekceyi gostermek icin. */
+export const canEnterMarket = (
+    market: ProductMarket,
+    corporateBrandValue: number,
+): { allowed: boolean; required: number; have: number } => {
+    const required = entryBrandRequirement(market);
+    return {
+        allowed: (corporateBrandValue || 0) >= required,
+        required,
+        have: corporateBrandValue || 0,
+    };
+};

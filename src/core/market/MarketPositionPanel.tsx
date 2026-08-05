@@ -95,7 +95,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('os.brandValue')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#FFD700' }]}>{brandValue}</Text>
+                    <Text style={[styles.summaryValue, { color: '#FFD700' }]}>{brandValue.toFixed(1)}</Text>
                     <Text style={styles.summaryUnit}>out of 100</Text>
                 </View>
             </View>

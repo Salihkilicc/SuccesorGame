@@ -297,11 +297,11 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             <View style={styles.demandRow}>
               <Text style={styles.demandText}>
                 Market wanted <Text style={styles.demandStrong}>{formatNumber(p.marketDemandUnits)}</Text>
-                {'  ·  '}share <Text style={styles.demandStrong}>{(p.marketShare ?? 0).toFixed(3)}%</Text>
+                {'  ·  '}{t('report.shareLabel')} <Text style={styles.demandStrong}>{(p.marketShare ?? 0).toFixed(3)}%</Text>
               </Text>
               {(p.unmetDemand ?? 0) > 0 && (
                 <Text style={styles.demandMiss}>
-                  {formatNumber(p.unmetDemand ?? 0)} lost to rivals
+                  {t('report.lostToRivalsV', { v1: formatNumber(p.unmetDemand ?? 0) })}
                 </Text>
               )}
             </View>
@@ -645,7 +645,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.brandValue")}</Text>
                   <Text style={[styles.opsValue, { color: '#FFD700' }]}>
-                    {report.brandValue}
+                    {(report.brandValue ?? 0).toFixed(1)}
                     <Text
                       style={{
                         fontSize: 11,

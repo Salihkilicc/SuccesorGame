@@ -3,6 +3,8 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { UnlockableProduct } from '../data/unlockableProductsData';
+import { canEnterMarket } from '../../../core/market/productMarkets';
+import { getMarket } from '../../../core/market/productMarkets';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
@@ -19,7 +21,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     useLocale();
     const { unlockProduct } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
-    const { companyCapital, update: updateStats } = useStatsStore();
+    const { companyCapital, brandValue, update: updateStats } = useStatsStore();
 
     const formatCurrency = (value: number) => {
         return formatMoney(value);
@@ -33,9 +35,35 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         return `${value} RP`;
     };
 
-    const canAfford = totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;
+    // ------------------------------------------------------------------
+    //  KATEGORI GIRIS ESIGI
+    // ------------------------------------------------------------------
+    //  Her pazarin kapisi kendi rakiplerinin gucunden dogar. Robotik gibi
+    //  dusuk hacimli ve guclu rakipli bir pazara itibarin olmadan
+    //  giremezsin. Esik KURUMSAL markaya bakar — kapidaki soru "bu sirket
+    //  robotikte iyi mi" degil, "bu sirket ciddi mi".
+    //  Bkz. core/market/productMarkets.ts -> canEnterMarket
+    // ------------------------------------------------------------------
+    const entryGate = (() => {
+        const mk = getMarket(product.category);
+        if (!mk) return { allowed: true, required: 0, have: 0 };
+        return canEnterMarket(mk, brandValue || 0);
+    })();
+
+    const canAfford = entryGate.allowed && totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;
 
     const handleUnlock = () => {
+        if (!entryGate.allowed) {
+            Alert.alert(
+                t('alert.marketClosed'),
+                t('alert.marketClosedBody', {
+                    v1: product.category,
+                    v2: entryGate.required.toFixed(0),
+                    v3: entryGate.have.toFixed(1),
+                }),
+            );
+            return;
+        }
         if (product.isUnlocked) {
             Alert.alert(t('alert.alreadyUnlocked'), t('alert.thisProductHasAlreadyBeen'));
             return;

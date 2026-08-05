@@ -9,6 +9,9 @@ export interface Product {
      * olsun. Bkz. core/market/attraction.ts
      */
     benchmarkSmoothed?: number;
+    /** Teslimat karnesi (0..1). Talebi karsilayamadikca duser, payini kirpar.
+     *  Bkz. core/market/attraction.ts -> updateReachIndex */
+    reachIndex?: number;
     // --- FASON URETIM (bkz. core/market/contract.ts) ---
     /** Fason uretici kimligi. Bos ise yalnizca kendi tesisinde uretilir. */
     contractPartnerId?: string;

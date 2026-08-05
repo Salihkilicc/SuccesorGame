@@ -59,6 +59,12 @@ export const TOTAL_SHARES_DEFAULT = 10_000_000;
 // ============================================================================
 
 import { brandValuationMultiplier } from './brand';
+import { shareValuationMultiplier } from './competitors';
+
+/** Pay carpaninin kiyas noktasi: bu payda carpan 1.0 kabul edilir. */
+export const SHARE_LIFT_REFERENCE = 5;
+/** Marka + pay carpanlarinin birlikte gecemeyecegi tavan. */
+export const MAX_VALUATION_LIFT = 2.2;
 
 export interface ValuationInput {
     /** Sirket kasasi */
@@ -88,6 +94,8 @@ export interface ValuationInput {
     isPublic: boolean;
     /** Marka degeri 0-100 */
     brandValue: number;
+    /** Toplam gerçeklesen pazar payi (%). Kazanc KALITESINI yukseltir. */
+    marketShare?: number;
 }
 
 export interface ValuationBreakdown {
@@ -141,10 +149,29 @@ export const companyValuation = (input: ValuationInput): ValuationBreakdown => {
     // TEK KAYNAK: marka matematiginin tamami brand.ts'te.
     const brandLift = brandValuationMultiplier(input.brandValue || 0);
 
+    // ------------------------------------------------------------------
+    //  PAZAR PAYI -> KAZANC KALITESI
+    // ------------------------------------------------------------------
+    //  Pay, degerlemeye PARA olarak eklenmez — ciro ve kar zaten paydan
+    //  doguyor, ustune bir de toplasak cift sayim olurdu. Payin yaptigi
+    //  sey CARPANI yukseltmek: pazarin %8'ine sahip sirketin kari, ayni
+    //  kari eden %0,5'lik sirketten daha degerlidir, cunku o kar daha
+    //  kalicidir. Finansta "kazanc kalitesi" denir; hendegin fiyatidir.
+    //
+    //  Karekok sekilli: ilk paylar en degerlisi. Marka carpaniyla
+    //  birlikte toplam bir ust sinira bagli, yoksa ikisi carpisip
+    //  degerlemeyi ucururdu.
+    // ------------------------------------------------------------------
+    const shareLift = shareValuationMultiplier(
+        Math.max(0, input.marketShare || 0),
+        SHARE_LIFT_REFERENCE,
+    );
+    const lift = Math.min(MAX_VALUATION_LIFT, brandLift * shareLift);
+
     const earningsMultiple =
-        (input.isPublic ? EARNINGS_MULTIPLE_PUBLIC : EARNINGS_MULTIPLE_PRIVATE) * brandLift;
+        (input.isPublic ? EARNINGS_MULTIPLE_PUBLIC : EARNINGS_MULTIPLE_PRIVATE) * lift;
     const revenueMultiple =
-        (input.isPublic ? REVENUE_MULTIPLE_PUBLIC : REVENUE_MULTIPLE_PRIVATE) * brandLift;
+        (input.isPublic ? REVENUE_MULTIPLE_PUBLIC : REVENUE_MULTIPLE_PRIVATE) * lift;
 
     const annualEbit = input.ttmEbit || 0;
     const annualRevenue = Math.max(0, input.ttmRevenue || 0);

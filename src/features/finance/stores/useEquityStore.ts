@@ -325,6 +325,13 @@ export const useEquityStore = create<EquityState>()(
                     marketMultiplier: state.marketMultiplier + DIVIDEND_SENTIMENT_BOOST,
                 }));
 
+                // Kurul temettu istediyse, bu odeme talebi kapatir.
+                // Talebi ACAN uye ozellikle memnun olur.
+                try {
+                    require('../../shareholders/stores/useShareholderStore')
+                        .useShareholderStore.getState().satisfyDemand('pay_dividend');
+                } catch { /* kurul modulu yoksa sessiz gec */ }
+
                 return {
                     totalRequired: totalCost,
                     playerPortion: playerNet,

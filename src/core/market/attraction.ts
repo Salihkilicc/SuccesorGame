@@ -308,8 +308,90 @@ export const computeShares = (
         return { shares: attractions.map(() => 0), totalShare: 0 };
     }
 
-    const shares = attractions.map(a => (Math.max(0, a) / denominator) * 100);
+    // ------------------------------------------------------------------
+    //  DEVRALINAN CEKICILIK URUNLERE DAGITILIR
+    // ------------------------------------------------------------------
+    //  BUG (oyuncu bildirdi: "startupi alinca gercekten pazarini almam"):
+    //  `inherited` paydaya ekleniyordu ama hicbir urune yazilmiyordu.
+    //  Yani sirket satin almak oyuncunun payini YUKSELTMIYOR, tam tersine
+    //  paydayi buyuttugu icin biraz DUSURUYORDU. Devralmanin pazar
+    //  tarafindaki tek getirisi bu ve calismiyordu.
+    //
+    //  Artik devralinan cekicilik oyuncunun urunlerine kendi cekicilikleri
+    //  oraninda dagitilir; hic urunu yoksa esit bolunur. Boylece
+    //  sum(shares) === totalShare olur ve talep de paya bagli oldugu icin
+    //  satin alinan sirketin musterisi gercekten sana gecer.
+    // ------------------------------------------------------------------
+    const own = attractions.map(a => Math.max(0, a));
+    const ownTotal = own.reduce((sum, a) => sum + a, 0);
+
+    const shares = own.map(a => {
+        const slice = ownTotal > 0
+            ? inherited * (a / ownTotal)
+            : inherited / Math.max(1, own.length);
+        return ((a + slice) / denominator) * 100;
+    });
+
     return { shares, totalShare: (sumPlayer / denominator) * 100 };
+};
+
+// ============================================================================
+//  ERISIM ENDEKSI — PAY TESLIMATA BAGLANIR
+// ============================================================================
+//  SORUN (oyuncu bildirdi): "her ceyrek maksimum satiyorum yine de hep
+//  lost to rivals oluyor."
+//
+//  Haksiz degildi ve sebebi kodda degil OLCEKTEYDI. Tuketici teknolojisi
+//  pazari ceyrekte 1.000.000 adet; kademe 1 tesis 4.500 adet uretiyor.
+//  Yani %0,45'in ustundeki her pay otomatik olarak karsilanamayan talep
+//  demekti. En kucuk rakip bile %1,2 paya sahip — yani oyuncunun bu
+//  uyaridan kacmasi matematiksel olarak imkansizdi. En ust kademede bile
+//  tavan %8,5.
+//
+//  COZUM: pazar payi POTANSIYEL degil GERCEKLESEN satistan dogsun.
+//  Gercek hayatta da boyledir — surekli stokta olmayan markanin payi
+//  yuksek olmaz, musteri bir kere bulamaz, ikincide baska yere bakar.
+//
+//  Erisim endeksi (0..1) cekiciligini carpar:
+//    - talebi tam karsiladiysan yavasca 1'e dogru toparlanir
+//    - karsilayamadiysan karsilayamadigin oranda duser
+//
+//  Sonuc bir DENGE: payin kapasitenin etrafina oturur. Kapasite
+//  buyutunce pay da buyur — fabrika yatirimi artik pazarin kapisi.
+//  "Lost to rivals" ise ancak GERCEKTEN yetisemedigin marjinal kismi
+//  gosterir, ulasilmasi imkansiz 47.000'i degil.
+// ============================================================================
+
+/** Endeksin inebilecegi taban. Sifir olsaydi urun pazardan tumden silinirdi. */
+export const REACH_FLOOR = 0.15;
+/** Talebi tam karsiladigin ceyrekte kalan aciğin ne kadari kapanir. */
+export const REACH_RECOVERY = 0.12;
+/** Karsilayamadigin oranin ne kadari endeksten dusulur. */
+export const REACH_DECAY = 0.35;
+/** Bu oranin ustunu karsiladiysan "tam karsiladi" sayilir. */
+export const REACH_FULL_THRESHOLD = 0.98;
+
+const clamp01 = (v: number, lo = REACH_FLOOR) => Math.min(1, Math.max(lo, v));
+
+/**
+ * Erisim endeksini bir ceyrek ilerletir.
+ *
+ * @param prev        onceki endeks (yoksa 1)
+ * @param servedRatio bu ceyrek talebin ne kadarini karsiladin (0..1)
+ */
+export const updateReachIndex = (
+    prev: number | undefined,
+    servedRatio: number,
+): number => {
+    const p = clamp01(prev ?? 1);
+    const served = Math.min(1, Math.max(0, servedRatio));
+
+    if (served >= REACH_FULL_THRESHOLD) {
+        // Toparlanma yavas: guveni geri kazanmak kaybetmekten uzun surer.
+        return clamp01(p + REACH_RECOVERY * (1 - p));
+    }
+    // Dusus oransal: %10 acik kucuk, %90 acik yikici.
+    return clamp01(p - REACH_DECAY * (1 - served) * p);
 };
 
 /**

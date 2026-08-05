@@ -92,6 +92,10 @@ export interface FacilityBuild {
 }
 
 export type StatsState = Record<StatKey, number> & {
+  /** Kategori bazli markalar (kategori adi -> 0..100).
+   *  Sayisal union'a giremez, bilincli olarak ayri duruyor.
+   *  Bkz. core/market/brand.ts -> corporateBrand */
+  brandByCategory: Record<string, number>;
   _hasHydrated: boolean;
   /** Gecen ceyregin kredi notu — not dususunu yakalamak icin */
   creditRatingPrev?: string;
@@ -304,6 +308,8 @@ export const initialStatsState: StatsState = {
   //  Bilinmeyen bir kurucunun sirketisin: 8 ile basliyorsun.
   // ------------------------------------------------------------------
   brandValue: 8,
+  /** Kategori bazli markalar. Bkz. core/market/brand.ts */
+  brandByCategory: {} as Record<string, number>,
 
   stockSplitCount: 0,
   isPublic: false,
@@ -897,6 +903,7 @@ export const useStatsStore = create<StatsStore>()(
         shareholders: state.shareholders,
         casinoReputation: state.casinoReputation,
         brandValue: state.brandValue,
+        brandByCategory: state.brandByCategory,
         factoryCount: state.factoryCount,
         facilityTier: state.facilityTier,
         facilityBuild: state.facilityBuild,

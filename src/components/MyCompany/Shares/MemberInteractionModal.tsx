@@ -16,7 +16,7 @@ type TabType = 'LOBBYING' | 'BUYOUT';
 
 const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     useLocale();
-    const { members, calculateBuyoutPrice } = useShareholderStore();
+    const { members, calculateBuyoutPrice, offerGesture } = useShareholderStore();
     const { money, companySharePrice, update: updateStats } = useStatsStore();
 
     const [activeTab, setActiveTab] = useState<TabType>('LOBBYING');
@@ -42,7 +42,6 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     // Lobbying Actions
     const handleSendGift = () => {
         const GIFT_COST = 50000;
-        const TRUST_BOOST = 5;
 
         if (money < GIFT_COST) {
             Alert.alert(t('alert.insufficientFunds'), t('mem.needForGift', { v1: formatMoney(GIFT_COST) }));
@@ -50,17 +49,32 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         }
 
         Alert.alert(
-            '🎁 Send Gift',
-            t('mem.sendGiftBody', { v1: formatMoney(GIFT_COST), v2: member.name, v3: TRUST_BOOST }),
+            t('mem.sendGiftTitle'),
+            t('mem.sendGiftBody2', { v1: formatMoney(GIFT_COST), v2: member.name }),
             [
                 { text: t('equity.cancel'), style: 'cancel' },
                 {
                     text: t('equity.sendGift'),
                     onPress: () => {
                         updateStats({ money: money - GIFT_COST });
-                        // TODO: Implement trust increase in store
-                        Alert.alert(t('mem.giftSent'), t('mem.giftSentBody', { v1: member.name, v2: TRUST_BOOST }));
-                        console.log(`[Lobbying] Gift sent to ${member.name}. Trust +${TRUST_BOOST}`);
+                        // ------------------------------------------------
+                        //  ARTIK GERCEKTEN BIR SEY OLUYOR
+                        // ------------------------------------------------
+                        //  Bu iki eylem de `TODO` idi: para dusuyordu ama
+                        //  hicbir sey degismiyordu. Simdi ILISKIYI artiriyor
+                        //  — guveni degil. Para oy satin alamaz.
+                        //
+                        //  Hediye PARA jestidir: parayi onemseyen uyeyi
+                        //  memnun eder, mirasini dusunen uyeyi asagilar.
+                        //  Bkz. core/market/governance.ts -> giftEffect
+                        // ------------------------------------------------
+                        const r = offerGesture(member.id, 'money', 1);
+                        Alert.alert(
+                            r.success ? t('mem.giftSent') : t('mem.giftBackfired'),
+                            r.success
+                                ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
+                                : t('mem.giftBackfiredBody', { v1: member.name }),
+                        );
                     },
                 },
             ]
@@ -69,20 +83,25 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     const handlePrivateDinner = () => {
         const ENERGY_COST = 20;
-        const TRUST_BOOST = 15;
 
         // TODO: Check energy from stats store
         Alert.alert(
-            '🍽️ Private Dinner',
-            t('mem.dinnerBody', { v1: member.name, v2: ENERGY_COST, v3: TRUST_BOOST }),
+            t('mem.dinnerTitle'),
+            t('mem.dinnerBody2', { v1: member.name, v2: String(ENERGY_COST) }),
             [
                 { text: t('equity.cancel'), style: 'cancel' },
                 {
                     text: t('equity.arrangeDinner'),
                     onPress: () => {
-                        // TODO: Deduct energy, increase trust
-                        Alert.alert(t('mem.dinnerArranged'), t('mem.dinnerArrangedBody', { v1: member.name, v2: TRUST_BOOST }));
-                        console.log(`[Lobbying] Dinner with ${member.name}. Trust +${TRUST_BOOST}`);
+                        // Ozel yemek bir TANINMA jestidir: adinin gecmesini
+                        // isteyen uyeye para degil ilgi lazimdir.
+                        const r = offerGesture(member.id, 'legacy', 1);
+                        Alert.alert(
+                            r.success ? t('mem.dinnerArranged') : t('mem.giftBackfired'),
+                            r.success
+                                ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
+                                : t('mem.giftBackfiredBody', { v1: member.name }),
+                        );
                     },
                 },
             ]

@@ -8,8 +8,9 @@ import { FEATURES } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
-import { advanceBrand, brandFromAcquisition, brandStabilityFactor } from '../market/brand';
+import { advanceBrand, brandFromAcquisition, brandStabilityFactor, corporateBrand, categoryStartingBrand } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
+import { updateReachIndex } from '../market/attraction';
 import {
   availableStandardUnits,
   effectiveCapacity,
@@ -409,6 +410,14 @@ export const useGameStore = create<GameStore>()(
           byCategory.get(key)!.push(p);
         });
 
+        // KATEGORI MARKALARI: her pazarin kendi itibari var. Yeni bir
+        // kategoriye girerken kurumsal markanin bir kismi taban sayilir.
+        const brandMap: Record<string, number> = {
+          ...(useStatsStore.getState().brandByCategory || {}),
+        };
+        const catBrand = (cat: string): number =>
+          brandMap[cat] ?? categoryStartingBrand(brandValue);
+
         byCategory.forEach((group, category) => {
           const market = getMarket(category);
 
@@ -461,15 +470,20 @@ export const useGameStore = create<GameStore>()(
                     cp.qualityCeiling,
                   );
                 })(),
-                brandValue,
+                // KENDI kategorisinin markasi. Saglikta kazandigin itibar
+                // teknolojide isine yaramaz.
+                brandValue: catBrand(category),
                 marketDemand: p.marketDemand ?? 50,
               },
               market,
             ),
           );
 
+          // ERISIM ENDEKSI: gecen ceyreklerde talebi karsilayamadiysan
+          // cekiciligin kirpilir. Pay artik teslimattan dogar.
+          // Bkz. core/market/attraction.ts -> updateReachIndex
           const { shares } = computeShares(
-            breakdowns.map(b => b.total),
+            breakdowns.map((b, i) => b.total * (group[i].reachIndex ?? 1)),
             market,
             acquiredStockIds,
           );
@@ -687,10 +701,27 @@ export const useGameStore = create<GameStore>()(
             totalMarketingCost += marketingCost;
             totalStorageCost += storageCost;
 
+            // ------------------------------------------------------------
+            //  ERISIM ENDEKSI — bu ceyregin teslimat karnesi
+            // ------------------------------------------------------------
+            //  Talebin ne kadarini karsilayabildin? Karsilayamadiysan
+            //  musterinin bir kismi kalici olarak rakibe gecer ve bir
+            //  sonraki ceyrek payin daha dusuk baslar. Karsiladiysan
+            //  yavasca geri kazanirsin.
+            // ------------------------------------------------------------
+            const servedRatio = effectiveDemand > 0
+              ? quarterlySales / effectiveDemand
+              : 1;
+            let nextReach = product.reachIndex ?? 1;
+            for (let q = 0; q < Math.max(1, quarters); q++) {
+              nextReach = updateReachIndex(nextReach, servedRatio);
+            }
+
             // Update product with new inventory
             updatedProducts.push({
               ...product,
               inventory: newInventory,
+              reachIndex: nextReach,
               // Bir sonraki ceyregin kiyas butcesi bu ciroya bakar.
               revenue: productRevenue,
             });
@@ -730,6 +761,9 @@ export const useGameStore = create<GameStore>()(
             useProductStore.getState().updateProduct(updatedProduct.id, {
               inventory: updatedProduct.inventory,
               revenue: updatedProduct.revenue,
+              // Teslimat karnesi kalici olmali; yoksa endeks her ceyrek
+              // 1'e donup butun dongu anlamsizlasirdi.
+              reachIndex: updatedProduct.reachIndex,
             });
           }
         });
@@ -1041,13 +1075,87 @@ export const useGameStore = create<GameStore>()(
         //  bilesik buyume motoru bu — ve tesis tavani da tam bu yuzden var,
         //  yoksa dongu kendini besleyip oyunu bitirir.
         // ==================================================================
-        const totalPlayerShare = productBreakdownList.reduce(
-          (sum, p) => sum + (p.marketShare || 0), 0,
-        ) / Math.max(1, new Set(productBreakdownList.map(p => p.category)).size);
+        // ------------------------------------------------------------------
+        //  GERCEKLESEN PAY — SATILAN ADETTEN, uretilenden degil
+        // ------------------------------------------------------------------
+        //  Oyuncunun sarti buydu: "satamasam da uretimi artirinca payim
+        //  artmasin, yoksa hemen tahta oturuuz." Marka artik computeShares'in
+        //  verdigi potansiyel payi degil, kategoride GERCEKTEN sattigin
+        //  adedin pazara oranini okuyor. Mal satmadan itibar birikmez.
+        // ------------------------------------------------------------------
+        const soldByCategory: Record<string, number> = {};
+        const revenueByCategory: Record<string, number> = {};
+        productBreakdownList.forEach(pb => {
+          const c = pb.category || 'Consumer';
+          soldByCategory[c] = (soldByCategory[c] || 0) + (pb.sold || 0);
+          revenueByCategory[c] = (revenueByCategory[c] || 0) + (pb.revenue || 0);
+        });
+
+        const realizedShareOf = (cat: string): number => {
+          const mk = getMarket(cat);
+          const size = (mk?.sizeUnitsPerQuarter || 0) * Math.max(1, quarters);
+          if (size <= 0) return 0;
+          return Math.min(100, ((soldByCategory[cat] || 0) / size) * 100);
+        };
+
+        const totalPlayerShare = Object.keys(soldByCategory)
+          .reduce((sum, c) => sum + realizedShareOf(c), 0);
+
+        // ------------------------------------------------------------------
+        //  HER KATEGORININ MARKASI AYRI ILERLER
+        // ------------------------------------------------------------------
+        //  Devralma katkisi, satin alinan sirketin KENDI kategorisine
+        //  yazilir — teknoloji sirketi almak saglik markani buyutmez.
+        // ------------------------------------------------------------------
+        const acquisitionGainByCategory: Record<string, number> = {};
+        {
+          const subs = useCorporateFinanceStore.getState().subsidiaries;
+          subs
+            .filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1)
+            .forEach(x => {
+              const cat = (x as any).category || (x as any).sector || 'Consumer';
+              acquisitionGainByCategory[cat] =
+                (acquisitionGainByCategory[cat] || 0) +
+                brandFromAcquisition(
+                  x.deal?.fairValue || x.valuation || 0,
+                  stats.companyValue || 1,
+                  !!x.deal?.hostile,
+                  catBrand(cat),
+                );
+            });
+        }
+
+        const nextBrandByCategory: Record<string, number> = { ...brandMap };
+        const categoriesTouched = new Set<string>([
+          ...Object.keys(soldByCategory),
+          ...Object.keys(acquisitionGainByCategory),
+          ...Object.keys(brandMap),
+        ]);
+
+        categoriesTouched.forEach(cat => {
+          const start = catBrand(cat);
+          const r = advanceBrand({
+            currentBrand: start,
+            // Pazarlamanin marka etkisi kategoriye pay oraninda dagilir.
+            marketingDelta:
+              (marketingBrand.newBrand - brandValue) *
+              (totalPlayerShare > 0 ? realizedShareOf(cat) / totalPlayerShare : 1),
+            totalMarketShare: realizedShareOf(cat),
+            profitable: netProfit > 0,
+            acquisitionGain: acquisitionGainByCategory[cat] || 0,
+            ceiling: tier.brandCeiling,
+            floor: tier.brandFloor,
+          });
+          nextBrandByCategory[cat] = r.newBrand;
+        });
+
+        // KURUMSAL MARKA: kategori markalarinin ciro agirlikli ortalamasi.
+        // Kategoriye bagli olmayan her sey bunu okur.
+        const corporate = corporateBrand(nextBrandByCategory, revenueByCategory);
 
         const brandResult = advanceBrand({
           currentBrand: brandValue,
-          marketingDelta: marketingBrand.newBrand - brandValue,
+          marketingDelta: 0,
           totalMarketShare: totalPlayerShare,
           profitable: netProfit > 0,
           // Bu ceyrek kapanan devralmalarin marka katkisi
@@ -1114,7 +1222,10 @@ export const useGameStore = create<GameStore>()(
         const nextTenure = blendTenure(avgTenure, headcount, arrivedHires, Math.max(1, quarters));
 
         useStatsStore.getState().update({
-          brandValue: brandResult.newBrand,
+          // Genel marka artik TUREV: kategori markalarinin ciro agirlikli
+          // ortalamasi. advanceBrand yalnizca rapor kalemleri icin cagrildi.
+          brandValue: corporate,
+          brandByCategory: nextBrandByCategory,
           employeeCount: headcount,
           incomingHires: queuedHires,
           facilityTier: nextTierLevel,
@@ -1355,7 +1466,9 @@ export const useGameStore = create<GameStore>()(
           ttmEbit: earningsPower,
           debt: stats.companyDebtTotal || 0,
           isPublic: isPublicNow,
-          brandValue: brandResult.newBrand,
+          brandValue: corporate,
+          // Pay carpani: kazanc kalitesi. Bkz. core/market/equity.ts
+          marketShare: totalPlayerShare,
         }).total;
 
         // Piyasa duygusu carpani her ceyrek 1.0'a dogru soner. IPO coskusu
@@ -1383,7 +1496,7 @@ export const useGameStore = create<GameStore>()(
         // MARKA ISTIKRAR SAGLAR: guclu markali sirketin hissesi daha az
         // oynar, cunku yatirimci kotu ceyregi "gecici" diye okur. Finansta
         // "kalite primi" denir. leverageVol ile ters yonde calisir.
-        const brandStability = brandStabilityFactor(brandResult.newBrand);
+        const brandStability = brandStabilityFactor(corporate);
         const marketCap = valuation / (leverageVol * brandStability);
         let newSharePrice = smoothPrice(prevPrice, fairPrice, isPublicNow, marketCap);
         if (isPublicNow) newSharePrice = applySentiment(newSharePrice, Math.random(), marketCap);
@@ -1583,7 +1696,38 @@ export const useGameStore = create<GameStore>()(
           //  bir kotu ceyrek kimseyi koltugundan etmemeli — gorevden
           //  alinma uzun sure ihmal edilmis bir iliskinin sonucudur.
           // ================================================================
-          const nc = shStore.getState().runNoConfidence(boardCtx);
+          // ================================================================
+          //  KURULUN KENDI GUNDEMI
+          // ================================================================
+          //  Guvensizlik oyundan ONCE calisir: karsilanan/ihmal edilen
+          //  talebin guven etkisi ayni ceyrekte hesaba katilsin diye.
+          //  Kurul artik sessiz oturmuyor — senden bir sey istiyor.
+          try {
+            const dmdCtx = {
+              ...boardCtx,
+              cash: stats.money || 0,
+              revenue: totalRevenue || 0,
+              debt: useStatsStore.getState().companyDebtTotal || 0,
+              marketShare: totalPlayerShare || 0,
+              // Ar-Ge harcamasi uydurma bir alan degil: laboratuvarda
+              // gercekten arastirmaci calistiriyor musun?
+              rndSpend: (() => {
+                try {
+                  const lab = require('./useLaboratoryStore').useLaboratoryStore.getState();
+                  const econ = require('../../features/laboratory/data/laboratoryData').RESEARCHER_ECONOMICS;
+                  return (lab.researcherCount || 0) * (econ?.SALARY_PER_QUARTER || 0);
+                } catch { return 0; }
+              })(),
+            };
+            const dr = shStore.getState().reviewDemands(dmdCtx as any, quarterIndex);
+            if (dr.raised) {
+              useStatsStore.getState().update({
+                boardDemandNotice: require('../i18n').t('board.demand_' + dr.raised.kind, { v1: dr.raised.raisedByName }),
+              } as any);
+            }
+          } catch (e) { console.warn('[Board] demand review failed', e); }
+
+          const nc = shStore.getState().runNoConfidence(boardCtx, quarterIndex);
           if (nc.called) {
             useStatsStore.getState().update({
               distressMessage: nc.result?.summary,

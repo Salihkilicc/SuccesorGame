@@ -21,8 +21,13 @@ import {
     requiresVote,
     resolvePromise,
     trustDelta,
-    voteNoConfidence,
-} from '../../../core/market/governance';
+    voteNoConfidence, giftEffect, RELATIONSHIP_NEUTRAL, type Motivation,
+    detectDemand, evaluateDemand, decayRelationship,
+    DEMAND_COOLDOWN_MET, DEMAND_COOLDOWN_FAILED, DEMAND_QUIET,
+    NO_CONFIDENCE_COOLDOWN,
+    DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
+    type BoardDemand, type DemandContext, type DemandKind, type PetIssue,
+}from '../../../core/market/governance';
 import { formatMoney, formatNumber } from '../../../core/utils';
 
 
@@ -48,10 +53,31 @@ export interface BoardMember {
     name: string;
     shareCount: number; // Absolute share count (e.g., 1,250,000)
     trait: TraitType;
+    /** SONUCLARIN olusturdugu profesyonel guven. Oyu YALNIZCA bu belirler. */
     trust: number; // 0-100
+    /** JESTLERIN olusturdugu kisisel yakinlik. Oy vermez, kapi acar.
+     *  Bkz. core/market/governance.ts -> "GUVEN vs ILISKI" */
+    relationship?: number; // 0-100, varsayilan 50
+    /** Aslinda ne pesinde — hangi jestin ise yaradigini belirler. */
+    motivation?: Motivation;
+    /**
+     * TAKINTI. Bu uyenin her toplantida donup dolasip geldigi konu.
+     * Kurulunda borc takintili kimse yoksa borcunu kimse sormaz —
+     * kimi kurula aldigin, neyin hesabini verecegini belirler.
+     */
+    petIssue?: PetIssue;
+    /** Bu uyeye yapilan jest sayisi — azalan getiri icin */
+    gestureCount?: number;
     isHostile: boolean; // True if trust < 20
     origin: 'Founder' | 'Investor' | 'Network' | 'DebtShark';
     networkId?: string; // If they came from the "Love/Friends" module
+}
+
+/** Bir jestin sonucu — ekranda gerekcesiyle gostermek icin. */
+export interface GestureResult {
+    success: boolean;
+    delta: number;
+    message: string;
 }
 
 // Buyout negotiation result
@@ -148,8 +174,33 @@ interface ShareholderState {
     /** Vadesi gelen sozleri degerlendir */
     settlePromises: (currentQuarter: number, keptKinds: BoardPromise['kind'][], ctx: CompanyContext) => void;
     /** Guvensizlik kontrolu — ceyrek sonunda */
-    runNoConfidence: (ctx: CompanyContext) => { called: boolean; removed: boolean; result?: VoteResult; warning?: string };
+    runNoConfidence: (ctx: CompanyContext, quarter?: number) => { called: boolean; removed: boolean; result?: VoteResult; warning?: string };
     /** Ceyrek basinda lobi ve gunlugu temizle */
+    /**
+     * KISISEL JEST — hediye, yemek, ilgi.
+     *
+     * GUVENI DEGIL ILISKIYI artirir. Para oy satin alamaz; iliskinin
+     * getirisi bilgi ve zamandir. Motivasyon filtresinden gecer: yanlis
+     * adama yanlis jest ters teper.
+     * Bkz. core/market/governance.ts -> giftEffect
+     */
+    offerGesture: (memberId: string, gestureFor: Motivation, magnitude: number) => GestureResult;
+
+    // ================= KURULUN KENDI GUNDEMI =============================
+    /** Kurulun senden istedigi, henuz kapanmamis seyler */
+    boardDemands: BoardDemand[];
+    /** Tur bazinda bekleme: bu ceyrekten once ayni talep acilamaz */
+    demandCooldowns: Partial<Record<DemandKind, number>>;
+    /** Bir talep kapandiktan sonra kurulun sustugu ceyrek */
+    demandQuietUntil: number;
+    /** Son guvensizlik oyunun yapildigi ceyrek — arka arkaya yapilamaz */
+    lastNoConfidenceQuarter: number;
+    /** Ceyrek sonunda: yeni talep dogar mi, acik talepler ne oldu */
+    reviewDemands: (ctx: DemandContext, quarter: number) => {
+        raised?: BoardDemand; met: BoardDemand[]; failed: BoardDemand[];
+    };
+    /** Oyuncu acikca bir talebi karsiladi (temettu odedi, Ar-Ge yapti...) */
+    satisfyDemand: (kind: DemandKind) => void;
     resetQuarterlyBoard: () => void;
 
     getPlayerOwnershipPercent: () => number;
@@ -208,6 +259,9 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         trust: 50,
         isHostile: false,
         origin: 'Investor',
+        // Parayi sever, gideri dert edinir. Hediye ONA gecer.
+        motivation: 'money',
+        petIssue: 'headcount',
     },
     {
         id: 'npc-elena-vance',
@@ -217,6 +271,10 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         trust: 65,
         isHostile: false,
         origin: 'Founder',
+        // Kurucu: adi bu sirketle anilsin ister. Ona para uzatirsan
+        // hakaret sayar; masaya davet edersen kazanirsin.
+        motivation: 'legacy',
+        petIssue: 'debt',
     },
     {
         id: 'npc-victor-k',
@@ -226,6 +284,8 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         trust: 40,
         isHostile: false,
         origin: 'Investor',
+        // Talep acmaz — zayif kalmak isine gelir. Peşinde koltuk var.
+        motivation: 'control',
     },
     {
         id: 'npc-sarah-jen',
@@ -235,6 +295,8 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         trust: 55,
         isHostile: false,
         origin: 'Founder',
+        motivation: 'vindication',
+        petIssue: 'market_share',
     },
 ];
 
@@ -285,6 +347,10 @@ export const useShareholderStore = create<ShareholderState>()(
             ceoRemoved: false,
             noConfidenceLevel: 0,
             boardLog: [] as { label: string; effect: string }[],
+            boardDemands: [] as BoardDemand[],
+            demandCooldowns: {} as Partial<Record<DemandKind, number>>,
+            demandQuietUntil: 0,
+            lastNoConfidenceQuarter: -99,
 
             initializeGame: () => {
                 const members = INITIAL_BOARD_MEMBERS;
@@ -1523,8 +1589,8 @@ export const useShareholderStore = create<ShareholderState>()(
                 get().recalculateBoardMood();
             },
 
-            runNoConfidence: (ctx) => {
-                const { members, playerShareCount } = get();
+            runNoConfidence: (ctx, quarter = 0) => {
+                const { members, playerShareCount, totalShares } = get();
                 const gov: GovMember[] = members.map(m => ({
                     id: m.id, name: m.name, trait: m.trait as any,
                     trust: m.trust, shareCount: m.shareCount,
@@ -1536,11 +1602,19 @@ export const useShareholderStore = create<ShareholderState>()(
                     return { called: false, removed: false, warning: check.warning };
                 }
 
+                // Atlatilan bir oylamadan sonra kurul bir sure yeniden
+                // toplanamaz. Yoksa her ceyrek oylama yapiliyor ve her
+                // cagri hisseye ayri bir darbe vuruyordu.
+                if (quarter - get().lastNoConfidenceQuarter < NO_CONFIDENCE_COOLDOWN) {
+                    return { called: false, removed: false, warning: check.warning };
+                }
+
                 applyGovernanceSignal('no_confidence_called');
-                const result = voteNoConfidence(gov, playerShareCount, ctx);
+                const result = voteNoConfidence(gov, playerShareCount, ctx, totalShares);
                 applyGovernanceSignal(result.passed ? 'ceo_removed' : 'ceo_survived');
 
                 set(state => ({
+                    lastNoConfidenceQuarter: quarter,
                     ceoRemoved: result.passed,
                     lastVote: { ...result, title: 'Vote of No Confidence' },
                     boardLog: [...state.boardLog, {
@@ -1551,12 +1625,137 @@ export const useShareholderStore = create<ShareholderState>()(
                 return { called: true, removed: result.passed, result };
             },
 
+
+            // ================= KURULUN KENDI GUNDEMI =====================
+            //  Kurul artik sadece not vermiyor, ISTIYOR.
+            reviewDemands: (ctx, quarter) => {
+                const { members, boardDemands } = get();
+                const gov = (): GovMember[] => get().members.map(m => ({
+                    id: m.id, name: m.name, trait: m.trait as any, trust: m.trust,
+                    shareCount: m.shareCount, relationship: m.relationship ?? RELATIONSHIP_NEUTRAL,
+                    motivation: m.motivation, petIssue: m.petIssue,
+                }));
+
+                const met: BoardDemand[] = [];
+                const failed: BoardDemand[] = [];
+                const still: BoardDemand[] = [];
+
+                // --- Acik talepleri degerlendir --------------------------
+                for (const d of boardDemands) {
+                    if (d.status !== 'open') continue;
+                    const verdict = evaluateDemand(d, ctx, quarter, (d as any).__satisfied === true);
+                    if (verdict === 'met') met.push({ ...d, status: 'met' });
+                    else if (verdict === 'failed') failed.push({ ...d, status: 'failed' });
+                    else still.push(d);
+                }
+
+                // --- Guven sonuclarini isle -----------------------------
+                let next = get().members;
+                const log = [...get().boardLog];
+                const applyTrust = (d: BoardDemand, own: number, others: number, label: string) => {
+                    next = next.map(m => {
+                        const delta = m.id === d.raisedBy ? own : others;
+                        return { ...m, trust: Math.max(0, Math.min(100, m.trust + delta)) };
+                    });
+                    log.push({ label, effect: `${own > 0 ? '+' : ''}${own}` });
+                };
+                met.forEach(d => applyTrust(d, DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS,
+                    t('board.demandMetLog', { v1: d.raisedByName })));
+                failed.forEach(d => applyTrust(d, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
+                    t('board.demandFailedLog', { v1: d.raisedByName })));
+
+                // --- Bekleme sureleri ----------------------------------
+                //  Kapanan her talep turu bir sure geri gelmez ve kurul
+                //  en az bir ceyrek susar. Aksi halde ihmal edilen talep
+                //  cezayi kesip AYNI ceyrekte yeniden aciliyordu.
+                const cooldowns = { ...get().demandCooldowns };
+                met.forEach(d => { cooldowns[d.kind] = quarter + DEMAND_COOLDOWN_MET; });
+                failed.forEach(d => { cooldowns[d.kind] = quarter + DEMAND_COOLDOWN_FAILED; });
+                const closed = met.length + failed.length;
+                const quietUntil = closed > 0
+                    ? Math.max(get().demandQuietUntil, quarter + DEMAND_QUIET)
+                    : get().demandQuietUntil;
+
+                // --- Yeni talep: ayni anda tek bir tane -----------------
+                let raised: BoardDemand | undefined;
+                if (still.length === 0 && quarter >= quietUntil) {
+                    const d = detectDemand(gov(), ctx, quarter, cooldowns);
+                    if (d) { raised = d; still.push(d); }
+                }
+
+                set({
+                    members: next, boardDemands: still, boardLog: log,
+                    demandCooldowns: cooldowns, demandQuietUntil: quietUntil,
+                });
+                get().recalculateBoardMood();
+                return { raised, met, failed };
+            },
+
+            satisfyDemand: (kind) => {
+                set({
+                    boardDemands: get().boardDemands.map(d =>
+                        d.kind === kind && d.status === 'open' ? ({ ...d, __satisfied: true } as BoardDemand) : d,
+                    ),
+                });
+            },
+
+            offerGesture: (memberId, gestureFor, magnitude) => {
+                const { members } = get();
+                const member = members.find(m => m.id === memberId);
+                if (!member) {
+                    return { success: false, delta: 0, message: 'Member not found' };
+                }
+
+                const delta = giftEffect(
+                    {
+                        id: member.id, name: member.name, trait: member.trait,
+                        trust: member.trust, shareCount: member.shareCount,
+                        relationship: member.relationship ?? RELATIONSHIP_NEUTRAL,
+                        motivation: member.motivation,
+                    },
+                    gestureFor,
+                    magnitude,
+                    // Ayni adama ust uste jest yapmak sonuk kalir.
+                    member.gestureCount ?? 0,
+                );
+
+                const before = member.relationship ?? RELATIONSHIP_NEUTRAL;
+                const after = Math.max(0, Math.min(100, before + delta));
+
+                set({
+                    members: members.map(m =>
+                        m.id === memberId
+                            ? { ...m, relationship: after, gestureCount: (m.gestureCount ?? 0) + 1 }
+                            : m,
+                    ),
+                });
+
+                return {
+                    success: delta > 0,
+                    delta,
+                    message:
+                        delta > 0
+                            ? `${member.name}: ${before.toFixed(0)} -> ${after.toFixed(0)}`
+                            : `${member.name} bunu bir jest olarak gormedi.`,
+                };
+            },
+
             resetQuarterlyBoard: () => {
                 // NOTRE CEKIM: guven her ceyrek 55'e dogru kayar. Olaylar
                 // uygulanmadan ONCE, ki o ceyregin hamleleri taze kalsin.
                 const decayed = get().members.map(m => {
                     const t = decayTrust(m.trust);
-                    return { ...m, trust: Math.round(t), isHostile: t < 20 };
+                    return {
+                        ...m,
+                        trust: Math.round(t),
+                        isHostile: t < 20,
+                        // ILISKI DE SONER — ve guvenden daha yavas.
+                        // Bir kez yemek yiyip yillarca dost kalinmaz; ama
+                        // bir kotu ceyrek de dostlugu bitirmez.
+                        relationship: Math.round(decayRelationship(m.relationship)),
+                        // Jest yorgunlugu ceyrek basi bir kademe dinlenir.
+                        gestureCount: Math.max(0, (m.gestureCount ?? 0) - 1),
+                    };
                 });
                 set({ members: decayed, lobbied: {}, boardLog: [] });
                 get().recalculateBoardMood();

@@ -299,3 +299,52 @@ export const advanceBrand = (input: BrandQuarterInput): BrandQuarterResult => {
         cappedByFacility: capped,
     };
 };
+
+// ============================================================================
+//  KATEGORI MARKALARI VE KURUMSAL CATI
+// ============================================================================
+//  Marka tek bir sayiydi: saglikta kazandigin itibar teknolojide de
+//  isine yariyordu. Gercek hayatta boyle degil — Apple telefonda
+//  guclu diye ilac satamaz.
+//
+//  Artik her kategorinin kendi markasi var ve urunun cekiciligi KENDI
+//  kategorisinin markasini okur. Dongu kategori icinde kapanir:
+//  teknolojide sat -> teknoloji markan buyur -> teknolojide daha cok sat.
+//
+//  Ustte bir de KURUMSAL MARKA duruyor: kategori markalarinin ciro
+//  agirlikli ortalamasi. Kategoriye bagli olmayan her sey bunu okur —
+//  hisse istikrari, kredi notu, fasoncuya kabul, ise alim, giris esigi.
+// ============================================================================
+
+/** Yeni kategoriye girerken kurumsal markanin ne kadari taban sayilir. */
+export const CORPORATE_HALO = 0.20;
+
+/**
+ * Kurumsal marka: kategori markalarinin CIRO AGIRLIKLI ortalamasi.
+ *
+ * Agirlik ciro cunku sirketi taniyan kitle nerede satiyorsan oradadir.
+ * Hic ciro yoksa duz ortalamaya duser.
+ */
+export const corporateBrand = (
+    byCategory: Record<string, number>,
+    revenueByCategory: Record<string, number>,
+): number => {
+    const keys = Object.keys(byCategory);
+    if (keys.length === 0) return 0;
+
+    const totalRevenue = keys.reduce((sum, k) => sum + Math.max(0, revenueByCategory[k] || 0), 0);
+    if (totalRevenue <= 0) {
+        return keys.reduce((sum, k) => sum + (byCategory[k] || 0), 0) / keys.length;
+    }
+    return keys.reduce(
+        (sum, k) => sum + (byCategory[k] || 0) * (Math.max(0, revenueByCategory[k] || 0) / totalRevenue),
+        0,
+    );
+};
+
+/**
+ * Yeni bir kategoriye ilk girerken markan sifirdan baslamaz.
+ * Kurumsal itibarinin bir kismi kapida sana yarar — ama yalnizca bir kismi.
+ */
+export const categoryStartingBrand = (corporate: number): number =>
+    Math.max(0, (corporate || 0) * CORPORATE_HALO);

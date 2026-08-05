@@ -912,6 +912,37 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     : subsidiary.valuation * 0.85;
 
                 setCompanyCapital(companyCapital + proceeds);
+
+                // ----------------------------------------------------------
+                //  SATTIGIN DEGERLEME PIYASAYA YAZILIR
+                // ----------------------------------------------------------
+                //  BUG (oyuncu bildirdi: "sattigim degerleme ile oraya
+                //  gecmeli"): satis listesi INITIAL_MARKET_ITEMS'tan
+                //  okunuyor ve degerleme marketPrices'a gore hesaplaniyordu.
+                //  marketPrices'a dokunmadigimiz icin, buyuttugun (ya da
+                //  batirdigin) sirket satilinca ILK GUNKU degerlemesiyle
+                //  rafa geri donuyordu — bes yil emek verdigin sirketi
+                //  satip ertesi ceyrek ayni ucuz fiyattan geri alabiliyordun.
+                //
+                //  Artik cikis degerlemesi ima edilen hisse fiyatina
+                //  cevrilip piyasaya yaziliyor. Sirket rafa senin biraktigin
+                //  degerle donuyor.
+                // ----------------------------------------------------------
+                try {
+                    const { INITIAL_MARKET_ITEMS } = require('../../assets/data/marketData');
+                    const base: any = (INITIAL_MARKET_ITEMS as any[]).find(x => x.id === id);
+                    const exitValuation = subsidiary.valuation || 0;
+                    if (base && exitValuation > 0 && (base.marketCap || 0) > 0) {
+                        const basePrice = base.price || 100;
+                        const impliedPrice = basePrice * (exitValuation / base.marketCap);
+                        require('../../../core/store/useMarketStore').useMarketStore.setState(
+                            (st: any) => ({
+                                marketPrices: { ...st.marketPrices, [id]: impliedPrice },
+                            }),
+                        );
+                    }
+                } catch { /* piyasa deposu yoksa sessizce gec */ }
+
                 set(state => ({
                     subsidiaries: state.subsidiaries.filter(s => s.id !== id),
                 }));
