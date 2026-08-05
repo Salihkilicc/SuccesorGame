@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
@@ -104,16 +104,39 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
+/**
+ * Stand-in used while a product is missing, so the hooks below can run
+ * unconditionally. Never rendered — the component returns null first.
+ */
+const EMPTY_PRODUCT: any = Object.freeze({
+    id: '', name: '', category: '', status: 'retired',
+    inventory: 0, revenue: 0, marketingBudget: 0, qualityLevel: 1,
+    complexity: 50, sellingPrice: 0, suggestedPrice: 0, marketDemand: 50,
+    productionUnits: 0, contractUnits: 0, reachIndex: 1,
+});
+
 export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity }: any) => {
     // Dil degisince yeniden ciz.
     useLocale();
     // 1. Get live product from store to ensure reactivity
-    const product = useProductStore((state) =>
+    const liveProduct = useProductStore((state) =>
         state.products.find((p) => p.id === initialProduct?.id)
     );
 
-    // If product doesn't exist (e.g. retired/deleted), return null or close
-    if (!product) return null;
+    // ----------------------------------------------------------------------
+    //  NO EARLY RETURN BEFORE THE HOOKS
+    // ----------------------------------------------------------------------
+    //  There used to be an `if (!product) return null;` right here, with
+    //  another dozen hooks below it. The moment a product was retired while
+    //  its modal was open, the component bailed out early, React saw fewer
+    //  hooks than on the previous render and crashed ("Rendered fewer hooks
+    //  than expected").
+    //
+    //  Now every hook runs unconditionally against a fallback, and the bail
+    //  out happens further down, just before the JSX.
+    // ----------------------------------------------------------------------
+    const product = liveProduct ?? initialProduct ?? EMPTY_PRODUCT;
+    const productMissing = !liveProduct && !initialProduct;
 
     const { totalRP } = useLaboratoryStore();
     const { optimizeProductionLine, upgradeProductQuality, randomizeProductName } = useProductStore();
@@ -309,10 +332,31 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     //
     //  Artik ekran motorun gordugu sayiyi goruyor.
     // ======================================================================
-    const siblings = useProductStore(state =>
-        state.products.filter(p => p.status === 'active' && p.category === product.category),
+    // ----------------------------------------------------------------------
+    //  SELECTORS MUST NOT BUILD NEW ARRAYS
+    // ----------------------------------------------------------------------
+    //  These two started life as `state => state.products.filter(...)` and
+    //  `state => state.subsidiaries.map(...)`. Both allocate a NEW array on
+    //  every call, so zustand's useSyncExternalStore saw a changed reference
+    //  every render and re-rendered forever:
+    //
+    //    "The result of getSnapshot should be cached to avoid an infinite loop"
+    //    "Maximum update depth exceeded"
+    //
+    //  Rule: a selector returns a stable reference straight out of the store.
+    //  Any derivation happens afterwards, in useMemo.
+    // ----------------------------------------------------------------------
+    const allProducts = useProductStore(state => state.products);
+    const subsidiaries = useCorporateFinanceStore(state => state.subsidiaries);
+
+    const siblings = useMemo(
+        () => allProducts.filter(p => p.status === 'active' && p.category === product.category),
+        [allProducts, product.category],
     );
-    const acquiredStockIds = useCorporateFinanceStore(state => state.subsidiaries.map(sub => sub.id));
+    const acquiredStockIds = useMemo(
+        () => subsidiaries.map(sub => sub.id),
+        [subsidiaries],
+    );
 
     const projectedShare = (() => {
         if (!market || !attraction) return 0;
@@ -353,6 +397,9 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // Pazarlama artik sabit gider: satis adediyle carpilmaz, tumden dusulur.
     const projectedMargin =
         expectedSales * (effectivePrice - currentUnitCost) - marketing;
+
+    // Now that every hook has run, it is safe to bail out.
+    if (productMissing) return null;
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
