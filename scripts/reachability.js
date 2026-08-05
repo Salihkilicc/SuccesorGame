@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+/* ============================================================================
+ *  REACHABILITY AUDIT
+ * ============================================================================
+ *  This project's recurring failure is not broken logic. It is logic that is
+ *  correct, typed, simulated - and called from nowhere. Per-category brand ran
+ *  in the engine for weeks while every screen showed one number. The gift
+ *  system was wired to the store while the screen that used it was referenced
+ *  from no file. Both compiled cleanly and both were reported as done.
+ *
+ *  tsc cannot catch this: unreachable code is still valid code. So this script
+ *  asks the question tsc does not - can the player actually get here?
+ *
+ *  Run before calling anything finished:   node scripts/reachability.js
+ * ========================================================================== */
+const fs = require('fs');
+const path = require('path');
+
+const SRC = path.join(__dirname, '..', 'src');
+const files = [];
+(function walk(d) {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) walk(p);
+        else if (/\.tsx?$/.test(e.name)) files.push(p);
+    }
+})(SRC);
+
+const read = f => fs.readFileSync(f, 'utf8');
+const body = new Map(files.map(f => [f, read(f)]));
+const rel = f => path.relative(SRC, f);
+const isDisabled = f => /features\/(life|love|casino|shopping)\//.test(rel(f));
+
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** How many files other than `self` mention `name` as a whole word. */
+const refs = (name, self) => {
+    let n = 0;
+    const re = new RegExp(`\\b${esc(name)}\\b`);
+    for (const [f, t] of body) if (f !== self && re.test(t)) n++;
+    return n;
+};
+
+/**
+ * Is it used inside its own file, beyond the declaration itself?
+ *
+ * Without this the audit cried wolf: loyaltyOf, fatigueMultiplier and
+ * contextMultiplier are all exported helpers that governance.ts uses
+ * internally, and they were being reported as dead. An audit that reports
+ * healthy code is worse than no audit - it gets ignored.
+ */
+const usedInternally = (name, self) =>
+    (body.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
+
+/** A file may opt out with `// @orphan-ok <reason>` - legacy kept on purpose. */
+const optedOut = f => /@orphan-ok/.test(body.get(f));
+
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [] };
+
+// --- 1) Components nothing renders -----------------------------------------
+for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
+    const m = read(f).match(/export default (?:function )?(\w+)|export const (\w+)\s*[:=]/);
+    if (!m) continue;
+    const name = m[1] || m[2];
+    if (optedOut(f)) continue;
+    if (refs(name, f) === 0) problems.components.push(`${name}  (${rel(f)})`);
+}
+
+// --- 2) Store actions no component calls ------------------------------------
+for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
+    const t = read(f);
+    const iface = t.match(/interface \w*State \{([\s\S]*?)\n\}/);
+    if (!iface) continue;
+    for (const line of iface[1].split('\n')) {
+        const a = line.match(/^\s{4}(\w+):\s*\(/);           // action signature
+        if (!a) continue;
+        let used = 0;
+        for (const [g, gt] of body) {
+            if (g === f) continue;
+            if (isDisabled(g)) continue;
+            if (new RegExp(`\\b${a[1]}\\b`).test(gt)) used++;
+        }
+        if (used === 0) problems.storeActions.push(`${a[1]}()  (${rel(f)})`);
+    }
+}
+
+// --- 3) Engine exports the game never consumes ------------------------------
+for (const f of files.filter(f => /core\/market\/\w+\.ts$/.test(f))) {
+    for (const m of read(f).matchAll(/export const (\w+)\s*=\s*\(/g)) {
+        // Only flag it if nothing anywhere uses it - including its own file.
+        if (refs(m[1], f) === 0 && !usedInternally(m[1], f)) {
+            problems.engineExports.push(`${m[1]}()  (${rel(f)})`);
+        }
+    }
+}
+
+// --- 4) Stats fields written by the engine and read by no screen ------------
+const statsFile = files.find(f => f.endsWith('useStatsStore.ts'));
+if (statsFile) {
+    const iface = read(statsFile).match(/interface StatsState \{([\s\S]*?)\n\}/);
+    const tsx = files.filter(f => f.endsWith('.tsx') && !isDisabled(f));
+    if (iface) {
+        for (const line of iface[1].split('\n')) {
+            const m = line.match(/^\s{2}(\w+)\??:/);
+            if (!m || /^(set|update|reset)/.test(m[1])) continue;
+            const written = [...body].some(([g, t]) =>
+                g !== statsFile && new RegExp(`\\b${m[1]}\\s*:`).test(t));
+            const shown = tsx.some(g => new RegExp(`\\b${m[1]}\\b`).test(body.get(g)));
+            if (written && !shown) problems.statsFields.push(m[1]);
+        }
+    }
+}
+
+// --- report -----------------------------------------------------------------
+const section = (title, list, why) => {
+    if (!list.length) { console.log(`\x1b[32m  OK  \x1b[0m ${title}`); return 0; }
+    console.log(`\x1b[31m FAIL \x1b[0m ${title}  (${list.length})`);
+    console.log(`        ${why}`);
+    list.forEach(l => console.log(`        - ${l}`));
+    return list.length;
+};
+
+console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
+let total = 0;
+total += section('Components nothing renders', problems.components,
+    'Written, compiles, and no screen mounts it.');
+total += section('Store actions nothing calls', problems.storeActions,
+    'The state can change but nothing in the UI ever triggers it.');
+total += section('Engine functions nothing uses', problems.engineExports,
+    'Pure logic that no caller reaches. Correct and inert.');
+total += section('Stats written but never displayed', problems.statsFields,
+    'The engine computes it every quarter and the player never sees it.');
+
+console.log(`\n${total === 0 ? '\x1b[32mNothing orphaned.\x1b[0m' : `\x1b[33m${total} unreachable item(s).\x1b[0m`}`);
+console.log('(features/life, love, casino, shopping are flagged off and excluded.)\n');
+process.exit(0);
