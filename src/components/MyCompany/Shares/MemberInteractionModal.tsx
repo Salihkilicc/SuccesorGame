@@ -19,14 +19,34 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     const { members, calculateBuyoutPrice, offerGesture } = useShareholderStore();
     const { money, companySharePrice, update: updateStats } = useStatsStore();
 
+    // ----------------------------------------------------------------------
+    //  EVERY HOOK RUNS BEFORE THE EARLY RETURN
+    // ----------------------------------------------------------------------
+    //  These two store selectors were added below `if (!member) return null`,
+    //  which crashed the moment the screen was opened:
+    //    "Rendered more hooks than during the previous render."
+    //  With the modal closed memberId is '' so member is undefined and the
+    //  component bailed out after 4 hooks; opening it ran 6. React counts
+    //  hooks per render and refuses the mismatch.
+    //
+    //  This is the same mistake that was just fixed in ProductModals. The
+    //  rule for this file: no early return above this line.
+    // ----------------------------------------------------------------------
     const [activeTab, setActiveTab] = useState<TabType>('LOBBYING');
     const [offerPremium, setOfferPremium] = useState(0); // Percentage premium (-20 to +100)
+    const totalShares = useShareholderStore(st => st.totalShares);
+    const playerPercent = useShareholderStore(st =>
+        st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
+    );
 
     const member = members.find((m) => m.id === memberId);
 
+    // Safe from here on: no hooks below this point.
     if (!member) {
         return null;
     }
+
+    const memberPercent = totalShares > 0 ? (member.shareCount / totalShares) * 100 : 0;
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
@@ -116,20 +136,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         );
     };
 
-    // ----------------------------------------------------------------------
-    //  `member.shares` NEVER EXISTED
-    // ----------------------------------------------------------------------
-    //  BoardMember carries `shareCount` (an absolute count out of totalShares).
-    //  This screen read `member.shares` as a percentage in six places, so
-    //  every buyout figure on it was NaN. Nobody caught it because the screen
-    //  was unreachable - it is only being fixed now that tapping a director
-    //  actually opens it.
-    // ----------------------------------------------------------------------
-    const totalShares = useShareholderStore(st => st.totalShares);
-    const memberPercent = totalShares > 0 ? (member.shareCount / totalShares) * 100 : 0;
-    const playerPercent = useShareholderStore(st =>
-        st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
-    );
+    // `member.shares` never existed on BoardMember - the field is shareCount -
+    // so every buyout figure on this screen used to render NaN. Percentages are
+    // derived above from shareCount/totalShares.
 
     // Buyout Logic
     const calculateOfferPrice = () => {

@@ -75,7 +75,32 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [] };
+
+// --- 0) Hooks below an early return ----------------------------------------
+//  React counts hooks per render and refuses a mismatch. A component that
+//  bails out early and then calls more hooks crashes the moment the bail-out
+//  stops happening - "Rendered more hooks than during the previous render."
+//
+//  This was written twice in one week: ProductDetailModal and then
+//  MemberInteractionModal, in both cases by adding a store selector to the
+//  bottom of a component that already had an early return at the top. It does
+//  not fail tsc and it only crashes on the path the developer does not take
+//  while testing, so it needs a machine to catch it.
+const HOOK = /\b(useState|useEffect|useMemo|useCallback|useRef|useReducer|useContext|use[A-Z]\w*Store)\s*\(/;
+for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
+    const lines = read(f).split('\n');
+    let guard = -1;
+    for (let i = 0; i < lines.length; i++) {
+        // An early return inside a component body (indented, returns nothing useful)
+        if (/^\s{2,8}(if \s*\(.*\)\s*)?return (null|undefined);?\s*$/.test(lines[i])) guard = i;
+        else if (/^\s{0,4}(export )?(const|function) [A-Z]/.test(lines[i])) guard = -1;  // new component
+        else if (guard >= 0 && HOOK.test(lines[i]) && !/^\s*(\/\/|\*)/.test(lines[i])) {
+            problems.hooks.push(`${rel(f)}:${i + 1}  hook after early return on line ${guard + 1}`);
+            guard = -1;
+        }
+    }
+}
 
 // --- 1) Components nothing renders -----------------------------------------
 //  Matched on IMPORT PATH, not on symbol name. Matching the exported symbol
@@ -156,6 +181,8 @@ const section = (title, list, why) => {
 
 console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
+total += section('Hooks called after an early return', problems.hooks,
+    'React will crash with "Rendered more hooks than during the previous render".');
 total += section('Components nothing renders', problems.components,
     'Written, compiles, and no screen mounts it.');
 total += section('Store actions nothing calls', problems.storeActions,
