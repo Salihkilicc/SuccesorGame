@@ -1,97 +1,98 @@
 // src/core/featureFlags.ts
 //
 // ============================================================================
-//  FEATURE FLAGS — "CEO CORE" ODAK KESİTİ
+//  FEATURE FLAGS — THE "CEO CORE" FOCUS CUT
 // ============================================================================
 //
-//  Oyunun tür tanımlayıcı çekirdeği CEO simülasyonu. Bu dosya, çekirdek dışında
-//  kalan hayat-simülasyonu modüllerini KOD SİLMEDEN devre dışı bırakır.
+//  The genre-defining core of this game is the CEO simulation. This file
+//  disables the life-simulation modules outside that core WITHOUT DELETING
+//  ANY CODE.
 //
-//  Geri açmak için: ilgili satırdaki `false` -> `true`. Başka hiçbir şey
-//  yapmanız gerekmez; navigator, menü grid'leri ve aylık tick hook'ları
-//  tamamı bu dosyadan okur.
+//  To switch one back on: change `false` -> `true` on its line. Nothing else
+//  is needed; the navigator, the menu grids and the monthly tick hooks all
+//  read from this file.
 //
-//  KURAL: Yeni bir modül eklerken önce buraya bir flag ekle. Bir ekranı
-//  navigator'a doğrudan (koşulsuz) bağlamak, dağılmanın başladığı yerdir.
+//  RULE: when adding a new module, add a flag here first. Wiring a screen
+//  straight into the navigator (unconditionally) is where the sprawl starts.
 //
 // ============================================================================
 
 export const FEATURES = {
     // ------------------------------------------------------------------
-    //  CEO CORE — her zaman açık. Oyunun asıl konusu bunlar.
+    //  CEO CORE — always on. This is what the game is actually about.
     // ------------------------------------------------------------------
-    /** Şirket yönetimi: üretim, fabrika, işe alım, finans, satın alma */
+    /** Company management: production, factories, hiring, finance, acquisitions */
     company: true,
-    /** Ürün portföyü, fiyatlama, tedarik */
+    /** Product portfolio, pricing, supply */
     products: true,
-    /** Ar-Ge ve teknoloji ağacı */
+    /** R&D and the tech tree */
     research: true,
-    /** Hisse senedi piyasası ve yatırım */
+    /** Stock market and investing */
     market: true,
-    /** Hissedarlar, sermaye yapısı, seyreltme, müzakere */
+    /** Shareholders, capital structure, dilution, negotiation */
     shareholders: true,
-    /** Çeyreklik finansal rapor — oyunun öğretme yüzeyi */
+    /** Quarterly financial report — the game's teaching surface */
     financialReport: true,
-    /** MBA / executive education. CEO'ya bağlanacak: karar kalitesi + kredibilite */
+    /** MBA / executive education. To be wired to the CEO: decision quality + credibility */
     education: true,
-    /** Takvim, notlar, ayarlar, profil — OS kabuğu */
+    /** Calendar, notes, settings, profile — the OS shell */
     os: true,
 
     // ------------------------------------------------------------------
-    //  RAFA KALDIRILDI — kod duruyor, sadece erişim kapalı.
-    //  Motor derinleştikten sonra tek tek, gerekçesiyle geri açılacak.
+    //  SHELVED — the code is still here, only access is closed.
+    //  These come back one at a time, with a reason, once the engine is deeper.
     // ------------------------------------------------------------------
-    /** Lifestyle hub'ı (features/life) — Life sekmesi ve app grid'i */
+    /** Lifestyle hub (features/life) — the Life tab and the app grid */
     life: false,
-    /** İlişkiler / partner sistemi (features/love).
-     *  NOT: Geri döneceği hâli "stakeholder management" olacak
-     *  (yönetim kurulu, yatırımcı ilişkileri, kilit işe alım). */
+    /** Relationships / partner system (features/love).
+     *  NOTE: when it returns it will be reshaped as "stakeholder management"
+     *  (board, investor relations, key hires). */
     love: false,
     /** Kumarhane: slots, rulet, poker, blackjack */
     casino: false,
-    /** Underworld sekmesi (kara borsa + hookup + network hub'ı) */
+    /** Underworld tab (black market + hookup + network hub) */
     underworld: false,
     /** Kara borsa ve polis takibi mini-oyunu */
     blackMarket: false,
     /** Night out / hookup zinciri */
     nightOut: false,
-    /** Lüks tüketim ve mağazalar */
+    /** Luxury spending and stores */
     shopping: false,
-    /** Kişisel eşya portföyü */
+    /** Personal possessions portfolio */
     belongings: false,
-    /** DNA / karakter statları ekranı */
+    /** DNA / character stats screen */
     dna: false,
-    /** Spor salonu ve dövüş sanatları */
+    /** Gym and martial arts */
     gym: false,
-    /** Spa, bakım, estetik */
+    /** Spa, grooming, cosmetic work */
     sanctuary: false,
     /** Seyahat ve tatil rezervasyonu */
     travel: false,
-    /** Hava durumu uygulaması */
+    /** Weather app */
     weather: false,
 
     // ------------------------------------------------------------------
-    //  GELİŞTİRİCİ ARAÇLARI
+    //  DEVELOPER TOOLS
     // ------------------------------------------------------------------
-    /** God Mode paneli. Yayın build'inde false olmalı. */
+    /** God Mode panel. Must be false in a release build. */
     godMode: __DEV__,
 } as const;
 
 export type FeatureKey = keyof typeof FEATURES;
 
-/** Tek bir modülün açık olup olmadığını sorar. */
+/** Asks whether a single module is enabled. */
 export const isEnabled = (key: FeatureKey): boolean => FEATURES[key] === true;
 
 /**
- * Menü/grid dizilerini flag'e göre süzer.
+ * Filters menu/grid arrays by flag.
  *
  *   const items = filterByFeature(SECTION_LEISURE);
  *
- * `feature` alanı olmayan öğeler her zaman kalır.
+ * Items with no `feature` field always stay.
  */
 export const filterByFeature = <T extends { feature?: FeatureKey }>(items: T[]): T[] =>
     items.filter(item => item.feature === undefined || isEnabled(item.feature));
 
-/** Rafa kaldırılmış modüllerin listesi — teşhis/log amaçlı. */
+/** The list of shelved modules — for diagnostics and logging. */
 export const shelvedFeatures = (): FeatureKey[] =>
     (Object.keys(FEATURES) as FeatureKey[]).filter(k => !isEnabled(k));

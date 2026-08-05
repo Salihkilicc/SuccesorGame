@@ -1,19 +1,19 @@
 // src/core/newGame.ts
 //
 // ============================================================================
-//  YENİ OYUN — tek giriş noktası
+//  NEW GAME — the single entry point
 // ============================================================================
 //
-//  Oyunun tüm kalıcı durumunu siler ve temiz bir başlangıç kurar.
+//  Wipes all persistent game state and sets up a clean start.
 //
-//  NEDEN BU DOSYA VAR: Proje 20+ ayrı zustand store'u AsyncStorage'a yazıyor.
-//  Eski `useGameStore.resetGame` bunlardan sadece 7'sini siliyordu ve iki
-//  anahtar adı yanlıştı ('succesor_laboratory_v1' ve 'succesor_user_v1' —
-//  gerçek adlar 'succesor_laboratory' ve 'succesor_user_v3'). Sonuç: yeni oyun
-//  başlatınca eski veri sızıyordu.
+//  WHY THIS FILE EXISTS: the project writes 20+ separate zustand stores to
+//  AsyncStorage. The old `useGameStore.resetGame` deleted only 7 of them, and
+//  two of the key names were wrong ('succesor_laboratory_v1' and
+//  'succesor_user_v1' — the real names are 'succesor_laboratory' and
+//  'succesor_user_v3'). The result: starting a new game leaked old data.
 //
-//  KURAL: Yeni bir persist'li store eklediğinde anahtarını PERSIST_KEYS'e ekle.
-//  Aksi halde o store yeni oyunda eski veriyle açılır ve bunu fark etmek zor.
+//  RULE: when you add a new persisted store, add its key to PERSIST_KEYS.
+//  Otherwise that store opens a new game with old data, and it is hard to spot.
 //
 // ============================================================================
 
@@ -32,13 +32,13 @@ import { useMarketStore } from './store/useMarketStore';
 import { useAchievementStore } from './store/useAchievementStore';
 
 /**
- * AsyncStorage'daki TÜM oyun anahtarları.
+ * EVERY game key in AsyncStorage.
  *
- * `succesor_settings_v1` bilinçli olarak DIŞARIDA: dil, bildirim gibi
- * kullanıcı tercihleri yeni oyunda sıfırlanmamalı.
+ * `succesor_settings_v1` is deliberately EXCLUDED: user preferences such as
+ * language and notifications must not be reset by a new game.
  */
 export const PERSIST_KEYS: string[] = [
-    // Çekirdek
+    // Core
     'succesor_game_v2',
     'succesor_stats_v1',
     'succesor_products_v3',
@@ -57,16 +57,16 @@ export const PERSIST_KEYS: string[] = [
     'subsidiary-storage',
     'shareholder-store',
 
-    // Eğitim
+    // Education
     'succesor_education_v3',
     'succesor_education_system_v2',
 
-    // Rafa kaldırılmış modüller (flag kapalı ama veri kalmasın)
+    // Shelved modules (flag is off, but don't leave the data behind)
     'succesor_assets_v2',
     'relationship-storage',
     'travel-storage',
 
-    // Eski sürümlerden kalan anahtarlar — temizlenmezse migration'da karışıyor
+    // Keys left over from older versions — leaving them confuses migrations
     'succesor_game_v1',
     'succesor_user_v1',
     'succesor_user_v2',
@@ -79,10 +79,10 @@ export const PERSIST_KEYS: string[] = [
 ];
 
 /**
- * Bellekteki store'ları başlangıç durumuna döndürür.
+ * Returns the in-memory stores to their initial state.
  *
- * Sadece diski silmek yetmez: zustand store'ları hâlâ bellekte eski veriyle
- * duruyor ve uygulama yeniden başlatılana kadar öyle kalıyor.
+ * Wiping the disk is not enough on its own: the zustand stores still hold the
+ * old data in memory and keep holding it until the app restarts.
  */
 const resetInMemoryStores = () => {
     // reset() metodu olanlar
@@ -96,8 +96,8 @@ const resetInMemoryStores = () => {
     useMarketStore.getState().reset();
     useAchievementStore.getState().resetAchievements();
 
-    // Dinamik require: bu store'lar feature klasörlerinde ve bazıları
-    // core'a geri import ediyor — statik import döngü kurar.
+    // Dynamic require: these stores live in feature folders and some of them
+    // import back into core — a static import would create a cycle.
     try {
         const { useEquityStore } = require('../features/finance/stores/useEquityStore');
         useEquityStore.getState().reset?.();
@@ -126,8 +126,8 @@ const resetInMemoryStores = () => {
         console.warn('[newGame] useAssetStore sifirlanamadi', e);
     }
 
-    // Yönetim kurulu: reset()'i yok, initializeGame() başlangıç üyelerini
-    // INITIAL_BOARD_MEMBERS'dan yeniden kuruyor.
+    // The board: it has no reset(); initializeGame() rebuilds the starting
+    // members from INITIAL_BOARD_MEMBERS.
     try {
         const { useShareholderStore } = require('../features/shareholders/stores/useShareholderStore');
         useShareholderStore.getState().initializeGame();
@@ -135,34 +135,34 @@ const resetInMemoryStores = () => {
         console.warn('[newGame] Kurul yeniden kurulamadi', e);
     }
 
-    // GameStore'u en sona bırak: _hasHydrated true kalmalı, yoksa UI donar.
+    // Leave GameStore for last: _hasHydrated must stay true or the UI freezes.
     useGameStore.setState({ ...initialGameState, _hasHydrated: true });
 
     // ------------------------------------------------------------------
-    //  KRİTİK: hidrasyon bayraklarını geri aç.
+    //  CRITICAL: turn the hydration flags back on.
     // ------------------------------------------------------------------
-    //  App.tsx, statsStore ve gameStore hidrate olmadan `null` döndürüyor
-    //  (yani beyaz ekran). Ama `initialStatsState._hasHydrated === false`
-    //  olduğu için `useStatsStore.reset()` bayrağı sıfırlıyor ve persist
-    //  bir daha hidrasyon çalıştırmıyor — diski zaten sildik.
+    //  App.tsx returns `null` until statsStore and gameStore have hydrated
+    //  (i.e. a white screen). But because `initialStatsState._hasHydrated`
+    //  is `false`, `useStatsStore.reset()` clears the flag and persist never
+    //  runs hydration again — we already deleted the disk.
     //
-    //  Sonuç: bayrağı elle açmazsak yeni oyun beyaz ekranda kalıyor.
-    //  (Bu tam olarak ilk denemede olan hataydı.)
+    //  Net effect: without setting the flag by hand, a new game sits on a
+    //  white screen. (This is exactly what happened on the first attempt.)
     // ------------------------------------------------------------------
     useStatsStore.setState({ _hasHydrated: true });
 
     // ------------------------------------------------------------------
-    //  BELLEĞİ SIFIRLANMAYAN STORE'LAR
+    //  STORES WHOSE MEMORY WAS NEVER RESET
     // ------------------------------------------------------------------
-    //  Bu üçünün `reset()` metodu yoktu ve burada YALNIZCA hidrasyon
-    //  bayrağı açılıyordu. Diskteki anahtarları siliniyordu ama
-    //  BELLEKTEKİ veri duruyordu — ve zustand persist, bir sonraki
-    //  yazımda o eski veriyi diske geri yazıyordu. Yani notlar, takvim
-    //  ve ilişkiler yeni oyuna aynen geçiyordu.
+    //  These three had no `reset()` method and ONLY had their hydration flag
+    //  set here. Their disk keys were deleted, but the IN-MEMORY data stayed
+    //  — and zustand persist wrote that stale data straight back to disk on
+    //  the next write. So notes, calendar and relationships carried over into
+    //  the new game intact.
     //
-    //  `_hasHydrated: true` başlangıç durumundan SONRA veriliyor:
-    //  initialState içinde `false` durduğu için sırayı ters yaparsak
-    //  uygulama beyaz ekranda kalır (aşağıdaki statsStore notuna bak).
+    //  `_hasHydrated: true` is applied AFTER the initial state: it sits as
+    //  `false` inside initialState, so reversing the order leaves the app on
+    //  a white screen (see the statsStore note below).
     // ------------------------------------------------------------------
     try {
         const { initialNotesState, useNotesStore } = require('./store/useNotesStore');
@@ -174,8 +174,8 @@ const resetInMemoryStores = () => {
         const { initialRelationshipState, useRelationshipStore } = require('./store/useRelationshipStore');
         useRelationshipStore.setState({ ...initialRelationshipState, _hasHydrated: true });
 
-        // Ayarlar BİLİNÇLİ olarak sıfırlanmaz: dil ve bildirim tercihleri
-        // oyuncunun, oyunun değil.
+        // Settings are DELIBERATELY not reset: language and notification
+        // preferences belong to the player, not to the game.
         const { useSettingsStore } = require('./store/useSettingsStore');
         useSettingsStore.setState({ _hasHydrated: true });
     } catch (e) {
@@ -184,15 +184,15 @@ const resetInMemoryStores = () => {
 };
 
 /**
- * Yeni oyun başlatır: diski siler, belleği sıfırlar, kurulu yeniden kurar.
+ * Starts a new game: wipes the disk, resets memory, rebuilds the board.
  *
- * Çağıran taraf işlem bitince oyuncuyu Home'a yönlendirmeli.
+ * The caller should send the player back to Home once this resolves.
  */
 export const startNewGame = async (): Promise<void> => {
     console.log('[newGame] Yeni oyun baslatiliyor...');
 
-    // 1) Belleği sıfırla. Önce bunu yap — persist middleware bundan sonraki
-    //    yazımda temiz durumu diske geçirir.
+    // 1) Reset memory. Do this first — the persist middleware then writes the
+    //    clean state to disk on its next write.
     resetInMemoryStores();
 
     // 2) Diski temizle.
@@ -217,16 +217,16 @@ export const startNewGame = async (): Promise<void> => {
 };
 
 // ============================================================================
-//  YENİ OYUN DENETİMİ
+//  NEW-GAME AUDIT
 // ============================================================================
-//  Bu dosyanın tamamı "bir şeyi sıfırlamayı unutmak" hatası üzerine kurulu
-//  ve o hata SESSİZ: oyun açılır, çalışır, sadece sayılar yanlıştır.
-//  Oyuncu "çalışan sayısı önceki oyundan geldi" der ve elle hangi store
-//  olduğunu bulmak saatler alır.
+//  This entire file exists because of the "forgot to reset something" bug,
+//  and that bug is SILENT: the game opens, it runs, only the numbers are
+//  wrong. The player says "the headcount came over from my last game" and
+//  finding which store did it by hand takes hours.
 //
-//  Bu fonksiyon sıfırlamadan sonra kritik alanları beklenen başlangıç
-//  değerleriyle karşılaştırır ve sapan alanı ADIYLA yazar. Sorunu
-//  çözmez — nerede olduğunu söyler, ki asıl zor olan oydu.
+//  This function compares the critical fields against their expected initial
+//  values after a reset and prints any that drifted BY NAME. It does not fix
+//  the problem — it tells you where it is, which was the hard part.
 // ============================================================================
 export const verifyNewGame = (): string[] => {
     const problems: string[] = [];
