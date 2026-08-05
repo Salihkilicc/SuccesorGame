@@ -1,3 +1,6 @@
+// @orphan-ok-symbol plannedUnits - superseded by resolveTargetUnits() - production is absolute units now
+// @orphan-ok-symbol utilizationForUnits - only needed by the old percentage-based production UI
+// @orphan-ok-symbol allocateCapacity - the engine allocates inline so it can carry contract units too
 // src/core/market/production.ts
 //
 // ============================================================================

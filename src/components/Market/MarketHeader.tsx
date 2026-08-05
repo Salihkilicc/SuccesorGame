@@ -1,3 +1,5 @@
+// @orphan-ok superseded by MarketScreen's own header
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

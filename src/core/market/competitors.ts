@@ -1,3 +1,4 @@
+// @orphan-ok-symbol describeShareImpact - written for a UI string that was never built
 // src/core/market/competitors.ts
 //
 // ============================================================================

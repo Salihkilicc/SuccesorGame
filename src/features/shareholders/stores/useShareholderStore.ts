@@ -1,3 +1,4 @@
+// @orphan-ok-symbol getMemberOwnershipPercent - screens derive it from shareCount/totalShares inline
 import { t } from '../../../core/i18n';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';

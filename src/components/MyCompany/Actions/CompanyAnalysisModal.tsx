@@ -1,3 +1,5 @@
+// @orphan-ok analysis was folded into the product launch flow
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';

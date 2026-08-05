@@ -1,3 +1,4 @@
+// @orphan-ok-symbol getBorrowingCapacity - the finance hub reads assessment.headroom from credit.ts instead
 import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';

@@ -1,3 +1,5 @@
+// @orphan-ok duplicate - the live one is exported from features/products/components/ProductModals.tsx
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';

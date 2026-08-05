@@ -1,3 +1,5 @@
+// @orphan-ok production moved inside ProductDetailModal (features/products/components/ProductModals.tsx)
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, StyleSheet, Text } from 'react-native';

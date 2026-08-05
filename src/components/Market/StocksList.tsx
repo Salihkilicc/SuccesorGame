@@ -1,3 +1,5 @@
+// @orphan-ok superseded by StockCategory in features/assets/screens/MarketScreen.tsx
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';

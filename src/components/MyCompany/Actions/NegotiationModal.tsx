@@ -1,3 +1,5 @@
+// @orphan-ok negotiation was folded into AcquisitionModal (see its negotiationCard)
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';

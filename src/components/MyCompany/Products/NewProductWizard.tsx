@@ -1,3 +1,5 @@
+// @orphan-ok superseded by ProductUnlockModal + ProductLaunchModal
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, FlatList, Alert, Pressable } from 'react-native';

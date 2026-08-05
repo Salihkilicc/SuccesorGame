@@ -1,3 +1,4 @@
+// @orphan-ok-symbol useAllMarketPositions - written for an overview screen that was never built
 // src/core/market/useMarketPosition.ts
 //
 // ============================================================================

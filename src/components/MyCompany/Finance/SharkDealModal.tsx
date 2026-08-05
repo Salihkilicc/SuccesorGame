@@ -15,8 +15,8 @@ type Props = {
 
 const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
     useLocale();
-    const { takeSharkLoan } = useShareholderStore();
-    const { update } = useStatsStore();
+    const { takeSharkLoan, repaySharkLoan, sharkLoans, members } = useShareholderStore();
+    const { update, money } = useStatsStore();
     const { currentMonth } = useGameStore();
 
     // ------------------------------------------------------------------
@@ -86,6 +86,53 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
+                {/* ----------------------------------------------------------
+                    ACTIVE LOANS — there was no way out
+                    ----------------------------------------------------------
+                    takeSharkLoan was reachable from this screen and
+                    repaySharkLoan was called from nowhere in the app. You
+                    could pledge your shares to a director and then had no
+                    means of ever paying them back; the only exit was
+                    collateral seizure. A one-way trap, and not by design.
+                   ---------------------------------------------------------- */}
+                {(sharkLoans || []).filter(l => l.isActive).map(loan => {
+                    const lender = members.find(m => m.id === loan.lenderId);
+                    return (
+                        <View key={loan.id} style={styles.activeLoanCard}>
+                            <Text style={styles.activeLoanTitle}>
+                                {t('finance.activeLoanFrom', { v1: lender?.name || '-' })}
+                            </Text>
+                            <Text style={styles.activeLoanBody}>
+                                {t('finance.activeLoanTerms', {
+                                    v1: formatMoney(loan.amount),
+                                    v2: String(loan.deadlineTurn),
+                                })}
+                            </Text>
+                            <Pressable
+                                style={[styles.repayBtn, money < loan.amount && styles.repayBtnDisabled]}
+                                disabled={money < loan.amount}
+                                onPress={() => {
+                                    const r = repaySharkLoan(loan.id, (amount: number) => {
+                                        if (money < amount) return false;
+                                        update({ money: money - amount });
+                                        return true;
+                                    });
+                                    Alert.alert(
+                                        r.success ? t('finance.loanRepaid') : t('finance.cannotRepay'),
+                                        r.message,
+                                    );
+                                }}
+                            >
+                                <Text style={styles.repayBtnText}>
+                                    {money < loan.amount
+                                        ? t('finance.needMoreCash', { v1: formatMoney(loan.amount - money) })
+                                        : t('finance.repayNow', { v1: formatMoney(loan.amount) })}
+                                </Text>
+                            </Pressable>
+                        </View>
+                    );
+                })}
+
                 {/* TUTAR — sirketin buyuklugune gore */}
                 <View style={styles.amountCard}>
                     <Text style={styles.amountLabel}>{t('finance.howMuchDoYouNeed')}</Text>
@@ -223,6 +270,12 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 export default SharkDealModal;
 
 const styles = StyleSheet.create({
+    activeLoanCard: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#FF6B6B' },
+    activeLoanTitle: { color: '#FF6B6B', fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    activeLoanBody: { color: '#D0B8B8', fontSize: 11, lineHeight: 16, marginBottom: 10 },
+    repayBtn: { backgroundColor: '#4ADE80', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
+    repayBtnDisabled: { backgroundColor: '#3A3D45' },
+    repayBtnText: { color: '#0B0B0F', fontWeight: '800', fontSize: 13 },
     amountCard: { backgroundColor: '#2A2D35', borderRadius: 12, padding: 16 },
     amountLabel: { fontSize: 12, color: '#8A9BA8', fontWeight: '600' },
     amountValue: { fontSize: 26, color: '#FFF', fontWeight: '800', marginVertical: 6 },

@@ -1,3 +1,5 @@
+// @orphan-ok-symbol sharesForRaise - the dilution flow computes this inline
+// @orphan-ok-symbol dilutedOwnership - superseded by ownershipPercent()
 // src/core/market/equity.ts
 //
 // ============================================================================

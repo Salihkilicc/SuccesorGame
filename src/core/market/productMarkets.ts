@@ -1,3 +1,4 @@
+// @orphan-ok-symbol canEnterMarket - superseded by canUnlockAnotherCategory() in brand.ts
 // src/core/market/productMarkets.ts
 //
 // ============================================================================

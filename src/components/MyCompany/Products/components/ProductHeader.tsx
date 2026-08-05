@@ -1,3 +1,5 @@
+// @orphan-ok superseded by ProductDetailModal
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../../core/theme';

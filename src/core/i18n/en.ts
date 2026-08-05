@@ -1894,4 +1894,10 @@ export const en: Record<string, string> = {
     'mem.giftHint.control': 'Neither gift moves them much — they want a say.',
     'mem.giftHint.safety': 'Cautious by nature. Gestures help a little, results help more.',
     'mem.giftHint.vindication': 'Cash reads as a bribe. Recognition is what works.',
+    'finance.activeLoanFrom': 'Open loan from {v1}',
+    'finance.activeLoanTerms': '{v1} due by month {v2}. Miss it and he takes the pledged shares, not the money.',
+    'finance.repayNow': 'Repay {v1} now',
+    'finance.needMoreCash': 'Need {v1} more',
+    'finance.loanRepaid': 'Loan repaid',
+    'finance.cannotRepay': 'Could not repay',
 };

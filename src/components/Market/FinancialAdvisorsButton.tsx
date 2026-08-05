@@ -1,3 +1,5 @@
+// @orphan-ok advisors were never built into the CEO cut
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState } from 'react';
 import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';

@@ -1,3 +1,5 @@
+// @orphan-ok superseded by MarketTicker in features/assets/screens/MarketScreen.tsx
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';

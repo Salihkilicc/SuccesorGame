@@ -1,3 +1,5 @@
+// @orphan-ok superseded by BorrowModal/RepayModal in features/assets/components/MyCompany/CompanyModals.tsx
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';

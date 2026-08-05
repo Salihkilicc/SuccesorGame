@@ -53,21 +53,54 @@ const usedInternally = (name, self) =>
     (body.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
 
 /** A file may opt out with `// @orphan-ok <reason>` - legacy kept on purpose. */
-const optedOut = f => /@orphan-ok/.test(body.get(f));
+const optedOut = f => /@orphan-ok\s/.test(body.get(f));
+
+/**
+ * A single export may opt out with `// @orphan-ok-symbol <name> - <reason>`.
+ * Used for leftovers inside a file that is otherwise very much alive - a
+ * whole-file opt-out there would blind the audit to real problems.
+ */
+const symbolOptedOut = (name, f) =>
+    new RegExp(`@orphan-ok-symbol\\s+${esc(name)}\\b`).test(body.get(f));
+
+/**
+ * `// @orphan-todo <reason>` marks work that is genuinely UNFINISHED rather
+ * than legacy. It is listed separately and does not fail the audit.
+ *
+ * The distinction matters: an audit that can never reach zero gets ignored,
+ * which is precisely how the codebase ended up carrying 53 unreachable items
+ * in the first place. Legacy is closed with a reason; unfinished work stays
+ * visible as a list of known gaps.
+ */
+const todos = [];
+const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
 const problems = { components: [], storeActions: [], engineExports: [], statsFields: [] };
 
 // --- 1) Components nothing renders -----------------------------------------
+//  Matched on IMPORT PATH, not on symbol name. Matching the exported symbol
+//  gave false positives: RAndDModal.tsx exports `RAndDModalRevised` as a const
+//  and the real component as the default, so the audit hunted for a name
+//  nobody imports while the file itself was rendered every game.
 for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
-    const m = read(f).match(/export default (?:function )?(\w+)|export const (\w+)\s*[:=]/);
-    if (!m) continue;
-    const name = m[1] || m[2];
     if (optedOut(f)) continue;
-    if (refs(name, f) === 0) problems.components.push(`${name}  (${rel(f)})`);
+    const base = path.basename(f).replace(/\.tsx$/, '');
+    const imported = [...body].some(([g, t]) =>
+        g !== f && new RegExp(`from\\s+['"][^'"]*\\b${esc(base)}['"]`).test(t));
+    if (imported) continue;
+    const m = read(f).match(/export default (?:function )?(\w+)|export const (\w+)\s*[:=]/);
+    const label = `${(m && (m[1] || m[2])) || base}  (${rel(f)})`;
+    if (isTodo(f)) {
+        const why = (body.get(f).match(/@orphan-todo\s+(.*)/) || [])[1] || '';
+        todos.push(`${label}\n          ${why}`);
+    } else {
+        problems.components.push(label);
+    }
 }
 
 // --- 2) Store actions no component calls ------------------------------------
 for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
+    if (isDisabled(f) || optedOut(f)) continue;   // shelved modules are not a finding
     const t = read(f);
     const iface = t.match(/interface \w*State \{([\s\S]*?)\n\}/);
     if (!iface) continue;
@@ -80,15 +113,16 @@ for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
             if (isDisabled(g)) continue;
             if (new RegExp(`\\b${a[1]}\\b`).test(gt)) used++;
         }
-        if (used === 0) problems.storeActions.push(`${a[1]}()  (${rel(f)})`);
+        if (used === 0 && !symbolOptedOut(a[1], f)) problems.storeActions.push(`${a[1]}()  (${rel(f)})`);
     }
 }
 
 // --- 3) Engine exports the game never consumes ------------------------------
 for (const f of files.filter(f => /core\/market\/\w+\.ts$/.test(f))) {
+    if (optedOut(f)) continue;
     for (const m of read(f).matchAll(/export const (\w+)\s*=\s*\(/g)) {
         // Only flag it if nothing anywhere uses it - including its own file.
-        if (refs(m[1], f) === 0 && !usedInternally(m[1], f)) {
+        if (refs(m[1], f) === 0 && !usedInternally(m[1], f) && !symbolOptedOut(m[1], f)) {
             problems.engineExports.push(`${m[1]}()  (${rel(f)})`);
         }
     }
@@ -130,6 +164,11 @@ total += section('Engine functions nothing uses', problems.engineExports,
     'Pure logic that no caller reaches. Correct and inert.');
 total += section('Stats written but never displayed', problems.statsFields,
     'The engine computes it every quarter and the player never sees it.');
+
+if (todos.length) {
+    console.log(`\x1b[33m TODO \x1b[0m Unfinished, tracked on purpose  (${todos.length})`);
+    todos.forEach(l => console.log(`        - ${l}`));
+}
 
 console.log(`\n${total === 0 ? '\x1b[32mNothing orphaned.\x1b[0m' : `\x1b[33m${total} unreachable item(s).\x1b[0m`}`);
 console.log('(features/life, love, casino, shopping are flagged off and excluded.)\n');

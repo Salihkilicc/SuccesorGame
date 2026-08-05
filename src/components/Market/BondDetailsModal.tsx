@@ -1,3 +1,5 @@
+// @orphan-ok superseded by the Market screen in features/assets/screens/MarketScreen.tsx
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState } from 'react';
 import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';

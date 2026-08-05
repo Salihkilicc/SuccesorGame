@@ -1,3 +1,4 @@
+// @orphan-ok-symbol categoryStartingBrand - left over from the corporate-halo model; brand is anchored to share now
 import { t } from '../i18n';
 // src/core/market/brand.ts
 //

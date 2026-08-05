@@ -1,3 +1,7 @@
+// @orphan-ok-symbol updatePersonality - personality belongs to the shelved life sim (features/love)
+// @orphan-ok-symbol performAction - the action-point system was dropped from the CEO cut
+// @orphan-ok-symbol resetQuarterlyActions - same - no action points in the CEO cut
+// @orphan-ok-symbol setRelationshipBuffs - relationship buffs belong to the shelved life sim
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -1,3 +1,4 @@
+// @orphan-ok-symbol refresh - the engine writes equity state directly each quarter
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';

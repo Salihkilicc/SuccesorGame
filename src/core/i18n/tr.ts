@@ -1895,4 +1895,10 @@ export const tr: Record<string, string> = {
     'mem.giftHint.control': 'İkisi de pek etkilemez — söz hakkı istiyor.',
     'mem.giftHint.safety': 'Doğası temkinli. Jestler biraz, sonuçlar çok daha fazla işe yarar.',
     'mem.giftHint.vindication': 'Para rüşvet gibi durur. Onu tanımak işe yarar.',
+    'finance.activeLoanFrom': '{v1} kişisinden açık kredi',
+    'finance.activeLoanTerms': '{v1}, {v2}. aya kadar. Kaçırırsan parayı değil, teminattaki hisseleri alır.',
+    'finance.repayNow': 'Şimdi öde: {v1}',
+    'finance.needMoreCash': '{v1} daha lazım',
+    'finance.loanRepaid': 'Kredi kapandı',
+    'finance.cannotRepay': 'Ödenemedi',
 };

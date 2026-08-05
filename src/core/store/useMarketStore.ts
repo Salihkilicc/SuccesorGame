@@ -1,3 +1,5 @@
+// @orphan-ok-symbol updatePrices - superseded by simulateQuarter(), which the engine calls each quarter
+// @orphan-ok-symbol updateStockPrice - superseded by simulateQuarter()
 import { create } from 'zustand';
 import { shareValuationMultiplier } from '../market/competitors';
 import { persist, createJSONStorage } from 'zustand/middleware';

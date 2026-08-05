@@ -1,3 +1,5 @@
+// @orphan-ok there is no news system yet - see brand.ts applyBrandShock
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useState } from 'react';
 import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';

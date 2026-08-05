@@ -1,3 +1,4 @@
+// @orphan-ok-symbol maxUnitsForProduct - callers use maxUnitsPerQuarter directly
 import { t } from '../i18n';
 // src/core/market/capacity.ts
 //

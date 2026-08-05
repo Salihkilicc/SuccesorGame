@@ -1,3 +1,5 @@
+// @orphan-ok the IPO flow lives in ShareControlHub (onOpenIPO)
+// Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import {

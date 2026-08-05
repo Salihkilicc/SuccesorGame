@@ -1,3 +1,5 @@
+// @orphan-todo Achievements were never finished: the store and these two components exist,
+// but no screen renders them, so nothing is ever awarded or shown. Kept for a later pass.
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Achievement } from '../../achievements/achievements';
