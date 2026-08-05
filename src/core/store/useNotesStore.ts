@@ -58,3 +58,6 @@ export const useNotesStore = create<NotesStore>()(
         },
     ),
 );
+
+/** Yeni oyunda bellegi sifirlamak icin disa acildi (bkz. core/newGame.ts). */
+export { initialState as initialNotesState };

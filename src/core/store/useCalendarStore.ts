@@ -67,3 +67,6 @@ export const useCalendarStore = create<CalendarStore>()(
         },
     ),
 );
+
+/** Yeni oyunda bellegi sifirlamak icin disa acildi (bkz. core/newGame.ts). */
+export { initialState as initialCalendarState };

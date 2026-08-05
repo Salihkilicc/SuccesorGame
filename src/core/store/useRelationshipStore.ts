@@ -157,3 +157,6 @@ export const useRelationshipStore = create<RelationshipStore>()(
         },
     ),
 );
+
+/** Yeni oyunda bellegi sifirlamak icin disa acildi (bkz. core/newGame.ts). */
+export { initialState as initialRelationshipState };
