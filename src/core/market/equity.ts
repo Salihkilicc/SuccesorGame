@@ -1,35 +1,35 @@
 // src/core/market/equity.ts
 //
 // ============================================================================
-//  DEĞERLEME VE HİSSE — tek kaynak
+//  VALUATION AND SHARES — the single source
 // ============================================================================
 //
-//  NEDEN BU DOSYA VAR: oyunda UC AYRI hisse sistemi vardi ve ucu de
-//  birbirinden farkli sayi soyluyordu.
+//  WHY THIS FILE EXISTS: the game had THREE SEPARATE share systems and all
+//  three quoted different numbers.
 //
-//    1) useStatsStore.companyOwnership  -> 65 (sadece yuzde)
-//    2) useShareholderStore             -> 10.000.000 hisse, oyuncuda 6.5M
-//    3) useEquityStore                  -> 1.000.000 hisse, oyuncuda 1M
+//    1) useStatsStore.companyOwnership  -> 65 (a percentage only)
+//    2) useShareholderStore             -> 10,000,000 shares, 6.5M held
+//    3) useEquityStore                  -> 1,000,000 shares, 1M held
 //
-//  Stock Market ekrani UCUNCUSUNU okuyordu. Oyuncuda 1M/1M = %100
-//  gorunuyordu, oysa kurulda dort uye ve %35 pay vardi. Ekranin "hepsi
-//  senin" demesinin sebebi buydu.
+//  The Stock Market screen read THE THIRD. The player appeared to hold
+//  1M/1M = 100%, while the board had four members and 35% of the company.
+//  That is why the screen said "it's all yours".
 //
-//  Fiyat da 10 kat sapiyordu: biri degerlemeyi 1M hisseye, digeri 10M
-//  hisseye boluyordu.
+//  The price was off by 10x too: one divided the valuation by 1M shares, the
+//  other by 10M.
 //
-//  GUNLUK DEGISIM NEDEN HEP %0 IDI
-//  --------------------------------
-//  `companyDailyChange` yalnizca `processCompanyMonthlyTick` icinde
-//  yaziliyordu ve o fonksiyon HIC CAGRILMIYORDU. Yani alan hicbir zaman
-//  guncellenmedi; fiyat degisse bile ekranda %0.00 yaziyordu.
+//  WHY THE DAILY CHANGE WAS ALWAYS 0%
+//  ----------------------------------
+//  `companyDailyChange` was only written inside `processCompanyMonthlyTick`,
+//  and that function was NEVER CALLED. So the field was never updated; even
+//  when the price moved, the screen read 0.00%.
 //
-//  ARTIK: kap tablosu useShareholderStore'da (10M hisse, kurul uyeleri
-//  dahil), degerleme ve fiyat bu dosyadaki saf fonksiyonlarda, sonuclar
-//  statsStore'da saklanir. Tek zincir.
+//  NOW: the cap table lives in useShareholderStore (10M shares, board members
+//  included), valuation and price live in the pure functions in this file,
+//  and the results are stored in statsStore. One chain.
 //
-//  BU DOSYA BANKACILIK VE HISSE SATISININ TEMELI. Buraya yeni bir formul
-//  eklemeden once mevcut olani okuyun; ucuncu bir kaynak yaratmayin.
+//  THIS FILE UNDERPINS BANKING AND SHARE SALES. Read what is already here
+//  before adding a new formula; do not create a third source.
 //
 // ============================================================================
 
@@ -37,25 +37,23 @@
 export const TOTAL_SHARES_DEFAULT = 10_000_000;
 
 // ============================================================================
-//  DEĞERLEME
+//  VALUATION
 // ============================================================================
-//  ONCEDEN IKI FORMUL VARDI:
-//    motor:      sermaye x 1.5
-//    statsStore: aylikCiro x 12 x carpan + sermaye
-//  Motor her ceyrek digerinin uzerine yaziyordu, yani ikincisi hic
-//  gecerli olmuyordu.
+//  THERE USED TO BE TWO FORMULAS:
+//    engine:     capital x 1.5
+//    statsStore: monthlyRevenue x 12 x multiple + capital
+//  The engine overwrote the other one every quarter, so the second never
+//  actually applied.
 //
-//  YENI MODEL — gercek bir degerlemenin uc bacagi:
-//    nakit + kazanc carpani + ciro carpani
+//  THE NEW MODEL — the three legs of a real valuation:
+//    cash + earnings multiple + revenue multiple
 //
-//  Neden ikisi birden (kazanc VE ciro): erken oyunda kar dusuktur ama
-//  buyuyen bir ciro degerlidir; gec oyunda kar hakimdir. Tek basina
-//  kar carpani kullanirsak zarar eden ama hizli buyuyen sirket sifir
-//  degerli cikar, ki bu gercek disi.
+//  Why both (earnings AND revenue): early on, profit is low but growing
+//  revenue is valuable; late on, profit dominates. Using an earnings multiple
+//  alone would value a fast-growing loss-maker at zero, which is unrealistic.
 //
-//  HALKA ACIK OLMAK CARPANI BUYUTUR. Likidite ve gorunurluk primi.
-//  Marka da katkida bulunur: taninan sirket daha yuksek carpanla islem
-//  gorur.
+//  BEING PUBLIC RAISES THE MULTIPLE. A liquidity and visibility premium.
+//  Brand contributes too: a recognised company trades on a higher multiple.
 // ============================================================================
 
 import { brandValuationMultiplier } from './brand';
@@ -70,12 +68,12 @@ export interface ValuationInput {
     /** Sirket kasasi */
     cash: number;
     /**
-     * SON DORT CEYREGIN toplam hasilati (TTM).
+     * Trailing twelve months of revenue (TTM).
      *
-     * Once "son ceyrek x 4" kullaniliyordu ve sonuc sacmaydi: tek bir
-     * ceyrekte kar 350 binden 0'a dusunce hisse %66 eriyordu. Gercek
-     * piyasalar son 12 ayi fiyatlar, tek ceyregi degil. TTM ile bir kotu
-     * ceyregin etkisi dortte bire iner.
+     * This used to be "last quarter x 4" and the result was nonsense: when
+     * profit fell from $350k to 0 in a single quarter the share lost 66%.
+     * Real markets price the last 12 months, not one quarter. With TTM, one
+     * bad quarter has a quarter of the effect.
      */
     ttmRevenue: number;
     /**
@@ -84,8 +82,8 @@ export interface ValuationInput {
      */
     tangibleAssets?: number;
     /**
-     * KAZANC GUCU — yumusatilmis TTM EBIT (bkz. updateEarningsPower).
-     * Ham TTM degil: piyasa tek bir gurultulu ceyregi tam fiyatlamaz.
+     * EARNINGS POWER — smoothed TTM EBIT (see updateEarningsPower).
+     * Not raw TTM: the market does not fully price a single noisy quarter.
      */
     ttmEbit: number;
     /** Toplam borc — degerlemeden duser */
@@ -94,7 +92,7 @@ export interface ValuationInput {
     isPublic: boolean;
     /** Marka degeri 0-100 */
     brandValue: number;
-    /** Toplam gerçeklesen pazar payi (%). Kazanc KALITESINI yukseltir. */
+    /** Total realised market share (%). Raises earnings QUALITY. */
     marketShare?: number;
 }
 
@@ -126,12 +124,12 @@ const EARNINGS_MULTIPLE_PUBLIC = 22;
 /** Ciro carpanlari. */
 const REVENUE_MULTIPLE_PRIVATE = 0.8;
 const REVENUE_MULTIPLE_PUBLIC = 1.6;
-/** Marka 100'de carpanlara eklenen oran. */
+/** The uplift added to the multiples at brand 100. */
 /**
- * EMEKLIYE AYRILDI — marka carpani artik brand.ts'te.
- * Dogrusal ve zayifti (%35 tavan, dogrusal). Marka etkisi bir esikten
- * sonra devreye girer; o yuzden karesel oldu ve tavan %55'e cikti.
- * Bkz. core/market/brand.ts -> brandValuationMultiplier
+ * RETIRED — the brand multiplier now lives in brand.ts.
+ * This one was linear and weak (35% cap, linear). Brand effects only bite
+ * past a threshold, so it became quadratic and the cap rose to 55%.
+ * See core/market/brand.ts -> brandValuationMultiplier
  */
 const BRAND_MULTIPLE_BONUS_LEGACY = 0.35;
 /** Zararin degerlemeye etkisi bu oranda sonumlenir. */
@@ -150,17 +148,18 @@ export const companyValuation = (input: ValuationInput): ValuationBreakdown => {
     const brandLift = brandValuationMultiplier(input.brandValue || 0);
 
     // ------------------------------------------------------------------
-    //  PAZAR PAYI -> KAZANC KALITESI
+    //  MARKET SHARE -> EARNINGS QUALITY
     // ------------------------------------------------------------------
-    //  Pay, degerlemeye PARA olarak eklenmez — ciro ve kar zaten paydan
-    //  doguyor, ustune bir de toplasak cift sayim olurdu. Payin yaptigi
-    //  sey CARPANI yukseltmek: pazarin %8'ine sahip sirketin kari, ayni
-    //  kari eden %0,5'lik sirketten daha degerlidir, cunku o kar daha
-    //  kalicidir. Finansta "kazanc kalitesi" denir; hendegin fiyatidir.
+    //  Share is not added to the valuation as MONEY — revenue and profit
+    //  already flow from share, and adding it on top would double-count.
+    //  What share does is raise the MULTIPLE: the profit of a company that
+    //  owns 8% of its market is worth more than the same profit at a 0.5%
+    //  company, because that profit is more durable. Finance calls it
+    //  "earnings quality"; it is the price of a moat.
     //
-    //  Karekok sekilli: ilk paylar en degerlisi. Marka carpaniyla
-    //  birlikte toplam bir ust sinira bagli, yoksa ikisi carpisip
-    //  degerlemeyi ucururdu.
+    //  Square-root shaped: the first points of share are the most valuable.
+    //  Together with the brand multiplier it is capped in total, otherwise
+    //  the two would compound and send the valuation into orbit.
     // ------------------------------------------------------------------
     const shareLift = shareValuationMultiplier(
         Math.max(0, input.marketShare || 0),
@@ -178,10 +177,10 @@ export const companyValuation = (input: ValuationInput): ValuationBreakdown => {
 
     const cash = Math.max(0, input.cash || 0);
 
-    // ZARAR SONUMLEME: zarar eden sirket daha ucuzdur ama degeri sifira
-    // inmez — musterisi, markasi ve nakdi durur. Once kazanc bacagi
-    // sifira KIRPILIYORDU, bu da kari 1 dolar dusen sirketle 1 milyon
-    // dolar zarar eden sirketi ayni fiyata getiriyordu.
+    // LOSS DAMPING: a loss-making company is cheaper, but its value does not
+    // fall to zero — its customers, brand and cash remain. The earnings leg
+    // used to be CLAMPED to zero, which priced a company whose profit fell by
+    // $1 the same as one losing $1M.
     const earnings =
         annualEbit >= 0
             ? annualEbit * earningsMultiple
@@ -191,22 +190,22 @@ export const companyValuation = (input: ValuationInput): ValuationBreakdown => {
     const debt = Math.max(0, input.debt || 0);
 
     // ------------------------------------------------------------------
-    //  MADDİ DURAN VARLIKLAR — tesis, laboratuvar, iştirakler
+    //  TANGIBLE FIXED ASSETS — plant, laboratory, subsidiaries
     // ------------------------------------------------------------------
-    //  Oyuncu hakliydi: "fabrika ladderdaki ve rd fabrikasinin yeri de
-    //  net worth'u etkilemeli, cunku sirketimin bir de pasif yatirimlari
-    //  vardir gibi."
+    //  The player was right: "the factory on the ladder and the R&D plant
+    //  should affect net worth too, because my company also has passive
+    //  investments."
     //
-    //  Degerleme yalnizca NAKIT AKISINA bakiyordu. Bu bir sirket icin
-    //  buyuk olcude dogrudur, ama sifira yakin kar eden agir sanayi
-    //  sirketi bile fabrikasinin degerinden asagi fiyatlanmaz — kotu
-    //  senaryoda tesis satilir. Finansta buna "tasfiye degeri tabani"
-    //  denir ve deger yatirimciligin temel fikridir.
+    //  The valuation looked only at CASH FLOW. That is largely correct for a
+    //  company, but even a heavy-industry firm earning near zero is not
+    //  priced below the value of its plant — in the bad case the plant is
+    //  sold. Finance calls this the "liquidation value floor" and it is the
+    //  founding idea of value investing.
     //
-    //  Defter degerinin TAMAMINI eklemiyoruz: ikinci elde tesis parasini
-    //  etmez. Ayrica bu bir TABAN, bir toplama degil — karli sirkette
-    //  kazanc carpani zaten fabrikanin degerinden buyuktur, o yuzden
-    //  hicbir etkisi olmaz. Yalnizca zorda olan sirketi korur.
+    //  We do not add the FULL book value: plant does not fetch its price
+    //  second-hand. And this is a FLOOR, not an addition — in a profitable
+    //  company the earnings multiple already exceeds the factory's value, so
+    //  it has no effect at all. It only protects a company in trouble.
     // ------------------------------------------------------------------
     const tangible = Math.max(0, input.tangibleAssets || 0) * TANGIBLE_RECOVERY;
 
@@ -221,63 +220,64 @@ export const companyValuation = (input: ValuationInput): ValuationBreakdown => {
     return {
         cash, earnings, revenue, debt, tangible,
         earningsMultiple, revenueMultiple, total,
-        // Hangi taban belirledi — ekranda aciklamak icin
+        // Which floor set the value — so it can be explained on screen
         valuedOn: total === liquidation && liquidation > goingConcern ? 'assets' : 'earnings',
     };
 };
 
 // ============================================================================
-//  HİSSE FİYATI
+//  SHARE PRICE
 // ============================================================================
 
-/** Hisse basina deger. Tek bolen: toplam hisse sayisi. */
+/** Value per share. One divisor: the total share count. */
 export const sharePrice = (valuation: number, totalShares: number): number => {
     const shares = Math.max(1, totalShares || TOTAL_SHARES_DEFAULT);
     return Math.max(0, valuation) / shares;
 };
 
 /**
- * Piyasa duygusu — fiyatin temel degerden sapmasi.
+ * Market sentiment — the price's deviation from fundamental value.
  *
- * Kucuk ve rastgele (±%3). Kasten kucuk: fiyatin ASIL surukleyicisi
- * sirketin performansi olmali, kumar degil. Eskiden degisimin yarisi
- * saf rastgeleydi (±%5 haber faktoru) ve oyuncu neyin neden oldugunu
- * anlayamiyordu.
+ * Small and random (+/-3%). Deliberately small: the MAIN driver of the price
+ * should be company performance, not a coin flip. It used to be that half of
+ * the movement was pure randomness (a +/-5% "news factor") and the player
+ * could not tell what had caused what.
  */
 export const SENTIMENT_RANGE = 0.02;
 
 /**
- * FIYAT YUMUSATMA — piyasa yeni bilgiyi ANINDA tam fiyatlamaz.
+ * PRICE SMOOTHING — the market does not price new information in full at once.
  *
- * Ozel sirket cok yavas hareket eder: degerleme ancak bir yatirim turunda
- * veya satis goruşmesinde guncellenir, gunluk bir fiyati yoktur.
+ * A private company moves very slowly: its valuation only updates at a
+ * funding round or in a sale negotiation; it has no daily price.
  *
- * Halka acik sirket hizli fiyatlanir ve ustune duygu bandi biner. Halka
- * acilmanin gercek takasi budur: carpanlar buyur ama her ceyrek yargilanirsin.
+ * A public company reprices fast, with a sentiment band on top. That is the
+ * real trade of going public: the multiples grow, but you are judged every
+ * quarter.
  */
 export const PRICE_ADJUST_PRIVATE = 0.30;
 export const PRICE_ADJUST_PUBLIC = 0.55;
 
 // ----------------------------------------------------------------------------
-//  ÖLÇEK SÖNÜMLEMESİ — büyük şirket daha az oynar
+//  SCALE DAMPING — a large company moves less
 // ----------------------------------------------------------------------------
-//  Model once OLCEKTEN BAGIMSIZDI: 10 milyon dolarlik sirket de 2 trilyon
-//  dolarlik sirket de ayni yuzde oynuyordu. Gercekte kucuk sirket
-//  volatildir, dev sirket degildir. Sebepleri gercek:
+//  The model used to be SCALE-INDEPENDENT: a $10M company and a $2T company
+//  swung by the same percentage. In reality small companies are volatile and
+//  giants are not. The reasons are real:
 //
-//    - CESITLENME: dev sirketin onlarca urunu ve pazari vardir; birinde
-//      kotu bir ceyrek butunu tasimaz
-//    - LIKIDITE VE TAKIP: derin emir defteri ve cok sayida analist,
-//      yanlis fiyatlamayi hizla duzeltir ve sicramalari yutar
-//    - KURUMSAL SAHIPLIK: endeks fonlari ve uzun vadeli fonlar hisseyi
-//      tutar; el degistirme hizi duser
+//    - DIVERSIFICATION: a giant has dozens of products and markets; one bad
+//      quarter in one of them does not move the whole
+//    - LIQUIDITY AND COVERAGE: a deep order book and many analysts correct
+//      mispricing quickly and absorb jumps
+//    - INSTITUTIONAL OWNERSHIP: index funds and long-only funds hold the
+//      stock; turnover falls
 //
-//  Oyun acisindan da onemli: gec oyunda oyuncu dev bir sirket yonetirken
-//  hisse fiyatinin ceyrekte %70 oynamasi hem gercek disi hem sinir bozucu
-//  olurdu. Buyudukce oyun sakinlesir, kararlar uzun vadelenir.
+//  It matters for the game too: in the late game, running a giant while the
+//  share price swings 70% a quarter would be both unrealistic and maddening.
+//  As you grow the game calms down and decisions lengthen.
 //
-//  Logaritmik: 10 milyon dolarda tam oynaklik (1.0), 1 trilyonda ucte bir
-//  (0.35). Aradaki her buyukluk mertebesi bir kademe sakinlik getirir.
+//  Logarithmic: full volatility at $10M (1.0), a third of it at $1T (0.35).
+//  Each order of magnitude in between buys a notch of calm.
 // ----------------------------------------------------------------------------
 
 /** Sonumlemenin baslangic noktasi — bunun altinda tam oynaklik. */
@@ -315,11 +315,10 @@ export const smoothPrice = (
 };
 
 /**
- * Piyasa duygusu carpani zamanla 1.0'a doner.
+ * The market-sentiment multiplier decays back to 1.0 over time.
  *
- * IPO coskusu (1.5) veya seyreltme paniği (0.7) kalici degildir. Once
- * bu sonumleme YOKTU: halka arzdan sonra fiyat sonsuza kadar %50 sisik
- * kaliyordu.
+ * IPO euphoria (1.5) or dilution panic (0.7) is not permanent. This decay
+ * was MISSING at first: after an IPO the price stayed 50% inflated forever.
  */
 export const SENTIMENT_DECAY = 0.25;
 
@@ -327,24 +326,24 @@ export const decaySentiment = (multiplier: number): number =>
     multiplier + (1 - multiplier) * SENTIMENT_DECAY;
 
 // ----------------------------------------------------------------------------
-//  KAZANÇ GÜCÜ — piyasa gerçekleşeni değil, BEKLENENİ fiyatlar
+//  EARNINGS POWER — the market prices what it EXPECTS, not what happened
 // ----------------------------------------------------------------------------
-//  TTM tek basina yetmedi. Sebep sudur: EBIT iki buyuk sayinin (ciro ve
-//  maliyet) FARKIDIR. Ciro %10 oynayinca kar %50 oynayabilir — buna
-//  faaliyet kaldiraci denir ve gercektir. Ama gercek piyasalar bu
-//  gurultunun tamamini fiyatlamaz; bir ceyregin sapmasini "kalici mi
-//  gecici mi" diye tartar ve tahminini KISMEN gunceller.
+//  TTM alone was not enough, for this reason: EBIT is the DIFFERENCE between
+//  two large numbers (revenue and cost). A 10% swing in revenue can swing
+//  profit 50% — that is operating leverage, and it is real. But real markets
+//  do not price all of that noise; they weigh whether a quarter's deviation
+//  is permanent or temporary and update their estimate only PARTLY.
 //
-//  Bu yuzden degerleme ham TTM kar yerine yumusatilmis bir "kazanc gucu"
-//  kullanir. Sonuc: gurultulu bir ceyrek fiyati az oynatir, ama kalici
-//  bir bozulma (ust uste kotu ceyrekler) tam olarak fiyatlanir.
+//  So the valuation uses a smoothed "earnings power" rather than raw TTM
+//  profit. The result: a noisy quarter moves the price a little, while a
+//  lasting deterioration (bad quarter after bad quarter) is priced in full.
 //
-//  Oyun acisindan onemi: rastgele dalgalanma cezalandirilmaz, GERCEK
-//  performans degisimi cezalandirilir. Oyuncunun kararlari gorunur,
-//  gurultu gorunmez.
+//  Why it matters for the game: random fluctuation is not punished, REAL
+//  changes in performance are. The player's decisions are visible; the noise
+//  is not.
 // ----------------------------------------------------------------------------
 
-/** Kazanc gucu her ceyrek yeni TTM'e bu oranda yaklasir. */
+/** Earnings power moves this far towards the new TTM each quarter. */
 export const EARNINGS_POWER_ADJUST = 0.5;
 
 export const updateEarningsPower = (
@@ -432,12 +431,12 @@ export const CONTROL_NOTES: Record<ControlStatus, string> = {
 };
 
 // ============================================================================
-//  SEYRELTME VE GERİ ALIM
+//  DILUTION AND BUYBACKS
 // ============================================================================
 
 /**
- * Belirli bir tutari toplamak icin kac yeni hisse cikarmak gerekir.
- * Yeni hisseler MEVCUT fiyattan satilir; herkesin payi orantili seyrelir.
+ * How many new shares must be issued to raise a given amount.
+ * New shares are sold at the CURRENT price; everyone is diluted proportionally.
  */
 export const sharesForRaise = (amount: number, currentSharePrice: number): number => {
     if (!(currentSharePrice > 0)) return 0;
@@ -477,29 +476,29 @@ export const EQUITY_EXPLANATIONS = {
 } as const;
 
 // ============================================================================
-//  SERMAYE İŞLEMLERİ — gerçek maliyetleriyle
+//  CAPITAL TRANSACTIONS — with their real costs
 // ============================================================================
-//  Bu islemler oncesinde "bedava" idi: komisyon yok, iskonto yok, islem
-//  primi yok. Gercek hayatta hicbiri bedava degildir ve bedelleri tam da
-//  kararlari ilginc kilan seydir.
+//  These transactions used to be "free": no fees, no discount, no deal
+//  premium. In real life none of them are free, and their costs are exactly
+//  what makes the decisions interesting.
 // ============================================================================
 
 // --- HALKA ARZ ---------------------------------------------------------------
 
 /**
- * ARACILIK KOMISYONU. Gercek halka arzlarda brut hasilatin %5-7'si
- * bankalara gider. Bu, "halka acilinca degerlemem kadar para gelir"
- * beklentisini kirar.
+ * UNDERWRITING FEE. In real IPOs 5-7% of gross proceeds goes to the banks.
+ * This breaks the expectation that "going public hands me my valuation in
+ * cash".
  */
 export const IPO_UNDERWRITING_FEE = 0.07;
 
 /**
- * HALKA ARZ ISKONTOSU.
+ * IPO DISCOUNT.
  *
- * Hisse KASTEN adil degerin altinda fiyatlanir ki talep dolsun ve ilk
- * gun yukselsin. Literaturde "masada birakilan para" denir; ortalama
- * %15 civarindadir. Yani halka acilmak degerlemenin tamamini nakde
- * cevirmez — bu, IPO'yu otomatik bir kazanc olmaktan cikarir.
+ * Shares are DELIBERATELY priced below fair value so the book fills and the
+ * stock rises on day one. The literature calls it "money left on the table";
+ * it averages around 15%. So going public does not convert your whole
+ * valuation into cash — which stops an IPO being automatic free money.
  */
 export const IPO_DISCOUNT = 0.12;
 
@@ -518,7 +517,7 @@ export interface IpoQuote {
     newShares: number;
     /** Iskontolu arz fiyati */
     offerPrice: number;
-    /** Iskontosuz adil fiyat — farki oyuncuya gostermek icin */
+    /** The fair price before the discount — to show the player the gap */
     fairPrice: number;
     /** Brut hasilat */
     grossProceeds: number;
@@ -542,8 +541,8 @@ export const quoteIpo = (
     const fairPrice = sharePrice(valuation, totalShares);
     const offerPrice = fairPrice * (1 - IPO_DISCOUNT);
 
-    // Halka arzda YENI hisse cikarilir; mevcut ortaklarin adedi degismez
-    // ama toplam artar, yani herkes orantili seyrelir.
+    // An IPO issues NEW shares; existing holders keep their count but the
+    // total rises, so everyone is diluted proportionally.
     const newShares = Math.floor((totalShares * ratio) / (1 - ratio));
     const grossProceeds = newShares * offerPrice;
     const underwritingFee = grossProceeds * IPO_UNDERWRITING_FEE;
@@ -560,7 +559,7 @@ export const quoteIpo = (
     };
 };
 
-// --- İKİNCİL HALKA ARZ (SEYRELTME) -------------------------------------------
+// --- SECONDARY OFFERING (DILUTION) -------------------------------------------
 
 /** Ikincil arzlarda hisse piyasa fiyatinin altinda satilir. */
 export const SECONDARY_DISCOUNT = 0.08;
@@ -601,7 +600,7 @@ export const quoteSecondary = (
     };
 };
 
-// --- GERİ ALIM ---------------------------------------------------------------
+// --- BUYBACK -----------------------------------------------------------------
 
 /**
  * ISLEM PRIMI.
@@ -642,7 +641,7 @@ export const quoteBuyback = (
         };
     }
 
-    // Iteratif degil, kapali form yaklasimi: once prim tahmini, sonra adet.
+    // Not iterative — a closed-form approximation: estimate premium, then count.
     const naive = budget / currentPrice;
     const consumedGuess = Math.min(1, naive / publicShares);
     const premium = consumedGuess * BUYBACK_EXECUTION_PREMIUM;
@@ -661,14 +660,15 @@ export const quoteBuyback = (
     };
 };
 
-// --- TEMETTÜ -----------------------------------------------------------------
+// --- DIVIDEND ----------------------------------------------------------------
 
 /**
- * Temettu artik NAKDIN yuzdesi degil, KARIN yuzdesi (dagitim orani).
+ * A dividend is now a percentage of PROFIT (a payout ratio), not of CASH.
  *
- * Onceki hali "sermayenin %10'unu dagit" idi. O bir temettu degil, kismi
- * tasfiyedir. Gercek sirketler kardan dagitir; dagitim orani sirketin
- * olgunluk isaretidir. Zarardayken dagitmak ise ciddi bir uyari sinyalidir.
+ * The previous version was "distribute 10% of capital". That is not a
+ * dividend, it is a partial liquidation. Real companies pay out of profit,
+ * and the payout ratio is a sign of a company's maturity. Paying one while
+ * loss-making is a serious warning signal.
  */
 export const DIVIDEND_PAYOUT_MAX = 1.0;
 
@@ -679,7 +679,7 @@ export interface DividendQuote {
     perShare: number;
     /** Oyuncunun cebine giren */
     playerCut: number;
-    /** Yillik getiri: (hisse basi x 4) / fiyat */
+    /** Annual yield: (per share x 4) / price */
     annualYieldPercent: number;
     /** Nakit yetiyor mu */
     affordable: boolean;
@@ -714,44 +714,45 @@ export const DIVIDEND_SENTIMENT_BOOST = 0.04;
 
 
 // ============================================================================
-//  KURUCUNUN KENDİ HİSSESİNİ SATMASI (secondary sale)
+//  THE FOUNDER SELLING THEIR OWN SHARES (secondary sale)
 // ============================================================================
 //
-//  Oyuncu hakliydi: "issue shares var, para sirkete gidiyor ama benim
-//  hissem azaliyor, bu sacma — ikisinden biri olsun."
+//  The player was right: "there's issue shares, the money goes to the company
+//  but my stake shrinks, that's absurd — it should be one or the other."
 //
-//  Aslinda BUNLAR IKI FARKLI ISLEM ve ekranda tek dugmede birlesmisti:
+//  In fact these are TWO DIFFERENT TRANSACTIONS that had been merged into a
+//  single button on screen:
 //
-//    BIRINCIL (dilution)  -> YENI hisse basilir, para SIRKETE girer.
-//                            Senin payin duser cunku pasta buyudu.
-//                            Sirket buyume icin para toplar.
+//    PRIMARY (dilution)   -> NEW shares are issued, the money goes to the
+//                            COMPANY. Your stake falls because the pie grew.
+//                            The company raises money to grow.
 //
-//    IKINCIL (secondary)  -> SENIN hissen el degistirir, para SANA gider.
-//                            Yeni hisse YOK, toplam degismez.
-//                            Sirkete tek kurus girmez.
+//    SECONDARY            -> YOUR shares change hands, the money goes to YOU.
+//                            NO new shares, the total is unchanged.
+//                            Not a cent reaches the company.
 //
-//  Ikisi de gercek ve ikisi de gerekli. Tek dugmede birlestirmek
-//  oyuncunun hangi parayi kime verdigini anlamasini imkansiz kiliyordu.
+//  Both are real and both are needed. Merging them into one button made it
+//  impossible for the player to understand which money went to whom.
 //
-//  IKINCIL SATISTA VERGI VAR: sermaye kazanci vergilendirilir. Sirket
-//  vergisinden ayridir cunku bu SENIN gelirin.
+//  A SECONDARY SALE IS TAXED: capital gains are taxable. This is separate
+//  from corporation tax because this is YOUR income.
 // ============================================================================
 
 /** Sermaye kazanci vergisi — kurucunun kendi hisse satisindan. */
 export const CAPITAL_GAINS_TAX = 0.20;
 
 /**
- * Temettu vergisi. Sirket zaten kurumlar vergisi odedi; temettuyu alan
- * kisi bir kez daha oder. Finansta "cifte vergilendirme" denir ve
- * sirketlerin neden temettu yerine hisse geri alimi tercih ettiginin
- * bir numarali sebebidir — geri alimda vergi ertelenir.
+ * Dividend tax. The company already paid corporation tax; whoever receives
+ * the dividend pays again. Finance calls this "double taxation", and it is
+ * the number one reason companies prefer buybacks to dividends — a buyback
+ * defers the tax.
  */
 export const DIVIDEND_TAX = 0.15;
 
 /**
- * Blok satis iskontosu.
- * Buyuk bir paketi bir anda satmak fiyati kirar; alici likidite
- * riskini fiyatlar. Ne kadar buyuk satarsan o kadar ucuza gider.
+ * Block-sale discount.
+ * Dumping a large parcel at once moves the price against you; the buyer
+ * prices in the liquidity risk. The more you sell, the cheaper it goes.
  */
 export const blockDiscount = (percentOfCompany: number): number =>
     Math.min(0.25, Math.max(0, percentOfCompany) * 0.012);
