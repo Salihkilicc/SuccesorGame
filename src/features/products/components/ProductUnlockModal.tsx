@@ -3,9 +3,9 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { UnlockableProduct } from '../data/unlockableProductsData';
-import { canEnterMarket } from '../../../core/market/productMarkets';
 import { getMarket } from '../../../core/market/productMarkets';
 import { useProductStore } from '../../../core/store/useProductStore';
+import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
@@ -36,18 +36,27 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     };
 
     // ------------------------------------------------------------------
-    //  KATEGORI GIRIS ESIGI
+    //  CATEGORY GATE — earn your way out before you spread
     // ------------------------------------------------------------------
-    //  Her pazarin kapisi kendi rakiplerinin gucunden dogar. Robotik gibi
-    //  dusuk hacimli ve guclu rakipli bir pazara itibarin olmadan
-    //  giremezsin. Esik KURUMSAL markaya bakar — kapidaki soru "bu sirket
-    //  robotikte iyi mi" degil, "bu sirket ciddi mi".
-    //  Bkz. core/market/productMarkets.ts -> canEnterMarket
+    //  You cannot open a new market until EVERY market you already trade in
+    //  is at CATEGORY_UNLOCK_BRAND (200 points, which is about 4.6% share).
+    //  Opening a fourth category on the back of one strong one while two sit
+    //  neglected is exactly the sprawl this gate exists to prevent.
+    //
+    //  The gate reads the WEAKEST category you hold, so the message can name
+    //  it. Entering your very first market is always allowed.
+    //  See core/market/brand.ts -> canUnlockAnotherCategory
     // ------------------------------------------------------------------
+    const brandByCategory = useStatsStore(st => st.brandByCategory);
+
     const entryGate = (() => {
-        const mk = getMarket(product.category);
-        if (!mk) return { allowed: true, required: 0, have: 0 };
-        return canEnterMarket(mk, brandValue || 0);
+        const map = brandByCategory || {};
+        const active = Object.keys(map);
+        // Already trading in this category, or it is the first one: no gate.
+        if (active.length === 0 || map[product.category] !== undefined) {
+            return { allowed: true, required: 0, have: 0, weakest: undefined as string | undefined };
+        }
+        return canUnlockAnotherCategory(map, active);
     })();
 
     const canAfford = entryGate.allowed && totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;
@@ -56,10 +65,11 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         if (!entryGate.allowed) {
             Alert.alert(
                 t('alert.marketClosed'),
-                t('alert.marketClosedBody', {
+                t('alert.marketLockedBody', {
                     v1: product.category,
-                    v2: entryGate.required.toFixed(0),
-                    v3: entryGate.have.toFixed(1),
+                    v2: entryGate.weakest || '-',
+                    v3: entryGate.have.toFixed(0),
+                    v4: entryGate.required.toFixed(0),
                 }),
             );
             return;

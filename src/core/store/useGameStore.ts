@@ -8,7 +8,10 @@ import { FEATURES } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
-import { advanceBrand, brandFromAcquisition, brandStabilityFactor } from '../market/brand';
+import {
+  advanceBrand, brandFromAcquisition, brandStabilityFactor,
+  advanceCategoryBrand, corporateBrandFrom, applyCorporateShock, brandIndex,
+} from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import { updateReachIndex } from '../market/attraction';
 import {
@@ -385,7 +388,17 @@ export const useGameStore = create<GameStore>()(
           overtimeFactor *
           Math.max(1, quarters);
 
-        const brandValue = brandValueRaw;
+        // ------------------------------------------------------------------
+        //  POINTS vs INDEX
+        // ------------------------------------------------------------------
+        //  stats.brandValue now holds BRAND POINTS (share x 43.3, so 433 at
+        //  10% share). Everything written before that change - attraction,
+        //  valuation multiples, hiring pull, contract partners - reads a
+        //  0-100 brand. `brandValue` stays the 0-100 index so those callers
+        //  keep working; the raw points travel as brandValueRaw.
+        // ------------------------------------------------------------------
+        const brandValue = brandIndex(brandValueRaw);
+        const brandValueIndexPrev = brandValue;
         const acquiredStockIds = useCorporateFinanceStore.getState().subsidiaries.map(s => s.id);
 
         const activeProducts = products.filter((p: any) => p.status === 'active');
@@ -1096,6 +1109,15 @@ export const useGameStore = create<GameStore>()(
           revenueByCategory[c] = (revenueByCategory[c] || 0) + (pb.revenue || 0);
         });
 
+        // Demand we generated per category — used to score how much of the
+        // appetite we actually served (that speeds brand growth).
+        const demandByCategory: Record<string, number> = {};
+        activeProducts.forEach((p: any) => {
+          const c = p.category || 'Consumer';
+          const want = marketDemandByProduct[p.id]?.demand || 0;
+          demandByCategory[c] = (demandByCategory[c] || 0) + want;
+        });
+
         const realizedShareOf = (cat: string): number => {
           const mk = getMarket(cat);
           const size = (mk?.sizeUnitsPerQuarter || 0) * Math.max(1, quarters);
@@ -1106,7 +1128,23 @@ export const useGameStore = create<GameStore>()(
         const totalPlayerShare = Object.keys(soldByCategory)
           .reduce((sum, c) => sum + realizedShareOf(c), 0);
 
-        // Acquisition brand gain across every category this quarter.
+        // Acquisition brand gain, per category: the reputation you BOUGHT.
+        // This is the one thing that moves brand in a single step.
+        const acquisitionGainByCategory: Record<string, number> = {};
+        (() => {
+          const subs = useCorporateFinanceStore.getState().subsidiaries;
+          subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1).forEach(x => {
+            const cat = (x.sector as string) || 'Consumer';
+            const gain = brandFromAcquisition(
+              x.deal?.fairValue || x.valuation || 0,
+              stats.companyValue || 1,
+              !!x.deal?.hostile,
+              brandValue,
+            );
+            acquisitionGainByCategory[cat] = (acquisitionGainByCategory[cat] || 0) + gain;
+          });
+        })();
+
         const acquisitionGainTotal = (() => {
           const subs = useCorporateFinanceStore.getState().subsidiaries;
           const fresh = subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1);
@@ -1121,16 +1159,51 @@ export const useGameStore = create<GameStore>()(
           );
         })();
 
-        const brandResult = advanceBrand({
-          currentBrand: brandValue,
-          // Marketing and quality effect, straight from attraction.ts.
-          marketingDelta: marketingBrand.newBrand - brandValue,
-          totalMarketShare: totalPlayerShare,
-          profitable: netProfit > 0,
-          acquisitionGain: acquisitionGainTotal,
-          ceiling: tier.brandCeiling,
-          floor: tier.brandFloor,
+        // ------------------------------------------------------------------
+        //  BRAND, PER CATEGORY, ANCHORED TO SHARE
+        // ------------------------------------------------------------------
+        //  Each market keeps its own reputation and each one walks towards the
+        //  level its realised share supports (share x 43.3). The corporate
+        //  figure q is DERIVED from these, never stored separately - so a hit
+        //  to one category shows up in q on its own.
+        //  See core/market/brand.ts
+        // ------------------------------------------------------------------
+        const prevByCategory: Record<string, number> = {
+          ...(useStatsStore.getState().brandByCategory || {}),
+        };
+
+        const activeCategories = Array.from(
+          new Set([...Object.keys(soldByCategory), ...Object.keys(prevByCategory)]),
+        );
+
+        // How much of the demand we created did we actually deliver?
+        const servedRatioOf = (cat: string): number => {
+          const want = demandByCategory[cat] || 0;
+          if (want <= 0) return 1;
+          return Math.min(1, (soldByCategory[cat] || 0) / want);
+        };
+
+        const nextByCategory: Record<string, number> = { ...prevByCategory };
+        const marketingDeltaTotal = marketingBrand.newBrand - brandValueIndexPrev;
+
+        activeCategories.forEach(cat => {
+          const shareHere = realizedShareOf(cat);
+          // Marketing effect is split across categories by their share of sales.
+          const weightHere = totalPlayerShare > 0 ? shareHere / totalPlayerShare : 1 / Math.max(1, activeCategories.length);
+          const r = advanceCategoryBrand({
+            current: prevByCategory[cat] ?? 0,
+            share: shareHere,
+            servedRatio: servedRatioOf(cat),
+            marketingDelta: marketingDeltaTotal * weightHere,
+            acquisitionGain: (acquisitionGainByCategory[cat] || 0),
+          });
+          nextByCategory[cat] = r.newBrand;
         });
+
+        const corporateQ = corporateBrandFrom(nextByCategory, activeCategories);
+
+        // Everything written before brand points existed reads a 0-100 index.
+        const brandIdx = brandIndex(corporateQ);
 
         // ------------------------------------------------------------------
         //  KADRO VE INSAAT DURUMUNU YAZ
@@ -1178,7 +1251,8 @@ export const useGameStore = create<GameStore>()(
         const nextTenure = blendTenure(avgTenure, headcount, arrivedHires, Math.max(1, quarters));
 
         useStatsStore.getState().update({
-          brandValue: brandResult.newBrand,
+          brandValue: corporateQ,
+          brandByCategory: nextByCategory,
           employeeCount: headcount,
           incomingHires: queuedHires,
           facilityTier: nextTierLevel,
@@ -1280,8 +1354,8 @@ export const useGameStore = create<GameStore>()(
 
           totalMarketDemand,
           totalUnmetDemand,
-          brandValue: brandResult.newBrand,
-          brandChange: brandResult.change,
+          brandValue: corporateQ,
+          brandChange: corporateQ - (stats.brandValue || 0),
           brandMaintenance: marketingBrand.maintenance,
           brandCeiling: tier.brandCeiling,
 
@@ -1419,7 +1493,7 @@ export const useGameStore = create<GameStore>()(
           ttmEbit: earningsPower,
           debt: stats.companyDebtTotal || 0,
           isPublic: isPublicNow,
-          brandValue: brandResult.newBrand,
+          brandValue: brandIdx,
           // Pay carpani: kazanc kalitesi. Bkz. core/market/equity.ts
           marketShare: totalPlayerShare,
         }).total;
@@ -1449,7 +1523,7 @@ export const useGameStore = create<GameStore>()(
         // MARKA ISTIKRAR SAGLAR: guclu markali sirketin hissesi daha az
         // oynar, cunku yatirimci kotu ceyregi "gecici" diye okur. Finansta
         // "kalite primi" denir. leverageVol ile ters yonde calisir.
-        const brandStability = brandStabilityFactor(brandResult.newBrand);
+        const brandStability = brandStabilityFactor(brandIdx);
         const marketCap = valuation / (leverageVol * brandStability);
         let newSharePrice = smoothPrice(prevPrice, fairPrice, isPublicNow, marketCap);
         if (isPublicNow) newSharePrice = applySentiment(newSharePrice, Math.random(), marketCap);

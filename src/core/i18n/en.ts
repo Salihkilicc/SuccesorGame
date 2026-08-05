@@ -1871,4 +1871,8 @@ export const en: Record<string, string> = {
     'product.matchDemandCapped': 'Build to capacity — {units} (demand exceeds what you can make)',
     'product.qualityQueued': 'Only Lvl {v1} of {v2} is being built — your {v3} cannot go higher. The rest is queued and activates when you upgrade the plant.',
     'product.acqCapacityLocked': 'You own {v1} units of demand but can only build {v2}. The share you bought unlocks as capacity grows.',
+    'alert.marketLockedBody': 'You cannot open {v1} yet. Every market you already trade in must reach {v4} brand. Your weakest is {v2} at {v3}. Build where you already are before spreading.',
+    'brand.thisCategory': 'Brand here',
+    'brand.corporateShort': 'company {v1}',
+    'brand.perCategory': 'Brand by market',
 };

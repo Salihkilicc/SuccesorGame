@@ -38,6 +38,9 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
     useLocale();
     const position = useMarketPosition(category);
     const brandValue = useStatsStore(state => state.brandValue);
+    // Per-category brand. The corporate figure above is a weighted average of
+    // these, leaning towards the harder markets.
+    const brandByCategory = useStatsStore(state => state.brandByCategory);
 
     if (!position) return null;
 
@@ -94,11 +97,36 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                     <Text style={styles.summaryUnit}>rank #{playerRank}</Text>
                 </View>
                 <View style={styles.summaryCell}>
-                    <Text style={styles.summaryLabel}>{t('os.brandValue')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#FFD700' }]}>{brandValue.toFixed(1)}</Text>
-                    <Text style={styles.summaryUnit}>out of 100</Text>
+                    <Text style={styles.summaryLabel}>{t('brand.thisCategory')}</Text>
+                    <Text style={[styles.summaryValue, { color: '#FFD700' }]}>
+                        {Math.round((brandByCategory || {})[category ?? ""] ?? 0)}
+                    </Text>
+                    <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: brandValue.toFixed(0) })}</Text>
                 </View>
             </View>
+
+            {/* --------------------------------------------------------------
+                EVERY CATEGORY'S BRAND
+                --------------------------------------------------------------
+                This existed in the engine for weeks and was never on screen,
+                so the player reasonably concluded there was only one brand.
+                The gate to a new market reads the WEAKEST row here.
+               -------------------------------------------------------------- */}
+            {Object.keys(brandByCategory || {}).length > 1 && (
+                <View style={styles.brandRow}>
+                    {Object.entries(brandByCategory || {}).map(([cat, v]) => (
+                        <View key={cat} style={styles.brandChip}>
+                            <Text style={styles.brandChipCat}>{cat}</Text>
+                            <Text style={[
+                                styles.brandChipVal,
+                                { color: (v as number) >= 200 ? '#4ADE80' : '#FFB020' },
+                            ]}>
+                                {Math.round(v as number)}
+                            </Text>
+                        </View>
+                    ))}
+                </View>
+            )}
 
             <Text style={styles.soldLine}>
                 You sold {formatNumber(unitsSold)} units in this category last quarter.
@@ -183,6 +211,10 @@ const styles = StyleSheet.create({
 
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },
     summaryCell: { flex: 1, alignItems: 'center' },
+    brandRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+    brandChip: { backgroundColor: '#1E1E24', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
+    brandChipCat: { color: '#8A9BA8', fontSize: 9 },
+    brandChipVal: { fontSize: 13, fontWeight: '800' },
     summaryLabel: { color: '#6E6E6E', fontSize: 9.5, letterSpacing: 0.5 },
     summaryValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 3 },
     summaryUnit: { color: '#5C5C5C', fontSize: 9, marginTop: 1 },

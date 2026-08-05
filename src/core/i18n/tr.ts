@@ -1872,4 +1872,8 @@ export const tr: Record<string, string> = {
     'product.matchDemandCapped': 'Kapasiteye kadar üret — {units} (talep üretebileceğinden fazla)',
     'product.qualityQueued': '{v2} seviyenin sadece {v1} kadarı üretiliyor — {v3} daha yukarısını kaldırmıyor. Gerisi sırada bekliyor, tesisi büyütünce devreye girer.',
     'product.acqCapacityLocked': '{v1} adetlik talebin var ama {v2} üretebiliyorsun. Satın aldığın pay, kapasite büyüdükçe açılır.',
+    'alert.marketLockedBody': '{v1} pazarını henüz açamazsın. Halihazırda bulunduğun her pazarın markası {v4} olmalı. En zayıfın {v2}, şu an {v3}. Yayılmadan önce bulunduğun yeri büyüt.',
+    'brand.thisCategory': 'Bu pazardaki marka',
+    'brand.corporateShort': 'şirket {v1}',
+    'brand.perCategory': 'Pazarlara göre marka',
 };
