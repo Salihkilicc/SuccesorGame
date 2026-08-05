@@ -1867,4 +1867,7 @@ export const tr: Record<string, string> = {
     'gov.personalFavor': 'Kararsızdı — kişisel olarak senden yana durdu',
     'board.demandPrivate': 'ÖZEL GÖRÜŞME',
     'board.demandConfidential': '{v1} bunu toplantıdan önce sana özel olarak açtı — fazladan vaktin var.',
+    'product.cannotBuildRetooling': 'Bu çeyrek üretemezsin — tesis yenileniyor. Talep var, kapasite yok.',
+    'product.cannotBuildNoCrew': 'Bu çeyrek üretemezsin — hatta çalışan yok. Bu talebi kullanmak için personel al.',
+    'product.matchDemandCapped': 'Kapasiteye kadar üret — {units} (talep üretebileceğinden fazla)',
 };

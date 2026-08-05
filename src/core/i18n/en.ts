@@ -1866,4 +1866,7 @@ export const en: Record<string, string> = {
     'gov.personalFavor': 'Undecided — sided with you personally',
     'board.demandPrivate': 'PRIVATE WORD',
     'board.demandConfidential': '{v1} raised this with you privately before the meeting — you have extra time.',
+    'product.cannotBuildRetooling': 'You cannot build this quarter — the plant is being retooled. Demand is there; capacity is not.',
+    'product.cannotBuildNoCrew': 'You cannot build this quarter — there is no crew on the line. Hire staff to use this demand.',
+    'product.matchDemandCapped': 'Build to capacity — {units} (demand exceeds what you can make)',
 };

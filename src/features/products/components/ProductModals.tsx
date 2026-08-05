@@ -5,6 +5,7 @@ import { theme } from '../../../core/theme';
 import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
+import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
@@ -219,7 +220,12 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
     // totalCapacity artik CALISAN SAYISI tasiyor (bkz. useProductsLogic).
     const employeeCount = totalCapacity || 0;
+    // KATEGORI markasi — motor bunu kullaniyor (catBrand). Kurumsal marka
+    // yalnizca yeni bir kategoriye girerken baslangic degeri verir.
     const brandValue = useStatsStore(state => state.brandValue);
+    const categoryBrand = useStatsStore(
+        state => state.brandByCategory?.[initialProduct?.category ?? ''] ?? state.brandValue,
+    );
     // Kapasite artik tesis kademesinden gelir (core/market/capacity.ts).
     const facilityTier = useStatsStore(state => state.facilityTier);
     const isRetooling = useStatsStore(state => !!state.facilityBuild);
@@ -275,16 +281,63 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                 marketingBudget: marketing,
                 benchmark,
                 qualityLevel,
-                brandValue,
+                brandValue: categoryBrand,
                 marketDemand: product.marketDemand ?? 50,
             },
             market,
         )
         : null;
 
-    const projectedShare = market && attraction
-        ? computeShares([attraction.total], market).shares[0]
-        : 0;
+    // ======================================================================
+    //  PAY PROJEKSIYONU — motorun cagrisiyla BIREBIR AYNI olmali
+    // ======================================================================
+    //  Burada dort fark vardi ve dordu de ekrandaki talebi OLDUGUNDAN
+    //  BUYUK gosteriyordu. "Talebe esitle" dedigin adet, ceyrek sonunda
+    //  satabileceginden fazla cikiyor ve fark stoga kaliyordu:
+    //
+    //   1) Marka: ekran KURUMSAL markayi veriyordu, motor KATEGORI
+    //      markasini kullaniyor. Saglikta kazandigin itibar teknolojide
+    //      isine yaramaz — ekran bunu bilmiyordu.
+    //   2) Kardes urunler: ekran urunu TEK BASINA hesapliyordu. Ayni
+    //      kategoride uc urunun varsa ucu de birbirinin payini yer;
+    //      motor hepsini birlikte veriyor.
+    //   3) Erisim endeksi: gecen ceyrek talebi karsilayamadiysan motor
+    //      cekiciligini kirpar. Ekran kirpmiyordu, yani toparlanma
+    //      donemindeki oyuncuya asla ulasamayacagi bir talep gosteriyordu.
+    //   4) Devralinan paylar: satin aldigin sirketlerin payi paydaya
+    //      giriyor.
+    //
+    //  Artik ekran motorun gordugu sayiyi goruyor.
+    // ======================================================================
+    const siblings = useProductStore(state =>
+        state.products.filter(p => p.status === 'active' && p.category === product.category),
+    );
+    const acquiredStockIds = useCorporateFinanceStore(state => state.subsidiaries.map(sub => sub.id));
+
+    const projectedShare = (() => {
+        if (!market || !attraction) return 0;
+        const others = siblings.filter(p => p.id !== product.id);
+        const attractions = [
+            attraction.total * (product.reachIndex ?? 1),
+            ...others.map(p => {
+                const b = marketingBenchmark(market, p.revenue || 0, p.benchmarkSmoothed);
+                const a = computeAttraction(
+                    {
+                        sellingPrice: p.sellingPrice || p.suggestedPrice,
+                        suggestedPrice: p.suggestedPrice,
+                        marketingBudget: p.marketingBudget || 0,
+                        benchmark: b,
+                        qualityLevel: Math.min(p.qualityLevel || 1, tier.qualityCeiling),
+                        brandValue: categoryBrand,
+                        marketDemand: p.marketDemand ?? 50,
+                    },
+                    market,
+                );
+                return a.total * (p.reachIndex ?? 1);
+            }),
+        ];
+        return computeShares(attractions, market, acquiredStockIds).shares[0];
+    })();
 
     const expectedDemand = market ? demandUnits(market, projectedShare) : 0;
 
@@ -497,13 +550,28 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     {t('product.enoughStock', { units: formatNumber(product.inventory || 0) })}
                                 </Text>
                             )}
-                            {expectedDemand > 0 && neededUnits > 0 && (
+                            {/* -----------------------------------------------
+                                KAPASITE YOKKEN BUTON "0 URET" DIYORDU
+                                -----------------------------------------------
+                                Tesis yenilenirken ya da kadro sifirlandiginda
+                                maxUnits 0 oluyor ve Math.min(0, ihtiyac) = 0.
+                                Buton bozuk gibi duruyordu. Artik sebebini
+                                soyluyor: uretemiyorsun, talep yok degil.
+                               ----------------------------------------------- */}
+                            {expectedDemand > 0 && neededUnits > 0 && maxUnits <= 0 && (
+                                <Text style={styles.matchNote}>
+                                    {isRetooling ? t('product.cannotBuildRetooling') : t('product.cannotBuildNoCrew')}
+                                </Text>
+                            )}
+                            {expectedDemand > 0 && neededUnits > 0 && maxUnits > 0 && (
                                 <Pressable
                                     style={styles.matchBtn}
                                     onPress={() => setProductionUnits(Math.min(maxUnits, neededUnits))}
                                 >
                                     <Text style={styles.matchBtnText}>
-                                        {t('product.matchDemand', { units: formatNumber(Math.min(maxUnits, neededUnits)) })}
+                                        {neededUnits > maxUnits
+                                            ? t('product.matchDemandCapped', { units: formatNumber(maxUnits) })
+                                            : t('product.matchDemand', { units: formatNumber(neededUnits) })}
                                     </Text>
                                 </Pressable>
                             )}
