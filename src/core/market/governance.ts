@@ -206,6 +206,10 @@ export const isConfidant = (m: GovMember): boolean =>
 //  rutindir. Ayni olay tekrarlandikca etkisi soner.
 // ============================================================================
 export const FATIGUE_DECAY = 0.65;
+/** Yorgunluk ust siniri — uye tamamen duyarsizlasmasin. */
+export const FATIGUE_CAP = 5;
+/** Ceyrek basi sonme. Artistan (1) yavas, yoksa hic birikmez. */
+export const FATIGUE_RECOVERY = 0.5;
 
 /** Ayni olayin ust uste tekrarinda etkiyi soker. */
 export const fatigueMultiplier = (member: GovMember, kind: string): number => {
@@ -430,11 +434,20 @@ export const trustDelta = (
     // ------------------------------------------------------------------
     if (delta > 0) {
         // 100'e yaklastikca kazanmak zorlasir. 55'te tam, 100'de sifir.
+        // Tekrar yorgunlugu BURAYA UYGULANMAZ: bu zaten bir sonum ve
+        // ikisi ust uste binince rutin kar guveni hic toparlayamiyordu.
+        // Dogrulama kosusu bunu yakaladi: "bir kotu yil sonra toparlanma"
+        // senaryosu, sirket duzelmesine ragmen CEO'nun gorevden
+        // alinmasiyla bitiyordu.
         const headroom = Math.max(0, (100 - member.trust) / 45);
         delta *= Math.min(1, headroom);
     } else {
         // Dususte boyle bir koruma YOK: guven hizli kaybedilir.
         delta *= 1.15;
+        // Yorgunluk yalnizca KOTU haberde: besinci zarar ceyregi ilki
+        // kadar sok degildir. Kurulun dibe yapisip bir daha donmemesini
+        // engelleyen sey bu.
+        delta *= fatigueMultiplier(member, event.kind);
     }
 
     // Kisisel filtre: cok guvenen daha bagislayici, guvenmeyen daha sert.
@@ -641,13 +654,26 @@ export const castVotes = (
         if (ctx.profitable && ctx.lossStreak === 0) performance += 0.2;
 
         const lobby = lobbied[m.id] || 0;
-        const inclination = stance + trustPull + performance + lobby;
+        const raw = stance + trustPull + performance + lobby;
+
+        // ------------------------------------------------------------------
+        //  KISISEL ILISKI — ama YALNIZCA kararsizda
+        // ------------------------------------------------------------------
+        //  Bu cagri eksikti: hediye/yemek iliskiyi yukseltiyordu ama
+        //  iliski oylamada hicbir sey yapmiyordu. Simdi yapiyor — ve
+        //  sadece egilim sifira yakinsa. Saglam bir "hayir" iliski 95'te
+        //  bile hayir kalir. Para oy satin almaz, tereddudu kirar.
+        // ------------------------------------------------------------------
+        const inclination = relationshipTiebreak(m, raw);
+        const swayed = Math.sign(inclination) !== Math.sign(raw) && raw !== 0;
 
         const vote: 'YES' | 'NO' = inclination > 0 ? 'YES' : 'NO';
 
         // Karari OKUNABILIR yap — oyuncu neden kaybettigini gormeli.
         let reason: string;
-        if (Math.abs(trustPull) > Math.abs(stance) && trustPull !== 0) {
+        if (swayed) {
+            reason = t('gov.personalFavor');
+        } else if (Math.abs(trustPull) > Math.abs(stance) && trustPull !== 0) {
             reason = trustPull > 0
                 ? t('gov.backsYou', { v1: m.trust })
                 : t('gov.doesNotTrust', { v1: m.trust });
@@ -1196,6 +1222,8 @@ export interface BoardDemand {
     deadline: number;
     /** Sayisal hedef (temettu tutari, inilecek kaldirac vb.) */
     target: number;
+    /** Yakin bir uye tarafindan ozel olarak mi acildi */
+    confidential?: boolean;
     status: 'open' | 'met' | 'failed';
 }
 
@@ -1216,6 +1244,8 @@ export const DEMAND_COOLDOWN_MET = 3;
 export const DEMAND_COOLDOWN_FAILED = 5;
 /** Bir talep kapandiktan sonra kurulun sessiz kalacagi ceyrek sayisi. */
 export const DEMAND_QUIET = 2;
+/** Sana yakin bir uyenin tanidigi ek sure. */
+export const CONFIDANT_GRACE_BONUS = 2;
 /** Karsilanan talep: talebi acana daha fazla, kurula genel bir miktar. */
 export const DEMAND_MET_TRUST = 9;
 export const DEMAND_MET_TRUST_OTHERS = 3;
@@ -1295,14 +1325,25 @@ export const detectDemand = (
     }
     if (!best) return null;
 
+    // ------------------------------------------------------------------
+    //  YAKIN UYE ONCE SANA SOYLER
+    // ------------------------------------------------------------------
+    //  Iliskinin ikinci getirisi bu: sana yakin bir yonetici konuyu
+    //  toplantida patlatmadan once ozel olarak acar ve toparlaman icin
+    //  fazladan zaman tanir. Oyu degistirmez — ZAMAN kazandirir, ki
+    //  iliskinin gercek hayattaki getirisi de tam olarak budur.
+    // ------------------------------------------------------------------
+    const friendly = isConfidant(best.member);
+
     return {
         id: `dem_${quarter}_${best.kind}`,
         kind: best.kind,
         raisedBy: best.member.id,
         raisedByName: best.member.name,
         quarterRaised: quarter,
-        deadline: quarter + DEMAND_GRACE,
+        deadline: quarter + DEMAND_GRACE + (friendly ? CONFIDANT_GRACE_BONUS : 0),
         target: best.target,
+        confidential: friendly,
         status: 'open',
     };
 };

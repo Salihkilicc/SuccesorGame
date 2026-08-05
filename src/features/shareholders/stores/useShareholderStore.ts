@@ -24,7 +24,7 @@ import {
     voteNoConfidence, giftEffect, RELATIONSHIP_NEUTRAL, type Motivation,
     detectDemand, evaluateDemand, decayRelationship,
     DEMAND_COOLDOWN_MET, DEMAND_COOLDOWN_FAILED, DEMAND_QUIET,
-    NO_CONFIDENCE_COOLDOWN,
+    NO_CONFIDENCE_COOLDOWN, FATIGUE_CAP, FATIGUE_RECOVERY,
     DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
     type BoardDemand, type DemandContext, type DemandKind, type PetIssue,
 }from '../../../core/market/governance';
@@ -68,6 +68,8 @@ export interface BoardMember {
     petIssue?: PetIssue;
     /** Bu uyeye yapilan jest sayisi — azalan getiri icin */
     gestureCount?: number;
+    /** Olay turu -> ust uste kac kez goruldu (tekrar yorgunlugu) */
+    fatigue?: Record<string, number>;
     isHostile: boolean; // True if trust < 20
     origin: 'Founder' | 'Investor' | 'Network' | 'DebtShark';
     networkId?: string; // If they came from the "Love/Friends" module
@@ -240,6 +242,31 @@ const convertPersonalityToTrait = (personalityId: string): TraitType => {
     return mapping[personalityId] || 'Loyalist'; // Default to Loyalist for friends
 };
 
+
+// ============================================================================
+//  TEK DÖNÜŞTÜRÜCÜ — bu dosyadaki en sinsi hata sinifinin ilaci
+// ============================================================================
+//  `GovMember` yedi ayri yerde ELLE kuruluyordu ve her yeni alan (iliski,
+//  motivasyon, takinti, yorgunluk) bu literallerin altisinda sessizce
+//  dusuyordu. Yani ozellik yazilmis, kaydedilmis, ekranda gorulmus ama
+//  motora HIC ULASMAMIS oluyordu.
+//
+//  Artik tek yer var. Yeni bir alan eklendiginde burayi guncellemek
+//  yeterli; unutulacak ikinci bir kopya yok.
+// ============================================================================
+const toGov = (m: BoardMember): GovMember => ({
+    id: m.id,
+    name: m.name,
+    trait: m.trait as any,
+    trust: m.trust,
+    shareCount: m.shareCount,
+    isHostile: m.isHostile,
+    relationship: m.relationship ?? RELATIONSHIP_NEUTRAL,
+    motivation: m.motivation,
+    petIssue: m.petIssue,
+    fatigue: m.fatigue,
+});
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -381,6 +408,26 @@ export const useShareholderStore = create<ShareholderState>()(
                     playerShareCount,
                     boardMood: 'Conservative',
                     sharkLoans: [],
+
+                    // --------------------------------------------------
+                    //  YENI OYUN GERCEKTEN YENI BASLASIN
+                    // --------------------------------------------------
+                    //  Burada yalnizca uyeler ve hisseler sifirlaniyordu;
+                    //  yonetisim durumunun tamami onceki oyundan
+                    //  DEVREDIYORDU. En agiri `ceoRemoved`: yeni oyuna
+                    //  gorevden alinmis olarak basliyordun. Acik talepler,
+                    //  bekleme sureleri ve verilmis sozler de tasiniyordu.
+                    // --------------------------------------------------
+                    promises: [],
+                    lobbied: {},
+                    lastVote: undefined,
+                    ceoRemoved: false,
+                    noConfidenceLevel: 0,
+                    lastNoConfidenceQuarter: -99,
+                    boardLog: [],
+                    boardDemands: [],
+                    demandCooldowns: {},
+                    demandQuietUntil: 0,
                 });
 
                 // Calculate initial board mood
@@ -416,10 +463,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 // 2) SANA KARSI TAVIR — ortalama guvenden. Esikler
                 //    governance.ts icinde, tek kaynak.
-                const stance = boardMoodFrom(members.map(m => ({
-                    id: m.id, name: m.name, trait: m.trait as any,
-                    trust: m.trust, shareCount: m.shareCount,
-                })));
+                const stance = boardMoodFrom(members.map(toGov));
 
                 set({
                     boardMood: dominant ?? get().boardMood,
@@ -1446,10 +1490,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 const log: { label: string; effect: string }[] = [];
 
                 const updated = members.map(m => {
-                    const gm: GovMember = {
-                        id: m.id, name: m.name, trait: m.trait as any,
-                        trust: m.trust, shareCount: m.shareCount,
-                    };
+                    const gm: GovMember = toGov(m);
                     const delta = trustDelta(gm, event, ctx);
                     if (delta !== 0) {
                         log.push({
@@ -1458,7 +1499,14 @@ export const useShareholderStore = create<ShareholderState>()(
                         });
                     }
                     const trust = Math.max(0, Math.min(100, m.trust + delta));
-                    return { ...m, trust, isHostile: trust < 20 };
+                    // Bu olay turunu bir kez daha gordu: bir dahakine
+                    // daha az etkilenecek. Ust sinir var ki tamamen
+                    // duyarsizlasmasin.
+                    const fatigue = {
+                        ...(m.fatigue || {}),
+                        [event.kind]: Math.min(FATIGUE_CAP, (m.fatigue?.[event.kind] ?? 0) + 1),
+                    };
+                    return { ...m, trust, isHostile: trust < 20, fatigue };
                 });
 
                 set(state => ({
@@ -1473,10 +1521,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
             holdVote: (proposal, ctx) => {
                 const { members, playerShareCount, totalShares, lobbied } = get();
-                const gov: GovMember[] = members.map(m => ({
-                    id: m.id, name: m.name, trait: m.trait as any,
-                    trust: m.trust, shareCount: m.shareCount,
-                }));
+                const gov: GovMember[] = members.map(toGov);
 
                 const result = castVotes(gov, playerShareCount, totalShares, proposal, ctx, lobbied);
 
@@ -1529,10 +1574,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 if (!m) {
                     return { success: false, pull: 0, message: 'Member not found.' };
                 }
-                const gm: GovMember = {
-                    id: m.id, name: m.name, trait: m.trait as any,
-                    trust: m.trust, shareCount: m.shareCount,
-                };
+                const gm: GovMember = toGov(m);
                 const res = lobbyMember(gm, proposal, lobbied[memberId] !== undefined);
                 if (res.success) {
                     set({ lobbied: { ...lobbied, [memberId]: res.pull } });
@@ -1564,10 +1606,7 @@ export const useShareholderStore = create<ShareholderState>()(
                     const { members } = get();
                     const updated = members.map(m => {
                         if (m.id !== p.memberId) return m;
-                        const gm: GovMember = {
-                            id: m.id, name: m.name, trait: m.trait as any,
-                            trust: m.trust, shareCount: m.shareCount,
-                        };
+                        const gm: GovMember = toGov(m);
                         const d = trustDelta(gm, event, ctx);
                         const trust = Math.max(0, Math.min(100, m.trust + d));
                         return { ...m, trust, isHostile: trust < 20 };
@@ -1591,10 +1630,7 @@ export const useShareholderStore = create<ShareholderState>()(
 
             runNoConfidence: (ctx, quarter = 0) => {
                 const { members, playerShareCount, totalShares } = get();
-                const gov: GovMember[] = members.map(m => ({
-                    id: m.id, name: m.name, trait: m.trait as any,
-                    trust: m.trust, shareCount: m.shareCount,
-                }));
+                const gov: GovMember[] = members.map(toGov);
                 const check = checkNoConfidence(gov, get().getPlayerOwnershipPercent(), ctx);
                 set({ noConfidenceLevel: check.conditionsMet });
 
@@ -1630,11 +1666,7 @@ export const useShareholderStore = create<ShareholderState>()(
             //  Kurul artik sadece not vermiyor, ISTIYOR.
             reviewDemands: (ctx, quarter) => {
                 const { members, boardDemands } = get();
-                const gov = (): GovMember[] => get().members.map(m => ({
-                    id: m.id, name: m.name, trait: m.trait as any, trust: m.trust,
-                    shareCount: m.shareCount, relationship: m.relationship ?? RELATIONSHIP_NEUTRAL,
-                    motivation: m.motivation, petIssue: m.petIssue,
-                }));
+                const gov = (): GovMember[] => get().members.map(toGov);
 
                 const met: BoardDemand[] = [];
                 const failed: BoardDemand[] = [];
@@ -1755,6 +1787,14 @@ export const useShareholderStore = create<ShareholderState>()(
                         relationship: Math.round(decayRelationship(m.relationship)),
                         // Jest yorgunlugu ceyrek basi bir kademe dinlenir.
                         gestureCount: Math.max(0, (m.gestureCount ?? 0) - 1),
+                        // Olay yorgunlugu da soner: tekrarlanmayan bir
+                        // hamle zamanla yeniden sasirtici olur. Sonme
+                        // artistan yavas, yoksa hicbir zaman birikmez.
+                        fatigue: Object.fromEntries(
+                            Object.entries(m.fatigue || {})
+                                .map(([k, v]) => [k, Math.max(0, v - FATIGUE_RECOVERY)])
+                                .filter(([, v]) => (v as number) > 0),
+                        ) as Record<string, number>,
                     };
                 });
                 set({ members: decayed, lobbied: {}, boardLog: [] });

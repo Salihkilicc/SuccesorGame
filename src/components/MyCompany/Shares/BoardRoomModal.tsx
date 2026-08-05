@@ -161,10 +161,17 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                        ------------------------------------------------ */}
                     {(boardDemands || []).filter(d => d.status === 'open').map(d => (
                         <View key={d.id} style={styles.demandCard}>
-                            <Text style={styles.demandTag}>{t('board.demandOpen').toUpperCase()}</Text>
+                            <Text style={styles.demandTag}>
+                                {(d.confidential ? t('board.demandPrivate') : t('board.demandOpen')).toUpperCase()}
+                            </Text>
                             <Text style={styles.demandBody}>
                                 {t(`board.demand_${d.kind}`, { v1: d.raisedByName })}
                             </Text>
+                            {d.confidential && (
+                                <Text style={styles.demandPrivate}>
+                                    {t('board.demandConfidential', { v1: d.raisedByName })}
+                                </Text>
+                            )}
                             <Text style={styles.demandDue}>{t('board.demandDue', { v1: d.deadline })}</Text>
                         </View>
                     ))}
@@ -332,6 +339,7 @@ const styles = StyleSheet.create({
     demandCard: { backgroundColor: '#2A2416', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FFB020' },
     demandTag: { fontSize: 10, color: '#FFB020', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
     demandBody: { fontSize: 12, color: '#E8DCC0', lineHeight: 18, fontStyle: 'italic' },
+    demandPrivate: { fontSize: 10, color: '#4ADE80', marginTop: 6, lineHeight: 15 },
     demandDue: { fontSize: 10, color: '#8A9BA8', marginTop: 6, fontWeight: '700' },
 
     dangerCard: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FF6B6B' },

@@ -1864,4 +1864,7 @@ export const tr: Record<string, string> = {
     'board.demandTitle': 'Kurulun bir talebi var',
     'board.demandOpen': 'Açık talep',
     'board.demandDue': 'Son: Ç{v1}',
+    'gov.personalFavor': 'Kararsızdı — kişisel olarak senden yana durdu',
+    'board.demandPrivate': 'ÖZEL GÖRÜŞME',
+    'board.demandConfidential': '{v1} bunu toplantıdan önce sana özel olarak açtı — fazladan vaktin var.',
 };

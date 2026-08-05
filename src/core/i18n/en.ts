@@ -1863,4 +1863,7 @@ export const en: Record<string, string> = {
     'board.demandOpen': 'Open demand',
     'board.demandDue': 'Due: Q{v1}',
     'obs.yourResearchersGeneratedVRp': 'Your researchers generated {v1} RP this quarter.',
+    'gov.personalFavor': 'Undecided — sided with you personally',
+    'board.demandPrivate': 'PRIVATE WORD',
+    'board.demandConfidential': '{v1} raised this with you privately before the meeting — you have extra time.',
 };
