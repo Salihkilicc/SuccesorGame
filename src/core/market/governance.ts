@@ -2,59 +2,60 @@ import { t } from '../i18n';
 // src/core/market/governance.ts
 //
 // ============================================================================
-//  YÖNETİŞİM — kurulun gerçekten gücü olduğu yer
+//  GOVERNANCE — where the board actually has power
 // ============================================================================
 //
-//  ONCE NE VARDI: BIR EVCIL HAYVAN GOSTERGESI
-//  ------------------------------------------
-//  Kurul sistemi yazilmisti ve ekrani bile vardi ama HICBIR GUCU YOKTU:
+//  WHAT WAS HERE BEFORE: A PET GAUGE
+//  ---------------------------------
+//  The board system was written and even had a screen, but it had NO POWER:
 //
-//    - `trust` 0-100 arasi oynuyordu ve HIC OKUNMUYORDU. Yalnizca
-//      profil ekraninda bir bar ciziyordu.
-//    - `isHostile` isaretleniyordu; hicbir kod bu bayragi okumuyordu.
-//    - `boardMood` yalnizca bir etiketin RENGINI belirliyordu.
-//    - `VotingOverlay.tsx` yazilmisti, hicbir ekrandan cagrilmiyordu.
-//    - "Call Emergency Vote" dugmesi `console.log` yapiyordu.
-//    - `appointDirectorFromNetwork` hicbir yerden cagrilmiyordu.
+//    - `trust` moved between 0-100 and was NEVER READ. It only drew a bar
+//      on the profile screen.
+//    - `isHostile` was set; no code ever read the flag.
+//    - `boardMood` only decided the COLOUR of a label.
+//    - `VotingOverlay.tsx` was written and called from no screen.
+//    - The "Call Emergency Vote" button ran `console.log`.
+//    - `appointDirectorFromNetwork` was called from nowhere.
 //
-//  Yani kurul bir sey ONAYLAYAMIYOR, ENGELLEYEMIYOR, kimseyi GOREVDEN
-//  ALAMIYORDU. Guveni sifira dusurmenin de yuze cikarmanin da sonucu
-//  ayniydi: hicbir sey.
+//  So the board could not APPROVE anything, BLOCK anything, or REMOVE
+//  anyone. Driving trust to zero and driving it to a hundred had the same
+//  consequence: none.
 //
-//  Bir kurulu gercek yapan tek sey vardir:
+//  Only one thing makes a board real:
 //
-//                  SIRKETI SENDEN ALABILMESI.
+//                  IT CAN TAKE THE COMPANY FROM YOU.
 //
-//  IKINCI SORUN: KORU KORUNE TEPKI
-//  --------------------------------
-//  `evaluatePlayerAction` dort secenekli bir enum aliyordu ve motor her
-//  ceyrek "en belirgin hamle neydi" diye TAHMIN edip birini yolluyordu.
-//  O ceyrekte tefeciden borc almis, 200 kisi cikarmis, halka acilmis
-//  olabilirsin — kurul yalnizca "ACQUISITION" duyuyordu.
+//  SECOND PROBLEM: BLIND REACTION
+//  ------------------------------
+//  `evaluatePlayerAction` took a four-option enum, and each quarter the
+//  engine GUESSED "what was the most notable move" and sent one of them.
+//  In that quarter you might have taken a loan shark's money, cut 200 jobs
+//  and gone public — the board only heard "ACQUISITION".
 //
-//  Ustelik tepki yalnizca HUYA bakiyordu, BUYUKLUGE ve BAGLAMA degil.
-//  1 dolarlik temettu ile 500 milyonluk temettu ayni +15'i veriyordu.
-//  Zarar ederken temettu dagitmakla rekor kardan dagitmak ayni seydi.
+//  Worse, the reaction looked only at TEMPERAMENT, not at SIZE or CONTEXT.
+//  A $1 dividend and a $500M dividend both gave the same +15. Paying a
+//  dividend while losing money was the same as paying one out of record
+//  profit.
 //
-//  BU DOSYANIN KURDUGU SEY
-//  -----------------------
-//      oyuncu hamlesi -> kurul olayi (BUYUKLUK + BAGLAM)
-//                          |- her uyenin guveni
-//                          |- kurul havasi
-//                          '- hisse sinyali
+//  WHAT THIS FILE BUILDS
+//  ---------------------
+//      player move -> board event (SIZE + CONTEXT)
+//                       |- each member's trust
+//                       |- board mood
+//                       '- share-price signal
 //
-//      buyuk kararlar -> OYLAMA (HISSE AGIRLIKLI)
-//                          |- gecer / REDDEDILIR   <- ilk gercek duvar
-//                          '- ret = itibar + hisse darbesi
+//      major decisions -> A VOTE (SHARE-WEIGHTED)
+//                       |- passes / IS REJECTED   <- the first real wall
+//                       '- rejection = reputation + share-price hit
 //
-//      kotu performans + dusuk guven + cogunluk kaybi
-//                       -> GUVENSIZLIK OYU -> CEO gider
+//      poor performance + low trust + loss of majority
+//                    -> NO-CONFIDENCE VOTE -> the CEO is gone
 //
-//  TASARIMIN OMURGASI: kurul ayri bir ozellik DEGIL, zaten kurulmus olan
-//  KAP TABLOSUNUN SONUC KATMANI. Bugune kadar IPO, seyreltme, mezzanine
-//  donusumu ve uyeye hisse satisi hisse hareket ettiriyor ama sana
-//  hicbir seye mal olmuyordu — yalnizca bir yuzde degisiyordu. Oylama
-//  eklendigi anda hepsi KONTROLE mal olmaya basliyor.
+//  THE SPINE OF THE DESIGN: the board is NOT a separate feature. It is the
+//  consequence layer for the cap table that already existed. Until now, IPOs,
+//  dilution, mezzanine conversion and selling shares to a member all moved
+//  shares but cost you nothing — only a percentage changed. The moment a
+//  vote exists, every one of them starts costing CONTROL.
 //
 // ============================================================================
 
@@ -70,7 +71,7 @@ export interface GovMember {
     id: string;
     name: string;
     trait: TraitType;
-    /** SONUCLARIN olusturdugu profesyonel guven. Oyu bu belirler. */
+    /** Professional trust, built by RESULTS. This is what decides votes. */
     trust: number;
     shareCount: number;
     isHostile?: boolean;
@@ -78,7 +79,7 @@ export interface GovMember {
     // --- KISISEL KATMANLAR (bkz. asagidaki "KISI" bolumu) ---
     /** JESTLERIN olusturdugu kisisel yakinlik. Oy vermez, kapi acar. */
     relationship?: number;
-    /** Aslinda ne istiyor — hangi hediyenin ve argumanin ise yaradigini belirler. */
+    /** What they actually want — decides which gift and which argument lands. */
     motivation?: Motivation;
     /** Kurula nasil geldi. Her cumlesinin rengi buradan cikar. */
     origin?: DirectorOrigin;
@@ -89,14 +90,14 @@ export interface GovMember {
 }
 
 // ============================================================================
-//  KİŞİ — karakter tipi iskelettir, insan degildir
+//  THE PERSON — a character type is a skeleton, not a human being
 // ============================================================================
-//  Alti karakter tipi iyi bir omurga ama ayni tipteki iki uye birebir ayni
-//  davraniyordu. Uzerine kisisel katmanlar biniyor: ne istedigi, nereden
-//  geldigi, neyi takintili sekilde onemsedigi.
+//  Six character types are a good backbone, but two members of the same type
+//  behaved identically. Personal layers sit on top: what they want, where
+//  they came from, and the one issue they care about out of all proportion.
 // ============================================================================
 
-/** Bu adam aslinda ne pesinde? Hangi jestin ise yarayacagini belirler. */
+/** What is this person actually after? Determines which gesture works. */
 export type Motivation =
     | 'money'      // temettu, geri alim, kisisel kazanc
     | 'legacy'     // buyuk isler, adinin gecmesi
@@ -115,29 +116,29 @@ export type DirectorOrigin =
 export type PetIssue = 'debt' | 'headcount' | 'rnd' | 'dividend' | 'market_share';
 
 // ============================================================================
-//  GUVEN vs ILISKI — ayri iki sey, ve ayri kalmali
+//  TRUST vs RELATIONSHIP — two different things, and they must stay apart
 // ============================================================================
-//  TEHLIKE: hediye guveni artiriyordu, guven de oyu belirliyordu. Yani
-//  para dogrudan oy satin aliyordu. Zengin CEO dokunulmaz olurdu ve
-//  kurul bu sefer ters yonden anlamsizlasirdi.
+//  THE DANGER: gifts raised trust, and trust decided votes. So money bought
+//  votes outright. A rich CEO would be untouchable and the board would end
+//  up meaningless again, just from the opposite direction.
 //
-//  Ayrim:
-//    GUVEN   <- yalnizca SONUCLAR (kar, pay, borc, tutulan sozler). Oy verir.
-//    ILISKI  <- jestler (hediye, yemek, ilgi). Oy VERMEZ.
+//  The split:
+//    TRUST        <- results only (profit, share, debt, promises kept). Votes.
+//    RELATIONSHIP <- gestures (gifts, dinners, attention). Does NOT vote.
 //
-//  Iliskinin getirisi bilgi ve zamandir, oy degil:
-//    - ozelden uyarir ("kurul seni onumuzdeki ceyrek konusacak")
-//    - digerlerinin nasil oy verecegini fisildar
-//    - KARARSIZ ise senden yana kirilir (yalnizca kararsizken!)
-//    - guvensizlik oyunda son ana kadar direnir
+//  What a relationship buys you is information and time, never a vote:
+//    - private warnings ("the board will discuss you next quarter")
+//    - whispers about how the others intend to vote
+//    - if UNDECIDED, they break your way (only when undecided!)
+//    - they hold out longest in a no-confidence vote
 // ============================================================================
 
 export const RELATIONSHIP_NEUTRAL = 50;
-/** Iliski de notre kayar ama guvenden YAVAS: kisisel bag daha kalicidir. */
+/** Relationship drifts to neutral too, but SLOWER than trust: personal ties last longer. */
 export const RELATIONSHIP_GRAVITY = 0.03;
 /** Kararsiz bir uyeyi iliskinin cevirebilecegi en fazla egilim. */
 export const RELATIONSHIP_TIEBREAK = 0.35;
-/** Bu iliskinin ustunde ozel kanal acilir: uyarilar ve fisiltilar gelir. */
+/** Above this relationship a private channel opens: warnings and whispers. */
 export const RELATIONSHIP_CONFIDANT = 70;
 
 /** Iliskiyi bir ceyrek ilerlet — ilgi gostermezsen yavasca soner. */
@@ -147,16 +148,16 @@ export const decayRelationship = (relationship: number | undefined): number => {
 };
 
 /**
- * Bir jestin iliskiye etkisi.
+ * The effect of a gesture on the relationship.
  *
- * MOTIVASYON FILTRESI: yanlis adama yanlis jest ters teper. Vizyoner bir
- * kurucuya para hediye etmek onu asagilar; ona "seni hakli cikardim"
- * demek gerekir. Bu yuzden her jestin hedef motivasyonu var.
+ * MOTIVATION FILTER: the wrong gesture to the wrong person backfires.
+ * Gifting cash to a visionary founder insults them; what they need to hear
+ * is "I proved you right". That is why every gesture targets a motivation.
  */
 /**
- * Ust uste yapilan jestin sonen etkisi. Ilk hediye jesttir, besincisi
- * fatura. Bu olmadan oyuncu 50 bin dolari bes kez basip herkesi
- * dost yapardi — iliski satin alinabilir bir sey olurdu.
+ * Diminishing returns on repeated gestures. The first gift is a gesture,
+ * the fifth is an invoice. Without this the player could spend $50k five
+ * times and befriend everyone — relationships would be purchasable.
  */
 export const GESTURE_FATIGUE = 0.55;
 
@@ -164,7 +165,7 @@ export const giftEffect = (
     member: GovMember,
     gestureFor: Motivation,
     magnitude: number,
-    /** Bu uyeye daha once kac kez jest yapildi */
+    /** How many gestures this member has already received */
     priorGestures = 0,
 ): number => {
     const fatigue = Math.pow(GESTURE_FATIGUE, Math.max(0, priorGestures));
@@ -193,17 +194,17 @@ export const relationshipTiebreak = (
     return inclination + (r / 50) * RELATIONSHIP_TIEBREAK;
 };
 
-/** Bu uye sana ozel konusacak kadar yakin mi? */
+/** Is this member close enough to speak to you privately? */
 export const isConfidant = (m: GovMember): boolean =>
     (m.relationship ?? RELATIONSHIP_NEUTRAL) >= RELATIONSHIP_CONFIDANT;
 
 // ============================================================================
-//  TEKRAR YORGUNLUGU
+//  REPETITION FATIGUE
 // ============================================================================
-//  Dogrulama kosusunda cikti: ayni hamleyi ust uste yapinca uye dibe
-//  yapisiyor ve bir daha donmuyordu (Muhafazakar bes zarar ceyreginde
-//  70'ten 3'e indi ve orada kaldi). Gercekte ilk temettu haber, besincisi
-//  rutindir. Ayni olay tekrarlandikca etkisi soner.
+//  Surfaced by a verification run: repeating the same move pinned a member
+//  at the bottom and they never came back (a Conservative fell from 70 to 3
+//  over five loss quarters and stayed there). In reality the first dividend
+//  is news, the fifth is routine. Each repeat of the same event lands softer.
 // ============================================================================
 export const FATIGUE_DECAY = 0.65;
 /** Yorgunluk ust siniri — uye tamamen duyarsizlasmasin. */
@@ -218,7 +219,7 @@ export const fatigueMultiplier = (member: GovMember, kind: string): number => {
 };
 
 // ============================================================================
-//  1. KURUL OLAYLARI — büyüklüğü ve bağlamı olan
+//  1. BOARD EVENTS — the ones that carry size and context
 // ============================================================================
 
 export type BoardEventKind =
@@ -245,10 +246,10 @@ export type BoardEventKind =
 export interface BoardEvent {
     kind: BoardEventKind;
     /**
-     * Olayin BUYUKLUGU, sirketin olcegine gore normalize edilmis 0-1.
-     * Ornek: temettude odenen / ceyrek kari. Isten cikarmada cikarilan /
-     * toplam kadro. Bu sayede kucuk sirkette de buyuk sirkette de ayni
-     * "ne kadar buyuk bir hamleydi" olcusu kullanilir.
+     * The SIZE of the event, normalised 0-1 against the company's scale.
+     * Example: dividend paid / quarterly profit. For layoffs: people cut /
+     * total headcount. This way the same "how big a move was that" measure
+     * applies to a small company and a large one alike.
      */
     magnitude: number;
     /** Ekranda gosterilecek tek cumlelik ozet */
@@ -270,18 +271,18 @@ export interface CompanyContext {
 }
 
 // ----------------------------------------------------------------------------
-//  HUY DURUŞU
+//  TEMPERAMENT STANCE
 // ----------------------------------------------------------------------------
-//  Her huyun her olaya karsi temel duruşu: -1 (nefret) ile +1 (bayilir).
-//  Bu SADECE yon verir; siddeti `magnitude` belirler.
+//  Each temperament's baseline stance towards each event: -1 (hates it) to
+//  +1 (loves it). This sets DIRECTION only; `magnitude` sets the intensity.
 //
-//  Bunlar rastgele degil, her biri bir yatirimci arketipini temsil eder:
-//    Conservative -> temettu sever, borctan ve riskten kacar
-//    Aggressive   -> buyume sever, atil nakitten nefret eder
-//    Visionary    -> uzun vadeli yatirim sever, temettuyu israf sayar
-//    Shark        -> firsatci; kaostan ve kaldirac'tan beslenir
-//    Loyalist     -> huydan cok GUVENE bakar (asagida agirligi farkli)
-//    Snake        -> zayifliktan beslenir; kotu haber onun icin firsattir
+//  These are not arbitrary — each one represents an investor archetype:
+//    Conservative -> likes dividends, avoids debt and risk
+//    Aggressive   -> likes growth, hates idle cash
+//    Visionary    -> likes long-term investment, sees dividends as waste
+//    Shark        -> opportunist; feeds on chaos and leverage
+//    Loyalist     -> weighs TRUST far more than temperament (see weights below)
+//    Snake        -> feeds on weakness; bad news is an opportunity
 // ----------------------------------------------------------------------------
 const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
     Conservative: {
@@ -336,15 +337,15 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
     },
 };
 
-/** Tepkinin azami buyuklugu — tek bir hamle guveni bu kadar oynatabilir. */
+/** The largest possible reaction — how far one move can swing trust. */
 export const MAX_TRUST_SWING = 22;
 
 /**
- * NÖTRE ÇEKİM. Her ceyrek guven bu oranda 55'e dogru kayar.
+ * PULL TO NEUTRAL. Each quarter trust drifts towards 55 at this rate.
  *
- * Bir yatirimcinin sana duydugu guven KALICI DEGILDIR; ne yaptigini
- * hatirlar ama zamanla notralize olur. Bu olmadan tek bir iyi donem
- * seni sonsuza kadar dokunulmaz yapiyordu.
+ * An investor's trust in you is NOT PERMANENT; they remember what you did,
+ * but it neutralises over time. Without this, a single good run made you
+ * untouchable forever.
  */
 export const TRUST_GRAVITY = 0.06;
 export const TRUST_NEUTRAL = 55;
@@ -354,12 +355,12 @@ export const decayTrust = (trust: number): number =>
     trust + (TRUST_NEUTRAL - trust) * TRUST_GRAVITY;
 
 /**
- * BAĞLAM ÇARPANI — aynı hamle, farklı durumda farklı okunur.
+ * CONTEXT MULTIPLIER — the same move reads differently in a different situation.
  *
- * Bunu ayirmak onemli: gercek bir kurul uyesi "temettuyu sever misin"
- * diye dusunmez, "BU SIRKET BU DURUMDA temettu dagitmali miydi" diye
- * dusunur. Zarar ederken temettu dagitmak temettu sevenin bile canini
- * sikar, cunku para sirketin yasamasi icin gerekliydi.
+ * Separating this out matters: a real director does not think "do I like
+ * dividends", they think "should THIS COMPANY have paid a dividend IN THIS
+ * SITUATION". Paying one while losing money annoys even the dividend lover,
+ * because that cash was what kept the company alive.
  */
 export const contextMultiplier = (kind: BoardEventKind, ctx: CompanyContext): number => {
     let m = 1;
@@ -393,13 +394,14 @@ export const contextMultiplier = (kind: BoardEventKind, ctx: CompanyContext): nu
 };
 
 /**
- * Bir olayin bir uyenin guvenine etkisi.
+ * The effect of one event on one member's trust.
  *
- * guven degisimi = durus × buyukluk × baglam × MAX_TRUST_SWING
+ * trust change = stance x size x context x MAX_TRUST_SWING
  *
- * Loyalist ozel: huyu zayiftir ama mevcut guveni yuksekse hamleyi
- * savunur (guven yuksekken tepkisi yumusar). Snake tam tersi: guveni
- * dusukse her seyi daha kotu okur.
+ * The Loyalist is special: their temperament is weak, but if their current
+ * trust is high they will defend the move (a high-trust Loyalist reacts more
+ * softly). The Snake is the reverse: the lower their trust, the worse they
+ * read everything.
  */
 export const trustDelta = (
     member: GovMember,
@@ -420,37 +422,37 @@ export const trustDelta = (
     let delta = stance * mag * contextMultiplier(event.kind, ctx) * MAX_TRUST_SWING;
 
     // ------------------------------------------------------------------
-    //  AZALAN VERİM — güven tek yönlü tırmanıyordu
+    //  DIMINISHING RETURNS — trust only ever climbed
     // ------------------------------------------------------------------
-    //  Oyuncu birkac saat oynadiktan sonra "kurul canli gibi degil, hep
-    //  supportive" dedi. Sebebi acikti: her karli ceyrek +7 guven
-    //  veriyordu ve HICBIR SEY asagi cekmiyordu. Altinci ceyrekte herkes
-    //  100'e yapisiyor, bir daha inmiyordu — yani kurul sadece bir kez
-    //  kazanilip sonsuza kadar unutulan bir sinavdi.
+    //  After a few hours of play the tester said "the board doesn't feel
+    //  alive, it's always supportive". The reason was plain: every
+    //  profitable quarter gave +7 trust and NOTHING pulled it down. By the
+    //  sixth quarter everyone was pinned at 100 and never came off it — so
+    //  the board was an exam you passed once and forgot forever.
     //
-    //  Gercekte guven boyle calismaz: rutin bir iyi ceyrek zaten
-    //  BEKLENEN seydir, kimseyi hayran birakmaz. Yukari cikmak zorlasir,
-    //  asagi inmek kolaydir. Asimetri kasitli.
+    //  Trust does not work like that. A routine good quarter is what was
+    //  EXPECTED; it impresses nobody. Climbing gets harder, falling stays
+    //  easy. The asymmetry is deliberate.
     // ------------------------------------------------------------------
     if (delta > 0) {
-        // 100'e yaklastikca kazanmak zorlasir. 55'te tam, 100'de sifir.
-        // Tekrar yorgunlugu BURAYA UYGULANMAZ: bu zaten bir sonum ve
-        // ikisi ust uste binince rutin kar guveni hic toparlayamiyordu.
-        // Dogrulama kosusu bunu yakaladi: "bir kotu yil sonra toparlanma"
-        // senaryosu, sirket duzelmesine ragmen CEO'nun gorevden
-        // alinmasiyla bitiyordu.
+        // The closer to 100, the harder it is to gain. Full at 55, zero at 100.
+        // Repetition fatigue is NOT applied here: this is already a damper, and
+        // stacking the two meant routine profit could never rebuild trust at all.
+        // A verification run caught it: the "one bad year, then recovery"
+        // scenario ended with the CEO removed even though the company had
+        // turned around.
         const headroom = Math.max(0, (100 - member.trust) / 45);
         delta *= Math.min(1, headroom);
     } else {
-        // Dususte boyle bir koruma YOK: guven hizli kaybedilir.
+        // No such protection on the way down: trust is lost fast.
         delta *= 1.15;
-        // Yorgunluk yalnizca KOTU haberde: besinci zarar ceyregi ilki
-        // kadar sok degildir. Kurulun dibe yapisip bir daha donmemesini
-        // engelleyen sey bu.
+        // Fatigue applies to BAD news only: the fifth loss quarter is not the
+        // shock the first one was. This is what stops the board sticking to
+        // the floor and never coming back.
         delta *= fatigueMultiplier(member, event.kind);
     }
 
-    // Kisisel filtre: cok guvenen daha bagislayici, guvenmeyen daha sert.
+    // Personal filter: the trusting are more forgiving, the distrustful harsher.
     if (member.trait === 'Loyalist' && member.trust > 60 && delta < 0) delta *= 0.6;
     if (member.trait === 'Snake' && member.trust < 40 && delta < 0) delta *= 1.4;
 
@@ -460,7 +462,7 @@ export const trustDelta = (
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v || 0));
 
 // ============================================================================
-//  2. OYLAMA — asıl duvar
+//  2. VOTING — the real wall
 // ============================================================================
 
 export type ProposalKind =
@@ -475,15 +477,16 @@ export type ProposalKind =
     | 'divestiture';
 
 /**
- * KONTROL EŞİĞİ.
+ * CONTROL THRESHOLD.
  *
- * Oyuncunun kendi istegi: "%50'den az ise cogu sey zaten direkt kurula
- * sorulmali". Bu tek kural sistemi kilitliyor, cunku oylamayi ayri bir
- * ozellik olmaktan cikarip KAP TABLOSUNUN DOGRUDAN SONUCU yapiyor.
+ * The player's own request: "below 50%, most things should go straight to
+ * the board". That single rule locks the system together, because it stops
+ * voting being a separate feature and makes it a DIRECT CONSEQUENCE OF THE
+ * CAP TABLE.
  *
- * Cogunluktayken yalnizca gercekten buyuk kararlar oya gider — gercek
- * hayatta da kurul gunluk isletmeye karismaz. Cogunlugu kaybettigin an
- * her sey degisir: artik sirketi sen degil, bir koalisyon yonetir.
+ * While you hold a majority only genuinely large decisions go to a vote —
+ * a real board does not run day-to-day operations either. The moment you
+ * lose the majority everything changes: a coalition runs the company, not you.
  */
 export const CONTROL_THRESHOLD = 50;
 
@@ -505,7 +508,7 @@ export interface Proposal {
     valuation: number;
     /** Ekranda gosterilecek baslik */
     title: string;
-    /** Dusmanca devralma mi — kurul cok daha temkinli olur */
+    /** Is this a hostile takeover — the board turns far more cautious */
     hostile?: boolean;
 }
 
@@ -557,7 +560,7 @@ export const requiresVote = (
     return { required: false, reason: t('data.governance.withinYourAuthorityAsMajority') };
 };
 
-/** Bir uyenin bir teklife karsi temel durusu. */
+/** A member's baseline stance towards a proposal. */
 const proposalStance = (trait: TraitType, p: Proposal): number => {
     const map: Record<ProposalKind, BoardEventKind> = {
         acquisition: 'acquisition',
@@ -576,7 +579,7 @@ const proposalStance = (trait: TraitType, p: Proposal): number => {
     return s;
 };
 
-/** GUVENIN oy uzerindeki agirligi. Huyu bastirabilir ama silemez. */
+/** How much TRUST weighs on a vote. It can override temperament, not erase it. */
 export const TRUST_VOTE_WEIGHT = 0.9;
 
 /**
@@ -592,7 +595,7 @@ export interface MemberVote {
     trait: TraitType;
     vote: 'YES' | 'NO';
     shareCount: number;
-    /** Neden boyle oy verdi — ekranda gosterilir */
+    /** Why they voted this way — shown on screen */
     reason: string;
 }
 
@@ -613,12 +616,12 @@ export interface VoteResult {
 }
 
 /**
- * Oylama. HISSE AGIRLIKLI, kisi basi degil.
+ * The vote. SHARE-WEIGHTED, not one member one vote.
  *
- * Bu ayrim sistemin butun anlamidir: kurulda kac kisi oldugu degil, kimin
- * kac hissesi oldugu belirler. Boylece IPO, seyreltme ve mezzanine
- * donusumu ilk kez GERCEK bir bedel tasir — para kazanirsin, oy
- * kaybedersin.
+ * That distinction is the whole point of the system: what decides an outcome
+ * is not how many people sit on the board but who holds how many shares. It
+ * is what finally gives IPOs, dilution and mezzanine conversion a REAL price
+ * — you gain money and you lose votes.
  */
 export const castVotes = (
     members: GovMember[],
@@ -629,18 +632,18 @@ export const castVotes = (
     lobbied: Record<string, number> = {},
 ): VoteResult => {
     // ------------------------------------------------------------------
-    //  SERBEST DOLAŞIM DA OY VERİR
+    //  THE PUBLIC FLOAT VOTES TOO
     // ------------------------------------------------------------------
-    //  Ilk yazimda yalnizca oyuncu ve kurul uyeleri oy veriyordu. Bu
-    //  YANLISTI ve simulasyonda hemen ortaya cikti: oyuncu %45'e
-    //  seyreltilip kurulun 5 uyesinden 4'u aleyhine oy verdiginde bile
-    //  teklif %65 ile geciyordu — cunku halka acik %20 hic sayilmiyordu.
+    //  In the first draft only the player and the board members voted. That
+    //  was WRONG and a simulation exposed it immediately: with the player
+    //  diluted to 45% and four of five directors voting against, the
+    //  proposal still passed with 65% — because the 20% public float was
+    //  never counted.
     //
-    //  Gercekte kurumsal yatirimcilar ve vekalet danismanlari (ISS,
-    //  Glass Lewis) neredeyse her zaman KURULUN TAVSIYESINI izler.
-    //  Kurulu kaybetmenin gercekten tehlikeli olmasinin sebebi budur:
-    //  yalnizca o odadaki oylari degil, arkalarindaki dolasimi da
-    //  kaybedersin.
+    //  In reality institutional investors and proxy advisers (ISS, Glass
+    //  Lewis) almost always follow THE BOARD'S RECOMMENDATION. That is what
+    //  makes losing the board genuinely dangerous: you lose not just the
+    //  votes in the room, but the float standing behind them.
     // ------------------------------------------------------------------
     const votes: MemberVote[] = members.map(m => {
         const stance = proposalStance(m.trait, proposal);
@@ -657,12 +660,13 @@ export const castVotes = (
         const raw = stance + trustPull + performance + lobby;
 
         // ------------------------------------------------------------------
-        //  KISISEL ILISKI — ama YALNIZCA kararsizda
+        //  PERSONAL RELATIONSHIP — but ONLY on the undecided
         // ------------------------------------------------------------------
-        //  Bu cagri eksikti: hediye/yemek iliskiyi yukseltiyordu ama
-        //  iliski oylamada hicbir sey yapmiyordu. Simdi yapiyor — ve
-        //  sadece egilim sifira yakinsa. Saglam bir "hayir" iliski 95'te
-        //  bile hayir kalir. Para oy satin almaz, tereddudu kirar.
+        //  This call was missing: gifts and dinners raised the relationship,
+        //  and the relationship then did nothing at all in a vote. Now it
+        //  does — and only when the inclination is near zero. A firm "no"
+        //  stays a no even at relationship 95. Money does not buy a vote,
+        //  it breaks a tie.
         // ------------------------------------------------------------------
         const inclination = relationshipTiebreak(m, raw);
         const swayed = Math.sign(inclination) !== Math.sign(raw) && raw !== 0;
@@ -706,15 +710,14 @@ export const castVotes = (
     const passed = yesShares >= requiredShares;
 
     // ------------------------------------------------------------------
-    //  ÇOĞUNLUK SAHİBİ OYU KAYBEDEMEZ — AMA BEDELSİZ DE KAZANAMAZ
+    //  A MAJORITY HOLDER CANNOT LOSE A VOTE — BUT CANNOT WIN ONE FOR FREE
     // ------------------------------------------------------------------
-    //  Cogunluktayken matematiksel olarak her oyu kazanirsin; gercek
-    //  hayatta da oyle. Ama kurulun aleyhine oy verdigi bir karari yine
-    //  de gecirmek "board override"dir ve BEDAVA DEGILDIR: yoneticiler
-    //  istifa eder, guven cokerr, piyasa bunu yonetisim sorunu olarak
-    //  fiyatlar.
+    //  While you hold a majority you win every vote mathematically; that is
+    //  true in real life too. But pushing through a decision the board voted
+    //  against is a "board override" and it is NOT FREE: directors resign,
+    //  trust collapses, and the market prices it as a governance problem.
     //
-    //  Kurulu, kaybedemeyecegin bir oyda bile onemli kilan sey budur.
+    //  That is what keeps the board relevant even in a vote you cannot lose.
     // ------------------------------------------------------------------
     const overrode = passed && !boardRecommends;
 
@@ -742,15 +745,15 @@ export const OVERRIDE_TRUST_COST = 12;
 export const OVERRIDE_RESIGN_CHANCE = 0.25;
 
 // ============================================================================
-//  3. GÜVENSİZLİK OYU — kurulun asıl silahı
+//  3. THE NO-CONFIDENCE VOTE — the board's real weapon
 // ============================================================================
 //
-//  Bu, kurulu oyunun en onemli seyi yapan mekanik. Digerlerinin hepsi
-//  buna hazirlik.
+//  This is the mechanic that makes the board the most important thing in the
+//  game. Everything else is preparation for it.
 //
-//  UC KOSUL BIRDEN gerekiyor ve bu bilincli: tek bir kotu ceyrek seni
-//  koltugundan etmemeli. Gorevden alinma, uzun sure ihmal edilmis bir
-//  iliskinin sonucudur — ani bir ceza degil.
+//  THREE CONDITIONS AT ONCE are required, and that is deliberate: a single
+//  bad quarter must not cost you your chair. Removal is the result of a
+//  relationship neglected for a long time — not a sudden penalty.
 // ============================================================================
 
 export interface NoConfidenceCheck {
@@ -760,29 +763,29 @@ export interface NoConfidenceCheck {
     reasons: string[];
     /** Kac kosul saglandi (3 uzerinden) */
     conditionsMet: number;
-    /** Bir sonraki asamaya ne kadar var — erken uyari */
+    /** How far to the next stage — an early warning */
     warning?: string;
 }
 
-/** Ust uste bu kadar zararli ceyrek performans kosulunu tetikler. */
+/** This many consecutive loss quarters trips the performance condition. */
 export const NO_CONFIDENCE_LOSS_STREAK = 4;
-/** Kurul ortalama guveni bu esigin altinda ise iliski kosulu saglanir. */
+/** Below this average board loyalty, the relationship condition is met. */
 export const NO_CONFIDENCE_TRUST = 35;
 
 /**
- * BİR ÜYENİN SANA GERÇEKTEN ARKA ÇIKMA İHTİMALİ.
+ * THE ODDS THAT A MEMBER ACTUALLY BACKS YOU.
  *
- * `trust` ile ayni sey DEGIL — ve bunu simulasyonda fark ettim.
- * Snake'in stance tablosunda kotu haber POZITIFTIR: felaket onun icin
- * firsattir, cunku zayiflayan CEO'yu devirmek kolaylasir. Dolayisiyla
- * felaket bir yilda Snake'in `trust` degeri 30'dan 78'e CIKIYORDU.
+ * NOT the same thing as `trust` — and a simulation is what revealed it.
+ * In the Snake's stance table, bad news is POSITIVE: disaster is an
+ * opportunity, because a weakened CEO is easier to depose. So over a
+ * catastrophic year a Snake's `trust` was CLIMBING from 30 to 78.
  *
- * Sonuc absurd: kurulun ortalama guveni yukseliyor ve seni devirmek
- * isteyen adam seni GOREVDEN ALINMAKTAN KORUYOR.
+ * The result was absurd: the board's average trust went up, and the man
+ * trying to depose you was PROTECTING YOU FROM REMOVAL.
  *
- * Kavram hatasi suydu: `trust` "bu uye durumdan memnun mu" olcuyor,
- * bizim ihtiyacimiz olan ise "bu uye BENIM arkamda mi". Snake icin
- * bu ikisi TERS orantili. O yuzden sadakat ayri hesaplanir.
+ * The conceptual error: `trust` measures "is this member pleased with the
+ * situation", when what we need is "is this member behind ME". For a Snake
+ * those two are INVERSELY related. Hence loyalty is computed separately.
  */
 export const loyaltyOf = (m: GovMember): number =>
     m.trait === 'Snake' ? 100 - m.trust : m.trust;
@@ -800,10 +803,10 @@ export const checkNoConfidence = (
         reasons.push(t('gov.noLongerMajority', { v1: playerOwnershipPercent.toFixed(1) }));
     }
 
-    // 2) ILISKI — kurul sana guvenmiyor.
-    // HISSE AGIRLIKLI SADAKAT. Iki duzeltme birden:
-    //   1) `trust` degil `loyaltyOf` — Snake'in firsatciligi seni korumasin
-    //   2) kisi basi degil hisse agirlikli — buyuk hissedarin sozu daha agir
+    // 2) RELATIONSHIP — the board does not trust you.
+    // SHARE-WEIGHTED LOYALTY. Two fixes at once:
+    //   1) `loyaltyOf`, not `trust` — a Snake's opportunism must not protect you
+    //   2) share-weighted, not per head — a large holder's word carries further
     const totalW = members.reduce((s, m) => s + Math.max(1, m.shareCount), 0);
     const avgTrust = members.length
         ? members.reduce((s, m) => s + loyaltyOf(m) * Math.max(1, m.shareCount), 0) / Math.max(1, totalW)
@@ -843,21 +846,21 @@ export const checkNoConfidence = (
 };
 
 /**
- * Guvensizlik oyunun kendisi.
+ * The no-confidence vote itself.
  *
- * Bu oylamada oyuncu KENDI hisseleriyle oy verir — gercek hayatta da
- * boyledir. Cogunluktaysan zaten tetiklenmez; cogunlugun yoksa
- * hisselerin yine de savunmandir. Bu yuzden "hisselerimi kaybetmek"
- * ile "koltugu kaybetmek" arasinda dogrudan ve okunabilir bir bag var.
+ * In this ballot the player votes THEIR OWN shares — as they would in real
+ * life. While you hold a majority it never triggers; once you do not, your
+ * shares are still your defence. That gives a direct, readable link between
+ * "losing my shares" and "losing my chair".
  */
 /**
- * OYLAMA ARALIGI. Bir guvensizlik oyunu atlattiysan kurul bunu her
- * ceyrek tekrarlayamaz.
+ * VOTING INTERVAL. Having survived a no-confidence vote, the board cannot
+ * repeat it every quarter.
  *
- *  Dogrulama kosusunda cikti: 20 ceyrek boyunca HER ceyrek guvensizlik
- *  oyu yapiliyordu. Hem sacma (yillik genel kurul ceyrekte bir olmaz),
- *  hem de her cagri hisse fiyatina ayri bir darbe vuruyordu — kaybedilen
- *  oy CEO'yu guclendirmesi gerekirken cezalandiriyordu.
+ *  Surfaced by a verification run: a no-confidence vote was being held EVERY
+ *  quarter for 20 quarters. Absurd (an annual meeting is not quarterly), and
+ *  every call landed another hit on the share price — a vote the CEO won was
+ *  punishing them when it should have strengthened them.
  */
 export const NO_CONFIDENCE_COOLDOWN = 4;
 
@@ -869,9 +872,9 @@ export const voteNoConfidence = (
     totalShares = 0,
 ): VoteResult => {
     const votes: MemberVote[] = members.map(m => {
-        // Guven ne kadar dusukse gorevden alma istegi o kadar yuksek.
-        // Burada da `trust` degil SADAKAT: Snake ne kadar 'memnun'sa
-        // seni indirmeye o kadar isteklidir.
+        // The lower the trust, the stronger the appetite to remove.
+        // LOYALTY here too, not `trust`: the more 'pleased' a Snake is,
+        // the more willing they are to bring you down.
         let removal = (50 - loyaltyOf(m)) / 50;
         if (ctx.lossStreak >= 4) removal += 0.4;
         if (ctx.inBreach) removal += 0.5;
@@ -897,16 +900,16 @@ export const voteNoConfidence = (
     const boardNo = votes.filter(v => v.vote === 'NO').reduce((s, v) => s + v.shareCount, 0);
 
     // ------------------------------------------------------------------
-    //  HALKA ACIK KISIM DA OY KULLANIR
+    //  THE PUBLIC FLOAT VOTES TOO
     // ------------------------------------------------------------------
-    //  Bu yoktu ve mekanigin tamamini olu birakiyordu: kurul en fazla
-    //  %35 tasidigi icin %40 hissesi olan bir CEO matematiksel olarak
-    //  INDIRILEMIYORDU. Bes yil ust uste zarar, sozlesme ihlali, tum
-    //  kurulun sifir sadakati — hicbiri yetmiyordu.
+    //  This was missing and it left the whole mechanic dead: because the
+    //  board holds at most 35%, a CEO holding 40% was MATHEMATICALLY
+    //  UNREMOVABLE. Five straight years of losses, a covenant breach and
+    //  zero loyalty across the entire board — none of it was enough.
     //
-    //  Gercekte kurumsal yatirimci bu oylamalarda oy kullanir ve genel
-    //  olarak kurulun okumasini takip eder. Tamami degil: bir kismi
-    //  cekimser kalir (FLOAT_FOLLOW_RATIO).
+    //  In reality institutional investors do vote in these ballots, and they
+    //  broadly follow the board's read. Not all of them: a share abstains
+    //  (FLOAT_FOLLOW_RATIO).
     // ------------------------------------------------------------------
     const boardShares = boardYes + boardNo;
     const float = Math.max(0, totalShares - playerShares - boardShares);
@@ -937,16 +940,17 @@ export const voteNoConfidence = (
 };
 
 // ============================================================================
-//  4. LOBİ VE SÖZ — 1:1 konuşmanın gerçek olduğu yer
+//  4. LOBBYING AND PROMISES — where a one-to-one conversation is real
 // ============================================================================
 //
-//  Oylamadan once bir uyeyi arayip destegini isteyebilirsin. Bedava
-//  degil: karsiliginda bir SOZ verirsin ve o soz kayda gecer. Tutarsan
-//  guven artar; tutmazsan huyu ne olursa olsun iki katiyla geri doner.
+//  Before a vote you can call a member and ask for their support. It is not
+//  free: you give a PROMISE in return, and that promise is recorded. Keep it
+//  and trust rises; break it and it comes back at double, whatever their
+//  temperament.
 //
-//  Sozu bozmanin huydan BAGIMSIZ cezalandirilmasi bilincli. Bir yatirimci
-//  senin agresif ya da temkinli olmandan hoslanmayabilir — ama yalan
-//  soylemenden kimse hoslanmaz.
+//  Punishing a broken promise INDEPENDENTLY of temperament is deliberate.
+//  An investor may dislike you being aggressive or cautious — but nobody
+//  likes being lied to.
 // ============================================================================
 
 export type PromiseKind =
@@ -960,15 +964,15 @@ export interface BoardPromise {
     id: string;
     memberId: string;
     kind: PromiseKind;
-    /** Hangi ceyrege kadar tutulmali */
+    /** The quarter by which it must be kept */
     dueQuarter: number;
-    /** Ne kadarlik bir soz — guven etkisi buna olcekli */
+    /** How large a promise — the trust effect scales with it */
     magnitude: number;
     description: string;
     resolved?: 'kept' | 'broken';
 }
 
-/** Lobinin oy uzerindeki agirligi — huyu bastirabilecek kadar guclu degil. */
+/** How much lobbying weighs on a vote — not enough to override temperament. */
 export const LOBBY_MAX_PULL = 0.75;
 
 export interface LobbyResult {
@@ -981,11 +985,11 @@ export interface LobbyResult {
 }
 
 /**
- * Bir uyeyle 1:1 konusma.
+ * A one-to-one conversation with a member.
  *
- * Ikna sansi guvene ve huya bagli. Yuksek guvenli bir Loyalist bedavaya
- * destekler; dusuk guvenli bir Snake once bir sey ister — ve istedigini
- * vermezsen zaten aleyhine oy verecektir.
+ * The chance of persuading them depends on trust and temperament. A
+ * high-trust Loyalist backs you for nothing; a low-trust Snake wants
+ * something first — and if you refuse, they were voting against you anyway.
  */
 export const lobbyMember = (
     member: GovMember,
@@ -1014,7 +1018,7 @@ export const lobbyMember = (
         };
     }
 
-    // Guven dusukse bedava destek yok — bir sey ister.
+    // Low trust means no free support — they want something.
     const wantsSomething = member.trust < 55 || member.trait === 'Snake' || member.trait === 'Shark';
     const demands: PromiseKind | undefined = wantsSomething
         ? (member.trait === 'Conservative' ? 'dividend_next'
@@ -1048,7 +1052,7 @@ export const resolvePromise = (
 });
 
 // ============================================================================
-//  5. KURUL HAVASI VE HİSSE SİNYALİ
+//  5. BOARD MOOD AND THE SHARE-PRICE SIGNAL
 // ============================================================================
 
 export type BoardMood = 'Supportive' | 'Neutral' | 'Restless' | 'Hostile';
@@ -1081,35 +1085,36 @@ export const GOVERNANCE_SIGNALS: Record<string, { impactPercent: number; note: s
 };
 
 // ============================================================================
-//  SATIN ALMADAN GELEN YÖNETİCİ — "rollover equity"
+//  A DIRECTOR FROM AN ACQUISITION — "rollover equity"
 // ============================================================================
 //
-//  Bugune kadar kurula tek bir yoldan uye geliyordu: tefeciden borc alip
-//  odeyememek. Yani kurul yalnizca BASARISIZLIKLA buyuyordu ve iyi giden
-//  bir oyuncunun kurulu ilk gunku haliyle donuyordu.
+//  Until now there was exactly one route onto the board: borrowing from a
+//  loan shark and failing to repay. So the board only ever grew through
+//  FAILURE, and a player doing well had the same board on day one thousand
+//  as on day one.
 //
-//  Gercekte kurul en cok SATIN ALMALARLA buyur. Dostane bir devralmada
-//  hedefin kurucusu genelde bedelin bir kismini HISSE olarak alir
-//  ("rollover equity") ve bir sure sirkette kalir — hem sirketi tanidigi
-//  icin hem de basarisina bagli kalmasi istendigi icin.
+//  In reality boards grow mostly through ACQUISITIONS. In a friendly deal the
+//  target's founder usually takes part of the price in SHARES ("rollover
+//  equity") and stays with the company for a while — both because they know
+//  the business and because you want them tied to its success.
 //
-//  OYUN ACISINDAN ONEMI: bu, dostane ve dusmanca devralma arasina gercek
-//  bir fark koyar.
+//  WHY IT MATTERS FOR THE GAME: it puts a real difference between a friendly
+//  and a hostile takeover.
 //
-//    DOSTANE  -> daha ucuz prim (%15), ama masaya BIR KISI DAHA oturur
-//                ve senin payin bir tik erir
-//    DUSMANCA -> pahali prim (%35), entegrasyon zor, ama kimse gelmez;
-//                yonetimlerini zaten sen kovdun
+//    FRIENDLY -> cheaper premium (15%), but ONE MORE PERSON at the table
+//                and your own stake erodes a notch
+//    HOSTILE  -> expensive premium (35%), hard integration, but nobody
+//                joins; you already fired their management
 //
-//  Yani "ucuz olan" seni yavas yavas kontrolden eder. Bu bilincli: her
-//  devralma kontrolunden bir dilim goturur ve yeterince buyurse oyuncu
-//  bir gun %50'nin altina duser — kurul sistemi de tam orada devreye
-//  girer. Buyumenin kendisi bir risk haline gelir.
+//  So "the cheap option" slowly costs you control. That is deliberate: every
+//  acquisition takes a slice of your control, and given enough of them the
+//  player one day drops below 50% — which is exactly where the board system
+//  comes alive. Growth itself becomes a risk.
 // ============================================================================
 
 /** Devralma bu buyuklugun altindaysa kimse koltuk istemez. */
 export const SEAT_MIN_DEAL_RATIO = 0.03;
-/** Bir devralmanin verebilecegi en kucuk ve en buyuk pay. */
+/** The smallest and largest stake an acquisition can hand over. */
 export const SEAT_MIN_STAKE = 0.005;
 export const SEAT_MAX_STAKE = 0.03;
 
@@ -1123,12 +1128,12 @@ export interface IncomingDirector {
 }
 
 /**
- * Hedefin risk profili, gelen kisinin HUYUNU belirler.
+ * The target's risk profile decides the TEMPERAMENT of the incoming director.
  *
- * Mantikli bir bag: olgun ve karli bir sirketi yoneten kisi temkinli
- * olur; para yakan bir girisimi yoneten kisi risk sever. Boylece kimi
- * satin aldigin, kurulunun gelecekteki karakterini de sekillendirir —
- * ve bu tamamen senin kontrolunde bir seçim.
+ * A sensible link: someone running a mature, profitable company turns out
+ * cautious; someone running a cash-burning startup likes risk. So who you
+ * acquire also shapes the future character of your board — and that is a
+ * choice entirely under your control.
  */
 const TRAIT_BY_RISK: Record<string, TraitType> = {
     'Very Low': 'Conservative',
@@ -1155,15 +1160,15 @@ export const directorFromAcquisition = (
     const ratio = Math.max(0, dealPrice || 0) / val;
     if (ratio < SEAT_MIN_DEAL_RATIO) return null;
 
-    // Pay islemin buyuklugune gore, ama dar bir bantta. Kendinden buyuk
-    // bir sirketi alsan bile tek bir kisi kurulun yarisini alamaz.
+    // The stake scales with deal size, but within a narrow band. Even buying
+    // a company larger than yours, no single person takes half the board.
     const stake = Math.max(SEAT_MIN_STAKE, Math.min(SEAT_MAX_STAKE, ratio * 0.35));
     const shareCount = Math.round((totalShares || 10_000_000) * stake);
 
     return {
         name: t('gov.founderOf', { v1: targetName }),
         trait: TRAIT_BY_RISK[risk] ?? 'Loyalist',
-        // Sana kendi istegiyle katildi: iyi niyetli ama korlemesine degil.
+        // They joined you willingly: well-intentioned, but not blindly.
         trust: 60,
         shareCount,
         note:
@@ -1172,23 +1177,25 @@ export const directorFromAcquisition = (
 };
 
 // ============================================================================
-//  KURULUN KENDİ GÜNDEMİ
+//  THE BOARD'S OWN AGENDA
 // ============================================================================
 //
-//  BURAYA KADAR kurul hep TEPKİ veriyordu: sen bir şey yapıyordun, onlar
-//  puan veriyordu. Bu yüzden masada yalnız hissediliyordu — karşında kimse
-//  yoktu, bir tabelaya bakıyordun.
+//  UP TO HERE the board only ever REACTED: you did something, they scored it.
+//  That is why the table felt lonely — there was nobody across from you, you
+//  were looking at a gauge.
 //
-//  Gerçek bir yönetim kurulu SENDEN BİR ŞEY İSTER. Sessiz kalmaz. İki çeyrek
-//  zarar edersen biri kesinlikle "maliyetler ne olacak" diye sorar. Kasada
-//  atıl para birikirse temettü ister. Borç şişerse ödemeni ister.
+//  A real board WANTS SOMETHING FROM YOU. It does not sit quietly. Lose money
+//  two quarters running and somebody will certainly ask what the plan on costs
+//  is. Let cash pile up idle and they want a dividend. Let debt swell and they
+//  want it paid down.
 //
-//  Ve önemlisi: talebi HERKES değil, o konuyu DERT EDİNEN üye açar
-//  (`petIssue`). Kurulunda borç takıntılı kimse yoksa borcunu kimse sormaz.
-//  Kurulunu sen seçiyorsun — kimi aldığın, neyi hesap vereceğini belirler.
+//  And crucially: a demand is raised not by EVERYONE but by the member who
+//  CARES about that issue (`petIssue`). If nobody on your board is fixated on
+//  debt, nobody asks about your debt. You choose your board — who you take on
+//  decides what you will be held to account for.
 //
-//  Talebi karşılamak güven kazandırır; görmezden gelmek kaybettirir ve
-//  güvensizlik oyuna giden yolu döşer.
+//  Meeting a demand earns trust; ignoring one costs it, and paves the road to
+//  a no-confidence vote.
 // ============================================================================
 
 export type DemandKind =
@@ -1214,15 +1221,15 @@ export interface DemandContext extends CompanyContext {
 export interface BoardDemand {
     id: string;
     kind: DemandKind;
-    /** Talebi acan uye — bu bir kurum degil, bir INSAN istiyor */
+    /** The member who raised it — this is a PERSON asking, not an institution */
     raisedBy: string;
     raisedByName: string;
     quarterRaised: number;
-    /** Bu ceyrege kadar karsilanmali */
+    /** Must be met by this quarter */
     deadline: number;
     /** Sayisal hedef (temettu tutari, inilecek kaldirac vb.) */
     target: number;
-    /** Yakin bir uye tarafindan ozel olarak mi acildi */
+    /** Was it raised privately by a close member */
     confidential?: boolean;
     status: 'open' | 'met' | 'failed';
 }
@@ -1230,32 +1237,33 @@ export interface BoardDemand {
 /** Talebi karsilamak icin taninan sure. */
 export const DEMAND_GRACE = 3;
 /**
- * BEKLEME SURELERI — dogrulama kosusunda cikan hatanin ilaci.
+ * COOLDOWNS — the cure for a bug a verification run exposed.
  *
- *  Ilk kosuda su goruldu: talep Ç7'de ihmal edildi (−14 guven) ve AYNI
- *  ceyrekte ayni talep yeniden acildi. Kurul cezayi kesip ayni cumleyi
- *  tekrar kuruyordu. Gercek bir kurul boyle davranmaz: dediginin
- *  yapilmadigini goren yonetici tekrar etmez, SUSAR ve hatirlar.
+ *  The first run showed this: a demand was ignored in Q7 (-14 trust) and the
+ *  SAME demand was reopened in the SAME quarter. The board handed down the
+ *  penalty and then repeated itself word for word. A real board does not
+ *  behave that way: a director who sees they were ignored does not repeat
+ *  themselves, they GO QUIET and remember.
  *
- *  Ayrica surekli tekrarlanan talep baskisini degil, inandiriciligini
- *  kaybeder. Karsilanan talep de bir sure geri gelmez.
+ *  A demand repeated endlessly also loses its credibility rather than
+ *  applying pressure. A met demand stays away for a while too.
  */
 export const DEMAND_COOLDOWN_MET = 3;
 export const DEMAND_COOLDOWN_FAILED = 5;
-/** Bir talep kapandiktan sonra kurulun sessiz kalacagi ceyrek sayisi. */
+/** How many quarters the board stays silent after a demand closes. */
 export const DEMAND_QUIET = 2;
 /** Sana yakin bir uyenin tanidigi ek sure. */
 export const CONFIDANT_GRACE_BONUS = 2;
-/** Karsilanan talep: talebi acana daha fazla, kurula genel bir miktar. */
+/** A met demand: more for whoever raised it, a smaller amount for the rest. */
 export const DEMAND_MET_TRUST = 9;
 export const DEMAND_MET_TRUST_OTHERS = 3;
-/** Gormezden gelinen talep — kazanmaktan daha cok kaybettirir. */
+/** An ignored demand — it costs more than meeting one gains. */
 export const DEMAND_FAILED_TRUST = -14;
 export const DEMAND_FAILED_TRUST_OTHERS = -5;
-/** Gelirin bu kati kadar atil nakit "cok" sayilir. */
+/** Idle cash counts as "a lot" at this multiple of revenue. */
 export const IDLE_CASH_MULTIPLE = 4;
 
-/** Bir uyenin bir konuyu dert edinip edinmedigi: once petIssue, sonra huy. */
+/** Whether a member cares about an issue: petIssue first, then temperament. */
 const caresAbout = (m: GovMember, kind: DemandKind): number => {
     const pet: Record<DemandKind, PetIssue> = {
         cut_costs: 'headcount', deleverage: 'debt', pay_dividend: 'dividend',
@@ -1275,17 +1283,17 @@ const caresAbout = (m: GovMember, kind: DemandKind): number => {
 };
 
 /**
- * Bu ceyrek kurul bir sey ister mi?
+ * Does the board want something this quarter?
  *
- * Tek seferde TEK talep acilir — surekli bagiran bir kurul gurultudur,
- * baski degil. Kosul saglanmiyorsa veya o konuyu dert edinen kimse yoksa
- * `null` doner: kurul gercekten sessizdir.
+ * Only ONE demand is open at a time — a board that shouts constantly is
+ * noise, not pressure. If no condition is met, or nobody on the board cares
+ * about the issue, this returns `null`: the board is genuinely silent.
  */
 export const detectDemand = (
     members: GovMember[],
     ctx: DemandContext,
     quarter: number,
-    /** Tur bazinda "bu ceyrekten once acilamaz" kaydi */
+    /** Per-kind record of "cannot be raised before this quarter" */
     cooldowns: Partial<Record<DemandKind, number>> = {},
 ): BoardDemand | null => {
     const idleThreshold = Math.max(0, ctx.revenue) * IDLE_CASH_MULTIPLE;
@@ -1312,13 +1320,13 @@ export const detectDemand = (
     candidates.length = 0;
     candidates.push(...fresh);
 
-    // Her aday icin: o konuyu en cok dert edinen uye kim? Kimse degilse dusur.
+    // For each candidate: who cares most about this issue? If nobody, drop it.
     let best: { kind: DemandKind; target: number; member: GovMember; score: number } | null = null;
     for (const c of candidates) {
         for (const m of members) {
             const care = caresAbout(m, c.kind);
             if (care <= 0) continue;
-            // Guveni dusuk uye daha yuksek sesle konusur.
+            // A member with low trust speaks louder.
             const voice = care * c.urgency * (1 + (TRUST_NEUTRAL - (m.trust ?? 50)) / 100);
             if (!best || voice > best.score) best = { kind: c.kind, target: c.target, member: m, score: voice };
         }
@@ -1326,12 +1334,12 @@ export const detectDemand = (
     if (!best) return null;
 
     // ------------------------------------------------------------------
-    //  YAKIN UYE ONCE SANA SOYLER
+    //  A CLOSE MEMBER TELLS YOU FIRST
     // ------------------------------------------------------------------
-    //  Iliskinin ikinci getirisi bu: sana yakin bir yonetici konuyu
-    //  toplantida patlatmadan once ozel olarak acar ve toparlaman icin
-    //  fazladan zaman tanir. Oyu degistirmez — ZAMAN kazandirir, ki
-    //  iliskinin gercek hayattaki getirisi de tam olarak budur.
+    //  The second thing a relationship buys you: a director close to you
+    //  raises the issue privately instead of dropping it in the meeting,
+    //  and gives you extra time to fix it. It does not change their vote —
+    //  it buys TIME, which is exactly what a relationship buys in real life.
     // ------------------------------------------------------------------
     const friendly = isConfidant(best.member);
 
@@ -1349,10 +1357,10 @@ export const detectDemand = (
 };
 
 /**
- * Acik bir talep karsilandi mi?
+ * Has an open demand been met?
  *
- * `satisfiedManually`: temettu/Ar-Ge gibi oyuncunun acikca yaptigi hamleler
- * store tarafindan isaretlenir; geri kalani sirket durumundan okunur.
+ * `satisfiedManually`: explicit player moves such as a dividend or R&D
+ * spend are flagged by the store; everything else is read from company state.
  */
 export const evaluateDemand = (
     demand: BoardDemand,
