@@ -71,8 +71,20 @@ export interface AttractionBreakdown {
 
 // --- Ayar sabitleri --------------------------------------------------------
 
-/** Kalite seviyesi basina cekicilik artisi. Lvl 5 -> 1 + 4*0.25 = 2.0 kat */
-const QUALITY_STEP = 0.25;
+/**
+ * Attraction gained per quality level. Lvl 5 -> 1 + 4*0.30 = 2.2x
+ *
+ * Raised from 0.25. R&D was the weakest of the four levers in practice: the
+ * facility ceiling only rose every two tiers, so a player who had researched a
+ * level often could not build it for a long stretch, and when it finally
+ * arrived the step was small enough to be hard to feel. The ceilings now climb
+ * a tier at a time and each level carries more weight.
+ *
+ * Note this only lifts the PLAYER - competitor attraction is derived from
+ * their market share, not from a quality level - so it is a deliberate,
+ * measured buff to the research route.
+ */
+const QUALITY_STEP = 0.30;
 
 /** Doymus ses payinin cekicilige katkisi. 2 -> en fazla 3 kat. */
 const MARKETING_MAX_BONUS = 2.0;

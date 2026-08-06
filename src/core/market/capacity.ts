@@ -105,6 +105,15 @@ export interface FacilityTier {
     /** Marka bu kademede bunun altina DUSMEZ */
     brandFloor: number;
     /** Uretilebilecek en yuksek kalite seviyesi */
+    /**
+     * The highest product quality this plant can actually build.
+     *
+     * Used to climb one level every TWO tiers (2,2,3,3,4,4...), so a quality
+     * upgrade bought with RP could sit queued for two full facility
+     * generations - long enough that the player reasonably concluded it never
+     * arrived at all. Now it climbs a level per tier through the early and mid
+     * game, reaching 10 at tier 15 instead of 17.
+     */
     qualityCeiling: number;
     /** Oyuncuya gosterilecek tek cumlelik tarif */
     description: string;
@@ -178,7 +187,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9052,
         brandCeiling: 26,
         brandFloor: 8,
-        qualityCeiling: 2,
+        qualityCeiling: 3,
         get description() { return t('data.capacity.oneRealLineWithA'); },
     },
     {
@@ -195,7 +204,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9103,
         brandCeiling: 30,
         brandFloor: 10,
-        qualityCeiling: 3,
+        qualityCeiling: 4,
         get description() { return t('data.capacity.aProperPlantWithShifts'); },
     },
     {
@@ -212,7 +221,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9155,
         brandCeiling: 34,
         brandFloor: 12,
-        qualityCeiling: 3,
+        qualityCeiling: 4,
         get description() { return t('data.capacity.secondHallSecondShiftScrap'); },
     },
     {
@@ -229,7 +238,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9206,
         brandCeiling: 38,
         brandFloor: 14,
-        qualityCeiling: 4,
+        qualityCeiling: 5,
         get description() { return t('data.capacity.suppliesAWholeRegionOn'); },
     },
     {
@@ -246,7 +255,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9258,
         brandCeiling: 43,
         brandFloor: 16,
-        qualityCeiling: 4,
+        qualityCeiling: 5,
         get description() { return t('data.capacity.twoIndependentLinesOneCan'); },
     },
     {
@@ -263,7 +272,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9309,
         brandCeiling: 47,
         brandFloor: 18,
-        qualityCeiling: 5,
+        qualityCeiling: 6,
         get description() { return t('data.capacity.robotsOnTheFloorFewer'); },
     },
     {
@@ -280,7 +289,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9361,
         brandCeiling: 52,
         brandFloor: 20,
-        qualityCeiling: 5,
+        qualityCeiling: 6,
         get description() { return t('data.capacity.cleanRoomsAndTolerancesYour'); },
     },
     {
@@ -297,7 +306,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9413,
         brandCeiling: 56,
         brandFloor: 23,
-        qualityCeiling: 6,
+        qualityCeiling: 7,
         get description() { return t('data.capacity.theSitePeopleFlyIn'); },
     },
     {
@@ -314,7 +323,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9464,
         brandCeiling: 61,
         brandFloor: 25,
-        qualityCeiling: 6,
+        qualityCeiling: 7,
         get description() { return t('data.capacity.componentsMadeInHouseYou'); },
     },
     {
@@ -331,7 +340,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9516,
         brandCeiling: 65,
         brandFloor: 28,
-        qualityCeiling: 7,
+        qualityCeiling: 8,
         get description() { return t('data.capacity.severalPlantsRunAsOne'); },
     },
     {
@@ -348,7 +357,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9567,
         brandCeiling: 70,
         brandFloor: 30,
-        qualityCeiling: 7,
+        qualityCeiling: 8,
         get description() { return t('data.capacity.tolerancesMeasuredInMicronsThis'); },
     },
     {
@@ -365,7 +374,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9619,
         brandCeiling: 74,
         brandFloor: 33,
-        qualityCeiling: 8,
+        qualityCeiling: 9,
         get description() { return t('data.capacity.linesThatReconfigureThemselvesBetween'); },
     },
     {
@@ -382,7 +391,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9671,
         brandCeiling: 79,
         brandFloor: 35,
-        qualityCeiling: 8,
+        qualityCeiling: 9,
         get description() { return t('data.capacity.aCityBuiltAroundProduction'); },
     },
     {
@@ -399,7 +408,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9722,
         brandCeiling: 83,
         brandFloor: 38,
-        qualityCeiling: 9,
+        qualityCeiling: 10,
         get description() { return t('data.capacity.everyMajorRegionHasA'); },
     },
     {
@@ -416,7 +425,7 @@ export const FACILITY_TIERS: FacilityTier[] = [
         yieldRate: 0.9774,
         brandCeiling: 88,
         brandFloor: 40,
-        qualityCeiling: 9,
+        qualityCeiling: 10,
         get description() { return t('data.capacity.aPlantThatRetoolsItself'); },
     },
     {
