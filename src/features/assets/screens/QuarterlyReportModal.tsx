@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   LayoutAnimation,
 } from 'react-native';
-import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { formatMoney, formatNumber, formatPercent, formatSignedMoney } from '../../../core/utils';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
@@ -415,16 +414,23 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
 const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   // Dil degisince yeniden ciz.
   useLocale();
-  const { evaluateSubsidiaries } = useCorporateFinanceStore();
+  // ----------------------------------------------------------------------
+  //  SUBSIDIARIES ARE VALUED BY THE ENGINE, NOT BY THIS SCREEN
+  // ----------------------------------------------------------------------
+  //  This screen used to call evaluateSubsidiaries() from a useEffect on open.
+  //  The engine calls it too, inside the quarter tick, so every quarter rolled
+  //  each subsidiary's valuation TWICE - and closing and reopening the report
+  //  rolled it again, with no limit. A player could farm the good outcomes by
+  //  reopening the report until the numbers came out well.
+  //
+  //  The engine call is the correct one. Owned companies still revalue every
+  //  quarter, which is deliberate: the market's acquisition targets move on
+  //  alternate quarters, but a company you already run reports to you every
+  //  quarter like any other division.
+  // ----------------------------------------------------------------------
   // Eski kayitlarda yeni alanlar olmayabilir — normalize et, yoksa render patlar.
   const rawReport = useGameStore(state => state.lastQuarterReport);
   const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
-
-  React.useEffect(() => {
-    if (visible) {
-      evaluateSubsidiaries();
-    }
-  }, [visible, evaluateSubsidiaries]);
 
   if (!report) {
     return (
