@@ -160,6 +160,9 @@ export const MORALE_ANCHOR = 70;
  */
 export const WAGE_MORALE_CEILING = 85;
 
+/** How steeply morale falls for each point below market pay. */
+export const BELOW_MARKET_SLOPE = 110;
+
 /** Maas orani tek basina hangi moral seviyesini tasir. */
 export const wageMoraleTarget = (salaryRatio: number): number => {
     const r = clampSalaryRatio(salaryRatio);
@@ -168,8 +171,19 @@ export const wageMoraleTarget = (salaryRatio: number): number => {
         const over = Math.min(0.5, r - 1);
         return MORALE_ANCHOR + (WAGE_MORALE_CEILING - MORALE_ANCHOR) * (1 - Math.exp(-over * 12));
     }
-    // Altina inersen sert duser — ucuza calistirmanin bedeli var.
-    return Math.max(0, MORALE_ANCHOR - (1 - r) * 180);
+    // ------------------------------------------------------------------
+    //  BELOW MARKET: A COST, NOT A CLIFF
+    // ------------------------------------------------------------------
+    //  The slope used to be 180, so every 1% below market cost 1.8 morale.
+    //  Paying 10% under dropped the target to 52 while paying 30% OVER only
+    //  bought 85 - losing more from a small cut than a huge raise could ever
+    //  gain. Underpaying was not a strategy with a price, it was a trap.
+    //
+    //  At 110 a 15% cut lands at 53.5, still above the attrition cliff at 50,
+    //  so running lean becomes a real choice: cheaper wages, slower output,
+    //  more scrap. Go far enough under and it still collapses.
+    // ------------------------------------------------------------------
+    return Math.max(0, MORALE_ANCHOR - (1 - r) * BELOW_MARKET_SLOPE);
 };
 
 /** Moral hedefe bu hizla yurur. 0.30 -> birkac ceyrekte oturur. */
