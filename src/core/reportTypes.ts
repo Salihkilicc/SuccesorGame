@@ -26,8 +26,19 @@ export interface ProductQuarterLine {
     name: string;
     /** Pazar payi hesabi icin gerekli — bkz. core/market/productMarkets.ts */
     category?: string;
-    /** Bu çeyrek üretilen adet */
+    /** Bu çeyrek üretilen adet — kendi hattın + fason TOPLAMI */
     produced: number;
+    /** Bunun kendi tesisinde üretilen kısmı */
+    ownUnits?: number;
+    /**
+     * Fason üretici tarafından üretilen ve teslim edilen kısım.
+     *
+     * Rapor bunu hiç göstermiyordu: `produced` ikisini tek sayıda eritiyordu,
+     * fason sipariş verip "rakiplere giden" satırını gören oyuncu haklı olarak
+     * o adetlerin sayılmadığını düşünüyordu. Motor hep doğru sayıyordu; görünür
+     * olmayan şey buydu.
+     */
+    contractUnits?: number;
     /** Bu çeyrek satılan adet */
     sold: number;
     /** Çeyrek sonunda elde kalan stok */

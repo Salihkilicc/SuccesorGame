@@ -1907,4 +1907,6 @@ export const tr: Record<string, string> = {
     'mem.relNone': 'Ona etkisi yok',
     'product.notFound': 'Ürün bulunamadı.',
     'market.noEventToday': 'Bugün henüz özel bir market olayı yaşanmadı.',
+    'report.producedSplit': '{v1} kendi hattın + {v2} fason',
+    'report.afterOutsourcing': 'üstelik bu, fasoncunun teslim ettiği {v1} adetten SONRA kalan açık',
 };

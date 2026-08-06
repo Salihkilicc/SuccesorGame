@@ -1906,4 +1906,6 @@ export const en: Record<string, string> = {
     'mem.relNone': 'No effect on them',
     'product.notFound': 'Product not found.',
     'market.noEventToday': 'No market event today.',
+    'report.producedSplit': '{v1} in-house + {v2} outsourced',
+    'report.afterOutsourcing': 'and that is after the {v1} your contract partner delivered',
 };

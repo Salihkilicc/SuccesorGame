@@ -319,6 +319,9 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
               {(p.unmetDemand ?? 0) > 0 && (
                 <Text style={styles.demandMiss}>
                   {t('report.lostToRivalsV', { v1: formatNumber(p.unmetDemand ?? 0) })}
+                  {(p.contractUnits ?? 0) > 0
+                    ? ` — ${t('report.afterOutsourcing', { v1: formatNumber(p.contractUnits ?? 0) })}`
+                    : ''}
                 </Text>
               )}
             </View>
@@ -328,6 +331,21 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.produced')}</Text>
               <Text style={styles.productStatValue}>{formatNumber(p.produced)}</Text>
+              {/* --------------------------------------------------------
+                  Outsourced units used to vanish into this one number.
+                  A player who had ordered contract production saw a
+                  "lost to rivals" line and concluded those units had not
+                  been counted - the engine had counted them all along,
+                  they were simply never shown.
+                 -------------------------------------------------------- */}
+              {(p.contractUnits ?? 0) > 0 && (
+                <Text style={styles.productSplit}>
+                  {t('report.producedSplit', {
+                    v1: formatNumber(p.ownUnits ?? 0),
+                    v2: formatNumber(p.contractUnits ?? 0),
+                  })}
+                </Text>
+              )}
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.sold')}</Text>
@@ -1064,6 +1082,7 @@ const styles = StyleSheet.create({
 
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
+  productSplit: { fontSize: 9, color: '#7FB3FF', marginTop: 2 },
   productStatLabel: { color: '#6E6E6E', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#E0E0E0', fontSize: 14, fontWeight: '700', marginTop: 2 },
   sellThroughTrack: {

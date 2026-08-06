@@ -750,7 +750,9 @@ export const useGameStore = create<GameStore>()(
               id: product.id,
               name: product.name,
               category: product.category,
-              produced: quarterlyProduction, // CORRECTED: Use this product's quarterly production
+              produced: quarterlyProduction, // own line + outsourced, combined
+              ownUnits: ownProduction,
+              contractUnits: contractGood,
               sold: quarterlySales,
               revenue: productRevenue,
               expense: (productCOGS + marketingCost + storageCost),
