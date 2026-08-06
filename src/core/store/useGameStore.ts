@@ -10,7 +10,7 @@ import { getMarket } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
-  advanceCategoryBrand, corporateBrandFrom, applyCorporateShock, brandIndex,
+  advanceCategoryBrand, corporateBrandFrom, applyCorporateShock, brandIndex, earnedFloor,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import { updateReachIndex } from '../market/attraction';
@@ -1185,6 +1185,12 @@ export const useGameStore = create<GameStore>()(
           return Math.min(1, (soldByCategory[cat] || 0) / want);
         };
 
+        // Floors a category has already earned - see brand.ts earnedFloor
+        const prevFloors: Record<string, number> = {
+          ...(useStatsStore.getState().brandFloorByCategory || {}),
+        };
+        const nextFloors: Record<string, number> = { ...prevFloors };
+
         const nextByCategory: Record<string, number> = { ...prevByCategory };
         const marketingDeltaTotal = marketingBrand.newBrand - brandValueIndexPrev;
 
@@ -1194,12 +1200,14 @@ export const useGameStore = create<GameStore>()(
           const weightHere = totalPlayerShare > 0 ? shareHere / totalPlayerShare : 1 / Math.max(1, activeCategories.length);
           const r = advanceCategoryBrand({
             current: prevByCategory[cat] ?? 0,
+            floor: prevFloors[cat] || 0,
             share: shareHere,
             servedRatio: servedRatioOf(cat),
             marketingDelta: marketingDeltaTotal * weightHere,
             acquisitionGain: (acquisitionGainByCategory[cat] || 0),
           });
           nextByCategory[cat] = r.newBrand;
+          nextFloors[cat] = earnedFloor(prevFloors[cat], r.newBrand);
         });
 
         const corporateQ = corporateBrandFrom(nextByCategory, activeCategories);
@@ -1255,6 +1263,7 @@ export const useGameStore = create<GameStore>()(
         useStatsStore.getState().update({
           brandValue: corporateQ,
           brandByCategory: nextByCategory,
+          brandFloorByCategory: nextFloors,
           employeeCount: headcount,
           incomingHires: queuedHires,
           facilityTier: nextTierLevel,

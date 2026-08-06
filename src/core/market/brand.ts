@@ -409,6 +409,17 @@ export const brandEquilibrium = (sharePercent: number): number =>
 export interface CategoryBrandInput {
     /** Current brand points in this category */
     current: number;
+    /**
+     * A floor this category can no longer fall below.
+     *
+     * Once a market has been taken to CATEGORY_UNLOCK_BRAND the standing is
+     * kept. Coca-Cola moving into water does not lose its cola brand, and in
+     * the game the alternative was worse: opening a second category split the
+     * shared factory, the first category's share fell, and its brand followed
+     * it down - so the player was punished for progressing. Climbing above the
+     * floor still depends entirely on share; only the fall is stopped.
+     */
+    floor?: number;
     /** Realised market share this quarter (%) */
     share: number;
     /** Of the demand you created, what fraction did you actually deliver (0-1) */
@@ -462,7 +473,8 @@ export const advanceCategoryBrand = (input: CategoryBrandInput): {
         sources.push({ label: t('data.brand.badNews'), amount: shock });
     }
 
-    const newBrand = Math.max(0, current + pull + marketing + acquisition + shock);
+    const floor = Math.max(0, input.floor || 0);
+    const newBrand = Math.max(floor, current + pull + marketing + acquisition + shock);
     return { newBrand, equilibrium, sources };
 };
 
@@ -605,4 +617,15 @@ export const canUnlockAnotherCategory = (
         have,
         required: CATEGORY_UNLOCK_BRAND,
     };
+};
+
+/**
+ * The floor a category has earned.
+ *
+ * Reaching CATEGORY_UNLOCK_BRAND locks it in permanently. Kept as a map rather
+ * than a boolean so a second milestone can be added later without a migration.
+ */
+export const earnedFloor = (currentFloor: number | undefined, brand: number): number => {
+    const floor = Math.max(0, currentFloor || 0);
+    return brand >= CATEGORY_UNLOCK_BRAND ? Math.max(floor, CATEGORY_UNLOCK_BRAND) : floor;
 };

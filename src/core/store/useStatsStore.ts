@@ -97,6 +97,8 @@ export type StatsState = Record<StatKey, number> & {
    *  Sayisal union'a giremez, bilincli olarak ayri duruyor.
    *  Bkz. core/market/brand.ts -> corporateBrand */
   brandByCategory: Record<string, number>;
+  /** Kategorinin bir kez kazandigi ve bir daha altina dusmedigi marka tabani */
+  brandFloorByCategory?: Record<string, number>;
   /** The board's open demand this quarter, already formatted for display. */
   boardDemandNotice?: string;
   _hasHydrated: boolean;
@@ -949,6 +951,17 @@ export const useStatsStore = create<StatsStore>()(
           //  converted figure so the category screens are not blank until
           //  the first quarter closes.
           // --------------------------------------------------------------
+          // A category already past the milestone in an existing save keeps it:
+          // seed the floor on load rather than waiting for the next quarter to
+          // notice, so nothing can slip under it in between.
+          if (state.brandByCategory && !state.brandFloorByCategory) {
+            const floors: Record<string, number> = {};
+            Object.entries(state.brandByCategory).forEach(([cat, v]) => {
+              if ((v as number) >= 200) floors[cat] = 200;
+            });
+            state.brandFloorByCategory = floors;
+          }
+
           if (!state.brandByCategory || Object.keys(state.brandByCategory).length === 0) {
             const asPoints = Math.round((state.brandValue ?? 8) * BRAND_INDEX_SCALE);
             state.brandValue = asPoints;
