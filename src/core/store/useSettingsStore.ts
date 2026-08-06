@@ -1,3 +1,5 @@
+// @orphan-ok deliberately excluded from a new game: language and notification
+// preferences belong to the player, not to the save.
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';

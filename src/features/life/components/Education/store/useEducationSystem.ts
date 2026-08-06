@@ -615,6 +615,7 @@ export const useEducationSystem = create<EducationSystemState>()(
             // ========================================
 
             reset: () => set({ ...initialState }),
+
         }),
         {
             name: 'succesor_education_system_v2',

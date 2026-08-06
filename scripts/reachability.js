@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -127,6 +127,34 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
             problems.frozenText.push(`${rel(f)}:${i + 1}  ${line.trim().slice(0, 60)}`);
         }
     });
+}
+
+// --- 0c) Persisted stores a new game does not clear --------------------------
+//  Every store that writes to disk has to be (a) in PERSIST_KEYS so the disk
+//  copy is deleted, and (b) reset in memory, since zustand keeps the old data
+//  in RAM until the app restarts and will write it straight back.
+//
+//  Missing either half is silent: the game opens, it runs, and only some
+//  numbers are wrong. That is how "my R&D points carried over" happens.
+{
+    const ng = body.get(files.find(f => f.endsWith('core/newGame.ts'))) || '';
+    for (const f of files.filter(f => /use\w+Store\.ts$/.test(f) && !optedOut(f))) {
+        const t = read(f);
+        if (!/persist\(/.test(t)) continue;
+        const key = [...t.matchAll(/name:\s*'([\w-]+)'/g)].pop()?.[1];
+        const hook = t.match(/export const (use\w+Store)/)?.[1];
+        if (!key || !hook) continue;
+        if (/@orphan-ok/.test(t)) continue;
+
+        const onDisk = ng.includes(`'${key}'`);
+        const inMemory = new RegExp(`${esc(hook)}[^\n]*\\.(reset|resetAchievements|initializeGame)|callReset\\('${esc(hook)}'`).test(ng)
+            || new RegExp(`${esc(hook)}\\.setState`).test(ng);
+
+        if (!onDisk || !inMemory) {
+            problems.newGame.push(
+                `${hook}  (${rel(f)})  disk=${onDisk ? 'ok' : 'MISSING from PERSIST_KEYS'}  memory=${inMemory ? 'ok' : 'NOT RESET'}`);
+        }
+    }
 }
 
 // --- 1) Components nothing renders -----------------------------------------
@@ -208,6 +236,8 @@ const section = (title, list, why) => {
 
 console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
+total += section('Persisted stores a new game does not clear', problems.newGame,
+    'Old data walks into the next game. Both halves are needed: the disk key and the in-memory reset.');
 total += section('Translations frozen at module load', problems.frozenText,
     'Evaluated once on import, so they never follow a language change. Use a getter.');
 total += section('Hooks called after an early return', problems.hooks,

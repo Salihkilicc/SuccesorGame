@@ -96,32 +96,55 @@ const resetInMemoryStores = () => {
     useMarketStore.getState().reset();
     useAchievementStore.getState().resetAchievements();
 
+    // ------------------------------------------------------------------
+    //  `reset?.()` HID A MISSING METHOD
+    // ------------------------------------------------------------------
+    //  These four were called as `store.getState().reset?.()`. If a store has
+    //  no reset - and useEducationSystem did not - the optional chaining
+    //  swallows it silently and that store's data walks into the next game
+    //  with nothing logged anywhere.
+    //
+    //  `callReset` does the same job but says so when the method is absent.
+    // ------------------------------------------------------------------
+    const callReset = (label: string, store: any) => {
+        const fn = store?.getState?.()?.reset;
+        if (typeof fn !== 'function') {
+            console.warn(`[newGame] ${label} has no reset() - its data will carry over`);
+            return;
+        }
+        fn();
+    };
+
     // Dynamic require: these stores live in feature folders and some of them
     // import back into core — a static import would create a cycle.
     try {
         const { useEquityStore } = require('../features/finance/stores/useEquityStore');
-        useEquityStore.getState().reset?.();
+        callReset('useEquityStore', useEquityStore);
     } catch (e) {
         console.warn('[newGame] useEquityStore sifirlanamadi', e);
     }
 
     try {
         const { useCorporateFinanceStore } = require('../features/finance/stores/useCorporateFinanceStore');
-        useCorporateFinanceStore.getState().reset?.();
+        callReset('useCorporateFinanceStore', useCorporateFinanceStore);
     } catch (e) {
         console.warn('[newGame] useCorporateFinanceStore sifirlanamadi', e);
     }
 
     try {
         const { useEducationSystem } = require('../features/life/components/Education/store/useEducationSystem');
-        useEducationSystem.getState().reset?.();
+        callReset('useEducationSystem', useEducationSystem);
     } catch (e) {
         console.warn('[newGame] useEducationSystem sifirlanamadi', e);
     }
 
     try {
         const { useAssetStore } = require('../features/shopping/store/useAssetStore');
-        useAssetStore.getState().reset?.();
+        callReset('useAssetStore', useAssetStore);
+
+        // Shelved module, but its data is still on disk and still in memory.
+        const { useTravelStore } = require('../features/life/components/Travel/store/useTravelStore');
+        callReset('useTravelStore', useTravelStore);
     } catch (e) {
         console.warn('[newGame] useAssetStore sifirlanamadi', e);
     }
@@ -210,8 +233,29 @@ export const startNewGame = async (): Promise<void> => {
     }
     console.log(`[newGame] ${removed}/${PERSIST_KEYS.length} anahtar temizlendi.`);
 
-    // 3) Denetle.
-    verifyNewGame();
+    // 3) Reset memory a SECOND time, after the disk is gone.
+    //    Persist writes are async: the writes queued by step 1 can land while
+    //    step 2 is awaiting, and any store that rehydrates in between would be
+    //    reading data we are in the middle of deleting. Running the reset again
+    //    once the disk is empty removes that race entirely. It is cheap - these
+    //    are plain setState calls - and it makes the end state unconditional
+    //    rather than dependent on timing.
+    resetInMemoryStores();
+
+    // 4) Audit, and say so loudly.
+    const problems = verifyNewGame();
+    if (__DEV__ && problems.length > 0) {
+        // A console warning was not enough - it is easy to miss and the player
+        // ends up reporting "my R&D points carried over" days later. In a dev
+        // build the audit now interrupts.
+        try {
+            const { Alert } = require('react-native');
+            Alert.alert(
+                'New game: data carried over',
+                problems.join('\n\n') + '\n\nThis is a bug. The field names above say where.',
+            );
+        } catch { /* Alert unavailable, the console warning still stands */ }
+    }
 
     console.log('[newGame] Hazir.');
 };
