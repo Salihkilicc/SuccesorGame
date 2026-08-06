@@ -286,11 +286,29 @@ export const efficiencyMultiplier = (morale: number): number =>
     0.78 + 0.30 * (Math.min(100, Math.max(0, morale || 0)) / 100);
 
 /**
- * Fire carpani: dikkatsiz ekip bozuk urun cikarir.
- * Moral 100 -> 1.0 (kademe firesi aynen), moral 0 -> 2.5 kat fire.
+ * Scrap multiplier: a careless team turns out bad units.
+ *
+ * ANCHORED AT MARKET PAY, NOT AT PERFECTION. This used to read
+ * `1 + (1 - morale/100) * 1.5`, so the plant's rated yield was only reached at
+ * morale 100 - a level that is not sustainable, since wages alone cap morale at
+ * 85. A normally paid team sitting at 70 ran at 1.45x scrap, which meant the
+ * yield figure printed on the facility screen was one the player could never
+ * actually hit. The spec sheet was fiction.
+ *
+ * Now MORALE_ANCHOR (70, what market pay sustains) gives exactly the rated
+ * yield. An unhappy team wastes more, a genuinely happy one beats the rating -
+ * which mirrors efficiencyMultiplier, already above 1.0 at high morale.
+ *
+ *   morale 100 -> 0.75x     morale 70 -> 1.00x     morale 40 -> 1.45x
  */
-export const scrapMultiplier = (morale: number): number =>
-    1 + (1 - Math.min(100, Math.max(0, morale || 0)) / 100) * 1.5;
+export const SCRAP_BEST = 0.75;
+export const SCRAP_WORST = 2.05;
+
+export const scrapMultiplier = (morale: number): number => {
+    const m = Math.min(100, Math.max(0, morale || 0));
+    const raw = 1 + ((MORALE_ANCHOR - m) / 100) * 1.5;
+    return Math.min(SCRAP_WORST, Math.max(SCRAP_BEST, raw));
+};
 
 /** Ceyreklik dogal kayip. Mutsuz ve ucuz calistirilan insan gider. */
 export const BASE_ATTRITION = 0.03;
