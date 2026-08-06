@@ -151,6 +151,15 @@ export interface QuarterReport {
     operationalSetback: boolean;
     setbackMessage: string;
     lostUnits: number;
+    /**
+     * Talebinin ne kadarini fabrikan karsilayabildi (0-1).
+     *
+     * Kapasite tek havuz ve butun kategoriler ondan besleniyor. Ikinci bir
+     * kategori acinca birincinin payi duser — simulasyonda %5.05'ten %3.97'ye
+     * indi — ama oyuncuya bunu soyleyen hicbir sey yoktu. Buyume karari tam
+     * olarak bu sayiya bakilarak verilir.
+     */
+    capacityUtilization?: number;
     lostRevenue: number;
     employeeMorale: number;
 

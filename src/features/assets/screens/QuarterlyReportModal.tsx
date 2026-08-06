@@ -231,6 +231,24 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
     }
   }
 
+  // ------------------------------------------------------------------
+  //  THE FACTORY IS THE CEILING, AND IT WAS NEVER SAID OUT LOUD
+  // ------------------------------------------------------------------
+  //  Capacity is one shared pool across every category. Open a second market
+  //  and the first one's share falls - 5.05% to 3.97% in simulation - purely
+  //  because the plant is now split. The answer is to upgrade, and the player
+  //  had no way of knowing that was the answer.
+  // ------------------------------------------------------------------
+  {
+    const util = r.capacityUtilization;
+    if (typeof util === 'number' && util < 0.999) {
+      notes.push({
+        tone: util < 0.7 ? 'bad' : 'warn',
+        text: t('report.capacitySqueeze', { v1: String(Math.round(util * 100)) }),
+      });
+    }
+  }
+
   if (r.layoffs > 0) {
     notes.push({
       tone: 'bad',

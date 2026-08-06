@@ -300,6 +300,29 @@ export const useMarketStore = create<MarketState>()(
                 const state = get();
                 let { marketTrend, marketPrices, priceHistory, currentQuarter } = state;
 
+                // ==========================================================
+                //  PIYASA IKI CEYREKTE BIR HAREKET EDER
+                // ==========================================================
+                //  The player's complaint: by the time enough cash is saved to
+                //  buy a target, the target has moved out of reach. Prices
+                //  repriced every single quarter while the player's own
+                //  earnings compound far more slowly, so the gap only widened.
+                //
+                //  Now the market updates on alternate quarters, and the value
+                //  anchor compounds per UPDATE rather than per quarter - which
+                //  halves its long-run growth from ~4%/yr to ~2%/yr. Over a
+                //  55-year career that is the difference between targets
+                //  drifting 8.9x away and 3x away.
+                // ==========================================================
+                const nextQ = currentQuarter + 1;
+                if (nextQ % 2 !== 0) {
+                    // Odd quarter: time passes, prices hold.
+                    set({ currentQuarter: nextQ });
+                    return;
+                }
+                /** How many times prices have actually moved. Drives the anchor. */
+                const priceUpdates = Math.floor(nextQ / 2);
+
                 // Step 1: Determine Trend (20% chance to switch each quarter)
                 if (Math.random() < 0.20) {
                     const trends: Array<'BULL' | 'BEAR' | 'FLAT'> = ['BULL', 'BEAR', 'FLAT'];
@@ -420,7 +443,7 @@ export const useMarketStore = create<MarketState>()(
                             ? shareValuationMultiplier(live, baseShare)
                             : 1;
                     const anchor =
-                        basePrice * Math.pow(1 + ANCHOR_GROWTH, currentQuarter + 1) * shareMult;
+                        basePrice * Math.pow(1 + ANCHOR_GROWTH, priceUpdates) * shareMult;
 
                     let newPrice = currentPrice * (1 + totalChangePercent);
                     // Cipaya dogru cek. Tahvilde neredeyse tam, kriptoda hic.
@@ -487,6 +510,40 @@ export const useMarketStore = create<MarketState>()(
                 // oyuncunun yillarca surdurdugu rekabet silinir.
                 competitorShares: state.competitorShares,
             }),
+            // ==============================================================
+            //  ONE-TIME CLAMP FOR PRE-REVERSION SAVES
+            // ==============================================================
+            //  Before mean reversion existed, prices were an uncapped random
+            //  walk and ran away by orders of magnitude - a $10M startup could
+            //  read as a $120B acquisition target. Reversion pulls those back
+            //  at 15% a quarter, but the player is trying to play NOW, and a
+            //  target that is 12,000x its real worth makes the whole M&A route
+            //  look broken for the next twenty-odd quarters.
+            //
+            //  On load, anything more than 3x its own value anchor is pulled
+            //  back to the anchor. 3x leaves the normal volatility band alone:
+            //  a healthy price sits within roughly +/-40% of its anchor, so
+            //  nothing that is merely expensive gets touched.
+            // ==============================================================
+            onRehydrateStorage: () => (state) => {
+                if (!state?.marketPrices) return;
+                const updates = Math.floor((state.currentQuarter || 0) / 2);
+                let clamped = 0;
+                INITIAL_MARKET_ITEMS.forEach(item => {
+                    const base = ('price' in item ? (item as any).price : 0) || 0;
+                    if (!base) return;
+                    const price = state.marketPrices[item.id];
+                    if (!price) return;
+                    const anchor = base * Math.pow(1.01, updates);
+                    if (price > anchor * 3) {
+                        state.marketPrices[item.id] = anchor;
+                        clamped += 1;
+                    }
+                });
+                if (clamped > 0) {
+                    console.log(`[MarketStore] ${clamped} runaway price(s) pulled back to their anchor`);
+                }
+            },
         }
     )
 );

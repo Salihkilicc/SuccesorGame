@@ -1908,4 +1908,5 @@ export const en: Record<string, string> = {
     'market.noEventToday': 'No market event today.',
     'report.producedSplit': '{v1} in-house + {v2} outsourced',
     'report.afterOutsourcing': 'and that is after the {v1} your contract partner delivered',
+    'report.capacitySqueeze': 'Your plant could only build {v1}% of what you planned. Everything above that is demand you created and could not deliver — and share is earned on what you actually ship. Upgrade the facility or hire, or scale the plan back.',
 };

@@ -1360,6 +1360,7 @@ export const useGameStore = create<GameStore>()(
           operationalSetback,
           setbackMessage,
           lostUnits: totalLostUnits,
+          capacityUtilization: allocationRatio,
           lostRevenue: totalLostRevenue,
           employeeMorale: moraleResult.newMorale,
 
