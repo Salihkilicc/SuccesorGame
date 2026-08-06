@@ -50,9 +50,9 @@ export const initialProductState: ProductState = {
     products: [
         {
             id: 'smart_phone',
-            name: t('product.smartPhone'),
+            get name() { return t('product.smartPhone'); },
             icon: '📱',
-            description: t('product.essentialForModernLife'),
+            get description() { return t('product.essentialForModernLife'); },
             status: 'active',
             category: 'Consumer', // Type cast if needed, but 'Consumer' is valid
             // Requirements
@@ -323,7 +323,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 const product = foundProduct;
 
                 if (!product) {
-                    return { success: false, message: 'Ürün bulunamadı.' };
+                    return { success: false, message: t('product.notFound') };
                 }
 
                 if (product.isUnlocked) {
@@ -359,7 +359,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     products: [...state.products, {
                         id: product.id, // Tech ID as Product ID
                         name: product.name,
-                        description: t('product.producedFromV1Technology', { v1: product.name }),
+                        get description() { return t('product.producedFromV1Technology', { v1: product.name }); },
                         category: product.category as any,
                         status: 'active',
 

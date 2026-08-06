@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -100,6 +100,33 @@ for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
             guard = -1;
         }
     }
+}
+
+// --- 0b) Translations frozen at module load ---------------------------------
+//  `name: t('data.capacity.workshop')` inside a module-level array runs ONCE,
+//  when the file is imported. Switch language later and the string never
+//  changes - the player sees English everywhere except the facility ladder,
+//  the product names and the morale items, which stay in whatever language
+//  the app happened to start in.
+//
+//  A getter fixes it: `get name() { return t('...'); }` evaluates on access.
+//  Only MODULE-LEVEL data counts. `text: t('ui.reset')` inside an Alert array
+//  lives in a function and is evaluated per call, which is fine - flagging it
+//  produced 48 findings of which 45 were noise.
+for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
+    const lines = read(f).split('\n');
+    let inData = false;
+    lines.forEach((line, i) => {
+        // A top-level data declaration: `export const X = [` / `const X: T = {`
+        if (/^(export\s+)?const\s+\w+[^=]*=\s*[[{]\s*$/.test(line)) inData = true;
+        else if (/^[\]}];?\s*$/.test(line)) inData = false;
+        // Anything containing a function opens a new scope - not module data
+        else if (/^(export\s+)?(const|function)\s/.test(line) && /=>|function/.test(line)) inData = false;
+
+        if (inData && /^\s+\w+:\s*t\(/.test(line)) {
+            problems.frozenText.push(`${rel(f)}:${i + 1}  ${line.trim().slice(0, 60)}`);
+        }
+    });
 }
 
 // --- 1) Components nothing renders -----------------------------------------
@@ -181,6 +208,8 @@ const section = (title, list, why) => {
 
 console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
+total += section('Translations frozen at module load', problems.frozenText,
+    'Evaluated once on import, so they never follow a language change. Use a getter.');
 total += section('Hooks called after an early return', problems.hooks,
     'React will crash with "Rendered more hooks than during the previous render".');
 total += section('Components nothing renders', problems.components,

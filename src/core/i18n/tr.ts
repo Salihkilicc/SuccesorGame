@@ -1905,4 +1905,6 @@ export const tr: Record<string, string> = {
     'mem.relPlus': 'İlişki +{v1}',
     'mem.relMinus': 'İlişki −{v1}',
     'mem.relNone': 'Ona etkisi yok',
+    'product.notFound': 'Ürün bulunamadı.',
+    'market.noEventToday': 'Bugün henüz özel bir market olayı yaşanmadı.',
 };

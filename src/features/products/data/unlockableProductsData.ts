@@ -46,8 +46,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     // --- TIER 1: CONSUMER ELECTRONICS (Starter Pack & Early Game) ---
     {
         id: 'smart_phone',
-        name: t('product.smartPhone'),
-        description: t('product.essentialForModernLifeHigh'),
+        get name() { return t('product.smartPhone'); },
+        get description() { return t('product.essentialForModernLifeHigh'); },
         baseSellingPrice: 600,
         baseUnitCost: 250,
         complexity: 50, // BASE DIFFICULTY
@@ -65,8 +65,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     // karmasiklik 90, Consumer kategorisi, stockBoost 2.
     {
         id: 'smart_speaker',
-        name: t('product.smartSpeaker'),
-        description: t('product.voiceAssistantForEveryHome'),
+        get name() { return t('product.smartSpeaker'); },
+        get description() { return t('product.voiceAssistantForEveryHome'); },
         baseSellingPrice: 150,
         baseUnitCost: 70,
         complexity: 12,
@@ -78,8 +78,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'vr_headset',
-        name: t('product.vrHeadset'),
-        description: t('product.gatewayToTheMetaverse'),
+        get name() { return t('product.vrHeadset'); },
+        get description() { return t('product.gatewayToTheMetaverse'); },
         baseSellingPrice: 800,
         baseUnitCost: 350,
         complexity: 65,
@@ -91,8 +91,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'gaming_console',
-        name: t('product.gameStationX'),
-        description: t('product.nextGenEntertainmentSystem'),
+        get name() { return t('product.gameStationX'); },
+        get description() { return t('product.nextGenEntertainmentSystem'); },
         baseSellingPrice: 500,
         baseUnitCost: 280,
         complexity: 40,
@@ -106,8 +106,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     // --- TIER 2: ROBOTICS & DRONES (Mid Game) ---
     {
         id: 'drone_4k',
-        name: t('product.autoDrone4k'),
-        description: t('product.autonomousCameraDrone'),
+        get name() { return t('product.autoDrone4k'); },
+        get description() { return t('product.autonomousCameraDrone'); },
         baseSellingPrice: 2500,
         baseUnitCost: 1100,
         complexity: 200,
@@ -119,8 +119,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'home_robot',
-        name: t('product.homeBotV1'),
-        description: t('product.cleansCooksAndSecures'),
+        get name() { return t('product.homeBotV1'); },
+        get description() { return t('product.cleansCooksAndSecures'); },
         baseSellingPrice: 15000,
         baseUnitCost: 6500,
         complexity: 1100,
@@ -132,8 +132,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'delivery_bot',
-        name: t('product.deliveryRover'),
-        description: t('product.lastMileLogisticsSolution'),
+        get name() { return t('product.deliveryRover'); },
+        get description() { return t('product.lastMileLogisticsSolution'); },
         baseSellingPrice: 8000,
         baseUnitCost: 3500,
         complexity: 600,
@@ -145,8 +145,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'ind_robot_arm',
-        name: t('product.industrialArm'),
-        description: t('product.automationForFactories'),
+        get name() { return t('product.industrialArm'); },
+        get description() { return t('product.automationForFactories'); },
         baseSellingPrice: 50000,
         baseUnitCost: 20000,
         complexity: 3500,
@@ -158,8 +158,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'electric_car',
-        name: t('product.electricSedan'),
-        description: t('product.longRangeZeroEmissionVehicle'),
+        get name() { return t('product.electricSedan'); },
+        get description() { return t('product.longRangeZeroEmissionVehicle'); },
         baseSellingPrice: 45000,
         baseUnitCost: 25000,
         complexity: 3000,
@@ -173,8 +173,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     // --- TIER 3: BIO-TECH & DEEP TECH (Late Game) ---
     {
         id: 'cyber_limb',
-        name: t('product.cyberneticLimb'),
-        description: t('product.betterFasterStrongerThanBiological'),
+        get name() { return t('product.cyberneticLimb'); },
+        get description() { return t('product.betterFasterStrongerThanBiological'); },
         baseSellingPrice: 120000,
         baseUnitCost: 50000,
         complexity: 8000,
@@ -186,8 +186,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'neural_chip',
-        name: t('product.neuralLink'),
-        description: t('product.directBrainComputerInterface'),
+        get name() { return t('product.neuralLink'); },
+        get description() { return t('product.directBrainComputerInterface'); },
         baseSellingPrice: 500000,
         baseUnitCost: 150000,
         complexity: 35000,
@@ -200,7 +200,7 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     {
         id: 'flying_car',
         name: 'eVTOL SkyCar',
-        description: t('product.trafficIsForTheGround'),
+        get description() { return t('product.trafficIsForTheGround'); },
         baseSellingPrice: 2500000,
         baseUnitCost: 1200000,
         complexity: 180000,
@@ -212,8 +212,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'quantum_pc',
-        name: t('product.quantumComputer'),
-        description: t('product.simulatingTheUniverse'),
+        get name() { return t('product.quantumComputer'); },
+        get description() { return t('product.simulatingTheUniverse'); },
         baseSellingPrice: 10000000,
         baseUnitCost: 4000000,
         complexity: 700000,
@@ -227,8 +227,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     // --- TIER 4: GOD TIER (End Game) ---
     {
         id: 'fusion_reactor',
-        name: t('product.fusionReactor'),
-        description: t('product.unlimitedCleanEnergyForCities'),
+        get name() { return t('product.fusionReactor'); },
+        get description() { return t('product.unlimitedCleanEnergyForCities'); },
         baseSellingPrice: 150000000, // $150M
         baseUnitCost: 60000000,
         complexity: 10000000, // Very hard to build
@@ -240,8 +240,8 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'immortality',
-        name: t('product.mindUpload'),
-        description: t('product.digitalImmortalityAsAService'),
+        get name() { return t('product.mindUpload'); },
+        get description() { return t('product.digitalImmortalityAsAService'); },
         baseSellingPrice: 1000000000, // $1 Billion
         baseUnitCost: 100000000,
         complexity: 50000000,

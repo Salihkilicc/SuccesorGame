@@ -274,7 +274,7 @@ const MarketEventFooter = () => {
         <Text style={styles.sectionTitle}>{t('company.todayAposSMarketEvent')}</Text>
       </View>
       <Text style={styles.eventText}>
-        {lastMarketEvent ?? 'Bugün henüz özel bir market olayı yaşanmadı.'}
+        {lastMarketEvent ?? t('market.noEventToday')}
       </Text>
       <Pressable
         onPress={() => void triggerEvent('market')}

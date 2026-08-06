@@ -544,7 +544,7 @@ export const requiresVote = (
     if (proposal.kind === 'mezzanine') {
         return {
             required: true,
-            reason: t('data.governance.mezzanineAlwaysGoesToA'),
+            get reason() { return t('data.governance.mezzanineAlwaysGoesToA'); },
         };
     }
     if (ratio >= threshold) {
@@ -1166,7 +1166,7 @@ export const directorFromAcquisition = (
     const shareCount = Math.round((totalShares || 10_000_000) * stake);
 
     return {
-        name: t('gov.founderOf', { v1: targetName }),
+        get name() { return t('gov.founderOf', { v1: targetName }); },
         trait: TRAIT_BY_RISK[risk] ?? 'Loyalist',
         // They joined you willingly: well-intentioned, but not blindly.
         trust: 60,

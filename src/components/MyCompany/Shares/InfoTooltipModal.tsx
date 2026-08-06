@@ -17,20 +17,20 @@ interface Props {
 
 const TOOLTIP_CONTENT: Record<string, { title: string; description: string }> = {
     IPO: {
-        title: t('equity.initialPublicOffering'),
-        description: t('equity.sellingSharesToThePublic'),
+        get title() { return t('equity.initialPublicOffering'); },
+        get description() { return t('equity.sellingSharesToThePublic'); },
     },
     Dilution: {
-        title: t('equity.shareDilution'),
-        description: t('equity.issuingNewSharesToRaise'),
+        get title() { return t('equity.shareDilution'); },
+        get description() { return t('equity.issuingNewSharesToRaise'); },
     },
     Dividend: {
-        title: t('equity.dividendPayment'),
-        description: t('equity.distributingProfitsToShareholdersBased'),
+        get title() { return t('equity.dividendPayment'); },
+        get description() { return t('equity.distributingProfitsToShareholdersBased'); },
     },
     'Stock Split': {
-        title: t('equity.stockSplit'),
-        description: t('equity.dividingExistingSharesToLower'),
+        get title() { return t('equity.stockSplit'); },
+        get description() { return t('equity.dividingExistingSharesToLower'); },
     },
 };
 

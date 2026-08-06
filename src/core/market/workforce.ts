@@ -414,31 +414,31 @@ export interface TeamEvent {
 export const TEAM_EVENTS: TeamEvent[] = [
     {
         id: 'lunch',
-        name: t('data.workforce.teamLunch'),
+        get name() { return t('data.workforce.teamLunch'); },
         costPerPerson: 150,
         moraleBoost: 3,
-        description: t('data.workforce.cheapQuickAndForgottenBy'),
+        get description() { return t('data.workforce.cheapQuickAndForgottenBy'); },
     },
     {
         id: 'offsite',
-        name: t('data.workforce.offsiteDay'),
+        get name() { return t('data.workforce.offsiteDay'); },
         costPerPerson: 600,
         moraleBoost: 7,
-        description: t('data.workforce.aDayOutOfThe'),
+        get description() { return t('data.workforce.aDayOutOfThe'); },
     },
     {
         id: 'retreat',
-        name: t('data.workforce.companyRetreat'),
+        get name() { return t('data.workforce.companyRetreat'); },
         costPerPerson: 2_200,
         moraleBoost: 13,
-        description: t('data.workforce.twoNightsAwayExpensiveAnd'),
+        get description() { return t('data.workforce.twoNightsAwayExpensiveAnd'); },
     },
     {
         id: 'gala',
-        name: t('data.workforce.flagshipGala'),
+        get name() { return t('data.workforce.flagshipGala'); },
         costPerPerson: 6_000,
         moraleBoost: 20,
-        description: t('data.workforce.theKindOfNightThat'),
+        get description() { return t('data.workforce.theKindOfNightThat'); },
     },
 ];
 

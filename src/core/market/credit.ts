@@ -180,38 +180,38 @@ export interface LoanProduct {
 export const LOAN_PRODUCTS: LoanProduct[] = [
     {
         kind: 'revolver',
-        name: t('data.credit.revolvingCredit'),
+        get name() { return t('data.credit.revolvingCredit'); },
         spread: 0.02,
         termQuarters: 0,
         prepaymentPenalty: 0,
-        description: t('data.credit.drawAndRepayWheneverYou'),
+        get description() { return t('data.credit.drawAndRepayWheneverYou'); },
     },
     {
         kind: 'term',
-        name: t('data.credit.termLoan'),
+        get name() { return t('data.credit.termLoan'); },
         spread: 0,
         termQuarters: 20,
         prepaymentPenalty: 0.02,
-        description: t('data.credit.fiveYearsFixedScheduleYour'),
+        get description() { return t('data.credit.fiveYearsFixedScheduleYour'); },
     },
     {
         kind: 'bond',
-        name: t('data.credit.corporateBond'),
+        get name() { return t('data.credit.corporateBond'); },
         spread: -0.01,
         termQuarters: 40,
         prepaymentPenalty: 0.05,
-        description: t('data.credit.tenYearsAtTheFinest'),
+        get description() { return t('data.credit.tenYearsAtTheFinest'); },
         minRating: 'BBB',
         requiresPublic: true,
     },
     {
         kind: 'shark',
-        name: t('data.credit.privateCredit'),
+        get name() { return t('data.credit.privateCredit'); },
         spread: 0,
         fixedRate: 0.35,
         termQuarters: 8,
         prepaymentPenalty: 0.10,
-        description: t('data.credit.moneyTodayNoQuestionsNo'),
+        get description() { return t('data.credit.moneyTodayNoQuestionsNo'); },
     },
 ];
 
@@ -358,7 +358,7 @@ export const assessDistress = (
             penaltyRate,
             canBorrow: true,
             mustSellAssets: false,
-            message: t('data.credit.covenantBreachedYourLendersHave'),
+            get message() { return t('data.credit.covenantBreachedYourLendersHave'); },
         };
     }
     if (q <= 3) {
@@ -368,7 +368,7 @@ export const assessDistress = (
             penaltyRate,
             canBorrow: false,
             mustSellAssets: false,
-            message: t('data.credit.stillInBreachNoNew'),
+            get message() { return t('data.credit.stillInBreachNoNew'); },
         };
     }
     return {
@@ -377,7 +377,7 @@ export const assessDistress = (
         penaltyRate,
         canBorrow: false,
         mustSellAssets: true,
-        message: t('data.credit.aYearInBreachYour'),
+        get message() { return t('data.credit.aYearInBreachYour'); },
     };
 };
 
@@ -556,39 +556,39 @@ export interface FinancingSignal {
 export const FINANCING_SIGNALS: Record<FinancingEvent, FinancingSignal> = {
     loan_healthy: {
         impactPercent: 0.8,
-        message: t('data.credit.theMarketReadsCheapDebt'),
+        get message() { return t('data.credit.theMarketReadsCheapDebt'); },
     },
     loan_stretched: {
         impactPercent: -3.5,
-        message: t('data.credit.borrowingAgainAtThisLeverage'),
+        get message() { return t('data.credit.borrowingAgainAtThisLeverage'); },
     },
     revolver_draw: {
         impactPercent: -1.2,
-        message: t('data.credit.drawingOnTheCreditLine'),
+        get message() { return t('data.credit.drawingOnTheCreditLine'); },
     },
     private_credit: {
         impactPercent: -8,
-        message: t('data.credit.borrowingAt35TellsThe'),
+        get message() { return t('data.credit.borrowingAt35TellsThe'); },
     },
     insider_loan: {
         impactPercent: -6,
-        message: t('data.credit.aDirectorLendingToThe'),
+        get message() { return t('data.credit.aDirectorLendingToThe'); },
     },
     capital_injection: {
         impactPercent: 4,
-        message: t('data.credit.theFounderPuttingPersonalMoney'),
+        get message() { return t('data.credit.theFounderPuttingPersonalMoney'); },
     },
     debt_repaid: {
         impactPercent: 1,
-        message: t('data.credit.payingDownDebtLowersThe'),
+        get message() { return t('data.credit.payingDownDebtLowersThe'); },
     },
     rating_downgrade: {
         impactPercent: -3,
-        message: t('data.credit.aDowngradeRaisesTheCost'),
+        get message() { return t('data.credit.aDowngradeRaisesTheCost'); },
     },
     covenant_breach: {
         impactPercent: -10,
-        message: t('data.credit.aCovenantBreachBecomesPublic'),
+        get message() { return t('data.credit.aCovenantBreachBecomesPublic'); },
     },
 };
 
@@ -775,19 +775,19 @@ export const quoteMezzanine = (
 export const EXTENDED_LOAN_PRODUCTS: LoanProduct[] = [
     {
         kind: 'secured',
-        name: t('data.credit.assetBackedLoan'),
+        get name() { return t('data.credit.assetBackedLoan'); },
         spread: 0.015,
         termQuarters: 24,
         prepaymentPenalty: 0.01,
-        description: t('data.credit.securedOnYourPlantInventory'),
+        get description() { return t('data.credit.securedOnYourPlantInventory'); },
     },
     {
         kind: 'mezzanine',
-        name: t('data.credit.mezzanineFacility'),
+        get name() { return t('data.credit.mezzanineFacility'); },
         spread: 0,
         fixedRate: 0.18,
         termQuarters: 12,
         prepaymentPenalty: 0.03,
-        description: t('data.credit.largeMoneyAgainstTheCompany'),
+        get description() { return t('data.credit.largeMoneyAgainstTheCompany'); },
     },
 ];

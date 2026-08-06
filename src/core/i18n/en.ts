@@ -1904,4 +1904,6 @@ export const en: Record<string, string> = {
     'mem.relPlus': 'Relationship +{v1}',
     'mem.relMinus': 'Relationship −{v1}',
     'mem.relNone': 'No effect on them',
+    'product.notFound': 'Product not found.',
+    'market.noEventToday': 'No market event today.',
 };
