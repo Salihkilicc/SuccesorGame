@@ -241,7 +241,7 @@ const START_PLAYER_CASH = 50_000;
 const START_FACTORIES = 1;
 // Tier 1 asks for a crew of 22. Starting at 20 meant opening the game
 // understaffed, running the plant at 91% before a single decision was made.
-const START_EMPLOYEES = 22;
+export const START_EMPLOYEES = 22;
 /** Kurul üyelerinin toplam payı %35 → oyuncuya %65 kalıyor. */
 const START_PLAYER_OWNERSHIP = 65;
 

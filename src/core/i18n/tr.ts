@@ -1916,4 +1916,5 @@ export const tr: Record<string, string> = {
     'report.scrappedLine': '{v1} adet hatta fire verdi — parasını ödedin, satılmadı',
     'equity.nothingToBuyBack': 'Geri alınacak hisse yok',
     'equity.nothingToBuyBackBody': 'Geri alım, halka açık dolaşımdaki hisseyi satın alır; şirketin hâlâ özel — payı sen ve kurul tutuyorsunuz, piyasada işlem gören hisse yok. Önce halka açıl; ondan sonra geri alım hisseyi imha eder, senin yüzdeni yükseltir ve fiyatı destekler.',
+    'newgame.freshStartBody': 'Yeni başlangıç hazır.\n\n• Şirket sermayesi: $2M\n• Kişisel nakit: $50K\n• 1 fabrika, {v1} çalışan\n• 1 aktif ürün (Akıllı Telefon)',
 };

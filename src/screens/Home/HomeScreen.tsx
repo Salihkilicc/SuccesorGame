@@ -36,6 +36,7 @@ import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGame } from '../../core/newGame';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
+import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -138,7 +139,7 @@ const HomeScreen = () => {
    * oyunun geri kalanini anlamsiz kilan bir servetle devam ediyordu.
    *
    * Artik startNewGame() tum store'lari ve diski temizleyip
-   * initialStatsState'e donuyor (1 fabrika, 20 calisan, 2M sermaye).
+   * initialStatsState, whose figures are the single source (see START_EMPLOYEES).
    */
   const handleRestart = async () => {
     setIsGameOver(false);
@@ -148,7 +149,7 @@ const HomeScreen = () => {
       await startNewGame();
       Alert.alert(
         'New Game',
-        'Fresh start ready.\n\n• Company capital: $2M\n• Personal cash: $50K\n• 1 factory, 20 employees\n• 1 active product (Smart Phone)',
+        t('newgame.freshStartBody', { v1: String(START_EMPLOYEES) }),
       );
     } catch (e) {
       console.error('[HomeScreen] Yeni oyun baslatilamadi', e);

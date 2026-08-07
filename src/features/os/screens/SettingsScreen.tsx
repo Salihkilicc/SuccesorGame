@@ -18,6 +18,7 @@ import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { startNewGame } from '../../../core/newGame';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
+import { START_EMPLOYEES } from '../../../core/store/useStatsStore';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -100,7 +101,7 @@ const SettingsScreen = () => {
 
     /**
      * Temiz yeni oyun. startNewGame() tum store'lari ve AsyncStorage'i
-     * temizleyip initialStatsState'e doner (1 fabrika, 20 calisan, 2M sermaye).
+     * temizleyip initialStatsState, whose figures are the single source (see START_EMPLOYEES).
      */
     const handleNewGame = () => {
         Alert.alert(
@@ -117,7 +118,7 @@ const SettingsScreen = () => {
                             navigation.goBack();
                             Alert.alert(
                                 'New Game',
-                                'Fresh start ready.\n\n• Company capital: $2M\n• Personal cash: $50K\n• 1 factory, 20 employees\n• 1 active product (Smart Phone)',
+                                t('newgame.freshStartBody', { v1: String(START_EMPLOYEES) }),
                             );
                         } catch (e) {
                             console.error('[Settings] Yeni oyun baslatilamadi', e);
