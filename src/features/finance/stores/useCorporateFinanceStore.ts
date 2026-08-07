@@ -1,7 +1,7 @@
 // @orphan-ok-symbol getBorrowingCapacity - the finance hub reads assessment.headroom from credit.ts instead
 import { create } from 'zustand';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
-import { MMKV } from 'react-native-mmkv';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandStorage } from '../../../storage/persist';
 import { useEquityStore } from './useEquityStore';
 import {
     CreditAssessment,
@@ -41,36 +41,29 @@ import { formatMoney } from '../../../core/utils';
 /**
  * CORPORATE FINANCE STORE
  * Manages Debt, Credit Score, Leverage, and Subsidiaries
- * Uses MMKV for synchronous storage to prevent async issues
+ * ============================================================================
+ *  STORAGE — the same AsyncStorage every other store uses
+ * ============================================================================
+ *  This was the only store in the project on MMKV, with its own local
+ *  `zustandStorage` shadowing the shared one. Two failures came out of that:
+ *
+ *  1) SILENT DATA LOSS. If `new MMKV()` threw - an unlinked pod, a New
+ *     Architecture mismatch, a simulator without the native module - the catch
+ *     block installed a no-op store whose set() discards and getString()
+ *     returns null. Writes went nowhere and reads came back empty, so
+ *     subsidiaries survived only in memory and vanished on every restart. The
+ *     player's report was "the companies I bought disappear when I close the
+ *     game". The only trace was one console warning at startup.
+ *
+ *  2) NEW GAME NEVER CLEARED IT. PERSIST_KEYS lists 'subsidiary-storage' and
+ *     newGame.ts deletes it from AsyncStorage - a different store entirely, so
+ *     the delete hit nothing.
+ *
+ *  Both disappear by using the shared storage. Twenty other stores persist
+ *  this way without trouble, and the async write is not a problem here: the
+ *  data is only read at startup, and zustand handles hydration.
+ * ============================================================================
  */
-
-// 1. Setup MMKV Storage
-let storage: MMKV;
-try {
-    storage = new MMKV({ id: 'subsidiary-storage' });
-} catch (e) {
-    console.warn('[WARN] MMKV Failed to Initialize (Data persistence disabled):', e);
-    // Fallback to prevent crash, though data won't persist
-    storage = {
-        set: () => { },
-        getString: () => null,
-        delete: () => { },
-    } as any;
-}
-export { storage };
-
-const zustandStorage: StateStorage = {
-    setItem: (name, value) => {
-        return storage.set(name, value);
-    },
-    getItem: (name) => {
-        const value = storage.getString(name);
-        return value ?? null;
-    },
-    removeItem: (name) => {
-        return storage.delete(name);
-    },
-};
 
 // 2. Define Interfaces
 export interface Loan {
