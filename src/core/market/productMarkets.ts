@@ -315,3 +315,28 @@ export const canEnterMarket = (
         have: corporateBrandValue || 0,
     };
 };
+
+/**
+ * Which product market does this listed company actually compete in?
+ *
+ * The stock listings carry a `sector` ('Technology', 'Health', 'Industrial'),
+ * and the product markets are named differently ('Consumer', 'Robotics',
+ * 'Deep Tech', 'Bio-Tech'). Code that reached for `sector` to find a brand
+ * category was writing into a category that does not exist, so the brand a
+ * player BOUGHT with an acquisition was silently discarded - market share
+ * transferred (that path matches on stockId) while the brand never moved.
+ *
+ * The competitor lists are the authoritative link: a company belongs to the
+ * market that lists it as a rival. Returns undefined for a listing that
+ * competes in no product market - a bank, say - which correctly earns no
+ * product brand.
+ */
+export const marketCategoryForStock = (stockId: string): string | undefined => {
+    if (!stockId) return undefined;
+    for (const m of PRODUCT_MARKETS) {
+        if ((m.competitors || []).some((c: any) => c.stockId === stockId)) {
+            return m.category;
+        }
+    }
+    return undefined;
+};

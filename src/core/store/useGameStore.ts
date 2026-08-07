@@ -6,7 +6,7 @@ import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyE
 import { applyPartnerBuffs } from '../../logic/relationshipLogic';
 import { FEATURES } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
-import { getMarket } from '../market/productMarkets';
+import { getMarket, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
@@ -1136,7 +1136,12 @@ export const useGameStore = create<GameStore>()(
         (() => {
           const subs = useCorporateFinanceStore.getState().subsidiaries;
           subs.filter(x => (x.deal?.quartersSinceClose ?? 99) <= 1).forEach(x => {
-            const cat = (x.sector as string) || 'Consumer';
+            // The subsidiary's `sector` is a stock-market label ('Technology'),
+            // not a product market ('Consumer'). Using it wrote the brand gain
+            // into a category that does not exist, so an acquisition raised
+            // share but never brand. Resolve through the competitor lists.
+            const cat = marketCategoryForStock(x.id);
+            if (!cat) return;   // competes in no product market - no brand to inherit
             const gain = brandFromAcquisition(
               x.deal?.fairValue || x.valuation || 0,
               stats.companyValue || 1,
