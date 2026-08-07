@@ -239,7 +239,9 @@ const BASE_SHARES = 10_000_000;
 const START_COMPANY_CAPITAL = 2_000_000;
 const START_PLAYER_CASH = 50_000;
 const START_FACTORIES = 1;
-const START_EMPLOYEES = 20;
+// Tier 1 asks for a crew of 22. Starting at 20 meant opening the game
+// understaffed, running the plant at 91% before a single decision was made.
+const START_EMPLOYEES = 22;
 /** Kurul üyelerinin toplam payı %35 → oyuncuya %65 kalıyor. */
 const START_PLAYER_OWNERSHIP = 65;
 
@@ -312,10 +314,25 @@ export const initialStatsState: StatsState = {
   //
   //  Bilinmeyen bir kurucunun sirketisin: 8 ile basliyorsun.
   // ------------------------------------------------------------------
-  // Brand is measured in POINTS now (share x 43.3), not on a 0-100 scale.
-  // 26 points is 0.6% share - the player's own anchor for "a small company
-  // that has just started selling".
-  brandValue: 26,
+  // ----------------------------------------------------------------------
+  //  START WHERE THE FACTORY CAN HOLD
+  // ----------------------------------------------------------------------
+  //  Brand is measured in POINTS (share x 43.3) and settles at whatever the
+  //  realised share supports. This began at 26, which is 0.6% share - the
+  //  level a TIER 2 plant sustains. The game starts on tier 1, whose full
+  //  crew reaches 0.405% and therefore holds a brand of 18.
+  //
+  //  So a player doing everything right - full crew, every unit sold, no
+  //  demand missed - still watched brand fall 26 -> 22.5 -> 20.2 -> 18.7,
+  //  and the tail of that decay is the "it only moves 0.2" they reported.
+  //  Starting above equilibrium means the opening hours of the game are a
+  //  slow loss no decision can prevent.
+  //
+  //  At 18 the same player holds steady, and the first facility upgrade
+  //  lifts the ceiling to 29 - so the number goes UP when they do the right
+  //  thing, which is what it was always supposed to signal.
+  // ----------------------------------------------------------------------
+  brandValue: 18,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,
 
