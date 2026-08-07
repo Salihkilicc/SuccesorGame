@@ -395,8 +395,34 @@ export const CATEGORY_UNLOCK_BRAND = 200;
 /** How fast brand walks towards its share-implied level, per quarter. */
 export const BRAND_APPROACH = 0.25;
 
-/** Extra pull when you actually served the demand you created. */
-export const BRAND_SERVICE_BONUS = 0.10;
+// ============================================================================
+//  THE WALK IS ASYMMETRIC — AND IT USED TO BE ASYMMETRIC THE WRONG WAY
+// ============================================================================
+//  A single rate was applied in both directions, sped up by servedRatio. So a
+//  player who failed to deliver walked SLOWER - and when brand was falling,
+//  that meant missing demand softened the fall. Failure was cushioned.
+//
+//  Reputation does not behave like that. Delivering what you promised builds
+//  standing quickly and protects it when the numbers dip; promising and not
+//  delivering destroys it fast. Four cases, and each rate says what it means:
+//
+//    rising,  delivered      fast   - you earned it and you can be relied on
+//    rising,  missed         slow   - the demand is there, you are not
+//    falling, delivered      slow   - a bad quarter, but customers were served
+//    falling, missed         FAST   - you promised and did not deliver
+//
+//  This also makes recovery cheaper than collapse, which is the shape the
+//  player asked for: easier to climb back, harsher while you are failing.
+// ============================================================================
+
+/** Extra pull when climbing and the demand was actually served. */
+export const BRAND_SERVICE_BONUS = 0.12;
+
+/** How much of the base pull is removed when falling despite serving demand. */
+export const BRAND_LOYALTY_CUSHION = 0.08;
+
+/** Extra pull downwards for demand created and not delivered. */
+export const BRAND_FAILURE_PENALTY = 0.20;
 
 /** Converts brand points to the 0-100 index used by attraction, valuation etc. */
 export const brandIndex = (points: number): number =>
@@ -451,9 +477,12 @@ export const advanceCategoryBrand = (input: CategoryBrandInput): {
     const served = Math.max(0, Math.min(1, input.servedRatio ?? 1));
     const sources: { label: string; amount: number }[] = [];
 
-    // Walk towards the level your share supports.
-    const rate = BRAND_APPROACH + BRAND_SERVICE_BONUS * served;
-    const pull = (equilibrium - current) * rate;
+    // Walk towards the level your share supports - see the four cases above.
+    const rising = equilibrium >= current;
+    const rate = rising
+        ? BRAND_APPROACH + BRAND_SERVICE_BONUS * served
+        : BRAND_APPROACH - BRAND_LOYALTY_CUSHION * served + BRAND_FAILURE_PENALTY * (1 - served);
+    const pull = (equilibrium - current) * Math.max(0.05, rate);
     if (Math.abs(pull) > 0.05) {
         sources.push({ label: t('data.brand.marketShareLabel'), amount: pull });
     }
