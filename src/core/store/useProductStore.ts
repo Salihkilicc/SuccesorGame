@@ -22,6 +22,18 @@ interface ProductActions {
     setProducts: (products: Product[]) => void;
     addProduct: (product: Product) => void;
     updateProduct: (id: string, updates: Partial<Product>) => void;
+    /**
+     * Applies many product updates in ONE write.
+     *
+     * The quarterly tick called updateProduct inside two loops - once per
+     * product for the smoothed benchmark, once more for inventory and reach.
+     * Every call is a set() on a persisted store, so each one stringified the
+     * whole product list, wrote it to AsyncStorage and re-rendered every
+     * subscriber. With a dozen products that is two dozen full writes and two
+     * dozen render passes for a single quarter, which is where the multi-second
+     * pause in the late game comes from.
+     */
+    updateProducts: (updates: Record<string, Partial<Product>>) => void;
     retireProduct: (id: string) => void;
     processMonthlySales: (context: SalesContext) => void;
     // R&D Upgrade Actions
@@ -97,6 +109,13 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 set((state) => ({
                     products: [...state.products, product],
                 })),
+            updateProducts: (updates) =>
+                set((state) => ({
+                    products: state.products.map(p =>
+                        updates[p.id] ? { ...p, ...updates[p.id] } : p,
+                    ),
+                })),
+
             updateProduct: (id, updates) =>
                 set((state) => ({
                     products: state.products.map((p) =>

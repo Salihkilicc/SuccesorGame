@@ -30,13 +30,26 @@ interface PriceHistoryEntry {
  * Bir rakibin baslangic pazar payi. `productMarkets.ts` tek kaynak;
  * burada yalnizca okunur.
  */
+/**
+ * Baseline shares, built once and reused.
+ *
+ * This used to require('../market/productMarkets') and scan every market's
+ * competitor list on EVERY call, and simulateQuarter calls it once per listed
+ * item - 68 requires and 68 nested scans per quarter, for data that never
+ * changes. Now it is a lookup table built on first use.
+ */
+let baselineShareCache: Record<string, number> | null = null;
+
 const baselineShareFor = (stockId: string): number => {
-    const { PRODUCT_MARKETS } = require('../market/productMarkets');
-    for (const m of PRODUCT_MARKETS) {
-        const c = (m.competitors || []).find((x: any) => x.stockId === stockId);
-        if (c) return c.share;
+    if (!baselineShareCache) {
+        const { PRODUCT_MARKETS } = require('../market/productMarkets');
+        const map: Record<string, number> = {};
+        for (const m of PRODUCT_MARKETS) {
+            for (const c of (m.competitors || [])) map[c.stockId] = c.share;
+        }
+        baselineShareCache = map;
     }
-    return 0;
+    return baselineShareCache[stockId] ?? 0;
 };
 
 interface MarketState {

@@ -252,6 +252,21 @@ export const useGameStore = create<GameStore>()(
         // Calculate quarters passed (assuming 3 months = 1 quarter)
         const quarters = Math.floor(months / 3);
 
+        // ------------------------------------------------------------------
+        //  ONE WRITE PER STORE, NOT ONE PER PRODUCT
+        // ------------------------------------------------------------------
+        //  Product changes are collected here and flushed once at the end of
+        //  the tick. Each set() on a persisted store stringifies the whole
+        //  list, writes it to AsyncStorage and re-renders every subscriber -
+        //  doing that inside a per-product loop is what made advancing a
+        //  quarter take seconds once the portfolio grew.
+        // ------------------------------------------------------------------
+        const pendingProductUpdates: Record<string, any> = {};
+        const queueProductUpdate = (id: string, patch: any) => {
+          pendingProductUpdates[id] = { ...(pendingProductUpdates[id] || {}), ...patch };
+        };
+
+
         // Initialize totals
         let totalRevenue = 0;
         let totalCOGS = 0;
@@ -458,7 +473,7 @@ export const useGameStore = create<GameStore>()(
             marketingBenchmark(market, p.revenue || 0, p.benchmarkSmoothed),
           );
           group.forEach((p, i) => {
-            useProductStore.getState().updateProduct(p.id, { benchmarkSmoothed: benchmarks[i] });
+            queueProductUpdate(p.id, { benchmarkSmoothed: benchmarks[i] });
           });
 
           const breakdowns = group.map((p, i) =>
@@ -646,7 +661,7 @@ export const useGameStore = create<GameStore>()(
               // Yalnizca BIR KEZ, ilk sipariste.
               if (!product.contractSetupPaid) {
                 contractSpend += partner.setupCost;
-                useProductStore.getState().updateProduct(product.id, { contractSetupPaid: true });
+                queueProductUpdate(product.id, { contractSetupPaid: true });
               }
             }
 
@@ -779,7 +794,7 @@ export const useGameStore = create<GameStore>()(
         // Update products in store with new inventory levels
         updatedProducts.forEach((updatedProduct) => {
           if (updatedProduct.inventory !== undefined) {
-            useProductStore.getState().updateProduct(updatedProduct.id, {
+            queueProductUpdate(updatedProduct.id, {
               inventory: updatedProduct.inventory,
               revenue: updatedProduct.revenue,
               // Teslimat karnesi kalici olmali; yoksa endeks her ceyrek
@@ -788,6 +803,11 @@ export const useGameStore = create<GameStore>()(
             });
           }
         });
+
+        // Flush every product change collected this quarter in a single write.
+        if (Object.keys(pendingProductUpdates).length > 0) {
+          useProductStore.getState().updateProducts(pendingProductUpdates);
+        }
 
         // ==================================================================
         //  TESIS GIDERI — kademeye bagli, SABIT
