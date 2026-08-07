@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { simulateNewMonth } from '../../event/eventEngine';
 import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyEngine';
 import { applyPartnerBuffs } from '../../logic/relationshipLogic';
-import { FEATURES } from '../featureFlags';
+import { FEATURES, isEnabled } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
@@ -1466,7 +1466,10 @@ export const useGameStore = create<GameStore>()(
           // NPC HOOK: yaşlan tüm NPC'leri (Anne, Baba, Çocuk vs.)
           // RAFA KALDIRILDI: ilişki modülü kapalıyken NPC'ler yaşlanmaz.
           if (FEATURES.love) {
-            useRelationshipStore.getState().ageUpNPCs();
+            // Shelved module: love is off, so the NPC list is empty and invisible.
+        // Each of these is still a set() on a persisted store, so skipping them
+        // saves a stringify and a write every quarter for nothing anyone sees.
+        if (isEnabled('love')) useRelationshipStore.getState().ageUpNPCs();
           }
         }
 
@@ -1837,7 +1840,7 @@ export const useGameStore = create<GameStore>()(
 
           // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
           if (FEATURES.love) {
-            useRelationshipStore.getState().advanceQuarterForNPCs();
+            if (isEnabled('love')) useRelationshipStore.getState().advanceQuarterForNPCs();
           }
 
 
@@ -1933,19 +1936,24 @@ export const useGameStore = create<GameStore>()(
             }
           }
 
-          // 7e. GYM QUARTERLY RESET (Gym 3.0 Integration)
+          // 7e. GYM QUARTERLY RESET — shelved module, skipped while the flag is off.
+          // It was clearing fatigue on a screen nobody can open, and paying for
+          // it with a persisted write every quarter.
+          if (isEnabled('gym')) {
           const userStore = useUserStore.getState();
           userStore.updateGymState({
             combatStrength: 0, // Reset fatigue to 0%
           });
-          console.log('[Gym] Quarterly reset: Fatigue cleared to 0%');
+            console.log('[Gym] Quarterly reset: Fatigue cleared to 0%');
+          }
 
-          // 7f. BLACK MARKET QUARTERLY LOGIC
+          // 7f. BLACK MARKET QUARTERLY LOGIC — shelved module. Two persisted
+          //     writes a quarter for a screen that cannot be opened.
           // Note: playerStore variable is already declared above (around line 415)
           const { blackMarket } = playerStore;
 
           // Reset quarterly usage
-          if (blackMarket) {
+          if (isEnabled('blackMarket') && blackMarket) {
             playerStore.updateBlackMarket('quarterlyDrugUsage', 0);
 
             // Decay Suspicion (90% reduction)
@@ -1957,8 +1965,10 @@ export const useGameStore = create<GameStore>()(
           }
         }
 
-        // 8. ANNUAL GYM MEMBERSHIP PAYMENT (Gym 3.0 Integration)
-        if (newMonth === 1) { // January
+        // 8. ANNUAL GYM MEMBERSHIP PAYMENT — shelved module. The require()
+        //    alone pulled in a whole feature file every January for a
+        //    membership the player cannot buy.
+        if (isEnabled('gym') && newMonth === 1) { // January
           const userStore = useUserStore.getState();
           const { membership } = userStore.gymState;
 
