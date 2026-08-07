@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { STANDARD_COMPLEXITY } from './capacity';
 // src/core/market/contract.ts
 //
 // ============================================================================
@@ -139,10 +140,27 @@ export interface ContractOrderResult {
  * mantigi budur — kapasite duvarinin etrafindan dolasmak. Bunun karsiligi
  * her üründe daha dusuk marj ve daha dusuk kalite tavanidir.
  */
+/**
+ * Order limits are measured in STANDARD UNITS, not product units.
+ *
+ * They used to be raw counts, which made the top partners unreachable for
+ * anything valuable. An electric sedan is complexity 3,000 - sixty standard
+ * units apiece - so a perfectly serious run of 800 cars, tens of millions of
+ * dollars of product, read as "800" against Apex's 200,000 and was refused.
+ * The player was forced into the cheapest partner on every high-value product
+ * regardless of their brand or their budget.
+ *
+ * Standard units are what the rest of the production system already speaks:
+ * factory capacity is allocated in them, and they are what a contract line
+ * actually sells - time, not pieces. A phone is 1 standard unit and nothing
+ * changes for it; a sedan is 60, and 800 of them now clear Meridian comfortably.
+ */
 export const quoteContractOrder = (
     partner: ContractPartner,
     requestedUnits: number,
     ownUnitCost: number,
+    /** Product complexity; 50 is the standard unit. */
+    complexity: number = STANDARD_COMPLEXITY,
 ): ContractOrderResult => {
     const requested = Math.max(0, Math.floor(requestedUnits || 0));
 
@@ -150,21 +168,31 @@ export const quoteContractOrder = (
         return { units: 0, goodUnits: 0, cost: 0, unitCost: 0, qualityCeiling: partner.qualityCeiling };
     }
 
+    // Convert to the currency the limits are written in.
+    const perUnit = Math.max(1, complexity || STANDARD_COMPLEXITY) / STANDARD_COMPLEXITY;
+    const standardRequested = requested * perUnit;
+    /** The partner's limits translated back into units of THIS product. */
+    const minUnits = Math.ceil(partner.minOrder / perUnit);
+    const maxUnits = Math.floor(partner.maxOrder / perUnit);
+
     let note: string | undefined;
     let units = requested;
 
-    if (units < partner.minOrder) {
+    if (standardRequested < partner.minOrder) {
         // Asgari siparisin altinda kalirsan hat kurulmaz. Kismen degil,
         // HIC uretmez — gercek fason sozlesmeleri de boyledir.
         return {
             units: 0, goodUnits: 0, cost: 0, unitCost: 0,
             qualityCeiling: partner.qualityCeiling,
-            note: `${partner.name} will not run a line below ${partner.minOrder.toLocaleString()} units.`,
+            note: t('contract.belowMinimum', {
+                v1: partner.name,
+                v2: minUnits.toLocaleString(),
+            }),
         };
     }
-    if (units > partner.maxOrder) {
-        units = partner.maxOrder;
-        note = `${partner.name} capped the order at ${partner.maxOrder.toLocaleString()} units.`;
+    if (units > maxUnits) {
+        units = maxUnits;
+        note = t('contract.cappedAt', { v1: partner.name, v2: maxUnits.toLocaleString() });
     }
 
     const unitCost = Math.max(1, ownUnitCost) * partner.costMultiplier;

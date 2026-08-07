@@ -635,6 +635,7 @@ export const useGameStore = create<GameStore>()(
                   partner,
                   (product.contractUnits || 0) * Math.max(1, quarters),
                   unitCost * (1 - costBuff),
+                  product.complexity,
                 )
               : null;
 

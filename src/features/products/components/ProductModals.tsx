@@ -319,7 +319,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const openPartners = availablePartners(brandValue);
     const chosenPartner = getPartner(partnerId);
     const contractQuote = chosenPartner
-        ? quoteContractOrder(chosenPartner, contractUnits, currentUnitCost)
+        ? quoteContractOrder(chosenPartner, contractUnits, currentUnitCost, complexity)
         : null;
     const margins = chosenPartner
         ? marginComparison(product.sellingPrice || product.suggestedPrice || 0, currentUnitCost, chosenPartner)

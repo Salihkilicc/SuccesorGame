@@ -1919,4 +1919,6 @@ export const tr: Record<string, string> = {
     'newgame.freshStartBody': 'Yeni başlangıç hazır.\n\n• Şirket sermayesi: $2M\n• Kişisel nakit: $50K\n• 1 fabrika, {v1} çalışan\n• 1 aktif ürün (Akıllı Telefon)',
     'merger.boardRefuses': 'Kurulları teklifini reddetti. İyi gidiyorlar, sana yakın büyüklükteler ve alıcı aramıyorlar. Bu şirketi istiyorsan başlarının üstünden geçmen gerekecek — düşmanca teklif.',
     'merger.boardOpen': 'Kurulları görüşmeye açık.',
+    'contract.belowMinimum': '{v1} bu üründen {v2} adedin altında hat kurmuyor.',
+    'contract.cappedAt': '{v1} siparişi bu üründen {v2} adette sınırladı.',
 };
