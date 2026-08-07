@@ -118,12 +118,20 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
     let inData = false;
     lines.forEach((line, i) => {
         // A top-level data declaration: `export const X = [` / `const X: T = {`
+        // `const X = [` and also the multi-line form, where a type annotation
+        // spans several lines and the `= [` lands on a line starting with `}>`.
+        // Missing that variant hid HOMESCREEN_APPS, whose labels were frozen.
         if (/^(export\s+)?const\s+\w+[^=]*=\s*[[{]\s*$/.test(line)) inData = true;
+        else if (/^\s*\}>\s*=\s*[[{]\s*$/.test(line)) inData = true;
+        else if (/^(export\s+)?const\s+\w+\s*:\s*\w/.test(line) && !/=/.test(line)) inData = false;
         else if (/^[\]}];?\s*$/.test(line)) inData = false;
         // Anything containing a function opens a new scope - not module data
         else if (/^(export\s+)?(const|function)\s/.test(line) && /=>|function/.test(line)) inData = false;
 
-        if (inData && /^\s+\w+:\s*t\(/.test(line)) {
+        // `prop: t(...)` anywhere on the line, not only at its start - inline
+        // object literals like `{ key: 'x', label: t('y'), icon: 'z' }` put it
+        // in the middle, which is exactly where HOMESCREEN_APPS hid.
+        if (inData && /\b\w+:\s*t\(/.test(line) && !/^\s*(\/\/|\*)/.test(line)) {
             problems.frozenText.push(`${rel(f)}:${i + 1}  ${line.trim().slice(0, 60)}`);
         }
     });

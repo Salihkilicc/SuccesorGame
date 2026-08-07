@@ -65,13 +65,13 @@ export interface RatingTier {
  * notu belirler.
  */
 export const RATING_TIERS: RatingTier[] = [
-    { rating: 'AAA', maxLeverage: 1.0, minCoverage: 12, rate: 0.035, meaning: t('data.credit.pristineLendersCompeteForYou') },
-    { rating: 'AA', maxLeverage: 1.5, minCoverage: 8, rate: 0.042, meaning: t('data.credit.veryStrongDebtIsCheap') },
-    { rating: 'A', maxLeverage: 2.0, minCoverage: 6, rate: 0.050, meaning: t('data.credit.solidInvestmentGrade') },
-    { rating: 'BBB', maxLeverage: 3.0, minCoverage: 4, rate: 0.065, meaning: t('data.credit.lowestInvestmentGradeOneBad') },
-    { rating: 'BB', maxLeverage: 4.0, minCoverage: 2.5, rate: 0.090, meaning: t('data.credit.junkLendersAreWatchingEvery') },
-    { rating: 'B', maxLeverage: 5.0, minCoverage: 1.5, rate: 0.130, meaning: t('data.credit.deepJunkRefinancingIsA') },
-    { rating: 'CCC', maxLeverage: Infinity, minCoverage: 0, rate: 0.190, meaning: t('data.credit.distressedOnlyOpportunistsWillLend') },
+    { rating: 'AAA', maxLeverage: 1.0, minCoverage: 12, rate: 0.035, get meaning() { return t('data.credit.pristineLendersCompeteForYou'); } },
+    { rating: 'AA', maxLeverage: 1.5, minCoverage: 8, rate: 0.042, get meaning() { return t('data.credit.veryStrongDebtIsCheap'); } },
+    { rating: 'A', maxLeverage: 2.0, minCoverage: 6, rate: 0.050, get meaning() { return t('data.credit.solidInvestmentGrade'); } },
+    { rating: 'BBB', maxLeverage: 3.0, minCoverage: 4, rate: 0.065, get meaning() { return t('data.credit.lowestInvestmentGradeOneBad'); } },
+    { rating: 'BB', maxLeverage: 4.0, minCoverage: 2.5, rate: 0.090, get meaning() { return t('data.credit.junkLendersAreWatchingEvery'); } },
+    { rating: 'B', maxLeverage: 5.0, minCoverage: 1.5, rate: 0.130, get meaning() { return t('data.credit.deepJunkRefinancingIsA'); } },
+    { rating: 'CCC', maxLeverage: Infinity, minCoverage: 0, rate: 0.190, get meaning() { return t('data.credit.distressedOnlyOpportunistsWillLend'); } },
 ];
 
 export interface CreditAssessment {

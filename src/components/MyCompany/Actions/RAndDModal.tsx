@@ -26,20 +26,20 @@ interface TechUpgrade {
 
 const TECH_TREE: Record<TechCategory, TechUpgrade[]> = {
   hardware: [
-    { level: 1, cost: 0, title: t('action.basicAccessories'), reward: 'Start' },
-    { level: 2, cost: 1_000_000_000, title: t('action.miniaturization'), reward: 'Unlocks MyPhone' },
-    { level: 3, cost: 4_200_000_000, title: t('action.siliconProcessors'), reward: 'Unlocks MyMac' },
-    { level: 4, cost: 10_500_000_000, title: t('action.wearableSensors'), reward: 'Unlocks MyWatch & MyPods' },
+    { level: 1, cost: 0, get title() { return t('action.basicAccessories'); }, reward: 'Start' },
+    { level: 2, cost: 1_000_000_000, get title() { return t('action.miniaturization'); }, reward: 'Unlocks MyPhone' },
+    { level: 3, cost: 4_200_000_000, get title() { return t('action.siliconProcessors'); }, reward: 'Unlocks MyMac' },
+    { level: 4, cost: 10_500_000_000, get title() { return t('action.wearableSensors'); }, reward: 'Unlocks MyWatch & MyPods' },
   ],
   software: [
-    { level: 1, cost: 0, title: t('action.basicOs'), reward: 'Start' },
-    { level: 2, cost: 1_800_000_000, title: t('action.cloudIntegration'), reward: 'Unlocks MyPad' },
-    { level: 3, cost: 7_000_000_000, title: t('action.myaiIntegration'), reward: 'Sales Price limit +20% & Demand Boost' },
+    { level: 1, cost: 0, get title() { return t('action.basicOs'); }, reward: 'Start' },
+    { level: 2, cost: 1_800_000_000, get title() { return t('action.cloudIntegration'); }, reward: 'Unlocks MyPad' },
+    { level: 3, cost: 7_000_000_000, get title() { return t('action.myaiIntegration'); }, reward: 'Sales Price limit +20% & Demand Boost' },
   ],
   future: [
-    { level: 1, cost: 0, title: t('action.researchLab'), reward: 'Requires Hardware Lvl 4 to Unlock', req: { category: 'hardware', level: 4 } },
-    { level: 2, cost: 35_000_000_000, title: t('action.autonomousDriving'), reward: 'Unlocks MyCar' },
-    { level: 3, cost: 70_000_000_000, title: t('action.spatialComputing'), reward: 'Unlocks MyVision' },
+    { level: 1, cost: 0, get title() { return t('action.researchLab'); }, reward: 'Requires Hardware Lvl 4 to Unlock', req: { category: 'hardware', level: 4 } },
+    { level: 2, cost: 35_000_000_000, get title() { return t('action.autonomousDriving'); }, reward: 'Unlocks MyCar' },
+    { level: 3, cost: 70_000_000_000, get title() { return t('action.spatialComputing'); }, reward: 'Unlocks MyVision' },
   ],
 };
 

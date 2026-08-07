@@ -41,13 +41,13 @@ const NAV_ITEMS: Array<{
     activeFor: string;
     feature?: keyof typeof FEATURES;
 }> = [
-        { key: 'home', label: t('nav.home'), icon: 'home-outline', target: 'Home', activeFor: 'Home' },
+        { key: 'home', get label() { return t('nav.home'); }, icon: 'home-outline', target: 'Home', activeFor: 'Home' },
         // target 'stats' özel: navigasyon yapmaz, stat modunu açar.
-        { key: 'stats', label: t('nav.stats'), icon: 'chart-bar', target: 'stats', activeFor: '' },
+        { key: 'stats', get label() { return t('nav.stats'); }, icon: 'chart-bar', target: 'stats', activeFor: '' },
         // Contacts (ilişkiler) rafa kaldırıldı; yerini şirket aldı.
-        { key: 'contacts', label: t('nav.contacts'), icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
-        { key: 'company', label: t('nav.company'), icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
-        { key: 'profile', label: t('nav.profile'), icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
+        { key: 'contacts', get label() { return t('nav.contacts'); }, icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
+        { key: 'company', get label() { return t('nav.company'); }, icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
+        { key: 'profile', get label() { return t('nav.profile'); }, icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
     ];
 
 const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]);

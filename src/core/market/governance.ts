@@ -1096,13 +1096,13 @@ export const boardMoodFrom = (members: GovMember[]): BoardMood => {
  * gecerler (bkz. credit.ts FINANCING_SIGNALS).
  */
 export const GOVERNANCE_SIGNALS: Record<string, { impactPercent: number; note: string }> = {
-    proposal_rejected: { impactPercent: -4, note: t('data.governance.theBoardPubliclyOverruledIts') },
-    director_resigned: { impactPercent: -6, note: t('data.governance.aDirectorWalkedOutInvestors') },
-    no_confidence_called: { impactPercent: -14, note: t('data.governance.aNoConfidenceVoteIs') },
-    ceo_removed: { impactPercent: -22, note: t('data.governance.theFounderHasBeenRemoved') },
-    ceo_survived: { impactPercent: -5, note: t('data.governance.survivedButTheFightWas') },
-    board_aligned: { impactPercent: 2, note: t('data.governance.aUnitedBoardReadsAs') },
-    promise_broken: { impactPercent: -3, note: t('data.governance.wordGetsAroundThatThe') },
+    proposal_rejected: { impactPercent: -4, get note() { return t('data.governance.theBoardPubliclyOverruledIts'); } },
+    director_resigned: { impactPercent: -6, get note() { return t('data.governance.aDirectorWalkedOutInvestors'); } },
+    no_confidence_called: { impactPercent: -14, get note() { return t('data.governance.aNoConfidenceVoteIs'); } },
+    ceo_removed: { impactPercent: -22, get note() { return t('data.governance.theFounderHasBeenRemoved'); } },
+    ceo_survived: { impactPercent: -5, get note() { return t('data.governance.survivedButTheFightWas'); } },
+    board_aligned: { impactPercent: 2, get note() { return t('data.governance.aUnitedBoardReadsAs'); } },
+    promise_broken: { impactPercent: -3, get note() { return t('data.governance.wordGetsAroundThatThe'); } },
 };
 
 // ============================================================================

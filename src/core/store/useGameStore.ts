@@ -1924,15 +1924,18 @@ export const useGameStore = create<GameStore>()(
 
           }
 
-          // 7d. EDUCATION ADVANCEMENT (New System)
-          const { useEducationStore } = require('./useEducationStore'); // Safe import
-          const eduResult = useEducationStore.getState().advanceProgress();
+          // 7d. EDUCATION ADVANCEMENT — behind the flag like every other
+          //     shelved module. The require() pulled in the education store and
+          //     advanced a degree nobody could enrol in.
+          if (isEnabled('education')) {
+            const { useEducationStore } = require('./useEducationStore'); // Safe import
+            const eduResult = useEducationStore.getState().advanceProgress();
 
-          if (eduResult.message) {
-
-            // Report to UI if significant (graduation) or just progress
-            if (!setbackMessage && !operationalSetback) {
-              setbackMessage = eduResult.message;
+            if (eduResult.message) {
+              // Report to UI if significant (graduation) or just progress
+              if (!setbackMessage && !operationalSetback) {
+                setbackMessage = eduResult.message;
+              }
             }
           }
 

@@ -64,16 +64,16 @@ const HOMESCREEN_APPS: Array<{
   gradient: string[];
   feature?: FeatureKey;
 }> = [
-    { key: 'calendar', label: t('home.calendar'), icon: 'calendar', gradient: GRADIENTS.orangeYellow },
-    { key: 'mail', label: t('home.mail'), icon: 'email', gradient: GRADIENTS.blueSky },
-    { key: 'myCompany', label: t('home.myCompany'), icon: 'office-building', gradient: GRADIENTS.networkBlue },
+    { key: 'calendar', get label() { return t('home.calendar'); }, icon: 'calendar', gradient: GRADIENTS.orangeYellow },
+    { key: 'mail', get label() { return t('home.mail'); }, icon: 'email', gradient: GRADIENTS.blueSky },
+    { key: 'myCompany', get label() { return t('home.myCompany'); }, icon: 'office-building', gradient: GRADIENTS.networkBlue },
     // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
-    { key: 'education', label: t('home.education'), icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
-    { key: 'financials', label: t('home.financials'), icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
-    { key: 'news', label: t('home.news'), icon: 'newspaper', gradient: GRADIENTS.tealCyan },
+    { key: 'education', get label() { return t('home.education'); }, icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
+    { key: 'financials', get label() { return t('home.financials'); }, icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
+    { key: 'news', get label() { return t('home.news'); }, icon: 'newspaper', gradient: GRADIENTS.tealCyan },
     // Settings'e giden tek yol Underworld sekmesiydi; o sekme rafa
     // kaldirilinca ekran yetim kalmisti (featureFlags.underworld = false).
-    { key: 'settings', label: t('home.settings'), icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
+    { key: 'settings', get label() { return t('home.settings'); }, icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
   ];
 
 const ACTIVE_HOMESCREEN_APPS = filterByFeature(HOMESCREEN_APPS);

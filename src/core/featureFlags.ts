@@ -33,8 +33,7 @@ export const FEATURES = {
     shareholders: true,
     /** Quarterly financial report — the game's teaching surface */
     financialReport: true,
-    /** MBA / executive education. To be wired to the CEO: decision quality + credibility */
-    education: true,
+
     /** Calendar, notes, settings, profile — the OS shell */
     os: true,
 
@@ -42,6 +41,13 @@ export const FEATURES = {
     //  SHELVED — the code is still here, only access is closed.
     //  These come back one at a time, with a reason, once the engine is deeper.
     // ------------------------------------------------------------------
+    /**
+     * MBA / executive education. Shelved on the player's call: it sat on the
+     * home screen without connecting to anything the CEO does, and it was
+     * advancing a degree every quarter behind the scenes.
+     * When it returns it should feed decision quality and credibility.
+     */
+    education: false,
     /** Lifestyle hub (features/life) — the Life tab and the app grid */
     life: false,
     /** Relationships / partner system (features/love).

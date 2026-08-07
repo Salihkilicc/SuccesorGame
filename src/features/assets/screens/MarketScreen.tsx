@@ -44,18 +44,18 @@ function isStock(item: MarketItem): item is StockItem {
 
 // --- TABS & CONFIG ---
 const MAIN_TABS: TabOption<TabKey>[] = [
-  { key: 'stocks', label: t('company.stocks') },
-  { key: 'crypto', label: t('company.crypto') },
-  { key: 'bonds', label: t('company.bonds') },
-  { key: 'funds', label: t('company.funds') },
+  { key: 'stocks', get label() { return t('company.stocks'); } },
+  { key: 'crypto', get label() { return t('company.crypto'); } },
+  { key: 'bonds', get label() { return t('company.bonds'); } },
+  { key: 'funds', get label() { return t('company.funds'); } },
 ];
 
 type StockCategory = 'Technology' | 'Industrial' | 'Finance' | 'Health';
 const STOCK_SUB_TABS: TabOption<StockCategory>[] = [
-  { key: 'Technology', label: t('company.technology') },
-  { key: 'Health', label: t('company.health') },
-  { key: 'Industrial', label: t('company.industrial') },
-  { key: 'Finance', label: t('company.finance') },
+  { key: 'Technology', get label() { return t('company.technology'); } },
+  { key: 'Health', get label() { return t('company.health'); } },
+  { key: 'Industrial', get label() { return t('company.industrial'); } },
+  { key: 'Finance', get label() { return t('company.finance'); } },
 ];
 
 const MarketScreen = () => {

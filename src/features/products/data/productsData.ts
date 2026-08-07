@@ -107,13 +107,13 @@ export interface Supplier {
 
 export const DEFAULT_SUPPLIERS: Record<string, Supplier[]> = {
   'Electronics': [
-    { name: t('product.globalComponentsInc'), cost: 100, quality: 75 },
-    { name: t('product.budgetTechSupplies'), cost: 60, quality: 45 },
-    { name: t('product.premiumSiliconWafer'), cost: 180, quality: 95 }
+    { get name() { return t('product.globalComponentsInc'); }, cost: 100, quality: 75 },
+    { get name() { return t('product.budgetTechSupplies'); }, cost: 60, quality: 45 },
+    { get name() { return t('product.premiumSiliconWafer'); }, cost: 180, quality: 95 }
   ],
   'Fashion': [ // Just in case
-    { name: t('product.textileGlobal'), cost: 50, quality: 70 },
-    { name: t('product.cheapFabrics'), cost: 20, quality: 30 }
+    { get name() { return t('product.textileGlobal'); }, cost: 50, quality: 70 },
+    { get name() { return t('product.cheapFabrics'); }, cost: 20, quality: 30 }
   ]
 };
 
