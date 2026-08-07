@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   label: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontWeight: '700',
     fontSize: theme.typography.body,
   },

@@ -171,7 +171,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 
                         {/* Info Note */}
                         <View style={styles.infoBox}>
-                            <Ionicons name="information-circle-outline" size={20} color="#B28C96" />
+                            <Ionicons name="information-circle-outline" size={20} color="#8A807B" />
                             <Text style={styles.infoText}>
                                 {t('sub.pointsHint')}
                             </Text>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         width: '90%',
         maxWidth: 420,
         height: '80%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#31241F',
-        backgroundColor: '#000000',
+        borderBottomColor: '#0F0E0D',
+        backgroundColor: '#0F0E0D',
     },
     companyName: {
         fontSize: 22,
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
     },
     sectorText: {
         fontSize: 13,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         textTransform: 'uppercase',
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         marginHorizontal: 10,
     },
     kpiLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         marginBottom: 4,
     },
@@ -315,11 +315,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#31241F',
+        borderColor: '#0F0E0D',
     },
     strategyInfo: {
         flexDirection: 'row',
@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
     },
     strategyDesc: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     controls: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -384,19 +384,19 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#12379F',
+        color: '#123AB8',
         fontSize: 12,
         lineHeight: 18,
     },
     footer: {
         padding: 20,
         borderTopWidth: 1,
-        borderTopColor: '#31241F',
-        backgroundColor: '#000000',
+        borderTopColor: '#0F0E0D',
+        backgroundColor: '#0F0E0D',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     saveBtn: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',

@@ -138,19 +138,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#B28C96',
+        borderBottomColor: '#8A807B',
         backgroundColor: '#5FB37A',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         alignItems: 'center',
         justifyContent: 'center',
     },
     backIcon: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
     },
     vipBanner: {
@@ -175,20 +175,20 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: theme.spacing.md,
         borderWidth: 2,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
         gap: 10,
     },
     vipIcon: {
         fontSize: 24,
     },
     vipTitle: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         fontSize: 14,
         marginBottom: 2,
     },
     vipText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
     },
     scrollContent: {
@@ -197,11 +197,11 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     optionCard: {
-        backgroundColor: '#000000', // Deep Ocean Blue
+        backgroundColor: '#0F0E0D', // Deep Ocean Blue
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
         shadowColor: '#5FB37A',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     },
     optionCardVIP: {
         borderWidth: 2,
-        borderColor: '#B28C96',
-        backgroundColor: '#000000', // Deep Ocean Blue
+        borderColor: '#8A807B',
+        backgroundColor: '#0F0E0D', // Deep Ocean Blue
     },
     optionCardPressed: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         transform: [{ scale: 0.98 }],
     },
     optionHeader: {
@@ -226,15 +226,15 @@ const styles = StyleSheet.create({
     optionName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     optionCost: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#B28C96',
+        color: '#8A807B',
     },
     freeBadge: {
-        backgroundColor: '#B28C96',
+        backgroundColor: '#8A807B',
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: 12,
@@ -242,12 +242,12 @@ const styles = StyleSheet.create({
     freeText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 1,
     },
     optionDesc: {
         fontSize: 13,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 8,
     },
     statsRow: {
@@ -260,6 +260,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     healthText: {
-        color: '#12379F', // Blue
+        color: '#123AB8', // Blue
     },
 });

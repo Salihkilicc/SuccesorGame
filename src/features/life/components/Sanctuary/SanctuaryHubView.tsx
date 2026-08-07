@@ -80,7 +80,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Massage */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('MASSAGE')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0F0E0D' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.MASSAGE}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.royalMassage')}</Text>
@@ -89,7 +89,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Grooming */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('GROOMING')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0F0E0D' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.GROOMING}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.groomingLounge')}</Text>
@@ -98,7 +98,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Surgery */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('SURGERY')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0F0E0D' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.SURGERY}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.plasticSurgery')}</Text>
@@ -135,21 +135,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderBottomWidth: 1,
-        borderBottomColor: '#B28C96',
+        borderBottomColor: '#8A807B',
     },
     closeBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         alignItems: 'center',
         justifyContent: 'center',
     },
     closeIcon: {
         fontSize: 18,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     titleContainer: {
         alignItems: 'center',
@@ -157,12 +157,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 1,
     },
     subtitle: {
         fontSize: 12,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginTop: 2,
     },
     content: {
@@ -176,19 +176,19 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 20,
         marginBottom: 24,
-        shadowColor: '#000000',
+        shadowColor: '#0F0E0D',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
         elevation: 5,
     },
     vipActive: {
-        backgroundColor: '#31241F', // Dark luxury
+        backgroundColor: '#0F0E0D', // Dark luxury
         borderWidth: 1,
         borderColor: '#5FB37A',
     },
     vipInactive: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     vipContent: {
         flex: 1,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     },
     vipDesc: {
         fontSize: 12,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginTop: 2,
     },
     vipIcon: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     priceText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '700',
         fontSize: 12,
     },
@@ -225,17 +225,17 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     card: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#000000',
+        shadowColor: '#0F0E0D',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
     },
     iconContainer: {
         width: 60,
@@ -251,12 +251,12 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     cardDesc: {
         fontSize: 13,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     bottomBarContainer: {
         position: 'absolute',

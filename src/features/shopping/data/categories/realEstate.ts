@@ -21,7 +21,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.skylinearch.com',
             category: 'REAL_ESTATE',
             description: 'Own the skyline.',
-            bannerColor: '#523F3E',
+            bannerColor: '#2A2624',
             emoji: '🏢',
         },
         {
@@ -30,7 +30,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.dynasty8elite.com',
             category: 'REAL_ESTATE',
             description: 'Residences of distinction.',
-            bannerColor: '#523F3E',
+            bannerColor: '#2A2624',
             emoji: '🏠',
         },
         {
@@ -39,7 +39,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.vaultprop.secure',
             category: 'REAL_ESTATE',
             description: 'Fortified luxury.',
-            bannerColor: '#B28C96',
+            bannerColor: '#8A807B',
             emoji: '🔒',
         },
         {
@@ -48,7 +48,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.heritage-estates.eu',
             category: 'REAL_ESTATE',
             description: 'History is yours.',
-            bannerColor: '#12379F',
+            bannerColor: '#123AB8',
             emoji: '🏰',
         },
         {

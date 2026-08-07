@@ -82,12 +82,12 @@ export const EducationMasterModal: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
     placeholder: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
 });

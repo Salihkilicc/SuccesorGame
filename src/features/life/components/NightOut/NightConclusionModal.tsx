@@ -32,7 +32,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
     useLocale();
     if (!visible || !data) return null;
 
-    const themeColor = data.themeColor || '#FFFFFF';
+    const themeColor = data.themeColor || '#EDE8E4';
     const isVibeCheck = typeof data.enjoymentScore === 'number';
 
     return (
@@ -83,7 +83,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
                             isVibeCheck && {
                                 fontSize: 18,
                                 opacity: Math.max(0.6, (data.enjoymentScore || 0) / 100),
-                                color: (data.enjoymentScore || 0) > 80 ? '#FFFFFF' : '#ccc'
+                                color: (data.enjoymentScore || 0) > 80 ? '#EDE8E4' : '#ccc'
                             }
                         ]}>
                             {data.text}
@@ -113,12 +113,12 @@ export default NightConclusionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 4,
         overflow: 'hidden',
         width: '100%'
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     narrativeText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 22,
         textAlign: 'center',
         fontStyle: 'italic',

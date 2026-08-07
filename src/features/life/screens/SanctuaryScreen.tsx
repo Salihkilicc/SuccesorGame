@@ -86,8 +86,8 @@ const SanctuaryScreen = () => {
     return (
         <AppLaunchLoader
             appName="Sanctuary"
-            appIcon={<MaterialCommunityIcons name="spa" size={64} color="#FFFFFF" />}
-            backgroundColor="#000000"
+            appIcon={<MaterialCommunityIcons name="spa" size={64} color="#EDE8E4" />}
+            backgroundColor="#0F0E0D"
         >
             <View style={styles.container}>
                 {/* LAYER 1: Hub (Always Rendered) */}
@@ -121,7 +121,7 @@ const SanctuaryScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     baseLayer: {
         flex: 1,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     overlayLayer: {
         ...StyleSheet.absoluteFillObject,
         zIndex: 10,
-        backgroundColor: '#000000', // Dark background for smooth fade
+        backgroundColor: '#0F0E0D', // Dark background for smooth fade
     },
 });
 

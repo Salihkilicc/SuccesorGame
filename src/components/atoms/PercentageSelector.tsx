@@ -73,18 +73,18 @@ export const PercentageSelector = ({
 
                 {/* 1. Satır: AZALTMA (Kırmızı/Turuncu Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("MIN", () => update('min', 0), '#3C2D29', '#E06B6B')}
-                    {renderBtn("-50%", () => update('percent', -50), '#473633', '#E06B6B')}
+                    {renderBtn("MIN", () => update('min', 0), '#181614', '#E06B6B')}
+                    {renderBtn("-50%", () => update('percent', -50), '#201D1C', '#E06B6B')}
                     {renderBtn("-10%", () => update('percent', -10), '#E06B6B', '#E06B6B')}
                     {renderBtn("-5%", () => update('percent', -5), '#E06B6B', '#E06B6B')}
                 </View>
 
                 {/* 2. Satır: ARTIRMA (Yeşil/Mavi Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("+5%", () => update('percent', 5), '#3C2D29', '#5FB37A')}
-                    {renderBtn("+10%", () => update('percent', 10), '#3C2D29', '#5FB37A')}
-                    {renderBtn("+50%", () => update('percent', 50), '#473633', '#5FB37A')}
-                    {renderBtn("MAX", () => update('max', 0), '#3C2D29', '#473633')}
+                    {renderBtn("+5%", () => update('percent', 5), '#181614', '#5FB37A')}
+                    {renderBtn("+10%", () => update('percent', 10), '#181614', '#5FB37A')}
+                    {renderBtn("+50%", () => update('percent', 50), '#201D1C', '#5FB37A')}
+                    {renderBtn("MAX", () => update('max', 0), '#181614', '#201D1C')}
                 </View>
 
             </View>
@@ -94,11 +94,11 @@ export const PercentageSelector = ({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#000000', // Koyu Kart Rengi
+        backgroundColor: '#0F0E0D', // Koyu Kart Rengi
         padding: 12,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#473633',
+        borderColor: '#201D1C',
         marginBottom: 12,
     },
     header: {
@@ -107,14 +107,14 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         marginBottom: 8,
     },
-    label: { color: '#B28C96', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
+    label: { color: '#8A807B', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
     value: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' },
     unit: { fontSize: 12, color: '#5992C6', fontWeight: 'normal' },
 
     // Bar Stilleri
     barTrack: {
         height: 6,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         borderRadius: 3,
         overflow: 'hidden',
     },

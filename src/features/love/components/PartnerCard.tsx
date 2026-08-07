@@ -24,10 +24,10 @@ const getTierColor = (tier: SocialTier): string => {
     case 'HIGH_SOCIETY': return '#E3A857'; // Gold
     case 'CORPORATE_ELITE': return '#5992C6'; // Blue
     case 'UNDERGROUND': return '#E06B6B'; // Red
-    case 'BLUE_COLLAR': return '#B28C96'; // Slate
+    case 'BLUE_COLLAR': return '#8A807B'; // Slate
     case 'STUDENT_LIFE': return '#5992C6'; // Cyan
-    case 'ARTISTIC': return '#12379F'; // Purple
-    default: return '#B28C96';
+    case 'ARTISTIC': return '#123AB8'; // Purple
+    default: return '#8A807B';
   }
 };
 
@@ -72,7 +72,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
   const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
-  const statusColor = (partner as PartnerProfile).isMarried ? '#12379F' : '#E06B6B';
+  const statusColor = (partner as PartnerProfile).isMarried ? '#123AB8' : '#E06B6B';
 
   return (
     <View style={styles.container}>
@@ -134,7 +134,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>🧠</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#12379F' }]} />
+                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#123AB8' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(smartsLevel)}</Text>
             </View>
@@ -178,7 +178,7 @@ export default PartnerCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#0F0E0D',
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     height: 180,
-    backgroundColor: '#3C2D29',
+    backgroundColor: '#181614',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#473633', // Fallback color
+    backgroundColor: '#201D1C', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   overlayJob: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontWeight: '500',
     marginTop: 2,
   },
@@ -303,16 +303,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#3C2D29',
+    backgroundColor: '#181614',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#473633',
+    borderColor: '#201D1C',
   },
   chipText: {
     fontSize: 12,
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   costChip: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   actionButtonPressed: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EDE8E4',
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {

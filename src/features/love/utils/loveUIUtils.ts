@@ -7,7 +7,7 @@ export const getLoveGradient = (love: number): { colors: string[]; locations: nu
 
     if (pct <= 0) {
         // Full navy: deep blue with subtle teal shimmer
-        return { colors: ['#000000', '#12379F', '#12379F', '#000000'], locations: [0, 0.3, 0.7, 1] };
+        return { colors: ['#0F0E0D', '#123AB8', '#123AB8', '#0F0E0D'], locations: [0, 0.3, 0.7, 1] };
     }
     if (pct >= 1) {
         // Full purple: vivid violet with highlights
@@ -24,10 +24,10 @@ export const getLoveGradient = (love: number): { colors: string[]; locations: nu
         colors: [
             '#0A2A92',   // deep violet start
             '#0A2A92',   // bright purple
-            '#12379F',   // lighter purple peak
+            '#123AB8',   // lighter purple peak
             '#E06B6B',   // hot pink transition
-            '#12379F',   // navy
-            '#000000',   // deep midnight end
+            '#123AB8',   // navy
+            '#0F0E0D',   // deep midnight end
         ],
         locations: [
             0,

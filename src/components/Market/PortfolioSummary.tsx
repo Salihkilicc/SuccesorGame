@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   label: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: theme.typography.caption,
     letterSpacing: 0.4,
   },
   value: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
   },

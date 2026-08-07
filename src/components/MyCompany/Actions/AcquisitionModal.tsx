@@ -429,7 +429,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
   },
   header: {
     padding: 20,
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderWidth: 1,
     borderColor: '#333',
   },
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   negBody: {
     marginBottom: 24,
     gap: 12,
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     padding: 16,
     borderRadius: 12,
   },

@@ -205,7 +205,7 @@ const CalendarScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#000000', '#000000', '#000000']}
+                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -275,7 +275,7 @@ const CalendarScreen = () => {
 
                             {/* Star icon */}
                             <LinearGradient
-                                colors={['#E9B8C9', '#E3A857', '#473633']}
+                                colors={['#E9B8C9', '#E3A857', '#201D1C']}
                                 style={styles.modalStar}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -309,7 +309,7 @@ export default CalendarScreen;
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: '#000000' },
+    root: { flex: 1, backgroundColor: '#0F0E0D' },
     safeArea: { flex: 1 },
 
     // Header
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     monthName: {
         fontSize: 18,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 4,
         textTransform: 'uppercase',
     },
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     weekLabel: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#614A4B',
+        color: '#3B3632',
         textAlign: 'center',
         letterSpacing: 0.5,
     },
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     dayNumWeekend: { color: 'rgba(192,192,208,0.4)' },
-    dayNumWithEvent: { color: '#FFFFFF', fontWeight: '700' },
+    dayNumWithEvent: { color: '#EDE8E4', fontWeight: '700' },
 
     // Today
     todayCircle: {
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     todayDayNum: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
     },
 
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(197,160,89,0.38)',
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     modalStarText: { fontSize: 24, color: '#FFF' },
     modalDate: {
         fontSize: 11,
-        color: '#614A4B',
+        color: '#3B3632',
         letterSpacing: 2,
         textTransform: 'uppercase',
         marginBottom: 6,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
         letterSpacing: 0.2,
         marginBottom: 18,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     },
     modalDesc: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 28,

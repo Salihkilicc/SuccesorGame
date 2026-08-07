@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         borderColor: '#555',
     },
     charterTitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '700',
         fontSize: 15,
     },
@@ -108,10 +108,10 @@ const styles = StyleSheet.create({
     },
     optionButtonSelected: {
         borderColor: '#5992C6',
-        backgroundColor: '#31241F', // subtle gold tint
+        backgroundColor: '#0F0E0D', // subtle gold tint
     },
     optionText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '600',
         fontSize: 16,
     },

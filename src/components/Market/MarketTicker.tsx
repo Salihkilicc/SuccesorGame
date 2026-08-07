@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.4,
     },
     price: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginRight: 5,
         fontSize: 11,
     },

@@ -81,19 +81,19 @@ export default NightEndModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 24,
         paddingBottom: 40,
         alignItems: 'center',
         justifyContent: 'center',
     },
     title: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 22,
         fontWeight: '800',
         marginBottom: 24,
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
         minHeight: 280,
     },
     classyCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E3A857', // Gold-ish
     },
     wildCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E06B6B', // Neon Red
         shadowColor: '#E06B6B',
         shadowOffset: { width: 0, height: 0 },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     optionTitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 8,

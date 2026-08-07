@@ -1,113 +1,101 @@
 // src/core/theme.ts
 //
 // ============================================================================
-//  TEMA — dort renk, hepsi turetilmis
+//  TEMA — notr koyu zemin, karakter vurgularda
 // ============================================================================
 //
-//  Palet oyuncunun secimi:
+//  ILK DENEMEDE HATA YAPILDI: Cocoa Brown (#31241F) dogrudan zemin yapildi.
+//  %37 doygunlukta bir renk butun ekranin zemini olunca her sey ona boyanir
+//  ve sonuc camurlu durur. Ustune 229 yerde saf siyah zemin duruyordu, yani
+//  ekranlar arasinda sicak kahve ile saf siyah yan yana geliyordu.
 //
-//    Cocoa Brown  #31241f   koyu, sicak    -> zemin
-//    Torea Bay    #0a2a92   koyu, doygun   -> dolgu (metin TASIYAMAZ)
-//    Danube       #5992c6   orta mavi      -> bilgi, ikincil, pozitif
-//    Shilo        #e9b8c9   acik pembe     -> vurgu, onemli sayi, negatif
+//  Arastirmanin soyledigi iki kural (Material, Toptal, UX Planet):
 //
-//  NEDEN BU DOSYA ONEMLI: projede 398 FARKLI renk, 2.760 kullanim vardi. Ayni
-//  is icin uc altin (#FFD700, #D4AF37, #C5A059), dort kirmizi, alti arka plan
-//  yan yana yasiyordu. Ekrandan ekrana gecerken hissedilen dagiklik buradan
-//  geliyordu — cirkinlikten degil, TUTARSIZLIKTAN.
+//    1) SAF SIYAH KULLANILMAZ. Beyaz metinle asiri kontrast yapar, goz
+//       yorar ve OLED'de "halation" denen tasma olusur. Taban #121212
+//       civari bir koyu notr olmali.
+//    2) DERINLIK GOLGEYLE DEGIL, ZEMINI ACARAK anlatilir — 4-6 kademe.
+//       Doygun renk ZEMIN degil VURGU olur.
 //
-//  KURAL: bilesenler artik hex yazmaz. Buradaki jetonu kullanir. Yeni bir ton
-//  gerekiyorsa once buraya eklenir, sonra kullanilir.
+//  Bu yuzden Cocoa'nin HUE'SU korundu ama doygunlugu kirildi: zemin hala
+//  sicak, ama notr. Dort renk artik zemin degil, o zeminin uzerinde duran
+//  karakter. Olculdu: notr zeminde Shilo 8.7 -> 11.2, Danube 4.5 -> 5.8
+//  kontrast kazandi. Zemin onlarla yarismayi birakinca renkler parladi.
 //
-//  KONTRAST — hepsi olculdu, WCAG AA (4.5:1) esigi tutturuldu:
-//
-//    zemin uzerinde beyaz          15.0    tam okunur
-//    zemin uzerinde Shilo           8.7    tam okunur
-//    zemin uzerinde textMuted       5.1    tam okunur
-//    zemin uzerinde Danube          4.5    tam okunur
-//    zemin uzerinde Torea Bay       1.25   OKUNMAZ -> yalnizca dolgu
-//    Torea dolgu uzerinde beyaz    11.9    tam okunur
-//
-//  Bu yuzden Torea Bay hicbir yerde metin rengi degildir. Dugme zemini,
-//  secili durum ve gradyan sonu olarak kullanilir; ustune beyaz gelir.
+//  KURAL: bilesenler hex yazmaz, buradaki jetonu kullanir.
 //
 // ============================================================================
 
-/** Paletin kendisi. Baska hicbir yerde ham hex bulunmamali. */
+/** Oyuncunun sectigi dort renk. Zemin degil, KARAKTER. */
 export const palette = {
-    cocoa: '#31241f',
-    torea: '#0a2a92',
-    danube: '#5992c6',
-    shilo: '#e9b8c9',
+    cocoa: '#31241F',   // sicak dolgu, kart aksani
+    torea: '#0A2A92',   // buton dolgusu
+    danube: '#5992C6',  // bilgi, ikincil
+    shilo: '#E9B8C9',   // vurgu, prestij
 } as const;
 
 export const theme = {
     colors: {
-        // --- Yuzeyler: Cocoa'dan Shilo yonunde acilarak turetildi ---------
-        background: '#31241f',
-        surface: '#3c2d29',
-        surfaceRaised: '#473633',
-        surfaceHigh: '#523f3e',
-        border: 'rgba(233,184,201,0.14)',
-        borderStrong: '#614a4b',
+        // --- Zemin: Cocoa hue'su, doygunluk kirik, 5 kademe --------------
+        //     Yukari ciktikca aciliyor. Golge degil, aciklik = yukseklik.
+        background: '#0F0E0D',
+        surface: '#181614',
+        surfaceRaised: '#201D1C',
+        surfaceHigh: '#2A2624',
+        border: 'rgba(237,232,228,0.10)',
+        borderStrong: '#3B3632',
 
-        // --- Metin: hepsi zemin uzerinde >=4.5 --------------------------
-        textPrimary: '#FFFFFF',
-        textSecondary: '#e9b8c9',
-        textMuted: '#b28c96',
+        // --- Metin: saf beyaz DEGIL (halation) ---------------------------
+        textPrimary: '#EDE8E4',
+        textSecondary: '#B9AFA9',
+        textMuted: '#8A807B',
 
-        // --- Eylem: Torea dolgu, ustune beyaz ---------------------------
-        primary: '#0a2a92',
-        primaryText: '#FFFFFF',
-        primaryHover: '#12379f',
+        // --- Eylem: Torea dolgu, ustune yumusak beyaz --------------------
+        primary: '#0A2A92',
+        primaryText: '#EDE8E4',
+        primaryHover: '#123AB8',
 
-        // --- Bilgi / ikincil --------------------------------------------
-        accent: '#5992c6',
+        // --- Bilgi / ikincil ---------------------------------------------
+        accent: '#5992C6',
         accentSoft: 'rgba(89,146,198,0.16)',
 
-        // --- Vurgu: dikkat cekmesi gereken sayi -------------------------
-        highlight: '#e9b8c9',
+        // --- Vurgu: ekranda one cikmasi gereken sayi ---------------------
+        highlight: '#E9B8C9',
         highlightSoft: 'rgba(233,184,201,0.14)',
 
+        // --- Sicak dolgu: kart aksani, secili durum ----------------------
+        warm: '#31241F',
+        warmSoft: 'rgba(49,36,31,0.55)',
+
         // ------------------------------------------------------------------
-        //  KAR / ZARAR
+        //  KAR / ZARAR — anlam renkleri, dort rengin disinda
         // ------------------------------------------------------------------
-        //  Bunlar dekorasyon degil VERI. Yesil/kirmizi okumasi ogrenilmis bir
-        //  refleks; finans oyununda onu paletin hatiri icin feda etmek
-        //  okunurlugu dogrudan dusurur. Bu yuzden dort rengin disinda tutuldu.
-        //
-        //  Doygunluklari kirildi ki sicak kahve zemine otursunlar: ekrandaki
-        //  tek parlak sey kar/zarar rakamidir. Ikisi de AA gecti.
+        //  Dekorasyon degil VERI. Yesil/kirmizi ogrenilmis bir refleks ve
+        //  finans oyununda onu paletin hatiri icin feda etmek okunurlugu
+        //  dusurur. Doygunluklari kirildi ki notr zemine otursunlar.
         // ------------------------------------------------------------------
         positive: '#5FB37A',
         negative: '#E06B6B',
-        neutral: '#b28c96',
+        warning: '#E3A857',
+        neutral: '#8A807B',
 
-        // Eski adlar — kademeli gecis icin
-        card: '#3c2d29',
-        cardSoft: '#473633',
+        // Eski adlar — kademeli gecis
+        card: '#181614',
+        cardSoft: '#201D1C',
         success: '#5FB37A',
         danger: '#E06B6B',
         error: '#E06B6B',
-        warning: '#E3A857',
     },
 
-    /** Yukseklik: zemin ne kadar acilirsa o kadar "yukarida". */
+    /** Yukseklik: zemin ne kadar acilirsa o kadar yukarida. */
     elevation: {
-        flat: '#31241f',
-        low: '#3c2d29',
-        mid: '#473633',
-        high: '#523f3e',
+        flat: '#0F0E0D',
+        low: '#181614',
+        mid: '#201D1C',
+        high: '#2A2624',
     },
 
     radius: { xs: 6, sm: 10, md: 14, lg: 20, pill: 999 },
     spacing: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 },
-    typography: {
-        display: 34,
-        title: 28,
-        subtitle: 16,
-        body: 14,
-        caption: 12,
-        micro: 10,
-    },
+    typography: { display: 34, title: 28, subtitle: 16, body: 14, caption: 12, micro: 10 },
 } as const;

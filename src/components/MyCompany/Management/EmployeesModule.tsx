@@ -212,7 +212,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
                     summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
-                    summaryColor={canBonus ? '#5FB37A' : '#B28C96'}
+                    summaryColor={canBonus ? '#5FB37A' : '#8A807B'}
                 >
                     <Text style={styles.line}>
                         5% of last quarter's profit: {formatMoney(bonusCost)}
@@ -260,9 +260,9 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
 const styles = StyleSheet.create({
     stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
-    label: { color: '#614A4B', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    label: { color: '#3B3632', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },
-    sub: { color: '#B28C96', fontSize: 11, marginTop: 2 },
+    sub: { color: '#8A807B', fontSize: 11, marginTop: 2 },
     strong: { color: theme.colors.textPrimary, fontWeight: '800' },
 
     moraleTrack: {
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
     moraleFill: { height: '100%', borderRadius: 5 },
     moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#E9B8C9' },
 
-    note: { color: '#B28C96', fontSize: 11, lineHeight: 16, marginBottom: 14 },
-    line: { color: '#B28C96', fontSize: 12, lineHeight: 17, marginTop: 6 },
+    note: { color: '#8A807B', fontSize: 11, lineHeight: 16, marginBottom: 14 },
+    line: { color: '#8A807B', fontSize: 12, lineHeight: 17, marginTop: 6 },
     warn: { color: '#E3A857', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
     ok: { color: '#5FB37A', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     },
     eventOff: { opacity: 0.4 },
     eventName: { color: theme.colors.textPrimary, fontSize: 13.5, fontWeight: '700' },
-    eventDesc: { color: '#614A4B', fontSize: 10.5, marginTop: 2 },
+    eventDesc: { color: '#3B3632', fontSize: 10.5, marginTop: 2 },
     eventCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '800' },
     eventGain: { color: '#5FB37A', fontSize: 11, marginTop: 2 },
 
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         alignItems: 'center', backgroundColor: '#5FB37A',
     },
     primaryOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
-    primaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+    primaryText: { color: '#EDE8E4', fontSize: 13, fontWeight: '800' },
 
     overtimeBox: {
         flexDirection: 'row', alignItems: 'center', gap: 12,

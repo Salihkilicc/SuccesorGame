@@ -116,7 +116,7 @@ const ManagementCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#31241F', // Dark Gray
+        backgroundColor: '#0F0E0D', // Dark Gray
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: theme.radius.md,
-        backgroundColor: '#31241F', // Light Gray for icon box
+        backgroundColor: '#0F0E0D', // Light Gray for icon box
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -140,23 +140,23 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     title: {
-        color: '#FFFFFF', // White
+        color: '#EDE8E4', // White
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
     subtitle: {
-        color: '#B28C96', // Text Secondary
+        color: '#8A807B', // Text Secondary
         fontSize: theme.typography.caption,
     },
     badge: {
         marginLeft: 'auto',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         paddingHorizontal: theme.spacing.sm,
         paddingVertical: 4,
         borderRadius: theme.radius.sm,
     },
     badgeText: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: theme.typography.caption,
         fontWeight: '600',
     },
@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: theme.typography.caption,
     },
     value: {
-        color: '#12379F', // Apple Blue for stat values
+        color: '#123AB8', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         color: theme.colors.success,
     },
     limitLabel: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 10,
     },
     footer: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#333',
     },
     costLabel: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: theme.typography.caption,
     },
     costValue: {

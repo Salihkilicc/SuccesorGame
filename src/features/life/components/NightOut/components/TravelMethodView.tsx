@@ -109,7 +109,7 @@ const TravelMethodView = ({
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
                         <View style={[styles.badge, { backgroundColor: '#E3A857' }]}>
-                            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
+                            <Text style={[styles.badgeText, { color: '#EDE8E4' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#5992C6',
         borderStyle: 'dashed',
     },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     cardContent: {
         gap: 4,
@@ -220,13 +220,13 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         lineHeight: 20,
     },
     cardPrice: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     hangarAction: {
         fontSize: 12,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     jetListName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     jetListDesc: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 8,
     },
     emptyText: {

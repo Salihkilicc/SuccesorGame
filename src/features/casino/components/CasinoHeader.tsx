@@ -31,8 +31,8 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
           fontWeight: '900' as '900',
           fontStyle: 'italic' as 'italic',
-          color: '#12379F', // Neon Purple
-          textShadowColor: '#12379F',
+          color: '#123AB8', // Neon Purple
+          textShadowColor: '#123AB8',
           textShadowRadius: 10
         };
       case 'macau':
@@ -70,7 +70,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
     <View style={[styles.container, { height: HEADER_HEIGHT, paddingTop: insets.top }]}>
       {/* Dynamic Background Simulation */}
       <View style={[styles.background, { backgroundColor: location.theme.primary }]} />
-      <View style={[styles.backgroundOverlay, { backgroundColor: '#000000' }]} />
+      <View style={[styles.backgroundOverlay, { backgroundColor: '#0F0E0D' }]} />
 
       {/* Content */}
       <View style={styles.content}>
@@ -146,9 +146,9 @@ export default CasinoHeader;
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderBottomWidth: 1,
-    borderBottomColor: '#523F3E'
+    borderBottomColor: '#2A2624'
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   repTrack: {
     height: 4,
-    backgroundColor: '#523F3E',
+    backgroundColor: '#2A2624',
     borderRadius: 2,
     width: '100%',
     overflow: 'hidden'
@@ -254,10 +254,10 @@ const styles = StyleSheet.create({
     top: -12
   },
   repText: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: 9,
     fontWeight: '600',
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     paddingHorizontal: 4
   }
 });

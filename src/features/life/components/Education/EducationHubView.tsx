@@ -301,7 +301,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
     mainContainer: {
         flex: 1,
@@ -319,9 +319,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderBottomWidth: 1,
-        borderBottomColor: '#FFFFFF',
+        borderBottomColor: '#EDE8E4',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#12379F',
+        color: '#123AB8',
         letterSpacing: 1,
     },
     headerSubtitle: {
@@ -352,56 +352,56 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         justifyContent: 'center',
         alignItems: 'center',
     },
     closeIcon: {
         fontSize: 16,
-        color: '#523F3E',
+        color: '#2A2624',
     },
 
     // Primary Card (Degree)
     primaryCard: {
-        backgroundColor: '#12379F', // Dark Blue
+        backgroundColor: '#123AB8', // Dark Blue
         borderRadius: 20,
         padding: 24,
         marginBottom: 4, // Tight spacing with secondary
-        shadowColor: '#12379F',
+        shadowColor: '#123AB8',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 5,
     },
     primaryCardEmpty: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 20,
         padding: 24,
         marginBottom: 20,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         borderStyle: 'dashed',
     },
     emptyTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#523F3E',
+        color: '#2A2624',
         marginBottom: 4,
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#614A4B',
+        color: '#3B3632',
         marginBottom: 16,
     },
     enrollBtnPrimary: {
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     enrollBtnText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: 'bold',
     },
     primaryHeader: {
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     primaryTitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 24,
         fontWeight: 'bold',
         maxWidth: 240,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     progressText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -468,11 +468,11 @@ const styles = StyleSheet.create({
     },
     secondaryCard: {
         width: '90%',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     secondaryTitle: {
-        color: '#31241F',
+        color: '#0F0E0D',
         fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'right',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     secondaryBarBg: {
         flex: 1,
         height: 6,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 3,
         overflow: 'hidden',
     },
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     },
     secondaryDetail: {
         fontSize: 10,
-        color: '#614A4B',
+        color: '#3B3632',
         marginTop: 6,
         textAlign: 'right',
     },
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         borderStyle: 'dashed',
         marginTop: 10, // Space if separated
     },
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -561,11 +561,11 @@ const styles = StyleSheet.create({
     addSkillTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#523F3E',
+        color: '#2A2624',
     },
     addSkillSubtitle: {
         fontSize: 12,
-        color: '#614A4B',
+        color: '#3B3632',
     },
 
 
@@ -579,12 +579,12 @@ const styles = StyleSheet.create({
     },
     menuItemHalf: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
     },
     menuItemDisabled: {
         opacity: 0.5,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
     menuIcon: {
         fontSize: 36,
@@ -602,26 +602,26 @@ const styles = StyleSheet.create({
     menuTitle: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#0F0E0D',
         marginBottom: 4,
         textAlign: 'center',
     },
     menuSubtitle: {
         fontSize: 11,
-        color: '#614A4B',
+        color: '#3B3632',
         textAlign: 'center',
     },
     menuSubtitleDisabled: {
-        color: '#B28C96',
+        color: '#8A807B',
     },
     menuItemFull: {
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -638,12 +638,12 @@ const styles = StyleSheet.create({
     menuTitleLarge: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#0F0E0D',
         marginBottom: 4,
     },
     menuSubtitleLarge: {
         fontSize: 13,
-        color: '#614A4B',
+        color: '#3B3632',
     },
 
     // Remaining Quarters Text
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     },
     secondaryRemaining: {
         fontSize: 10,
-        color: '#614A4B',
+        color: '#3B3632',
         fontStyle: 'italic',
         marginTop: 4,
         textAlign: 'right',
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     dropButtonText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 11,
         fontWeight: '600',
     },

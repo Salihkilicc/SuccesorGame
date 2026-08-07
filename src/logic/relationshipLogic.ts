@@ -231,7 +231,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🧠',
                     title: 'Intellect Boost',
                     desc: `+${val} Intellect`,
-                    color: '#12379F' // Purple
+                    color: '#123AB8' // Purple
                 });
                 break;
             case 'CHARM_BOOST':
@@ -260,7 +260,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🛡️',
                     title: 'Protection',
                     desc: `+${val} Personal Security`,
-                    color: '#523F3E' // Navy
+                    color: '#2A2624' // Navy
                 });
                 break;
             case 'LUCK_BOOST':
@@ -306,7 +306,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '✨',
                     title: 'Partner Bonus',
                     desc: `${buffType.replace(/_/g, ' ')}`,
-                    color: '#B28C96'
+                    color: '#8A807B'
                 });
                 break;
         }
@@ -375,7 +375,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '⚖️',
             title: 'Legal Immunity',
             desc: 'Clears Police Heat, -10 Risk',
-            color: '#12379F'
+            color: '#123AB8'
         });
     }
 
@@ -443,7 +443,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '🥂',
             title: 'Elite Network',
             desc: '+10 Social Rep, Exclusive Invites',
-            color: '#12379F'
+            color: '#123AB8'
         });
     }
 

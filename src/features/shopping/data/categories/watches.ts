@@ -39,7 +39,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.genevaatelier.ch',
             category: 'WATCH',
             description: 'Bespoke brilliance.',
-            bannerColor: '#12379F',
+            bannerColor: '#123AB8',
             emoji: '💎',
         },
         // Removed low-end shops to maintain exclusivity

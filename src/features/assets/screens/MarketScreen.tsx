@@ -111,8 +111,8 @@ const MarketScreen = () => {
   return (
     <AppLaunchLoader
       appName="Market"
-      appIcon={<MaterialCommunityIcons name="finance" size={64} color="#FFFFFF" />}
-      backgroundColor="#000000"
+      appIcon={<MaterialCommunityIcons name="finance" size={64} color="#EDE8E4" />}
+      backgroundColor="#0F0E0D"
     >
       <AppScreen
         title={t('company.market')}
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   tabBarContent: { paddingVertical: theme.spacing.sm, paddingHorizontal: theme.spacing.sm, gap: theme.spacing.sm },
   tab: { paddingVertical: theme.spacing.xs, paddingHorizontal: theme.spacing.md, borderRadius: 999, backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   tabActive: { backgroundColor: 'rgba(212,175,55,0.15)', borderColor: '#E9B8C9' },
-  tabLabel: { color: '#B28C96', fontWeight: '700', fontSize: theme.typography.caption + 1 },
+  tabLabel: { color: '#8A807B', fontWeight: '700', fontSize: theme.typography.caption + 1 },
   tabLabelActive: { color: '#E9B8C9' },
   subTabsContainer: { marginTop: 0, height: 48 },
   subTab: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)' },
@@ -324,20 +324,20 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 2,
   },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#FFFFFF', marginBottom: theme.spacing.sm, marginTop: theme.spacing.lg, letterSpacing: 0.5 },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#EDE8E4', marginBottom: theme.spacing.sm, marginTop: theme.spacing.lg, letterSpacing: 0.5 },
   eventCard: { marginTop: theme.spacing.md, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: theme.spacing.md },
   eventIcon: { fontSize: 16 },
-  eventText: { fontSize: theme.typography.caption + 1, color: '#B28C96', lineHeight: 18 },
+  eventText: { fontSize: theme.typography.caption + 1, color: '#8A807B', lineHeight: 18 },
   secondaryButton: { backgroundColor: 'rgba(212,175,55,0.12)', paddingVertical: theme.spacing.md, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#E9B8C9' },
   secondaryButtonPressed: { backgroundColor: 'rgba(212,175,55,0.2)', transform: [{ scale: 0.98 }] },
   secondaryButtonText: { color: '#E9B8C9', fontWeight: '700', fontSize: theme.typography.body },
   backButton: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)' },
   backButtonPressed: { backgroundColor: 'rgba(255,255,255,0.1)', transform: [{ scale: 0.97 }] },
-  backIcon: { color: '#FFFFFF', fontSize: theme.typography.subtitle, fontWeight: '700' },
+  backIcon: { color: '#EDE8E4', fontSize: theme.typography.subtitle, fontWeight: '700' },
   portfolioCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: theme.spacing.md, marginBottom: theme.spacing.md },
   portfolioHeader: { gap: theme.spacing.xs },
-  portfolioLabel: { fontSize: theme.typography.caption, color: '#B28C96', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
-  portfolioValue: { fontSize: theme.typography.title, color: '#FFFFFF', fontWeight: '800' },
+  portfolioLabel: { fontSize: theme.typography.caption, color: '#8A807B', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
+  portfolioValue: { fontSize: theme.typography.title, color: '#EDE8E4', fontWeight: '800' },
   portfolioActions: { flexDirection: 'row', gap: theme.spacing.sm },
   seeInvestmentsButton: { flex: 1, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1.5, borderColor: '#E9B8C9', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
   seeInvestmentsButtonPressed: { backgroundColor: 'rgba(212,175,55,0.22)', transform: [{ scale: 0.98 }] },

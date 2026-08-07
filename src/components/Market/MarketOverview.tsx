@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -79,11 +79,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },

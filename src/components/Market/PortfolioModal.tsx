@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: theme.typography.title,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 1,
   },
   totalValue: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   listContent: {
     padding: theme.spacing.lg,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
@@ -219,11 +219,11 @@ const styles = StyleSheet.create({
   },
   itemQuantity: {
     fontSize: theme.typography.caption,
-    color: '#B28C96',
+    color: '#8A807B',
   },
   itemCostInfo: {
     fontSize: theme.typography.caption,
-    color: '#B28C96',
+    color: '#8A807B',
     fontWeight: '500',
   },
   itemRight: {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   itemValue: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   itemPL: {
     fontSize: theme.typography.caption,
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: theme.typography.subtitle,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   emptySubtext: {
     fontSize: theme.typography.caption,
-    color: '#B28C96',
+    color: '#8A807B',
   },
 });
 

@@ -164,7 +164,7 @@ const GymHubView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000', // Changed to full black
+        backgroundColor: '#0F0E0D', // Changed to full black
     },
     safeArea: {
         flex: 1,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     glassCard: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#000000', // Dark premium background
+        backgroundColor: '#0F0E0D', // Dark premium background
         padding: 24,
         paddingBottom: 100, // Safe space for CrystalNavBar
         alignItems: 'center',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#FFFFFF', // Changed from dark text to light
+        color: '#EDE8E4', // Changed from dark text to light
         letterSpacing: 1
     },
     badge: {
@@ -210,14 +210,14 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
     },
-    badgeStandard: { borderColor: '#E9B8C9', backgroundColor: '#000000' },
-    badgeTitanium: { borderColor: '#E3A857', backgroundColor: '#000000' },
+    badgeStandard: { borderColor: '#E9B8C9', backgroundColor: '#0F0E0D' },
+    badgeTitanium: { borderColor: '#E3A857', backgroundColor: '#0F0E0D' },
     badgeText: { fontSize: 10, fontWeight: '700' },
     textStandard: { color: '#E9B8C9' },
     textTitanium: { color: '#E3A857' },
     statsCard: {
         width: '100%',
-        backgroundColor: '#000000', // Darker premium tint
+        backgroundColor: '#0F0E0D', // Darker premium tint
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     },
     divider: { height: 1, backgroundColor: '#E9B8C9', marginVertical: 12 },
     statLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9', letterSpacing: 0.5 },
-    statValue: { fontSize: 16, fontWeight: '900', color: '#FFFFFF' },
+    statValue: { fontSize: 16, fontWeight: '900', color: '#EDE8E4' },
     fatigueContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     fatigueBar: {
         width: 100,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#000000', // Dark mode card
+        backgroundColor: '#0F0E0D', // Dark mode card
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     menuIcon: { fontSize: 28 },
-    menuLabel: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
+    menuLabel: { fontSize: 16, fontWeight: '700', color: '#EDE8E4' },
     menuSubLabel: { fontSize: 12, color: '#E9B8C9', marginTop: 2 },
     maButtonActive: {
         backgroundColor: '#E3A857',
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     maButtonInactive: {
         borderColor: '#E3A857',
         borderWidth: 1.5,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
 });
 

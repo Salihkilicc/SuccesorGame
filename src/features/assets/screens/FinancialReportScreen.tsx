@@ -244,7 +244,7 @@ const FinancialReportScreen = () => {
                     note={t('company.perProductDemandSalesAnd')}
                     info={t('company.productsInTheSameCategory')}
                     summary={`${report.products.length}`}
-                    summaryColor="#B28C96"
+                    summaryColor="#8A807B"
                 >
 
                     <View style={styles.tableHeader}>
@@ -296,14 +296,14 @@ const FinancialReportScreen = () => {
                     note={t('company.whereYouStandAtThe')}
                     info={t('company.companyCapitalFundsTheBusiness2')}
                     summary={formatMoney(report.endingCapital)}
-                    summaryColor="#FFFFFF"
+                    summaryColor="#EDE8E4"
                     defaultOpen
                 >
                     <Row label={t('company.companyCapital')} amount={report.endingCapital} />
                     <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
                         <Text style={styles.label}>{t('company.researchPoints')}</Text>
-                        <Text style={[styles.value, { color: '#12379F' }]}>
+                        <Text style={[styles.value, { color: '#123AB8' }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>
                     </View>
@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
     labelStrong: { color: theme.colors.textPrimary, fontWeight: '700' },
     value: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
     valueBig: { fontSize: 19, fontWeight: '800' },
-    explain: { color: '#614A4B', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
-    footnote: { color: '#614A4B', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
+    explain: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
+    footnote: { color: '#3B3632', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
 
     opsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     opsCell: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     tableRow: { flexDirection: 'row', paddingVertical: 9, alignItems: 'center' },
     cellText: { color: theme.colors.textPrimary, fontSize: 12.5, flex: 1 },
     productEcon: {
-        color: '#614A4B',
+        color: '#3B3632',
         fontSize: 10,
         paddingBottom: 8,
         borderBottomWidth: 1,

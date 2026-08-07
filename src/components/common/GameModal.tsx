@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxHeight: '90%',
-        backgroundColor: '#000000', // Default dark theme background
+        backgroundColor: '#0F0E0D', // Default dark theme background
         borderRadius: theme.radius.lg,
         padding: theme.spacing.lg,
         borderWidth: 1,
@@ -76,14 +76,14 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
         letterSpacing: 1,
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         fontStyle: 'italic',
     },

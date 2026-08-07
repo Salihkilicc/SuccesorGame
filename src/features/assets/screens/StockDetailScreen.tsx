@@ -55,7 +55,7 @@ const StockDetailScreen = () => {
                     onPress={() => navigation.goBack()}
                     style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
                 >
-                    <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
+                    <MaterialCommunityIcons name="chevron-left" size={28} color="#EDE8E4" />
                 </Pressable>
             }
         >
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     symbolText: {
         fontSize: 20,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 0.5,
     },
     categoryText: {
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     priceText: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     changeText: {
         fontSize: 14,

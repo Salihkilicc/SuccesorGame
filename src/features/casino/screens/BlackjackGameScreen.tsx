@@ -30,7 +30,7 @@ const BlackjackGameScreen = () => {
   const renderCard = (card: Card, idx: number) => (
     <View key={`${card.rank}${card.suit}-${idx}`} style={styles.card}>
       <Text style={styles.cardRank}>{card.rank}</Text>
-      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E06B6B' : '#FFFFFF' }]}>
+      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E06B6B' : '#EDE8E4' }]}>
         {card.suit}
       </Text>
     </View>
@@ -157,7 +157,7 @@ const BlackjackGameScreen = () => {
 export default BlackjackGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
+  container: { flex: 1, backgroundColor: '#0F0E0D' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -166,20 +166,20 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 10, fontWeight: '600' },
 
   handCard: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#0F0E0D',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     gap: 12,
     minHeight: 140
   },
-  handLabel: { color: '#B28C96', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
+  handLabel: { color: '#8A807B', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
   cardRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   card: {
     width: 64,
     height: 90,
     borderRadius: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EDE8E4',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   hiddenCard: { backgroundColor: '#E06B6B', borderWidth: 2, borderColor: '#FFF' },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#000000' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#0F0E0D' },
   cardSuit: { fontSize: 20 },
 
   tableCenter: { alignItems: 'center', paddingVertical: 10 },
@@ -200,16 +200,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#31241F',
+    backgroundColor: '#0F0E0D',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#523F3E',
+    borderColor: '#2A2624',
     minHeight: 80
   },
   betDisplay: { gap: 2 },
-  betLabel: { color: '#B28C96', fontSize: 10, fontWeight: '700' },
-  betValueText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
+  betLabel: { color: '#8A807B', fontSize: 10, fontWeight: '700' },
+  betValueText: { color: '#EDE8E4', fontSize: 20, fontWeight: '800' },
 
   actionButtons: { flexDirection: 'row', gap: 12 },
   primaryButton: {

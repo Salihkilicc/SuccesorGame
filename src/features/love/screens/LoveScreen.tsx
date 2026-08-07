@@ -531,7 +531,7 @@ const LoveScreen = () => {
     const getSatisfactionColor = (v: number) => {
       if (v <= 30) return '#E06B6B';
       if (v <= 60) return '#E3A857';
-      return '#12379F';
+      return '#123AB8';
     };
 
     return (
@@ -540,9 +540,9 @@ const LoveScreen = () => {
           { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#E3A857' },
           { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#5992C6' },
           { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#E06B6B' },
-          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#12379F' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#123AB8' },
           { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#5FB37A' },
-          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#12379F' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#123AB8' },
           { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#E06B6B' },
         ].map((btn) => (
           <Pressable
@@ -694,8 +694,8 @@ const LoveScreen = () => {
       <View style={styles.actionList}>
         {[
           { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#5992C6' },
-          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#12379F' },
-          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#12379F' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#123AB8' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#123AB8' },
           { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#E3A857' },
         ].map(btn => (
           <Pressable
@@ -726,10 +726,10 @@ const LoveScreen = () => {
   const totalFamilyCount = family.length + npcFamily.length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#000000', '#000000', '#000000']}
+        colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
@@ -992,7 +992,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   gridTileLabel: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontWeight: '700',
     fontSize: 13,
     textAlign: 'center',
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   actionRowLabel: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: 14,
     fontWeight: '700',
   },

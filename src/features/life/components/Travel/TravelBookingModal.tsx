@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add space for bottom bar
     },
     container: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         overflow: 'hidden',
         maxHeight: '85%',
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         marginBottom: -10,
     },
     content: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     classOption: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderTopColor: '#222',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     closeText: {
         color: '#666',

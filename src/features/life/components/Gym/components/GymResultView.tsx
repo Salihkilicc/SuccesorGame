@@ -48,13 +48,13 @@ const styles = StyleSheet.create({
     resultMessage: { color: '#E9B8C9', textAlign: 'center', marginTop: 10, fontSize: 16 },
     enjoymentBar: { marginTop: 30, alignItems: 'center' },
     enjoymentLabel: { color: '#E9B8C9', fontSize: 12, marginBottom: 8 },
-    barBg: { width: '80%', height: 10, backgroundColor: '#000000', borderRadius: 5, overflow: 'hidden' },
+    barBg: { width: '80%', height: 10, backgroundColor: '#0F0E0D', borderRadius: 5, overflow: 'hidden' },
     barFill: { height: '100%', backgroundColor: '#E3A857' },
-    enjoymentValue: { color: '#FFFFFF', marginTop: 5 },
-    promotionBadge: { marginTop: 20, backgroundColor: '#000000', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#E3A857' },
+    enjoymentValue: { color: '#EDE8E4', marginTop: 5 },
+    promotionBadge: { marginTop: 20, backgroundColor: '#0F0E0D', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#E3A857' },
     promotionText: { color: '#E3A857', fontWeight: '800', textAlign: 'center' },
     doneBtn: { backgroundColor: '#E3A857', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
-    doneText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
+    doneText: { color: '#EDE8E4', fontWeight: '800', fontSize: 16 },
 });
 
 export default GymResultView;

@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     closeButtonText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 24,
         fontWeight: 'bold',
     },
@@ -319,19 +319,19 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 1,
         marginBottom: 4,
         textAlign: 'center',
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontStyle: 'italic',
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         borderWidth: 2,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     heroLabel: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
         textAlign: 'center',
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     },
     ratingDescription: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
     },
     capacityContainer: {
@@ -376,13 +376,13 @@ const styles = StyleSheet.create({
     },
     capacityLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     progressBar: {
         height: 8,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -402,16 +402,16 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     statLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 8,
@@ -423,18 +423,18 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     emptyStateIcon: {
         fontSize: 32,
@@ -448,17 +448,17 @@ const styles = StyleSheet.create({
     },
     emptyStateSubtext: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     loansList: {
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     loanHeader: {
         flexDirection: 'row',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     },
     loanDetailLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 4,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     repayButton: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 16,
         padding: 18,
         alignItems: 'center',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     },
     // Shark Deal Styles
     sharkDealCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     sharkDealTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     sharkDealSubtitle: {
@@ -620,11 +620,11 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         gap: 12,
     },
 
@@ -639,11 +639,11 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     cardDesc: {
         fontSize: 10,
-        color: '#B28C96',
+        color: '#8A807B',
     },
 });

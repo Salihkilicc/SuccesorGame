@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
     },
     container: {
         width: '100%',
-        backgroundColor: '#31241F', // Dark Gray
+        backgroundColor: '#0F0E0D', // Dark Gray
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#3C2D29',
+        borderBottomColor: '#181614',
         paddingBottom: 16,
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#B28C96',
+        color: '#8A807B',
         letterSpacing: 2,
         marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     valuationContainer: {
         alignItems: 'center',
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 4,
@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
     valuationValue: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     priceSection: {
         marginBottom: 24,
     },
     sectionTitle: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         marginBottom: 8,
         textAlign: 'center',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     askingPrice: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
         marginHorizontal: 16,
         letterSpacing: -1,
@@ -237,30 +237,30 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
         minWidth: 70,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#523F3E',
+        borderColor: '#2A2624',
     },
     incrementBtn: {
-        backgroundColor: '#3C2D29', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        backgroundColor: '#181614', // Keep uniform dark, maybe blue tint? Sticking to dark.
         borderColor: '#5FB37A', // Green border for positive
     },
     controlBtnText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     btnPressed: {
         opacity: 0.7,
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 2,
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         alignItems: 'center',
     },
     cancelBtnText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '700',
         fontSize: 14,
     },
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
         flex: 2,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         alignItems: 'center',
     },
     submitBtnText: {
-        color: '#000000',
+        color: '#0F0E0D',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,

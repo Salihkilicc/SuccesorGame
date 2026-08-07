@@ -205,12 +205,12 @@ export default HookupGameModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 24,
         paddingTop: 48,
         borderTopWidth: 2,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     partnerName: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     partnerJob: {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     clueBox: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     },
     clueText: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         lineHeight: 24,
         fontStyle: 'italic',
     },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     choiceButton: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -290,28 +290,28 @@ const styles = StyleSheet.create({
         borderColor: '#5992C6',
     },
     choiceButtonPressed: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         transform: [{ scale: 0.98 }],
     },
     choiceButtonCorrect: {
         borderColor: '#5992C6',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     choiceButtonWrong: {
         borderColor: '#E3A857',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     choiceContent: {
         gap: 8,
     },
     choiceText: {
         fontSize: 15,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         lineHeight: 22,
     },
     choiceTag: {
         alignSelf: 'flex-start',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,

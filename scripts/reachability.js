@@ -171,10 +171,10 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
 //  not any single choice, is what made the app feel scattered from screen to
 //  screen. They are consolidated to fifteen; this keeps them there.
 const PALETTE = new Set([
-    '#31241F', '#3C2D29', '#473633', '#523F3E', '#614A4B',   // surfaces
-    '#0A2A92', '#12379F', '#5992C6', '#E9B8C9', '#B28C96',   // brand + text
+    '#0F0E0D', '#181614', '#201D1C', '#2A2624', '#3B3632',   // neutral ground, 5 steps
+    '#EDE8E4', '#B9AFA9', '#8A807B',                          // text, never pure white
+    '#0A2A92', '#123AB8', '#5992C6', '#E9B8C9', '#31241F',   // the four, as accents
     '#5FB37A', '#E06B6B', '#E3A857',                          // meaning
-    '#FFFFFF', '#000000',
 ]);
 for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith('theme.ts'))) {
     const seen = new Map();

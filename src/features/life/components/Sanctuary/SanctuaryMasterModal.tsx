@@ -118,7 +118,7 @@ const SanctuaryMasterModal = ({
             {isHubVisible && (
                 <AppLaunchLoader
                     appName="Sanctuary"
-                    appIcon={<MaterialCommunityIcons name="spa" size={64} color="#FFFFFF" />}
+                    appIcon={<MaterialCommunityIcons name="spa" size={64} color="#EDE8E4" />}
                     backgroundColor="#5FB37A"
                 >
                     {/* LAYER 1: Hub (Always Rendered) */}

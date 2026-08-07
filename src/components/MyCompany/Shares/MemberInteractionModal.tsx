@@ -504,12 +504,12 @@ export default MemberInteractionModal;
 const styles = StyleSheet.create({
     heroSection: {
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 24,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     heroAvatar: {
         width: 80,
@@ -528,12 +528,12 @@ const styles = StyleSheet.create({
     heroName: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     heroRole: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 12,
     },
     trustBadge: {
@@ -548,9 +548,9 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#31241F', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
-    characterLine: { color: '#B28C96', fontSize: 11, marginBottom: 3 },
-    characterValue: { color: '#FFFFFF', fontWeight: '700' },
+    characterCard: { backgroundColor: '#0F0E0D', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterLine: { color: '#8A807B', fontSize: 11, marginBottom: 3 },
+    characterValue: { color: '#EDE8E4', fontWeight: '700' },
     characterHint: { color: '#5992C6', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
@@ -561,14 +561,14 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 10,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 4,
         textTransform: 'uppercase',
     },
     statValue: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     tabContainer: {
         flexDirection: 'row',
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         alignItems: 'center',
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 8,
     },
     tabActive: {
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#B28C96',
+        color: '#8A807B',
         letterSpacing: 1,
     },
     tabTextActive: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#B28C96',
+        color: '#8A807B',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
     },
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '48%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     actionButtonDisabled: {
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         opacity: 0.5,
     },
     actionIcon: {
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     actionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     actionCost: {
         fontSize: 12,
@@ -645,14 +645,14 @@ const styles = StyleSheet.create({
         color: '#5FB37A',
     },
     stepperContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         gap: 12,
     },
     stepperLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
@@ -676,25 +676,25 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.95 }],
     },
     stepperButtonDisabled: {
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         opacity: 0.3,
     },
     stepperButtonText: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     stepperDisplay: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         paddingVertical: 12,
     },
     stepperPrice: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     stepperPremium: {
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     },
     reactionLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     reactionStatus: {
         fontSize: 14,
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     },
     reactionBarBg: {
         height: 12,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -740,8 +740,8 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     makeOfferButtonDisabled: {
-        backgroundColor: '#3C2D29',
-        borderColor: '#3C2D29',
+        backgroundColor: '#181614',
+        borderColor: '#181614',
         opacity: 0.5,
     },
     makeOfferButtonText: {
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     infoBox: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 8,
         padding: 12,
         borderLeftWidth: 4,
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     },
     infoText: {
         fontSize: 12,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         lineHeight: 18,
     },
 });

@@ -152,7 +152,7 @@ const GymLockerRoomView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#000',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 0.5,
     },
     subtitle: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     statsCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     },
     divider: { height: 1, backgroundColor: '#E9B8C9', marginVertical: 8 },
     statLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9', letterSpacing: 0.5 },
-    statValue: { fontSize: 14, fontWeight: '900', color: '#FFFFFF' },
+    statValue: { fontSize: 14, fontWeight: '900', color: '#EDE8E4' },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     supplementCard: {
         width: '47%',
         marginBottom: 12,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     supplementCardUsed: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E9B8C9',
         opacity: 0.6,
     },
     supplementCardDanger: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E3A857',
     },
     supplementIcon: { fontSize: 36, marginBottom: 8 },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     supplementLabel: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
         textAlign: 'center',
     },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     usedBadgeText: {
         fontSize: 9,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     priceText: {
         fontSize: 12,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     infoFooter: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,

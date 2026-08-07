@@ -197,7 +197,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.infoLabel}>{t('dividend.remainingCapital')}</Text>
                                 <Text style={[
                                     styles.infoValue,
-                                    { color: isRisky ? '#E06B6B' : '#FFFFFF' }
+                                    { color: isRisky ? '#E06B6B' : '#EDE8E4' }
                                 ]}>
                                     {formatMoney(remainingCapital)}
                                 </Text>
@@ -263,7 +263,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    cashHint: { color: '#B28C96', fontSize: 11, marginTop: 4 },
+    cashHint: { color: '#8A807B', fontSize: 11, marginTop: 4 },
     flagBox: {
         backgroundColor: 'rgba(255,69,58,0.10)', borderRadius: 12,
         borderWidth: 1, borderColor: 'rgba(255,69,58,0.30)',
@@ -275,8 +275,8 @@ const styles = StyleSheet.create({
         paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
         marginTop: 8,
     },
-    yieldLabel: { color: '#B28C96', fontSize: 11.5 },
-    yieldValue: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '700' },
+    yieldLabel: { color: '#8A807B', fontSize: 11.5 },
+    yieldValue: { color: '#EDE8E4', fontSize: 12.5, fontWeight: '700' },
 
     overlay: {
         flex: 1,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -303,18 +303,18 @@ const styles = StyleSheet.create({
     titleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
     closeBtn: {
         width: 32, height: 32, borderRadius: 16,
-        backgroundColor: '#3C2D29', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#181614', alignItems: 'center', justifyContent: 'center',
     },
-    closeText: { color: '#B28C96', fontSize: 16, fontWeight: '700' },
+    closeText: { color: '#8A807B', fontSize: 16, fontWeight: '700' },
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 16,
     },
     cashCard: {
@@ -342,14 +342,14 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '600',
         marginBottom: 12,
     },
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -358,14 +358,14 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         alignItems: 'center',
         justifyContent: 'center',
     },
     stepperText: {
         fontSize: 28,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     stepperTextDisabled: {
         color: '#666',
@@ -377,12 +377,12 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     labelSmall: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -393,20 +393,20 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#473633',
+        borderColor: '#201D1C',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#B28C96',
+        color: '#8A807B',
     },
     infoSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -419,17 +419,17 @@ const styles = StyleSheet.create({
     },
     infoLabel: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     infoValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 0,
     },
     divider: {
         height: 1,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         marginVertical: 8,
     },
     profitHighlight: {
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     },
     profitNote: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 12,
     },
     profitBadge: {
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     profitBadgeText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#000000',
+        color: '#0F0E0D',
     },
     warningBox: {
         backgroundColor: '#E06B6B20',
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     distributeButton: {
         flex: 1,
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     distributeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#000000',
+        color: '#0F0E0D',
     },
 });
 

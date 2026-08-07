@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 0.5,
   },
   ownedText: {
@@ -161,18 +161,18 @@ const styles = StyleSheet.create({
   qtyButtonText: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   qtyValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     minWidth: 32,
     textAlign: 'center',
   },
   helper: {
     fontSize: theme.typography.caption + 1,
-    color: '#B28C96',
+    color: '#8A807B',
   },
   actions: {
     flexDirection: 'row',
@@ -199,11 +199,11 @@ const styles = StyleSheet.create({
   sellText: {
     fontSize: theme.typography.body,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   buyText: {
     fontSize: theme.typography.body,
     fontWeight: '800',
-    color: '#000000',
+    color: '#0F0E0D',
   },
 });

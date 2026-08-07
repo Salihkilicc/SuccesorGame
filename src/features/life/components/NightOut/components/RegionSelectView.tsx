@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
         marginBottom: 8,
         letterSpacing: 0.5,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '45%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     },
     cardSelected: {
         borderColor: '#5992C6',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     cardLocal: {
         borderColor: '#5992C6', // Blue for USA Local
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     regionName: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center',
         marginBottom: 4,
     },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     localBadgeText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 1,
     },
 });

@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E9B8C9',
     },
     rarityRare: {
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
     },
     rarityCommon: {
         backgroundColor: '#5992C6',

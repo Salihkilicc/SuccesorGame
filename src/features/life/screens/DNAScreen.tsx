@@ -136,34 +136,34 @@ const DNAScreen = () => {
     const getBeltBgColor = (belt: string) => {
         const lowerBelt = belt?.toLowerCase() || 'white';
         const colors: Record<string, string> = {
-            white: '#FFFFFF',
+            white: '#EDE8E4',
             yellow: '#E3A857',
             orange: '#E3A857',
             green: '#5FB37A',
             blue: '#5992C6',
-            purple: '#12379F',
-            brown: '#614A4B',
-            black: '#000000'
+            purple: '#123AB8',
+            brown: '#3B3632',
+            black: '#0F0E0D'
         };
         return colors[lowerBelt] || '#333';
     };
 
     const getHeatColor = (val: number) => {
         if (val > 80) return '#E06B6B';
-        if (val < 30) return '#12379F';
+        if (val < 30) return '#123AB8';
         return '#E3A857';
     };
 
     return (
         <AppLaunchLoader
             appName="DNA"
-            appIcon={<MaterialCommunityIcons name="dna" size={64} color="#FFFFFF" />}
-            backgroundColor="#000000"
+            appIcon={<MaterialCommunityIcons name="dna" size={64} color="#EDE8E4" />}
+            backgroundColor="#0F0E0D"
         >
             <View style={styles.container}>
                 {/* Premium background gradient */}
                 <LinearGradient
-                    colors={['#000000', '#000000', '#000000']}
+                    colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={StyleSheet.absoluteFill}
@@ -221,13 +221,13 @@ const DNAScreen = () => {
                             <ProgressBar label={t('life.casinoVip')} value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E06B6B" icon="🎰" buff={getBuffString(repBuffs.casino)} />
                             <ProgressBar label={t('life.streetCred')} value={getEffective(reputation?.street, repBuffs.street)} color="#E06B6B" icon="🗡️" buff={getBuffString(repBuffs.street)} />
                             <ProgressBar label={t('life.businessTrust')} value={getEffective(reputation?.business, repBuffs.business)} color="#5992C6" icon="💼" buff={getBuffString(repBuffs.business)} />
-                            <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#12379F" icon="🥂" buff={getBuffString(repBuffs.social)} />
+                            <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#123AB8" icon="🥂" buff={getBuffString(repBuffs.social)} />
                         </View>
 
                         {/* 🧬 GENETICS */}
                         <View style={styles.card}>
                             <SectionHeader title={t('life.coreGenetics')} icon="🧬" />
-                            <ProgressBar label={t('life.intellect')} value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#12379F" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
+                            <ProgressBar label={t('life.intellect')} value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#123AB8" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
                             <ProgressBar label={t('life.charm')} value={getEffective(attributes?.charm, attrBuffs.charm)} color="#E06B6B" icon="👄" buff={getBuffString(attrBuffs.charm)} />
                             <ProgressBar label={t('life.looks')} value={getEffective(attributes?.looks, attrBuffs.looks)} color="#E3A857" icon="✨" buff={getBuffString(attrBuffs.looks)} />
                             <ProgressBar label={t('life.strength')} value={getEffective(attributes?.strength, attrBuffs.strength)} color="#E06B6B" icon="💪" buff={getBuffString(attrBuffs.strength)} />
@@ -254,7 +254,7 @@ const DNAScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     safeArea: {
         flex: 1,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#614A4B',
+        color: '#3B3632',
         textTransform: 'uppercase',
         letterSpacing: 3,
     },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     statLabel: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 13,
         fontWeight: '500',
     },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     statValue: {
         width: 52,
         textAlign: 'right',
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 11,
         fontWeight: '600',
         fontVariant: ['tabular-nums'],
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     skillName: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 4,
         letterSpacing: 0.5,
     },
     skillDetail: {
-        color: '#614A4B',
+        color: '#3B3632',
         fontSize: 12,
         marginBottom: 2,
     },

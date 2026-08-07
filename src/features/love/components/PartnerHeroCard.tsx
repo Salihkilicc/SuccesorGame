@@ -25,11 +25,11 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                 >
                     <View style={[styles.partnerInfo, { paddingLeft: 16 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
+                            <Text style={[styles.partnerName, { color: '#EDE8E4', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
                                 {partner.name}
                             </Text>
                             <View style={[styles.partnerBadge, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.4)', flexShrink: 0 }]}>
-                                <Text style={[styles.partnerBadgeText, { color: '#FFFFFF', fontSize: 9 }]}>{getPartnerBadge(partner, partner.love)}</Text>
+                                <Text style={[styles.partnerBadgeText, { color: '#EDE8E4', fontSize: 9 }]}>{getPartnerBadge(partner, partner.love)}</Text>
                             </View>
                         </View>
 
@@ -106,7 +106,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
     return (
         <View style={styles.partnerCardWrapper}>
             <LinearGradient
-                colors={['#000000', '#31241F', '#523F3E']}
+                colors={['#0F0E0D', '#0F0E0D', '#2A2624']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}

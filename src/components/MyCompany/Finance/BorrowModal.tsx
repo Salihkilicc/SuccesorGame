@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         maxWidth: 420,
         // Ekranin en fazla %78'ini kaplasin; gerisi kaydirilir.
         maxHeight: '78%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -383,11 +383,11 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    closeText: { color: '#B28C96', fontSize: 16, fontWeight: '700' },
+    closeText: { color: '#8A807B', fontSize: 16, fontWeight: '700' },
     title: {
         flex: 1,
         fontSize: 22,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 13,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     },
     typeButton: {
         flex: 1,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     },
     typeButtonActive: {
         borderColor: '#E9B8C9',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
     },
     typeEmoji: {
         fontSize: 24,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     },
     typeLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         marginBottom: 2,
     },
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     previewContainer: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     },
     previewLabel: {
         fontSize: 13,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
     },
     previewValue: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     tierNote: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 16,
         lineHeight: 15,
     },
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
     },
     cancelText: {
         color: '#AAA',

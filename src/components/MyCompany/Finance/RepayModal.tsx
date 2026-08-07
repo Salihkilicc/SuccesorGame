@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 420,
         maxHeight: '80%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         marginBottom: 80, // Space for Bottom Bar
     },
     title: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loanCard: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     },
     loanRemainingLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 2,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     },
     loanDetailLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 4,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     },
     repayButtonLabel: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         marginBottom: 4,
     },
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     closeButton: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',

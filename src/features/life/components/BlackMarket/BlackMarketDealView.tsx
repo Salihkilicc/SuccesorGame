@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
@@ -165,16 +165,16 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 2,
-        borderColor: '#473633'
+        borderColor: '#201D1C'
     },
     drugIconContainer: {
         borderColor: '#E06B6B',
-        backgroundColor: '#31241F'
+        backgroundColor: '#0F0E0D'
     },
     icon: {
         fontSize: 48
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     },
     itemDesc: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         marginBottom: 20,
         fontStyle: 'italic'
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     statLabel: {
-        color: '#614A4B',
+        color: '#3B3632',
         fontSize: 14
     },
     statValue: {
@@ -236,12 +236,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     passButton: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderWidth: 1,
-        borderColor: '#473633'
+        borderColor: '#201D1C'
     },
     passButtonText: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: 'bold'
     },
     buyButton: {
@@ -255,8 +255,8 @@ const styles = StyleSheet.create({
         borderColor: '#E06B6B'
     },
     disabledButton: {
-        backgroundColor: '#473633',
-        borderColor: '#614A4B',
+        backgroundColor: '#201D1C',
+        borderColor: '#3B3632',
         opacity: 0.5
     },
     actionButtonText: {
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     priceSubtext: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
         marginTop: 2
     },

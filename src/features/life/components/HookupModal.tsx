@@ -134,8 +134,8 @@ export function HookupModal({
             {visible && (
                 <AppLaunchLoader
                     appName="Hookup"
-                    appIcon={<MaterialCommunityIcons name="fire" size={64} color="#FFFFFF" />}
-                    backgroundColor="#000000"
+                    appIcon={<MaterialCommunityIcons name="fire" size={64} color="#EDE8E4" />}
+                    backgroundColor="#0F0E0D"
                 >
                     <View style={styles.backdrop}>
 
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#000000', // Slightly lighter than pure black/card
+        backgroundColor: '#0F0E0D', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(76, 111, 255, 0.3)',
     },
     chipText: {
-        color: '#12379F',
+        color: '#123AB8',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

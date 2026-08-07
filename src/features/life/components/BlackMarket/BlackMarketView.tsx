@@ -24,14 +24,14 @@ interface BlackMarketViewProps {
 // --- CONSTANTS ---
 
 const COLORS = {
-    background: '#000000',
+    background: '#0F0E0D',
     bloodRed: '#E06B6B',
     neonRed: '#E06B6B',
-    darkGray: '#000000',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#B28C96',
+    darkGray: '#0F0E0D',
+    textPrimary: '#EDE8E4',
+    textSecondary: '#8A807B',
     gold: '#E3A857',
-    locked: '#3C2D29'
+    locked: '#181614'
 };
 
 // --- COMPONENT ---
@@ -172,7 +172,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#614A4B',
+            1: '#3B3632',
             2: '#E06B6B',
             3: '#E06B6B',
             4: '#E06B6B'
@@ -365,11 +365,11 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#523F3E'
+        borderColor: '#2A2624'
     },
     suspicionBar: {
         height: '100%',
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginBottom: 15,
         borderWidth: 2,
-        borderColor: '#523F3E',
+        borderColor: '#2A2624',
         overflow: 'hidden'
     },
     drugCard: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 2
     },
     lockedCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

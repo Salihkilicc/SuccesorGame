@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     },
     headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    title: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
+    title: { fontSize: 16, fontWeight: '800', color: '#EDE8E4' },
     regionBadge: {
         paddingHorizontal: 8,
         paddingVertical: 3,
@@ -207,19 +207,19 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,215,0,0.12)',
     },
     regionText: { color: '#E9B8C9', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
-    description: { color: '#B28C96', fontSize: 11, lineHeight: 16, marginTop: 6 },
+    description: { color: '#8A807B', fontSize: 11, lineHeight: 16, marginTop: 6 },
 
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },
     summaryCell: { flex: 1, alignItems: 'center' },
     brandRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-    brandChip: { backgroundColor: '#31241F', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
-    brandChipCat: { color: '#B28C96', fontSize: 9 },
+    brandChip: { backgroundColor: '#0F0E0D', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
+    brandChipCat: { color: '#8A807B', fontSize: 9 },
     brandChipVal: { fontSize: 13, fontWeight: '800' },
-    summaryLabel: { color: '#614A4B', fontSize: 9.5, letterSpacing: 0.5 },
-    summaryValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 3 },
-    summaryUnit: { color: '#614A4B', fontSize: 9, marginTop: 1 },
+    summaryLabel: { color: '#3B3632', fontSize: 9.5, letterSpacing: 0.5 },
+    summaryValue: { color: '#EDE8E4', fontSize: 17, fontWeight: '800', marginTop: 3 },
+    summaryUnit: { color: '#3B3632', fontSize: 9, marginTop: 1 },
 
-    soldLine: { color: '#B28C96', fontSize: 10.5, fontStyle: 'italic', marginBottom: 10 },
+    soldLine: { color: '#8A807B', fontSize: 10.5, fontStyle: 'italic', marginBottom: 10 },
 
     rankingSection: { marginTop: 4, marginBottom: 4 },
     rankingBox: { gap: 7 },
@@ -230,9 +230,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
         marginHorizontal: -4,
     },
-    rankNum: { color: '#614A4B', fontSize: 10, width: 18, fontWeight: '700' },
-    rankName: { color: '#FFFFFF', fontSize: 11.5, flex: 1 },
-    rankSymbol: { color: '#614A4B', fontSize: 9.5 },
+    rankNum: { color: '#3B3632', fontSize: 10, width: 18, fontWeight: '700' },
+    rankName: { color: '#EDE8E4', fontSize: 11.5, flex: 1 },
+    rankSymbol: { color: '#3B3632', fontSize: 9.5 },
     rankTextPlayer: { color: '#5FB37A', fontWeight: '800' },
     rankBarTrack: {
         width: 70,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     rankBarFill: { height: '100%', borderRadius: 2 },
-    rankShare: { color: '#B28C96', fontSize: 11, width: 52, textAlign: 'right', fontWeight: '600' },
+    rankShare: { color: '#8A807B', fontSize: 11, width: 52, textAlign: 'right', fontWeight: '600' },
 
-    footnote: { color: '#614A4B', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
+    footnote: { color: '#3B3632', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
 });

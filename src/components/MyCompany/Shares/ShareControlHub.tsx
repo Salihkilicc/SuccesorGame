@@ -256,7 +256,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 onPress={onOpenIPO}
                                 activeOpacity={0.7}
                             >
-                                <View style={[styles.actionIconBox, { backgroundColor: '#12379F20' }]}>
+                                <View style={[styles.actionIconBox, { backgroundColor: '#123AB820' }]}>
                                     <Text style={styles.actionIcon}>🔔</Text>
                                 </View>
                                 <View style={styles.actionContent}>
@@ -290,7 +290,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#12379F20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#123AB820' }]}>
                                 <Text style={styles.actionIcon}>📈</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -427,12 +427,12 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
 const styles = StyleSheet.create({
     controlBanner: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 12 },
-    controlPct: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-    controlLabel: { color: '#B28C96', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 3 },
-    controlShares: { color: '#B28C96', fontSize: 12, fontWeight: '700' },
-    controlNote: { color: '#B28C96', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    controlPct: { color: '#EDE8E4', fontSize: 24, fontWeight: '800' },
+    controlLabel: { color: '#8A807B', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 3 },
+    controlShares: { color: '#8A807B', fontSize: 12, fontWeight: '700' },
+    controlNote: { color: '#8A807B', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
-    heroNote: { color: '#614A4B', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    heroNote: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
         backgroundColor: 'rgba(127,179,255,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
@@ -444,17 +444,17 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
         padding: 14, marginBottom: 12,
     },
-    breakdownTitle: { color: '#B28C96', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
+    breakdownTitle: { color: '#8A807B', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
     breakRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
-    breakLabel: { color: '#B28C96', fontSize: 12 },
-    breakValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
+    breakLabel: { color: '#8A807B', fontSize: 12 },
+    breakValue: { color: '#EDE8E4', fontSize: 12, fontWeight: '600' },
     breakBold: { fontWeight: '800', fontSize: 13 },
     breakDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
-    breakdownNote: { color: '#614A4B', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
+    breakdownNote: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
 
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     header: {
         flexDirection: 'row',
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#31241F',
+        borderBottomColor: '#0F0E0D',
     },
     backButton: {
         paddingVertical: 8,
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#12379F',
+        color: '#123AB8',
         fontWeight: '600',
     },
     headerTitle: {
         fontSize: 17,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         position: 'absolute',
         left: 0,
         right: 0,
@@ -491,14 +491,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     heroCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 24,
         marginTop: 20,
     },
     heroLabel: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '500',
         marginBottom: 8,
     },
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     heroPrice: {
         fontSize: 48,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: -1,
     },
     changeBadge: {
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     statCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         width: '48%',
@@ -540,24 +540,24 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '500',
         marginBottom: 4,
     },
     statValue: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginTop: 32,
         marginBottom: 16,
     },
     actionRow: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -585,20 +585,20 @@ const styles = StyleSheet.create({
     actionTitle: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     actionDescription: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     actionArrow: {
         fontSize: 28,
-        color: '#473633',
+        color: '#201D1C',
         fontWeight: '300',
     },
     textDisabled: {
-        color: '#473633',
+        color: '#201D1C',
     },
 });
 

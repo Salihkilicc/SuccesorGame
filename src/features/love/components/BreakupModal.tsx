@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#000000', // Very dark red/black
+        backgroundColor: '#0F0E0D', // Very dark red/black
         borderRadius: 24,
         padding: 32,
         alignItems: 'center',

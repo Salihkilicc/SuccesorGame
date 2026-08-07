@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         height: 160,
         borderRadius: 16,
         overflow: 'hidden',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         marginBottom: 16,
         elevation: 4,
         shadowColor: '#000',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
     subtitle: {
-        color: '#FFFFFF', // Gray-200
+        color: '#EDE8E4', // Gray-200
         fontSize: 14,
         fontWeight: '500',
         marginTop: 4,
@@ -126,13 +126,13 @@ const styles = StyleSheet.create({
     },
     lockBadge: {
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 8,
     },
     lockText: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         fontSize: 10,
         letterSpacing: 1,

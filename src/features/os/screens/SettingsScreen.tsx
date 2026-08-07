@@ -65,12 +65,12 @@ const SettingsRow = ({
                 <Switch
                     value={value}
                     onValueChange={onToggle}
-                    trackColor={{ false: '#31241F', true: '#E9B8C9' }}
-                    thumbColor={value ? '#FFFFFF' : '#B28C96'}
-                    ios_backgroundColor="#31241F"
+                    trackColor={{ false: '#0F0E0D', true: '#E9B8C9' }}
+                    thumbColor={value ? '#EDE8E4' : '#8A807B'}
+                    ios_backgroundColor="#0F0E0D"
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#614A4B" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#3B3632" />
             )}
         </TouchableOpacity>
     );
@@ -135,7 +135,7 @@ const SettingsScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#000000', '#000000', '#000000']}
+                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -186,7 +186,7 @@ const SettingsScreen = () => {
                                     <MaterialCommunityIcons
                                         name="translate"
                                         size={22}
-                                        color={locale === l.code ? '#E9B8C9' : '#B28C96'}
+                                        color={locale === l.code ? '#E9B8C9' : '#8A807B'}
                                     />
                                     <Text
                                         style={[
@@ -300,13 +300,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 14,
         paddingVertical: 15, paddingHorizontal: 16,
     },
-    langLabel: { flex: 1, fontSize: 15, color: '#B28C96', fontWeight: '600' },
+    langLabel: { flex: 1, fontSize: 15, color: '#8A807B', fontWeight: '600' },
     langLabelActive: { color: '#FFF' },
     langCheck: { color: '#E9B8C9', fontSize: 16, fontWeight: '800' },
-    langNote: { fontSize: 11, color: '#B28C96', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
+    langNote: { fontSize: 11, color: '#8A807B', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     safeArea: {
         flex: 1,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
@@ -370,13 +370,13 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#B28C96',
+        color: '#8A807B',
         letterSpacing: 2,
         marginLeft: 16,
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     rowFirst: {
         borderTopLeftRadius: 16,
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     },
     rowLabel: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '500',
         letterSpacing: 0.3,
     },
@@ -431,14 +431,14 @@ const styles = StyleSheet.create({
     },
     footerVersion: {
         fontSize: 13,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         letterSpacing: 1,
         marginBottom: 4,
     },
     footerTagline: {
         fontSize: 11,
-        color: '#614A4B',
+        color: '#3B3632',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

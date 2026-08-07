@@ -103,7 +103,7 @@ const GymTrainerView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#000',
@@ -129,21 +129,21 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: { fontSize: 14, color: '#E9B8C9', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
-    title: { fontSize: 24, fontWeight: '900', color: '#FFFFFF' },
+    title: { fontSize: 24, fontWeight: '900', color: '#EDE8E4' },
     subtitle: { fontSize: 14, color: '#E9B8C9', marginTop: 4 },
     list: { gap: 16 },
 
     trainerCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -151,17 +151,17 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     activeCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E3A857',
     },
     icon: { fontSize: 32 },
     info: { flex: 1 },
-    name: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
+    name: { fontSize: 16, fontWeight: '800', color: '#EDE8E4' },
     role: { fontSize: 12, color: '#E9B8C9', fontWeight: '600' },
     boost: { fontSize: 12, color: '#E3A857', fontWeight: '700', marginTop: 2 },
 
     actions: { alignItems: 'flex-end', gap: 6 },
-    price: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
+    price: { fontSize: 14, fontWeight: '700', color: '#EDE8E4' },
     hireBtn: {
         paddingVertical: 6,
         paddingHorizontal: 16,
@@ -169,9 +169,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     hiredBtn: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
-    hireText: { fontSize: 12, fontWeight: '800', color: '#FFFFFF' },
+    hireText: { fontSize: 12, fontWeight: '800', color: '#EDE8E4' },
 });
 
 export default GymTrainerView;

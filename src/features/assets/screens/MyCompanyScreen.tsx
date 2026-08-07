@@ -170,10 +170,10 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#000000', '#000000', '#000000']}
+        colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  subtitle: { color: '#B28C96', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
+  subtitle: { color: '#8A807B', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {
     flexBasis: '48%',
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-  deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
-  deptSub: { fontSize: 12, color: '#B28C96', textAlign: 'center' },
+  deptTitle: { fontSize: 15, fontWeight: '800', color: '#EDE8E4', textAlign: 'center', letterSpacing: 0.3 },
+  deptSub: { fontSize: 12, color: '#8A807B', textAlign: 'center' },
   sharePrice: { fontSize: 18, fontWeight: '700', color: '#E9B8C9' }, // Gold for money
 });

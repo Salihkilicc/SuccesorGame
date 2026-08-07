@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     namingCard: {
         width: '100%',
         maxWidth: 360,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 24,
         padding: 28,
         alignItems: 'center',
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         fontSize: 52,
     },
     namingTitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 22,
         fontWeight: '900',
         letterSpacing: 0.5,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(250,204,21,0.35)',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 16,
         fontWeight: '600',
         textAlign: 'center',
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         opacity: 0.35,
     },
     namingConfirmText: {
-        color: '#000000',
+        color: '#0F0E0D',
         fontSize: 15,
         fontWeight: '800',
         letterSpacing: 0.5,

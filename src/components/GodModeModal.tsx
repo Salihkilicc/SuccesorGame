@@ -45,7 +45,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <MaterialCommunityIcons name="close" size={24} color="#B28C96" />
+                            <MaterialCommunityIcons name="close" size={24} color="#8A807B" />
                         </TouchableOpacity>
                     </View>
 
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '85%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: '#E9B8C9',

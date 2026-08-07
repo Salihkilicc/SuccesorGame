@@ -143,11 +143,11 @@ export const COLORS = [
     '#E9B8C9', // Lavender
     '#5992C6', // Powder Blue
     '#E9B8C9', // Peach
-    '#B28C96', // Mauve
-    '#614A4B', // Purple
+    '#8A807B', // Mauve
+    '#3B3632', // Purple
     '#5992C6', // Navy Blue
     '#E06B6B', // Pink
-    '#FFFFFF', // Light Green
+    '#EDE8E4', // Light Green
     '#E9B8C9', // Light Orange
 ];
 

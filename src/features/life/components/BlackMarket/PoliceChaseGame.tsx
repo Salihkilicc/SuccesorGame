@@ -413,11 +413,11 @@ const CONTROL_BUTTON_SIZE = 60;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         paddingHorizontal: 0,
         paddingBottom: 20,
         justifyContent: 'space-evenly',
@@ -441,19 +441,19 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         marginTop: 2,
         fontFamily: 'Courier New',
         textAlign: 'center',
     },
     statsContainer: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 5,
         width: '90%',
         marginBottom: 5,
         borderWidth: 1,
-        borderColor: '#523F3E'
+        borderColor: '#2A2624'
     },
     statRow: {
         flexDirection: 'row',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         width: 70,
         fontFamily: 'Courier New'
     },
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     staminaBarContainer: {
         flex: 1,
         height: 10,
-        backgroundColor: '#523F3E',
+        backgroundColor: '#2A2624',
         borderRadius: 5,
         overflow: 'hidden',
         marginHorizontal: 10
@@ -493,11 +493,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: GRID_CONTAINER_WIDTH,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 2,
         borderWidth: 2,
-        borderColor: '#523F3E',
+        borderColor: '#2A2624',
         justifyContent: 'center'
     },
     cell: {
@@ -505,14 +505,14 @@ const styles = StyleSheet.create({
         height: cellSize,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         margin: CELL_MARGIN,
         borderRadius: 8
     },
     playerCell: {
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
         borderWidth: 2,
-        borderColor: '#12379F'
+        borderColor: '#123AB8'
     },
     policeCell: {
         backgroundColor: '#E06B6B',
@@ -538,21 +538,21 @@ const styles = StyleSheet.create({
     controlButton: {
         width: CONTROL_BUTTON_SIZE,
         height: CONTROL_BUTTON_SIZE,
-        backgroundColor: '#523F3E',
+        backgroundColor: '#2A2624',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 12,
         marginHorizontal: 5,
         borderWidth: 2,
-        borderColor: '#614A4B',
+        borderColor: '#3B3632',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
     },
     controlButtonDisabled: {
-        backgroundColor: '#31241F',
-        borderColor: '#523F3E',
+        backgroundColor: '#0F0E0D',
+        borderColor: '#2A2624',
         opacity: 0.5
     },
     controlText: {

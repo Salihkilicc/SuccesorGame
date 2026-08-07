@@ -60,7 +60,7 @@ export default CompanyHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#31241F', // Dark Gray
+    backgroundColor: '#0F0E0D', // Dark Gray
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   title: {
-    color: '#FFFFFF', // White
+    color: '#EDE8E4', // White
     fontSize: theme.typography.subtitle + 8,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   metricLabel: {
-    color: '#B28C96', // Text Secondary
+    color: '#8A807B', // Text Secondary
     fontSize: theme.typography.caption,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     color: '#E06B6B', // Red
   },
   meta: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: theme.typography.caption + 1,
   },
   debt: {

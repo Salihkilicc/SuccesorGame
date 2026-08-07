@@ -140,7 +140,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                                <Text style={[styles.impactValue, { color: '#12379F' }]}>
+                                <Text style={[styles.impactValue, { color: '#123AB8' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
@@ -155,7 +155,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                                <Text style={[styles.impactValue, { color: '#12379F' }]}>
+                                <Text style={[styles.impactValue, { color: '#123AB8' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
                             </View>
@@ -216,9 +216,9 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    noFloatCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#E3A857' },
+    noFloatCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#E3A857' },
     noFloatTitle: { color: '#E3A857', fontWeight: '800', fontSize: 13, marginBottom: 4 },
-    noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
+    noFloatBody: { color: '#EDE8E4', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         padding: 20, // Moved padding here
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -241,12 +241,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 16,
     },
     stepperSection: {
@@ -254,14 +254,14 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '600',
         marginBottom: 12,
     },
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -270,14 +270,14 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         alignItems: 'center',
         justifyContent: 'center',
     },
     stepperText: {
         fontSize: 28,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     stepperTextDisabled: {
         color: '#666',
@@ -289,12 +289,12 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     labelSmall: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -305,17 +305,17 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#473633',
+        borderColor: '#201D1C',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#B28C96',
+        color: '#8A807B',
     },
     amountCard: {
         backgroundColor: 'rgba(10, 132, 255, 0.15)',
@@ -324,21 +324,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#12379F40',
+        borderColor: '#123AB840',
     },
     amountLabel: {
         fontSize: 13,
-        color: '#12379F',
+        color: '#123AB8',
         fontWeight: '600',
         marginBottom: 6,
     },
     amountValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#12379F',
+        color: '#123AB8',
     },
     impactSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     },
     impactLabel: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '500',
     },
     impactValue: {
@@ -360,11 +360,11 @@ const styles = StyleSheet.create({
     },
     impactSubValue: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         marginTop: 2,
     },
     costSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     costLabel: {
         fontSize: 15,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '500',
     },
     costValue: {
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -411,23 +411,23 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     executeButton: {
         flex: 1,
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
     },
     executeButtonDisabled: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         opacity: 0.5,
     },
     executeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     executeButtonTextDisabled: {
         color: '#666',

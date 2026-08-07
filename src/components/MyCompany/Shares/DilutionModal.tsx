@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -221,12 +221,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         marginBottom: 16,
     },
     warningBanner: {
@@ -248,14 +248,14 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '600',
         marginBottom: 12,
     },
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -264,14 +264,14 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#473633',
+        backgroundColor: '#201D1C',
         alignItems: 'center',
         justifyContent: 'center',
     },
     stepperText: {
         fontSize: 28,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     stepperTextDisabled: {
         color: '#666',
@@ -283,12 +283,12 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     labelSmall: {
         fontSize: 11,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -299,20 +299,20 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#473633',
+        borderColor: '#201D1C',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#B28C96',
+        color: '#8A807B',
     },
     impactSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     },
     impactLabel: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '500',
     },
     impactValue: {
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     },
     stockWarningText: {
         fontSize: 13,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 6,
     },
     stockWarningValue: {
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     authorizeButton: {
         flex: 1,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     authorizeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#000000',
+        color: '#0F0E0D',
     },
 });
 

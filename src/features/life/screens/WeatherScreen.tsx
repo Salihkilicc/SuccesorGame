@@ -36,7 +36,7 @@ const WeatherScreen = () => {
         <View style={styles.root}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#000000', '#000000', '#000000']}
+                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                 locations={[0, 0.5, 1]}
                 style={StyleSheet.absoluteFill}
             />
@@ -123,7 +123,7 @@ export default WeatherScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     safeArea: {
         flex: 1,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     unitToggleActive: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     unitToggleDivider: {
         color: 'rgba(255,255,255,0.2)',
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
         padding: 36,
         alignItems: 'center',
-        shadowColor: '#12379F',
+        shadowColor: '#123AB8',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.15,
         shadowRadius: 40,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     temperature: {
         fontSize: 90,
         fontWeight: '200',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: -4,
         lineHeight: 96,
     },
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
         marginVertical: 2,
     },
     forecastHigh: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 13,
         fontWeight: '600',
     },

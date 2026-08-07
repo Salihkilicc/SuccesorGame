@@ -74,15 +74,15 @@ const styles = StyleSheet.create({
         borderColor: '#E3A857',
     },
     primaryText: {
-        color: '#000000',
+        color: '#0F0E0D',
     },
     // Secondary
     secondaryButton: {
-        backgroundColor: '#473633',
-        borderColor: '#614A4B',
+        backgroundColor: '#201D1C',
+        borderColor: '#3B3632',
     },
     secondaryText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     // Danger
     dangerButton: {

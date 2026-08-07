@@ -72,7 +72,7 @@ const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanatio
       ? '#E06B6B'
       : subtotal
         ? '#E9B8C9'
-        : '#FFFFFF';
+        : '#EDE8E4';
 
   return (
     <View style={[styles.line, subtotal && styles.lineSubtotal, emphasis && styles.lineEmphasis]}>
@@ -381,7 +381,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
-              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#E06B6B' : '#B28C96' }]}>
+              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#E06B6B' : '#8A807B' }]}>
                 {formatNumber(p.unsold)}
               </Text>
             </View>
@@ -706,7 +706,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.totalUnmetDemand > 0 ? '#E06B6B' : '#B28C96' },
+                      { color: report.totalUnmetDemand > 0 ? '#E06B6B' : '#8A807B' },
                     ]}
                   >
                     {formatNumber(report.totalUnmetDemand)}
@@ -846,7 +846,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               note={t('company.plainLanguageReadOfThis')}
               info={t('company.automaticObservationsAboutWhatActually')} 
               summary={`${observations.length}`}
-              summaryColor="#B28C96"
+              summaryColor="#8A807B"
               defaultOpen
               hidden={observations.length === 0}
             >
@@ -878,7 +878,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               note={t('company.perProductDemandSalesAnd')}
               info={t('company.tapAnyProductToExpand')} 
               summary={`${report.products.length}`}
-              summaryColor="#B28C96"
+              summaryColor="#8A807B"
             >
               {report.products.length === 0 ? (
                 <Text style={styles.emptyText}>{t('company.noActiveProductsThisQuarter')}</Text>
@@ -894,7 +894,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.companyCapitalFundsTheBusiness')}
               infoDetail={t('company.theTwoMoneyPoolsAre')} 
               summary={formatMoney(report.endingCapital)}
-              summaryColor="#FFFFFF"
+              summaryColor="#EDE8E4"
             >
               <View style={styles.balanceRow}>
                 <View style={styles.balanceCell}>
@@ -909,7 +909,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
                   <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  <Text style={[styles.balanceValue, { color: '#12379F' }]}>
+                  <Text style={[styles.balanceValue, { color: '#123AB8' }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
                 </View>
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 480,
     maxHeight: '92%',
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255,215,0,0.18)',
@@ -963,10 +963,10 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.07)',
   },
   closeButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  closeButtonText: { color: '#B28C96', fontSize: 17 },
+  closeButtonText: { color: '#8A807B', fontSize: 17 },
   headerCenter: { flex: 1, alignItems: 'center' },
-  headerTitle: { color: '#FFFFFF', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
-  headerSubtitle: { color: '#B28C96', fontSize: 10, marginTop: 2, letterSpacing: 1 },
+  headerTitle: { color: '#EDE8E4', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  headerSubtitle: { color: '#8A807B', fontSize: 10, marginTop: 2, letterSpacing: 1 },
   periodBadge: {
     paddingHorizontal: 9,
     paddingVertical: 5,
@@ -984,9 +984,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.03)',
   },
-  heroLabel: { color: '#B28C96', fontSize: 10, letterSpacing: 2, fontWeight: '700' },
+  heroLabel: { color: '#8A807B', fontSize: 10, letterSpacing: 2, fontWeight: '700' },
   heroValue: { fontSize: 34, fontWeight: '800', marginTop: 6 },
-  heroSub: { color: '#B28C96', fontSize: 11, marginTop: 6 },
+  heroSub: { color: '#8A807B', fontSize: 11, marginTop: 6 },
 
   sectionTitle: {
     color: '#E9B8C9',
@@ -1019,15 +1019,15 @@ const styles = StyleSheet.create({
   },
   lineTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   lineLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 7, flex: 1 },
-  lineLabel: { color: '#FFFFFF', fontSize: 13 },
-  lineLabelStrong: { color: '#FFFFFF', fontWeight: '700' },
+  lineLabel: { color: '#EDE8E4', fontSize: 13 },
+  lineLabelStrong: { color: '#EDE8E4', fontWeight: '700' },
   lineAmount: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
   lineAmountBig: { fontSize: 20, fontWeight: '800' },
-  lineExplain: { color: '#614A4B', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
-  lineHint: { color: '#B28C96', fontSize: 10.5, marginTop: 2, fontStyle: 'italic' },
+  lineExplain: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
+  lineHint: { color: '#8A807B', fontSize: 10.5, marginTop: 2, fontStyle: 'italic' },
 
   groupLabel: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1.5,
@@ -1037,13 +1037,13 @@ const styles = StyleSheet.create({
 
   cashDivider: {
     height: 1,
-    backgroundColor: '#3C2D29',
+    backgroundColor: '#181614',
     marginVertical: 12,
   },
   cashHeader: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#B28C96',
+    color: '#8A807B',
     letterSpacing: 1,
     marginBottom: 8,
   },
@@ -1054,15 +1054,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 16,
   },
-  footnote: { color: '#614A4B', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
+  footnote: { color: '#3B3632', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
 
-  opsDelta: { fontSize: 11, color: '#B28C96', fontWeight: '600' },
+  opsDelta: { fontSize: 11, color: '#8A807B', fontWeight: '600' },
   facilityBar: {
     flexDirection: 'row', alignItems: 'flex-end',
     paddingBottom: 12, marginBottom: 12,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)',
   },
-  facilityName: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginTop: 3 },
+  facilityName: { color: '#EDE8E4', fontSize: 15, fontWeight: '700', marginTop: 3 },
   facilityUtil: { fontSize: 18, fontWeight: '800', marginTop: 2 },
   opsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   opsCell: {
@@ -1073,8 +1073,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
   },
-  opsLabel: { color: '#B28C96', fontSize: 10, letterSpacing: 0.8 },
-  opsValue: { color: '#FFFFFF', fontSize: 18, fontWeight: '700', marginTop: 3 },
+  opsLabel: { color: '#8A807B', fontSize: 10, letterSpacing: 0.8 },
+  opsValue: { color: '#EDE8E4', fontSize: 18, fontWeight: '700', marginTop: 3 },
 
   notesBox: {
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -1101,9 +1101,9 @@ const styles = StyleSheet.create({
   },
   productHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   productShareMini: { color: '#5992C6', fontSize: 11, fontWeight: '700' },
-  productChevron: { color: '#614A4B', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
+  productChevron: { color: '#3B3632', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
   productChevronOpen: { color: '#E9B8C9', transform: [{ rotate: '180deg' }], marginTop: 3 },
-  productName: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flex: 1 },
+  productName: { color: '#EDE8E4', fontSize: 14, fontWeight: '700', flex: 1 },
   productProfit: { fontSize: 14, fontWeight: '800', marginLeft: 10 },
   demandRow: {
     marginTop: 9,
@@ -1111,16 +1111,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.05)',
   },
-  demandText: { color: '#B28C96', fontSize: 10.5 },
-  demandStrong: { color: '#FFFFFF', fontWeight: '700' },
+  demandText: { color: '#8A807B', fontSize: 10.5 },
+  demandStrong: { color: '#EDE8E4', fontWeight: '700' },
   demandMiss: { color: '#E06B6B', fontSize: 10.5, marginTop: 2, fontWeight: '600' },
 
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
   scrapLine: { fontSize: 9, color: '#E06B6B', marginTop: 2 },
   productSplit: { fontSize: 9, color: '#5992C6', marginTop: 2 },
-  productStatLabel: { color: '#614A4B', fontSize: 9.5, letterSpacing: 0.5 },
-  productStatValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginTop: 2 },
+  productStatLabel: { color: '#3B3632', fontSize: 9.5, letterSpacing: 0.5 },
+  productStatValue: { color: '#EDE8E4', fontSize: 14, fontWeight: '700', marginTop: 2 },
   sellThroughTrack: {
     height: 5,
     borderRadius: 3,
@@ -1128,8 +1128,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sellThroughFill: { height: '100%', borderRadius: 3 },
-  sellThroughLabel: { color: '#B28C96', fontSize: 10, marginTop: 5 },
-  productEcon: { color: '#614A4B', fontSize: 10, marginTop: 7, lineHeight: 15 },
+  sellThroughLabel: { color: '#8A807B', fontSize: 10, marginTop: 5 },
+  productEcon: { color: '#3B3632', fontSize: 10, marginTop: 7, lineHeight: 15 },
 
   balanceRow: {
     flexDirection: 'row',
@@ -1138,11 +1138,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   balanceCell: { flex: 1, alignItems: 'center' },
-  balanceLabel: { color: '#B28C96', fontSize: 9.5, letterSpacing: 0.6 },
-  balanceValue: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginTop: 4 },
+  balanceLabel: { color: '#8A807B', fontSize: 9.5, letterSpacing: 0.6 },
+  balanceValue: { color: '#EDE8E4', fontSize: 15, fontWeight: '700', marginTop: 4 },
   balanceDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
 
-  emptyText: { color: '#614A4B', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
+  emptyText: { color: '#3B3632', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
 
   footerActions: {
     padding: 14,
@@ -1156,5 +1156,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonPressed: { opacity: 0.8 },
-  primaryButtonText: { color: '#000000', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  primaryButtonText: { color: '#0F0E0D', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
 });

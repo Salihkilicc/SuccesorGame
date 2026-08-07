@@ -103,12 +103,12 @@ export default GymSupplementModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         justifyContent: 'center',
         padding: 20
     },
     container: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
@@ -116,12 +116,12 @@ const styles = StyleSheet.create({
     },
     warningContainer: {
         borderColor: '#E3A857',
-        backgroundColor: '#000000'
+        backgroundColor: '#0F0E0D'
     },
     title: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         textAlign: 'center'
     },
     subtitle: {
@@ -136,16 +136,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 8
     },
-    itemText: { color: '#FFFFFF', fontWeight: '700' },
+    itemText: { color: '#EDE8E4', fontWeight: '700' },
     itemPrice: { color: '#E3A857' },
     dangerItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderColor: '#E3A857',
         borderWidth: 1,
         borderRadius: 8,
@@ -162,5 +162,5 @@ const styles = StyleSheet.create({
     cancelBtn: { padding: 12, borderWidth: 1, borderColor: '#E9B8C9', borderRadius: 8 },
     cancelText: { color: '#E9B8C9' },
     injectBtn: { padding: 12, backgroundColor: '#E3A857', borderRadius: 8 },
-    injectText: { color: '#FFFFFF', fontWeight: '900' }
+    injectText: { color: '#EDE8E4', fontWeight: '900' }
 });

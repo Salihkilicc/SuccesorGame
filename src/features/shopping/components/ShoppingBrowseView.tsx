@@ -33,7 +33,7 @@ type BrandConfig = {
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
     Velocity: { name: t('ui.velocityMotors'), color: '#E06B6B', emoji: '🏎️' },
-    Dynasty8: { name: t('ui.dynasty8'), color: '#12379F', emoji: '🏠' },
+    Dynasty8: { name: t('ui.dynasty8'), color: '#123AB8', emoji: '🏠' },
     Luxe: { name: t('ui.luxeVault'), color: '#0A2A92', emoji: '💎' },
     Elitas: { name: t('ui.elitasTravel'), color: '#E06B6B', emoji: '✈️' },
 };
@@ -85,7 +85,7 @@ const ShoppingBrowseView = ({
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#000000" />
+            <StatusBar barStyle="light-content" backgroundColor="#0F0E0D" />
 
             {/* Header */}
             <View style={[styles.header, { backgroundColor: brandConfig.color }]}>
@@ -179,9 +179,9 @@ const ShoppingBrowseView = ({
                                             styles.addButton,
                                             {
                                                 backgroundColor: owned
-                                                    ? '#3C2D29'
+                                                    ? '#181614'
                                                     : inCart
-                                                        ? '#12379F'
+                                                        ? '#123AB8'
                                                         : '#E06B6B',
                                             },
                                             pressed && !owned && !inCart && styles.addButtonPressed,
@@ -212,7 +212,7 @@ export default ShoppingBrowseView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
 
     // Header
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
     },
     card: {
         width: CARD_WIDTH,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         gap: theme.spacing.sm,
     },
     itemIcon: {

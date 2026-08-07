@@ -73,16 +73,16 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 0.5,
   },
   name: {
     fontSize: theme.typography.caption + 1,
-    color: '#B28C96',
+    color: '#8A807B',
     marginTop: 2,
   },
   riskTag: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: 999,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: theme.typography.subtitle,
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontWeight: '700',
   },
   change: {
@@ -106,6 +106,6 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: '#B28C96',
+    color: '#8A807B',
   },
 });

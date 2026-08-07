@@ -270,23 +270,23 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 export default SharkDealModal;
 
 const styles = StyleSheet.create({
-    activeLoanCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E06B6B' },
+    activeLoanCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E06B6B' },
     activeLoanTitle: { color: '#E06B6B', fontWeight: '800', fontSize: 13, marginBottom: 4 },
     activeLoanBody: { color: '#E9B8C9', fontSize: 11, lineHeight: 16, marginBottom: 10 },
     repayBtn: { backgroundColor: '#5FB37A', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
-    repayBtnDisabled: { backgroundColor: '#473633' },
-    repayBtnText: { color: '#000000', fontWeight: '800', fontSize: 13 },
-    amountCard: { backgroundColor: '#3C2D29', borderRadius: 12, padding: 16 },
-    amountLabel: { fontSize: 12, color: '#B28C96', fontWeight: '600' },
+    repayBtnDisabled: { backgroundColor: '#201D1C' },
+    repayBtnText: { color: '#0F0E0D', fontWeight: '800', fontSize: 13 },
+    amountCard: { backgroundColor: '#181614', borderRadius: 12, padding: 16 },
+    amountLabel: { fontSize: 12, color: '#8A807B', fontWeight: '600' },
     amountValue: { fontSize: 26, color: '#FFF', fontWeight: '800', marginVertical: 6 },
     amountRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
-    amountChip: { flex: 1, padding: 8, borderRadius: 8, backgroundColor: '#31241F', alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
+    amountChip: { flex: 1, padding: 8, borderRadius: 8, backgroundColor: '#0F0E0D', alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
     amountChipActive: { borderColor: '#E06B6B' },
     amountChipText: { fontSize: 12, color: '#FFF', fontWeight: '700' },
-    amountNote: { fontSize: 11, color: '#B28C96', marginTop: 10, lineHeight: 16 },
-    termsCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: '#E06B6B' },
+    amountNote: { fontSize: 11, color: '#8A807B', marginTop: 10, lineHeight: 16 },
+    termsCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: '#E06B6B' },
     termRow: { flexDirection: 'row', justifyContent: 'space-between' },
-    termLabel: { fontSize: 12, color: '#B28C96' },
+    termLabel: { fontSize: 12, color: '#8A807B' },
     termValue: { fontSize: 12, color: '#FFF', fontWeight: '700' },
     termBad: { fontSize: 12, color: '#E06B6B', fontWeight: '700' },
     header: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 2,
         marginBottom: 4,
     },
@@ -316,11 +316,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     lenderAvatar: {
         width: 56,
@@ -338,25 +338,25 @@ const styles = StyleSheet.create({
     lenderName: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 2,
     },
     lenderRole: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
     },
     dealSection: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         gap: 16,
     },
     sectionTitle: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#B28C96',
+        color: '#8A807B',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
         marginBottom: 8,
@@ -368,13 +368,13 @@ const styles = StyleSheet.create({
     },
     dealLabel: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '600',
     },
     dealAmount: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: -1,
     },
     dealInterest: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         color: '#E06B6B',
     },
     warningBox: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 20,
         borderWidth: 2,
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     },
     warningText: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         lineHeight: 22,
     },
     warningTextBold: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     riskBox: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         padding: 16,
         borderWidth: 1,
@@ -450,12 +450,12 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     rejectButton: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
     },
     rejectButtonPressed: {
         opacity: 0.7,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     rejectButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#B28C96',
+        color: '#8A807B',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     signButtonText: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#000000',
+        color: '#0F0E0D',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
     },

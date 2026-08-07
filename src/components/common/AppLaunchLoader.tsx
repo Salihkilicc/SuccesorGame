@@ -48,7 +48,7 @@ const AppLaunchLoader: React.FC<AppLaunchLoaderProps> = ({
                         <View style={styles.iconContainer}>{appIcon}</View>
                         <Text style={styles.appName}>{appName}</Text>
                     </View>
-                    <ActivityIndicator size="large" color="#FFFFFF" style={styles.loader} />
+                    <ActivityIndicator size="large" color="#EDE8E4" style={styles.loader} />
                 </Animated.View>
             )}
         </View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 4,
         textTransform: 'uppercase',
     },

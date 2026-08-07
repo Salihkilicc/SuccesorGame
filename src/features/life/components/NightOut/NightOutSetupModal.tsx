@@ -105,7 +105,7 @@ const NightOutSetupModal = ({
                                 padding: 8,
                                 opacity: pressed ? 0.7 : 1
                             })}>
-                            <Text style={{ fontSize: 24, color: '#FFFFFF', fontWeight: 'bold' }}>←</Text>
+                            <Text style={{ fontSize: 24, color: '#EDE8E4', fontWeight: 'bold' }}>←</Text>
                         </Pressable>
                     </View>
                     <View style={styles.headerCenter}>
@@ -169,12 +169,12 @@ export default NightOutSetupModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         paddingHorizontal: 24,
         paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,

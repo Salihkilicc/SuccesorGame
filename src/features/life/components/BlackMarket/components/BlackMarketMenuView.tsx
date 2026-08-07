@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     dangerButton: {
         borderLeftColor: '#900',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     pressed: {
         transform: [{ scale: 0.98 }],

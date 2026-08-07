@@ -474,7 +474,7 @@ const getMajorIcon = (majorId: MajorType) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000', // Navy Blue
+        backgroundColor: '#0F0E0D', // Navy Blue
     },
     safeArea: {
         flex: 1,
@@ -485,9 +485,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderBottomWidth: 1,
-        borderBottomColor: '#523F3E',
+        borderBottomColor: '#2A2624',
     },
     backBtn: {
         paddingVertical: 8,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 0.5,
     },
     subtitle: {
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     },
     // Tabs
     tabContainer: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#E9B8C9',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     majorCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
     },
     disabledCard: {
         opacity: 0.8,
-        borderColor: '#523F3E',
+        borderColor: '#2A2624',
     },
     cardHeader: {
         marginBottom: 16,
@@ -600,13 +600,13 @@ const styles = StyleSheet.create({
     majorTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 4,
     },
     masterTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         marginBottom: 6,
     },
     masterSubtitle: {
@@ -685,11 +685,11 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     enrollButtonDisabled: {
-        backgroundColor: '#523F3E',
+        backgroundColor: '#2A2624',
         shadowOpacity: 0,
     },
     enrollButtonText: {
-        color: '#000000',
+        color: '#0F0E0D',
         fontSize: 16,
         fontWeight: 'bold',
         paddingHorizontal: 32, // Added padding to ensure text doesn't overflow

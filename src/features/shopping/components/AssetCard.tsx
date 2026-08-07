@@ -26,11 +26,11 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
 
     // 1. Determine Visuals based on Category/Value
     const isPremium = item.price > 10000000; // > $10M = Gold Border
-    const borderColor = isPremium ? '#0A2A92' : '#3C2D29';
+    const borderColor = isPremium ? '#0A2A92' : '#181614';
     const emoji = getEmoji(item.category);
 
     // 2. Condition Color Logic
-    let conditionColor = '#12379F'; // Blue
+    let conditionColor = '#123AB8'; // Blue
     if (item.condition < 50) conditionColor = '#E06B6B'; // Red
     else if (item.condition < 80) conditionColor = '#E06B6B'; // Pink
 
@@ -53,7 +53,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                     style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                     onPress={() => onRepair(item)}
                 >
-                    <Text style={[styles.actionText, { color: '#12379F' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
+                    <Text style={[styles.actionText, { color: '#123AB8' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
                 </Pressable>
             );
         } else {
@@ -65,8 +65,8 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 )
             } else {
                 ActionButton = (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(58, 134, 255, 0.2)', borderColor: '#12379F' }]}>
-                        <Text style={[styles.badgeText, { color: '#12379F' }]}>{t('ui.perfect')}</Text>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(58, 134, 255, 0.2)', borderColor: '#123AB8' }]}>
+                        <Text style={[styles.badgeText, { color: '#123AB8' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );
             }
@@ -172,12 +172,12 @@ const getEmoji = (category: string) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         borderWidth: 1,
         padding: 16,
         marginBottom: 16,
-        shadowColor: "#000000",
+        shadowColor: "#0F0E0D",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 4.65,
@@ -185,14 +185,14 @@ const styles = StyleSheet.create({
     },
     // Grid Tile specific styles
     containerTile: {
-        backgroundColor: '#000000', // Darker background
+        backgroundColor: '#0F0E0D', // Darker background
         borderRadius: 12,
         borderWidth: 1,
         height: 130, // Much more compact
         padding: 10,
         overflow: 'hidden',
         justifyContent: 'space-between',
-        shadowColor: "#000000",
+        shadowColor: "#0F0E0D",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 3,
@@ -210,13 +210,13 @@ const styles = StyleSheet.create({
         marginBottom: 6, // Space for condition strip
     },
     tileTitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
         fontWeight: '700',
         marginBottom: 2,
     },
     tilePrice: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 11,
         fontFamily: 'monospace', // Tech feel
         fontWeight: '500',
@@ -233,9 +233,9 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 0,
@@ -268,13 +268,13 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     marketValueLabel: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 10,
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     marketValue: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 18,
         fontWeight: '700',
     },
@@ -282,13 +282,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     title: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 4,
     },
     subtitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
         fontWeight: '500',
         textTransform: 'uppercase',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     conditionBarBg: {
         height: 4,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 3,
         marginBottom: 4,
         overflow: 'hidden',

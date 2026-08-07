@@ -211,7 +211,7 @@ const LaboratoryScreen = () => {
                         Artik urun uretim barindaki mantik: mutlak sayi,
                         buyuyen tavan, 1/10/100 butonlari ve KUCUK yuzde
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
-                    <Text style={{ color: '#B28C96', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
+                    <Text style={{ color: '#8A807B', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
                         <Text style={{ color: '#5992C6', fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
@@ -270,7 +270,7 @@ const LaboratoryScreen = () => {
                     </View>
                     <View style={styles.statRow}>
                         <Text style={styles.statLabel}>{t('company.availableCapital')}</Text>
-                        <Text style={[styles.statValue, { color: '#FFFFFF' }]}>{formatMoney(companyCapital)}</Text>
+                        <Text style={[styles.statValue, { color: '#EDE8E4' }]}>{formatMoney(companyCapital)}</Text>
                     </View>
                 </View>
                 <View style={{ height: 40 }} />

@@ -50,8 +50,8 @@ const GRADIENTS = {
   pinkRed: ['#E06B6B', '#E06B6B'],
   orangeYellow: ['#E3A857', '#E3A857'],
   blueSky: ['#5992C6', '#5992C6'],
-  bluePurple: ['#5992C6', '#12379F'],
-  darkGrey: ['#31241F', '#523F3E'],
+  bluePurple: ['#5992C6', '#123AB8'],
+  darkGrey: ['#0F0E0D', '#2A2624'],
   networkBlue: ['#0A2A92', '#5FB37A'],
   tealCyan: ['#5FB37A', '#5FB37A'],
 };
@@ -278,14 +278,14 @@ const HomeScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
+        <MaterialCommunityIcons name={item.icon} size={32} color="#EDE8E4" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
       <ImageBackground
         source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
         style={StyleSheet.absoluteFill}
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#E9B8C9', '#E3A857', '#473633']}
+                colors={['#E9B8C9', '#E3A857', '#201D1C']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,14 +367,14 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#E9B8C9', '#E3A857', '#473633']}
+                colors={['#E9B8C9', '#E3A857', '#201D1C']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               />
               <View style={styles.nextMonthContent}>
                 <Text style={styles.nextMonthText}>{t('home.advanceToNextQuarter')}</Text>
-                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#FFFFFF" />
+                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#EDE8E4" />
               </View>
             </Pressable>
           </View>
@@ -388,10 +388,10 @@ const HomeScreen = () => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
                 <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#B28C96" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#8A807B" />
               </View>
               <LinearGradient
-                colors={['#B28C96', '#000000', '#000000', '#5992C6']}
+                colors={['#8A807B', '#0F0E0D', '#0F0E0D', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['#B28C96', '#000000', '#000000', '#5992C6']}
+                colors={['#8A807B', '#0F0E0D', '#0F0E0D', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 0.2,
   },
   gender: {
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#614A4B',
+    color: '#3B3632',
     fontSize: 11,
     letterSpacing: 0.1,
   },
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
   ageChipValue: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
   },
   ageChipDivider: {
     width: 1,
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.96 }],
   },
   nextMonthText: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontWeight: '800',
     fontSize: 11.3,
     letterSpacing: 4,
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -878,11 +878,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   label: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   statusText: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.body,
   },
   entryRow: {
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   },
   entryLife: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EDE8E4',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -970,7 +970,7 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -1002,7 +1002,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   entrySubtitleLight: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     marginTop: 4 * 0.9,
     fontSize: (theme.typography.caption + 1) * 0.9,
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 6,
     textShadowColor: 'rgba(255, 255, 255, 0.7)',
     textShadowOffset: { width: 0, height: 0 },

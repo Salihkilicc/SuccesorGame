@@ -43,14 +43,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     marginBottom: theme.spacing.sm,
     marginTop: theme.spacing.lg,
     letterSpacing: 0.5,
   },
   row: {
     fontSize: theme.typography.body,
-    color: '#B28C96',
+    color: '#8A807B',
     lineHeight: 20,
   },
   expertCard: {
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   expertText: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: theme.typography.body,
     fontWeight: '600',
     flex: 1,
   },
   lockedText: {
-    color: '#B28C96',
+    color: '#8A807B',
     fontSize: theme.typography.caption + 1,
     lineHeight: 18,
   },

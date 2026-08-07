@@ -106,7 +106,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
     safeArea: {
         flex: 1,
@@ -117,21 +117,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderBottomWidth: 2,
         borderBottomColor: '#E9B8C9',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#523F3E',
+        color: '#2A2624',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#12379F',
+        color: '#123AB8',
     },
     subtitle: {
         fontSize: 12,
-        color: '#614A4B',
+        color: '#3B3632',
         marginTop: 2,
     },
     scrollContent: {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     multiplierCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 24,
         marginBottom: 24,
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#614A4B',
+        color: '#3B3632',
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#12379F',
+        color: '#123AB8',
         marginBottom: 8,
     },
     multiplierHint: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontStyle: 'italic',
     },
     section: {
@@ -188,16 +188,16 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#12379F',
+        color: '#123AB8',
         marginBottom: 16,
     },
     emptyState: {
         alignItems: 'center',
         padding: 40,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         borderStyle: 'dashed',
     },
     emptyIcon: {
@@ -206,23 +206,23 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#614A4B',
+        color: '#3B3632',
         fontWeight: '600',
         marginBottom: 8,
     },
     emptyHint: {
         fontSize: 14,
-        color: '#B28C96',
+        color: '#8A807B',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     degreeCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 20,
         marginBottom: 12,
         borderWidth: 2,
-        borderColor: '#12379F',
+        borderColor: '#123AB8',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#0F0E0D',
     },
     degreeType: {
         fontSize: 14,
-        color: '#614A4B',
+        color: '#3B3632',
         fontWeight: '600',
     },
     degreeBonus: {

@@ -102,7 +102,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000', // Pure black
+        backgroundColor: '#0F0E0D', // Pure black
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     securityBadge: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     securityText: {
-        color: '#12379F',
+        color: '#123AB8',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -153,19 +153,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 30,
         borderWidth: 2,
-        borderColor: '#12379F',
+        borderColor: '#123AB8',
     },
     checkmarkIcon: {
         fontSize: 60,
     },
     successText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 28,
         fontWeight: '700',
         marginBottom: 10,
     },
     subtitleText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 16,
     },
 });

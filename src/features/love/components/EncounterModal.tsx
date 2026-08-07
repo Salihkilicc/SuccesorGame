@@ -32,11 +32,11 @@ interface EncounterModalProps {
 const getTierBadgeColor = (tier: string): string => {
     switch (tier) {
         case 'HIGH_SOCIETY': return '#E9B8C9';
-        case 'CORPORATE_ELITE': return '#12379F';
+        case 'CORPORATE_ELITE': return '#123AB8';
         case 'UNDERGROUND': return '#E06B6B';
         case 'BLUE_COLLAR': return '#5992C6';
         case 'STUDENT_LIFE': return '#5992C6';
-        case 'ARTISTIC': return '#12379F';
+        case 'ARTISTIC': return '#123AB8';
         default: return theme.colors.accent;
     }
 };
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         width: '100%',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         padding: 12,
         borderRadius: 10,
         marginBottom: 16,

@@ -89,7 +89,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                         <MaterialCommunityIcons
                             name="trash-can-outline"
                             size={18}
-                            color="#523F3E"
+                            color="#2A2624"
                         />
                     </TouchableOpacity>
                 </View>
@@ -104,7 +104,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                     <MaterialCommunityIcons
                         name="clock-outline"
                         size={11}
-                        color="#614A4B"
+                        color="#3B3632"
                     />
                     <Text style={styles.noteDate}>{formatDate(note.date)}</Text>
                 </View>
@@ -175,7 +175,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={title}
                 onChangeText={setTitle}
                 placeholder={t('os.title')}
-                placeholderTextColor="#523F3E"
+                placeholderTextColor="#2A2624"
                 returnKeyType="next"
                 onSubmitEditing={() => contentRef.current?.focus()}
                 autoFocus={!note}
@@ -193,7 +193,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={content}
                 onChangeText={setContent}
                 placeholder={t('os.startWritingYourNote')}
-                placeholderTextColor="#3C2D29"
+                placeholderTextColor="#181614"
                 multiline
                 textAlignVertical="top"
                 selectionColor="#E9B8C9"
@@ -281,7 +281,7 @@ const NotesScreen = () => {
             <View style={styles.root}>
                 <StatusBar barStyle="light-content" />
                 <LinearGradient
-                    colors={['#000000', '#000000', '#000000']}
+                    colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                     style={StyleSheet.absoluteFill}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -304,7 +304,7 @@ const NotesScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#000000', '#000000', '#000000']}
+                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -341,7 +341,7 @@ const NotesScreen = () => {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                         />
-                        <MaterialCommunityIcons name="plus" size={22} color="#FFFFFF" />
+                        <MaterialCommunityIcons name="plus" size={22} color="#EDE8E4" />
                     </Pressable>
                 </View>
 
@@ -388,7 +388,7 @@ export default NotesScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
     },
     safeArea: {
         flex: 1,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     },
     countBadge: {
         fontSize: 11,
-        color: '#614A4B',
+        color: '#3B3632',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
         fontWeight: '600',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
         height: 10,
     },
     noteCard: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 0.2,
         marginRight: 8,
     },
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     },
     notePreview: {
         fontSize: 13,
-        color: '#614A4B',
+        color: '#3B3632',
         lineHeight: 18,
     },
     noteFooter: {
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     },
     noteDate: {
         fontSize: 10,
-        color: '#523F3E',
+        color: '#2A2624',
         letterSpacing: 0.5,
         fontWeight: '500',
     },
@@ -566,12 +566,12 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 0.5,
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#614A4B',
+        color: '#3B3632',
         textAlign: 'center',
         lineHeight: 21,
     },
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     editorSaveBtnText: {
         fontSize: 11,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         letterSpacing: 2,
     },
     editorRule: {
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     editorTitleInput: {
         fontSize: 26,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         paddingHorizontal: 20,
         paddingVertical: 8,
         letterSpacing: 0.2,
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     editorContentInput: {
         flex: 1,
         fontSize: 15,
-        color: '#B28C96',
+        color: '#8A807B',
         paddingHorizontal: 20,
         paddingTop: 8,
         paddingBottom: 20,

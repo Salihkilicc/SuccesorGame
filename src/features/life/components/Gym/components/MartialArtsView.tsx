@@ -24,7 +24,7 @@ const MartialArtsView = ({
     useLocale();
 
     const getBeltColor = (level: number) => {
-        const colors = ['#E9B8C9', '#E3A857', '#E3A857', '#E3A857', '#E3A857', '#E3A857', '#000000'];
+        const colors = ['#E9B8C9', '#E3A857', '#E3A857', '#E3A857', '#E3A857', '#E3A857', '#0F0E0D'];
         return colors[level] || '#E9B8C9';
     };
 
@@ -58,14 +58,14 @@ const MartialArtsView = ({
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
+    subTitle: { fontSize: 24, fontWeight: '900', color: '#EDE8E4', textAlign: 'center', marginBottom: 10 },
     beltDisplay: { alignItems: 'center', marginVertical: 30 },
     beltLabel: { color: '#E9B8C9', fontSize: 12, letterSpacing: 1 },
-    beltName: { color: '#FFFFFF', fontSize: 28, fontWeight: '900', marginTop: 5 },
+    beltName: { color: '#EDE8E4', fontSize: 28, fontWeight: '900', marginTop: 5 },
     beltVisual: { width: 100, height: 20, borderRadius: 4, marginTop: 10, borderWidth: 1, borderColor: '#E9B8C9' },
     startBtn: { backgroundColor: '#E3A857', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-    startText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
-    disabledBtn: { backgroundColor: '#000000' },
+    startText: { color: '#EDE8E4', fontWeight: '800', fontSize: 16 },
+    disabledBtn: { backgroundColor: '#0F0E0D' },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
     backText: { color: '#E9B8C9', fontSize: 14 },
 });

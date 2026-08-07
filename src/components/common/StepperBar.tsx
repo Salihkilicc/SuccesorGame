@@ -178,8 +178,8 @@ const styles = StyleSheet.create({
     disabled: { opacity: 0.45 },
     valueRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginBottom: 8 },
     value: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800' },
-    unit: { color: '#614A4B', fontSize: 11, marginBottom: 4 },
-    max: { color: '#614A4B', fontSize: 11, fontWeight: '700', marginBottom: 4 },
+    unit: { color: '#3B3632', fontSize: 11, marginBottom: 4 },
+    max: { color: '#3B3632', fontSize: 11, fontWeight: '700', marginBottom: 4 },
 
     track: {
         height: 12, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.08)',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.04)',
     },
     marker: { position: 'absolute', width: 2, height: 12 },
-    scale: { color: '#614A4B', fontSize: 9.5, marginTop: 6 },
+    scale: { color: '#3B3632', fontSize: 9.5, marginTop: 6 },
 
     stepRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
     stepGap: { flex: 1 },
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     },
     pctChipActive: { backgroundColor: 'rgba(76,175,80,0.22)' },
     pctChipAccent: { backgroundColor: 'rgba(127,179,255,0.16)' },
-    pctText: { color: '#B28C96', fontSize: 10.5, fontWeight: '700' },
+    pctText: { color: '#8A807B', fontSize: 10.5, fontWeight: '700' },
     pctTextActive: { color: '#5FB37A' },
     pctTextAccent: { color: '#5992C6' },
 });

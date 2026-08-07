@@ -176,7 +176,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
     },
     safeArea: {
         flex: 1,
@@ -187,21 +187,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderBottomWidth: 2,
         borderBottomColor: '#E9B8C9',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#523F3E',
+        color: '#2A2624',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#12379F',
+        color: '#123AB8',
     },
     subtitle: {
         fontSize: 12,
-        color: '#614A4B',
+        color: '#3B3632',
         marginTop: 2,
     },
     scrollContent: {
@@ -223,11 +223,11 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     clubCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: '#EDE8E4',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     clubCardActive: {
-        borderColor: '#12379F',
-        backgroundColor: '#FFFFFF',
+        borderColor: '#123AB8',
+        backgroundColor: '#EDE8E4',
     },
     clubHeader: {
         marginBottom: 16,
@@ -250,24 +250,24 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#0F0E0D',
     },
     activeBadge: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#FFFFFF',
-        backgroundColor: '#12379F',
+        color: '#EDE8E4',
+        backgroundColor: '#123AB8',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     clubDescription: {
         fontSize: 14,
-        color: '#614A4B',
+        color: '#3B3632',
         lineHeight: 20,
     },
     buffSection: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#EDE8E4',
         padding: 12,
         borderRadius: 12,
         marginBottom: 16,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#523F3E',
+        color: '#2A2624',
         marginBottom: 8,
     },
     avatarsContainer: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
@@ -312,10 +312,10 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     actionBtn: {
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
@@ -329,6 +329,6 @@ const styles = StyleSheet.create({
     actionBtnText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
 });

@@ -12,7 +12,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.gemvault.museum',
             category: 'JEWELRY',
             description: 'Museum grade stones.',
-            bannerColor: '#12379F',
+            bannerColor: '#123AB8',
             emoji: '💎',
         },
         {
@@ -30,7 +30,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.imperial.royal',
             category: 'JEWELRY',
             description: 'Fit for a queen.',
-            bannerColor: '#12379F',
+            bannerColor: '#123AB8',
             emoji: '🤴',
         },
         {

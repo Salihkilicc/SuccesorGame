@@ -53,7 +53,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
         { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#E3A857' },
         { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#E06B6B' },
         { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#5992C6' },
-        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#12379F' }
+        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#123AB8' }
     ];
 
     const getRepTitle = (rep: number) => {
@@ -163,7 +163,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 20
     },
     header: {
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     statusSection: {
         marginBottom: 30,
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         marginBottom: 8
     },
     barLabel: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 1
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     },
     track: {
         height: 6,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 3,
         overflow: 'hidden'
     },
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     moneyLabel: {
-        color: '#614A4B',
+        color: '#3B3632',
         fontSize: 12
     },
     moneyValue: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     gridItem: {
         width: '47%',
         aspectRatio: 1,
-        backgroundColor: '#000000', // Dark card
+        backgroundColor: '#0F0E0D', // Dark card
         borderRadius: 16,
         borderWidth: 1,
         alignItems: 'center',
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     footerText: {
-        color: '#614A4B',
+        color: '#3B3632',
         fontStyle: 'italic',
         fontSize: 12,
         fontFamily: 'Courier New'

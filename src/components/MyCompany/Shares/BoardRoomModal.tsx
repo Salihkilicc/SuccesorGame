@@ -126,7 +126,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 
     const moodColor =
         boardStance === 'Supportive' ? '#5FB37A'
-            : boardStance === 'Neutral' ? '#B28C96'
+            : boardStance === 'Neutral' ? '#8A807B'
                 : boardStance === 'Restless' ? '#E3A857' : '#E06B6B';
 
     return (
@@ -363,70 +363,70 @@ const styles = StyleSheet.create({
     backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
     container: {
         width: '100%', maxWidth: 460, maxHeight: '85%',
-        backgroundColor: '#31241F', borderRadius: 20, padding: 20,
+        backgroundColor: '#0F0E0D', borderRadius: 20, padding: 20,
         borderWidth: 1, borderColor: '#E9B8C9',
     },
     titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
     title: { fontSize: 22, fontWeight: '800', color: '#FFF' },
-    closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#3C2D29', alignItems: 'center', justifyContent: 'center' },
-    closeText: { color: '#B28C96', fontSize: 16, fontWeight: '700' },
+    closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#181614', alignItems: 'center', justifyContent: 'center' },
+    closeText: { color: '#8A807B', fontSize: 16, fontWeight: '700' },
 
-    controlCard: { backgroundColor: '#3C2D29', borderRadius: 12, padding: 14, marginBottom: 12 },
+    controlCard: { backgroundColor: '#181614', borderRadius: 12, padding: 14, marginBottom: 12 },
     controlRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    controlLabel: { fontSize: 12, color: '#B28C96', fontWeight: '600' },
+    controlLabel: { fontSize: 12, color: '#8A807B', fontWeight: '600' },
     controlValue: { fontSize: 22, fontWeight: '800' },
     controlNote: { fontSize: 11, color: '#E9B8C9', lineHeight: 16, marginTop: 6 },
     moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
     moodValue: { fontSize: 13, fontWeight: '800' },
 
-    demandCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#E3A857' },
+    demandCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#E3A857' },
     demandTag: { fontSize: 10, color: '#E3A857', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
-    demandBody: { fontSize: 12, color: '#FFFFFF', lineHeight: 18, fontStyle: 'italic' },
+    demandBody: { fontSize: 12, color: '#EDE8E4', lineHeight: 18, fontStyle: 'italic' },
     demandPrivate: { fontSize: 10, color: '#5FB37A', marginTop: 6, lineHeight: 15 },
-    demandDue: { fontSize: 10, color: '#B28C96', marginTop: 6, fontWeight: '700' },
+    demandDue: { fontSize: 10, color: '#8A807B', marginTop: 6, fontWeight: '700' },
 
-    dangerCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#E06B6B' },
+    dangerCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#E06B6B' },
     dangerTitle: { fontSize: 13, color: '#E06B6B', fontWeight: '800', marginBottom: 4 },
     dangerBody: { fontSize: 11, color: '#E9B8C9', lineHeight: 16 },
 
     tabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#3C2D29', alignItems: 'center' },
+    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#181614', alignItems: 'center' },
     tabActive: { backgroundColor: '#E9B8C9' },
-    tabText: { fontSize: 12, color: '#B28C96', fontWeight: '700' },
+    tabText: { fontSize: 12, color: '#8A807B', fontWeight: '700' },
     tabTextActive: { color: '#000' },
 
     body: { flexGrow: 0, flexShrink: 1 },
 
-    memberCard: { backgroundColor: '#3C2D29', borderRadius: 12, padding: 14, marginBottom: 10 },
+    memberCard: { backgroundColor: '#181614', borderRadius: 12, padding: 14, marginBottom: 10 },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
     memberName: { fontSize: 15, color: '#FFF', fontWeight: '700' },
-    memberTrait: { fontSize: 11, color: '#B28C96', marginTop: 2 },
+    memberTrait: { fontSize: 11, color: '#8A807B', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#5992C6', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
-    trustBarBg: { height: 5, backgroundColor: '#31241F', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
+    trustBarBg: { height: 5, backgroundColor: '#0F0E0D', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
     promiseNote: { fontSize: 11, color: '#E9B8C9', marginTop: 8 },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#31241F', borderWidth: 1, borderColor: '#E3A857' },
+    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#0F0E0D', borderWidth: 1, borderColor: '#E3A857' },
     openMemberText: { color: '#E3A857', fontSize: 12, fontWeight: '700' },
-    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#31241F', alignItems: 'center' },
+    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#0F0E0D', alignItems: 'center' },
     lobbyBtnDone: { opacity: 0.4 },
     lobbyText: { fontSize: 12, color: '#E9B8C9', fontWeight: '700' },
 
-    floatCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginTop: 4 },
+    floatCard: { backgroundColor: '#0F0E0D', borderRadius: 12, padding: 14, marginTop: 4 },
     floatTitle: { fontSize: 13, color: '#FFF', fontWeight: '700', marginBottom: 4 },
-    floatBody: { fontSize: 11, color: '#B28C96', lineHeight: 16 },
+    floatBody: { fontSize: 11, color: '#8A807B', lineHeight: 16 },
 
-    voteCard: { backgroundColor: '#3C2D29', borderRadius: 12, padding: 14, marginBottom: 12 },
+    voteCard: { backgroundColor: '#181614', borderRadius: 12, padding: 14, marginBottom: 12 },
     voteTitle: { fontSize: 14, color: '#FFF', fontWeight: '800' },
     voteSummary: { fontSize: 12, color: '#E9B8C9', marginTop: 4, marginBottom: 10 },
     voteRow: { flexDirection: 'row', gap: 10, marginBottom: 8, alignItems: 'flex-start' },
     voteMark: { fontSize: 16, fontWeight: '800', width: 18 },
     voteName: { fontSize: 13, color: '#FFF', fontWeight: '600' },
-    voteReason: { fontSize: 11, color: '#B28C96' },
+    voteReason: { fontSize: 11, color: '#8A807B' },
 
-    logRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#3C2D29' },
+    logRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#181614' },
     logLabel: { fontSize: 12, color: '#FFF' },
-    logEffect: { fontSize: 11, color: '#B28C96', marginTop: 2 },
-    emptyLog: { fontSize: 12, color: '#B28C96', textAlign: 'center', paddingVertical: 24 },
+    logEffect: { fontSize: 11, color: '#8A807B', marginTop: 2 },
+    emptyLog: { fontSize: 12, color: '#8A807B', textAlign: 'center', paddingVertical: 24 },
 });

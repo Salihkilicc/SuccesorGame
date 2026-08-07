@@ -28,7 +28,7 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
         company.boardSentiment === 'Supportive' ? theme.colors.success :
             company.boardSentiment === 'Hostile' ? theme.colors.danger :
                 company.boardSentiment === 'Skeptical' ? '#E9B8C9' :
-                    company.boardSentiment === 'Cautious' ? '#E3A857' : '#B28C96';
+                    company.boardSentiment === 'Cautious' ? '#E3A857' : '#8A807B';
 
     return (
         <Modal
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     },
     container: {
         height: '92%',
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: theme.spacing.lg,
@@ -166,21 +166,21 @@ const styles = StyleSheet.create({
         color: '#FFF',
     },
     sectorBadge: {
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
         alignSelf: 'flex-start',
     },
     sectorText: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 12,
         fontWeight: '700',
         textTransform: 'uppercase',
     },
     closeButton: {
         padding: 8,
-        backgroundColor: '#3C2D29',
+        backgroundColor: '#181614',
         borderRadius: 20,
     },
     closeButtonText: {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 15,
-        color: '#B28C96',
+        color: '#8A807B',
         lineHeight: 22,
     },
     sectionTitle: {
@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     gridContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     grid: {
         flexDirection: 'row',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     },
     gridLabel: {
         fontSize: 10,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         marginBottom: 4,
     },
@@ -228,11 +228,11 @@ const styles = StyleSheet.create({
         color: '#FFF',
     },
     fitContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#3C2D29',
+        borderColor: '#181614',
     },
     fitRow: {
         gap: 8,
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     },
     fitDesc: {
         fontSize: 12,
-        color: '#B28C96',
+        color: '#8A807B',
         fontStyle: 'italic',
     },
     divider: {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: 20,
         right: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         padding: 16,
         borderRadius: 16,
         flexDirection: 'row',
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     },
     priceLabel: {
         fontSize: 10,
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
     },
     priceValue: {

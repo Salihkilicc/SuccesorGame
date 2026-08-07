@@ -47,11 +47,11 @@ const GRADIENTS = {
   orangeYellow: ['#E3A857', '#E3A857'],
   pinkRed: ['#E06B6B', '#E06B6B'],
   blueSky: ['#5992C6', '#5992C6'],
-  brownGold: ['#12379F', '#12379F'], // Belongings
+  brownGold: ['#123AB8', '#123AB8'], // Belongings
   greenTeal: ['#5FB37A', '#5FB37A'],
-  bluePurple: ['#5992C6', '#12379F'],
+  bluePurple: ['#5992C6', '#123AB8'],
   redCasino: ['#E06B6B', '#E06B6B'], // Casino Red
-  darkGrey: ['#31241F', '#523F3E'],
+  darkGrey: ['#0F0E0D', '#2A2624'],
   hookupFire: ['#0A2A92', '#0A2A92'],
   networkBlue: ['#0A2A92', '#5FB37A'],
 };
@@ -153,7 +153,7 @@ const LifeScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
+        <MaterialCommunityIcons name={item.icon} size={32} color="#EDE8E4" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
@@ -227,7 +227,7 @@ export default LifeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#0F0E0D',
   },
   safeArea: {
     flex: 1,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 36,
     fontWeight: '300',
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     letterSpacing: 8,
     textTransform: 'uppercase',
   },
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#614A4B',
+    color: '#3B3632',
     marginBottom: 20,
     letterSpacing: 4,
     textTransform: 'uppercase',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -359,13 +359,13 @@ const styles = StyleSheet.create({
   },
   bottomTabIcon: {
     fontSize: 24, // Slightly larger icons
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     textShadowColor: 'rgba(0,0,0,0.3)', // Depth
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
   bottomTabLabel: {
-    color: '#FFFFFF',
+    color: '#EDE8E4',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.3,

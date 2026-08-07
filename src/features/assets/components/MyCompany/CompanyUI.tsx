@@ -39,16 +39,16 @@ export const SectionHeader = ({ title }: { title: string }) => (
 );
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#31241F', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: '#E9B8C9', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
+  card: { backgroundColor: '#0F0E0D', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: '#E9B8C9', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' }, // White
+  cardTitle: { fontSize: 20, fontWeight: '800', color: '#EDE8E4' }, // White
   contentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12, borderTopWidth: 1, borderTopColor: '#333' },
   col: { flex: 1, gap: 4 },
   separator: { width: 1, backgroundColor: '#333', marginHorizontal: 12 },
-  label: { fontSize: 11, color: '#B28C96', textTransform: 'uppercase' }, // Text Secondary
-  value: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' }, // White
+  label: { fontSize: 11, color: '#8A807B', textTransform: 'uppercase' }, // Text Secondary
+  value: { fontSize: 14, fontWeight: '700', color: '#EDE8E4' }, // White
   success: { color: '#5FB37A' }, // Green
   danger: { color: theme.colors.danger },
   sectionHeader: { marginTop: theme.spacing.sm },
-  sectionTitle: { color: '#B28C96', fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
+  sectionTitle: { color: '#8A807B', fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
 });

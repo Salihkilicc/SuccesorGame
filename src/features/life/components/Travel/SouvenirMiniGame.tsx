@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     container: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0E0D',
         borderRadius: 20,
         padding: 24, // Reduced padding
         width: '100%',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     },
     box: {
         aspectRatio: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#333',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     boxSelected: {
         borderColor: '#E9B8C9',
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
     },
     boxIcon: {
         fontSize: 24, // Smaller icon
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E9B8C9',
     },
     rarityRare: {
-        backgroundColor: '#12379F',
+        backgroundColor: '#123AB8',
     },
     rarityCommon: {
         backgroundColor: '#5992C6',

@@ -202,12 +202,12 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 )}
                                 Do you wish to proceed with <Text style={{ fontWeight: 'bold' }}>{selectedDoctor?.name}</Text> for{' '}
                                 {hasDiscount && (
-                                    <Text style={{ color: '#FFFFFF', textDecorationLine: 'line-through' }}>
+                                    <Text style={{ color: '#EDE8E4', textDecorationLine: 'line-through' }}>
                                         ${selectedDoctor?.cost.toLocaleString()}
                                     </Text>
                                 )}
                                 {hasDiscount && ' '}
-                                <Text style={{ color: '#B28C96', fontWeight: 'bold' }}>
+                                <Text style={{ color: '#8A807B', fontWeight: 'bold' }}>
                                     ${selectedDoctor ? getDiscountedPrice(selectedDoctor.cost).toLocaleString() : '0'}
                                 </Text>
                                 {hasDiscount && (
@@ -266,19 +266,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#B28C96',
-        backgroundColor: '#000000',
+        borderBottomColor: '#8A807B',
+        backgroundColor: '#0F0E0D',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         alignItems: 'center',
         justifyContent: 'center',
     },
     backIcon: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -286,13 +286,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
     },
     scrollContent: {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
         gap: 10,
     },
     discountIcon: {
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     discountText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
     },
     listContent: {
@@ -329,20 +329,20 @@ const styles = StyleSheet.create({
     },
     doctorCard: {
         padding: 16,
-        backgroundColor: '#31241F',
+        backgroundColor: '#0F0E0D',
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
         gap: 10,
         position: 'relative',
     },
     doctorCardPressed: {
-        backgroundColor: '#31241F',
-        borderColor: '#B28C96',
+        backgroundColor: '#0F0E0D',
+        borderColor: '#8A807B',
     },
     doctorCardDisabled: {
         opacity: 0.5,
-        borderColor: '#B28C96',
+        borderColor: '#8A807B',
     },
     riskBadge: {
         position: 'absolute',
@@ -366,24 +366,24 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     doctorName: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontWeight: '700',
         fontSize: 16,
     },
     disabledText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
     },
     priceContainer: {
         alignItems: 'flex-end',
         gap: 2,
     },
     originalPrice: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
         textDecorationLine: 'line-through',
     },
     doctorCost: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontWeight: '700',
         fontSize: 16,
     },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     successRateLabel: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 13,
     },
     successRateBadge: {
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     successRateText: {
-        color: '#000000',
+        color: '#0F0E0D',
         fontWeight: '700',
         fontSize: 12,
     },
@@ -414,12 +414,12 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     outcomeLabel: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
         fontWeight: '600',
     },
     outcomeText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 12,
     },
     insufficientFundsOverlay: {
@@ -467,13 +467,13 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     processingText: {
-        color: '#B28C96',
+        color: '#8A807B',
         fontSize: 18,
         fontWeight: '600',
         marginTop: 10,
     },
     processingSubText: {
-        color: '#FFFFFF',
+        color: '#EDE8E4',
         fontSize: 14,
     },
 });
