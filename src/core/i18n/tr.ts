@@ -1912,4 +1912,8 @@ export const tr: Record<string, string> = {
     'report.capacitySqueeze': 'Fabrikan planladığının ancak %{v1}\'ini üretebildi. Üstü, yarattığın ama teslim edemediğin taleptir — pay ise sattığın maldan doğar. Ya tesisi büyüt ya personel al, ya da planı küçült.',
     'gov.boardRejected': 'Kurul reddetti',
     'gov.dilutionAlwaysVotes': 'Yeni hisse ihracı her zaman oya gider — tüm ortakları seyrelttiği için tek başına CEO\'nun kararı değildir.',
+    'product.afterScrap': '{v1} sipariş, {v2} fire (verim %{v3})',
+    'report.scrappedLine': '{v1} adet hatta fire verdi — parasını ödedin, satılmadı',
+    'equity.nothingToBuyBack': 'Geri alınacak hisse yok',
+    'equity.nothingToBuyBackBody': 'Geri alım, halka açık dolaşımdaki hisseyi satın alır; şirketin hâlâ özel — payı sen ve kurul tutuyorsunuz, piyasada işlem gören hisse yok. Önce halka açıl; ondan sonra geri alım hisseyi imha eder, senin yüzdeni yükseltir ve fiyatı destekler.',
 };

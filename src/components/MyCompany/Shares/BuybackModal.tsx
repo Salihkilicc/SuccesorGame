@@ -23,7 +23,9 @@ const BuybackModal = ({ visible, onClose }: Props) => {
         isAffordable,
         currentStockPrice,
         estimatedNewStockPrice,
-        handleConfirm
+        handleConfirm,
+        floatShares,
+        hasFloat
     } = useBuybackLogic(onClose);
 
     // Stepper handler - clamps between 1% and 100%
@@ -194,7 +196,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                     !isAffordable && styles.executeButtonDisabled
                                 ]}
                                 onPress={handleConfirm}
-                                disabled={!isAffordable}
+                                disabled={!isAffordable || !hasFloat}
                                 activeOpacity={0.7}
                             >
                                 <Text style={[
@@ -214,6 +216,9 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
+    noFloatCard: { backgroundColor: '#2A2416', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#FFB020' },
+    noFloatTitle: { color: '#FFB020', fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    noFloatBody: { color: '#D8CBB0', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',

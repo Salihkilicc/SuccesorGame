@@ -355,6 +355,17 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
                   been counted - the engine had counted them all along,
                   they were simply never shown.
                  -------------------------------------------------------- */}
+              {/* --------------------------------------------------------
+                  Scrap was computed, written to the report and never once
+                  shown. Units ordered but never made appeared nowhere: not
+                  in sold, not in stock. They simply went missing between
+                  the production order and the invoice.
+                 -------------------------------------------------------- */}
+              {(p.scrapped ?? 0) > 0 && (
+                <Text style={styles.scrapLine}>
+                  {t('report.scrappedLine', { v1: formatNumber(p.scrapped ?? 0) })}
+                </Text>
+              )}
               {(p.contractUnits ?? 0) > 0 && (
                 <Text style={styles.productSplit}>
                   {t('report.producedSplit', {
@@ -1106,6 +1117,7 @@ const styles = StyleSheet.create({
 
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
+  scrapLine: { fontSize: 9, color: '#FF6B6B', marginTop: 2 },
   productSplit: { fontSize: 9, color: '#7FB3FF', marginTop: 2 },
   productStatLabel: { color: '#6E6E6E', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#E0E0E0', fontSize: 14, fontWeight: '700', marginTop: 2 },

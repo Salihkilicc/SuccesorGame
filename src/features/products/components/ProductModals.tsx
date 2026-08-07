@@ -27,6 +27,7 @@ import {
     quoteContractOrder,
 } from '../../../core/market/contract';
 import { getTier, utilizationVerdict, UTILIZATION_NOTES } from '../../../core/market/capacity';
+import { scrapMultiplier } from '../../../core/market/workforce';
 import InfoDot from '../../../components/common/InfoDot';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
@@ -286,6 +287,28 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const maxUnits = maxUnitsPerQuarter(employeeCount, complexity, facilityTier, isRetooling);
     // Kapasite kuculdiyse (eleman cikardin) hedef otomatik kirpilir.
     const willBuild = Math.max(0, Math.min(productionUnits, maxUnits));
+
+    // ----------------------------------------------------------------------
+    //  WHAT THE LINE ORDERS vs WHAT COMES OFF IT
+    // ----------------------------------------------------------------------
+    //  Every tier has a yield rate and morale scales the scrap on top of it.
+    //  This screen ignored both: it promised 15,000 units while the engine
+    //  produced 13,500 and quietly scrapped 1,500. The report never showed
+    //  the scrap line either, so those units simply vanished between the
+    //  order and the invoice - "I produce a lot, it doesn't say sold and it
+    //  doesn't go to stock".
+    //
+    //  Worse than cosmetic: 'Match demand' set the order equal to demand, so
+    //  after scrap it always came up short by the scrap rate. The order now
+    //  grosses up for yield, and the screen states both numbers.
+    // ----------------------------------------------------------------------
+    const employeeMorale = useStatsStore(state => state.employeeMorale ?? 70);
+    const effectiveYield = Math.max(
+        0.5,
+        1 - (1 - tier.yieldRate) * scrapMultiplier(employeeMorale),
+    );
+    const goodUnits = Math.floor(willBuild * effectiveYield);
+    const scrapUnits = willBuild - goodUnits;
     // Bar adimi: kapasitenin %5'i, en az 1
     const unitStep = Math.max(1, Math.round(maxUnits * 0.05));
 
@@ -414,7 +437,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const expectedDemand = market ? demandUnits(market, projectedShare) : 0;
 
     // Elde stok da satilabilir
-    const available = willBuild + (product.inventory || 0);
+    const available = goodUnits + (product.inventory || 0);
     const expectedSales = Math.min(available, expectedDemand);
     const supplyGap = available - expectedDemand;
     const neededUnits = Math.max(0, expectedDemand - (product.inventory || 0));
@@ -604,7 +627,16 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             <View style={styles.compareRow}>
                                 <View>
                                     <Text style={styles.compareLabel}>{t('product.youWillBuild')}</Text>
-                                    <Text style={styles.compareValue}>{formatNumber(willBuild)}</Text>
+                                    <Text style={styles.compareValue}>{formatNumber(goodUnits)}</Text>
+                                    {scrapUnits > 0 && (
+                                        <Text style={styles.scrapNote}>
+                                            {t('product.afterScrap', {
+                                                v1: formatNumber(willBuild),
+                                                v2: formatNumber(scrapUnits),
+                                                v3: (effectiveYield * 100).toFixed(1),
+                                            })}
+                                        </Text>
+                                    )}
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
                                     <Text style={styles.compareLabel}>{t('product.marketWants')}</Text>
@@ -651,12 +683,12 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             {expectedDemand > 0 && neededUnits > 0 && maxUnits > 0 && (
                                 <Pressable
                                     style={styles.matchBtn}
-                                    onPress={() => setProductionUnits(Math.min(maxUnits, neededUnits))}
+                                    onPress={() => setProductionUnits(Math.min(maxUnits, Math.ceil(neededUnits / effectiveYield)))}
                                 >
                                     <Text style={styles.matchBtnText}>
                                         {neededUnits > maxUnits
                                             ? t('product.matchDemandCapped', { units: formatNumber(maxUnits) })
-                                            : t('product.matchDemand', { units: formatNumber(neededUnits) })}
+                                            : t('product.matchDemand', { units: formatNumber(Math.ceil(neededUnits / effectiveYield)) })}
                                     </Text>
                                 </Pressable>
                             )}
@@ -1319,6 +1351,7 @@ const styles = StyleSheet.create({
     sliderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#2D3748', padding: 8, borderRadius: 8 },
     adjBtn: { width: 36, height: 36, backgroundColor: '#4A5568', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
     adjText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+    scrapNote: { fontSize: 9, color: '#FFB020', marginTop: 2, lineHeight: 13 },
     queuedLine: { fontSize: 10, color: '#FFB020', marginTop: 3, lineHeight: 14 },
     hint: { fontSize: 11, color: '#718096', marginTop: 4, textAlign: 'right' },
     realStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },

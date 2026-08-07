@@ -1911,4 +1911,8 @@ export const en: Record<string, string> = {
     'report.capacitySqueeze': 'Your plant could only build {v1}% of what you planned. Everything above that is demand you created and could not deliver — and share is earned on what you actually ship. Upgrade the facility or hire, or scale the plan back.',
     'gov.boardRejected': 'The board voted it down',
     'gov.dilutionAlwaysVotes': 'Issuing new shares always goes to a vote — it dilutes every holder, so it is not the CEO\'s call alone.',
+    'product.afterScrap': 'ordered {v1}, {v2} scrapped ({v3}% yield)',
+    'report.scrappedLine': '{v1} scrapped on the line — paid for, never sold',
+    'equity.nothingToBuyBack': 'There is nothing to buy back',
+    'equity.nothingToBuyBackBody': 'A buyback purchases shares from the public float, and your company is still private — you hold your stake and the board holds theirs, with nothing trading. Go public first, and a buyback then retires shares, lifts your percentage and supports the price.',
 };

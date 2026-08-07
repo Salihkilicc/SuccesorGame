@@ -3,6 +3,8 @@ import { Alert } from 'react-native';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../../features/finance/stores/useEquityStore';
 import { formatNumber, formatMoney } from '../../../../core/utils';
+import { t } from '../../../../core/i18n';
+import { useShareholderStore } from '../../../../features/shareholders/stores/useShareholderStore';
 
 /**
  * Hook: useBuybackLogic
@@ -30,7 +32,28 @@ export const useBuybackLogic = (onClose: () => void) => {
 
     const isAffordable = companyCapital >= cost;
 
+    // ----------------------------------------------------------------------
+    //  YOU CAN ONLY BUY BACK WHAT IS PUBLICLY TRADED
+    // ----------------------------------------------------------------------
+    //  quoteBuyback buys from the FLOAT, and a private company has none: at
+    //  the start the cap table is 65% founder plus 35% board, so the float is
+    //  zero and a buyback purchases nothing. The engine handles that safely -
+    //  it returns zero shares before spending a cent - but this screen still
+    //  showed a confirmation promising a higher stake and a price boost, and
+    //  then nothing happened. That is the "buyback seems to do nothing" the
+    //  player reported: not a broken mechanic, an unexplained precondition.
+    // ----------------------------------------------------------------------
+    const floatShares = useShareholderStore(st => {
+        const insiders = (st.members || []).reduce((sum: number, m: any) => sum + (m.shareCount || 0), 0);
+        return Math.max(0, (st.totalShares || 0) - (st.playerShareCount || 0) - insiders);
+    });
+    const hasFloat = floatShares > 0;
+
     const handleConfirm = () => {
+        if (!hasFloat) {
+            Alert.alert(t('equity.nothingToBuyBack'), t('equity.nothingToBuyBackBody'));
+            return;
+        }
         if (buybackPercentage <= 0) {
             Alert.alert('Invalid Amount', 'Please select a percentage.');
             return;
@@ -81,6 +104,8 @@ export const useBuybackLogic = (onClose: () => void) => {
     };
 
     return {
+        floatShares,
+        hasFloat,
         buybackPercentage,
         setBuybackPercentage,
         cost,
