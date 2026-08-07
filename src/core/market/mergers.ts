@@ -169,7 +169,19 @@ export const SYNERGY_ANNUAL_RATIO = 0.30;
 /** Sinerjinin tam hizina ulasmasi kac ceyrek surer. */
 export const SYNERGY_RAMP_QUARTERS = 6;
 /** Dusmanca devralmada sinerjinin ne kadari gerceklesir. */
-export const HOSTILE_SYNERGY_REALIZATION = 0.6;
+/**
+ * How much of the synergy a hostile deal actually realises.
+ *
+ * Raised from 0.60. At 0.60 a hostile bid was strictly dominated: it paid 20
+ * points more premium, doubled the integration bill, took a heavier
+ * announcement hit AND gave up a third of the synergy for good. Nothing
+ * compensated, so the option existed and no one would ever take it.
+ *
+ * Losing key people in a contested deal is real and should still cost, but a
+ * permanent third is too much. At 0.85 the premium and the integration remain
+ * the price of going hostile, and payback moves from 4.7 years to about 3.5.
+ */
+export const HOSTILE_SYNERGY_REALIZATION = 0.85;
 
 /** Hedefin kazancinin ilk ceyrekte ne kadari sana gecer. */
 export const EARNINGS_CAPTURE_START = 0.5;
@@ -349,8 +361,21 @@ export const quoteAcquisition = (
 
     const totalIntegration =
         price * INTEGRATION_COST_RATIO * (hostile ? HOSTILE_INTEGRATION_MULTIPLIER : 1);
+    // ------------------------------------------------------------------
+    //  SYNERGY COMES FROM THE BUSINESS, NOT FROM WHAT YOU PAID
+    // ------------------------------------------------------------------
+    //  This quote scaled synergy by `price` while the quarterly engine
+    //  (processAcquisitionsQuarter) scales it by targetAnnualEbit. Two
+    //  consequences, both bad: the preview never matched what the engine
+    //  delivered, and paying a higher premium APPEARED to buy more synergy -
+    //  so a hostile bid's 15% realisation penalty was cancelled out by its own
+    //  20-point premium and the two came out identical.
+    //
+    //  Overpaying does not make two businesses fit together better.
+    // ------------------------------------------------------------------
     const annualSynergy =
-        price * SYNERGY_ANNUAL_RATIO * (hostile ? HOSTILE_SYNERGY_REALIZATION : 1);
+        Math.max(0, targetAnnualEbit) * SYNERGY_ANNUAL_RATIO *
+        (hostile ? HOSTILE_SYNERGY_REALIZATION : 1);
 
     // Ilk yil: kazanc yakalama ortalama ~%75, sinerji ~%29, entegrasyonun
     // tamami. Bu yuzden ilk yil neredeyse her zaman dilutive olur — ki
@@ -527,4 +552,68 @@ export const FINANCING_EXPLANATIONS: Record<FinancingMethod, string> = {
     cash: 'Paid from the company treasury. Simple, and it costs you nothing in ownership — but you can only buy what you can afford.',
     debt: 'A leveraged buyout. No dilution and no cash needed up front, but the interest eats your profit every quarter and the debt sits against your valuation. If the deal disappoints, the debt does not.',
     stock: 'You hand the target\'s owners newly issued shares in your company. No cash required, so you can buy something far larger than yourself — but everyone, including you, is diluted. Buy a company a hundred times your size this way and you will own almost none of what results.',
+};
+
+// ============================================================================
+//  NOT EVERY BOARD WILL SELL
+// ============================================================================
+//  Friendly offers were accepted unconditionally, and that is what left the
+//  hostile route pointless: if the polite path always works, nobody ever pays
+//  the premium for the rude one.
+//
+//  In reality a target's board refuses when it is doing well and does not need
+//  you - which is exactly when you most want it. Refusal is decided by the
+//  target itself, not by a dice roll the player can re-roll:
+//
+//    STRENGTH  a strong competitor has less reason to sell
+//    SIZE      a target close to your own size is not looking for a rescue
+//    RISK      a struggling company takes the offer; a low-risk one does not
+//
+//  When the board refuses, the acquisition is still possible - hostile. That
+//  is what the premium buys: the ability to go over their heads. It also makes
+//  the friendly/hostile choice situational instead of always-friendly.
+// ============================================================================
+
+/** Above this refusal score the target's board will not agree to be bought. */
+export const REFUSAL_THRESHOLD = 0.55;
+
+export interface RefusalCheck {
+    refuses: boolean;
+    score: number;
+    reason: string;
+}
+
+/**
+ * Will this board entertain a friendly offer?
+ *
+ * `strength` is the competitor's strength score (0-100) where known; without
+ * it, only size and risk decide.
+ */
+export const boardWillSell = (
+    targetMarketCap: number,
+    acquirerValuation: number,
+    risk: TargetRisk,
+    strength?: number,
+): RefusalCheck => {
+    const relative = Math.min(2, targetMarketCap / Math.max(1, acquirerValuation));
+
+    // A strong operator has less reason to take your money.
+    const strengthPart = strength !== undefined
+        ? Math.max(0, (strength - 50) / 100)      // 50 -> 0, 100 -> 0.5
+        : 0.15;
+
+    // Approaching your own size, they are a peer rather than a target.
+    const sizePart = Math.min(0.35, relative * 0.25);
+
+    // The riskier the business, the more willing they are to be rescued.
+    const riskPart = risk === 'Low' ? 0.20 : risk === 'Medium' ? 0.05 : -0.15;
+
+    const score = strengthPart + sizePart + riskPart;
+    const refuses = score >= REFUSAL_THRESHOLD;
+
+    return {
+        refuses,
+        score,
+        reason: refuses ? t('merger.boardRefuses') : t('merger.boardOpen'),
+    };
 };

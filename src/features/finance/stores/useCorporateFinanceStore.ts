@@ -35,6 +35,7 @@ import {
     quoteFinancing,
 } from '../../../core/market/mergers';
 import { directorFromAcquisition } from '../../../core/market/governance';
+import { boardWillSell } from '../../../core/market/mergers';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney } from '../../../core/utils';
 
@@ -220,6 +221,18 @@ export interface CorporateFinanceState {
  * Ama oyunun borc terazisinde bir maliyeti olmali, yoksa "bedava borc"
  * kapisi acik kalirdi.
  */
+/** A listed company's competitor strength, where it competes in a product market. */
+const competitorStrengthOf = (stockId: string): number | undefined => {
+    try {
+        const { PRODUCT_MARKETS } = require('../../../core/market/productMarkets');
+        for (const m of PRODUCT_MARKETS) {
+            const c = (m.competitors || []).find((x: any) => x.stockId === stockId);
+            if (c) return c.strength;
+        }
+    } catch { /* not a product-market rival */ }
+    return undefined;
+};
+
 const SHARK_IMPLIED_RATE = 0.30;
 
 /** Kurul uyelerinden alinan aktif borclarin toplami. */
@@ -746,6 +759,27 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 const base = quoteAcquisition(target.marketCap, risk, hostile, acquirerValuation);
                 const price = negotiatedPrice ?? base.price;
                 const premium = Math.max(0, price - target.marketCap);
+
+                // ------------------------------------------------------------
+                //  1b) HEDEFIN KURULU SATMAK ISTIYOR MU
+                // ------------------------------------------------------------
+                //  A friendly offer used to be accepted unconditionally, which
+                //  is what made the hostile route pointless - if the polite
+                //  path always works, nobody pays the premium for the rude one.
+                //  A board that is strong, close to your size and not in
+                //  trouble says no, and then hostile is the only way in.
+                // ------------------------------------------------------------
+                if (!hostile) {
+                    const strength = competitorStrengthOf(target.id);
+                    const check = boardWillSell(target.marketCap, acquirerValuation, risk, strength);
+                    if (check.refuses) {
+                        return {
+                            success: false,
+                            message: check.reason,
+                            announcementImpact: 0,
+                        };
+                    }
+                }
 
                 // 2) Finansman
                 const shStore = require('../../shareholders/stores/useShareholderStore').useShareholderStore;

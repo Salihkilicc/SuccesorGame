@@ -1916,4 +1916,6 @@ export const en: Record<string, string> = {
     'equity.nothingToBuyBack': 'There is nothing to buy back',
     'equity.nothingToBuyBackBody': 'A buyback purchases shares from the public float, and your company is still private — you hold your stake and the board holds theirs, with nothing trading. Go public first, and a buyback then retires shares, lifts your percentage and supports the price.',
     'newgame.freshStartBody': 'Fresh start ready.\n\n• Company capital: $2M\n• Personal cash: $50K\n• 1 factory, {v1} employees\n• 1 active product (Smart Phone)',
+    'merger.boardRefuses': 'Their board turned you down. They are performing, they are close to your size, and they are not looking for a buyer. If you want this company you will have to go over their heads — a hostile bid.',
+    'merger.boardOpen': 'Their board is willing to talk.',
 };
