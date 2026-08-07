@@ -1909,4 +1909,6 @@ export const en: Record<string, string> = {
     'report.producedSplit': '{v1} in-house + {v2} outsourced',
     'report.afterOutsourcing': 'and that is after the {v1} your contract partner delivered',
     'report.capacitySqueeze': 'Your plant could only build {v1}% of what you planned. Everything above that is demand you created and could not deliver — and share is earned on what you actually ship. Upgrade the facility or hire, or scale the plan back.',
+    'gov.boardRejected': 'The board voted it down',
+    'gov.dilutionAlwaysVotes': 'Issuing new shares always goes to a vote — it dilutes every holder, so it is not the CEO\'s call alone.',
 };

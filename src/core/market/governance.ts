@@ -533,6 +533,27 @@ export const requiresVote = (
         };
     }
 
+    // ------------------------------------------------------------------
+    //  ISSUING SHARES ALWAYS GOES TO A VOTE
+    // ------------------------------------------------------------------
+    //  Not an operational call. New equity dilutes every existing holder, and
+    //  in real company law that is the shareholders' decision regardless of
+    //  who runs the business - one of the few things a controlling founder
+    //  cannot simply do alone.
+    //
+    //  It was falling through to "within your authority as majority" at ANY
+    //  size, which is how issuing shares became an unlimited source of cash:
+    //  the raise lifts the valuation, and the larger valuation supports a
+    //  larger raise next time. A majority holder still wins the vote - but
+    //  carrying it against the board's advice is an override, and overrides
+    //  cost trust and can trigger resignations.
+    // ------------------------------------------------------------------
+    if (proposal.kind === 'dilution') {
+        return {
+            required: true,
+            get reason() { return t('gov.dilutionAlwaysVotes'); },
+        };
+    }
     const threshold = MAJORITY_VOTE_THRESHOLDS[proposal.kind];
     if (threshold === undefined) {
         return { required: false, reason: t('data.governance.withinYourAuthorityAsMajority') };

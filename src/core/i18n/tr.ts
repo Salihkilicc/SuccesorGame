@@ -1910,4 +1910,6 @@ export const tr: Record<string, string> = {
     'report.producedSplit': '{v1} kendi hattın + {v2} fason',
     'report.afterOutsourcing': 'üstelik bu, fasoncunun teslim ettiği {v1} adetten SONRA kalan açık',
     'report.capacitySqueeze': 'Fabrikan planladığının ancak %{v1}\'ini üretebildi. Üstü, yarattığın ama teslim edemediğin taleptir — pay ise sattığın maldan doğar. Ya tesisi büyüt ya personel al, ya da planı küçült.',
+    'gov.boardRejected': 'Kurul reddetti',
+    'gov.dilutionAlwaysVotes': 'Yeni hisse ihracı her zaman oya gider — tüm ortakları seyrelttiği için tek başına CEO\'nun kararı değildir.',
 };

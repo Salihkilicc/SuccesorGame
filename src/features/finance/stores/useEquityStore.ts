@@ -50,6 +50,14 @@ import {
 export interface EquityState {
     /** Piyasa duygusu carpani. 1.0 = normal, >1 = coskulu */
     marketMultiplier: number;
+    /**
+     * Quarters in which shares were issued, most recent first.
+     *
+     * The discount on a placement grows with how recently the last one was
+     * done - going back to the market twice in a year is not priced like
+     * going once. Without this, repeated issuance was free.
+     */
+    issueHistory: number[];
     priceHistory: number[];
 
     // --- Turetilmis alanlar (kap tablosundan okunur) ---
@@ -108,6 +116,7 @@ export const useEquityStore = create<EquityState>()(
     persist<EquityState>(
         (set, get) => ({
             marketMultiplier: 1.0,
+            issueHistory: [],
             priceHistory: [] as number[],
 
             totalShares: 10_000_000,
@@ -227,12 +236,18 @@ export const useEquityStore = create<EquityState>()(
                 const price = useStatsStore.getState().companySharePrice
                     || sharePrice(valuation, cap.totalShares);
 
-                const q = quoteSecondary(price, cap.totalShares, cap.playerShares, decimal);
+                // How many placements in the last four quarters
+                const nowQ = (useStatsStore.getState() as any).currentQuarter
+                    ?? require('../../../core/store/useGameStore').useGameStore.getState().currentMonth ?? 0;
+                const recent = (get().issueHistory || []).filter(q2 => nowQ - q2 < 4).length;
+
+                const q = quoteSecondary(price, cap.totalShares, cap.playerShares, decimal, recent);
                 const sharesCreated = q.newShares;
                 const cashRaised = q.netProceeds;
 
                 addCashFn(cashRaised);
                 shareholderStore().setState({ totalShares: cap.totalShares + sharesCreated });
+                set(state => ({ issueHistory: [nowQ, ...(state.issueHistory || [])].slice(0, 8) }));
 
                 // Yeni hisse cikarmak piyasada olumsuz sinyaldir.
                 const impact = decimal * DILUTION_PRICE_PRESSURE;

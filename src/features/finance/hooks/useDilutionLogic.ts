@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { boardGate } from '../stores/useCorporateFinanceStore';
 import { useEquityStore } from '../stores/useEquityStore';
 import { formatMoney } from '../../../core/utils';
+import { t } from '../../../core/i18n';
 
 export interface DilutionLogicResult {
     // State
@@ -72,6 +74,37 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
                     text: "Confirm & Sell",
                     style: "destructive",
                     onPress: () => {
+                        // ------------------------------------------------------
+                        //  THE BOARD DECIDES THIS ONE
+                        // ------------------------------------------------------
+                        //  Issuing shares was the one big capital decision that
+                        //  never reached the board. governance.ts lists
+                        //  'dilution' as a proposal kind and gives every
+                        //  temperament a stance on it (Conservative -0.9,
+                        //  Aggressive +0.5), and nothing ever called for the
+                        //  vote - only acquisitions did.
+                        //
+                        //  That left an unlimited money printer: dilute, the
+                        //  cash raises the valuation, dilute again against the
+                        //  larger valuation. The player's report was "I can buy
+                        //  any company I want, my own value does not matter".
+                        //
+                        //  Now it goes through the same gate as an acquisition.
+                        //  While you hold a majority you still win the vote -
+                        //  but against the board's advice that is an override,
+                        //  and overrides cost trust and can trigger resignations.
+                        // ------------------------------------------------------
+                        const gate = boardGate(
+                            'dilution',
+                            capitalRaised,
+                            t('equity.shareDilution'),
+                        );
+                        if (gate.needed && !gate.passed) {
+                            Alert.alert(t('gov.boardRejected'), gate.reason);
+                            onClose();
+                            return;
+                        }
+
                         // Execute dilution via Equity Store
                         const result = useEquityStore.getState().executeDilution(
                             dilutionPercentage,
@@ -92,7 +125,8 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
                         Alert.alert(
                             "Success",
                             `${formatMoney(result.capitalRaised)} Raised!\n` +
-                            `New Ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+                            `New Ownership: ${result.newOwnershipPercent.toFixed(1)}%` +
+                            (gate.needed ? `\n\n${gate.reason}` : ''),
                         );
                         onClose();
                     }

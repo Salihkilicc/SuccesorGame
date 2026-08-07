@@ -579,14 +579,35 @@ export interface SecondaryQuote {
     priceImpactPercent: number;
 }
 
+/**
+ * How much extra discount a large issue costs, and how much a recent one adds.
+ *
+ * A flat 8% discount meant the market would absorb any size of issue at the
+ * same price, which is what made repeated issuance a money printer: raise cash,
+ * the cash lifts the valuation, raise again against the larger valuation. Real
+ * placements do not work that way - flooding the market moves the price against
+ * you, and going back within a year moves it further.
+ */
+export const SIZE_DISCOUNT_SLOPE = 0.6;
+export const REPEAT_DISCOUNT = 0.10;
+export const MAX_SECONDARY_DISCOUNT = 0.55;
+
+export const secondaryDiscount = (ratio: number, recentIssues = 0): number => {
+    const size = Math.max(0, Math.min(0.5, ratio)) * SIZE_DISCOUNT_SLOPE;
+    const repeat = Math.max(0, recentIssues) * REPEAT_DISCOUNT;
+    return Math.min(MAX_SECONDARY_DISCOUNT, SECONDARY_DISCOUNT + size + repeat);
+};
+
 export const quoteSecondary = (
     currentPrice: number,
     totalShares: number,
     playerShares: number,
     dilutionRatio: number,
+    /** Issues placed in the last four quarters, this one excluded */
+    recentIssues = 0,
 ): SecondaryQuote => {
     const ratio = Math.min(0.5, Math.max(0, dilutionRatio));
-    const offerPrice = currentPrice * (1 - SECONDARY_DISCOUNT);
+    const offerPrice = currentPrice * (1 - secondaryDiscount(ratio, recentIssues));
     const newShares = Math.floor((totalShares * ratio) / (1 - ratio));
     const grossProceeds = newShares * offerPrice;
     const fee = grossProceeds * SECONDARY_FEE;
