@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
     },
     backButtonText: {
-        color: '#C8B6FF',
+        color: '#5992C6',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#4CC9F0',
+        color: '#5992C6',
         textTransform: 'uppercase',
         letterSpacing: 2,
     },
@@ -111,11 +111,11 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     venueCard: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 16,
         borderWidth: 2,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
     },
     venueCardPressed: {
         transform: [{ scale: 0.98 }],
@@ -141,11 +141,11 @@ const styles = StyleSheet.create({
     },
     venueLocation: {
         fontSize: 13,
-        color: '#4CC9F0',
+        color: '#5992C6',
     },
     venueDetails: {
         borderTopWidth: 1,
-        borderTopColor: '#C8B6FF',
+        borderTopColor: '#5992C6',
         paddingTop: 12,
     },
     detailRow: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     entryFee: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C8B6FF',
+        color: '#5992C6',
     },
     selectedBadge: {
         position: 'absolute',

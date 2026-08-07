@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   ownedText: {
     fontSize: theme.typography.caption,
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontWeight: '600',
     marginTop: -8,
   },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   helper: {
     fontSize: theme.typography.caption + 1,
-    color: '#A0A0A0',
+    color: '#B28C96',
   },
   actions: {
     flexDirection: 'row',
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sellButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#E06B6B',
   },
   buyButton: {
-    backgroundColor: '#00E676',
+    backgroundColor: '#5FB37A',
   },
   sellText: {
     fontSize: theme.typography.body,

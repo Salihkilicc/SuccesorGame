@@ -42,7 +42,7 @@ export default FinancialSummary;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1C1C1E', // Dark Gray - HARDCODED
+    backgroundColor: '#31241F', // Dark Gray - HARDCODED
     borderRadius: 12,
     padding: 16,
     gap: 12,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    color: '#8E8E93', // Gray labels - HARDCODED
+    color: '#B28C96', // Gray labels - HARDCODED
   },
   value: {
     fontSize: 14,

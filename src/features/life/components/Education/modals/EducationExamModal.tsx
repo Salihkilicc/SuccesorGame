@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         width: width * 0.9,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         overflow: 'hidden',
         borderWidth: 1,
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 4,
-        borderBottomColor: '#FFD700', // Gold accent
+        borderBottomColor: '#E9B8C9', // Gold accent
     },
     headerIcon: {
         fontSize: 32,
         marginRight: 15,
     },
     headerTitle: {
-        color: '#ffffff',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
         textTransform: 'uppercase',
@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
     },
     body: {
         padding: 24,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.border,
     },
     questionText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#1e293b',
+        color: '#31241F',
         lineHeight: 28,
         textAlign: 'center',
     },
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     optionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderColor: '#FFFFFF',
         borderRadius: 12,
         padding: 12,
         marginBottom: 10,
@@ -167,20 +167,20 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     optionLetter: {
-        color: '#ffffff',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: 'bold',
     },
     optionText: {
         flex: 1,
         fontSize: 15,
-        color: '#334155',
+        color: '#523F3E',
         fontWeight: '500',
     },
     footerWarning: {
         textAlign: 'center',
         fontSize: 11,
-        color: '#94a3b8',
+        color: '#B28C96',
         paddingBottom: 16,
         fontStyle: 'italic',
     },

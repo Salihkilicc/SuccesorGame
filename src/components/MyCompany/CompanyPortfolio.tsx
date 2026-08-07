@@ -104,36 +104,36 @@ export default CompanyPortfolio;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0C0F1A',
+    backgroundColor: '#000000',
     borderRadius: 14,
     padding: 16,
     gap: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#181C2A',
+    borderColor: '#000000',
   },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#EEF2FF',
+    color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   list: {
     gap: 10,
   },
   card: {
-    backgroundColor: '#0F1424',
+    backgroundColor: '#000000',
     borderRadius: 12,
     padding: 12,
     gap: 6,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#1C2335',
+    borderColor: '#31241F',
   },
   shareCard: {
-    borderColor: '#3B82F6',
+    borderColor: '#12379F',
     borderWidth: 1,
   },
   cardPressed: {
-    backgroundColor: '#131A2D',
+    backgroundColor: '#000000',
   },
   shareHeader: {
     flexDirection: 'row',
@@ -143,19 +143,19 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#E6ECF7',
+    color: '#FFFFFF',
   },
   ownershipBadge: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#3B82F6',
-    backgroundColor: '#3B82F620',
+    color: '#12379F',
+    backgroundColor: '#12379F20',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
   },
   revenue: {
     fontSize: 13,
-    color: '#9AA7BC',
+    color: '#B28C96',
   },
 });

@@ -72,27 +72,24 @@ export const theme = {
         // ------------------------------------------------------------------
         //  KAR / ZARAR
         // ------------------------------------------------------------------
-        //  Paletin tek gercek bedeli burasi. Dort renkte yesil yok, yani
-        //  finans oyunlarinin ogrenilmis yesil/kirmizi okumasi elde degil.
-        //  Ayni bilgiyi paletten cikmadan tasiyan en iyi cift:
+        //  Bunlar dekorasyon degil VERI. Yesil/kirmizi okumasi ogrenilmis bir
+        //  refleks; finans oyununda onu paletin hatiri icin feda etmek
+        //  okunurlugu dogrudan dusurur. Bu yuzden dort rengin disinda tutuldu.
         //
-        //    pozitif -> Danube  (sakin mavi, 4.5 kontrast)
-        //    negatif -> Shilo   (yumusak pembe, 8.7 kontrast)
-        //
-        //  Tutarli kullanildiginda okunur, ama yesil/kirmizi kadar ANINDA
-        //  degil. Sayinin yanina yon isareti koymak bu farki kapatir.
+        //  Doygunluklari kirildi ki sicak kahve zemine otursunlar: ekrandaki
+        //  tek parlak sey kar/zarar rakamidir. Ikisi de AA gecti.
         // ------------------------------------------------------------------
-        positive: '#5992c6',
-        negative: '#e9b8c9',
+        positive: '#5FB37A',
+        negative: '#E06B6B',
         neutral: '#b28c96',
 
         // Eski adlar — kademeli gecis icin
         card: '#3c2d29',
         cardSoft: '#473633',
-        success: '#5992c6',
-        danger: '#e9b8c9',
-        error: '#e9b8c9',
-        warning: '#e9b8c9',
+        success: '#5FB37A',
+        danger: '#E06B6B',
+        error: '#E06B6B',
+        warning: '#E3A857',
     },
 
     /** Yukseklik: zemin ne kadar acilirsa o kadar "yukarida". */

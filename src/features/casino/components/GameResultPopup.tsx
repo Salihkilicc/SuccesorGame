@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   tapText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#B28C96',
     fontStyle: 'italic'
   }
 });

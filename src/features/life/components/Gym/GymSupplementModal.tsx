@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
         padding: 20
     },
     container: {
-        backgroundColor: '#0D1321',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#C0C0C0'
+        borderColor: '#E9B8C9'
     },
     warningContainer: {
-        borderColor: '#FF6F00',
+        borderColor: '#E3A857',
         backgroundColor: '#000000'
     },
     title: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         textAlign: 'center',
-        color: '#C0C0C0',
+        color: '#E9B8C9',
         marginBottom: 30
     },
     grid: {
@@ -140,27 +140,27 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     itemText: { color: '#FFFFFF', fontWeight: '700' },
-    itemPrice: { color: '#FF6F00' },
+    itemPrice: { color: '#E3A857' },
     dangerItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#0D1321',
-        borderColor: '#FF6F00',
+        backgroundColor: '#000000',
+        borderColor: '#E3A857',
         borderWidth: 1,
         borderRadius: 8,
         marginTop: 20
     },
-    dangerText: { color: '#FF6F00', fontWeight: '900' },
-    dangerPrice: { color: '#FF6F00', fontWeight: '700' },
+    dangerText: { color: '#E3A857', fontWeight: '900' },
+    dangerPrice: { color: '#E3A857', fontWeight: '700' },
     closeBtn: { marginTop: 20, alignItems: 'center', padding: 10 },
-    closeText: { color: '#C0C0C0', textDecorationLine: 'underline' },
+    closeText: { color: '#E9B8C9', textDecorationLine: 'underline' },
     warningBox: { alignItems: 'center' },
-    warningTitle: { color: '#FF6F00', fontSize: 22, fontWeight: '900', marginBottom: 20 },
-    warningBody: { color: '#C0C0C0', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
+    warningTitle: { color: '#E3A857', fontSize: 22, fontWeight: '900', marginBottom: 20 },
+    warningBody: { color: '#E9B8C9', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
     warningActions: { flexDirection: 'row', gap: 20 },
-    cancelBtn: { padding: 12, borderWidth: 1, borderColor: '#C0C0C0', borderRadius: 8 },
-    cancelText: { color: '#C0C0C0' },
-    injectBtn: { padding: 12, backgroundColor: '#FF6F00', borderRadius: 8 },
+    cancelBtn: { padding: 12, borderWidth: 1, borderColor: '#E9B8C9', borderRadius: 8 },
+    cancelText: { color: '#E9B8C9' },
+    injectBtn: { padding: 12, backgroundColor: '#E3A857', borderRadius: 8 },
     injectText: { color: '#FFFFFF', fontWeight: '900' }
 });

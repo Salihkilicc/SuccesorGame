@@ -13,21 +13,21 @@ type PartnerCardProps = {
 // --- HELPERS ---
 
 const getLoveColor = (love: number) => {
-  if (love >= 80) return '#ef4444'; // Red
-  if (love >= 50) return '#ec4899'; // Pink
-  if (love >= 30) return '#f59e0b'; // Amber
-  return '#64748b'; // Slate
+  if (love >= 80) return '#E06B6B'; // Red
+  if (love >= 50) return '#E06B6B'; // Pink
+  if (love >= 30) return '#E3A857'; // Amber
+  return '#5992C6'; // Slate
 };
 
 const getTierColor = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY': return '#fbbf24'; // Gold
-    case 'CORPORATE_ELITE': return '#60a5fa'; // Blue
-    case 'UNDERGROUND': return '#ef4444'; // Red
-    case 'BLUE_COLLAR': return '#94a3b8'; // Slate
-    case 'STUDENT_LIFE': return '#22d3ee'; // Cyan
-    case 'ARTISTIC': return '#a855f7'; // Purple
-    default: return '#9ca3af';
+    case 'HIGH_SOCIETY': return '#E3A857'; // Gold
+    case 'CORPORATE_ELITE': return '#5992C6'; // Blue
+    case 'UNDERGROUND': return '#E06B6B'; // Red
+    case 'BLUE_COLLAR': return '#B28C96'; // Slate
+    case 'STUDENT_LIFE': return '#5992C6'; // Cyan
+    case 'ARTISTIC': return '#12379F'; // Purple
+    default: return '#B28C96';
   }
 };
 
@@ -72,7 +72,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
   const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
-  const statusColor = (partner as PartnerProfile).isMarried ? '#a855f7' : '#ec4899';
+  const statusColor = (partner as PartnerProfile).isMarried ? '#12379F' : '#E06B6B';
 
   return (
     <View style={styles.container}>
@@ -123,7 +123,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>💎</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#38bdf8' }]} />
+                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#5992C6' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(looksLevel)}</Text>
             </View>
@@ -134,7 +134,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>🧠</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#a855f7' }]} />
+                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#12379F' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(smartsLevel)}</Text>
             </View>
@@ -178,7 +178,7 @@ export default PartnerCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#31241F',
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     height: 180,
-    backgroundColor: '#2D2D2D',
+    backgroundColor: '#3C2D29',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#383838', // Fallback color
+    backgroundColor: '#473633', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   overlayJob: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#FFFFFF',
     fontWeight: '500',
     marginTop: 2,
   },
@@ -303,23 +303,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#2D2D2D',
+    backgroundColor: '#3C2D29',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#404040',
+    borderColor: '#473633',
   },
   chipText: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#FFFFFF',
   },
   costChip: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderColor: 'rgba(239, 68, 68, 0.3)',
   },
   costText: {
-    color: '#ef4444',
+    color: '#E06B6B',
     fontWeight: '600',
   },
   actionButton: {
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   actionButtonPressed: {
-    backgroundColor: '#e5e5e5',
+    backgroundColor: '#FFFFFF',
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {

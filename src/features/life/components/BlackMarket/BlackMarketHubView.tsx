@@ -46,14 +46,14 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
 
     const suspicionColor = suspicionAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: ['#ef4444', '#7f1d1d'] // Red to Dark Red
+        outputRange: ['#E06B6B', '#E06B6B'] // Red to Dark Red
     });
 
     const categories: { id: BlackMarketCategory, label: string, icon: string, color: string }[] = [
-        { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#f59e0b' },
-        { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#ef4444' },
-        { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#06b6d4' },
-        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#a855f7' }
+        { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#E3A857' },
+        { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#E06B6B' },
+        { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#5992C6' },
+        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#12379F' }
     ];
 
     const getRepTitle = (rep: number) => {
@@ -87,7 +87,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                                 {
                                     width: `${Math.min(100, data.suspicion)}%`,
                                     backgroundColor: suspicionColor,
-                                    shadowColor: '#ef4444',
+                                    shadowColor: '#E06B6B',
                                     shadowOpacity: data.suspicion > 50 ? 0.8 : 0,
                                     shadowRadius: 10
                                 }
@@ -103,7 +103,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                 <View style={[styles.barContainer, { marginTop: 15 }]}>
                     <View style={styles.barHeader}>
                         <Text style={styles.barLabel}>👑 STREET REP</Text>
-                        <Text style={[styles.barValue, { color: '#fbbf24' }]}>
+                        <Text style={[styles.barValue, { color: '#E3A857' }]}>
                             {data.streetRep.toFixed(1)} / 100
                         </Text>
                     </View>
@@ -114,7 +114,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                                 styles.fill,
                                 {
                                     width: `${Math.min(100, data.streetRep)}%`,
-                                    backgroundColor: '#fbbf24'
+                                    backgroundColor: '#E3A857'
                                 }
                             ]}
                         />
@@ -163,7 +163,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#000000',
         padding: 20
     },
     header: {
@@ -179,13 +179,13 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#22c55e', // Hacker green
+        color: '#5FB37A', // Hacker green
         fontFamily: 'Courier New',
         marginTop: 4
     },
     statusSection: {
         marginBottom: 30,
-        backgroundColor: '#171717',
+        backgroundColor: '#000000',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -200,25 +200,25 @@ const styles = StyleSheet.create({
         marginBottom: 8
     },
     barLabel: {
-        color: '#a3a3a3',
+        color: '#B28C96',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 1
     },
     barValue: {
-        color: '#ef4444',
+        color: '#E06B6B',
         fontSize: 14,
         fontWeight: 'bold'
     },
     repTier: {
-        color: '#fbbf24',
+        color: '#E3A857',
         fontSize: 10,
         marginBottom: 4,
         fontFamily: 'Courier New'
     },
     track: {
         height: 6,
-        backgroundColor: '#262626',
+        backgroundColor: '#31241F',
         borderRadius: 3,
         overflow: 'hidden'
     },
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         borderRadius: 3
     },
     warningText: {
-        color: '#ef4444',
+        color: '#E06B6B',
         fontSize: 10,
         fontWeight: 'bold',
         marginTop: 4,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     moneyLabel: {
-        color: '#737373',
+        color: '#614A4B',
         fontSize: 12
     },
     moneyValue: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     gridItem: {
         width: '47%',
         aspectRatio: 1,
-        backgroundColor: '#171717', // Dark card
+        backgroundColor: '#000000', // Dark card
         borderRadius: 16,
         borderWidth: 1,
         alignItems: 'center',
@@ -285,19 +285,19 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     footerText: {
-        color: '#525252',
+        color: '#614A4B',
         fontStyle: 'italic',
         fontSize: 12,
         fontFamily: 'Courier New'
     },
     disconnectButton: {
         marginTop: 20,
-        backgroundColor: '#ef4444',
+        backgroundColor: '#E06B6B',
         paddingVertical: 12,
         paddingHorizontal: 30,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#b91c1c'
+        borderColor: '#E06B6B'
     },
     disconnectButtonText: {
         color: '#fff',

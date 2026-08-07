@@ -13,10 +13,10 @@ interface CompanyActionsProps {
 }
 
 const ACTIONS = [
-  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#FFD700' }, // Gold
-  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#30D158' }, // Green
-  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#0A84FF' }, // Blue
-  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#BF5AF2' }, // Purple
+  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#E9B8C9' }, // Gold
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#5FB37A' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#12379F' }, // Blue
+  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#12379F' }, // Purple
 ] as const;
 
 const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {
@@ -68,7 +68,7 @@ export default CompanyActions;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1C1C1E', // Dark Gray
+    backgroundColor: '#31241F', // Dark Gray
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: '#1C1C1E', // Dark Gray - HARDCODED
+    backgroundColor: '#31241F', // Dark Gray - HARDCODED
     borderRadius: 16,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttonPressed: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: '#31241F',
     transform: [{ scale: 0.98 }],
     shadowOpacity: 0.6,
     elevation: 12,

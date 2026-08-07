@@ -63,10 +63,10 @@ const BelongingsScreen = () => {
         <AppLaunchLoader
             appName="Belongings"
             appIcon={<MaterialCommunityIcons name="treasure-chest" size={64} color="#FFFFFF" />}
-            backgroundColor="#0A1128"
+            backgroundColor="#000000"
         >
             <View style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor="#0A1128" />
+                <StatusBar barStyle="light-content" backgroundColor="#000000" />
                 <SafeAreaView style={{ flex: 1 }}>
 
                     {/* 1. Header (Black Card Style) */}
@@ -185,13 +185,13 @@ const BelongingsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A1128', // Deep Black
+        backgroundColor: '#000000', // Deep Black
     },
     // Header
     header: {
         paddingHorizontal: 20,
         paddingBottom: 12, // Reduced from 20 to tighten layout
-        backgroundColor: '#0A1128',
+        backgroundColor: '#000000',
     },
     headerTop: {
         flexDirection: 'row',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     headerTitle: {
-        color: '#3A86FF',
+        color: '#12379F',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -225,12 +225,12 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
         aspectRatio: 1.58, // Credit Card Ratio
-        backgroundColor: '#0A1128', // Matte Black
+        backgroundColor: '#000000', // Matte Black
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#3E2723',
-        shadowColor: "#0A1128",
+        borderColor: '#3C2D29',
+        shadowColor: "#000000",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     cardLabelSmall: {
-        color: '#FF3366',
+        color: '#E06B6B',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -273,24 +273,24 @@ const styles = StyleSheet.create({
     chipGraphic: {
         width: 44,
         height: 34,
-        backgroundColor: '#FF3366', // Gold/Copper Chip color
+        backgroundColor: '#E06B6B', // Gold/Copper Chip color
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#3E2723',
+        borderColor: '#3C2D29',
         justifyContent: 'center',
         alignItems: 'center',
     },
     chipLine1: {
         width: '100%',
         height: 1,
-        backgroundColor: '#3E2723',
+        backgroundColor: '#3C2D29',
         marginBottom: 8,
     },
     chipLine2: {
         position: 'absolute',
         width: 1,
         height: '60%',
-        backgroundColor: '#3E2723',
+        backgroundColor: '#3C2D29',
     },
     netWorthValue: {
         color: '#FFFFFF',
@@ -325,10 +325,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 51, 102, 0.1)',
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#FF3366',
+        borderColor: '#E06B6B',
     },
     badgeText: {
-        color: '#FF3366',
+        color: '#E06B6B',
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 1,
@@ -346,14 +346,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20, // Pill shape
-        backgroundColor: '#0A1128',
+        backgroundColor: '#000000',
         borderWidth: 1,
-        borderColor: '#3E2723',
+        borderColor: '#3C2D29',
     },
     filterChipActive: {
-        borderColor: '#FF3366',
-        backgroundColor: '#0A1128',
-        shadowColor: "#FF3366",
+        borderColor: '#E06B6B',
+        backgroundColor: '#000000',
+        shadowColor: "#E06B6B",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     filterTextActive: {
-        color: '#FF3366',
+        color: '#E06B6B',
     },
 
     // List
@@ -401,10 +401,10 @@ const styles = StyleSheet.create({
     shopAction: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: '#0A1128',
+        backgroundColor: '#000000',
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#3E2723',
+        borderColor: '#3C2D29',
     },
     shopActionText: {
         color: '#FFFFFF',

@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         paddingHorizontal: 24,
         paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         paddingBottom: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#C8B6FF',
+        borderBottomColor: '#5992C6',
     },
     headerLeft: {
         width: 40,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '900',
-        color: '#C8B6FF',
+        color: '#5992C6',
         textAlign: 'center',
         marginBottom: 4,
         letterSpacing: 2,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     progress: {
         fontSize: 12,
-        color: '#4CC9F0',
+        color: '#5992C6',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

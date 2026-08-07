@@ -239,7 +239,7 @@ export function HookupModal({
                         {/* MATCHED OVERLAY */}
                         {matchStatus === 'MATCHED' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#22C55E' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#5FB37A' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.itSAMatch')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         You and {candidate.name} passed the vibe check.
@@ -271,7 +271,7 @@ export function HookupModal({
                         {/* GHOSTED OVERLAY */}
                         {matchStatus === 'NO_MATCH' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#EF4444' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#E06B6B' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.ghosted')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         {candidate.name} wasn't interested...
@@ -321,27 +321,27 @@ const styles = StyleSheet.create({
     },
     likeFeedback: {
         left: 20,
-        borderColor: '#4ECDC4',
+        borderColor: '#5FB37A',
     },
     nopeFeedback: {
         right: 20,
-        borderColor: '#FF6B6B',
+        borderColor: '#E06B6B',
         transform: [{ rotate: '15deg' }],
     },
     likeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#4ECDC4',
+        color: '#5FB37A',
     },
     nopeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#FF6B6B',
+        color: '#E06B6B',
     },
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#1A1D2D', // Slightly lighter than pure black/card
+        backgroundColor: '#000000', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(76, 111, 255, 0.3)',
     },
     chipText: {
-        color: '#4C6FFF',
+        color: '#12379F',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#2A2E40',
+        backgroundColor: '#3C2D29',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -440,11 +440,11 @@ const styles = StyleSheet.create({
     },
     passButton: {
         borderWidth: 1,
-        borderColor: '#EF4444',
+        borderColor: '#E06B6B',
     },
     likeButton: {
         borderWidth: 1,
-        borderColor: '#22C55E',
+        borderColor: '#5FB37A',
     },
     buttonIcon: {
         fontSize: 28,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     keepPlayingText: {
-        color: '#22C55E',
+        color: '#5FB37A',
         fontWeight: '800',
         textAlign: 'center',
         fontSize: 16,

@@ -36,7 +36,7 @@ const WeatherScreen = () => {
         <View style={styles.root}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#050A1A', '#0A1832', '#071428']}
+                colors={['#000000', '#000000', '#000000']}
                 locations={[0, 0.5, 1]}
                 style={StyleSheet.absoluteFill}
             />
@@ -123,7 +123,7 @@ export default WeatherScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#050A1A',
+        backgroundColor: '#000000',
     },
     safeArea: {
         flex: 1,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
         padding: 36,
         alignItems: 'center',
-        shadowColor: '#3B82F6',
+        shadowColor: '#12379F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.15,
         shadowRadius: 40,

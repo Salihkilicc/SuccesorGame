@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         padding: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 10,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 5,
         overflow: 'hidden'
     },

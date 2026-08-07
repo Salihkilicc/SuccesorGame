@@ -74,7 +74,7 @@ export const BreakdownSection = ({ title, items, isIncome }: { title: string, it
             {items.map((item, index) => (
                 <View key={index} style={styles.breakdownRow}>
                     <Text style={styles.breakdownLabel}>{item.label}</Text>
-                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : '#F0F0F0' }]}>
+                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : '#FFFFFF' }]}>
                         {isIncome ? '+' : '-'}{formatMoney(item.amount)}
                     </Text>
                 </View>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     cardSoft: { backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.xs },
     cardTitle: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body },
     cardBody: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, lineHeight: 18 },
-    summaryLabel: { color: '#888888', fontSize: 12, letterSpacing: 0.4, textTransform: 'uppercase', marginBottom: 2 },
+    summaryLabel: { color: '#B28C96', fontSize: 12, letterSpacing: 0.4, textTransform: 'uppercase', marginBottom: 2 },
     summaryValue: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', letterSpacing: 0.5 },
     categoryCard: { flex: 1, backgroundColor: theme.colors.cardSoft, borderRadius: theme.radius.md, padding: theme.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: theme.spacing.xs, minHeight: 110 },
     categoryCardPressed: { transform: [{ scale: 0.98 }], backgroundColor: theme.colors.card },
@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
     actionBody: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 18 },
     actionTilePressed: { transform: [{ scale: 0.98 }], opacity: 0.94 },
     tileCta: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.subtitle, alignSelf: 'flex-end' },
-    sectionHeader: { fontSize: 13, fontWeight: '700', color: '#888888', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
+    sectionHeader: { fontSize: 13, fontWeight: '700', color: '#B28C96', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
     breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255, 255, 255, 0.05)' },
-    breakdownLabel: { fontSize: 14, color: '#CCCCCC' },
+    breakdownLabel: { fontSize: 14, color: '#FFFFFF' },
     breakdownValue: { fontSize: 14, fontWeight: '700' },
 });

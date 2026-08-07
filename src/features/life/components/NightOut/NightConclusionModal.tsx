@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 4,
         overflow: 'hidden',
         width: '100%'
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         lineHeight: 32,
     },
     wildText: {
-        color: '#FF9E00',
+        color: '#E3A857',
         fontWeight: '600'
     },
     minimalStatsRow: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     closeButtonText: {
-        color: '#4CC9F0',
+        color: '#5992C6',
         fontSize: 14,
         textTransform: 'uppercase',
         letterSpacing: 2

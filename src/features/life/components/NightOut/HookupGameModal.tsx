@@ -210,28 +210,28 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         padding: 24,
         paddingTop: 48,
         borderTopWidth: 2,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
     },
     partnerSection: {
         alignItems: 'center',
         marginBottom: 24,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#C8B6FF',
+        borderBottomColor: '#5992C6',
     },
     partnerAvatar: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
         marginBottom: 12,
     },
     avatarEmoji: {
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     partnerJob: {
         fontSize: 14,
-        color: '#C8B6FF',
+        color: '#5992C6',
         fontStyle: 'italic',
     },
     clueSection: {
@@ -254,16 +254,16 @@ const styles = StyleSheet.create({
     clueLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#4CC9F0',
+        color: '#5992C6',
         letterSpacing: 2,
         marginBottom: 8,
     },
     clueBox: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
-        borderLeftColor: '#4CC9F0',
+        borderLeftColor: '#5992C6',
     },
     clueText: {
         fontSize: 16,
@@ -277,29 +277,29 @@ const styles = StyleSheet.create({
     choicesLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#4CC9F0',
+        color: '#5992C6',
         letterSpacing: 2,
         marginBottom: 12,
     },
     choiceButton: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 2,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
     },
     choiceButtonPressed: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         transform: [{ scale: 0.98 }],
     },
     choiceButtonCorrect: {
-        borderColor: '#4CC9F0',
-        backgroundColor: '#1A1A2E',
+        borderColor: '#5992C6',
+        backgroundColor: '#000000',
     },
     choiceButtonWrong: {
-        borderColor: '#FF9E00',
-        backgroundColor: '#1A1A2E',
+        borderColor: '#E3A857',
+        backgroundColor: '#000000',
     },
     choiceContent: {
         gap: 8,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     },
     choiceTag: {
         alignSelf: 'flex-start',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     choiceTagText: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#C8B6FF',
+        color: '#5992C6',
         letterSpacing: 1,
     },
     resultSection: {
@@ -334,9 +334,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     resultSuccess: {
-        color: '#4CC9F0',
+        color: '#5992C6',
     },
     resultFail: {
-        color: '#FF9E00',
+        color: '#E3A857',
     },
 });

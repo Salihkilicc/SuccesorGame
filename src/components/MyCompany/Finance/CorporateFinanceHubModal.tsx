@@ -67,13 +67,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     // Credit Rating Display
     const getCreditRating = () => {
-        if (creditScore >= 800) return { label: 'AAA', color: '#FFD700', description: t('finance.excellent') };
-        if (creditScore >= 750) return { label: 'AA', color: '#FFD700', description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: '#90EE90', description: t('finance.good') };
-        if (creditScore >= 650) return { label: 'BBB', color: '#FFA500', description: t('finance.fair') };
-        if (creditScore >= 600) return { label: 'BB', color: '#FFA500', description: t('finance.moderate') };
-        if (creditScore >= 500) return { label: 'B', color: '#FF6B6B', description: t('finance.risky') };
-        return { label: 'C', color: '#FF0000', description: t('finance.junk') };
+        if (creditScore >= 800) return { label: 'AAA', color: '#E9B8C9', description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: '#E9B8C9', description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: '#5FB37A', description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: '#E3A857', description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: '#E3A857', description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: '#E06B6B', description: t('finance.risky') };
+        return { label: 'C', color: '#E06B6B', description: t('finance.junk') };
     };
 
     const rating = getCreditRating();
@@ -100,7 +100,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 {/* --- NAVIGATION GRID --- */}
                 <View style={styles.navGrid}>
                     {/* OWNER INJECTION BUTTON */}
-                    <TouchableOpacity style={[styles.navCard, { borderColor: '#4ADE80', flex: 1 }]} onPress={() => setShowInjection(true)}>
+                    <TouchableOpacity style={[styles.navCard, { borderColor: '#5FB37A', flex: 1 }]} onPress={() => setShowInjection(true)}>
                         <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
@@ -108,7 +108,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
                             <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
                         </View>
-                        <Text style={{ color: '#4ADE80', fontSize: 18 }}>→</Text>
+                        <Text style={{ color: '#5FB37A', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -136,7 +136,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     styles.progressFill,
                                     {
                                         width: `${Math.min(100, (totalDebt / (totalDebt + borrowingCapacity)) * 100)}%`,
-                                        backgroundColor: leverage > 60 ? '#FF6B6B' : '#FFD700'
+                                        backgroundColor: leverage > 60 ? '#E06B6B' : '#E9B8C9'
                                     }
                                 ]}
                             />
@@ -151,19 +151,19 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.statsGrid}>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
-                        <Text style={[styles.statValue, { color: '#FF6B6B' }]}>
+                        <Text style={[styles.statValue, { color: '#E06B6B' }]}>
                             {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
-                        <Text style={[styles.statValue, { color: '#FFA500' }]}>
+                        <Text style={[styles.statValue, { color: '#E3A857' }]}>
                             {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
-                        <Text style={[styles.statValue, { color: leverage > 60 ? '#FF6B6B' : '#90EE90' }]}>
+                        <Text style={[styles.statValue, { color: leverage > 60 ? '#E06B6B' : '#5FB37A' }]}>
                             {leverage.toFixed(1)}%
                         </Text>
                     </View>
@@ -319,28 +319,28 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#F0F0F0',
+        color: '#FFFFFF',
         letterSpacing: 1,
         marginBottom: 4,
         textAlign: 'center',
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#8A9BA8',
+        color: '#B28C96',
         fontStyle: 'italic',
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         borderWidth: 2,
-        borderColor: '#FFD700',
+        borderColor: '#E9B8C9',
     },
     heroLabel: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#8A9BA8',
+        color: '#B28C96',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
         textAlign: 'center',
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     },
     ratingDescription: {
         fontSize: 14,
-        color: '#8A9BA8',
+        color: '#B28C96',
         fontWeight: '600',
     },
     capacityContainer: {
@@ -376,13 +376,13 @@ const styles = StyleSheet.create({
     },
     capacityLabel: {
         fontSize: 12,
-        color: '#8A9BA8',
+        color: '#B28C96',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     progressBar: {
         height: 8,
-        backgroundColor: '#2A2D35',
+        backgroundColor: '#3C2D29',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     },
     capacityValue: {
         fontSize: 14,
-        color: '#FFD700',
+        color: '#E9B8C9',
         fontWeight: '700',
         textAlign: 'right',
     },
@@ -402,16 +402,16 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#2A2D35',
+        borderColor: '#3C2D29',
     },
     statLabel: {
         fontSize: 11,
-        color: '#8A9BA8',
+        color: '#B28C96',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 8,
@@ -423,18 +423,18 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#E0E0E0',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#2A2D35',
+        borderColor: '#3C2D29',
     },
     emptyStateIcon: {
         fontSize: 32,
@@ -443,22 +443,22 @@ const styles = StyleSheet.create({
     emptyStateText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#90EE90',
+        color: '#5FB37A',
         marginBottom: 4,
     },
     emptyStateSubtext: {
         fontSize: 14,
-        color: '#8A9BA8',
+        color: '#B28C96',
     },
     loansList: {
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#2A2D35',
+        borderColor: '#3C2D29',
     },
     loanHeader: {
         flexDirection: 'row',
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     loanRate: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FFD700',
+        color: '#E9B8C9',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     },
     loanDetailLabel: {
         fontSize: 11,
-        color: '#8A9BA8',
+        color: '#B28C96',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 4,
@@ -496,12 +496,12 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     repayButton: {
-        backgroundColor: '#2A2D35',
+        backgroundColor: '#3C2D29',
         borderRadius: 16,
         padding: 18,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#90EE90',
+        borderColor: '#5FB37A',
     },
     repayButtonPressed: {
         opacity: 0.8,
@@ -510,16 +510,16 @@ const styles = StyleSheet.create({
     repayButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#90EE90',
+        color: '#5FB37A',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     ctaButton: {
-        backgroundColor: '#FFD700',
+        backgroundColor: '#E9B8C9',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#FFD700',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -542,8 +542,8 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
-        borderColor: '#FF3B30',
-        shadowColor: '#FF3B30',
+        borderColor: '#E06B6B',
+        shadowColor: '#E06B6B',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 12,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#FF3B30',
+        backgroundColor: '#E06B6B',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -583,11 +583,11 @@ const styles = StyleSheet.create({
     },
     sharkDealSubtitle: {
         fontSize: 12,
-        color: '#FF3B30',
+        color: '#E06B6B',
         fontWeight: '600',
     },
     instantBadge: {
-        backgroundColor: '#FF3B30',
+        backgroundColor: '#E06B6B',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 8,
@@ -600,12 +600,12 @@ const styles = StyleSheet.create({
     },
     sharkDealFooter: {
         borderTopWidth: 1,
-        borderTopColor: '#FF3B30',
+        borderTopColor: '#E06B6B',
         paddingTop: 12,
     },
     sharkDealWarning: {
         fontSize: 11,
-        color: '#FF6B6B',
+        color: '#E06B6B',
         fontStyle: 'italic',
         textAlign: 'center',
     },
@@ -620,11 +620,11 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#2A2D35',
+        borderColor: '#3C2D29',
         gap: 12,
     },
 
@@ -644,6 +644,6 @@ const styles = StyleSheet.create({
     },
     cardDesc: {
         fontSize: 10,
-        color: '#9CA3AF',
+        color: '#B28C96',
     },
 });

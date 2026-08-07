@@ -42,18 +42,18 @@ import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
 
 // Gradients for Icons
 const GRADIENTS = {
-  purplePink: ['#8E2DE2', '#4A00E0'],
-  tealCyan: ['#00b09b', '#96c93d'],
-  orangeYellow: ['#F2994A', '#F2C94C'],
-  pinkRed: ['#ec008c', '#fc6767'],
-  blueSky: ['#2980B9', '#6DD5FA'],
-  brownGold: ['#834d9b', '#d04ed6'], // Belongings
-  greenTeal: ['#11998e', '#38ef7d'],
-  bluePurple: ['#00c6ff', '#0072ff'],
-  redCasino: ['#e52d27', '#b31217'], // Casino Red
-  darkGrey: ['#232526', '#414345'],
-  hookupFire: ['#DA22FF', '#9733EE'],
-  networkBlue: ['#1A2980', '#26D0CE'],
+  purplePink: ['#0A2A92', '#0A2A92'],
+  tealCyan: ['#5FB37A', '#5FB37A'],
+  orangeYellow: ['#E3A857', '#E3A857'],
+  pinkRed: ['#E06B6B', '#E06B6B'],
+  blueSky: ['#5992C6', '#5992C6'],
+  brownGold: ['#12379F', '#12379F'], // Belongings
+  greenTeal: ['#5FB37A', '#5FB37A'],
+  bluePurple: ['#5992C6', '#12379F'],
+  redCasino: ['#E06B6B', '#E06B6B'], // Casino Red
+  darkGrey: ['#31241F', '#523F3E'],
+  hookupFire: ['#0A2A92', '#0A2A92'],
+  networkBlue: ['#0A2A92', '#5FB37A'],
 };
 
 const SECTION_LEISURE = [
@@ -240,17 +240,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 36,
     fontWeight: '300',
-    color: '#E5E5E5',
+    color: '#FFFFFF',
     letterSpacing: 8,
     textTransform: 'uppercase',
   },
   headerAccent: {
     width: 44,
     height: 2,
-    backgroundColor: '#D4AF37', // Gold accent
+    backgroundColor: '#E9B8C9', // Gold accent
     marginTop: 14,
     borderRadius: 2,
-    shadowColor: '#D4AF37',
+    shadowColor: '#E9B8C9',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#777777',
+    color: '#614A4B',
     marginBottom: 20,
     letterSpacing: 4,
     textTransform: 'uppercase',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#E0E0E0',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',

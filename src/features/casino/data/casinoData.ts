@@ -34,9 +34,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 0,
     maxBet: 1_000_000,
     theme: {
-      primary: '#0057B7', // Greek Blue
+      primary: '#12379F', // Greek Blue
       secondary: '#FFFFFF', // White
-      chipColor: '#0057B7',
+      chipColor: '#12379F',
     },
     chips: [1000, 5000, 10000, 50000],
   },
@@ -47,9 +47,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 100,
     maxBet: 5_000_000,
     theme: {
-      primary: '#40E0D0', // Turquoise
-      secondary: '#FFD700', // Gold
-      chipColor: '#40E0D0',
+      primary: '#5FB37A', // Turquoise
+      secondary: '#E9B8C9', // Gold
+      chipColor: '#5FB37A',
     },
     chips: [50000, 100000, 500000, 2500000],
   },
@@ -60,9 +60,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 200,
     maxBet: 25_000_000,
     theme: {
-      primary: '#9B30FF', // Purple
-      secondary: '#FF69B4', // Neon Pink
-      chipColor: '#9B30FF',
+      primary: '#0A2A92', // Purple
+      secondary: '#E06B6B', // Neon Pink
+      chipColor: '#0A2A92',
     },
     chips: [100000, 500000, 2500000, 10000000],
   },
@@ -73,9 +73,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 300,
     maxBet: 100_000_000,
     theme: {
-      primary: '#C8102E', // Royal Red
-      secondary: '#DA291C', // Velvet
-      chipColor: '#C8102E',
+      primary: '#E06B6B', // Royal Red
+      secondary: '#E06B6B', // Velvet
+      chipColor: '#E06B6B',
     },
     chips: [500000, 2500000, 10000000, 50000000],
   },
@@ -86,9 +86,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 400,
     maxBet: 1_000_000_000,
     theme: {
-      primary: '#C0C0C0', // Silver
-      secondary: '#E0FFFF', // Glass/Cyan tint
-      chipColor: '#C0C0C0',
+      primary: '#E9B8C9', // Silver
+      secondary: '#FFFFFF', // Glass/Cyan tint
+      chipColor: '#E9B8C9',
     },
     chips: [2500000, 10000000, 50000000, 500000000],
   },
@@ -99,9 +99,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 500,
     maxBet: 10_000_000_000,
     theme: {
-      primary: '#F5DEB3', // Cream
-      secondary: '#FFD700', // Gold
-      chipColor: '#F5DEB3',
+      primary: '#FFFFFF', // Cream
+      secondary: '#E9B8C9', // Gold
+      chipColor: '#FFFFFF',
     },
     chips: [10000000, 50000000, 500000000, 5000000000],
   },
@@ -112,9 +112,9 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     requirement: 600,
     maxBet: 100_000_000_000,
     theme: {
-      primary: '#8B0000', // Dark Red
-      secondary: '#FFD700', // Gold
-      chipColor: '#8B0000',
+      primary: '#E06B6B', // Dark Red
+      secondary: '#E9B8C9', // Gold
+      chipColor: '#E06B6B',
     },
     chips: [100000000, 1000000000, 10000000000, 50000000000],
   },

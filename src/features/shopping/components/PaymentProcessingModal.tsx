@@ -77,7 +77,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
             <View style={styles.container}>
                 {!showSuccess ? (
                     <View style={styles.content}>
-                        <ActivityIndicator size="large" color="#FF3366" style={styles.spinner} />
+                        <ActivityIndicator size="large" color="#E06B6B" style={styles.spinner} />
                         <Text style={styles.statusText}>{statusText}</Text>
                         <Text style={styles.amountText}>-${amount.toLocaleString()}</Text>
 
@@ -102,7 +102,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A1128', // Pure black
+        backgroundColor: '#000000', // Pure black
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     amountText: {
-        color: '#E60000', // Red for debit
+        color: '#E06B6B', // Red for debit
         fontSize: 32,
         fontWeight: '700',
         marginBottom: 60,
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     securityBadge: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#0A1128',
+        backgroundColor: '#000000',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#3E2723',
+        borderColor: '#3C2D29',
     },
     securityText: {
-        color: '#3A86FF',
+        color: '#12379F',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 30,
         borderWidth: 2,
-        borderColor: '#3A86FF',
+        borderColor: '#12379F',
     },
     checkmarkIcon: {
         fontSize: 60,

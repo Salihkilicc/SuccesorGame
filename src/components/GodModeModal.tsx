@@ -41,11 +41,11 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <MaterialCommunityIcons name="flash" size={24} color="#D4AF37" />
+                            <MaterialCommunityIcons name="flash" size={24} color="#E9B8C9" />
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <MaterialCommunityIcons name="close" size={24} color="#AAAAAA" />
+                            <MaterialCommunityIcons name="close" size={24} color="#B28C96" />
                         </TouchableOpacity>
                     </View>
 
@@ -57,7 +57,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(39, 174, 96, 0.2)', 'rgba(39, 174, 96, 0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#2ecc71" />
+                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#5FB37A" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
@@ -66,7 +66,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(192, 57, 43, 0.2)', 'rgba(192, 57, 43, 0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="skull" size={24} color="#e74c3c" />
+                            <MaterialCommunityIcons name="skull" size={24} color="#E06B6B" />
                             <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '85%',
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#000000',
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#D4AF37',
+        borderColor: '#E9B8C9',
         overflow: 'hidden',
-        shadowColor: '#D4AF37',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 15,
@@ -110,14 +110,14 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#D4AF37',
+        color: '#E9B8C9',
         letterSpacing: 2,
     },
     closeButton: {
         padding: 4,
     },
     subtitle: {
-        color: '#00ff00',
+        color: '#5FB37A',
         fontSize: 12,
         fontFamily: 'Courier',
         textAlign: 'center',
@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     actionTextMoney: {
-        color: '#2ecc71',
+        color: '#5FB37A',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,
     },
     actionTextReset: {
-        color: '#e74c3c',
+        color: '#E06B6B',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

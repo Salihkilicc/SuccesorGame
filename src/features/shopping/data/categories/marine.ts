@@ -12,7 +12,7 @@ export const marineData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.poseidonyards.com',
             category: 'MARINE',
             description: 'Megayachts for the 0.001%.',
-            bannerColor: '#3498DB',
+            bannerColor: '#5992C6',
             emoji: '⛵',
         },
         {
@@ -21,7 +21,7 @@ export const marineData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.deepblue.tech',
             category: 'MARINE',
             description: 'Conquer the abyss.',
-            bannerColor: '#1F618D',
+            bannerColor: '#5992C6',
             emoji: '🌊',
         },
         {
@@ -30,7 +30,7 @@ export const marineData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.horizoncruise.luxury',
             category: 'MARINE',
             description: 'Own the fleet.',
-            bannerColor: '#5DADE2',
+            bannerColor: '#5992C6',
             emoji: '🚢',
         },
     ],

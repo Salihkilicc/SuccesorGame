@@ -106,7 +106,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#FFFFFF',
     },
     safeArea: {
         flex: 1,
@@ -117,21 +117,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 2,
-        borderBottomColor: '#d4af37',
+        borderBottomColor: '#E9B8C9',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#374151',
+        color: '#523F3E',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#1e3a8a',
+        color: '#12379F',
     },
     subtitle: {
         fontSize: 12,
-        color: '#6b7280',
+        color: '#614A4B',
         marginTop: 2,
     },
     scrollContent: {
@@ -152,12 +152,12 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     multiplierCard: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 24,
         marginBottom: 24,
         borderWidth: 2,
-        borderColor: '#d4af37',
+        borderColor: '#E9B8C9',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#6b7280',
+        color: '#614A4B',
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#1e3a8a',
+        color: '#12379F',
         marginBottom: 8,
     },
     multiplierHint: {
         fontSize: 12,
-        color: '#9ca3af',
+        color: '#B28C96',
         fontStyle: 'italic',
     },
     section: {
@@ -188,16 +188,16 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#1e3a8a',
+        color: '#12379F',
         marginBottom: 16,
     },
     emptyState: {
         alignItems: 'center',
         padding: 40,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#e5e7eb',
+        borderColor: '#FFFFFF',
         borderStyle: 'dashed',
     },
     emptyIcon: {
@@ -206,23 +206,23 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#6b7280',
+        color: '#614A4B',
         fontWeight: '600',
         marginBottom: 8,
     },
     emptyHint: {
         fontSize: 14,
-        color: '#9ca3af',
+        color: '#B28C96',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     degreeCard: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
         marginBottom: 12,
         borderWidth: 2,
-        borderColor: '#1e3a8a',
+        borderColor: '#12379F',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -238,16 +238,16 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#1f2937',
+        color: '#31241F',
     },
     degreeType: {
         fontSize: 14,
-        color: '#6b7280',
+        color: '#614A4B',
         fontWeight: '600',
     },
     degreeBonus: {
         fontSize: 14,
-        color: '#d4af37',
+        color: '#E9B8C9',
         fontWeight: '700',
     },
 });

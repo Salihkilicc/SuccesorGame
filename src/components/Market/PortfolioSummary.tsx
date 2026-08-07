@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   label: {
-    color: '#A0A0A0',
+    color: '#B28C96',
     fontSize: theme.typography.caption,
     letterSpacing: 0.4,
   },
@@ -86,18 +86,18 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#D4AF37',
+    borderColor: '#E9B8C9',
   },
   buttonPressed: {
     transform: [{ scale: 0.99 }],
   },
   buttonText: {
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontWeight: '800',
     fontSize: theme.typography.body,
   },
   buttonArrow: {
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontSize: theme.typography.subtitle,
   },
 });

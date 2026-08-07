@@ -43,23 +43,23 @@ export default CasinoRoomCard;
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 14,
     gap: 8,
-    shadowColor: '#0f172a',
+    shadowColor: '#000000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
   cardPressed: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#FFFFFF',
     transform: [{scale: 0.99}],
   },
   cardLocked: {
-    backgroundColor: '#f3f4f6',
-    borderColor: '#e5e7eb',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
     borderWidth: 1,
   },
   headerRow: {
@@ -70,15 +70,15 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
+    color: '#000000',
   },
   requirement: {
     fontSize: 13,
-    color: '#4b5563',
+    color: '#614A4B',
   },
   lockedTag: {
-    backgroundColor: '#fee2e2',
-    color: '#b91c1c',
+    backgroundColor: '#FFFFFF',
+    color: '#E06B6B',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

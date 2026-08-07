@@ -25,13 +25,13 @@ interface BlackMarketViewProps {
 
 const COLORS = {
     background: '#000000',
-    bloodRed: '#8a0303',
-    neonRed: '#ff0000',
-    darkGray: '#1a1a1a',
-    textPrimary: '#ffffff',
-    textSecondary: '#999999',
-    gold: '#fbbf24',
-    locked: '#333333'
+    bloodRed: '#E06B6B',
+    neonRed: '#E06B6B',
+    darkGray: '#000000',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#B28C96',
+    gold: '#E3A857',
+    locked: '#3C2D29'
 };
 
 // --- COMPONENT ---
@@ -172,10 +172,10 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#4b5563',
-            2: '#7c2d12',
-            3: '#991b1b',
-            4: '#7f1d1d'
+            1: '#614A4B',
+            2: '#E06B6B',
+            3: '#E06B6B',
+            4: '#E06B6B'
         };
         return colors[tier] || colors[1];
     };
@@ -226,7 +226,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
                                         data.suspicion > 80
                                             ? COLORS.neonRed
                                             : data.suspicion > 50
-                                                ? '#dc2626'
+                                                ? '#E06B6B'
                                                 : COLORS.bloodRed,
                                     transform: [{ scale: data.suspicion > 60 ? pulseAnim : 1 }]
                                 }
@@ -365,11 +365,11 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#1f2937',
+        backgroundColor: '#31241F',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#374151'
+        borderColor: '#523F3E'
     },
     suspicionBar: {
         height: '100%',
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginBottom: 15,
         borderWidth: 2,
-        borderColor: '#374151',
+        borderColor: '#523F3E',
         overflow: 'hidden'
     },
     drugCard: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 2
     },
     lockedCard: {
-        backgroundColor: '#0f0f0f',
+        backgroundColor: '#000000',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

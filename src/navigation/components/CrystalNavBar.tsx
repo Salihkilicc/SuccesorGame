@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     blurContainer: {
         borderRadius: 20,
         overflow: 'hidden',
-        shadowColor: "#8b8ecc",
+        shadowColor: "#5992C6",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,

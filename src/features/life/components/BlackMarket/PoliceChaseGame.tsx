@@ -338,8 +338,8 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
                                     {
                                         width: `${staminaPercentage}%`,
                                         backgroundColor:
-                                            staminaPercentage > 50 ? '#4ade80' :
-                                                staminaPercentage > 25 ? '#fbbf24' : '#ef4444'
+                                            staminaPercentage > 50 ? '#5FB37A' :
+                                                staminaPercentage > 25 ? '#E3A857' : '#E06B6B'
                                     }
                                 ]}
                             />
@@ -413,11 +413,11 @@ const CONTROL_BUTTON_SIZE = 60;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#000000',
     },
     container: {
         flex: 1,
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#000000',
         paddingHorizontal: 0,
         paddingBottom: 20,
         justifyContent: 'space-evenly',
@@ -432,8 +432,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#ef4444',
-        textShadowColor: '#dc2626',
+        color: '#E06B6B',
+        textShadowColor: '#E06B6B',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
         fontFamily: 'Courier New',
@@ -441,19 +441,19 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#9ca3af',
+        color: '#B28C96',
         marginTop: 2,
         fontFamily: 'Courier New',
         textAlign: 'center',
     },
     statsContainer: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 5,
         width: '90%',
         marginBottom: 5,
         borderWidth: 1,
-        borderColor: '#374151'
+        borderColor: '#523F3E'
     },
     statRow: {
         flexDirection: 'row',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 12,
-        color: '#9ca3af',
+        color: '#B28C96',
         width: 70,
         fontFamily: 'Courier New'
     },
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     staminaBarContainer: {
         flex: 1,
         height: 10,
-        backgroundColor: '#374151',
+        backgroundColor: '#523F3E',
         borderRadius: 5,
         overflow: 'hidden',
         marginHorizontal: 10
@@ -493,11 +493,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: GRID_CONTAINER_WIDTH,
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 2,
         borderWidth: 2,
-        borderColor: '#374151',
+        borderColor: '#523F3E',
         justifyContent: 'center'
     },
     cell: {
@@ -505,24 +505,24 @@ const styles = StyleSheet.create({
         height: cellSize,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#262626',
+        backgroundColor: '#31241F',
         margin: CELL_MARGIN,
         borderRadius: 8
     },
     playerCell: {
-        backgroundColor: '#1e40af',
+        backgroundColor: '#12379F',
         borderWidth: 2,
-        borderColor: '#3b82f6'
+        borderColor: '#12379F'
     },
     policeCell: {
-        backgroundColor: '#991b1b',
+        backgroundColor: '#E06B6B',
         borderWidth: 2,
-        borderColor: '#ef4444'
+        borderColor: '#E06B6B'
     },
     safeHouseCell: {
-        backgroundColor: '#065f46',
+        backgroundColor: '#5FB37A',
         borderWidth: 2,
-        borderColor: '#10b981'
+        borderColor: '#5FB37A'
     },
     emoji: {
         fontSize: Math.min(30, cellSize * 0.7)
@@ -538,21 +538,21 @@ const styles = StyleSheet.create({
     controlButton: {
         width: CONTROL_BUTTON_SIZE,
         height: CONTROL_BUTTON_SIZE,
-        backgroundColor: '#374151',
+        backgroundColor: '#523F3E',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 12,
         marginHorizontal: 5,
         borderWidth: 2,
-        borderColor: '#4b5563',
+        borderColor: '#614A4B',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
     },
     controlButtonDisabled: {
-        backgroundColor: '#1f2937',
-        borderColor: '#374151',
+        backgroundColor: '#31241F',
+        borderColor: '#523F3E',
         opacity: 0.5
     },
     controlText: {
@@ -565,13 +565,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 5
     },
     quitButton: {
-        backgroundColor: '#7c2d12',
+        backgroundColor: '#E06B6B',
         paddingVertical: 10,
         paddingHorizontal: 40,
         borderRadius: 8,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#ea580c',
+        borderColor: '#E06B6B',
         marginTop: 5
     },
     quitText: {

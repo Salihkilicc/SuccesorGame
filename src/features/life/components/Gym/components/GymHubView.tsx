@@ -51,9 +51,9 @@ const GymHubView = ({
                             {[0, 1, 2, 3, 4].map((segment) => {
                                 const segmentValue = segment * 20;
                                 const isActive = (100 - fatigue) > segmentValue;
-                                let segmentColor = '#34C759'; // Green
-                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#FF9500'; // Orange
-                                if (fatigue > 80) segmentColor = '#FF3B30'; // Red
+                                let segmentColor = '#5FB37A'; // Green
+                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#E3A857'; // Orange
+                                if (fatigue > 80) segmentColor = '#E06B6B'; // Red
 
                                 return (
                                     <View
@@ -61,7 +61,7 @@ const GymHubView = ({
                                         style={[
                                             styles.batterySegment,
                                             {
-                                                backgroundColor: isActive ? segmentColor : '#E5E7EB',
+                                                backgroundColor: isActive ? segmentColor : '#FFFFFF',
                                                 opacity: isActive ? 1 : 0.3,
                                             }
                                         ]}
@@ -147,16 +147,16 @@ const GymHubView = ({
 
 const getBodyTypeColor = (bodyType: string): string => {
     const colors: Record<string, string> = {
-        'Skinny': '#95a5a6',
-        'Fit': '#3498db',
-        'Muscular': '#e67e22',
-        'Godlike': '#f39c12'
+        'Skinny': '#B28C96',
+        'Fit': '#5992C6',
+        'Muscular': '#E3A857',
+        'Godlike': '#E3A857'
     };
     return colors[bodyType] || '#fff';
 };
 
 const styles = StyleSheet.create({
-    scrollView: { flex: 1, backgroundColor: '#F2F4F6' },
+    scrollView: { flex: 1, backgroundColor: '#FFFFFF' },
     scrollContent: { paddingHorizontal: 20, paddingBottom: 100 },
     statsCard: {
         backgroundColor: '#FFFFFF',
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4
     },
     statLabel: {
-        color: '#6B7280',
+        color: '#614A4B',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 0.3
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fatigueBarBg: {
         flex: 1,
         height: 10,
-        backgroundColor: '#E5E7EB',
+        backgroundColor: '#FFFFFF',
         borderRadius: 8,
         overflow: 'hidden'
     },
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     fatigueText: {
-        color: '#1C1C1E',
+        color: '#31241F',
         fontSize: 14,
         fontWeight: '700',
         width: 45,
@@ -224,10 +224,10 @@ const styles = StyleSheet.create({
     batteryBody: {
         flex: 1,
         height: 24,
-        backgroundColor: '#F2F4F6',
+        backgroundColor: '#FFFFFF',
         borderRadius: 6,
         borderWidth: 2,
-        borderColor: '#8E8E93',
+        borderColor: '#B28C96',
         flexDirection: 'row',
         padding: 2,
         gap: 2,
@@ -240,12 +240,12 @@ const styles = StyleSheet.create({
     batteryTip: {
         width: 4,
         height: 12,
-        backgroundColor: '#8E8E93',
+        backgroundColor: '#B28C96',
         borderTopRightRadius: 2,
         borderBottomRightRadius: 2,
     },
     sectionTitle: {
-        color: '#6B7280',
+        color: '#614A4B',
         fontWeight: '800',
         marginTop: 30,
         marginBottom: 15,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         borderWidth: 0,
-        shadowColor: '#007AFF',
+        shadowColor: '#12379F',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     icon: { fontSize: 36, marginBottom: 10 },
-    cardLabel: { color: '#1C1C1E', fontWeight: '700', fontSize: 15 },
+    cardLabel: { color: '#31241F', fontWeight: '700', fontSize: 15 },
     maList: { gap: 10 },
     maCard: {
         paddingVertical: 18,
@@ -294,8 +294,8 @@ const styles = StyleSheet.create({
     maIcon: {
         fontSize: 24
     },
-    maLabel: { color: '#1C1C1E', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
-    maBelt: { color: '#8E8E93', fontSize: 14, fontWeight: '600' },
+    maLabel: { color: '#31241F', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
+    maBelt: { color: '#B28C96', fontSize: 14, fontWeight: '600' },
     modifierBtn: {
         padding: 20,
         backgroundColor: 'rgba(255,255,255,0.9)',
@@ -309,8 +309,8 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     modContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modLabel: { color: '#007AFF', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
-    changeText: { color: '#9CA3AF', fontSize: 11, fontWeight: '600' },
+    modLabel: { color: '#12379F', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
+    changeText: { color: '#B28C96', fontSize: 11, fontWeight: '600' },
 });
 
 export default GymHubView;

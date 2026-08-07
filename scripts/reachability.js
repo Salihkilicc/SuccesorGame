@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -165,6 +165,31 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
     }
 }
 
+// --- 0d) Colours outside the palette ----------------------------------------
+//  The project carried 393 distinct colours across 2,750 usages - three golds,
+//  four reds and six backgrounds all doing the same jobs. That inconsistency,
+//  not any single choice, is what made the app feel scattered from screen to
+//  screen. They are consolidated to fifteen; this keeps them there.
+const PALETTE = new Set([
+    '#31241F', '#3C2D29', '#473633', '#523F3E', '#614A4B',   // surfaces
+    '#0A2A92', '#12379F', '#5992C6', '#E9B8C9', '#B28C96',   // brand + text
+    '#5FB37A', '#E06B6B', '#E3A857',                          // meaning
+    '#FFFFFF', '#000000',
+]);
+for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith('theme.ts'))) {
+    const seen = new Map();
+    read(f).split('\n').forEach((line, i) => {
+        if (/^\s*(\/\/|\*)/.test(line)) return;          // comments may cite old values
+        for (const m of line.matchAll(/#[0-9A-Fa-f]{6}/g)) {
+            const hex = m[0].toUpperCase();
+            if (!PALETTE.has(hex) && !seen.has(hex)) seen.set(hex, i + 1);
+        }
+    });
+    for (const [hex, ln] of seen) {
+        problems.palette.push(`${rel(f)}:${ln}  ${hex}`);
+    }
+}
+
 // --- 1) Components nothing renders -----------------------------------------
 //  Matched on IMPORT PATH, not on symbol name. Matching the exported symbol
 //  gave false positives: RAndDModal.tsx exports `RAndDModalRevised` as a const
@@ -244,6 +269,8 @@ const section = (title, list, why) => {
 
 console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
+total += section('Colours outside the palette', problems.palette,
+    'Consolidated to fifteen tokens. A new hex here is how the drift starts again.');
 total += section('Persisted stores a new game does not clear', problems.newGame,
     'Old data walks into the next game. Both halves are needed: the disk key and the in-memory reset.');
 total += section('Translations frozen at module load', problems.frozenText,

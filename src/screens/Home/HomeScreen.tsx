@@ -46,14 +46,14 @@ type HomeNavProp = CompositeNavigationProp<
 
 
 const GRADIENTS = {
-  purplePink: ['#8E2DE2', '#4A00E0'],
-  pinkRed: ['#ec008c', '#fc6767'],
-  orangeYellow: ['#F2994A', '#F2C94C'],
-  blueSky: ['#2980B9', '#6DD5FA'],
-  bluePurple: ['#00c6ff', '#0072ff'],
-  darkGrey: ['#232526', '#414345'],
-  networkBlue: ['#1A2980', '#26D0CE'],
-  tealCyan: ['#00b09b', '#96c93d'],
+  purplePink: ['#0A2A92', '#0A2A92'],
+  pinkRed: ['#E06B6B', '#E06B6B'],
+  orangeYellow: ['#E3A857', '#E3A857'],
+  blueSky: ['#5992C6', '#5992C6'],
+  bluePurple: ['#5992C6', '#12379F'],
+  darkGrey: ['#31241F', '#523F3E'],
+  networkBlue: ['#0A2A92', '#5FB37A'],
+  tealCyan: ['#5FB37A', '#5FB37A'],
 };
 
 // Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#C5A059', '#8C6C3A', '#4F3A15']}
+                colors={['#E9B8C9', '#E3A857', '#473633']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,7 +367,7 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#C5A059', '#8C6C3A', '#4F3A15']}
+                colors={['#E9B8C9', '#E3A857', '#473633']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -388,10 +388,10 @@ const HomeScreen = () => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
                 <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#888888" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#B28C96" />
               </View>
               <LinearGradient
-                colors={['#c38d9e', '#16121d', '#16121d', '#8b8ecc']}
+                colors={['#B28C96', '#000000', '#000000', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['#c38d9e', '#16121d', '#16121d', '#8b8ecc']}
+                colors={['#B28C96', '#000000', '#000000', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#8C6C3A', // Dark gold shadow
+    shadowColor: '#E3A857', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -651,12 +651,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#F5F5F5',
+    color: '#FFFFFF',
     letterSpacing: 0.2,
   },
   gender: {
     fontSize: 13,
-    color: '#9D8EC7',
+    color: '#5992C6',
   },
   premiumTag: {
     marginLeft: theme.spacing.xs,
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#5A5A72',
+    color: '#614A4B',
     fontSize: 11,
     letterSpacing: 0.1,
   },
@@ -690,13 +690,13 @@ const styles = StyleSheet.create({
   ageChipLabel: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#9D8EC7',
+    color: '#5992C6',
     letterSpacing: 1,
   },
   ageChipValue: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#EDE9FE',
+    color: '#FFFFFF',
   },
   ageChipDivider: {
     width: 1,
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
   ageValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
   monthBadge: { color: theme.colors.accent, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
   nextMonthButton: {
-    shadowColor: '#8C6C3A', // Dark gold shadow
+    shadowColor: '#E3A857', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8, // Increased opacity for better glow
     shadowRadius: 12,
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#D4D4D8',
+    color: '#FFFFFF',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#E0E0E0',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#161618',
+    backgroundColor: '#000000',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   label: {
-    color: '#888888',
+    color: '#B28C96',
     fontSize: theme.typography.caption + 1,
   },
   value: {
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#131315',
+    backgroundColor: '#000000',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   statusText: {
-    color: '#E5E5E5',
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
   },
   entryRow: {
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   },
   entryLife: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -970,20 +970,20 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#101010',
+    backgroundColor: '#000000',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4af37',
+    borderColor: '#E9B8C9',
     justifyContent: 'center',
   },
   entryLove: {
     flex: 1,
-    backgroundColor: '#FF4B8B',
+    backgroundColor: '#E06B6B',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#ffb3d6',
+    borderColor: '#E9B8C9',
     justifyContent: 'center',
   },
   entryTitleDark: {
@@ -1002,7 +1002,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   entrySubtitleLight: {
-    color: '#f8f8f8',
+    color: '#FFFFFF',
     marginTop: 4 * 0.9,
     fontSize: (theme.typography.caption + 1) * 0.9,
   },
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 33,
     borderWidth: 0,
-    shadowColor: '#8b8ecc',
+    shadowColor: '#5992C6',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 20,

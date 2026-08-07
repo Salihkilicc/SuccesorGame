@@ -21,7 +21,7 @@ export const VENUES: Venue[] = [
         location: 'Las Vegas',
         entryFee: 1000,
         tier: 5,
-        themeColor: '#FFD700', // Gold
+        themeColor: '#E9B8C9', // Gold
         emoji: '🎰',
         vibeText: 'The kinetic chandelier pulsated above, syncing with the beat of the strip.',
     },
@@ -32,7 +32,7 @@ export const VENUES: Venue[] = [
         location: 'Las Vegas',
         entryFee: 100,
         tier: 5,
-        themeColor: '#003366', // Dark Blue
+        themeColor: '#12379F', // Dark Blue
         emoji: '🏯',
         vibeText: 'Massive temple of EDM with world-class DJs.',
     },
@@ -43,7 +43,7 @@ export const VENUES: Venue[] = [
         location: 'Las Vegas',
         entryFee: 120,
         tier: 5,
-        themeColor: '#FFD700', // Gold
+        themeColor: '#E9B8C9', // Gold
         emoji: '💎',
         vibeText: 'Swimming in gold by the pool under the stars.',
     },
@@ -54,7 +54,7 @@ export const VENUES: Venue[] = [
         location: 'Miami',
         entryFee: 800,
         tier: 5,
-        themeColor: '#4CC9F0', // Cyan/Neon Blue
+        themeColor: '#5992C6', // Cyan/Neon Blue
         emoji: '🌴',
         vibeText: 'Confetti rained down as the bass shook the palm trees outside.',
     },
@@ -65,7 +65,7 @@ export const VENUES: Venue[] = [
         location: 'Miami',
         entryFee: 60,
         tier: 4,
-        themeColor: '#FF69B4', // Hot Pink
+        themeColor: '#E06B6B', // Hot Pink
         emoji: '👽',
         vibeText: 'The sunrise on the terrace hit different after 10 hours of techno.',
     },
@@ -76,7 +76,7 @@ export const VENUES: Venue[] = [
         location: 'Miami',
         entryFee: 600,
         tier: 4,
-        themeColor: '#FF69B4', // Hot Pink
+        themeColor: '#E06B6B', // Hot Pink
         emoji: '💃',
         vibeText: 'The party never stopped, blurring the lines between night and day.',
     },
@@ -87,7 +87,7 @@ export const VENUES: Venue[] = [
         location: 'New York City',
         entryFee: 1500,
         tier: 4,
-        themeColor: '#FF9E00', // Red
+        themeColor: '#E3A857', // Red
         emoji: '🎭',
         vibeText: 'A shocking cabaret performance left the crowd speechless and wanting more.',
     },
@@ -98,7 +98,7 @@ export const VENUES: Venue[] = [
         location: 'New York City',
         entryFee: 80,
         tier: 4,
-        themeColor: '#800080', // Purple
+        themeColor: '#0A2A92', // Purple
         emoji: '🍸',
         vibeText: 'A classic high-energy fashion week afterparty vibe.',
     },
@@ -120,7 +120,7 @@ export const VENUES: Venue[] = [
         location: 'Chicago',
         entryFee: 70,
         tier: 4,
-        themeColor: '#B22222', // Firebrick
+        themeColor: '#E06B6B', // Firebrick
         emoji: '🏮',
         vibeText: 'Dimly lit, mysterious, and absolutely packed with energy.',
     },
@@ -133,7 +133,7 @@ export const VENUES: Venue[] = [
         location: 'Berlin',
         entryFee: 250,
         tier: 3,
-        themeColor: '#4CC9F0', // Neon Blue
+        themeColor: '#5992C6', // Neon Blue
         emoji: '⛓️',
         vibeText: 'The industrial techno beat consumed you completely in the concrete halls.',
     },
@@ -155,7 +155,7 @@ export const VENUES: Venue[] = [
         location: 'Berlin',
         entryFee: 25,
         tier: 3,
-        themeColor: '#8B4513', // Saddle Brown (Rust)
+        themeColor: '#E06B6B', // Saddle Brown (Rust)
         emoji: '🏭',
         vibeText: 'Hard industrial techno in an abandoned power plant vault.',
     },
@@ -166,7 +166,7 @@ export const VENUES: Venue[] = [
         location: 'Ibiza',
         entryFee: 1200,
         tier: 5,
-        themeColor: '#FF9E00', // Sunset Orange
+        themeColor: '#E3A857', // Sunset Orange
         emoji: '🌅',
         vibeText: 'Dancing by the pool while the sun went down was strictly magical.',
     },
@@ -177,7 +177,7 @@ export const VENUES: Venue[] = [
         location: 'Ibiza',
         entryFee: 90,
         tier: 4,
-        themeColor: '#FF9E00', // Crimson
+        themeColor: '#E3A857', // Crimson
         emoji: '🍒',
         vibeText: 'The legendary cherries and house music history.',
     },
@@ -188,7 +188,7 @@ export const VENUES: Venue[] = [
         location: 'Ibiza',
         entryFee: 100,
         tier: 5,
-        themeColor: '#32CD32', // Lime Green
+        themeColor: '#5FB37A', // Lime Green
         emoji: '🌫️',
         vibeText: 'Lost in the CO2 cannons and lasers until dawn.',
     },
@@ -199,7 +199,7 @@ export const VENUES: Venue[] = [
         location: 'London',
         entryFee: 400,
         tier: 4,
-        themeColor: '#800080', // Purple
+        themeColor: '#0A2A92', // Purple
         emoji: '🇬🇧',
         vibeText: 'The legendary sound system rattled your very bones.',
     },
@@ -210,7 +210,7 @@ export const VENUES: Venue[] = [
         location: 'London',
         entryFee: 40,
         tier: 3,
-        themeColor: '#C0C0C0', // Silver
+        themeColor: '#E9B8C9', // Silver
         emoji: '🔊',
         vibeText: 'The sound system literally shook your bones.',
     },
@@ -221,7 +221,7 @@ export const VENUES: Venue[] = [
         location: 'Paris',
         entryFee: 900,
         tier: 5,
-        themeColor: '#C0C0C0', // Silver
+        themeColor: '#E9B8C9', // Silver
         emoji: '🗼',
         vibeText: 'Champagne flowed endlessly with a view of the Arc de Triomphe.',
     },
@@ -232,7 +232,7 @@ export const VENUES: Venue[] = [
         location: 'Barcelona',
         entryFee: 50,
         tier: 4,
-        themeColor: '#4CC9F0', // Dodger Blue
+        themeColor: '#5992C6', // Dodger Blue
         emoji: '🌊',
         vibeText: 'Dancing right on the beach with the Mediterranean breeze.',
     },
@@ -245,7 +245,7 @@ export const VENUES: Venue[] = [
         location: 'Tokyo',
         entryFee: 700,
         tier: 5,
-        themeColor: '#C8B6FF', // Neon Purple
+        themeColor: '#5992C6', // Neon Purple
         emoji: '🏯',
         vibeText: 'The neon lights and bass drops created a cyberpunk trance.',
     },
@@ -256,7 +256,7 @@ export const VENUES: Venue[] = [
         location: 'Tokyo',
         entryFee: 40,
         tier: 4,
-        themeColor: '#696969', // Dim Gray
+        themeColor: '#614A4B', // Dim Gray
         emoji: '🥁',
         vibeText: 'The bass from the massive speaker stack controlled your heartbeat.',
     },
@@ -267,7 +267,7 @@ export const VENUES: Venue[] = [
         location: 'Tokyo',
         entryFee: 25,
         tier: 3,
-        themeColor: '#FF4500', // Orange Red
+        themeColor: '#E06B6B', // Orange Red
         emoji: '⚛️',
         vibeText: 'Young, chaotic, and incredibly fun Shibuya energy.',
     },
@@ -278,7 +278,7 @@ export const VENUES: Venue[] = [
         location: 'Singapore',
         entryFee: 1000,
         tier: 5,
-        themeColor: '#FF4500', // Orange Red
+        themeColor: '#E06B6B', // Orange Red
         emoji: '🏙️',
         vibeText: 'Sky-high views of the marina made every toast feel infinite.',
     },
@@ -289,7 +289,7 @@ export const VENUES: Venue[] = [
         location: 'Singapore',
         entryFee: 50,
         tier: 4,
-        themeColor: '#4CC9F0', // Lime
+        themeColor: '#5992C6', // Lime
         emoji: '💿',
         vibeText: 'A futuristic wonderland of sound and light.',
     },
@@ -300,7 +300,7 @@ export const VENUES: Venue[] = [
         location: 'Seoul',
         entryFee: 600,
         tier: 4,
-        themeColor: '#0000FF', // Blue
+        themeColor: '#0A2A92', // Blue
         emoji: '🇰🇷',
         vibeText: 'Electronic beats and K-pop visuals merged into a sensory overload.',
     },
@@ -322,7 +322,7 @@ export const VENUES: Venue[] = [
         location: 'Hong Kong',
         entryFee: 150,
         tier: 5,
-        themeColor: '#FF9E00', // Red
+        themeColor: '#E3A857', // Red
         emoji: '🐉',
         vibeText: 'Rubbing shoulders with celebrities in the ultimate VIP lounge.',
     },
@@ -333,7 +333,7 @@ export const VENUES: Venue[] = [
         location: 'Shanghai',
         entryFee: 60,
         tier: 4,
-        themeColor: '#0000FF', // Blue
+        themeColor: '#0A2A92', // Blue
         emoji: '🌃',
         vibeText: 'Neon lights and luxury in the heart of the city.',
     },
@@ -344,7 +344,7 @@ export const VENUES: Venue[] = [
         location: 'Phuket',
         entryFee: 30,
         tier: 3,
-        themeColor: '#DAA520', // Goldenrod
+        themeColor: '#E9B8C9', // Goldenrod
         emoji: '🐘',
         vibeText: 'Massive stage shows and acrobats flying over the crowd.',
     },
@@ -357,7 +357,7 @@ export const VENUES: Venue[] = [
         location: 'Johannesburg',
         entryFee: 300,
         tier: 4,
-        themeColor: '#DAA520', // Goldenrod
+        themeColor: '#E9B8C9', // Goldenrod
         emoji: '🦁',
         vibeText: 'Afrobeats and luxury combined for an unforgettable rhythm.',
     },
@@ -368,7 +368,7 @@ export const VENUES: Venue[] = [
         location: 'Johannesburg',
         entryFee: 350,
         tier: 4,
-        themeColor: '#8B4513', // Saddle Brown
+        themeColor: '#E06B6B', // Saddle Brown
         emoji: '💎',
         vibeText: 'A lavish setting where diamonds and beats sparkled in unison.',
     },
@@ -379,7 +379,7 @@ export const VENUES: Venue[] = [
         location: 'Lagos',
         entryFee: 100,
         tier: 5,
-        themeColor: '#FFD700', // Gold
+        themeColor: '#E9B8C9', // Gold
         emoji: '👑',
         vibeText: 'Pure luxury and Afrobeats royalty.',
     },
@@ -390,7 +390,7 @@ export const VENUES: Venue[] = [
         location: 'Lagos',
         entryFee: 70,
         tier: 4,
-        themeColor: '#FF8C00', // Dark Orange
+        themeColor: '#E3A857', // Dark Orange
         emoji: '🦁',
         vibeText: 'The energy of the crowd was unmatched anywhere else.',
     },
@@ -401,7 +401,7 @@ export const VENUES: Venue[] = [
         location: 'Cape Town',
         entryFee: 30,
         tier: 3,
-        themeColor: '#FF1493', // Deep Pink
+        themeColor: '#E06B6B', // Deep Pink
         emoji: '👠',
         vibeText: 'Glamorous décor and commercial hits all night.',
     },
@@ -423,7 +423,7 @@ export const VENUES: Venue[] = [
         location: 'Accra',
         entryFee: 80,
         tier: 5,
-        themeColor: '#4CC9F0', // Sky Blue
+        themeColor: '#5992C6', // Sky Blue
         emoji: '🌤️',
         vibeText: 'Partying above the city skyline with an incredible view.',
     },
@@ -434,7 +434,7 @@ export const VENUES: Venue[] = [
         location: 'Nairobi',
         entryFee: 20,
         tier: 3,
-        themeColor: '#228B22', // Forest Green
+        themeColor: '#5FB37A', // Forest Green
         emoji: '🌿',
         vibeText: 'An artistic, open-air creative hub turned wild party.',
     },
@@ -445,7 +445,7 @@ export const VENUES: Venue[] = [
         location: 'Nairobi',
         entryFee: 50,
         tier: 4,
-        themeColor: '#B22222', // Firebrick
+        themeColor: '#E06B6B', // Firebrick
         emoji: '🌹',
         vibeText: 'Velvet ropes and exclusive vibes.',
     },
@@ -456,7 +456,7 @@ export const VENUES: Venue[] = [
         location: 'Nairobi',
         entryFee: 35,
         tier: 3,
-        themeColor: '#4B0082', // Indigo
+        themeColor: '#0A2A92', // Indigo
         emoji: '🎷',
         vibeText: 'The true spirit of Pan-African music and dance.',
     },

@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
     footer: {
         marginTop: 20,
         borderTopWidth: 1,
-        borderTopColor: '#C8B6FF',
+        borderTopColor: '#5992C6',
         paddingTop: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     totalLabel: {
-        color: '#4CC9F0',
+        color: '#5992C6',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     confirmButton: {
-        backgroundColor: '#C8B6FF',
+        backgroundColor: '#5992C6',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     closeText: {
-        color: '#4CC9F0',
+        color: '#5992C6',
         fontSize: 14
     }
 });

@@ -115,7 +115,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.label}>{t('ui.output')}</Text>
-                        <Text style={[styles.big, { color: efficiency >= 1 ? '#4CAF50' : '#FFB74D' }]}>
+                        <Text style={[styles.big, { color: efficiency >= 1 ? '#5FB37A' : '#E3A857' }]}>
                             ×{efficiency.toFixed(2)}
                         </Text>
                         <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
@@ -125,7 +125,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                 <View style={styles.moraleTrack}>
                     <View style={[styles.moraleFill, {
                         width: `${morale}%`,
-                        backgroundColor: morale < 40 ? '#EF5350' : morale < 65 ? '#FFB74D' : '#4CAF50',
+                        backgroundColor: morale < 40 ? '#E06B6B' : morale < 65 ? '#E3A857' : '#5FB37A',
                     }]} />
                     {/* Maasin tasidigi seviye isareti */}
                     <View style={[styles.moraleMarker, { left: `${target}%` }]} />
@@ -139,7 +139,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     info={WORKFORCE_EXPLANATIONS.salaryRatio}
                     infoDetail={`Market rate for a ${tier.name} is ${formatMoney(market)} per person per quarter. You are paying ${formatMoney(perPerson)}.`}
                     summary={`${Math.round(salaryRatio * 100)}%`}
-                    summaryColor={salaryRatio < 0.95 ? '#FFB74D' : '#4CAF50'}
+                    summaryColor={salaryRatio < 0.95 ? '#E3A857' : '#5FB37A'}
                     defaultOpen
                 >
                     <View style={styles.row}>
@@ -212,7 +212,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
                     summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
-                    summaryColor={canBonus ? '#4CAF50' : '#8A8A8A'}
+                    summaryColor={canBonus ? '#5FB37A' : '#B28C96'}
                 >
                     <Text style={styles.line}>
                         5% of last quarter's profit: {formatMoney(bonusCost)}
@@ -260,9 +260,9 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
 const styles = StyleSheet.create({
     stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
-    label: { color: '#6E6E6E', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    label: { color: '#614A4B', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },
-    sub: { color: '#8A8A8A', fontSize: 11, marginTop: 2 },
+    sub: { color: '#B28C96', fontSize: 11, marginTop: 2 },
     strong: { color: theme.colors.textPrimary, fontWeight: '800' },
 
     moraleTrack: {
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
         overflow: 'hidden', marginBottom: 8,
     },
     moraleFill: { height: '100%', borderRadius: 5 },
-    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#FFD700' },
+    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#E9B8C9' },
 
-    note: { color: '#8A8A8A', fontSize: 11, lineHeight: 16, marginBottom: 14 },
-    line: { color: '#B0B0B0', fontSize: 12, lineHeight: 17, marginTop: 6 },
-    warn: { color: '#FFB74D', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
-    ok: { color: '#4CAF50', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    note: { color: '#B28C96', fontSize: 11, lineHeight: 16, marginBottom: 14 },
+    line: { color: '#B28C96', fontSize: 12, lineHeight: 17, marginTop: 6 },
+    warn: { color: '#E3A857', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    ok: { color: '#5FB37A', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
     row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 6 },
     rowTight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -291,13 +291,13 @@ const styles = StyleSheet.create({
     },
     eventOff: { opacity: 0.4 },
     eventName: { color: theme.colors.textPrimary, fontSize: 13.5, fontWeight: '700' },
-    eventDesc: { color: '#6E6E6E', fontSize: 10.5, marginTop: 2 },
+    eventDesc: { color: '#614A4B', fontSize: 10.5, marginTop: 2 },
     eventCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '800' },
-    eventGain: { color: '#4CAF50', fontSize: 11, marginTop: 2 },
+    eventGain: { color: '#5FB37A', fontSize: 11, marginTop: 2 },
 
     primary: {
         marginTop: 10, paddingVertical: 12, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#2E7D32',
+        alignItems: 'center', backgroundColor: '#5FB37A',
     },
     primaryOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
     primaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },

@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     dangerButton: {
         borderLeftColor: '#900',
-        backgroundColor: '#1a0505',
+        backgroundColor: '#000000',
     },
     pressed: {
         transform: [{ scale: 0.98 }],
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     dangerText: {
-        color: '#ff4444',
+        color: '#E06B6B',
     },
     menuSubtitle: {
         color: '#555',

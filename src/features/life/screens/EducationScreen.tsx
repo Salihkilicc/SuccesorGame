@@ -12,7 +12,7 @@ const EducationScreen = () => {
             <AppLaunchLoader
                 appName="Education"
                 appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
-                backgroundColor="#1e1e1e"
+                backgroundColor="#31241F"
             >
                 <EducationMasterModal />
                 <EducationExamModal />

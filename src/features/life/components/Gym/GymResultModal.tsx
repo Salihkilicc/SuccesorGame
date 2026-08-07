@@ -76,12 +76,12 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 320,
-        backgroundColor: '#0D1321',
+        backgroundColor: '#000000',
         borderRadius: theme.radius.lg,
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#C0C0C0'
+        borderColor: '#E9B8C9'
     },
     title: {
         fontSize: 20,
@@ -98,19 +98,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderBottomWidth: 1,
-        borderBottomColor: '#C0C0C0',
+        borderBottomColor: '#E9B8C9',
         paddingBottom: 8
     },
     statLabel: {
-        color: '#C0C0C0',
+        color: '#E9B8C9',
         fontSize: 16
     },
     statValue: {
         fontSize: 16,
         fontWeight: '700'
     },
-    green: { color: '#FF6F00' },
-    red: { color: '#C0C0C0' },
+    green: { color: '#E3A857' },
+    red: { color: '#E9B8C9' },
     message: {
         color: '#FFFFFF',
         textAlign: 'center',
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         opacity: 0.8
     },
     button: {
-        backgroundColor: '#FF6F00',
+        backgroundColor: '#E3A857',
         paddingVertical: 12,
         paddingHorizontal: 32,
         borderRadius: 8

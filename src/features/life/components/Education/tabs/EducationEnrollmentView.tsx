@@ -474,7 +474,7 @@ const getMajorIcon = (majorId: MajorType) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0a192f', // Navy Blue
+        backgroundColor: '#000000', // Navy Blue
     },
     safeArea: {
         flex: 1,
@@ -485,9 +485,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#112240',
+        backgroundColor: '#000000',
         borderBottomWidth: 1,
-        borderBottomColor: '#1e3a5f',
+        borderBottomColor: '#523F3E',
     },
     backBtn: {
         paddingVertical: 8,
@@ -495,11 +495,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(30, 58, 95, 0.5)',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#c5a059',
+        borderColor: '#E9B8C9',
     },
     backText: {
         fontSize: 14,
-        color: '#c5a059',
+        color: '#E9B8C9',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -508,20 +508,20 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#e6f1ff',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     subtitle: {
         fontSize: 12,
-        color: '#8892b0',
+        color: '#5992C6',
         marginTop: 2,
     },
     // Tabs
     tabContainer: {
-        backgroundColor: '#112240',
+        backgroundColor: '#000000',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#c5a059',
+        borderBottomColor: '#E9B8C9',
     },
     tabScrollContent: {
         paddingHorizontal: 16,
@@ -537,15 +537,15 @@ const styles = StyleSheet.create({
     },
     activeTab: {
         backgroundColor: 'rgba(197, 160, 89, 0.15)',
-        borderColor: '#c5a059',
+        borderColor: '#E9B8C9',
     },
     tabText: {
-        color: '#8892b0',
+        color: '#5992C6',
         fontSize: 14,
         fontWeight: '600',
     },
     activeTabText: {
-        color: '#c5a059',
+        color: '#E9B8C9',
         fontWeight: 'bold',
     },
     // Status Section
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     warningText: {
-        color: '#ff6b6b',
+        color: '#E06B6B',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     majorCard: {
-        backgroundColor: '#112240',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
     },
     disabledCard: {
         opacity: 0.8,
-        borderColor: '#233554',
+        borderColor: '#523F3E',
     },
     cardHeader: {
         marginBottom: 16,
@@ -600,18 +600,18 @@ const styles = StyleSheet.create({
     majorTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#e6f1ff',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     masterTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#e6f1ff',
+        color: '#FFFFFF',
         marginBottom: 6,
     },
     masterSubtitle: {
         fontSize: 13,
-        color: '#8892b0',
+        color: '#5992C6',
         fontStyle: 'italic',
     },
     cardDetails: {
@@ -627,13 +627,13 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: 12,
-        color: '#8892b0',
+        color: '#5992C6',
         marginBottom: 2,
     },
     detailValue: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#c5a059',
+        color: '#E9B8C9',
     },
     badgeContainer: {
         flexDirection: 'row',
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(100, 255, 218, 0.3)',
     },
     statBadgeText: {
-        color: '#64ffda',
+        color: '#5FB37A',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -669,13 +669,13 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 107, 107, 0.3)',
     },
     prerequisiteText: {
-        color: '#ff6b6b',
+        color: '#E06B6B',
         fontSize: 12,
         fontWeight: '600',
         textAlign: 'center',
     },
     enrollButton: {
-        backgroundColor: '#c5a059',
+        backgroundColor: '#E9B8C9',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -685,11 +685,11 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     enrollButtonDisabled: {
-        backgroundColor: '#233554',
+        backgroundColor: '#523F3E',
         shadowOpacity: 0,
     },
     enrollButtonText: {
-        color: '#0a192f',
+        color: '#000000',
         fontSize: 16,
         fontWeight: 'bold',
         paddingHorizontal: 32, // Added padding to ensure text doesn't overflow

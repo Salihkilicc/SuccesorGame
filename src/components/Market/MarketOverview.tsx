@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#A0A0A0',
+    color: '#B28C96',
     fontSize: theme.typography.caption + 1,
   },
   value: {
@@ -87,9 +87,9 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
-  positive: { color: '#00E676' },
-  negative: { color: '#FF3B30' },
-  warning: { color: '#FFB300' },
+  positive: { color: '#5FB37A' },
+  negative: { color: '#E06B6B' },
+  warning: { color: '#E3A857' },
   helper: {
     color: 'rgba(160,160,160,0.6)',
     fontSize: theme.typography.caption,

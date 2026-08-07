@@ -529,21 +529,21 @@ const LoveScreen = () => {
     const alreadyMadeLove = !!partnerNPC?.madeLoveThisQuarter;
 
     const getSatisfactionColor = (v: number) => {
-      if (v <= 30) return '#EF4444';
-      if (v <= 60) return '#F59E0B';
-      return '#A855F7';
+      if (v <= 30) return '#E06B6B';
+      if (v <= 60) return '#E3A857';
+      return '#12379F';
     };
 
     return (
       <View style={styles.grid}>
         {[
-          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#F59E0B' },
-          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#38BDF8' },
-          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#EF4444' },
-          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#A855F7' },
-          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#22C55E' },
-          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#6366F1' },
-          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
+          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#E3A857' },
+          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#5992C6' },
+          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#E06B6B' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#12379F' },
+          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#5FB37A' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#12379F' },
+          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#E06B6B' },
         ].map((btn) => (
           <Pressable
             key={btn.action}
@@ -556,7 +556,7 @@ const LoveScreen = () => {
             <View style={[styles.gridTileIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '55' }]}>
               <Text style={styles.gridTileEmoji}>{btn.emoji}</Text>
             </View>
-            <Text style={[styles.gridTileLabel, btn.danger && { color: '#EF4444' }]}>{btn.label}</Text>
+            <Text style={[styles.gridTileLabel, btn.danger && { color: '#E06B6B' }]}>{btn.label}</Text>
             <Text style={styles.gridTileDesc}>{btn.desc}</Text>
           </Pressable>
         ))}
@@ -572,10 +572,10 @@ const LoveScreen = () => {
           onPress={handleMakeLove}
           disabled={alreadyMadeLove}
         >
-          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#EF4444' + '22' : '#EC4899' + '22', borderColor: alreadyMadeLove ? '#EF4444' + '55' : '#EC4899' + '55' }]}>
+          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#E06B6B' + '22' : '#E06B6B' + '22', borderColor: alreadyMadeLove ? '#E06B6B' + '55' : '#E06B6B' + '55' }]}>
             <Text style={styles.gridTileEmoji}>💗</Text>
           </View>
-          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#EF4444' }]}>{t('love.makeLove')}</Text>
+          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#E06B6B' }]}>{t('love.makeLove')}</Text>
           <Text style={styles.gridTileDesc}>
             {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
           </Text>
@@ -614,7 +614,7 @@ const LoveScreen = () => {
             ]}
             onPress={() => handlePartnerAction('Propose')}
           >
-            <View style={[styles.gridTileIcon, { backgroundColor: '#FACC15' + '22', borderColor: '#FACC15' + '55' }]}>
+            <View style={[styles.gridTileIcon, { backgroundColor: '#E3A857' + '22', borderColor: '#E3A857' + '55' }]}>
               <Text style={styles.gridTileEmoji}>💍</Text>
             </View>
             <Text style={styles.gridTileLabel}>{t('love.propose')}</Text>
@@ -645,10 +645,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#F59E0B' },
-          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#38BDF8' },
-          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#22C55E' },
-          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#EF4444' },
+          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#E3A857' },
+          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#5992C6' },
+          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#5FB37A' },
+          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#E06B6B' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -662,10 +662,10 @@ const LoveScreen = () => {
               <Text style={{ fontSize: 20 }}>{btn.emoji}</Text>
             </View>
             <View style={styles.actionRowText}>
-              <Text style={[styles.actionRowLabel, btn.danger && { color: '#EF4444' }]}>{btn.label}</Text>
+              <Text style={[styles.actionRowLabel, btn.danger && { color: '#E06B6B' }]}>{btn.label}</Text>
               <Text style={styles.actionRowDesc}>{btn.desc}</Text>
             </View>
-            <Text style={[styles.actionRowChevron, btn.danger && { color: '#EF4444' }]}>›</Text>
+            <Text style={[styles.actionRowChevron, btn.danger && { color: '#E06B6B' }]}>›</Text>
           </Pressable>
         ))}
       </View>
@@ -693,10 +693,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#38BDF8' },
-          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#6366F1' },
-          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#A855F7' },
-          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#F59E0B' },
+          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#5992C6' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#12379F' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#12379F' },
+          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#E3A857' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -729,7 +729,7 @@ const LoveScreen = () => {
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#0a0a0c', '#000000', '#050505']}
+        colors={['#000000', '#000000', '#000000']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -744,7 +744,7 @@ const LoveScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -922,17 +922,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#E5E5E5',
+    color: '#FFFFFF',
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#D4AF37',
+    backgroundColor: '#E9B8C9',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#D4AF37',
+    shadowColor: '#E9B8C9',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
   },
   feedbackBannerText: {
     flex: 1,
-    color: '#C7D2FE',
+    color: '#E9B8C9',
     fontSize: 13,
     fontWeight: '600',
     lineHeight: 18,

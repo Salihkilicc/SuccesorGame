@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   row: {
     fontSize: theme.typography.body,
-    color: '#A0A0A0',
+    color: '#B28C96',
     lineHeight: 20,
   },
   expertCard: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   lockedText: {
-    color: '#A0A0A0',
+    color: '#B28C96',
     fontSize: theme.typography.caption + 1,
     lineHeight: 18,
   },
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212,175,55,0.3)',
   },
   sentimentText: {
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontSize: theme.typography.caption + 1,
   },
 });

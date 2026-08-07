@@ -23,12 +23,12 @@ export default PremiumBadge;
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: '#FACC15',
+    backgroundColor: '#E3A857',
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#B45309',
+    borderColor: '#E3A857',
   },
   small: {
     paddingHorizontal: 8,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   label: {
-    color: '#7C2D12',
+    color: '#E06B6B',
     fontWeight: '800',
     letterSpacing: 0.5,
   },

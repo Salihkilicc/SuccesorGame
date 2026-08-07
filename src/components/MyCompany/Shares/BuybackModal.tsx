@@ -140,14 +140,14 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                                <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
+                                <Text style={[styles.impactValue, { color: '#12379F' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={[styles.impactValue, { color: '#30D158' }]}>
+                                    <Text style={[styles.impactValue, { color: '#5FB37A' }]}>
                                         +{(predictedImpact * 100).toFixed(1)}%
                                     </Text>
                                     <Text style={styles.impactSubValue}>{t('equity.targetV1', { v1: formatPrice(predictedPrice) })}</Text>
@@ -155,7 +155,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                                <Text style={[styles.impactValue, { color: '#0A84FF' }]}>
+                                <Text style={[styles.impactValue, { color: '#12379F' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
                             </View>
@@ -167,7 +167,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.costLabel}>{t('equity.availableCash')}</Text>
                                 <Text style={[
                                     styles.costValue,
-                                    { color: isAffordable ? '#30D158' : '#FF453A' }
+                                    { color: isAffordable ? '#5FB37A' : '#E06B6B' }
                                 ]}>
                                     {formatMoney(companyCapital)}
                                 </Text>
@@ -216,9 +216,9 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    noFloatCard: { backgroundColor: '#2A2416', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#FFB020' },
-    noFloatTitle: { color: '#FFB020', fontWeight: '800', fontSize: 13, marginBottom: 4 },
-    noFloatBody: { color: '#D8CBB0', fontSize: 11, lineHeight: 16 },
+    noFloatCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#E3A857' },
+    noFloatTitle: { color: '#E3A857', fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         padding: 20, // Moved padding here
     },
     card: {
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#8E8E93',
+        color: '#B28C96',
         marginBottom: 16,
     },
     stepperSection: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#3A3A3C',
+        backgroundColor: '#473633',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     },
     labelSmall: {
         fontSize: 11,
-        color: '#8E8E93',
+        color: '#B28C96',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -305,17 +305,17 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#3A3A3C',
+        borderColor: '#473633',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#8E8E93',
+        color: '#B28C96',
     },
     amountCard: {
         backgroundColor: 'rgba(10, 132, 255, 0.15)',
@@ -324,21 +324,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#0A84FF40',
+        borderColor: '#12379F40',
     },
     amountLabel: {
         fontSize: 13,
-        color: '#0A84FF',
+        color: '#12379F',
         fontWeight: '600',
         marginBottom: 6,
     },
     amountValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#0A84FF',
+        color: '#12379F',
     },
     impactSection: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -360,11 +360,11 @@ const styles = StyleSheet.create({
     },
     impactSubValue: {
         fontSize: 12,
-        color: '#8E8E93',
+        color: '#B28C96',
         marginTop: 2,
     },
     costSection: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     costLabel: {
         fontSize: 15,
-        color: '#8E8E93',
+        color: '#B28C96',
         fontWeight: '500',
     },
     costValue: {
@@ -384,16 +384,16 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     warningBox: {
-        backgroundColor: '#FF453A20',
+        backgroundColor: '#E06B6B20',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#FF453A40',
+        borderColor: '#E06B6B40',
     },
     warningText: {
         fontSize: 14,
-        color: '#FF453A',
+        color: '#E06B6B',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -415,13 +415,13 @@ const styles = StyleSheet.create({
     },
     executeButton: {
         flex: 1,
-        backgroundColor: '#0A84FF',
+        backgroundColor: '#12379F',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
     },
     executeButtonDisabled: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         opacity: 0.5,
     },
     executeButtonText: {

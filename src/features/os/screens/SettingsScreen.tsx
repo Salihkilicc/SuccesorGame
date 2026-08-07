@@ -41,7 +41,7 @@ const SettingsRow = ({
     onPress,
     isFirst,
     isLast,
-    color = '#C0C0C0',
+    color = '#E9B8C9',
 }: SettingsRowProps) => {
     return (
         <TouchableOpacity
@@ -65,12 +65,12 @@ const SettingsRow = ({
                 <Switch
                     value={value}
                     onValueChange={onToggle}
-                    trackColor={{ false: '#2A2A2A', true: '#C5A059' }}
-                    thumbColor={value ? '#FFFFFF' : '#888888'}
-                    ios_backgroundColor="#2A2A2A"
+                    trackColor={{ false: '#31241F', true: '#E9B8C9' }}
+                    thumbColor={value ? '#FFFFFF' : '#B28C96'}
+                    ios_backgroundColor="#31241F"
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#5A5A72" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#614A4B" />
             )}
         </TouchableOpacity>
     );
@@ -135,7 +135,7 @@ const SettingsScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#050509', '#040408', '#020205']}
+                colors={['#000000', '#000000', '#000000']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -151,7 +151,7 @@ const SettingsScreen = () => {
                             pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
                         ]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -186,7 +186,7 @@ const SettingsScreen = () => {
                                     <MaterialCommunityIcons
                                         name="translate"
                                         size={22}
-                                        color={locale === l.code ? '#FFD700' : '#8A9BA8'}
+                                        color={locale === l.code ? '#E9B8C9' : '#B28C96'}
                                     />
                                     <Text
                                         style={[
@@ -212,7 +212,7 @@ const SettingsScreen = () => {
                             value={isMusicEnabled}
                             onToggle={toggleMusic}
                             isFirst
-                            color="#8E2DE2"
+                            color="#0A2A92"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -220,7 +220,7 @@ const SettingsScreen = () => {
                             label={t('os.soundEffects')}
                             value={isSoundEnabled}
                             onToggle={toggleSound}
-                            color="#2980B9"
+                            color="#5992C6"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -228,7 +228,7 @@ const SettingsScreen = () => {
                             label={t('os.notifications')}
                             value={isNotificationsEnabled}
                             onToggle={toggleNotifications}
-                            color="#ec008c"
+                            color="#E06B6B"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -237,7 +237,7 @@ const SettingsScreen = () => {
                             value={isHapticsEnabled}
                             onToggle={toggleHaptics}
                             isLast
-                            color="#F2994A"
+                            color="#E3A857"
                         />
                     </View>
 
@@ -300,13 +300,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 14,
         paddingVertical: 15, paddingHorizontal: 16,
     },
-    langLabel: { flex: 1, fontSize: 15, color: '#8A9BA8', fontWeight: '600' },
+    langLabel: { flex: 1, fontSize: 15, color: '#B28C96', fontWeight: '600' },
     langLabelActive: { color: '#FFF' },
-    langCheck: { color: '#FFD700', fontSize: 16, fontWeight: '800' },
-    langNote: { fontSize: 11, color: '#8A9BA8', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
+    langCheck: { color: '#E9B8C9', fontSize: 16, fontWeight: '800' },
+    langNote: { fontSize: 11, color: '#B28C96', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#020205',
+        backgroundColor: '#000000',
     },
     safeArea: {
         flex: 1,
@@ -344,17 +344,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#E5E5E5',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#D4AF37',
+        backgroundColor: '#E9B8C9',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#D4AF37',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -370,13 +370,13 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#7A7A92',
+        color: '#B28C96',
         letterSpacing: 2,
         marginLeft: 16,
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#000000',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#000000',
     },
     rowFirst: {
         borderTopLeftRadius: 16,
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     },
     rowLabel: {
         fontSize: 16,
-        color: '#E8E8E8',
+        color: '#FFFFFF',
         fontWeight: '500',
         letterSpacing: 0.3,
     },
@@ -431,14 +431,14 @@ const styles = StyleSheet.create({
     },
     footerVersion: {
         fontSize: 13,
-        color: '#7A7A92',
+        color: '#B28C96',
         fontWeight: '600',
         letterSpacing: 1,
         marginBottom: 4,
     },
     footerTagline: {
         fontSize: 11,
-        color: '#5A5A72',
+        color: '#614A4B',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

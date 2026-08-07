@@ -17,7 +17,7 @@ const ProfileScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#050509', '#040408', '#020205']}
+                colors={['#000000', '#000000', '#000000']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -33,7 +33,7 @@ const ProfileScreen = () => {
                             pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
                         ]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -70,7 +70,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#020205',
+        backgroundColor: '#000000',
     },
     safeArea: {
         flex: 1,
@@ -106,17 +106,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#E5E5E5',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#D4AF37',
+        backgroundColor: '#E9B8C9',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#D4AF37',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,

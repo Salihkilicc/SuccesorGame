@@ -116,7 +116,7 @@ const ManagementCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#1C1C1E', // Dark Gray
+        backgroundColor: '#31241F', // Dark Gray
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: theme.radius.md,
-        backgroundColor: '#2C2C2E', // Light Gray for icon box
+        backgroundColor: '#31241F', // Light Gray for icon box
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -145,18 +145,18 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     subtitle: {
-        color: '#8E8E93', // Text Secondary
+        color: '#B28C96', // Text Secondary
         fontSize: theme.typography.caption,
     },
     badge: {
         marginLeft: 'auto',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         paddingHorizontal: theme.spacing.sm,
         paddingVertical: 4,
         borderRadius: theme.radius.sm,
     },
     badgeText: {
-        color: '#8E8E93',
+        color: '#B28C96',
         fontSize: theme.typography.caption,
         fontWeight: '600',
     },
@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        color: '#8E8E93',
+        color: '#B28C96',
         fontSize: theme.typography.caption,
     },
     value: {
-        color: '#0A84FF', // Apple Blue for stat values
+        color: '#12379F', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         color: theme.colors.success,
     },
     limitLabel: {
-        color: '#8E8E93',
+        color: '#B28C96',
         fontSize: 10,
     },
     footer: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#333',
     },
     costLabel: {
-        color: '#8E8E93',
+        color: '#B28C96',
         fontSize: theme.typography.caption,
     },
     costValue: {

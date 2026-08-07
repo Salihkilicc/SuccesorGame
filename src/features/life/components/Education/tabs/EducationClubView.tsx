@@ -176,7 +176,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#FFFFFF',
     },
     safeArea: {
         flex: 1,
@@ -187,21 +187,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 2,
-        borderBottomColor: '#d4af37',
+        borderBottomColor: '#E9B8C9',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#374151',
+        color: '#523F3E',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#1e3a8a',
+        color: '#12379F',
     },
     subtitle: {
         fontSize: 12,
-        color: '#6b7280',
+        color: '#614A4B',
         marginTop: 2,
     },
     scrollContent: {
@@ -223,11 +223,11 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     clubCard: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
-        borderColor: '#e5e7eb',
+        borderColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     clubCardActive: {
-        borderColor: '#1e3a8a',
-        backgroundColor: '#eff6ff',
+        borderColor: '#12379F',
+        backgroundColor: '#FFFFFF',
     },
     clubHeader: {
         marginBottom: 16,
@@ -250,40 +250,40 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#1f2937',
+        color: '#31241F',
     },
     activeBadge: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#ffffff',
-        backgroundColor: '#1e3a8a',
+        color: '#FFFFFF',
+        backgroundColor: '#12379F',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     clubDescription: {
         fontSize: 14,
-        color: '#6b7280',
+        color: '#614A4B',
         lineHeight: 20,
     },
     buffSection: {
-        backgroundColor: '#fef3c7',
+        backgroundColor: '#FFFFFF',
         padding: 12,
         borderRadius: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#fbbf24',
+        borderColor: '#E3A857',
     },
     buffLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#92400e',
+        color: '#E06B6B',
         marginBottom: 4,
     },
     buffText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#b45309',
+        color: '#E3A857',
     },
     membersSection: {
         marginBottom: 16,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#374151',
+        color: '#523F3E',
         marginBottom: 8,
     },
     avatarsContainer: {
@@ -303,32 +303,32 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#1e3a8a',
+        backgroundColor: '#12379F',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#d4af37',
+        borderColor: '#E9B8C9',
     },
     avatarText: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#ffffff',
+        color: '#FFFFFF',
     },
     actionBtn: {
-        backgroundColor: '#1e3a8a',
+        backgroundColor: '#12379F',
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#d4af37',
+        borderColor: '#E9B8C9',
     },
     actionBtnActive: {
-        backgroundColor: '#dc2626',
-        borderColor: '#ef4444',
+        backgroundColor: '#E06B6B',
+        borderColor: '#E06B6B',
     },
     actionBtnText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#ffffff',
+        color: '#FFFFFF',
     },
 });

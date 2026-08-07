@@ -173,7 +173,7 @@ const MyCompanyScreen = () => {
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#0a0a0c', '#000000', '#050505']}
+        colors={['#000000', '#000000', '#000000']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -188,7 +188,7 @@ const MyCompanyScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -407,23 +407,23 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#E5E5E5',
+    color: '#FFFFFF',
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#D4AF37',
+    backgroundColor: '#E9B8C9',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#D4AF37',
+    shadowColor: '#E9B8C9',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 4,
   },
-  subtitle: { color: '#888888', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
+  subtitle: { color: '#B28C96', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {
     flexBasis: '48%',
@@ -443,6 +443,6 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
-  deptSub: { fontSize: 12, color: '#888888', textAlign: 'center' },
-  sharePrice: { fontSize: 18, fontWeight: '700', color: '#FFD700' }, // Gold for money
+  deptSub: { fontSize: 12, color: '#B28C96', textAlign: 'center' },
+  sharePrice: { fontSize: 18, fontWeight: '700', color: '#E9B8C9' }, // Gold for money
 });

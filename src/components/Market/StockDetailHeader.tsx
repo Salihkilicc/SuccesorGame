@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212,175,55,0.4)',
   },
   chipText: {
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontWeight: '700',
     fontSize: theme.typography.caption + 1,
   },
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   up: {
-    color: '#00E676',
+    color: '#5FB37A',
   },
   down: {
-    color: '#FF3B30',
+    color: '#E06B6B',
   },
   metaRow: {
     flexDirection: 'row',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: '#A0A0A0',
+    color: '#B28C96',
   },
   divider: {
     height: 1,

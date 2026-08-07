@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     subheader: {
         fontSize: 14,
-        color: '#4CC9F0',
+        color: '#5992C6',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -90,21 +90,21 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '45%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
         minHeight: 160, // Increased height for large cards
         justifyContent: 'center',
     },
     cardSelected: {
-        borderColor: '#C8B6FF',
-        backgroundColor: '#1A1A2E',
+        borderColor: '#5992C6',
+        backgroundColor: '#000000',
     },
     cardLocal: {
-        borderColor: '#3498db', // Blue for USA Local
+        borderColor: '#5992C6', // Blue for USA Local
     },
     cardPressed: {
         transform: [{ scale: 0.97 }],
@@ -122,15 +122,15 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textSelected: {
-        color: '#C8B6FF',
+        color: '#5992C6',
     },
     venueCount: {
         fontSize: 12,
-        color: '#4CC9F0',
+        color: '#5992C6',
         marginTop: 4,
     },
     localBadge: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#5992C6',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,

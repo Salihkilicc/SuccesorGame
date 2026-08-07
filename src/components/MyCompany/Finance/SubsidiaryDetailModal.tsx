@@ -144,7 +144,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <View style={styles.divider} />
                             <View style={styles.kpiItem}>
                                 <Text style={styles.kpiLabel}>{t('finance.lastQChange')}</Text>
-                                <Text style={[styles.kpiValue, { color: isPositive ? '#30D158' : '#FF453A' }]}>
+                                <Text style={[styles.kpiValue, { color: isPositive ? '#5FB37A' : '#E06B6B' }]}>
                                     {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
                                 </Text>
                             </View>
@@ -171,7 +171,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 
                         {/* Info Note */}
                         <View style={styles.infoBox}>
-                            <Ionicons name="information-circle-outline" size={20} color="#8E8E93" />
+                            <Ionicons name="information-circle-outline" size={20} color="#B28C96" />
                             <Text style={styles.infoText}>
                                 {t('sub.pointsHint')}
                             </Text>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         width: '90%',
         maxWidth: 420,
         height: '80%',
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#2C2C2E',
-        backgroundColor: '#151517',
+        borderBottomColor: '#31241F',
+        backgroundColor: '#000000',
     },
     companyName: {
         fontSize: 22,
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
     },
     sectorText: {
         fontSize: 13,
-        color: '#8E8E93',
+        color: '#B28C96',
         fontWeight: '600',
         textTransform: 'uppercase',
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#252528',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#3A3A3C',
+        backgroundColor: '#473633',
         marginHorizontal: 10,
     },
     kpiLabel: {
         fontSize: 11,
-        color: '#8E8E93',
+        color: '#B28C96',
         fontWeight: '700',
         marginBottom: 4,
     },
@@ -315,11 +315,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#252528',
+        backgroundColor: '#31241F',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#2C2C2E',
+        borderColor: '#31241F',
     },
     strategyInfo: {
         flexDirection: 'row',
@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
     },
     strategyDesc: {
         fontSize: 11,
-        color: '#8E8E93',
+        color: '#B28C96',
     },
     controls: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#151517',
+        backgroundColor: '#000000',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -384,28 +384,28 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#0A84FF',
+        color: '#12379F',
         fontSize: 12,
         lineHeight: 18,
     },
     footer: {
         padding: 20,
         borderTopWidth: 1,
-        borderTopColor: '#2C2C2E',
-        backgroundColor: '#151517',
+        borderTopColor: '#31241F',
+        backgroundColor: '#000000',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#FF3B30',
+        borderColor: '#E06B6B',
     },
     sellBtnText: {
-        color: '#FF3B30',
+        color: '#E06B6B',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

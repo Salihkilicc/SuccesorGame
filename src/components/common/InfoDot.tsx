@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     dotSmall: { width: 15, height: 15, borderRadius: 7.5 },
     dotPressed: { backgroundColor: 'rgba(255,215,0,0.25)' },
     dotText: {
-        color: '#FFD700',
+        color: '#E9B8C9',
         fontSize: 11,
         fontWeight: '800',
         lineHeight: 14,
@@ -102,22 +102,22 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#14141A',
+        backgroundColor: '#000000',
         borderRadius: 18,
         borderWidth: 1,
         borderColor: 'rgba(255,215,0,0.22)',
         padding: 20,
     },
     title: {
-        color: '#FFD700',
+        color: '#E9B8C9',
         fontSize: 13,
         fontWeight: '800',
         letterSpacing: 0.6,
         marginBottom: 10,
     },
-    text: { color: '#D8D8D8', fontSize: 13, lineHeight: 20 },
+    text: { color: '#FFFFFF', fontSize: 13, lineHeight: 20 },
     detail: {
-        color: '#8A8A8A',
+        color: '#B28C96',
         fontSize: 11.5,
         lineHeight: 17,
         marginTop: 10,
@@ -130,5 +130,5 @@ const styles = StyleSheet.create({
         paddingVertical: 11,
         alignItems: 'center',
     },
-    buttonText: { color: '#FFD700', fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
+    buttonText: { color: '#E9B8C9', fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
 });

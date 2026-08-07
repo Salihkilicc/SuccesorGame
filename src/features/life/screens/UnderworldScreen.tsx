@@ -24,13 +24,13 @@ import { HookupModal } from '../components/HookupModal';
 import GodModeModal from '../../../components/GodModeModal';
 
 const GRADIENTS = {
-    purplePink: ['#8E2DE2', '#4A00E0'],
-    greenTeal: ['#11998e', '#38ef7d'],
-    redCasino: ['#e52d27', '#b31217'],
-    darkGrey: ['#232526', '#414345'],
-    hookupFire: ['#DA22FF', '#9733EE'],
-    networkBlue: ['#1A2980', '#26D0CE'],
-    bluePurple: ['#00c6ff', '#0072ff'],
+    purplePink: ['#0A2A92', '#0A2A92'],
+    greenTeal: ['#5FB37A', '#5FB37A'],
+    redCasino: ['#E06B6B', '#E06B6B'],
+    darkGrey: ['#31241F', '#523F3E'],
+    hookupFire: ['#0A2A92', '#0A2A92'],
+    networkBlue: ['#0A2A92', '#5FB37A'],
+    bluePurple: ['#5992C6', '#12379F'],
 };
 
 const SECTION_ESSENTIALS = [
@@ -197,17 +197,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 36,
         fontWeight: '300',
-        color: '#E5E5E5',
+        color: '#FFFFFF',
         letterSpacing: 8,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 44,
         height: 2,
-        backgroundColor: '#D4AF37',
+        backgroundColor: '#E9B8C9',
         marginTop: 14,
         borderRadius: 2,
-        shadowColor: '#D4AF37',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#777777',
+        color: '#614A4B',
         marginBottom: 20,
         letterSpacing: 4,
         textTransform: 'uppercase',
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 3,
     },
     appIconLabel: {
-        color: '#E0E0E0',
+        color: '#FFFFFF',
         fontSize: 11,
         fontWeight: '500',
         textAlign: 'center',

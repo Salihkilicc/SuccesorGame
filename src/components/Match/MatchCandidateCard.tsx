@@ -29,11 +29,11 @@ export default MatchCandidateCard;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     gap: 12,
-    shadowColor: '#0f172a',
+    shadowColor: '#000000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
   photoPlaceholder: {
     height: 160,
     borderRadius: 12,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   photoText: {
-    color: '#6b7280',
+    color: '#614A4B',
     fontSize: 14,
   },
   info: {
@@ -56,10 +56,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#111827',
+    color: '#000000',
   },
   meta: {
     fontSize: 14,
-    color: '#4b5563',
+    color: '#614A4B',
   },
 });

@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#0a0a0c',
+    backgroundColor: '#000000',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontSize: theme.typography.body,
-    color: '#D4AF37',
+    color: '#E9B8C9',
     marginTop: theme.spacing.xs,
     fontWeight: '600',
   },
@@ -214,16 +214,16 @@ const styles = StyleSheet.create({
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
-    color: '#D4AF37',
+    color: '#E9B8C9',
     fontWeight: '700',
   },
   itemQuantity: {
     fontSize: theme.typography.caption,
-    color: '#A0A0A0',
+    color: '#B28C96',
   },
   itemCostInfo: {
     fontSize: theme.typography.caption,
-    color: '#A0A0A0',
+    color: '#B28C96',
     fontWeight: '500',
   },
   itemRight: {
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profit: {
-    color: '#00E676',
+    color: '#5FB37A',
   },
   loss: {
-    color: '#FF3B30',
+    color: '#E06B6B',
   },
   actions: {
     flexDirection: 'row',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: '#5FB37A',
   },
   sellButton: {
     backgroundColor: 'rgba(255,59,48,0.12)',
@@ -264,19 +264,19 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#FF3B30',
+    borderColor: '#E06B6B',
   },
   buttonPressed: {
     opacity: 0.7,
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: '#00E676',
+    color: '#5FB37A',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
   sellButtonText: {
-    color: '#FF3B30',
+    color: '#E06B6B',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: theme.typography.caption,
-    color: '#A0A0A0',
+    color: '#B28C96',
   },
 });
 

@@ -29,10 +29,10 @@ const styles = StyleSheet.create({
   fallbackContainer: {
     padding: 12,
     borderRadius: 10,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#FFFFFF',
   },
   fallbackText: {
-    color: '#6b7280',
+    color: '#614A4B',
     fontSize: 13,
     fontWeight: '600',
   },

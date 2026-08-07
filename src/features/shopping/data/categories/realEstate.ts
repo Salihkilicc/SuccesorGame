@@ -12,7 +12,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.edenislands.luxury',
             category: 'REAL_ESTATE',
             description: 'Buy the horizon.',
-            bannerColor: '#16A085',
+            bannerColor: '#5FB37A',
             emoji: '🏝️',
         },
         {
@@ -21,7 +21,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.skylinearch.com',
             category: 'REAL_ESTATE',
             description: 'Own the skyline.',
-            bannerColor: '#34495E',
+            bannerColor: '#523F3E',
             emoji: '🏢',
         },
         {
@@ -30,7 +30,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.dynasty8elite.com',
             category: 'REAL_ESTATE',
             description: 'Residences of distinction.',
-            bannerColor: '#2C3E50',
+            bannerColor: '#523F3E',
             emoji: '🏠',
         },
         {
@@ -39,7 +39,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.vaultprop.secure',
             category: 'REAL_ESTATE',
             description: 'Fortified luxury.',
-            bannerColor: '#7F8C8D',
+            bannerColor: '#B28C96',
             emoji: '🔒',
         },
         {
@@ -48,7 +48,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.heritage-estates.eu',
             category: 'REAL_ESTATE',
             description: 'History is yours.',
-            bannerColor: '#8E44AD',
+            bannerColor: '#12379F',
             emoji: '🏰',
         },
         {
@@ -57,7 +57,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.urbancorp.global',
             category: 'REAL_ESTATE',
             description: 'Commercial dominance.',
-            bannerColor: '#2980B9',
+            bannerColor: '#5992C6',
             emoji: '🏙️',
         },
     ],

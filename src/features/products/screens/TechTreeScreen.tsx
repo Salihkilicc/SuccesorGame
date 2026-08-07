@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     productRowUnlocked: {
-        backgroundColor: '#1A2E1A', // Dark green tint for unlocked
+        backgroundColor: '#31241F', // Dark green tint for unlocked
         borderColor: theme.colors.success,
     },
     iconPlaceholder: {

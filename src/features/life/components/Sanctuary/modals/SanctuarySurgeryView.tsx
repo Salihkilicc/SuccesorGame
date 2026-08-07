@@ -111,9 +111,9 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
 
                                 // Risk/Reward labels
                                 const getRiskLabel = () => {
-                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#66BB6A' };
-                                    if (successPercent >= 80) return { text: '⚠️ Low Risk', color: '#ECC94B' };
-                                    return { text: '⚠️ High Risk', color: '#E53E3E' };
+                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#5FB37A' };
+                                    if (successPercent >= 80) return { text: '⚠️ Low Risk', color: '#E3A857' };
+                                    return { text: '⚠️ High Risk', color: '#E06B6B' };
                                 };
                                 const riskLabel = getRiskLabel();
 
@@ -150,7 +150,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                             <Text style={styles.successRateLabel}>{t('life.successRate')}</Text>
                                             <View style={[
                                                 styles.successRateBadge,
-                                                { backgroundColor: successPercent === 100 ? '#48BB78' : successPercent >= 80 ? '#ECC94B' : '#ED8936' }
+                                                { backgroundColor: successPercent === 100 ? '#5FB37A' : successPercent >= 80 ? '#E3A857' : '#E3A857' }
                                             ]}>
                                                 <Text style={styles.successRateText}>{successPercent}%</Text>
                                             </View>
@@ -164,7 +164,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                                     {doctor.success.highSociety && ` | +${doctor.success.highSociety} High Society 🎩`}
                                                 </Text>
                                                 {/* Looks Reward Display */}
-                                                <Text style={[styles.outcomeText, { marginTop: 2, color: '#F6AD55' }]}>
+                                                <Text style={[styles.outcomeText, { marginTop: 2, color: '#E3A857' }]}>
                                                     ✨ Looks: +{doctor.looksMin}-{doctor.looksMax}
                                                 </Text>
                                             </View>
@@ -202,16 +202,16 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 )}
                                 Do you wish to proceed with <Text style={{ fontWeight: 'bold' }}>{selectedDoctor?.name}</Text> for{' '}
                                 {hasDiscount && (
-                                    <Text style={{ color: '#F4EBD0', textDecorationLine: 'line-through' }}>
+                                    <Text style={{ color: '#FFFFFF', textDecorationLine: 'line-through' }}>
                                         ${selectedDoctor?.cost.toLocaleString()}
                                     </Text>
                                 )}
                                 {hasDiscount && ' '}
-                                <Text style={{ color: '#C4A484', fontWeight: 'bold' }}>
+                                <Text style={{ color: '#B28C96', fontWeight: 'bold' }}>
                                     ${selectedDoctor ? getDiscountedPrice(selectedDoctor.cost).toLocaleString() : '0'}
                                 </Text>
                                 {hasDiscount && (
-                                    <Text style={{ color: '#66BB6A', fontSize: 12 }}>
+                                    <Text style={{ color: '#5FB37A', fontSize: 12 }}>
                                         {' '}(Partner Discount!)
                                     </Text>
                                 )}?
@@ -226,7 +226,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                     {/* PROCESSING STAGE */}
                     {stage === 'processing' && (
                         <View style={styles.processingContent}>
-                            <ActivityIndicator size="large" color="#C5A065" />
+                            <ActivityIndicator size="large" color="#E3A857" />
                             <Text style={styles.processingText}>{t('life.performingSurgery')}</Text>
                             <Text style={styles.processingSubText}>{t('life.anesthesiaAdministered')}</Text>
                         </View>
@@ -245,7 +245,7 @@ export default SanctuarySurgeryView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#4CA771', // Dark theme matching current modal style
+        backgroundColor: '#5FB37A', // Dark theme matching current modal style
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -266,14 +266,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#C4A484',
-        backgroundColor: '#0F172A',
+        borderBottomColor: '#B28C96',
+        backgroundColor: '#000000',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#133323',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     scrollContent: {
@@ -302,19 +302,19 @@ const styles = StyleSheet.create({
     discountBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#48BB7820',
+        backgroundColor: '#5FB37A20',
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#C4A484',
+        borderColor: '#B28C96',
         gap: 10,
     },
     discountIcon: {
         fontSize: 24,
     },
     discountTitle: {
-        color: '#66BB6A',
+        color: '#5FB37A',
         fontWeight: '700',
         fontSize: 14,
         marginBottom: 2,
@@ -329,20 +329,20 @@ const styles = StyleSheet.create({
     },
     doctorCard: {
         padding: 16,
-        backgroundColor: '#133323',
+        backgroundColor: '#31241F',
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#C4A484',
+        borderColor: '#B28C96',
         gap: 10,
         position: 'relative',
     },
     doctorCardPressed: {
-        backgroundColor: '#232730',
-        borderColor: '#C4A484',
+        backgroundColor: '#31241F',
+        borderColor: '#B28C96',
     },
     doctorCardDisabled: {
         opacity: 0.5,
-        borderColor: '#C4A484',
+        borderColor: '#B28C96',
     },
     riskBadge: {
         position: 'absolute',
@@ -371,24 +371,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     disabledText: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
     },
     priceContainer: {
         alignItems: 'flex-end',
         gap: 2,
     },
     originalPrice: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
         fontSize: 12,
         textDecorationLine: 'line-through',
     },
     doctorCost: {
-        color: '#C4A484',
+        color: '#B28C96',
         fontWeight: '700',
         fontSize: 16,
     },
     discountedPrice: {
-        color: '#66BB6A',
+        color: '#5FB37A',
     },
     successRateContainer: {
         flexDirection: 'row',
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     successRateLabel: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
         fontSize: 13,
     },
     successRateBadge: {
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     successRateText: {
-        color: '#1A202C',
+        color: '#000000',
         fontWeight: '700',
         fontSize: 12,
     },
@@ -414,12 +414,12 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     outcomeLabel: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '600',
     },
     outcomeText: {
-        color: '#E2E8F0',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     insufficientFundsOverlay: {
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
         bottom: 12,
         left: 12,
         right: 12,
-        backgroundColor: '#E53E3E',
+        backgroundColor: '#E06B6B',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 8,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
     },
     warningTitle: {
-        color: '#E53E3E',
+        color: '#E06B6B',
         fontSize: 20,
         fontWeight: '900',
         marginBottom: 20,
@@ -467,13 +467,13 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     processingText: {
-        color: '#C4A484',
+        color: '#B28C96',
         fontSize: 18,
         fontWeight: '600',
         marginTop: 10,
     },
     processingSubText: {
-        color: '#F4EBD0',
+        color: '#FFFFFF',
         fontSize: 14,
     },
 });

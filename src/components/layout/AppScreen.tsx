@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   subtitle: {
-    color: '#A0A0A0',
+    color: '#B28C96',
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',

@@ -211,9 +211,9 @@ const LaboratoryScreen = () => {
                         Artik urun uretim barindaki mantik: mutlak sayi,
                         buyuyen tavan, 1/10/100 butonlari ve KUCUK yuzde
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
-                    <Text style={{ color: '#8A8A8A', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
+                    <Text style={{ color: '#B28C96', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
-                        <Text style={{ color: '#7FB3FF', fontWeight: '800' }}>
+                        <Text style={{ color: '#5992C6', fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
                         </Text>{' '}
                         per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
@@ -225,9 +225,9 @@ const LaboratoryScreen = () => {
                         onChange={setTempCount}
                         max={facility.capacity}
                         unit="researchers"
-                        markers={[{ value: researcherCount, label: 'Now', color: '#7FB3FF' }]}
+                        markers={[{ value: researcherCount, label: 'Now', color: '#5992C6' }]}
                         steps={[1, 10, 100]}
-                        fillColor={canAfford ? '#7FB3FF' : '#EF5350'}
+                        fillColor={canAfford ? '#5992C6' : '#E06B6B'}
                     />
 
                     {/* Summary & Confirm */}
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     maxTierText: {
-        color: '#FFD700',
+        color: '#E9B8C9',
         fontSize: 14,
         fontWeight: '700',
     },

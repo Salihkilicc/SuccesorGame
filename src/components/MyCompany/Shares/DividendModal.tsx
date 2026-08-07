@@ -91,7 +91,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             <Text style={styles.cashLabel}>{t('dividend.lastQuarterProfit')}</Text>
                             <Text style={[
                                 styles.cashValue,
-                                lastQuarterProfit <= 0 && { color: '#FF453A' },
+                                lastQuarterProfit <= 0 && { color: '#E06B6B' },
                             ]}>
                                 {formatMoney(lastQuarterProfit)}
                             </Text>
@@ -197,7 +197,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.infoLabel}>{t('dividend.remainingCapital')}</Text>
                                 <Text style={[
                                     styles.infoValue,
-                                    { color: isRisky ? '#FF453A' : '#FFFFFF' }
+                                    { color: isRisky ? '#E06B6B' : '#FFFFFF' }
                                 ]}>
                                     {formatMoney(remainingCapital)}
                                 </Text>
@@ -263,19 +263,19 @@ const DividendModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    cashHint: { color: '#8A8A8A', fontSize: 11, marginTop: 4 },
+    cashHint: { color: '#B28C96', fontSize: 11, marginTop: 4 },
     flagBox: {
         backgroundColor: 'rgba(255,69,58,0.10)', borderRadius: 12,
         borderWidth: 1, borderColor: 'rgba(255,69,58,0.30)',
         padding: 12, marginBottom: 12,
     },
-    flagText: { color: '#FF9F9F', fontSize: 11.5, lineHeight: 16 },
+    flagText: { color: '#E06B6B', fontSize: 11.5, lineHeight: 16 },
     yieldRow: {
         flexDirection: 'row', justifyContent: 'space-between',
         paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
         marginTop: 8,
     },
-    yieldLabel: { color: '#8A8A8A', fontSize: 11.5 },
+    yieldLabel: { color: '#B28C96', fontSize: 11.5 },
     yieldValue: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '700' },
 
     overlay: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -303,9 +303,9 @@ const styles = StyleSheet.create({
     titleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
     closeBtn: {
         width: 32, height: 32, borderRadius: 16,
-        backgroundColor: '#2A2D35', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#3C2D29', alignItems: 'center', justifyContent: 'center',
     },
-    closeText: { color: '#8A9BA8', fontSize: 16, fontWeight: '700' },
+    closeText: { color: '#B28C96', fontSize: 16, fontWeight: '700' },
     title: {
         fontSize: 22,
         fontWeight: '700',
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: '#8E8E93',
+        color: '#B28C96',
         marginBottom: 16,
     },
     cashCard: {
@@ -324,18 +324,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#30D15840',
+        borderColor: '#5FB37A40',
     },
     cashLabel: {
         fontSize: 13,
-        color: '#30D158',
+        color: '#5FB37A',
         fontWeight: '600',
         marginBottom: 6,
     },
     cashValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#30D158',
+        color: '#5FB37A',
     },
     stepperSection: {
         marginBottom: 16,
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#3A3A3C',
+        backgroundColor: '#473633',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     },
     labelSmall: {
         fontSize: 11,
-        color: '#8E8E93',
+        color: '#B28C96',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -393,20 +393,20 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#3A3A3C',
+        borderColor: '#473633',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#8E8E93',
+        color: '#B28C96',
     },
     infoSection: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     },
     infoLabel: {
         fontSize: 14,
-        color: '#8E8E93',
+        color: '#B28C96',
     },
     infoValue: {
         fontSize: 16,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#3A3A3C',
+        backgroundColor: '#473633',
         marginVertical: 8,
     },
     profitHighlight: {
@@ -439,27 +439,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 2,
-        borderColor: '#30D158',
+        borderColor: '#5FB37A',
     },
     profitLabel: {
         fontSize: 14,
-        color: '#30D158',
+        color: '#5FB37A',
         fontWeight: '600',
         marginBottom: 8,
     },
     profitAmount: {
         fontSize: 36,
         fontWeight: '700',
-        color: '#30D158',
+        color: '#5FB37A',
         marginBottom: 6,
     },
     profitNote: {
         fontSize: 12,
-        color: '#8E8E93',
+        color: '#B28C96',
         marginBottom: 12,
     },
     profitBadge: {
-        backgroundColor: '#30D158',
+        backgroundColor: '#5FB37A',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
@@ -470,16 +470,16 @@ const styles = StyleSheet.create({
         color: '#000000',
     },
     warningBox: {
-        backgroundColor: '#FF453A20',
+        backgroundColor: '#E06B6B20',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#FF453A40',
+        borderColor: '#E06B6B40',
     },
     warningText: {
         fontSize: 13,
-        color: '#FF453A',
+        color: '#E06B6B',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     },
     distributeButton: {
         flex: 1,
-        backgroundColor: '#30D158',
+        backgroundColor: '#5FB37A',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',

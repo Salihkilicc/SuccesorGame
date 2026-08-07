@@ -68,7 +68,7 @@ const NightOutScreen = () => {
             <AppLaunchLoader
                 appName="Night Out"
                 appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
-                backgroundColor="#1A1A2E"
+                backgroundColor="#000000"
             >
                 {/* Main Setup Flow — shown as full screen */}
                 <NightOutSetupModal

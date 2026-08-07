@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#FFD700',
+        backgroundColor: '#E9B8C9',
         borderRadius: 4,
     },
     gridContainer: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#252525',
+        backgroundColor: '#31241F',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -244,13 +244,13 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     rarityLegendary: {
-        backgroundColor: '#FFD700',
+        backgroundColor: '#E9B8C9',
     },
     rarityRare: {
-        backgroundColor: '#9370DB',
+        backgroundColor: '#12379F',
     },
     rarityCommon: {
-        backgroundColor: '#708090',
+        backgroundColor: '#5992C6',
     },
     rarityText: {
         fontSize: 10,

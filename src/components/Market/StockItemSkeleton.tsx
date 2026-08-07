@@ -26,7 +26,7 @@ const StockItemSkeleton = ({
   const getRiskColor = (risk: string) => {
     const r = risk.toLowerCase();
     if (r.includes('low')) return theme.colors.success; // Green
-    if (r.includes('medium')) return theme.colors.warning || '#FFA500'; // Orange
+    if (r.includes('medium')) return theme.colors.warning || '#E3A857'; // Orange
     if (r.includes('high') || r.includes('extreme')) return theme.colors.danger; // Red
     return theme.colors.textSecondary;
   };
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: theme.typography.caption + 1,
-    color: '#A0A0A0',
+    color: '#B28C96',
     marginTop: 2,
   },
   riskTag: {
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#00E676',
+    color: '#5FB37A',
   },
   changeDown: {
-    color: '#FF3B30',
+    color: '#E06B6B',
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: '#A0A0A0',
+    color: '#B28C96',
   },
 });

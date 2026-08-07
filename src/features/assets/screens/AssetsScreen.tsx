@@ -37,7 +37,7 @@ const AssetsScreen = () => {
         <View style={{ flex: 1, backgroundColor: '#000000' }}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#0a0a0c', '#000000', '#050505']}
+                colors={['#000000', '#000000', '#000000']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -58,7 +58,7 @@ const AssetsScreen = () => {
                     <View style={styles.glassCard}>
                         <View style={styles.cardHeader}>
                             <Text style={styles.sectionTitle}>{t('company.quarterlyReport2')}</Text>
-                            <MaterialCommunityIcons name="finance" size={20} color="#888888" />
+                            <MaterialCommunityIcons name="finance" size={20} color="#B28C96" />
                         </View>
 
                         <View style={styles.summaryRow}>
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 10,
-        color: '#888888',
+        color: '#B28C96',
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 1.2,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     glassCard: {
-        backgroundColor: '#161618',
+        backgroundColor: '#000000',
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#F0F0F0',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     summaryRow: {
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     netFlowLabel: {
-        color: '#888888',
+        color: '#B28C96',
         fontSize: 12,
         fontWeight: '700',
         textTransform: 'uppercase',

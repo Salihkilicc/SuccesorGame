@@ -31,12 +31,12 @@ interface EncounterModalProps {
 // Helper functions for Deep Persona display
 const getTierBadgeColor = (tier: string): string => {
     switch (tier) {
-        case 'HIGH_SOCIETY': return '#FFD700';
-        case 'CORPORATE_ELITE': return '#1E3A8A';
-        case 'UNDERGROUND': return '#7C2D12';
-        case 'BLUE_COLLAR': return '#64748B';
-        case 'STUDENT_LIFE': return '#0EA5E9';
-        case 'ARTISTIC': return '#A855F7';
+        case 'HIGH_SOCIETY': return '#E9B8C9';
+        case 'CORPORATE_ELITE': return '#12379F';
+        case 'UNDERGROUND': return '#E06B6B';
+        case 'BLUE_COLLAR': return '#5992C6';
+        case 'STUDENT_LIFE': return '#5992C6';
+        case 'ARTISTIC': return '#12379F';
         default: return theme.colors.accent;
     }
 };
@@ -342,26 +342,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         width: '100%',
-        backgroundColor: '#FEE2E2',
+        backgroundColor: '#FFFFFF',
         padding: 12,
         borderRadius: 10,
         marginBottom: 16,
         borderLeftWidth: 4,
-        borderLeftColor: '#DC2626',
+        borderLeftColor: '#E06B6B',
     },
     costIcon: {
         fontSize: 24,
     },
     costLabel: {
         fontSize: 11,
-        color: '#7F1D1D',
+        color: '#E06B6B',
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     costValue: {
         fontSize: 18,
-        color: '#DC2626',
+        color: '#E06B6B',
         fontWeight: '800',
     },
 

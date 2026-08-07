@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     venueCard: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 20,
         padding: 24,
         borderWidth: 2,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#C8B6FF',
+        borderBottomColor: '#5992C6',
     },
     venueEmoji: {
         fontSize: 48,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     },
     venueLocation: {
         fontSize: 14,
-        color: '#4CC9F0',
+        color: '#5992C6',
     },
     breakdown: {
         gap: 12,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         paddingTop: 16,
         borderTopWidth: 2,
-        borderTopColor: '#C8B6FF',
+        borderTopColor: '#5992C6',
     },
     totalLabel: {
         fontSize: 18,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     totalValue: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#C8B6FF',
+        color: '#5992C6',
     },
     actions: {
         gap: 12,
@@ -175,12 +175,12 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
     },
     cancelButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#4CC9F0',
+        color: '#5992C6',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

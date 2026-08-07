@@ -134,21 +134,21 @@ export const BIOS = [
 
 // Profile Background Colors
 export const COLORS = [
-    '#FF6B6B', // Coral Red
-    '#4ECDC4', // Turquoise
-    '#45B7D1', // Sky Blue
-    '#FFA07A', // Light Salmon
-    '#98D8C8', // Mint
-    '#F7DC6F', // Soft Yellow
-    '#BB8FCE', // Lavender
-    '#85C1E2', // Powder Blue
-    '#F8B195', // Peach
-    '#C06C84', // Mauve
-    '#6C5B7B', // Purple
-    '#355C7D', // Navy Blue
-    '#F67280', // Pink
-    '#C8E6C9', // Light Green
-    '#FFCCBC', // Light Orange
+    '#E06B6B', // Coral Red
+    '#5FB37A', // Turquoise
+    '#5992C6', // Sky Blue
+    '#E3A857', // Light Salmon
+    '#5FB37A', // Mint
+    '#E3A857', // Soft Yellow
+    '#E9B8C9', // Lavender
+    '#5992C6', // Powder Blue
+    '#E9B8C9', // Peach
+    '#B28C96', // Mauve
+    '#614A4B', // Purple
+    '#5992C6', // Navy Blue
+    '#E06B6B', // Pink
+    '#FFFFFF', // Light Green
+    '#E9B8C9', // Light Orange
 ];
 
 /**

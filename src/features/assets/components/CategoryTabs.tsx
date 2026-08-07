@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
     },
     activeTab: {
         backgroundColor: 'rgba(212,175,55,0.18)',
-        borderColor: '#D4AF37',
-        shadowColor: '#D4AF37',
+        borderColor: '#E9B8C9',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -105,13 +105,13 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     tabText: {
-        color: '#A0A0A0',
+        color: '#B28C96',
         fontSize: 13,
         fontWeight: '700',
         letterSpacing: 0.3,
     },
     activeTabText: {
-        color: '#D4AF37',
+        color: '#E9B8C9',
         fontWeight: '800',
     },
 });

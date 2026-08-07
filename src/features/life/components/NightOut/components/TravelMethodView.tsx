@@ -26,7 +26,7 @@ const TravelMethodView = ({
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, { color: '#C8B6FF' }]}>{t('life.privateHangar')}</Text>
+                    <Text style={[styles.title, { color: '#5992C6' }]}>{t('life.privateHangar')}</Text>
                     <Text style={styles.subtitle}>{t('life.selectYourAircraft')}</Text>
                 </View>
 
@@ -76,7 +76,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
-                        <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#E3A857' }]}>
                             <Text style={styles.badgeText}>{t('life.rep1')}</Text>
                         </View>
                     </View>
@@ -92,7 +92,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🛫</Text>
-                        <View style={[styles.badge, { backgroundColor: '#C8B6FF' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#5992C6' }]}>
                             <Text style={styles.badgeText}>{t('life.rep0')}</Text>
                         </View>
                     </View>
@@ -105,16 +105,16 @@ const TravelMethodView = ({
                 {/* 3. Royal Charter */}
                 <Pressable
                     onPress={() => onSelectMethod('luxury')}
-                    style={({ pressed }) => [styles.card, { borderColor: '#FF9E00' }, pressed && styles.pressed]}>
+                    style={({ pressed }) => [styles.card, { borderColor: '#E3A857' }, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
-                        <View style={[styles.badge, { backgroundColor: '#FF9E00' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#E3A857' }]}>
                             <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>Royal{'\n'}Charter</Text>
-                        <Text style={[styles.cardPrice, { color: '#FF9E00' }]}>$50k</Text>
+                        <Text style={[styles.cardPrice, { color: '#E3A857' }]}>$50k</Text>
                     </View>
                 </Pressable>
 
@@ -126,7 +126,7 @@ const TravelMethodView = ({
                         <Text style={styles.cardEmoji}>🛩️</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={[styles.cardTitle, { color: '#C8B6FF' }]}>MY{'\n'}HANGAR</Text>
+                        <Text style={[styles.cardTitle, { color: '#5992C6' }]}>MY{'\n'}HANGAR</Text>
                         <Text style={styles.hangarAction}>{t('life.useOwnJet')}</Text>
                     </View>
                 </Pressable>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     backButtonText: {
-        color: '#4CC9F0',
+        color: '#5992C6',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#4CC9F0',
+        color: '#5992C6',
         marginTop: 2,
     },
     scrollView: {
@@ -184,16 +184,16 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#1A1A2E',
-        borderColor: '#C8B6FF',
+        backgroundColor: '#000000',
+        borderColor: '#5992C6',
         borderStyle: 'dashed',
     },
     cardHeader: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     hangarAction: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#C8B6FF',
+        color: '#5992C6',
     },
     pressed: {
         opacity: 0.8,
@@ -241,17 +241,17 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#C8B6FF',
+        borderColor: '#5992C6',
     },
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     },
     jetListDesc: {
         fontSize: 12,
-        color: '#4CC9F0',
+        color: '#5992C6',
     },
     jetListCost: {
         alignItems: 'flex-end',
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
     costText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C8B6FF',
+        color: '#5992C6',
     },
     fuelText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#4CC9F0',
+        color: '#5992C6',
     },
     emptyState: {
         alignItems: 'center',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 14,
-        color: '#4CC9F0',
+        color: '#5992C6',
         textAlign: 'center',
         lineHeight: 20,
     },

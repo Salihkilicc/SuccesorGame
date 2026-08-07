@@ -85,7 +85,7 @@ const DayCell = ({ day, dateKey, isToday, hasEvent, onPress }: DayCellProps) => 
         >
             {isToday ? (
                 <LinearGradient
-                    colors={['#C5A059', '#8C6C3A']}
+                    colors={['#E9B8C9', '#E3A857']}
                     style={styles.todayCircle}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -205,7 +205,7 @@ const CalendarScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#080812', '#06060F', '#04040C']}
+                colors={['#000000', '#000000', '#000000']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -218,7 +218,7 @@ const CalendarScreen = () => {
                         onPress={() => navigation.goBack()}
                         style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] }]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C5A059" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -275,7 +275,7 @@ const CalendarScreen = () => {
 
                             {/* Star icon */}
                             <LinearGradient
-                                colors={['#C5A059', '#8C6C3A', '#4F3A15']}
+                                colors={['#E9B8C9', '#E3A857', '#473633']}
                                 style={styles.modalStar}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -309,7 +309,7 @@ export default CalendarScreen;
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: '#04040C' },
+    root: { flex: 1, backgroundColor: '#000000' },
     safeArea: { flex: 1 },
 
     // Header
@@ -344,17 +344,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#E5E5E5',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#D4AF37', // Gold accent
+        backgroundColor: '#E9B8C9', // Gold accent
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#D4AF37',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -391,12 +391,12 @@ const styles = StyleSheet.create({
     monthName: {
         fontSize: 18,
         fontWeight: '300',
-        color: '#E5E5E5',
+        color: '#FFFFFF',
         letterSpacing: 4,
         textTransform: 'uppercase',
     },
     monthNameCurrent: {
-        color: '#C5A059',
+        color: '#E9B8C9',
         fontWeight: '600',
     },
     currentMonthBadge: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     currentMonthBadgeText: {
         fontSize: 8,
         fontWeight: '800',
-        color: '#C5A059',
+        color: '#E9B8C9',
         letterSpacing: 1.5,
     },
 
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     weekLabel: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#4A4A62',
+        color: '#614A4B',
         textAlign: 'center',
         letterSpacing: 0.5,
     },
@@ -461,11 +461,11 @@ const styles = StyleSheet.create({
     dayNum: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#C0C0D0',
+        color: '#E9B8C9',
         textAlign: 'center',
     },
     dayNumWeekend: { color: 'rgba(192,192,208,0.4)' },
-    dayNumWithEvent: { color: '#E5D8B0', fontWeight: '700' },
+    dayNumWithEvent: { color: '#FFFFFF', fontWeight: '700' },
 
     // Today
     todayCircle: {
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
         borderRadius: CELL_SIZE,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#C5A059',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 8,
@@ -492,12 +492,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 1,
         fontSize: 7,
-        color: '#C5A059',
+        color: '#E9B8C9',
         textShadowColor: 'rgba(197,160,89,0.9)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
     },
-    eventStarToday: { color: '#FFE88A' },
+    eventStarToday: { color: '#E3A857' },
 
     // Modal
     modalOverlay: {
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '100%',
-        backgroundColor: '#0D0D1C',
+        backgroundColor: '#000000',
         borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(197,160,89,0.38)',
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         alignItems: 'center',
         overflow: 'hidden',
-        shadowColor: '#C5A059',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.25,
         shadowRadius: 30,
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 16,
-        shadowColor: '#C5A059',
+        shadowColor: '#E9B8C9',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.9,
         shadowRadius: 18,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     modalStarText: { fontSize: 24, color: '#FFF' },
     modalDate: {
         fontSize: 11,
-        color: '#5A5A72',
+        color: '#614A4B',
         letterSpacing: 2,
         textTransform: 'uppercase',
         marginBottom: 6,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#F5F5F0',
+        color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2,
         marginBottom: 18,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     },
     modalDesc: {
         fontSize: 14,
-        color: '#9090A8',
+        color: '#B28C96',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 28,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     modalDismissText: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#C5A059',
+        color: '#E9B8C9',
         letterSpacing: 2.5,
     },
 });

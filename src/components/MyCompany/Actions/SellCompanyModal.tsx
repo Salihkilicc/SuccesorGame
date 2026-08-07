@@ -35,9 +35,9 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     const successChance = Math.max(0, rawChance) * 100;
 
     // Color Logic
-    let chanceColor = '#FF3B30'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#4ADE80'; // Green
-    else if (successChance >= 40) chanceColor = '#FACC15'; // Yellow
+    let chanceColor = '#E06B6B'; // Red (< 40%)
+    if (successChance >= 70) chanceColor = '#5FB37A'; // Green
+    else if (successChance >= 40) chanceColor = '#E3A857'; // Yellow
 
     const formatMoney = (amount: number) => {
         return formatMoneyExact(amount);
@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
     },
     container: {
         width: '100%',
-        backgroundColor: '#1C1C1E', // Dark Gray
+        backgroundColor: '#31241F', // Dark Gray
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#2A2D35',
+        borderColor: '#3C2D29',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#2A2D35',
+        borderBottomColor: '#3C2D29',
         paddingBottom: 16,
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#8A9BA8',
+        color: '#B28C96',
         letterSpacing: 2,
         marginBottom: 4,
     },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 12,
-        color: '#8A9BA8',
+        color: '#B28C96',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 4,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 12,
-        color: '#8A9BA8',
+        color: '#B28C96',
         fontWeight: '700',
         marginBottom: 8,
         textAlign: 'center',
@@ -237,18 +237,18 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#2A2D35',
+        backgroundColor: '#3C2D29',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
         minWidth: 70,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#3F424A',
+        borderColor: '#523F3E',
     },
     incrementBtn: {
-        backgroundColor: '#2A2D35', // Keep uniform dark, maybe blue tint? Sticking to dark.
-        borderColor: '#4ADE80', // Green border for positive
+        backgroundColor: '#3C2D29', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        borderColor: '#5FB37A', // Green border for positive
     },
     controlBtnText: {
         fontSize: 12,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#2A2D35',
+        backgroundColor: '#3C2D29',
         alignItems: 'center',
     },
     cancelBtnText: {

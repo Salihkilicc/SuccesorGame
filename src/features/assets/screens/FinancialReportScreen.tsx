@@ -42,9 +42,9 @@ const Row = ({
             ? theme.colors.success
             : theme.colors.error
         : negative
-            ? '#E57373'
+            ? '#E06B6B'
             : subtotal
-                ? '#FFD700'
+                ? '#E9B8C9'
                 : theme.colors.textPrimary;
 
     return (
@@ -114,7 +114,7 @@ const FinancialReportScreen = () => {
                 {header}
 
                 {/* Ozet */}
-                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FFD700' : theme.colors.error }]}>
+                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#E9B8C9' : theme.colors.error }]}>
                     <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
                     <Text
                         style={[
@@ -201,7 +201,7 @@ const FinancialReportScreen = () => {
                     note={t('company.howMuchYouBuiltAnd')}
                     info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
-                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#E57373'}
+                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#E06B6B'}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
@@ -219,7 +219,7 @@ const FinancialReportScreen = () => {
                             <Text
                                 style={[
                                     styles.opsValue,
-                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#E57373' },
+                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#E06B6B' },
                                 ]}
                             >
                                 {formatPercent(report.sellThrough)}
@@ -227,7 +227,7 @@ const FinancialReportScreen = () => {
                         </View>
                         <View style={styles.opsCell}>
                             <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                            <Text style={[styles.opsValue, { color: '#FFB74D' }]}>
+                            <Text style={[styles.opsValue, { color: '#E3A857' }]}>
                                 {formatNumber(report.endingInventory)}
                             </Text>
                         </View>
@@ -244,7 +244,7 @@ const FinancialReportScreen = () => {
                     note={t('company.perProductDemandSalesAnd')}
                     info={t('company.productsInTheSameCategory')}
                     summary={`${report.products.length}`}
-                    summaryColor="#9E9E9E"
+                    summaryColor="#B28C96"
                 >
 
                     <View style={styles.tableHeader}>
@@ -268,7 +268,7 @@ const FinancialReportScreen = () => {
                                     <Text style={[styles.cellText, styles.center, { color: theme.colors.success }]}>
                                         {formatNumber(p.sold)}
                                     </Text>
-                                    <Text style={[styles.cellText, styles.center, { color: '#FFB74D' }]}>
+                                    <Text style={[styles.cellText, styles.center, { color: '#E3A857' }]}>
                                         {formatNumber(p.stock)}
                                     </Text>
                                     <Text
@@ -303,7 +303,7 @@ const FinancialReportScreen = () => {
                     <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
                         <Text style={styles.label}>{t('company.researchPoints')}</Text>
-                        <Text style={[styles.value, { color: '#BA68C8' }]}>
+                        <Text style={[styles.value, { color: '#12379F' }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>
                     </View>
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     cardTitle: {
-        color: '#FFD700',
+        color: '#E9B8C9',
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 1.5,
@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
     labelStrong: { color: theme.colors.textPrimary, fontWeight: '700' },
     value: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
     valueBig: { fontSize: 19, fontWeight: '800' },
-    explain: { color: '#6E6E6E', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
-    footnote: { color: '#5C5C5C', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
+    explain: { color: '#614A4B', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
+    footnote: { color: '#614A4B', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
 
     opsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     opsCell: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     tableRow: { flexDirection: 'row', paddingVertical: 9, alignItems: 'center' },
     cellText: { color: theme.colors.textPrimary, fontSize: 12.5, flex: 1 },
     productEcon: {
-        color: '#6E6E6E',
+        color: '#614A4B',
         fontSize: 10,
         paddingBottom: 8,
         borderBottomWidth: 1,

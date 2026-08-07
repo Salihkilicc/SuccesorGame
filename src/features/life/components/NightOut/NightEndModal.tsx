@@ -47,7 +47,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress10')}</Text>
-                                <Text style={[styles.statGain, { color: '#C0A062' }]}>{t('life.cost2000')}</Text>
+                                <Text style={[styles.statGain, { color: '#E3A857' }]}>{t('life.cost2000')}</Text>
                             </View>
                         </Pressable>
 
@@ -66,7 +66,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress25')}</Text>
-                                <Text style={[styles.statGain, { color: '#FF9E00' }]}>⚠️ Multiple Risks</Text>
+                                <Text style={[styles.statGain, { color: '#E3A857' }]}>⚠️ Multiple Risks</Text>
                             </View>
                         </Pressable>
                     </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#000000',
         padding: 24,
         paddingBottom: 40,
         alignItems: 'center',
@@ -115,13 +115,13 @@ const styles = StyleSheet.create({
         minHeight: 280,
     },
     classyCard: {
-        backgroundColor: '#0a1a2a',
-        borderColor: '#C0A062', // Gold-ish
+        backgroundColor: '#000000',
+        borderColor: '#E3A857', // Gold-ish
     },
     wildCard: {
-        backgroundColor: '#1a0505',
-        borderColor: '#FF0055', // Neon Red
-        shadowColor: '#FF0055',
+        backgroundColor: '#000000',
+        borderColor: '#E06B6B', // Neon Red
+        shadowColor: '#E06B6B',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.3)'
     },
     classyBadge: {
-        color: '#C0A062',
+        color: '#E3A857',
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
     },
     wildBadge: {
-        color: '#FF0055',
+        color: '#E06B6B',
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         fontWeight: '700'
     },
     riskWarning: {
-        color: '#FF0055',
+        color: '#E06B6B',
         fontSize: 11,
         fontWeight: '700',
         marginTop: 4

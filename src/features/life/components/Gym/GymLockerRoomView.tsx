@@ -87,7 +87,7 @@ const GymLockerRoomView = () => {
                         <View style={styles.divider} />
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>{t('life.health2')}</Text>
-                            <Text style={[styles.statValue, { color: health < 50 ? '#FF6F00' : '#FF6F00' }]}>
+                            <Text style={[styles.statValue, { color: health < 50 ? '#E3A857' : '#E3A857' }]}>
                                 {health.toFixed(0)}
                             </Text>
                         </View>
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#0D1321',
+        backgroundColor: '#000000',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#000',
@@ -180,12 +180,12 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#0D1321',
+        backgroundColor: '#000000',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#C0C0C0', fontWeight: '700' },
+    backText: { fontSize: 14, color: '#E9B8C9', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#C0C0C0',
+        color: '#E9B8C9',
         marginTop: 4,
     },
     statsCard: {
@@ -205,15 +205,15 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#C0C0C0',
+        borderColor: '#E9B8C9',
     },
     statRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    divider: { height: 1, backgroundColor: '#C0C0C0', marginVertical: 8 },
-    statLabel: { fontSize: 12, fontWeight: '700', color: '#C0C0C0', letterSpacing: 0.5 },
+    divider: { height: 1, backgroundColor: '#E9B8C9', marginVertical: 8 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9', letterSpacing: 0.5 },
     statValue: { fontSize: 14, fontWeight: '900', color: '#FFFFFF' },
     grid: {
         flexDirection: 'row',
@@ -225,23 +225,23 @@ const styles = StyleSheet.create({
     supplementCard: {
         width: '47%',
         marginBottom: 12,
-        backgroundColor: '#0D1321',
+        backgroundColor: '#000000',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#FF6F00',
+        borderColor: '#E3A857',
         minHeight: 140,
         justifyContent: 'center',
     },
     supplementCardUsed: {
         backgroundColor: '#000000',
-        borderColor: '#C0C0C0',
+        borderColor: '#E9B8C9',
         opacity: 0.6,
     },
     supplementCardDanger: {
-        backgroundColor: '#0D1321',
-        borderColor: '#FF6F00',
+        backgroundColor: '#000000',
+        borderColor: '#E3A857',
     },
     supplementIcon: { fontSize: 36, marginBottom: 8 },
     usedIcon: { opacity: 0.4 },
@@ -254,13 +254,13 @@ const styles = StyleSheet.create({
     },
     supplementDesc: {
         fontSize: 10,
-        color: '#C0C0C0',
+        color: '#E9B8C9',
         textAlign: 'center',
         marginBottom: 8,
     },
-    usedText: { color: '#C0C0C0' },
+    usedText: { color: '#E9B8C9' },
     usedBadge: {
-        backgroundColor: '#FF6F00',
+        backgroundColor: '#E3A857',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     priceText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#FF6F00',
+        color: '#E3A857',
         marginTop: 4,
     },
     infoFooter: {
@@ -282,11 +282,11 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#FF6F00',
+        borderColor: '#E3A857',
     },
     infoText: {
         fontSize: 12,
-        color: '#C0C0C0',
+        color: '#E9B8C9',
         textAlign: 'center',
         lineHeight: 16,
     },
