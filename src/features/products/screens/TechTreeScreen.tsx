@@ -5,9 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
 import { useProductStore } from '../../../core/store/useProductStore';
+import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
-import { formatNumber } from '../../../core/utils';
+import { formatNumber, formatMoney } from '../../../core/utils';
 
 const TechTreeScreen = () => {
     useLocale();
@@ -15,6 +18,33 @@ const TechTreeScreen = () => {
     const insets = useSafeAreaInsets();
     const { unlockableProducts } = useProductStore();
     const [selectedProduct, setSelectedProduct] = useState<UnlockableProduct | null>(null);
+
+    // ------------------------------------------------------------------
+    //  WHAT YOU HAVE, NOT JUST WHAT THINGS COST
+    // ------------------------------------------------------------------
+    //  The screen listed a price against every product and never once showed
+    //  the balance those prices are measured against. You could read the whole
+    //  tree and still not know whether a single row was within reach - the
+    //  only way to find out was to tap one and be refused.
+    //
+    //  Two separate things gate an unlock and neither was visible here: the
+    //  RP and cash cost, and the CATEGORY GATE - you cannot open a new market
+    //  until every market you already trade in is at 200 brand points. Being
+    //  refused for a reason the screen never mentioned is what made this page
+    //  feel arbitrary.
+    // ------------------------------------------------------------------
+    const totalRP = useLaboratoryStore(st => st.totalRP);
+    const companyCapital = useStatsStore(st => st.companyCapital);
+    const brandByCategory = useStatsStore(st => st.brandByCategory);
+
+    const activeCategories = Object.keys(brandByCategory || {});
+    const gate = canUnlockAnotherCategory(brandByCategory || {}, activeCategories);
+
+    /** Is this category already one of ours, or would opening it need the gate? */
+    const categoryOpen = (category: ProductCategory) =>
+        activeCategories.length === 0
+        || (brandByCategory || {})[category] !== undefined
+        || gate.allowed;
 
     const getCategoryIcon = (category: ProductCategory) => {
         switch (category) {
@@ -48,7 +78,15 @@ const TechTreeScreen = () => {
                 <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Text style={styles.backButtonText}>←</Text>
                 </Pressable>
-                <Text style={styles.title}>{t('product.futureTechnologies')}</Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.title}>{t('product.futureTechnologies')}</Text>
+                </View>
+
+                {/* The balance every price on this page is measured against. */}
+                <View style={styles.balance}>
+                    <Text style={styles.balanceValue}>{formatNumber(totalRP)} RP</Text>
+                    <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
+                </View>
             </View>
 
             <ScrollView
@@ -66,6 +104,18 @@ const TechTreeScreen = () => {
                                 <Text style={styles.categoryIcon}>{getCategoryIcon(category)}</Text>
                                 <Text style={styles.categoryTitle}>{category}</Text>
                             </View>
+
+                            {/* Say WHY a category is shut before the player
+                                spends a tap finding out. */}
+                            {!categoryOpen(category) && (
+                                <Text style={styles.gateNote}>
+                                    {t('product.techGateNote', {
+                                        v1: gate.weakest || '-',
+                                        v2: Math.round(gate.have),
+                                        v3: gate.required,
+                                    })}
+                                </Text>
+                            )}
 
                             <View style={styles.productsList}>
                                 {products.map((product) => (
@@ -101,7 +151,27 @@ const TechTreeScreen = () => {
                                             ) : (
                                                 <View style={styles.lockedStatus}>
                                                     <Text style={styles.lockIcon}>🔒</Text>
-                                                    <Text style={styles.costText}>{formatRPShort(product.unlockRPCost)}</Text>
+                                                    {/* Affordability is now readable at a glance: the
+                                                        cost brightens when you can actually pay it. */}
+                                                    <Text
+                                                        style={[
+                                                            styles.costText,
+                                                            totalRP >= product.unlockRPCost && styles.costAffordable,
+                                                        ]}>
+                                                        {formatRPShort(product.unlockRPCost)}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.costCash,
+                                                            companyCapital >= product.unlockCashCost && styles.costAffordable,
+                                                        ]}>
+                                                        {formatMoney(product.unlockCashCost)}
+                                                    </Text>
+                                                    {totalRP < product.unlockRPCost && (
+                                                        <Text style={styles.shortfall}>
+                                                            {formatNumber(product.unlockRPCost - totalRP)} RP short
+                                                        </Text>
+                                                    )}
                                                 </View>
                                             )}
                                         </View>
@@ -197,7 +267,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     productRowUnlocked: {
-        backgroundColor: '#434B50', // Dark green tint for unlocked
+        backgroundColor: theme.colors.surfaceRaised,
         borderColor: theme.colors.accent,
     },
     iconPlaceholder: {
@@ -260,6 +330,40 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '600',
         color: theme.colors.textMuted,
+    },
+    costCash: {
+        fontSize: 11,
+        color: theme.colors.textMuted,
+        marginTop: 1,
+    },
+    /** Within reach. Not green - affording something is not a profit. */
+    costAffordable: {
+        color: theme.colors.textPrimary,
+    },
+    shortfall: {
+        fontSize: 10,
+        color: theme.colors.warning,
+        marginTop: 2,
+    },
+    balance: {
+        alignItems: 'flex-end',
+    },
+    balanceValue: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: theme.colors.textPrimary,
+    },
+    balanceCash: {
+        fontSize: 12,
+        color: theme.colors.textSecondary,
+        marginTop: 2,
+    },
+    gateNote: {
+        marginHorizontal: theme.spacing.lg,
+        marginBottom: theme.spacing.sm,
+        color: theme.colors.warning,
+        fontSize: 11.5,
+        lineHeight: 16,
     },
 });
 

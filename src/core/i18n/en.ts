@@ -1616,6 +1616,7 @@ export const en: Record<string, string> = {
     'product.estStorageCostV1Quarter': 'Est. Storage Cost: $ {v1} / quarter',
     'product.prodV1': 'Prod: {v1} %',
     'product.stockBoostV1': 'Stock Boost: + {v1} %',
+    'product.techGateNote': 'Locked: bring {v1} to {v3} brand points first (now {v2}). A new market opens only when every market you already hold is established.',
 
     // ---- urun sayfalari ----
     'product.alreadyActive': 'Already Active',

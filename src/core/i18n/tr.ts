@@ -1618,6 +1618,7 @@ export const tr: Record<string, string> = {
     'product.estStorageCostV1Quarter': 'Tahmini Depo Maliyeti: ${v1}/çeyrek',
     'product.prodV1': 'Üretim: %{v1}',
     'product.stockBoostV1': 'Hisse Sıçraması: +%{v1}',
+    'product.techGateNote': 'Kilitli: once {v1} kategorisini {v3} marka puanina cikar (su an {v2}). Yeni pazar, elindeki her pazar oturmadan acilmaz.',
 
     // ---- urun sayfalari ----
     'product.alreadyActive': 'Zaten Aktif',
