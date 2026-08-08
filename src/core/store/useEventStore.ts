@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zustandStorage } from '../../storage/persist';
 
 export type EventState = {
   todayEvent?: string;
@@ -98,7 +99,7 @@ export const useEventStore = create<EventStore>()(
     }),
     {
       name: 'succesor_events_v1',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         lastLifeEvent: state.lastLifeEvent,
         lastLoveEvent: state.lastLoveEvent,

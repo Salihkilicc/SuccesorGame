@@ -6,6 +6,7 @@ import { Product } from '../types';
 import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../../features/products/data/unlockableProductsData';
 import { formatMoney, formatNumber } from '../../core/utils';
 import { productUpgradeRP } from '../market/production';
+import { zustandStorage } from '../../storage/persist';
 
 export interface SalesContext {
     morale: number;
@@ -422,7 +423,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
         }),
         {
             name: 'succesor_products_v3', // Bump version for new schema
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 products: state.products,
                 // HATA DUZELTMESI: bu satir yoktu.

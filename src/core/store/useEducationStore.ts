@@ -5,6 +5,7 @@ import { EducationItem, StatImpact } from '../../features/education/educationTyp
 import { canEnroll, advanceEducation, applyGraduationBuffs } from '../../logic/educationLogic';
 import { useStatsStore } from './useStatsStore';
 import { usePlayerStore } from './usePlayerStore';
+import { zustandStorage } from '../../storage/persist';
 
 export interface ActiveEducation {
     item: EducationItem;
@@ -322,7 +323,7 @@ export const useEducationStore = create<EducationState>()(
         }),
         {
             name: 'succesor_education_v3', // Version bump for bug fixes
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 activeAcademic: state.activeAcademic,
                 activeCertificate: state.activeCertificate,

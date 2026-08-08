@@ -6,6 +6,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 import { HoldingItem, MarketItem, StockItem, BondItem, FundItem, CryptoAsset } from '../../components/Market/marketTypes';
+import { zustandStorage } from '../../storage/persist';
 
 // Type Guards to safely access unique properties of union members
 function isCrypto(item: MarketItem): item is CryptoAsset {
@@ -511,7 +512,7 @@ export const useMarketStore = create<MarketState>()(
         }),
         {
             name: 'succesor_market_v6',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 holdings: state.holdings,
                 marketPrices: state.marketPrices,

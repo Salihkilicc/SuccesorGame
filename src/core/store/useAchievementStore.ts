@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zustandStorage } from '../../storage/persist';
 
 type AchievementState = {
   unlockedIds: string[];
@@ -37,7 +38,7 @@ export const useAchievementStore = create<AchievementStore>()(
     }),
     {
       name: 'succesor_achievements_v1',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         unlockedIds: state.unlockedIds,
         lastUnlockedId: state.lastUnlockedId,

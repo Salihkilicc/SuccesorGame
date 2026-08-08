@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zustandStorage } from '../../storage/persist';
 
 type SettingsState = {
     _hasHydrated: boolean;
@@ -40,7 +41,7 @@ export const useSettingsStore = create<SettingsStore>()(
         }),
         {
             name: 'succesor_settings_v1',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 isMusicEnabled: state.isMusicEnabled,
                 isSoundEnabled: state.isSoundEnabled,

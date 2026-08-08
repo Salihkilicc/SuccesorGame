@@ -6,6 +6,7 @@ import { useProductStore } from './useProductStore';
 import { BUILD_CANCEL_REFUND, getNextTier, getTier } from '../market/capacity';
 import { clampSalaryRatio, quarterlyWage } from '../market/workforce';
 import { useLaboratoryStore } from './useLaboratoryStore';
+import { zustandStorage } from '../../storage/persist';
 import {
   companyValuation,
   ownershipPercent,
@@ -910,7 +911,7 @@ export const useStatsStore = create<StatsStore>()(
     }),
     {
       name: 'succesor_stats_v1',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         money: state.money,
         netWorth: state.netWorth,

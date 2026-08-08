@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PartnerProfile, ExPartnerProfile, MarriageProposalResult } from '../types';
 import { useStatsStore } from './useStatsStore';
 import { formatMoney } from '../../core/utils';
+import { zustandStorage } from '../../storage/persist';
 
 export interface AcquiredCompany {
   id: string;
@@ -437,7 +438,7 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'succesor_user_v3',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         name: state.name,
         bio: state.bio,

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zustandStorage } from '../../storage/persist';
 
 export type CalendarEvent = {
     id: string;
@@ -57,7 +58,7 @@ export const useCalendarStore = create<CalendarStore>()(
         }),
         {
             name: 'succesor_calendar_v2',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({ events: state.events }),
             onRehydrateStorage: () => (state) => {
                 if (state) {

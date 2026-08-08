@@ -78,6 +78,7 @@ import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { enforceSharkDeadlines, absoluteMonth } from '../../features/shareholders/hooks/useDebtEnforcer';
 import { useUserStore } from './useUserStore';
 import * as AchievementChecker from '../../achievements/checker';
+import { zustandStorage } from '../../storage/persist';
 
 const LOW_MORALE_REASONS = [
   "Factory strikes halted production for 3 days.",
@@ -2168,7 +2169,7 @@ export const useGameStore = create<GameStore>()(
     }),
     {
       name: 'succesor_game_v2',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
         currentMonth: state.currentMonth,
         age: state.age,

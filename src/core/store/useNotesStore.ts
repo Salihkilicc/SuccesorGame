@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zustandStorage } from '../../storage/persist';
 
 export type Note = {
     id: string;
@@ -48,7 +49,7 @@ export const useNotesStore = create<NotesStore>()(
         }),
         {
             name: 'succesor_notes_v1',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({ notes: state.notes }),
             onRehydrateStorage: () => (state) => {
                 if (state) {

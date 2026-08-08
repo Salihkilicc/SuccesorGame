@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NPC } from '../../features/love/types';
+import { zustandStorage } from '../../storage/persist';
 
 // ─────────────────────────────────────────────
 //  Yardımcı: Rastgele aralık üreteci
@@ -145,7 +146,7 @@ export const useRelationshipStore = create<RelationshipStore>()(
         }),
         {
             name: 'relationship-storage',
-            storage: createJSONStorage(() => AsyncStorage),
+            storage: createJSONStorage(() => zustandStorage),
             partialize: (state) => ({
                 contacts: state.contacts,
             }),
