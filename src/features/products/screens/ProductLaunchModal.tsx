@@ -138,8 +138,10 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
                         onBack={onClose}
                     />
 
-                    {step === 1 && renderStep1()}
-                    {step === 2 && renderStep2()}
+                    <View style={styles.cardBody}>
+                        {step === 1 && renderStep1()}
+                        {step === 2 && renderStep2()}
+                    </View>
                 </View>
             </View>
 
@@ -156,6 +158,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
 };
 
 const styles = StyleSheet.create({
+    cardBody: { paddingHorizontal: 20, paddingTop: 16 },
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(28,36,44,0.85)',
@@ -165,7 +168,8 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: theme.colors.card,
         borderRadius: 16,
-        padding: 20,
+        overflow: 'hidden',
+        paddingBottom: 20,
         borderWidth: 1,
         borderColor: theme.colors.border,
     },

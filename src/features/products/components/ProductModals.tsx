@@ -474,7 +474,6 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
             <View style={styles.overlay}>
                 <View style={styles.content}>
                     <ScreenHeader
-                        inset={false}
                         title={`${product.icon} ${displayName}`}
                         onBack={onClose}
                         right={

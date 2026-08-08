@@ -153,6 +153,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
             <Pressable style={styles.overlay} onPress={onClose}>
                 <Pressable style={styles.modal} onPress={(e) => e.stopPropagation()}>
                     <ScreenHeader inset={false} title={product.name} onBack={onClose} />
+                    <View style={styles.cardBody}>
 
                     {/* Description */}
                     <View style={styles.descriptionContainer}>
@@ -205,6 +206,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                         variant={canAfford && !product.isUnlocked ? 'primary' : 'ghost'}
                         style={styles.button}
                     />
+                    </View>
                 </Pressable>
             </Pressable>
 
@@ -222,6 +224,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
+    cardBody: { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.md },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(28,36,44,0.9)',
@@ -234,7 +237,8 @@ const styles = StyleSheet.create({
         maxWidth: 500,
         backgroundColor: theme.colors.card,
         borderRadius: theme.radius.lg,
-        padding: theme.spacing.lg,
+        overflow: 'hidden',
+        paddingBottom: theme.spacing.lg,
         borderWidth: 1,
         borderColor: theme.colors.border,
     },
