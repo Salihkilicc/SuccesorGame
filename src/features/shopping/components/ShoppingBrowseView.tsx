@@ -33,8 +33,8 @@ type BrandConfig = {
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
     Velocity: { name: t('ui.velocityMotors'), color: '#C734CA', emoji: '🏎️' },
-    Dynasty8: { name: t('ui.dynasty8'), color: '#6004BD', emoji: '🏠' },
-    Luxe: { name: t('ui.luxeVault'), color: '#6004BD', emoji: '💎' },
+    Dynasty8: { name: t('ui.dynasty8'), color: '#7B68D7', emoji: '🏠' },
+    Luxe: { name: t('ui.luxeVault'), color: '#7B68D7', emoji: '💎' },
     Elitas: { name: t('ui.elitasTravel'), color: '#C734CA', emoji: '✈️' },
 };
 
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.xl * 3,
     },
     emptyText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 16,
     },
 

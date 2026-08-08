@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     title: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
         letterSpacing: 2,
         fontWeight: 'bold',
@@ -153,13 +153,13 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     buyText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 1,
     },
     rejectText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
     },

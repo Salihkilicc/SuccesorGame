@@ -178,8 +178,8 @@ const styles = StyleSheet.create({
     disabled: { opacity: 0.45 },
     valueRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginBottom: 8 },
     value: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800' },
-    unit: { color: '#1A0A4A', fontSize: 11, marginBottom: 4 },
-    max: { color: '#1A0A4A', fontSize: 11, fontWeight: '700', marginBottom: 4 },
+    unit: { color: '#FFFFFF', fontSize: 11, marginBottom: 4 },
+    max: { color: '#FFFFFF', fontSize: 11, fontWeight: '700', marginBottom: 4 },
 
     track: {
         height: 12, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.08)',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.04)',
     },
     marker: { position: 'absolute', width: 2, height: 12 },
-    scale: { color: '#1A0A4A', fontSize: 9.5, marginTop: 6 },
+    scale: { color: '#FFFFFF', fontSize: 9.5, marginTop: 6 },
 
     stepRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
     stepGap: { flex: 1 },

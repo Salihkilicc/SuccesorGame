@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 
   // Headers
   sectionHeader: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 2,

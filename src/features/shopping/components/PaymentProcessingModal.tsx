@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     securityText: {
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,

@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#020626',
+    color: '#FFFFFF',
   },
   description: {
     fontSize: 13,
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     marginTop: 2,
   },
   descriptionLocked: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
   },
 });

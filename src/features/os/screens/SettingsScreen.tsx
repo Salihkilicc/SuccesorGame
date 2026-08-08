@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     },
     footerTagline: {
         fontSize: 11,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

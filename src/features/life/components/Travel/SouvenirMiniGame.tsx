@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     rarityText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
 });

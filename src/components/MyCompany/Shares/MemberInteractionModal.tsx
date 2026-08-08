@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     heroAvatarText: {
         fontSize: 40,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     heroName: {
         fontSize: 24,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     tabTextActive: {
-        color: '#020626',
+        color: '#FFFFFF',
     },
     tabContent: {
         gap: 16,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
     makeOfferButtonText: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
     infoBox: {

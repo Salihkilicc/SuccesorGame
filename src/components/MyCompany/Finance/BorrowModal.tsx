@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 15,
     },

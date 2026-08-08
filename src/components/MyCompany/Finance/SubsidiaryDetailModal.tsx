@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 12,
         lineHeight: 18,
     },
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     saveBtnText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   levelText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#020626',
+    color: '#FFFFFF',
   },
   stepsContainer: {
     flexDirection: 'row',
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   upgradeBtnText: {
-    color: '#020626',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 14,
   },

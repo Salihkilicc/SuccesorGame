@@ -140,7 +140,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                                <Text style={[styles.impactValue, { color: '#6004BD' }]}>
+                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
@@ -155,7 +155,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                                <Text style={[styles.impactValue, { color: '#6004BD' }]}>
+                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
                             </View>
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
     valueContainer: {
         alignItems: 'center',
@@ -328,14 +328,14 @@ const styles = StyleSheet.create({
     },
     amountLabel: {
         fontSize: 13,
-        color: '#6004BD',
+        color: '#7B68D7',
         fontWeight: '600',
         marginBottom: 6,
     },
     amountValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#6004BD',
+        color: '#7B68D7',
     },
     impactSection: {
         backgroundColor: '#020626',
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     executeButtonTextDisabled: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
 });
 

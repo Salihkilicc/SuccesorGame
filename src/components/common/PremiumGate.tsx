@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   fallbackText: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '600',
   },

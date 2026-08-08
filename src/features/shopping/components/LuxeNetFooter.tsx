@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     linkText: {
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 12,
         fontWeight: '500',
     },

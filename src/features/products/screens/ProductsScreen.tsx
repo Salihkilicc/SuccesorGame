@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   activeName: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   activeProfit: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },
   activePrice: { color: theme.colors.success, fontWeight: '800', fontSize: 16 },
-  emptyText: { color: '#1A0A4A', fontStyle: 'italic', marginLeft: 20 },
+  emptyText: { color: '#FFFFFF', fontStyle: 'italic', marginLeft: 20 },
   lockedList: { paddingHorizontal: 20, gap: 12 },
   lockedCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0B0635', padding: 16, borderRadius: 12, opacity: 0.8 },
   iconBox: { width: 48, height: 48, backgroundColor: '#020626', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   infoBox: { flex: 1 },
   lockedName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
   lockedCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '600', marginTop: 2 },
-  arrow: { color: '#1A0A4A', fontSize: 20, fontWeight: 'bold' },
+  arrow: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
 });
 
 export default ProductsScreen;

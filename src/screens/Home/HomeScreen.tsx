@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 11,
     letterSpacing: 0.1,
   },
@@ -987,12 +987,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   entryTitleDark: {
-    color: '#020626',
+    color: '#FFFFFF',
     fontSize: (theme.typography.subtitle + 2) * 0.9,
     fontWeight: '800',
   },
   entrySubtitleDark: {
-    color: '#11063D',
+    color: '#FFFFFF',
     marginTop: 4 * 0.9,
     fontSize: (theme.typography.caption + 1) * 0.9,
   },
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   restartButtonText: {
-    color: '#020626',
+    color: '#FFFFFF',
     fontWeight: '800',
     fontSize: 16,
   },

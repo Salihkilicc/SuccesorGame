@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(123,104,215,0.3)',
     },
     chipText: {
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 13,
         fontWeight: '600',
     },

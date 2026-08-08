@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     itemDesc: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
         marginTop: 4,
     },

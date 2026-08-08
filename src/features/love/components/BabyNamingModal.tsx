@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         opacity: 0.35,
     },
     namingConfirmText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 15,
         fontWeight: '800',
         letterSpacing: 0.5,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
     },
     namingSkipText: {
-        color: 'rgba(255,255,255,0.3)',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 13,
         fontWeight: '500',
     },

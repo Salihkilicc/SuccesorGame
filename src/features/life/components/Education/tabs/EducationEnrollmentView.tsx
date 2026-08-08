@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0,
     },
     enrollButtonText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
         paddingHorizontal: 32, // Added padding to ensure text doesn't overflow

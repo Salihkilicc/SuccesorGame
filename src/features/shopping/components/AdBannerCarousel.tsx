@@ -26,7 +26,7 @@ const ADS = [
         title: t('ui.dynasty8'),
         subtitle: t('ui.liveAboveTheClouds'),
         cta: 'View Estates →',
-        color: '#11063D',
+        color: '#FFFFFF',
         emoji: '🏠',
     },
     {

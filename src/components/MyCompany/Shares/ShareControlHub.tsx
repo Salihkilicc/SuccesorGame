@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     controlShares: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '700' },
     controlNote: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
-    heroNote: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    heroNote: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
         backgroundColor: 'rgba(123,104,215,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     breakValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
     breakBold: { fontWeight: '800', fontSize: 13 },
     breakDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
-    breakdownNote: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
+    breakdownNote: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
 
     container: {
         flex: 1,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#6004BD',
+        color: '#7B68D7',
         fontWeight: '600',
     },
     headerTitle: {
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
     },
     actionArrow: {
         fontSize: 28,
-        color: '#0B0635',
+        color: '#FFFFFF',
         fontWeight: '300',
     },
     textDisabled: {
-        color: '#0B0635',
+        color: '#FFFFFF',
     },
 });
 

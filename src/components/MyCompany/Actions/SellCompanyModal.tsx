@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     },
     markupText: {
         fontSize: 12,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontStyle: 'italic',
     },
     actionButtons: {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     submitBtnText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,

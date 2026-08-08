@@ -53,7 +53,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
         { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#C734CA' },
         { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#C734CA' },
         { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#7B68D7' },
-        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#6004BD' }
+        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#7B68D7' }
     ];
 
     const getRepTitle = (rep: number) => {
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     moneyLabel: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12
     },
     moneyValue: {
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     footerText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         fontSize: 12,
         fontFamily: 'Courier New'

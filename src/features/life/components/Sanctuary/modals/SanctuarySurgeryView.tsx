@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     successRateText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 12,
     },

@@ -59,7 +59,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                     </View>
 
                                     <View style={{ flex: 1, gap: 4 }}>
-                                        <Text style={[styles.locName, isLocked && { color: '#1A0A4A' }]}>
+                                        <Text style={[styles.locName, isLocked && { color: '#FFFFFF' }]}>
                                             {loc.name.toUpperCase()}
                                         </Text>
                                         <Text style={[styles.locSub, { color: isUnlocked ? loc.theme.secondary : '#1A0A4A' }]}>

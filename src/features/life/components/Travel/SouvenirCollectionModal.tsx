@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginTop: 4,
     },
     closeButton: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         width: 60,
     },
     closeButtonText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 12,
     },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     lockedText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
     spotName: {
         fontSize: 12,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     rarityText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
 });

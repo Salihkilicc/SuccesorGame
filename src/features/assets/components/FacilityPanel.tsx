@@ -462,14 +462,14 @@ const styles = StyleSheet.create({
 
     statRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     stat: { flex: 1 },
-    statLabel: { color: '#1A0A4A', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
+    statLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
     statValue: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700', marginTop: 2 },
     statWarn: { color: '#C734CA' },
 
     compareRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     compareValue: { marginTop: 2 },
-    compareFrom: { color: '#1A0A4A', fontSize: 13, fontWeight: '600' },
-    compareArrow: { color: '#11063D', fontSize: 11 },
+    compareFrom: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+    compareArrow: { color: '#FFFFFF', fontSize: 11 },
     compareTo: { color: '#7B68D7', fontSize: 14, fontWeight: '800' },
 
     warn: { color: '#C734CA', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
 
     utilBox: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)' },
     utilHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-    utilLabel: { color: '#1A0A4A', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    utilLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     utilValue: { fontSize: 18, fontWeight: '800' },
     util_idle: { color: '#C734CA' },
     util_healthy: { color: '#7B68D7' },
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     adjText: { color: theme.colors.textPrimary, fontSize: 22, fontWeight: '700' },
     headValue: { flex: 1, alignItems: 'center' },
     headNumber: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800' },
-    headUnit: { color: '#1A0A4A', fontSize: 10.5, marginTop: 1 },
+    headUnit: { color: '#FFFFFF', fontSize: 10.5, marginTop: 1 },
 
     matchBtn: {
         paddingVertical: 9, borderRadius: 10, alignItems: 'center',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     ladderNow: { backgroundColor: 'rgba(123,104,215,0.08)', borderRadius: 8, paddingHorizontal: 8 },
     ladderNum: { color: '#7B68D7', fontSize: 13, fontWeight: '800', width: 20 },
     ladderName: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '700' },
-    ladderMeta: { color: '#1A0A4A', fontSize: 10, marginTop: 2 },
+    ladderMeta: { color: '#FFFFFF', fontSize: 10, marginTop: 2 },
     ladderCost: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '700' },
     ladderDim: { opacity: 0.45 },
 });

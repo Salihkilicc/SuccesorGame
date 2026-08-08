@@ -94,7 +94,7 @@ const ProposalWizardView: React.FC<Props> = ({
                 <Pressable
                     style={[styles.actionButton, { backgroundColor: theme.colors.success }]}
                     onPress={() => onDecidePrenup(false)}>
-                    <Text style={[styles.actionButtonText, { color: '#020626' }]}>❤️ No Prenup (Trust)</Text>
+                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>❤️ No Prenup (Trust)</Text>
                 </Pressable>
             </View>
         );
@@ -200,7 +200,7 @@ const ProposalWizardView: React.FC<Props> = ({
                     { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5 }
                 ]}
                 onPress={onStartProposal}>
-                <Text style={[styles.actionButtonText, { color: '#020626', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
+                <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
             </Pressable>
         </View>
     );
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     smallButtonText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
     },

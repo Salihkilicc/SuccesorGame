@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1.5,
     },
     sectionCount: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 11,
         fontWeight: '600',
     },

@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
     // --- Yeni uretim / pazarlama kontrolleri ---
     controlHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
     controlValueBox: { alignItems: 'center', flex: 1 },
-    controlValueUnit: { color: '#1A0A4A', fontSize: 9.5, marginTop: 2 },
+    controlValueUnit: { color: '#FFFFFF', fontSize: 9.5, marginTop: 2 },
 
     capacityTrack: {
         height: 10,
@@ -1114,7 +1114,7 @@ const styles = StyleSheet.create({
         borderRadius: 1,
     },
     compareRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-    compareLabel: { color: '#1A0A4A', fontSize: 9.5, letterSpacing: 0.5 },
+    compareLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
     compareValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 2 },
 
     warnLine: { color: '#C734CA', fontSize: 11, lineHeight: 16, marginTop: 10 },
@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
     mktMarker: { position: 'absolute', width: 2, height: 14, backgroundColor: '#0B0635' },
     // Kiyas butce isareti — bakim esiginden ayirt edilsin diye farkli renk
     mktMarkerBenchmark: { backgroundColor: '#7B68D7', width: 2, height: 14 },
-    mktScale: { color: '#1A0A4A', fontSize: 9.5, marginTop: 6 },
+    mktScale: { color: '#FFFFFF', fontSize: 9.5, marginTop: 6 },
 
     whyRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5 },
     whyLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5 },
@@ -1178,7 +1178,7 @@ const styles = StyleSheet.create({
     previewTitle: { color: '#7B68D7', fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
     previewRow: { flexDirection: 'row', marginTop: 6 },
     previewCell: { flex: 1, alignItems: 'center' },
-    previewLabel: { color: '#1A0A4A', fontSize: 9.5 },
+    previewLabel: { color: '#FFFFFF', fontSize: 9.5 },
     previewValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', marginTop: 3 },
 
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 16 },
@@ -1214,7 +1214,7 @@ const styles = StyleSheet.create({
         marginTop: 12
     },
     btnGhost: { padding: 14, alignItems: 'center' },
-    btnText: { color: '#020626', fontWeight: '700', fontSize: 16 },
+    btnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
     btnOutlineText: { color: 'rgba(255,255,255,0.48)', fontWeight: '700', fontSize: 16 },
     ghostText: { color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     closeIcon: { fontSize: 24, color: 'rgba(255,255,255,0.48)' },
@@ -1225,7 +1225,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     rpBadgeText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '800',
     },
@@ -1325,7 +1325,7 @@ const styles = StyleSheet.create({
         minWidth: 140
     },
     upgradeBtnTextCompact: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 13,
         textAlign: 'center'
@@ -1343,7 +1343,7 @@ const styles = StyleSheet.create({
     rpCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '700' },
     upgradeBtn: { backgroundColor: theme.colors.accent, padding: 12, borderRadius: 8, alignItems: 'center' },
     upgradeBtnDisabled: { backgroundColor: '#1A0A4A', opacity: 0.5 },
-    upgradeBtnText: { color: '#020626', fontWeight: '700', fontSize: 14 },
+    upgradeBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
 
     controlGroup: { marginBottom: 20 },
     controlTitle: { color: '#FFFFFF', fontWeight: '600', marginBottom: 8 },

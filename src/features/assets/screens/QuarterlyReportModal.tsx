@@ -909,7 +909,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
                   <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  <Text style={[styles.balanceValue, { color: '#6004BD' }]}>
+                  <Text style={[styles.balanceValue, { color: '#7B68D7' }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
                 </View>
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   lineLabelStrong: { color: '#FFFFFF', fontWeight: '700' },
   lineAmount: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
   lineAmountBig: { fontSize: 20, fontWeight: '800' },
-  lineExplain: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
+  lineExplain: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
   lineHint: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, marginTop: 2, fontStyle: 'italic' },
 
   groupLabel: {
@@ -1054,7 +1054,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 16,
   },
-  footnote: { color: '#1A0A4A', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
+  footnote: { color: '#FFFFFF', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
 
   opsDelta: { fontSize: 11, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
   facilityBar: {
@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
   },
   productHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   productShareMini: { color: '#7B68D7', fontSize: 11, fontWeight: '700' },
-  productChevron: { color: '#1A0A4A', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
+  productChevron: { color: '#FFFFFF', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
   productChevronOpen: { color: '#C734CA', transform: [{ rotate: '180deg' }], marginTop: 3 },
   productName: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flex: 1 },
   productProfit: { fontSize: 14, fontWeight: '800', marginLeft: 10 },
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
   productStat: { flex: 1 },
   scrapLine: { fontSize: 9, color: '#C734CA', marginTop: 2 },
   productSplit: { fontSize: 9, color: '#7B68D7', marginTop: 2 },
-  productStatLabel: { color: '#1A0A4A', fontSize: 9.5, letterSpacing: 0.5 },
+  productStatLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginTop: 2 },
   sellThroughTrack: {
     height: 5,
@@ -1129,7 +1129,7 @@ const styles = StyleSheet.create({
   },
   sellThroughFill: { height: '100%', borderRadius: 3 },
   sellThroughLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, marginTop: 5 },
-  productEcon: { color: '#1A0A4A', fontSize: 10, marginTop: 7, lineHeight: 15 },
+  productEcon: { color: '#FFFFFF', fontSize: 10, marginTop: 7, lineHeight: 15 },
 
   balanceRow: {
     flexDirection: 'row',
@@ -1142,7 +1142,7 @@ const styles = StyleSheet.create({
   balanceValue: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginTop: 4 },
   balanceDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
 
-  emptyText: { color: '#1A0A4A', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
+  emptyText: { color: '#FFFFFF', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
 
   footerActions: {
     padding: 14,
@@ -1156,5 +1156,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonPressed: { opacity: 0.8 },
-  primaryButtonText: { color: '#020626', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  primaryButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
 });

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     summary: { fontSize: 14, fontWeight: '800', maxWidth: 130, textAlign: 'right' },
     chevron: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 16,
         marginTop: -4,
         width: 14,

@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
     valueContainer: {
         alignItems: 'center',
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     profitBadgeText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     warningBox: {
         backgroundColor: '#C734CA20',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     distributeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#020626',
+        color: '#FFFFFF',
     },
 });
 

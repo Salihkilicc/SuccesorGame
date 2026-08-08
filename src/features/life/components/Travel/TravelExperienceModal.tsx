@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         marginBottom: 8,
         textTransform: 'uppercase',
         letterSpacing: 2,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     },
     narrativeText: {
         fontSize: 18,
-        color: '#020626',
+        color: '#FFFFFF',
         textAlign: 'center',
         fontStyle: 'italic',
         lineHeight: 28,
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
     completionTitle: {
         fontSize: 28,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 2,
     },
     finalNarrative: {
         fontSize: 20,
-        color: '#020626',
+        color: '#FFFFFF',
         textAlign: 'center',
         fontWeight: '500',
         lineHeight: 32,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     statText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '700',
     },
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(199,52,202,0.5)',
     },
     souvenirHintText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         textAlign: 'center',

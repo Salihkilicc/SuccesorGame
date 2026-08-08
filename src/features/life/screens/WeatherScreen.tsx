@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     unitToggleDivider: {
-        color: 'rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.48)',
         marginHorizontal: 8,
         fontSize: 14,
     },
     appTitle: {
-        color: 'rgba(255,255,255,0.25)',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 6,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     forecastTitle: {
-        color: 'rgba(255,255,255,0.3)',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 3,
@@ -309,12 +309,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     forecastLow: {
-        color: 'rgba(255,255,255,0.35)',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 11,
         fontWeight: '400',
     },
     attribution: {
-        color: 'rgba(255,255,255,0.18)',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 10,
         letterSpacing: 0.5,
         textAlign: 'center',

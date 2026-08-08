@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     statLabel: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 14
     },
     statValue: {

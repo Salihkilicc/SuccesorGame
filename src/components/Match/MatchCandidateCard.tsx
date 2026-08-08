@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoText: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 14,
   },
   info: {
@@ -56,10 +56,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#020626',
+    color: '#FFFFFF',
   },
   meta: {
     fontSize: 14,
-    color: '#1A0A4A',
+    color: '#FFFFFF',
   },
 });

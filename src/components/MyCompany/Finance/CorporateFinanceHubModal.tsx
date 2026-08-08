@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     ctaButtonText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#020626',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     sharkAvatarText: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     sharkDealInfo: {
         flex: 1,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     instantBadgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#020626',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     sharkDealFooter: {

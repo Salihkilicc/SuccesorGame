@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#6004BD',
+        color: '#7B68D7',
         letterSpacing: 1,
     },
     headerSubtitle: {
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     },
     closeIcon: {
         fontSize: 16,
-        color: '#11063D',
+        color: '#FFFFFF',
     },
 
     // Primary Card (Degree)
@@ -386,12 +386,12 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#11063D',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginBottom: 16,
     },
     enrollBtnPrimary: {
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     secondaryTitle: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'right',
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     },
     secondaryDetail: {
         fontSize: 10,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginTop: 6,
         textAlign: 'right',
     },
@@ -561,11 +561,11 @@ const styles = StyleSheet.create({
     addSkillTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#11063D',
+        color: '#FFFFFF',
     },
     addSkillSubtitle: {
         fontSize: 12,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
 
 
@@ -602,13 +602,13 @@ const styles = StyleSheet.create({
     menuTitle: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: '#020626',
+        color: '#FFFFFF',
         marginBottom: 4,
         textAlign: 'center',
     },
     menuSubtitle: {
         fontSize: 11,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         textAlign: 'center',
     },
     menuSubtitleDisabled: {
@@ -638,12 +638,12 @@ const styles = StyleSheet.create({
     menuTitleLarge: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#020626',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     menuSubtitleLarge: {
         fontSize: 13,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
 
     // Remaining Quarters Text
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     },
     secondaryRemaining: {
         fontSize: 10,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         marginTop: 4,
         textAlign: 'right',

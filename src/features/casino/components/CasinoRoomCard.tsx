@@ -70,11 +70,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#020626',
+    color: '#FFFFFF',
   },
   requirement: {
     fontSize: 13,
-    color: '#1A0A4A',
+    color: '#FFFFFF',
   },
   lockedTag: {
     backgroundColor: '#FFFFFF',

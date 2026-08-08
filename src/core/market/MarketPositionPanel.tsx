@@ -215,9 +215,9 @@ const styles = StyleSheet.create({
     brandChip: { backgroundColor: '#020626', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
     brandChipCat: { color: 'rgba(255,255,255,0.48)', fontSize: 9 },
     brandChipVal: { fontSize: 13, fontWeight: '800' },
-    summaryLabel: { color: '#1A0A4A', fontSize: 9.5, letterSpacing: 0.5 },
+    summaryLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
     summaryValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 3 },
-    summaryUnit: { color: '#1A0A4A', fontSize: 9, marginTop: 1 },
+    summaryUnit: { color: '#FFFFFF', fontSize: 9, marginTop: 1 },
 
     soldLine: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, fontStyle: 'italic', marginBottom: 10 },
 
@@ -230,9 +230,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
         marginHorizontal: -4,
     },
-    rankNum: { color: '#1A0A4A', fontSize: 10, width: 18, fontWeight: '700' },
+    rankNum: { color: '#FFFFFF', fontSize: 10, width: 18, fontWeight: '700' },
     rankName: { color: '#FFFFFF', fontSize: 11.5, flex: 1 },
-    rankSymbol: { color: '#1A0A4A', fontSize: 9.5 },
+    rankSymbol: { color: '#FFFFFF', fontSize: 9.5 },
     rankTextPlayer: { color: '#7B68D7', fontWeight: '800' },
     rankBarTrack: {
         width: 70,
@@ -245,5 +245,5 @@ const styles = StyleSheet.create({
     rankBarFill: { height: '100%', borderRadius: 2 },
     rankShare: { color: 'rgba(255,255,255,0.48)', fontSize: 11, width: 52, textAlign: 'right', fontWeight: '600' },
 
-    footnote: { color: '#1A0A4A', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
+    footnote: { color: '#FFFFFF', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
 });

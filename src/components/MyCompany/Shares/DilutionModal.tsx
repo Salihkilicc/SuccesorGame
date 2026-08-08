@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
     },
     valueContainer: {
         alignItems: 'center',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     authorizeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#020626',
+        color: '#FFFFFF',
     },
 });
 

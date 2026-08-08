@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#11063D',
+        color: '#FFFFFF',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#6004BD',
+        color: '#7B68D7',
     },
     subtitle: {
         fontSize: 12,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginTop: 2,
     },
     scrollContent: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     activeBadge: {
         fontSize: 10,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     },
     clubDescription: {
         fontSize: 14,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         lineHeight: 20,
     },
     buffSection: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#11063D',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     avatarsContainer: {

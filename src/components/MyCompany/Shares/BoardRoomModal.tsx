@@ -391,9 +391,9 @@ const styles = StyleSheet.create({
 
     tabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
     tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#07062E', alignItems: 'center' },
-    tabActive: { backgroundColor: '#0B0635' },
+    tabActive: { backgroundColor: '#6004BD' },
     tabText: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
-    tabTextActive: { color: '#020626' },
+    tabTextActive: { color: '#FFFFFF' },
 
     body: { flexGrow: 0, flexShrink: 1 },
 

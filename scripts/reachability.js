@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -191,6 +191,40 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     }
 }
 
+// --- 0e) Text that cannot be read on the ground -----------------------------
+//  Chained palette migrations quietly turned old `color: '#000'` into the
+//  BACKGROUND colour, so 89 labels became invisible - the player found it as
+//  "this button and its text are both gone". Fill tones are dark by design and
+//  make unreadable text; each has a lightened form for that job.
+{
+    const hx = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+    const lum = c => {
+        const [r, g, b] = c.map(v => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a, b) => {
+        const l1 = lum(a), l2 = lum(b);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+    const GROUND = hx('#020626');
+
+    for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+        read(f).split('\n').forEach((line, i) => {
+            const m = line.match(/\bcolor: *'(#[0-9A-Fa-f]{6})'/);
+            if (m && ratio(hx(m[1].toUpperCase()), GROUND) < 3) {
+                problems.contrast.push(`${rel(f)}:${i + 1}  ${m[1]} on the ground`);
+            }
+            const faint = line.match(/\bcolor: *'rgba\(255,255,255, *([\d.]+)\)'/);
+            if (faint && parseFloat(faint[1]) < 0.35) {
+                problems.contrast.push(`${rel(f)}:${i + 1}  white at ${faint[1]} alpha`);
+            }
+        });
+    }
+}
+
 // --- 1) Components nothing renders -----------------------------------------
 //  Matched on IMPORT PATH, not on symbol name. Matching the exported symbol
 //  gave false positives: RAndDModal.tsx exports `RAndDModalRevised` as a const
@@ -270,6 +304,8 @@ const section = (title, list, why) => {
 
 console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
+total += section('Text unreadable on the ground', problems.contrast,
+    'Below 3:1 against the background. Fill tones are not text colours - use their light form.');
 total += section('Colours outside the palette', problems.palette,
     'Consolidated to fifteen tokens. A new hex here is how the drift starts again.');
 total += section('Persisted stores a new game does not clear', problems.newGame,

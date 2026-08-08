@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeTabText: {
-    color: '#020626',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
 
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   itemSector: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '500',
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   valueLabel: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 11,
   },
   emptyState: {
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#11063D',
+    color: '#FFFFFF',
   },
 
   // Negotiation Overlay
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   negSubtitle: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 14,
   },
   negBody: {
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   optionDesc: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontSize: 12,
   },
   hostileBtn: {
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   cancelText: {
-    color: '#1A0A4A',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
 

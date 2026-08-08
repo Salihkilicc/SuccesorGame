@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     ownedBadge: {
         fontSize: 9,
         fontWeight: '700',
-        color: '#020626',
+        color: '#FFFFFF',
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 6,
         paddingVertical: 2,

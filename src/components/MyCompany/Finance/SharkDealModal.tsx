@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     activeLoanBody: { color: '#C734CA', fontSize: 11, lineHeight: 16, marginBottom: 10 },
     repayBtn: { backgroundColor: '#7B68D7', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
     repayBtnDisabled: { backgroundColor: '#0B0635' },
-    repayBtnText: { color: '#020626', fontWeight: '800', fontSize: 13 },
+    repayBtnText: { color: '#FFFFFF', fontWeight: '800', fontSize: 13 },
     amountCard: { backgroundColor: '#07062E', borderRadius: 12, padding: 16 },
     amountLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     amountValue: { fontSize: 26, color: '#FFFFFF', fontWeight: '800', marginVertical: 6 },
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     lenderAvatarText: {
         fontSize: 28,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     lenderName: {
         fontSize: 18,
@@ -486,13 +486,13 @@ const styles = StyleSheet.create({
     signButtonText: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
     },
     disclaimer: {
         fontSize: 10,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         textAlign: 'center',
         lineHeight: 16,

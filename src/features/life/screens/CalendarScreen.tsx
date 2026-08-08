@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     weekLabel: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.5,
     },
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     modalStarText: { fontSize: 24, color: '#FFFFFF' },
     modalDate: {
         fontSize: 11,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         letterSpacing: 2,
         textTransform: 'uppercase',
         marginBottom: 6,

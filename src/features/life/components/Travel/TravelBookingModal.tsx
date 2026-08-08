@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     },
     airlineText: {
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
         letterSpacing: 2,
         fontSize: 12,
     },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     destCode: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     flightLine: {
         flex: 1,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     },
     spotName: {
         fontSize: 18,
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '600',
         textAlign: 'center',
         textTransform: 'uppercase',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         padding: 24,
     },
     sectionTitle: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 1,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     totalLabel: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: 'bold',
         marginBottom: 4,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
         borderRadius: 30,
     },
     bookButtonText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#020626',
     },
     closeText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 2,

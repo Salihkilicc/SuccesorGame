@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 3,
     },
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     skillDetail: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
         marginBottom: 2,
     },
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
         width: 60,
     },
     luxuryTarget: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: '600',
         fontSize: 12,
         width: 60,
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     luxuryPercentage: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 11,
         textAlign: 'center',
         letterSpacing: 1,

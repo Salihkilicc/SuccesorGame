@@ -204,6 +204,6 @@ const styles = StyleSheet.create({
   buyText: {
     fontSize: theme.typography.body,
     fontWeight: '800',
-    color: '#020626',
+    color: '#FFFFFF',
   },
 });

@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#11063D',
+        color: '#FFFFFF',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#6004BD',
+        color: '#7B68D7',
     },
     subtitle: {
         fontSize: 12,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginTop: 2,
     },
     scrollContent: {
@@ -167,14 +167,14 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#6004BD',
+        color: '#7B68D7',
         marginBottom: 8,
     },
     multiplierHint: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#6004BD',
+        color: '#7B68D7',
         marginBottom: 16,
     },
     emptyState: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#020626',
+        color: '#FFFFFF',
     },
     degreeType: {
         fontSize: 14,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: '600',
     },
     degreeBonus: {

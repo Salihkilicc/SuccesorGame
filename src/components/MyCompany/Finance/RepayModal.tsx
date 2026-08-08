@@ -143,8 +143,8 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                     ]}
                                                     onPress={() => handleRepay(loan.id, loan.balance)}
                                                 >
-                                                    <Text style={[styles.repayButtonLabel, { color: '#020626' }]}>{t('finance.payFull')}</Text>
-                                                    <Text style={[styles.repayButtonValue, { color: '#020626' }]}>
+                                                    <Text style={[styles.repayButtonLabel, { color: '#FFFFFF' }]}>{t('finance.payFull')}</Text>
+                                                    <Text style={[styles.repayButtonValue, { color: '#FFFFFF' }]}>
                                                         {formatMoney(loan.balance)}
                                                     </Text>
                                                 </Pressable>
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     confirmText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 16,
     },

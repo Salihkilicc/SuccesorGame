@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     locationButton: { backgroundColor: theme.colors.cardSoft, padding: theme.spacing.md, borderRadius: theme.radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, justifyContent: 'center' },
     locationLabel: { color: theme.colors.textMuted, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 },
     locationValue: { color: theme.colors.textPrimary, fontSize: 16, fontWeight: '800', letterSpacing: 0.5 },
-    locationHint: { color: 'rgba(255,255,255,0.3)', fontSize: 11, alignSelf: 'center' },
+    locationHint: { color: 'rgba(255,255,255,0.48)', fontSize: 11, alignSelf: 'center' },
     cardPressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
     gameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.colors.card, padding: theme.spacing.lg, borderRadius: theme.radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
     gameTitle: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700' },

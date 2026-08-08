@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 80,
     fontWeight: 'bold',
-    color: '#1A0A4A',
+    color: '#FFFFFF',
   },
   overlay: {
     position: 'absolute',
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {
-    color: '#020626',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 0.5,

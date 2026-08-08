@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     primaryText: {
-        color: '#020626',
+        color: '#FFFFFF',
     },
     // Secondary
     secondaryButton: {

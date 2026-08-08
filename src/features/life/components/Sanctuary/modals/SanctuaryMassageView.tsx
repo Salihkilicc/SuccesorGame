@@ -260,6 +260,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     healthText: {
-        color: '#6004BD', // Blue
+        color: '#7B68D7', // Blue
     },
 });

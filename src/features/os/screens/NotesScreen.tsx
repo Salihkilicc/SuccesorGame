@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     },
     countBadge: {
         fontSize: 11,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
         fontWeight: '600',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     },
     notePreview: {
         fontSize: 13,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         lineHeight: 18,
     },
     noteFooter: {
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     },
     noteDate: {
         fontSize: 10,
-        color: '#11063D',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
         fontWeight: '500',
     },
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         textAlign: 'center',
         lineHeight: 21,
     },

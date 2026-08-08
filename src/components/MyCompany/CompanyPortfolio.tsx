@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   ownershipBadge: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#6004BD',
+    color: '#7B68D7',
     backgroundColor: '#6004BD20',
     paddingHorizontal: 8,
     paddingVertical: 2,

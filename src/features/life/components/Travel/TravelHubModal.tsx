@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     headerButtonText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 12,
     },

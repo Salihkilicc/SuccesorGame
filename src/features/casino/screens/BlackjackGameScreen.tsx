@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   hiddenCard: { backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#020626' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#FFFFFF' },
   cardSuit: { fontSize: 20 },
 
   tableCenter: { alignItems: 'center', paddingVertical: 10 },

@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     btnText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 14,
     },

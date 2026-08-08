@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   cardHidden: { backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   cardBack: { fontSize: 32 },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#020626' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#FFFFFF' },
   cardSuit: { fontSize: 20 },
 
   controlsSection: { marginTop: 'auto', gap: 16 },

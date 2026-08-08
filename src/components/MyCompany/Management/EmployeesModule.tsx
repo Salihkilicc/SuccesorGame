@@ -260,7 +260,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
 const styles = StyleSheet.create({
     stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
-    label: { color: '#1A0A4A', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    label: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },
     sub: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 2 },
     strong: { color: theme.colors.textPrimary, fontWeight: '800' },
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     },
     eventOff: { opacity: 0.4 },
     eventName: { color: theme.colors.textPrimary, fontSize: 13.5, fontWeight: '700' },
-    eventDesc: { color: '#1A0A4A', fontSize: 10.5, marginTop: 2 },
+    eventDesc: { color: '#FFFFFF', fontSize: 10.5, marginTop: 2 },
     eventCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '800' },
     eventGain: { color: '#7B68D7', fontSize: 11, marginTop: 2 },
 

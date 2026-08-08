@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     headerTitle: {
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,

@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4
     },
     statLabel: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 0.3
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     fatigueText: {
-        color: '#020626',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '700',
         width: 45,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 2,
     },
     sectionTitle: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontWeight: '800',
         marginTop: 30,
         marginBottom: 15,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     icon: { fontSize: 36, marginBottom: 10 },
-    cardLabel: { color: '#020626', fontWeight: '700', fontSize: 15 },
+    cardLabel: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
     maList: { gap: 10 },
     maCard: {
         paddingVertical: 18,
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     maIcon: {
         fontSize: 24
     },
-    maLabel: { color: '#020626', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
+    maLabel: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
     maBelt: { color: 'rgba(255,255,255,0.48)', fontSize: 14, fontWeight: '600' },
     modifierBtn: {
         padding: 20,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     modContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modLabel: { color: '#6004BD', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
+    modLabel: { color: '#7B68D7', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
     changeText: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600' },
 });
 

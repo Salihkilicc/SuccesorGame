@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     separator: {
-        color: 'rgba(255,255,255,0.15)',
+        color: 'rgba(255,255,255,0.48)',
         marginLeft: 10,
         fontSize: 11,
     },

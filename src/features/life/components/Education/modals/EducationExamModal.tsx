@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     questionText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#020626',
+        color: '#FFFFFF',
         lineHeight: 28,
         textAlign: 'center',
     },
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     optionText: {
         flex: 1,
         fontSize: 15,
-        color: '#11063D',
+        color: '#FFFFFF',
         fontWeight: '500',
     },
     footerWarning: {

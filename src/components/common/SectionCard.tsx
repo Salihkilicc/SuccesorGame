@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     rightText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#6004BD', // Apple Blue
+        color: '#7B68D7', // Apple Blue
     },
     dangerText: {
         color: '#C734CA',

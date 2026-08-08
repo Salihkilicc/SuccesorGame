@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption + 1,
   },
   separator: {
-    color: 'rgba(255,255,255,0.15)',
+    color: 'rgba(255,255,255,0.48)',
     paddingHorizontal: theme.spacing.xs,
   },
 });

@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     inStockText: {
-        color: '#6004BD',
+        color: '#7B68D7',
         fontSize: 12,
         fontWeight: '600',
         marginBottom: 2,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     specText: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 11,
     },
 

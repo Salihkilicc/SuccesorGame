@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     headerSubtitle: {
-        color: '#11063D',
+        color: '#FFFFFF',
         fontSize: 14,
         marginBottom: 50,
         fontStyle: 'italic',
@@ -132,11 +132,11 @@ const styles = StyleSheet.create({
         color: '#C734CA',
     },
     menuSubtitle: {
-        color: '#1A0A4A',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     arrow: {
-        color: '#0B0635',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: 'bold',
         marginLeft: 'auto',
