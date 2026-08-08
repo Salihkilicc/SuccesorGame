@@ -13,10 +13,10 @@ interface CompanyActionsProps {
 }
 
 const ACTIONS = [
-  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(233,184,201,0.5)', glowColor: '#E9B8C9' }, // Gold
-  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(89,146,198,0.5)', glowColor: '#5992C6' }, // Green
-  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(89,146,198,0.5)', glowColor: '#0A2A92' }, // Blue
-  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(233,184,201,0.5)', glowColor: '#0A2A92' }, // Purple
+  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#C734CA' }, // Gold
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(123,104,215,0.5)', glowColor: '#7B68D7' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(123,104,215,0.5)', glowColor: '#6004BD' }, // Blue
+  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#6004BD' }, // Purple
 ] as const;
 
 const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {
@@ -68,7 +68,7 @@ export default CompanyActions;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#31241F', // Dark Gray
+    backgroundColor: '#020626', // Dark Gray
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: '#31241F', // Dark Gray - HARDCODED
+    backgroundColor: '#020626', // Dark Gray - HARDCODED
     borderRadius: 16,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
@@ -101,14 +101,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)', // Subtle border - HARDCODED
     gap: theme.spacing.xs,
     // Premium shadows - CRUCIAL
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 8,
   },
   buttonPressed: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     transform: [{ scale: 0.98 }],
     shadowOpacity: 0.6,
     elevation: 12,

@@ -28,7 +28,7 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#533D35' }: any) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#0B0635' }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
@@ -170,10 +170,10 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#31241F' }}>
+    <View style={{ flex: 1, backgroundColor: '#020626' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#31241F', '#31241F', '#31241F']}
+        colors={['#020626', '#020626', '#020626']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -188,7 +188,7 @@ const MyCompanyScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -222,7 +222,7 @@ const MyCompanyScreen = () => {
             </View>
 
             {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#533D35', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#0B0635', marginVertical: 16 }} />
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -238,7 +238,7 @@ const MyCompanyScreen = () => {
               />
             </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: '#533D35', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#0B0635', marginVertical: 16 }} />
 
             {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
                 su an yavas biriken bir itibar gostergesi.
@@ -263,7 +263,7 @@ const MyCompanyScreen = () => {
               title={t('company.finance')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => toggleModal('finance', true)}
-              color="rgba(233,184,201,0.5)" // Gold
+              color="rgba(199,52,202,0.5)" // Gold
             />
 
             <DepartmentCard
@@ -271,7 +271,7 @@ const MyCompanyScreen = () => {
               title={t('company.products')}
               subtitle={`${activeProductsCount} Active`}
               onPress={() => navigation.navigate('Products')}
-              color="rgba(89,146,198,0.5)" // Blue
+              color="rgba(123,104,215,0.5)" // Blue
             />
 
             <DepartmentCard
@@ -279,14 +279,14 @@ const MyCompanyScreen = () => {
               title={t('company.financialReport')}
               subtitle={t('company.expensesProfitsRoi')}
               onPress={() => navigation.navigate('FinancialReport')}
-              color="rgba(233,184,201,0.5)" // Purple
+              color="rgba(199,52,202,0.5)" // Purple
             />
             <DepartmentCard
               icon="📈"
               title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => toggleModal('shareControl', true)}
-              color="rgba(89,146,198,0.5)" // Green
+              color="rgba(123,104,215,0.5)" // Green
             />
           </View>
 
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(233,184,201,0.15)',
+    borderBottomColor: 'rgba(199,52,202,0.15)',
     minHeight: 80,
     backgroundColor: 'transparent',
   },
@@ -394,10 +394,10 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 12,
     zIndex: 10,
-    backgroundColor: 'rgba(233,184,201,0.08)',
+    backgroundColor: 'rgba(199,52,202,0.08)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(233,184,201,0.2)',
+    borderColor: 'rgba(199,52,202,0.2)',
   },
   headerCenter: {
     flex: 1,
@@ -414,10 +414,10 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#533D35',
+    backgroundColor: '#0B0635',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 120,
     justifyContent: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
@@ -444,5 +444,5 @@ const styles = StyleSheet.create({
   },
   deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
   deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
-  sharePrice: { fontSize: 18, fontWeight: '700', color: '#E9B8C9' }, // Gold for money
+  sharePrice: { fontSize: 18, fontWeight: '700', color: '#C734CA' }, // Gold for money
 });

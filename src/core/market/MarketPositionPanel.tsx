@@ -83,7 +83,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('os.yourShare')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#5992C6' }]}>
+                    <Text style={[styles.summaryValue, { color: '#7B68D7' }]}>
                         {formatShare(playerShare)}
                     </Text>
                     {ownedShare > 0 && (
@@ -98,7 +98,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('brand.thisCategory')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#E9B8C9' }]}>
+                    <Text style={[styles.summaryValue, { color: '#C734CA' }]}>
                         {Math.round((brandByCategory || {})[category ?? ""] ?? 0)}
                     </Text>
                     <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: brandValue.toFixed(0) })}</Text>
@@ -119,7 +119,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                             <Text style={styles.brandChipCat}>{cat}</Text>
                             <Text style={[
                                 styles.brandChipVal,
-                                { color: (v as number) >= 200 ? '#5992C6' : '#E9B8C9' },
+                                { color: (v as number) >= 200 ? '#7B68D7' : '#C734CA' },
                             ]}>
                                 {Math.round(v as number)}
                             </Text>
@@ -138,7 +138,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 note={t('os.whoHoldsThisMarketAnd')}
                 info={t('os.theseAreRealCompaniesYou')}
                 summary={`#${playerRank} of ${ranking.length}`}
-                summaryColor="#5992C6"
+                summaryColor="#7B68D7"
                 style={styles.rankingSection}
             >
             <View style={styles.rankingBox}>
@@ -161,8 +161,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                                     {
                                         width: `${Math.min(100, p.share)}%`,
                                         backgroundColor: p.isPlayer
-                                            ? '#5992C6'
-                                            : p.owned ? '#5992C6' : 'rgba(255,255,255,0.28)',
+                                            ? '#7B68D7'
+                                            : p.owned ? '#7B68D7' : 'rgba(255,255,255,0.28)',
                                     },
                                 ]}
                             />
@@ -186,8 +186,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
 export default MarketPositionPanel;
 
 const styles = StyleSheet.create({
-    groupNote: { color: '#5992C6', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
-    compactLine: { color: '#5992C6', fontSize: 11, fontWeight: '600' },
+    groupNote: { color: '#7B68D7', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
+    compactLine: { color: '#7B68D7', fontSize: 11, fontWeight: '600' },
 
     panel: {
         backgroundColor: 'rgba(255,255,255,0.04)',
@@ -204,20 +204,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 6,
-        backgroundColor: 'rgba(233,184,201,0.12)',
+        backgroundColor: 'rgba(199,52,202,0.12)',
     },
-    regionText: { color: '#E9B8C9', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+    regionText: { color: '#C734CA', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
     description: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 6 },
 
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },
     summaryCell: { flex: 1, alignItems: 'center' },
     brandRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-    brandChip: { backgroundColor: '#31241F', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
+    brandChip: { backgroundColor: '#020626', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
     brandChipCat: { color: 'rgba(255,255,255,0.48)', fontSize: 9 },
     brandChipVal: { fontSize: 13, fontWeight: '800' },
-    summaryLabel: { color: '#7F5E51', fontSize: 9.5, letterSpacing: 0.5 },
+    summaryLabel: { color: '#1A0A4A', fontSize: 9.5, letterSpacing: 0.5 },
     summaryValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 3 },
-    summaryUnit: { color: '#7F5E51', fontSize: 9, marginTop: 1 },
+    summaryUnit: { color: '#1A0A4A', fontSize: 9, marginTop: 1 },
 
     soldLine: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, fontStyle: 'italic', marginBottom: 10 },
 
@@ -225,15 +225,15 @@ const styles = StyleSheet.create({
     rankingBox: { gap: 7 },
     rankRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3 },
     rankRowPlayer: {
-        backgroundColor: 'rgba(89,146,198,0.08)',
+        backgroundColor: 'rgba(123,104,215,0.08)',
         borderRadius: 6,
         paddingHorizontal: 4,
         marginHorizontal: -4,
     },
-    rankNum: { color: '#7F5E51', fontSize: 10, width: 18, fontWeight: '700' },
+    rankNum: { color: '#1A0A4A', fontSize: 10, width: 18, fontWeight: '700' },
     rankName: { color: '#FFFFFF', fontSize: 11.5, flex: 1 },
-    rankSymbol: { color: '#7F5E51', fontSize: 9.5 },
-    rankTextPlayer: { color: '#5992C6', fontWeight: '800' },
+    rankSymbol: { color: '#1A0A4A', fontSize: 9.5 },
+    rankTextPlayer: { color: '#7B68D7', fontWeight: '800' },
     rankBarTrack: {
         width: 70,
         height: 4,
@@ -245,5 +245,5 @@ const styles = StyleSheet.create({
     rankBarFill: { height: '100%', borderRadius: 2 },
     rankShare: { color: 'rgba(255,255,255,0.48)', fontSize: 11, width: 52, textAlign: 'right', fontWeight: '600' },
 
-    footnote: { color: '#7F5E51', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
+    footnote: { color: '#1A0A4A', fontSize: 9.5, lineHeight: 14, marginTop: 12, fontStyle: 'italic' },
 });

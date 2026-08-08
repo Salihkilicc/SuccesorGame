@@ -12,7 +12,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.chronos.swiss',
             category: 'WATCH',
             description: 'Heritage and investment.',
-            bannerColor: '#E9B8C9',
+            bannerColor: '#C734CA',
             emoji: '⌚',
         },
         {
@@ -21,7 +21,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.avantgarde.luxury',
             category: 'WATCH',
             description: 'Engineering insanity.',
-            bannerColor: '#E06B6B',
+            bannerColor: '#C836CA',
             emoji: '🎨',
         },
         {
@@ -30,7 +30,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.legacytime.auction',
             category: 'WATCH',
             description: 'History for sale.',
-            bannerColor: '#E9B8C9',
+            bannerColor: '#C734CA',
             emoji: '🏆',
         },
         {
@@ -39,7 +39,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.genevaatelier.ch',
             category: 'WATCH',
             description: 'Bespoke brilliance.',
-            bannerColor: '#0A2A92',
+            bannerColor: '#6004BD',
             emoji: '💎',
         },
         // Removed low-end shops to maintain exclusivity

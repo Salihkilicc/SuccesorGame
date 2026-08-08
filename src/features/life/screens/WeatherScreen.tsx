@@ -36,7 +36,7 @@ const WeatherScreen = () => {
         <View style={styles.root}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#31241F', '#31241F', '#31241F']}
+                colors={['#020626', '#020626', '#020626']}
                 locations={[0, 0.5, 1]}
                 style={StyleSheet.absoluteFill}
             />
@@ -72,12 +72,12 @@ const WeatherScreen = () => {
                 <View style={styles.mainContent}>
                     {loading ? (
                         <View style={styles.centerBox}>
-                            <ActivityIndicator size="large" color="rgba(89,146,198,0.9)" />
+                            <ActivityIndicator size="large" color="rgba(123,104,215,0.9)" />
                             <Text style={styles.statusText}>{t('life.detectingLocation')}</Text>
                         </View>
                     ) : error ? (
                         <View style={styles.centerBox}>
-                            <MaterialCommunityIcons name="weather-cloudy-alert" size={64} color="rgba(233,184,201,0.7)" />
+                            <MaterialCommunityIcons name="weather-cloudy-alert" size={64} color="rgba(199,52,202,0.7)" />
                             <Text style={styles.errorText}>{error}</Text>
                         </View>
                     ) : (
@@ -123,7 +123,7 @@ export default WeatherScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     safeArea: {
         flex: 1,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     errorText: {
-        color: 'rgba(233,184,201,0.9)',
+        color: 'rgba(199,52,202,0.9)',
         fontSize: 15,
         textAlign: 'center',
         letterSpacing: 0.3,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
         padding: 36,
         alignItems: 'center',
-        shadowColor: '#0A2A92',
+        shadowColor: '#6004BD',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.15,
         shadowRadius: 40,
@@ -285,9 +285,9 @@ const styles = StyleSheet.create({
         borderRadius: 14,
     },
     forecastDayFirst: {
-        backgroundColor: 'rgba(89,146,198,0.12)',
+        backgroundColor: 'rgba(123,104,215,0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(89,146,198,0.18)',
+        borderColor: 'rgba(123,104,215,0.18)',
     },
     forecastDayLabel: {
         color: 'rgba(255,255,255,0.45)',
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     forecastDayLabelToday: {
-        color: 'rgba(89,146,198,0.9)',
+        color: 'rgba(123,104,215,0.9)',
     },
     forecastEmoji: {
         fontSize: 20,

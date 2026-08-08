@@ -25,7 +25,7 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => onNavigate('LAB')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(89,146,198,0.15)' }]}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(123,104,215,0.15)' }]}>
                         <Text style={styles.cardIcon}>🧪</Text>
                     </View>
                     <View style={styles.cardContent}>
@@ -40,7 +40,7 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => (navigation as any).navigate('TechTree')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(233,184,201,0.15)' }]}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(199,52,202,0.15)' }]}>
                         <Text style={styles.cardIcon}>🧬</Text>
                     </View>
                     <View style={styles.cardContent}>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,

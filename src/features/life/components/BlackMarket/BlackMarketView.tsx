@@ -24,14 +24,14 @@ interface BlackMarketViewProps {
 // --- CONSTANTS ---
 
 const COLORS = {
-    background: '#31241F',
-    bloodRed: '#E9B8C9',
-    neonRed: '#E9B8C9',
-    darkGray: '#31241F',
+    background: '#020626',
+    bloodRed: '#C734CA',
+    neonRed: '#C734CA',
+    darkGray: '#020626',
     textPrimary: '#FFFFFF',
     textSecondary: 'rgba(255,255,255,0.48)',
-    gold: '#E9B8C9',
-    locked: '#42312A'
+    gold: '#C734CA',
+    locked: '#07062E'
 };
 
 // --- COMPONENT ---
@@ -172,10 +172,10 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#7F5E51',
-            2: '#E9B8C9',
-            3: '#E9B8C9',
-            4: '#E9B8C9'
+            1: '#1A0A4A',
+            2: '#C734CA',
+            3: '#C734CA',
+            4: '#C734CA'
         };
         return colors[tier] || colors[1];
     };
@@ -226,7 +226,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
                                         data.suspicion > 80
                                             ? COLORS.neonRed
                                             : data.suspicion > 50
-                                                ? '#E9B8C9'
+                                                ? '#C734CA'
                                                 : COLORS.bloodRed,
                                     transform: [{ scale: data.suspicion > 60 ? pulseAnim : 1 }]
                                 }
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     lockedCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderColor: COLORS.locked,
         opacity: 0.6
     },
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     lockOverlay: {
         marginTop: 10,
         padding: 8,
-        backgroundColor: 'rgba(233,184,201,0.2)',
+        backgroundColor: 'rgba(199,52,202,0.2)',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: COLORS.bloodRed

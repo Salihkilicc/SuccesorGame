@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     },
     gridCardOwned: {
         borderColor: theme.colors.success,
-        backgroundColor: 'rgba(89,146,198,0.1)',
+        backgroundColor: 'rgba(123,104,215,0.1)',
     },
     gridCardPressed: {
         backgroundColor: theme.colors.card,

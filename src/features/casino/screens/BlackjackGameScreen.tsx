@@ -30,7 +30,7 @@ const BlackjackGameScreen = () => {
   const renderCard = (card: Card, idx: number) => (
     <View key={`${card.rank}${card.suit}-${idx}`} style={styles.card}>
       <Text style={styles.cardRank}>{card.rank}</Text>
-      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E9B8C9' : '#FFFFFF' }]}>
+      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#C734CA' : '#FFFFFF' }]}>
         {card.suit}
       </Text>
     </View>
@@ -157,7 +157,7 @@ const BlackjackGameScreen = () => {
 export default BlackjackGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#31241F' },
+  container: { flex: 1, backgroundColor: '#020626' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 10, fontWeight: '600' },
 
   handCard: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -182,14 +182,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2
   },
-  hiddenCard: { backgroundColor: '#533D35', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#31241F' },
+  hiddenCard: { backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#020626' },
   cardSuit: { fontSize: 20 },
 
   tableCenter: { alignItems: 'center', paddingVertical: 10 },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     minWidth: 90,
     alignItems: 'center'
   },
-  hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(89,146,198,0.1)' },
-  standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' },
+  hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(123,104,215,0.1)' },
+  standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' },
   gameBtnText: { color: '#FFFFFF', fontWeight: '900' }
 });

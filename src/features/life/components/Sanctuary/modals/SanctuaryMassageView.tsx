@@ -117,7 +117,7 @@ export default SanctuaryMassageView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     vipBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#E9B8C920',
+        backgroundColor: '#C734CA20',
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     optionCard: {
-        backgroundColor: '#31241F', // Deep Ocean Blue
+        backgroundColor: '#020626', // Deep Ocean Blue
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        shadowColor: '#5992C6',
+        shadowColor: '#7B68D7',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
@@ -211,10 +211,10 @@ const styles = StyleSheet.create({
     optionCardVIP: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#31241F', // Deep Ocean Blue
+        backgroundColor: '#020626', // Deep Ocean Blue
     },
     optionCardPressed: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         transform: [{ scale: 0.98 }],
     },
     optionHeader: {
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     },
     statText: {
         fontSize: 12,
-        color: '#5992C6', // Green
+        color: '#7B68D7', // Green
         fontWeight: '600',
     },
     healthText: {
-        color: '#0A2A92', // Blue
+        color: '#6004BD', // Blue
     },
 });

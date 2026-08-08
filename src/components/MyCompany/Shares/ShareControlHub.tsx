@@ -41,7 +41,7 @@ interface Props {
 const BreakLine = ({ label, value, bold, negative }: { label: string; value: string; bold?: boolean; negative?: boolean }) => (
     <View style={styles.breakRow}>
         <Text style={[styles.breakLabel, bold && styles.breakBold]}>{label}</Text>
-        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#E9B8C9' }]}>
+        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#C734CA' }]}>
             {value}
         </Text>
     </View>
@@ -150,13 +150,13 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             styles.controlBanner,
                             {
                                 backgroundColor:
-                                    control === 'lost' ? 'rgba(233,184,201,0.12)'
-                                        : control === 'contested' ? 'rgba(233,184,201,0.12)'
-                                            : 'rgba(89,146,198,0.10)',
+                                    control === 'lost' ? 'rgba(199,52,202,0.12)'
+                                        : control === 'contested' ? 'rgba(199,52,202,0.12)'
+                                            : 'rgba(123,104,215,0.10)',
                                 borderColor:
-                                    control === 'lost' ? 'rgba(233,184,201,0.35)'
-                                        : control === 'contested' ? 'rgba(233,184,201,0.35)'
-                                            : 'rgba(89,146,198,0.30)',
+                                    control === 'lost' ? 'rgba(199,52,202,0.35)'
+                                        : control === 'contested' ? 'rgba(199,52,202,0.35)'
+                                            : 'rgba(123,104,215,0.30)',
                             },
                         ]}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -177,11 +177,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
                                     styles.changeBadge,
-                                    { backgroundColor: companyDailyChange >= 0 ? '#5992C620' : '#E9B8C920' }
+                                    { backgroundColor: companyDailyChange >= 0 ? '#7B68D720' : '#C734CA20' }
                                 ]}>
                                     <Text style={[
                                         styles.changeBadgeText,
-                                        { color: companyDailyChange >= 0 ? '#5992C6' : '#E9B8C9' }
+                                        { color: companyDailyChange >= 0 ? '#7B68D7' : '#C734CA' }
                                     ]}>
                                         {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
                                     </Text>
@@ -256,7 +256,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 onPress={onOpenIPO}
                                 activeOpacity={0.7}
                             >
-                                <View style={[styles.actionIconBox, { backgroundColor: '#0A2A9220' }]}>
+                                <View style={[styles.actionIconBox, { backgroundColor: '#6004BD20' }]}>
                                     <Text style={styles.actionIcon}>🔔</Text>
                                 </View>
                                 <View style={styles.actionContent}>
@@ -290,7 +290,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#0A2A9220' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#6004BD20' }]}>
                                 <Text style={styles.actionIcon}>📈</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -309,7 +309,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#E9B8C920' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#C734CA20' }]}>
                                 <Text style={styles.actionIcon}>📉</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -373,7 +373,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#5992C620' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#7B68D720' }]}>
                                 <Text style={styles.actionIcon}>💼</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -396,7 +396,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#5992C620' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#7B68D720' }]}>
                                 <Text style={styles.actionIcon}>💰</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -432,12 +432,12 @@ const styles = StyleSheet.create({
     controlShares: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '700' },
     controlNote: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
-    heroNote: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    heroNote: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
-        backgroundColor: 'rgba(89,146,198,0.10)', borderRadius: 8,
+        backgroundColor: 'rgba(123,104,215,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
     },
-    dampText: { color: '#5992C6', fontSize: 10, lineHeight: 14, fontWeight: '600' },
+    dampText: { color: '#7B68D7', fontSize: 10, lineHeight: 14, fontWeight: '600' },
 
     breakdownCard: {
         backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,
@@ -450,11 +450,11 @@ const styles = StyleSheet.create({
     breakValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
     breakBold: { fontWeight: '800', fontSize: 13 },
     breakDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
-    breakdownNote: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
+    breakdownNote: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
 
     container: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     header: {
         flexDirection: 'row',
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#31241F',
+        borderBottomColor: '#020626',
     },
     backButton: {
         paddingVertical: 8,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#0A2A92',
+        color: '#6004BD',
         fontWeight: '600',
     },
     headerTitle: {
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     heroCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 24,
         marginTop: 20,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     statCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         width: '48%',
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     actionRow: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
     },
     actionArrow: {
         fontSize: 28,
-        color: '#533D35',
+        color: '#0B0635',
         fontWeight: '300',
     },
     textDisabled: {
-        color: '#533D35',
+        color: '#0B0635',
     },
 });
 

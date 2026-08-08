@@ -84,7 +84,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
                     {deal.tier === 4 && (
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>{t('life.highSociety2')}</Text>
-                            <Text style={[styles.statGain, { color: '#E9B8C9' }]}>+5</Text>
+                            <Text style={[styles.statGain, { color: '#C734CA' }]}>+5</Text>
                         </View>
                     )}
                 </View>
@@ -140,23 +140,23 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#E9B8C9',
+        color: '#C734CA',
         marginBottom: 30,
-        textShadowColor: '#E9B8C9',
+        textShadowColor: '#C734CA',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
         fontFamily: 'Courier New'
     },
     card: {
         width: '100%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 30,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     drugIconContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#31241F'
+        backgroundColor: '#020626'
     },
     icon: {
         fontSize: 48
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     divider: {
         width: '100%',
         height: 1,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         marginBottom: 20
     },
     statsContainer: {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     statLabel: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontSize: 14
     },
     statValue: {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     statGain: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 14,
         fontWeight: 'bold'
     },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     passButton: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
@@ -245,17 +245,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     buyButton: {
-        backgroundColor: '#5992C6', // Green
+        backgroundColor: '#7B68D7', // Green
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
     consumeButton: {
-        backgroundColor: '#533D35', // Red-ish
+        backgroundColor: '#0B0635', // Red-ish
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)'
     },
     disabledButton: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         marginTop: 2
     },
     warningText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         marginTop: 15,
         fontWeight: 'bold',
         letterSpacing: 1

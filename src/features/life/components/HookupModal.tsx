@@ -135,7 +135,7 @@ export function HookupModal({
                 <AppLaunchLoader
                     appName="Hookup"
                     appIcon={<MaterialCommunityIcons name="fire" size={64} color="#FFFFFF" />}
-                    backgroundColor="#31241F"
+                    backgroundColor="#020626"
                 >
                     <View style={styles.backdrop}>
 
@@ -239,14 +239,14 @@ export function HookupModal({
                         {/* MATCHED OVERLAY */}
                         {matchStatus === 'MATCHED' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#5992C6' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#7B68D7' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.itSAMatch')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         You and {candidate.name} passed the vibe check.
                                     </Text>
 
                                     <View style={styles.overlayAvatarRow}>
-                                        <View style={[styles.smallAvatar, { backgroundColor: '#533D35' }]}>
+                                        <View style={[styles.smallAvatar, { backgroundColor: '#0B0635' }]}>
                                             <Text style={{ fontSize: 40 }}>😎</Text>
                                         </View>
                                         <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
@@ -271,7 +271,7 @@ export function HookupModal({
                         {/* GHOSTED OVERLAY */}
                         {matchStatus === 'NO_MATCH' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#533D35' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#0B0635' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.ghosted')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         {candidate.name} wasn't interested...
@@ -331,17 +331,17 @@ const styles = StyleSheet.create({
     likeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     nopeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#31241F', // Slightly lighter than pure black/card
+        backgroundColor: '#020626', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -399,15 +399,15 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     chip: {
-        backgroundColor: 'rgba(89,146,198,0.15)', // Accent soft
+        backgroundColor: 'rgba(123,104,215,0.15)', // Accent soft
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(89,146,198,0.3)',
+        borderColor: 'rgba(123,104,215,0.3)',
     },
     chipText: {
-        color: '#0A2A92',
+        color: '#6004BD',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -431,8 +431,8 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#42312A',
-        shadowColor: '#31241F',
+        backgroundColor: '#07062E',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
         padding: 30,
         borderRadius: 24,
         alignItems: 'center',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     keepPlayingText: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontWeight: '800',
         textAlign: 'center',
         fontSize: 16,

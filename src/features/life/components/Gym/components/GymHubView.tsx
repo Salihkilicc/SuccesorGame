@@ -51,9 +51,9 @@ const GymHubView = ({
                             {[0, 1, 2, 3, 4].map((segment) => {
                                 const segmentValue = segment * 20;
                                 const isActive = (100 - fatigue) > segmentValue;
-                                let segmentColor = '#5992C6'; // Green
-                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#E9B8C9'; // Orange
-                                if (fatigue > 80) segmentColor = '#E9B8C9'; // Red
+                                let segmentColor = '#7B68D7'; // Green
+                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#C734CA'; // Orange
+                                if (fatigue > 80) segmentColor = '#C734CA'; // Red
 
                                 return (
                                     <View
@@ -148,9 +148,9 @@ const GymHubView = ({
 const getBodyTypeColor = (bodyType: string): string => {
     const colors: Record<string, string> = {
         'Skinny': 'rgba(255,255,255,0.48)',
-        'Fit': '#5992C6',
-        'Muscular': '#E9B8C9',
-        'Godlike': '#E9B8C9'
+        'Fit': '#7B68D7',
+        'Muscular': '#C734CA',
+        'Godlike': '#C734CA'
     };
     return colors[bodyType] || '#FFFFFF';
 };
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         borderWidth: 0,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4
     },
     statLabel: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 0.3
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     fatigueText: {
-        color: '#31241F',
+        color: '#020626',
         fontSize: 14,
         fontWeight: '700',
         width: 45,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 2,
     },
     sectionTitle: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontWeight: '800',
         marginTop: 30,
         marginBottom: 15,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         borderWidth: 0,
-        shadowColor: '#0A2A92',
+        shadowColor: '#6004BD',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     icon: { fontSize: 36, marginBottom: 10 },
-    cardLabel: { color: '#31241F', fontWeight: '700', fontSize: 15 },
+    cardLabel: { color: '#020626', fontWeight: '700', fontSize: 15 },
     maList: { gap: 10 },
     maCard: {
         paddingVertical: 18,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,
@@ -294,14 +294,14 @@ const styles = StyleSheet.create({
     maIcon: {
         fontSize: 24
     },
-    maLabel: { color: '#31241F', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
+    maLabel: { color: '#020626', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
     maBelt: { color: 'rgba(255,255,255,0.48)', fontSize: 14, fontWeight: '600' },
     modifierBtn: {
         padding: 20,
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     modContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modLabel: { color: '#0A2A92', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
+    modLabel: { color: '#6004BD', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
     changeText: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600' },
 });
 

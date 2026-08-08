@@ -46,14 +46,14 @@ type HomeNavProp = CompositeNavigationProp<
 
 
 const GRADIENTS = {
-  purplePink: ['#0A2A92', '#0A2A92'],
-  pinkRed: ['#E9B8C9', '#E9B8C9'],
-  orangeYellow: ['#E9B8C9', '#E9B8C9'],
-  blueSky: ['#5992C6', '#5992C6'],
-  bluePurple: ['#5992C6', '#0A2A92'],
-  darkGrey: ['#31241F', '#674C41'],
-  networkBlue: ['#0A2A92', '#5992C6'],
-  tealCyan: ['#5992C6', '#5992C6'],
+  purplePink: ['#6004BD', '#6004BD'],
+  pinkRed: ['#C734CA', '#C734CA'],
+  orangeYellow: ['#C734CA', '#C734CA'],
+  blueSky: ['#7B68D7', '#7B68D7'],
+  bluePurple: ['#7B68D7', '#6004BD'],
+  darkGrey: ['#020626', '#11063D'],
+  networkBlue: ['#6004BD', '#7B68D7'],
+  tealCyan: ['#7B68D7', '#7B68D7'],
 };
 
 // Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
@@ -285,7 +285,7 @@ const HomeScreen = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#31241F' }}>
+    <View style={{ flex: 1, backgroundColor: '#020626' }}>
       <ImageBackground
         source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
         style={StyleSheet.absoluteFill}
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#E9B8C9', '#E9B8C9', '#533D35']}
+                colors={['#C734CA', '#C734CA', '#0B0635']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,7 +367,7 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#E9B8C9', '#E9B8C9', '#533D35']}
+                colors={['#C734CA', '#C734CA', '#0B0635']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -391,7 +391,7 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#31241F', '#31241F', '#5992C6']}
+                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#7B68D7']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#31241F', '#31241F', '#5992C6']}
+                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#7B68D7']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
     marginBottom: 4,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#31241F', // Dark gold shadow
+    shadowColor: '#020626', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
   },
   gender: {
     fontSize: 13,
-    color: '#5992C6',
+    color: '#7B68D7',
   },
   premiumTag: {
     marginLeft: theme.spacing.xs,
@@ -669,17 +669,17 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 11,
     letterSpacing: 0.1,
   },
   ageChips: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(233,184,201,0.12)',
+    backgroundColor: 'rgba(199,52,202,0.12)',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(233,184,201,0.25)',
+    borderColor: 'rgba(199,52,202,0.25)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 8,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   ageChipLabel: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#5992C6',
+    color: '#7B68D7',
     letterSpacing: 1,
   },
   ageChipValue: {
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
   ageChipDivider: {
     width: 1,
     height: 22,
-    backgroundColor: 'rgba(233,184,201,0.3)',
+    backgroundColor: 'rgba(199,52,202,0.3)',
   },
   // --- Legacy stubs ---
   ageRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
   ageValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
   monthBadge: { color: theme.colors.accent, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
   nextMonthButton: {
-    shadowColor: '#31241F', // Dark gold shadow
+    shadowColor: '#020626', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8, // Increased opacity for better glow
     shadowRadius: 12,
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     letterSpacing: 4,
     textTransform: 'uppercase',
     textAlign: 'center',
-    textShadowColor: 'rgba(233,184,201,0.4)', // Softer glow
+    textShadowColor: 'rgba(199,52,202,0.4)', // Softer glow
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 6,
   },
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -860,13 +860,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     gap: theme.spacing.sm,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
@@ -928,13 +928,13 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
     gap: theme.spacing.md,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
@@ -970,7 +970,7 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
   },
   entryLove: {
     flex: 1,
-    backgroundColor: '#533D35',
+    backgroundColor: '#0B0635',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -987,12 +987,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   entryTitleDark: {
-    color: '#31241F',
+    color: '#020626',
     fontSize: (theme.typography.subtitle + 2) * 0.9,
     fontWeight: '800',
   },
   entrySubtitleDark: {
-    color: '#674C41',
+    color: '#11063D',
     marginTop: 4 * 0.9,
     fontSize: (theme.typography.caption + 1) * 0.9,
   },
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   restartButtonText: {
-    color: '#31241F',
+    color: '#020626',
     fontWeight: '800',
     fontSize: 16,
   },
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 33,
     borderWidth: 0,
-    shadowColor: '#5992C6',
+    shadowColor: '#7B68D7',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 20,

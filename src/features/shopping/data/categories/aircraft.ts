@@ -12,7 +12,7 @@ export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.elitas.aero',
             category: 'AIRCRAFT',
             description: 'Your palace in the clouds.',
-            bannerColor: '#0A2A92',
+            bannerColor: '#6004BD',
             emoji: '✈️',
         },
         {
@@ -21,7 +21,7 @@ export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.mach1defense.mil',
             category: 'AIRCRAFT',
             description: 'Supersonic superiority.',
-            bannerColor: '#674C41',
+            bannerColor: '#11063D',
             emoji: '🚀',
         },
         {
@@ -30,7 +30,7 @@ export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.cloud9copters.com',
             category: 'AIRCRAFT',
             description: 'Vertical luxury.',
-            bannerColor: '#5FB37A',
+            bannerColor: '#C8C0EF',
             emoji: '🚁',
         },
     ],

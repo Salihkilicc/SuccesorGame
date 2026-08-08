@@ -45,7 +45,7 @@ const GymScreen = () => {
         <AppLaunchLoader
             appName="Gym"
             appIcon={<MaterialCommunityIcons name="dumbbell" size={64} color="#FFFFFF" />}
-            backgroundColor="#31241F"
+            backgroundColor="#020626"
         >
             <View style={styles.container}>
                 {/* LAYER 1: Hub (Always Rendered) */}
@@ -67,7 +67,7 @@ const GymScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     baseLayer: {
         flex: 1,

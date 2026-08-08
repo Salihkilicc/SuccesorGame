@@ -73,18 +73,18 @@ export const PercentageSelector = ({
 
                 {/* 1. Satır: AZALTMA (Kırmızı/Turuncu Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("MIN", () => update('min', 0), '#42312A', '#E9B8C9')}
-                    {renderBtn("-50%", () => update('percent', -50), '#533D35', '#E9B8C9')}
-                    {renderBtn("-10%", () => update('percent', -10), '#E9B8C9', '#E9B8C9')}
-                    {renderBtn("-5%", () => update('percent', -5), '#E9B8C9', '#E9B8C9')}
+                    {renderBtn("MIN", () => update('min', 0), '#07062E', '#C734CA')}
+                    {renderBtn("-50%", () => update('percent', -50), '#0B0635', '#C734CA')}
+                    {renderBtn("-10%", () => update('percent', -10), '#C734CA', '#C734CA')}
+                    {renderBtn("-5%", () => update('percent', -5), '#C734CA', '#C734CA')}
                 </View>
 
                 {/* 2. Satır: ARTIRMA (Yeşil/Mavi Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("+5%", () => update('percent', 5), '#42312A', '#5992C6')}
-                    {renderBtn("+10%", () => update('percent', 10), '#42312A', '#5992C6')}
-                    {renderBtn("+50%", () => update('percent', 50), '#533D35', '#5992C6')}
-                    {renderBtn("MAX", () => update('max', 0), '#42312A', '#533D35')}
+                    {renderBtn("+5%", () => update('percent', 5), '#07062E', '#7B68D7')}
+                    {renderBtn("+10%", () => update('percent', 10), '#07062E', '#7B68D7')}
+                    {renderBtn("+50%", () => update('percent', 50), '#0B0635', '#7B68D7')}
+                    {renderBtn("MAX", () => update('max', 0), '#07062E', '#0B0635')}
                 </View>
 
             </View>
@@ -94,7 +94,7 @@ export const PercentageSelector = ({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#31241F', // Koyu Kart Rengi
+        backgroundColor: '#020626', // Koyu Kart Rengi
         padding: 12,
         borderRadius: 12,
         borderWidth: 1,
@@ -109,12 +109,12 @@ const styles = StyleSheet.create({
     },
     label: { color: 'rgba(255,255,255,0.48)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
     value: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' },
-    unit: { fontSize: 12, color: '#5992C6', fontWeight: 'normal' },
+    unit: { fontSize: 12, color: '#7B68D7', fontWeight: 'normal' },
 
     // Bar Stilleri
     barTrack: {
         height: 6,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 3,
         overflow: 'hidden',
     },
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
         marginBottom: 10
     },
-    limitText: { fontSize: 10, color: '#5992C6' },
+    limitText: { fontSize: 10, color: '#7B68D7' },
 
     // Buton Stilleri
     controls: { gap: 6 },

@@ -213,7 +213,7 @@ const LaboratoryScreen = () => {
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
-                        <Text style={{ color: '#5992C6', fontWeight: '800' }}>
+                        <Text style={{ color: '#7B68D7', fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
                         </Text>{' '}
                         per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
@@ -225,9 +225,9 @@ const LaboratoryScreen = () => {
                         onChange={setTempCount}
                         max={facility.capacity}
                         unit="researchers"
-                        markers={[{ value: researcherCount, label: 'Now', color: '#5992C6' }]}
+                        markers={[{ value: researcherCount, label: 'Now', color: '#7B68D7' }]}
                         steps={[1, 10, 100]}
-                        fillColor={canAfford ? '#5992C6' : '#E9B8C9'}
+                        fillColor={canAfford ? '#7B68D7' : '#C734CA'}
                     />
 
                     {/* Summary & Confirm */}
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
     },
     maxTierBadge: {
-        backgroundColor: 'rgba(233,184,201,0.1)',
+        backgroundColor: 'rgba(199,52,202,0.1)',
         padding: 12,
         borderRadius: 12,
         alignItems: 'center',
     },
     maxTierText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 14,
         fontWeight: '700',
     },

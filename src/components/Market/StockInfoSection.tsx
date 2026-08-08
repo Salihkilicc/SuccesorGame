@@ -80,15 +80,15 @@ const styles = StyleSheet.create({
   },
   sentimentChip: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(233,184,201,0.10)',
+    backgroundColor: 'rgba(199,52,202,0.10)',
     borderRadius: 999,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: 'rgba(233,184,201,0.3)',
+    borderColor: 'rgba(199,52,202,0.3)',
   },
   sentimentText: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontSize: theme.typography.caption + 1,
   },
 });

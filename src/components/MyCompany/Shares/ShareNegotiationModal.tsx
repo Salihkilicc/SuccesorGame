@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     activeTabText: {
-        color: '#31241F',
+        color: '#020626',
     },
     section: {
         marginBottom: theme.spacing.lg,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.success,
     },
     mainBtnText: {
-        color: '#31241F',
+        color: '#020626',
         fontWeight: '800',
     },
     resultContent: {

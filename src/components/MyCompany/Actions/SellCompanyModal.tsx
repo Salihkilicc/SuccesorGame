@@ -35,9 +35,9 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     const successChance = Math.max(0, rawChance) * 100;
 
     // Color Logic
-    let chanceColor = '#E9B8C9'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#5992C6'; // Green
-    else if (successChance >= 40) chanceColor = '#E9B8C9'; // Yellow
+    let chanceColor = '#C734CA'; // Red (< 40%)
+    if (successChance >= 70) chanceColor = '#7B68D7'; // Green
+    else if (successChance >= 40) chanceColor = '#C734CA'; // Yellow
 
     const formatMoney = (amount: number) => {
         return formatMoneyExact(amount);
@@ -159,12 +159,12 @@ const styles = StyleSheet.create({
     },
     container: {
         width: '100%',
-        backgroundColor: '#31241F', // Dark Gray
+        backgroundColor: '#020626', // Dark Gray
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     valuationContainer: {
         alignItems: 'center',
         marginBottom: 24,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 12,
         borderRadius: 12,
     },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     incrementBtn: {
-        backgroundColor: '#42312A', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        backgroundColor: '#07062E', // Keep uniform dark, maybe blue tint? Sticking to dark.
         borderColor: 'rgba(255,255,255,0.06)', // Green border for positive
     },
     controlBtnText: {
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     },
     markupText: {
         fontSize: 12,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontStyle: 'italic',
     },
     actionButtons: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         alignItems: 'center',
     },
     cancelBtnText: {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     submitBtnText: {
-        color: '#31241F',
+        color: '#020626',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,

@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   ownedText: {
     fontSize: theme.typography.caption,
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontWeight: '600',
     marginTop: -8,
   },
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sellButton: {
-    backgroundColor: '#533D35',
+    backgroundColor: '#0B0635',
   },
   buyButton: {
-    backgroundColor: '#5992C6',
+    backgroundColor: '#7B68D7',
   },
   sellText: {
     fontSize: theme.typography.body,
@@ -204,6 +204,6 @@ const styles = StyleSheet.create({
   buyText: {
     fontSize: theme.typography.body,
     fontWeight: '800',
-    color: '#31241F',
+    color: '#020626',
   },
 });

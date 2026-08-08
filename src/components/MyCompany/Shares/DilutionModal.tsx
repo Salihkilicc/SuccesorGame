@@ -135,7 +135,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>💵 Cash Raised</Text>
-                                <Text style={[styles.impactValue, { color: '#5992C6' }]}>
+                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
                                     +{formatMoney(capitalRaised)}
                                 </Text>
                             </View>
@@ -143,7 +143,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
                                 <Text style={[
                                     styles.impactValue,
-                                    { color: newOwnership < 50 ? '#E9B8C9' : '#E9B8C9' }
+                                    { color: newOwnership < 50 ? '#C734CA' : '#C734CA' }
                                 ]}>
                                     {currentOwnership.toFixed(1)}% → {newOwnership.toFixed(1)}%
                                 </Text>
@@ -156,7 +156,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                             <View style={styles.stockWarningContent}>
                                 <Text style={styles.stockWarningTitle}>{t('equity.stockPriceImpact')}</Text>
                                 <Text style={styles.stockWarningText}>
-                                    Est. Price Drop: <Text style={{ color: '#E9B8C9', fontWeight: '700' }}>
+                                    Est. Price Drop: <Text style={{ color: '#C734CA', fontWeight: '700' }}>
                                         -{(predictedDrop * 100).toFixed(1)}%
                                     </Text>
                                 </Text>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -230,16 +230,16 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     warningBanner: {
-        backgroundColor: 'rgba(233,184,201,0.15)',
+        backgroundColor: 'rgba(199,52,202,0.15)',
         borderRadius: 12,
         padding: 12,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#E9B8C940',
+        borderColor: '#C734CA40',
     },
     warningBannerText: {
         fontSize: 13,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
     },
     valueContainer: {
         alignItems: 'center',
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     impactSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     stockWarningBox: {
-        backgroundColor: 'rgba(233,184,201,0.15)',
+        backgroundColor: 'rgba(199,52,202,0.15)',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     stockWarningTitle: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#E9B8C9',
+        color: '#C734CA',
         marginBottom: 4,
     },
     stockWarningText: {
@@ -362,19 +362,19 @@ const styles = StyleSheet.create({
     stockWarningValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     criticalBox: {
-        backgroundColor: '#E9B8C920',
+        backgroundColor: '#C734CA20',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#E9B8C940',
+        borderColor: '#C734CA40',
     },
     criticalText: {
         fontSize: 14,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     },
     authorizeButton: {
         flex: 1,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     authorizeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#31241F',
+        color: '#020626',
     },
 });
 

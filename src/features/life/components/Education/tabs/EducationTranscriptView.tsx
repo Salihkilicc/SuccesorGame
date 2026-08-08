@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#674C41',
+        color: '#11063D',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#0A2A92',
+        color: '#6004BD',
     },
     subtitle: {
         fontSize: 12,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         marginTop: 2,
     },
     scrollContent: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         alignItems: 'center',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -167,14 +167,14 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#0A2A92',
+        color: '#6004BD',
         marginBottom: 8,
     },
     multiplierHint: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#0A2A92',
+        color: '#6004BD',
         marginBottom: 16,
     },
     emptyState: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -238,16 +238,16 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#020626',
     },
     degreeType: {
         fontSize: 14,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontWeight: '600',
     },
     degreeBonus: {
         fontSize: 14,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '700',
     },
 });

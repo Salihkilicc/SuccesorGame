@@ -67,11 +67,11 @@ type LineProps = {
 
 const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanation, hint }: LineProps) => {
   const color = emphasis
-    ? (amount >= 0 ? '#5FB37A' : '#E06B6B')
+    ? (amount >= 0 ? '#C8C0EF' : '#C836CA')
     : negative
-      ? '#E9B8C9'
+      ? '#C734CA'
       : subtotal
-        ? '#E9B8C9'
+        ? '#C734CA'
         : '#FFFFFF';
 
   return (
@@ -318,7 +318,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
         <Text style={styles.productName} numberOfLines={1}>{p.name}</Text>
         <View style={styles.productHeadRight}>
           <Text style={styles.productShareMini}>{(p.marketShare ?? 0).toFixed(2)}%</Text>
-          <Text style={[styles.productProfit, { color: p.profit >= 0 ? '#5FB37A' : '#E06B6B' }]}>
+          <Text style={[styles.productProfit, { color: p.profit >= 0 ? '#C8C0EF' : '#C836CA' }]}>
             {formatSignedMoney(p.profit)}
           </Text>
           <Text style={[styles.productChevron, open && styles.productChevronOpen]}>⌄</Text>
@@ -377,17 +377,17 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.sold')}</Text>
-              <Text style={[styles.productStatValue, { color: '#5992C6' }]}>{formatNumber(p.sold)}</Text>
+              <Text style={[styles.productStatValue, { color: '#7B68D7' }]}>{formatNumber(p.sold)}</Text>
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
-              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#E9B8C9' : 'rgba(255,255,255,0.48)' }]}>
+              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#C734CA' : 'rgba(255,255,255,0.48)' }]}>
                 {formatNumber(p.unsold)}
               </Text>
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.stock')}</Text>
-              <Text style={[styles.productStatValue, { color: '#E9B8C9' }]}>{formatNumber(p.stock)}</Text>
+              <Text style={[styles.productStatValue, { color: '#C734CA' }]}>{formatNumber(p.stock)}</Text>
             </View>
           </View>
 
@@ -398,7 +398,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
                 {
                   width: `${Math.min(100, Math.max(0, p.sellThrough))}%`,
                   backgroundColor:
-                    p.sellThrough >= 60 ? '#5992C6' : p.sellThrough >= 30 ? '#E9B8C9' : '#E9B8C9',
+                    p.sellThrough >= 60 ? '#7B68D7' : p.sellThrough >= 30 ? '#C734CA' : '#C734CA',
                 },
               ]}
             />
@@ -485,9 +485,9 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
             {/* Net sonuc */}
-            <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#E9B8C9' : '#E06B6B' }]}>
+            <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#C734CA' : '#C836CA' }]}>
               <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
-              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#5FB37A' : '#E06B6B' }]}>
+              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#C8C0EF' : '#C836CA' }]}>
                 {formatSignedMoney(report.netProfit)}
               </Text>
               <Text style={styles.heroSub}>
@@ -502,7 +502,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.aStandardIncomeStatementRevenue')}
               infoDetail={t('company.tapTheNextToAny')} 
               summary={formatSignedMoney(report.netProfit)}
-              summaryColor={report.netProfit >= 0 ? '#5FB37A' : '#E06B6B'}
+              summaryColor={report.netProfit >= 0 ? '#C8C0EF' : '#C836CA'}
             >
               <View style={styles.statement}>
                 <StatementLine
@@ -688,7 +688,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
                   : 'fully served'
               }
-              summaryColor={report.totalUnmetDemand > 0 ? '#E9B8C9' : '#5992C6'}
+              summaryColor={report.totalUnmetDemand > 0 ? '#C734CA' : '#7B68D7'}
             >
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
@@ -697,7 +697,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.youSupplied")}</Text>
-                  <Text style={[styles.opsValue, { color: '#5992C6' }]}>
+                  <Text style={[styles.opsValue, { color: '#7B68D7' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -706,7 +706,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.totalUnmetDemand > 0 ? '#E9B8C9' : 'rgba(255,255,255,0.48)' },
+                      { color: report.totalUnmetDemand > 0 ? '#C734CA' : 'rgba(255,255,255,0.48)' },
                     ]}
                   >
                     {formatNumber(report.totalUnmetDemand)}
@@ -714,12 +714,12 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.brandValue")}</Text>
-                  <Text style={[styles.opsValue, { color: '#E9B8C9' }]}>
+                  <Text style={[styles.opsValue, { color: '#C734CA' }]}>
                     {(report.brandValue ?? 0).toFixed(1)}
                     <Text
                       style={{
                         fontSize: 11,
-                        color: report.brandChange >= 0 ? '#5992C6' : '#E9B8C9',
+                        color: report.brandChange >= 0 ? '#7B68D7' : '#C734CA',
                       }}
                     >
                       {'  '}
@@ -742,7 +742,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.sellThroughIsTheShare')}
               infoDetail={t('company.unsoldUnitsCarryIntoNext')} 
               summary={`${formatPercent(report.sellThrough)} sold`}
-              summaryColor={report.sellThrough >= 60 ? '#5992C6' : '#E9B8C9'}
+              summaryColor={report.sellThrough >= 60 ? '#7B68D7' : '#C734CA'}
             >
               {/* Tesis durumu — kapasite kullanimi oyuncunun bakacagi tek sayi */}
               <View style={styles.facilityBar}>
@@ -760,8 +760,8 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                       styles.facilityUtil,
                       {
                         color:
-                          report.utilization < 60 ? '#E9B8C9'
-                            : report.utilization > 95 ? '#E9B8C9' : '#5992C6',
+                          report.utilization < 60 ? '#C734CA'
+                            : report.utilization > 95 ? '#C734CA' : '#7B68D7',
                       },
                     ]}
                   >
@@ -775,7 +775,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.headcount')}</Text>
                   <Text style={[
                     styles.opsValue,
-                    report.headcount < report.crewRequired && { color: '#E9B8C9' },
+                    report.headcount < report.crewRequired && { color: '#C734CA' },
                   ]}>
                     {formatNumber(report.headcount)} / {formatNumber(report.crewRequired)}
                   </Text>
@@ -789,7 +789,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 {report.attrition > 0 && (
                   <View style={styles.opsCell}>
                     <Text style={styles.opsLabel}>{t('company.left')}</Text>
-                    <Text style={[styles.opsValue, { color: '#E9B8C9' }]}>
+                    <Text style={[styles.opsValue, { color: '#C734CA' }]}>
                       −{formatNumber(report.attrition)}
                     </Text>
                   </View>
@@ -798,7 +798,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.morale')}</Text>
                   <Text style={[
                     styles.opsValue,
-                    { color: report.employeeMorale < 50 ? '#E9B8C9' : report.employeeMorale < 70 ? '#E9B8C9' : '#5992C6' },
+                    { color: report.employeeMorale < 50 ? '#C734CA' : report.employeeMorale < 70 ? '#C734CA' : '#7B68D7' },
                   ]}>
                     {report.employeeMorale.toFixed(0)}
                     <Text style={styles.opsDelta}>
@@ -816,7 +816,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t('company.sold')}</Text>
-                  <Text style={[styles.opsValue, { color: '#5992C6' }]}>
+                  <Text style={[styles.opsValue, { color: '#7B68D7' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -825,7 +825,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.sellThrough >= 60 ? '#5992C6' : '#E9B8C9' },
+                      { color: report.sellThrough >= 60 ? '#7B68D7' : '#C734CA' },
                     ]}
                   >
                     {formatPercent(report.sellThrough)}
@@ -833,7 +833,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                  <Text style={[styles.opsValue, { color: '#E9B8C9' }]}>
+                  <Text style={[styles.opsValue, { color: '#C734CA' }]}>
                     {formatNumber(report.endingInventory)}
                   </Text>
                 </View>
@@ -859,10 +859,10 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                         {
                           backgroundColor:
                             note.tone === 'bad'
-                              ? '#E9B8C9'
+                              ? '#C734CA'
                               : note.tone === 'warn'
-                                ? '#E9B8C9'
-                                : '#5992C6',
+                                ? '#C734CA'
+                                : '#7B68D7',
                         },
                       ]}
                     />
@@ -909,7 +909,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
                   <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  <Text style={[styles.balanceValue, { color: '#0A2A92' }]}>
+                  <Text style={[styles.balanceValue, { color: '#6004BD' }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
                 </View>
@@ -947,10 +947,10 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 480,
     maxHeight: '92%',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(233,184,201,0.18)',
+    borderColor: 'rgba(199,52,202,0.18)',
     overflow: 'hidden',
   },
 
@@ -971,9 +971,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 5,
     borderRadius: 8,
-    backgroundColor: 'rgba(233,184,201,0.1)',
+    backgroundColor: 'rgba(199,52,202,0.1)',
   },
-  periodText: { color: '#E9B8C9', fontSize: 10, fontWeight: '700' },
+  periodText: { color: '#C734CA', fontSize: 10, fontWeight: '700' },
 
   scrollContent: { padding: 16, paddingBottom: 24 },
 
@@ -989,7 +989,7 @@ const styles = StyleSheet.create({
   heroSub: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 6 },
 
   sectionTitle: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 2,
@@ -1008,12 +1008,12 @@ const styles = StyleSheet.create({
   line: { paddingVertical: 9 },
   lineSubtotal: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(233,184,201,0.25)',
+    borderTopColor: 'rgba(199,52,202,0.25)',
     marginTop: 4,
   },
   lineEmphasis: {
     borderTopWidth: 2,
-    borderTopColor: 'rgba(233,184,201,0.5)',
+    borderTopColor: 'rgba(199,52,202,0.5)',
     marginTop: 6,
     paddingTop: 12,
   },
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   lineLabelStrong: { color: '#FFFFFF', fontWeight: '700' },
   lineAmount: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
   lineAmountBig: { fontSize: 20, fontWeight: '800' },
-  lineExplain: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
+  lineExplain: { color: '#1A0A4A', fontSize: 10.5, lineHeight: 15, marginTop: 3, paddingRight: 40 },
   lineHint: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, marginTop: 2, fontStyle: 'italic' },
 
   groupLabel: {
@@ -1037,7 +1037,7 @@ const styles = StyleSheet.create({
 
   cashDivider: {
     height: 1,
-    backgroundColor: '#42312A',
+    backgroundColor: '#07062E',
     marginVertical: 12,
   },
   cashHeader: {
@@ -1049,12 +1049,12 @@ const styles = StyleSheet.create({
   },
   cashWarn: {
     fontSize: 11,
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontWeight: '600',
     marginTop: 8,
     lineHeight: 16,
   },
-  footnote: { color: '#7F5E51', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
+  footnote: { color: '#1A0A4A', fontSize: 10, marginTop: 8, fontStyle: 'italic', lineHeight: 14 },
 
   opsDelta: { fontSize: 11, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
   facilityBar: {
@@ -1084,7 +1084,7 @@ const styles = StyleSheet.create({
   },
   noteRow: { flexDirection: 'row', alignItems: 'flex-start' },
   noteDot: { width: 6, height: 6, borderRadius: 3, marginTop: 5, marginRight: 9 },
-  noteText: { color: '#E9B8C9', fontSize: 11.5, lineHeight: 17, flex: 1 },
+  noteText: { color: '#C734CA', fontSize: 11.5, lineHeight: 17, flex: 1 },
 
   productCard: {
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -1100,9 +1100,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  productShareMini: { color: '#5992C6', fontSize: 11, fontWeight: '700' },
-  productChevron: { color: '#7F5E51', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
-  productChevronOpen: { color: '#E9B8C9', transform: [{ rotate: '180deg' }], marginTop: 3 },
+  productShareMini: { color: '#7B68D7', fontSize: 11, fontWeight: '700' },
+  productChevron: { color: '#1A0A4A', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
+  productChevronOpen: { color: '#C734CA', transform: [{ rotate: '180deg' }], marginTop: 3 },
   productName: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flex: 1 },
   productProfit: { fontSize: 14, fontWeight: '800', marginLeft: 10 },
   demandRow: {
@@ -1113,13 +1113,13 @@ const styles = StyleSheet.create({
   },
   demandText: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5 },
   demandStrong: { color: '#FFFFFF', fontWeight: '700' },
-  demandMiss: { color: '#E9B8C9', fontSize: 10.5, marginTop: 2, fontWeight: '600' },
+  demandMiss: { color: '#C734CA', fontSize: 10.5, marginTop: 2, fontWeight: '600' },
 
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
-  scrapLine: { fontSize: 9, color: '#E9B8C9', marginTop: 2 },
-  productSplit: { fontSize: 9, color: '#5992C6', marginTop: 2 },
-  productStatLabel: { color: '#7F5E51', fontSize: 9.5, letterSpacing: 0.5 },
+  scrapLine: { fontSize: 9, color: '#C734CA', marginTop: 2 },
+  productSplit: { fontSize: 9, color: '#7B68D7', marginTop: 2 },
+  productStatLabel: { color: '#1A0A4A', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginTop: 2 },
   sellThroughTrack: {
     height: 5,
@@ -1129,7 +1129,7 @@ const styles = StyleSheet.create({
   },
   sellThroughFill: { height: '100%', borderRadius: 3 },
   sellThroughLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, marginTop: 5 },
-  productEcon: { color: '#7F5E51', fontSize: 10, marginTop: 7, lineHeight: 15 },
+  productEcon: { color: '#1A0A4A', fontSize: 10, marginTop: 7, lineHeight: 15 },
 
   balanceRow: {
     flexDirection: 'row',
@@ -1142,7 +1142,7 @@ const styles = StyleSheet.create({
   balanceValue: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginTop: 4 },
   balanceDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
 
-  emptyText: { color: '#7F5E51', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
+  emptyText: { color: '#1A0A4A', fontSize: 12, textAlign: 'center', paddingVertical: 20 },
 
   footerActions: {
     padding: 14,
@@ -1150,11 +1150,11 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.07)',
   },
   primaryButton: {
-    backgroundColor: '#533D35',
+    backgroundColor: '#0B0635',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
   primaryButtonPressed: { opacity: 0.8 },
-  primaryButtonText: { color: '#31241F', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  primaryButtonText: { color: '#020626', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
 });

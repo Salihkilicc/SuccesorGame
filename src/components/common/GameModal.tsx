@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxHeight: '90%',
-        backgroundColor: '#31241F', // Default dark theme background
+        backgroundColor: '#020626', // Default dark theme background
         borderRadius: theme.radius.lg,
         padding: theme.spacing.lg,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

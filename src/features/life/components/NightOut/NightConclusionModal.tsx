@@ -113,12 +113,12 @@ export default NightConclusionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 4,
         overflow: 'hidden',
         width: '100%'
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         lineHeight: 32,
     },
     wildText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600'
     },
     minimalStatsRow: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     closeButtonText: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 14,
         textTransform: 'uppercase',
         letterSpacing: 2

@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
     },
     closeBtnText: {
-        color: '#31241F',
+        color: '#020626',
         fontWeight: '700',
         fontSize: 16,
     },

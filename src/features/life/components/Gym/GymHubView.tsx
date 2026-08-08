@@ -25,17 +25,17 @@ const GymHubView = () => {
     // --- Helpers ---
     const getBodyTypeColor = (type: string) => {
         switch (type) {
-            case 'Godlike': return '#E9B8C9';
-            case 'Muscular': return '#E9B8C9';
-            case 'Fit': return '#E9B8C9';
-            default: return '#E9B8C9';
+            case 'Godlike': return '#C734CA';
+            case 'Muscular': return '#C734CA';
+            case 'Fit': return '#C734CA';
+            default: return '#C734CA';
         }
     };
 
     const getFatigueColor = (value: number) => {
-        if (value > 80) return '#E9B8C9';
-        if (value > 50) return '#E9B8C9';
-        return '#E9B8C9';
+        if (value > 80) return '#C734CA';
+        if (value > 50) return '#C734CA';
+        return '#C734CA';
     };
 
     const renderMartialArtsButton = () => {
@@ -164,7 +164,7 @@ const GymHubView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F', // Changed to full black
+        backgroundColor: '#020626', // Changed to full black
     },
     safeArea: {
         flex: 1,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     glassCard: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#31241F', // Dark premium background
+        backgroundColor: '#020626', // Dark premium background
         padding: 24,
         paddingBottom: 100, // Safe space for CrystalNavBar
         alignItems: 'center',
@@ -191,11 +191,11 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    closeIcon: { fontSize: 18, color: '#E9B8C9' },
+    closeIcon: { fontSize: 18, color: '#C734CA' },
     titleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -210,14 +210,14 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
     },
-    badgeStandard: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#31241F' },
-    badgeTitanium: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#31241F' },
+    badgeStandard: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#020626' },
+    badgeTitanium: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#020626' },
     badgeText: { fontSize: 10, fontWeight: '700' },
-    textStandard: { color: '#E9B8C9' },
-    textTitanium: { color: '#E9B8C9' },
+    textStandard: { color: '#C734CA' },
+    textTitanium: { color: '#C734CA' },
     statsCard: {
         width: '100%',
-        backgroundColor: '#31241F', // Darker premium tint
+        backgroundColor: '#020626', // Darker premium tint
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -229,19 +229,19 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    divider: { height: 1, backgroundColor: '#533D35', marginVertical: 12 },
-    statLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9', letterSpacing: 0.5 },
+    divider: { height: 1, backgroundColor: '#0B0635', marginVertical: 12 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: '#C734CA', letterSpacing: 0.5 },
     statValue: { fontSize: 16, fontWeight: '900', color: '#FFFFFF' },
     fatigueContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     fatigueBar: {
         width: 100,
         height: 8,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 4,
         overflow: 'hidden',
     },
     fatigueFill: { height: '100%', borderRadius: 4 },
-    fatigueText: { fontSize: 12, fontWeight: '700', color: '#E9B8C9' },
+    fatigueText: { fontSize: 12, fontWeight: '700', color: '#C734CA' },
     grid: {
         width: '100%',
         gap: 12,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F', // Dark mode card
+        backgroundColor: '#020626', // Dark mode card
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -258,15 +258,15 @@ const styles = StyleSheet.create({
     },
     menuIcon: { fontSize: 28 },
     menuLabel: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
-    menuSubLabel: { fontSize: 12, color: '#E9B8C9', marginTop: 2 },
+    menuSubLabel: { fontSize: 12, color: '#C734CA', marginTop: 2 },
     maButtonActive: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     maButtonInactive: {
         borderColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1.5,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
 });
 

@@ -195,8 +195,8 @@ const FacilityPanel: React.FC = () => {
                         <View style={styles.utilTrack}>
                             <View style={[styles.utilFill, {
                                 width: `${Math.min(100, utilization)}%`,
-                                backgroundColor: verdict === 'idle' ? '#E9B8C9'
-                                    : verdict === 'tight' ? '#E9B8C9' : '#5992C6',
+                                backgroundColor: verdict === 'idle' ? '#C734CA'
+                                    : verdict === 'tight' ? '#C734CA' : '#7B68D7',
                             }]} />
                         </View>
                         <Text style={styles.utilNote}>{UTILIZATION_NOTES[verdict]}</Text>
@@ -251,7 +251,7 @@ const FacilityPanel: React.FC = () => {
                     info={t('company.youCannotSkipTiersYou')}
                     infoDetail={t('company.thatDowntimeIsTheReal')}
                     summary={companyCapital >= next.upgradeCost ? t('fac.affordable') : t('fac.saving')}
-                    summaryColor={companyCapital >= next.upgradeCost ? '#5992C6' : 'rgba(255,255,255,0.48)'}
+                    summaryColor={companyCapital >= next.upgradeCost ? '#7B68D7' : 'rgba(255,255,255,0.48)'}
                 >
                     <Text style={styles.nextName}>{next.name}</Text>
                     <Text style={styles.tierDesc}>{next.description}</Text>
@@ -321,7 +321,7 @@ const FacilityPanel: React.FC = () => {
                 info={t('company.youSetATargetAnd')}
                 infoDetail={`Hiring costs ${formatMoney(hiringFee(tier.level, salaryRatio))} per person. Severance is ${formatMoney(severancePay(tier.level, salaryRatio))} per person, and cutting a large share of the workforce hits morale hard — worse if you just reported a profit.`}
                 summary={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
-                summaryColor={staffing < 1 ? '#E9B8C9' : '#5992C6'}
+                summaryColor={staffing < 1 ? '#C734CA' : '#7B68D7'}
                 defaultOpen={staffing < 1}
             >
                 {/* Yuzdelik stepper KALDIRILDI. Kadro artik mutlak sayi;
@@ -335,7 +335,7 @@ const FacilityPanel: React.FC = () => {
                     softLimit={tier.crew}
                     softLimitLabel="Crew"
                     markers={[
-                        { value: employeeCount, label: 'Now', color: '#5992C6' },
+                        { value: employeeCount, label: 'Now', color: '#7B68D7' },
                     ]}
                     steps={[1, 10, 100]}
                 />
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
     stripeMeta: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, marginTop: 3 },
     stripeUtil: { alignItems: 'flex-end' },
     alertBox: {
-        backgroundColor: 'rgba(233,184,201,0.09)',
+        backgroundColor: 'rgba(199,52,202,0.09)',
         borderRadius: 12,
-        borderWidth: 1, borderColor: 'rgba(233,184,201,0.28)',
+        borderWidth: 1, borderColor: 'rgba(199,52,202,0.28)',
         padding: 12,
     },
-    alertText: { color: '#E9B8C9', fontSize: 11.5, lineHeight: 16.5 },
-    alertCta: { color: '#E9B8C9', fontSize: 11, fontWeight: '800', marginTop: 6 },
+    alertText: { color: '#C734CA', fontSize: 11.5, lineHeight: 16.5 },
+    alertCta: { color: '#C734CA', fontSize: 11, fontWeight: '800', marginTop: 6 },
     card: {
         backgroundColor: 'rgba(255,255,255,0.04)',
         borderRadius: 16,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     cardHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-    tierLabel: { color: '#5992C6', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+    tierLabel: { color: '#7B68D7', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
     tierName: { color: theme.colors.textPrimary, fontSize: 22, fontWeight: '800', marginTop: 2 },
     tierDesc: { color: 'rgba(255,255,255,0.48)', fontSize: 12, lineHeight: 17, marginBottom: 12 },
     sectionTitle: { color: theme.colors.textPrimary, fontSize: 12, fontWeight: '800', letterSpacing: 1, flex: 1 },
@@ -462,27 +462,27 @@ const styles = StyleSheet.create({
 
     statRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     stat: { flex: 1 },
-    statLabel: { color: '#7F5E51', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
+    statLabel: { color: '#1A0A4A', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
     statValue: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700', marginTop: 2 },
-    statWarn: { color: '#E9B8C9' },
+    statWarn: { color: '#C734CA' },
 
     compareRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     compareValue: { marginTop: 2 },
-    compareFrom: { color: '#7F5E51', fontSize: 13, fontWeight: '600' },
-    compareArrow: { color: '#674C41', fontSize: 11 },
-    compareTo: { color: '#5992C6', fontSize: 14, fontWeight: '800' },
+    compareFrom: { color: '#1A0A4A', fontSize: 13, fontWeight: '600' },
+    compareArrow: { color: '#11063D', fontSize: 11 },
+    compareTo: { color: '#7B68D7', fontSize: 14, fontWeight: '800' },
 
-    warn: { color: '#E9B8C9', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
-    okLine: { color: '#5992C6', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    warn: { color: '#C734CA', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    okLine: { color: '#7B68D7', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 6 },
 
     utilBox: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)' },
     utilHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-    utilLabel: { color: '#7F5E51', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
+    utilLabel: { color: '#1A0A4A', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     utilValue: { fontSize: 18, fontWeight: '800' },
-    util_idle: { color: '#E9B8C9' },
-    util_healthy: { color: '#5992C6' },
-    util_tight: { color: '#E9B8C9' },
+    util_idle: { color: '#C734CA' },
+    util_healthy: { color: '#7B68D7' },
+    util_tight: { color: '#C734CA' },
     utilTrack: {
         height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden', marginTop: 6,
@@ -491,22 +491,22 @@ const styles = StyleSheet.create({
     utilNote: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 8 },
 
     queue: {
-        backgroundColor: 'rgba(89,146,198,0.07)',
+        backgroundColor: 'rgba(123,104,215,0.07)',
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(89,146,198,0.22)',
+        borderColor: 'rgba(123,104,215,0.22)',
         padding: 14,
     },
-    queueTitle: { color: '#5992C6', fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
+    queueTitle: { color: '#7B68D7', fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
     queueRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
     queueIcon: { fontSize: 18 },
     queueName: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '700' },
     queueSub: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 2 },
     cancelBtn: {
         paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
-        borderWidth: 1, borderColor: 'rgba(233,184,201,0.4)',
+        borderWidth: 1, borderColor: 'rgba(199,52,202,0.4)',
     },
-    cancelText: { color: '#E9B8C9', fontSize: 11, fontWeight: '700' },
+    cancelText: { color: '#C734CA', fontSize: 11, fontWeight: '700' },
 
     headRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 8 },
     adjBtn: {
@@ -516,17 +516,17 @@ const styles = StyleSheet.create({
     adjText: { color: theme.colors.textPrimary, fontSize: 22, fontWeight: '700' },
     headValue: { flex: 1, alignItems: 'center' },
     headNumber: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800' },
-    headUnit: { color: '#7F5E51', fontSize: 10.5, marginTop: 1 },
+    headUnit: { color: '#1A0A4A', fontSize: 10.5, marginTop: 1 },
 
     matchBtn: {
         paddingVertical: 9, borderRadius: 10, alignItems: 'center',
-        backgroundColor: 'rgba(89,146,198,0.12)', marginBottom: 4,
+        backgroundColor: 'rgba(123,104,215,0.12)', marginBottom: 4,
     },
-    matchBtnText: { color: '#5992C6', fontSize: 12, fontWeight: '700' },
+    matchBtnText: { color: '#7B68D7', fontSize: 12, fontWeight: '700' },
 
     primaryBtn: {
         marginTop: 12, paddingVertical: 13, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#5992C6',
+        alignItems: 'center', backgroundColor: '#7B68D7',
     },
     primaryBtnOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
     primaryBtnText: { color: '#FFFFFF', fontSize: 13.5, fontWeight: '800' },
@@ -535,10 +535,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 10,
         paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
     },
-    ladderNow: { backgroundColor: 'rgba(89,146,198,0.08)', borderRadius: 8, paddingHorizontal: 8 },
-    ladderNum: { color: '#5992C6', fontSize: 13, fontWeight: '800', width: 20 },
+    ladderNow: { backgroundColor: 'rgba(123,104,215,0.08)', borderRadius: 8, paddingHorizontal: 8 },
+    ladderNum: { color: '#7B68D7', fontSize: 13, fontWeight: '800', width: 20 },
     ladderName: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '700' },
-    ladderMeta: { color: '#7F5E51', fontSize: 10, marginTop: 2 },
+    ladderMeta: { color: '#1A0A4A', fontSize: 10, marginTop: 2 },
     ladderCost: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '700' },
     ladderDim: { opacity: 0.45 },
 });

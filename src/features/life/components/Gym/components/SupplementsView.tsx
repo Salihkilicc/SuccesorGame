@@ -38,14 +38,14 @@ const SupplementsView = ({ onBack }: SupplementsViewProps) => {
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
     subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
-    subSubtitle: { color: '#E9B8C9', textAlign: 'center', marginBottom: 20 },
+    subSubtitle: { color: '#C734CA', textAlign: 'center', marginBottom: 20 },
     list: { gap: 12 },
-    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#31241F', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#020626', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     supplementIcon: { fontSize: 24, marginRight: 12 },
     supplementName: { color: '#FFFFFF', fontWeight: '700' },
-    supplementEffect: { color: '#E9B8C9', fontSize: 12 },
+    supplementEffect: { color: '#C734CA', fontSize: 12 },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#E9B8C9', fontSize: 14 },
+    backText: { color: '#C734CA', fontSize: 14 },
 });
 
 export default SupplementsView;

@@ -42,18 +42,18 @@ import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
 
 // Gradients for Icons
 const GRADIENTS = {
-  purplePink: ['#0A2A92', '#0A2A92'],
-  tealCyan: ['#5992C6', '#5992C6'],
-  orangeYellow: ['#E9B8C9', '#E9B8C9'],
-  pinkRed: ['#E9B8C9', '#E9B8C9'],
-  blueSky: ['#5992C6', '#5992C6'],
-  brownGold: ['#0A2A92', '#0A2A92'], // Belongings
-  greenTeal: ['#5992C6', '#5992C6'],
-  bluePurple: ['#5992C6', '#0A2A92'],
-  redCasino: ['#E9B8C9', '#E9B8C9'], // Casino Red
-  darkGrey: ['#31241F', '#674C41'],
-  hookupFire: ['#0A2A92', '#0A2A92'],
-  networkBlue: ['#0A2A92', '#5992C6'],
+  purplePink: ['#6004BD', '#6004BD'],
+  tealCyan: ['#7B68D7', '#7B68D7'],
+  orangeYellow: ['#C734CA', '#C734CA'],
+  pinkRed: ['#C734CA', '#C734CA'],
+  blueSky: ['#7B68D7', '#7B68D7'],
+  brownGold: ['#6004BD', '#6004BD'], // Belongings
+  greenTeal: ['#7B68D7', '#7B68D7'],
+  bluePurple: ['#7B68D7', '#6004BD'],
+  redCasino: ['#C734CA', '#C734CA'], // Casino Red
+  darkGrey: ['#020626', '#11063D'],
+  hookupFire: ['#6004BD', '#6004BD'],
+  networkBlue: ['#6004BD', '#7B68D7'],
 };
 
 const SECTION_LEISURE = [
@@ -227,7 +227,7 @@ export default LifeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
   },
   safeArea: {
     flex: 1,
@@ -247,10 +247,10 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 44,
     height: 2,
-    backgroundColor: '#533D35', // Gold accent
+    backgroundColor: '#0B0635', // Gold accent
     marginTop: 14,
     borderRadius: 2,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#7F5E51',
+    color: '#1A0A4A',
     marginBottom: 20,
     letterSpacing: 4,
     textTransform: 'uppercase',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     overflow: 'hidden', // Ensures blur stays inside
     // Shadow for the dock itself
-    shadowColor: "#31241F",
+    shadowColor: "#020626",
     shadowOffset: {
       width: 0,
       height: 10,

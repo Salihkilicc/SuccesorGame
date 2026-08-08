@@ -109,7 +109,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             </View>
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>{t('finance.canRepay')}</Text>
-                                                <Text style={[styles.loanDetailValue, { color: '#5992C6' }]}>
+                                                <Text style={[styles.loanDetailValue, { color: '#7B68D7' }]}>
                                                     {formatMoney(maxRepayable)}
                                                 </Text>
                                             </View>
@@ -143,8 +143,8 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                     ]}
                                                     onPress={() => handleRepay(loan.id, loan.balance)}
                                                 >
-                                                    <Text style={[styles.repayButtonLabel, { color: '#31241F' }]}>{t('finance.payFull')}</Text>
-                                                    <Text style={[styles.repayButtonValue, { color: '#31241F' }]}>
+                                                    <Text style={[styles.repayButtonLabel, { color: '#020626' }]}>{t('finance.payFull')}</Text>
+                                                    <Text style={[styles.repayButtonValue, { color: '#020626' }]}>
                                                         {formatMoney(loan.balance)}
                                                     </Text>
                                                 </Pressable>
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 420,
         maxHeight: '80%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loanCard: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     loanRate: {
         fontSize: 13,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
     },
     loanRemainingLabel: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     loanRemaining: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     repayButtonFull: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     repayButtonPressed: {
@@ -318,16 +318,16 @@ const styles = StyleSheet.create({
     repayButtonValue: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     insufficientText: {
         fontSize: 12,
-        color: '#E9B8C9',
+        color: '#C734CA',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     closeButton: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     confirmButton: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
         marginTop: 20,
     },
     confirmText: {
-        color: '#31241F',
+        color: '#020626',
         fontWeight: '800',
         fontSize: 16,
     },

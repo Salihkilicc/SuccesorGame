@@ -12,7 +12,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.gemvault.museum',
             category: 'JEWELRY',
             description: 'Museum grade stones.',
-            bannerColor: '#0A2A92',
+            bannerColor: '#6004BD',
             emoji: '💎',
         },
         {
@@ -21,7 +21,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.aurum.luxury',
             category: 'JEWELRY',
             description: 'Heavy metal.',
-            bannerColor: '#E9B8C9',
+            bannerColor: '#C734CA',
             emoji: '👑',
         },
         {
@@ -30,7 +30,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.imperial.royal',
             category: 'JEWELRY',
             description: 'Fit for a queen.',
-            bannerColor: '#0A2A92',
+            bannerColor: '#6004BD',
             emoji: '🤴',
         },
         {
@@ -39,7 +39,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.voweternity.love',
             category: 'JEWELRY',
             description: 'Begin your legacy.',
-            bannerColor: '#E06B6B',
+            bannerColor: '#C836CA',
             emoji: '💍',
         },
         {
@@ -48,7 +48,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.ice.vip',
             category: 'JEWELRY',
             description: 'Frozen in time.',
-            bannerColor: '#5992C6',
+            bannerColor: '#7B68D7',
             emoji: '❄️',
         }
     ],

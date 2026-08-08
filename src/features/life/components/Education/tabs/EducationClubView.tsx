@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#674C41',
+        color: '#11063D',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#0A2A92',
+        color: '#6004BD',
     },
     subtitle: {
         fontSize: 12,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         marginTop: 2,
     },
     scrollContent: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -250,20 +250,20 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#31241F',
+        color: '#020626',
     },
     activeBadge: {
         fontSize: 10,
         fontWeight: 'bold',
         color: '#FFFFFF',
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     clubDescription: {
         fontSize: 14,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         lineHeight: 20,
     },
     buffSection: {
@@ -277,13 +277,13 @@ const styles = StyleSheet.create({
     buffLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#E9B8C9',
+        color: '#C734CA',
         marginBottom: 4,
     },
     buffText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     membersSection: {
         marginBottom: 16,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#674C41',
+        color: '#11063D',
         marginBottom: 8,
     },
     avatarsContainer: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     actionBtn: {
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnActive: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnText: {

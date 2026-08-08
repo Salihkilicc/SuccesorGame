@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(233,184,201,0.12)',
+    backgroundColor: 'rgba(199,52,202,0.12)',
     borderRadius: 12,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.99 }],
   },
   buttonText: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontWeight: '800',
     fontSize: theme.typography.body,
   },
   buttonArrow: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontSize: theme.typography.subtitle,
   },
 });

@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     headerSubtitle: {
-        color: '#674C41',
+        color: '#11063D',
         fontSize: 14,
         marginBottom: 50,
         fontStyle: 'italic',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 20,
         borderRadius: 4,
         borderLeftWidth: 3,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     dangerButton: {
         borderLeftColor: '#900',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     pressed: {
         transform: [{ scale: 0.98 }],
@@ -129,14 +129,14 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     dangerText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     menuSubtitle: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontSize: 12,
     },
     arrow: {
-        color: '#533D35',
+        color: '#0B0635',
         fontSize: 24,
         fontWeight: 'bold',
         marginLeft: 'auto',

@@ -70,15 +70,15 @@ const styles = StyleSheet.create({
     },
     // Primary
     primaryButton: {
-        backgroundColor: '#533D35', // Gold
+        backgroundColor: '#0B0635', // Gold
         borderColor: 'rgba(255,255,255,0.08)',
     },
     primaryText: {
-        color: '#31241F',
+        color: '#020626',
     },
     // Secondary
     secondaryButton: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     secondaryText: {
@@ -86,11 +86,11 @@ const styles = StyleSheet.create({
     },
     // Danger
     dangerButton: {
-        backgroundColor: 'rgba(233,184,201,0.1)',
+        backgroundColor: 'rgba(199,52,202,0.1)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     dangerText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     // Ghost
     ghostButton: {

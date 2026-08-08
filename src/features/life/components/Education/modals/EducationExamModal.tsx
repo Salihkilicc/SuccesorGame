@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: "#31241F",
+        shadowColor: "#020626",
         shadowOffset: {
             width: 0,
             height: 4,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     questionText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#31241F',
+        color: '#020626',
         lineHeight: 28,
         textAlign: 'center',
     },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         marginBottom: 10,
-        shadowColor: "#31241F",
+        shadowColor: "#020626",
         shadowOffset: {
             width: 0,
             height: 1,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     optionText: {
         flex: 1,
         fontSize: 15,
-        color: '#674C41',
+        color: '#11063D',
         fontWeight: '500',
     },
     footerWarning: {

@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   tabActive: {
-    backgroundColor: 'rgba(233,184,201,0.15)',
+    backgroundColor: 'rgba(199,52,202,0.15)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
   },
@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   labelActive: {
-    color: '#E9B8C9',
+    color: '#C734CA',
   },
 });

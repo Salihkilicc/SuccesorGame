@@ -139,7 +139,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                 )}
 
                 <LinearGradient
-                    colors={['rgba(233,184,201,0.5)', 'rgba(233,184,201,0.4)', 'rgba(233,184,201,0.4)', 'rgba(89,146,198,0.5)']}
+                    colors={['rgba(199,52,202,0.5)', 'rgba(199,52,202,0.4)', 'rgba(199,52,202,0.4)', 'rgba(123,104,215,0.5)']}
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
                     locations={[0, 0.2, 0.8, 1]}
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         borderRadius: 3,
         marginHorizontal: 4,
         // Added subtle shadow for dots
-        shadowColor: "#31241F",
+        shadowColor: "#020626",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.3,
         shadowRadius: 1,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     blurContainer: {
         borderRadius: 20,
         overflow: 'hidden',
-        shadowColor: "#5992C6",
+        shadowColor: "#7B68D7",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,

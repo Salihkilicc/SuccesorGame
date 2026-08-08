@@ -30,7 +30,7 @@ const PokerGameScreen = () => {
       ) : (
         <>
           <Text style={styles.cardRank}>{card.rank}</Text>
-          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E9B8C9' : '#FFFFFF' }]}>
+          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#C734CA' : '#FFFFFF' }]}>
             {card.suit}
           </Text>
         </>
@@ -68,7 +68,7 @@ const PokerGameScreen = () => {
           <View style={styles.cardRow}>
             {board.slice(0, revealedBoard).map((card, idx) => renderCard(card, idx))}
             {Array.from({ length: 5 - revealedBoard }).map((_, idx) => (
-              <View key={`placeholder-${idx}`} style={[styles.card, { opacity: 0.1, backgroundColor: '#31241F' }]} />
+              <View key={`placeholder-${idx}`} style={[styles.card, { opacity: 0.1, backgroundColor: '#020626' }]} />
             ))}
           </View>
         </View>
@@ -138,7 +138,7 @@ const PokerGameScreen = () => {
 export default PokerGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#31241F' },
+  container: { flex: 1, backgroundColor: '#020626' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 12, fontWeight: '800' },
 
   boardCard: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   tableCard: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -174,14 +174,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2
   },
-  cardHidden: { backgroundColor: '#533D35', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  cardHidden: { backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   cardBack: { fontSize: 32 },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#31241F' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#020626' },
   cardSuit: { fontSize: 20 },
 
   controlsSection: { marginTop: 'auto', gap: 16 },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -220,5 +220,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   secondaryButtonPressed: { opacity: 0.7 },
-  secondaryText: { color: '#E9B8C9', fontWeight: '800', fontSize: 14 },
+  secondaryText: { color: '#C734CA', fontWeight: '800', fontSize: 14 },
 });

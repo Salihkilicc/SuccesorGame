@@ -26,7 +26,7 @@ const TravelMethodView = ({
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, { color: '#5992C6' }]}>{t('life.privateHangar')}</Text>
+                    <Text style={[styles.title, { color: '#7B68D7' }]}>{t('life.privateHangar')}</Text>
                     <Text style={styles.subtitle}>{t('life.selectYourAircraft')}</Text>
                 </View>
 
@@ -76,7 +76,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
-                        <View style={[styles.badge, { backgroundColor: '#533D35' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#0B0635' }]}>
                             <Text style={styles.badgeText}>{t('life.rep1')}</Text>
                         </View>
                     </View>
@@ -92,7 +92,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🛫</Text>
-                        <View style={[styles.badge, { backgroundColor: '#5992C6' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#7B68D7' }]}>
                             <Text style={styles.badgeText}>{t('life.rep0')}</Text>
                         </View>
                     </View>
@@ -108,13 +108,13 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, { borderColor: 'rgba(255,255,255,0.08)' }, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
-                        <View style={[styles.badge, { backgroundColor: '#533D35' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#0B0635' }]}>
                             <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>Royal{'\n'}Charter</Text>
-                        <Text style={[styles.cardPrice, { color: '#E9B8C9' }]}>$50k</Text>
+                        <Text style={[styles.cardPrice, { color: '#C734CA' }]}>$50k</Text>
                     </View>
                 </Pressable>
 
@@ -126,7 +126,7 @@ const TravelMethodView = ({
                         <Text style={styles.cardEmoji}>🛩️</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={[styles.cardTitle, { color: '#5992C6' }]}>MY{'\n'}HANGAR</Text>
+                        <Text style={[styles.cardTitle, { color: '#7B68D7' }]}>MY{'\n'}HANGAR</Text>
                         <Text style={styles.hangarAction}>{t('life.useOwnJet')}</Text>
                     </View>
                 </Pressable>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     backButtonText: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#5992C6',
+        color: '#7B68D7',
         marginTop: 2,
     },
     scrollView: {
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderColor: 'rgba(255,255,255,0.06)',
         borderStyle: 'dashed',
     },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     hangarAction: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     pressed: {
         opacity: 0.8,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     },
     jetListDesc: {
         fontSize: 12,
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     jetListCost: {
         alignItems: 'flex-end',
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
     costText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     fuelText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     emptyState: {
         alignItems: 'center',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 14,
-        color: '#5992C6',
+        color: '#7B68D7',
         textAlign: 'center',
         lineHeight: 20,
     },

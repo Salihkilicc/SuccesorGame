@@ -59,18 +59,18 @@ const GymMartialArtsView = () => {
     // --- Helpers ---
     const getBeltColor = (rank: number) => {
         switch (rank) {
-            case 0: return '#E9B8C9';
-            case 1: return '#E9B8C9';
-            case 2: return '#E9B8C9';
-            case 3: return '#E9B8C9';
+            case 0: return '#C734CA';
+            case 1: return '#C734CA';
+            case 2: return '#C734CA';
+            case 3: return '#C734CA';
             case 4:
-            case 5: return '#31241F';
-            default: return '#E9B8C9';
+            case 5: return '#020626';
+            default: return '#C734CA';
         }
     };
 
     const getBeltTextColor = (rank: number) => {
-        if (rank === 0) return '#31241F';
+        if (rank === 0) return '#020626';
         return '#FFFFFF';
     };
 
@@ -184,7 +184,7 @@ const GymMartialArtsView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -195,10 +195,10 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 24,
         padding: 24,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.25,
         shadowRadius: 20,
@@ -213,12 +213,12 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#E9B8C9', fontWeight: '700' },
+    backText: { fontSize: 14, color: '#C734CA', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#E9B8C9',
+        color: '#C734CA',
         marginTop: 4,
     },
     listContainer: {
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     selectionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -249,15 +249,15 @@ const styles = StyleSheet.create({
     artIcon: { fontSize: 32 },
     artInfo: { flex: 1 },
     artName: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
-    artDesc: { fontSize: 12, color: '#E9B8C9', marginTop: 2 },
+    artDesc: { fontSize: 12, color: '#C734CA', marginTop: 2 },
     selectBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 8,
     },
     selectBtnText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '700',
         fontSize: 12,
     },
@@ -290,17 +290,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    progressLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9' },
+    progressLabel: { fontSize: 12, fontWeight: '700', color: '#C734CA' },
     progressValue: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
     progressBarBg: {
         height: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 6,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 6,
     },
     infoRow: {
@@ -311,22 +311,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.08)',
     },
-    infoLabel: { fontSize: 14, color: '#E9B8C9', fontWeight: '500' },
+    infoLabel: { fontSize: 14, color: '#C734CA', fontWeight: '500' },
     infoValue: { fontSize: 14, color: '#FFFFFF', fontWeight: '700' },
     trainBtn: {
         width: '100%',
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         paddingVertical: 18,
         borderRadius: 16,
         alignItems: 'center',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 5,
     },
     trainBtnDisabled: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         shadowOpacity: 0,
     },
     trainBtnText: {
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     trainBtnSub: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 12,
         marginTop: 2,
     },

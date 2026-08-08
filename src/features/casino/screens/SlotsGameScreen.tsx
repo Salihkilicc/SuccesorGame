@@ -151,7 +151,7 @@ const SlotsGameScreen = () => {
               disabled={isSpinning || bet <= 0}
               style={({ pressed }) => [
                 styles.spinButton,
-                { backgroundColor: isSpinning || bet <= 0 ? '#7F5E51' : currentLocation.theme.primary },
+                { backgroundColor: isSpinning || bet <= 0 ? '#1A0A4A' : currentLocation.theme.primary },
                 pressed && styles.spinButtonPressed,
                 (isSpinning || bet <= 0) && styles.disabledButton
               ]}>
@@ -169,7 +169,7 @@ export default SlotsGameScreen;
 
 // STYLES
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#31241F' },
+  container: { flex: 1, backgroundColor: '#020626' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 100 },
 
   infoRow: {
@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
   },
 
   machineContainer: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.6,
     shadowRadius: 20,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   reelsWrapper: {
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 10,
     borderRadius: 12,
     overflow: 'hidden',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -289,10 +289,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)'
   },
   bigWinText: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontSize: 64,
     fontWeight: '900',
-    textShadowColor: '#E9B8C9',
+    textShadowColor: '#C734CA',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 20,
     transform: [{ rotate: '-5deg' }]

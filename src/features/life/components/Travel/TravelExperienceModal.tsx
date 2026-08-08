@@ -170,14 +170,14 @@ export default TravelExperienceModal;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#31241F', // Solid base background
+        backgroundColor: '#020626', // Solid base background
         padding: 24,
         paddingBottom: 100, // Add padding for bottom bar
         justifyContent: 'center',
     },
     opaqueLayer: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#31241F', // Base layer behind spot color
+        backgroundColor: '#020626', // Base layer behind spot color
         zIndex: -1,
     },
     header: {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
         marginBottom: 8,
         textTransform: 'uppercase',
         letterSpacing: 2,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     },
     narrativeText: {
         fontSize: 18,
-        color: '#31241F',
+        color: '#020626',
         textAlign: 'center',
         fontStyle: 'italic',
         lineHeight: 28,
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
     completionTitle: {
         fontSize: 28,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
         textTransform: 'uppercase',
         letterSpacing: 2,
     },
     finalNarrative: {
         fontSize: 20,
-        color: '#31241F',
+        color: '#020626',
         textAlign: 'center',
         fontWeight: '500',
         lineHeight: 32,
@@ -274,26 +274,26 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     statText: {
-        color: '#31241F',
+        color: '#020626',
         fontSize: 14,
         fontWeight: '700',
     },
     souvenirHint: {
-        backgroundColor: 'rgba(233,184,201,0.3)',
+        backgroundColor: 'rgba(199,52,202,0.3)',
         padding: 16,
         borderRadius: 12,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: 'rgba(233,184,201,0.5)',
+        borderColor: 'rgba(199,52,202,0.5)',
     },
     souvenirHintText: {
-        color: '#31241F',
+        color: '#020626',
         fontSize: 16,
         fontWeight: '700',
         textAlign: 'center',
     },
     continueButton: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         paddingVertical: 18,
         borderRadius: 30,
         alignItems: 'center',

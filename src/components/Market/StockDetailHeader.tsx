@@ -82,15 +82,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   chip: {
-    backgroundColor: 'rgba(233,184,201,0.12)',
+    backgroundColor: 'rgba(199,52,202,0.12)',
     borderRadius: 999,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: 'rgba(233,184,201,0.4)',
+    borderColor: 'rgba(199,52,202,0.4)',
   },
   chipText: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontWeight: '700',
     fontSize: theme.typography.caption + 1,
   },
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   up: {
-    color: '#5992C6',
+    color: '#7B68D7',
   },
   down: {
-    color: '#E9B8C9',
+    color: '#C734CA',
   },
   metaRow: {
     flexDirection: 'row',

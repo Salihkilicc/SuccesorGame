@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     sectionHeader: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#5992C6',
+        color: '#7B68D7',
         marginBottom: 8,
         marginTop: 12,
         letterSpacing: 1,
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     charterBox: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         padding: 12,
         borderRadius: 8,
         alignItems: 'center',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     charterSub: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 12,
         marginVertical: 4,
     },
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     optionButton: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 8,
         padding: 12,
         borderWidth: 1,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
     optionButtonSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#31241F', // subtle gold tint
+        backgroundColor: '#020626', // subtle gold tint
     },
     optionText: {
         color: '#FFFFFF',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     optionTextSelected: {
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     optionSubText: {
         color: '#FFFFFF',

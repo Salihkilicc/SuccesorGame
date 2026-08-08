@@ -91,7 +91,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, -1)}
                     disabled={strategy[field] === 0}
                 >
-                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#7F5E51' : '#FFFFFF'} />
+                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#1A0A4A' : '#FFFFFF'} />
                 </TouchableOpacity>
 
                 <View style={styles.valueBox}>
@@ -103,7 +103,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, 1)}
                     disabled={totalPoints >= maxPoints}
                 >
-                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#7F5E51' : '#FFFFFF'} />
+                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#1A0A4A' : '#FFFFFF'} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -144,7 +144,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <View style={styles.divider} />
                             <View style={styles.kpiItem}>
                                 <Text style={styles.kpiLabel}>{t('finance.lastQChange')}</Text>
-                                <Text style={[styles.kpiValue, { color: isPositive ? '#5FB37A' : '#E06B6B' }]}>
+                                <Text style={[styles.kpiValue, { color: isPositive ? '#C8C0EF' : '#C836CA' }]}>
                                     {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
                                 </Text>
                             </View>
@@ -214,12 +214,12 @@ const styles = StyleSheet.create({
         width: '90%',
         maxWidth: 420,
         height: '80%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        shadowColor: "#31241F",
+        shadowColor: "#020626",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#31241F',
-        backgroundColor: '#31241F',
+        borderBottomColor: '#020626',
+        backgroundColor: '#020626',
     },
     companyName: {
         fontSize: 22,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         marginHorizontal: 10,
     },
     kpiLabel: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     pointsBadge: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 12,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 10,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     infoBox: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(89,146,198,0.1)',
+        backgroundColor: 'rgba(123,104,215,0.1)',
         padding: 12,
         borderRadius: 12,
         marginTop: 20,
@@ -384,19 +384,19 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#0A2A92',
+        color: '#6004BD',
         fontSize: 12,
         lineHeight: 18,
     },
     footer: {
         padding: 20,
         borderTopWidth: 1,
-        borderTopColor: '#31241F',
-        backgroundColor: '#31241F',
+        borderTopColor: '#020626',
+        backgroundColor: '#020626',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     sellBtnText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     saveBtnText: {
-        color: '#31241F',
+        color: '#020626',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

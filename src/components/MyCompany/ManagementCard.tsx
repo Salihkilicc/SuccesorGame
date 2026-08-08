@@ -116,7 +116,7 @@ const ManagementCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#31241F', // Dark Gray
+        backgroundColor: '#020626', // Dark Gray
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: theme.radius.md,
-        backgroundColor: '#31241F', // Light Gray for icon box
+        backgroundColor: '#020626', // Light Gray for icon box
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     },
     badge: {
         marginLeft: 'auto',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         paddingHorizontal: theme.spacing.sm,
         paddingVertical: 4,
         borderRadius: theme.radius.sm,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.caption,
     },
     value: {
-        color: '#0A2A92', // Apple Blue for stat values
+        color: '#6004BD', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },

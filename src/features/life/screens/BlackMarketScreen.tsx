@@ -48,7 +48,7 @@ const BlackMarketScreen: React.FC = () => {
         <AppLaunchLoader
             appName="Black Market"
             appIcon={<MaterialCommunityIcons name="incognito" size={64} color="#FFFFFF" />}
-            backgroundColor="#31241F"
+            backgroundColor="#020626"
         >
             <SafeAreaView style={styles.container}>
                 {/* Layer 1: Hub View */}
@@ -87,7 +87,7 @@ const BlackMarketScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
 });
 

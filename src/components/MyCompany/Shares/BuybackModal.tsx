@@ -140,14 +140,14 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                                <Text style={[styles.impactValue, { color: '#0A2A92' }]}>
+                                <Text style={[styles.impactValue, { color: '#6004BD' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={[styles.impactValue, { color: '#5992C6' }]}>
+                                    <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
                                         +{(predictedImpact * 100).toFixed(1)}%
                                     </Text>
                                     <Text style={styles.impactSubValue}>{t('equity.targetV1', { v1: formatPrice(predictedPrice) })}</Text>
@@ -155,7 +155,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                                <Text style={[styles.impactValue, { color: '#0A2A92' }]}>
+                                <Text style={[styles.impactValue, { color: '#6004BD' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
                             </View>
@@ -167,7 +167,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.costLabel}>{t('equity.availableCash')}</Text>
                                 <Text style={[
                                     styles.costValue,
-                                    { color: isAffordable ? '#5992C6' : '#E9B8C9' }
+                                    { color: isAffordable ? '#7B68D7' : '#C734CA' }
                                 ]}>
                                     {formatMoney(companyCapital)}
                                 </Text>
@@ -216,8 +216,8 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    noFloatCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    noFloatTitle: { color: '#E9B8C9', fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    noFloatCard: { backgroundColor: '#020626', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    noFloatTitle: { color: '#C734CA', fontWeight: '800', fontSize: 13, marginBottom: 4 },
     noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         padding: 20, // Moved padding here
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
     },
     valueContainer: {
         alignItems: 'center',
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
@@ -318,27 +318,27 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     amountCard: {
-        backgroundColor: 'rgba(89,146,198,0.15)',
+        backgroundColor: 'rgba(123,104,215,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#0A2A9240',
+        borderColor: '#6004BD40',
     },
     amountLabel: {
         fontSize: 13,
-        color: '#0A2A92',
+        color: '#6004BD',
         fontWeight: '600',
         marginBottom: 6,
     },
     amountValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#0A2A92',
+        color: '#6004BD',
     },
     impactSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     costSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -384,16 +384,16 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     warningBox: {
-        backgroundColor: '#E9B8C920',
+        backgroundColor: '#C734CA20',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#E9B8C940',
+        borderColor: '#C734CA40',
     },
     warningText: {
         fontSize: 14,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -415,13 +415,13 @@ const styles = StyleSheet.create({
     },
     executeButton: {
         flex: 1,
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
     },
     executeButtonDisabled: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         opacity: 0.5,
     },
     executeButtonText: {
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     executeButtonTextDisabled: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
     },
 });
 

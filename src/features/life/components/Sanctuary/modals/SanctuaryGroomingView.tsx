@@ -166,7 +166,7 @@ export default SanctuaryGroomingView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -188,13 +188,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     specialServiceCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: theme.radius.md,
         padding: 16,
         borderWidth: 1,
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     specialServicePrice: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 18,
         fontWeight: '700',
     },
     specialServiceBenefit: {
-        backgroundColor: '#5992C620',
+        backgroundColor: '#7B68D720',
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -272,11 +272,11 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     specialServiceCardActive: {
-        backgroundColor: '#5992C630',
+        backgroundColor: '#7B68D730',
         borderColor: 'rgba(255,255,255,0.48)',
     },
     activeBuffBadge: {
-        backgroundcolor: '#5992C6',
+        backgroundcolor: '#7B68D7',
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 8,
@@ -311,12 +311,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
     },
     gridItemSelected: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
         borderColor: 'rgba(255,255,255,0.48)',
     },
     gridItemText: {

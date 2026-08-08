@@ -98,6 +98,6 @@ export default ProductionModal;
 const styles = StyleSheet.create({
     container: { gap: 12, paddingVertical: 10 },
     infoBox: { gap: 4 },
-    hint: { fontSize: 11, color: '#5992C6', textAlign: 'center', fontStyle: 'italic' },
+    hint: { fontSize: 11, color: '#7B68D7', textAlign: 'center', fontStyle: 'italic' },
     actionRow: { flexDirection: 'row', gap: 12, marginTop: 10 }
 });

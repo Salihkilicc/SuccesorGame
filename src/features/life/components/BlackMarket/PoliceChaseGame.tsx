@@ -338,8 +338,8 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
                                     {
                                         width: `${staminaPercentage}%`,
                                         backgroundColor:
-                                            staminaPercentage > 50 ? '#5992C6' :
-                                                staminaPercentage > 25 ? '#E9B8C9' : '#E9B8C9'
+                                            staminaPercentage > 50 ? '#7B68D7' :
+                                                staminaPercentage > 25 ? '#C734CA' : '#C734CA'
                                     }
                                 ]}
                             />
@@ -413,11 +413,11 @@ const CONTROL_BUTTON_SIZE = 60;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     container: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         paddingHorizontal: 0,
         paddingBottom: 20,
         justifyContent: 'space-evenly',
@@ -432,8 +432,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#E9B8C9',
-        textShadowColor: '#E9B8C9',
+        color: '#C734CA',
+        textShadowColor: '#C734CA',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
         fontFamily: 'Courier New',
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     statsContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 5,
         width: '90%',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     staminaBarContainer: {
         flex: 1,
         height: 10,
-        backgroundColor: '#674C41',
+        backgroundColor: '#11063D',
         borderRadius: 5,
         overflow: 'hidden',
         marginHorizontal: 10
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: GRID_CONTAINER_WIDTH,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 2,
         borderWidth: 1,
@@ -505,22 +505,22 @@ const styles = StyleSheet.create({
         height: cellSize,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         margin: CELL_MARGIN,
         borderRadius: 8
     },
     playerCell: {
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
     policeCell: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)'
     },
     safeHouseCell: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
@@ -538,20 +538,20 @@ const styles = StyleSheet.create({
     controlButton: {
         width: CONTROL_BUTTON_SIZE,
         height: CONTROL_BUTTON_SIZE,
-        backgroundColor: '#674C41',
+        backgroundColor: '#11063D',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 12,
         marginHorizontal: 5,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
     },
     controlButtonDisabled: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5
     },
     quitButton: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         paddingVertical: 10,
         paddingHorizontal: 40,
         borderRadius: 8,

@@ -94,7 +94,7 @@ const ProposalWizardView: React.FC<Props> = ({
                 <Pressable
                     style={[styles.actionButton, { backgroundColor: theme.colors.success }]}
                     onPress={() => onDecidePrenup(false)}>
-                    <Text style={[styles.actionButtonText, { color: '#31241F' }]}>❤️ No Prenup (Trust)</Text>
+                    <Text style={[styles.actionButtonText, { color: '#020626' }]}>❤️ No Prenup (Trust)</Text>
                 </Pressable>
             </View>
         );
@@ -111,7 +111,7 @@ const ProposalWizardView: React.FC<Props> = ({
                         style={[styles.actionButton, {
                             justifyContent: 'space-between',
                             backgroundColor: ring.instanceId === selectedRingInstanceId
-                                ? 'rgba(233,184,201,0.18)'
+                                ? 'rgba(199,52,202,0.18)'
                                 : 'rgba(255,255,255,0.04)',
                             borderWidth: ring.instanceId === selectedRingInstanceId ? 1 : 0,
                             borderColor: theme.colors.accent,
@@ -166,7 +166,7 @@ const ProposalWizardView: React.FC<Props> = ({
             {/* Ring Check */}
             <View style={[styles.actionButton, {
                 justifyContent: 'space-between',
-                backgroundColor: ownedRings.length > 0 ? 'rgba(89,146,198,0.1)' : 'rgba(233,184,201,0.1)',
+                backgroundColor: ownedRings.length > 0 ? 'rgba(123,104,215,0.1)' : 'rgba(199,52,202,0.1)',
             }]}>
                 {ownedRings.length === 0 ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -200,7 +200,7 @@ const ProposalWizardView: React.FC<Props> = ({
                     { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5 }
                 ]}
                 onPress={onStartProposal}>
-                <Text style={[styles.actionButtonText, { color: '#31241F', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
+                <Text style={[styles.actionButtonText, { color: '#020626', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
             </Pressable>
         </View>
     );
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     smallButtonText: {
-        color: '#31241F',
+        color: '#020626',
         fontSize: 12,
         fontWeight: '700',
     },

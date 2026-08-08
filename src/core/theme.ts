@@ -1,96 +1,98 @@
 // src/core/theme.ts
 //
 // ============================================================================
-//  TEMA — kahve zemin, dolgu butonlar, beyaz yazi
+//  TEMA — mor/lacivert, oyuna has palet
 // ============================================================================
 //
-//  Oyuncunun karari: zemin Cocoa Brown, butonlar Shilo / Danube / Torea Bay,
-//  yazilar beyaz. Yesil ve kirmizi YALNIZCA kar-zarar icin; baska hicbir yerde
-//  kullanilmaz.
+//  Oyuncunun secimi:
+//    Violet Eggplant  #BA04BD
+//    Purple           #8504BD
+//    Purple           #6004BD
+//    Dark Blue        #2304BD
+//    Deep Cove        #020626   -> zemin
 //
-//  CERCEVE DEGIL DOLGU. Onceki hali siyah kartlara renkli kenarlik cekiyordu
-//  ve ekran "siyah zemin + renkli cerceve" gibi duruyordu. Renk artik
-//  kenarlikta degil YUZEYDE: kart zaten kahvenin bir tonu, kenarliga gerek
-//  kalmiyor. Derinlik kenarlikla degil, zemini kademeli acarak anlatiliyor.
+//  OLCUM SONUCU IKI KISIT:
 //
-//  KONTRAST (olculdu, hepsi WCAG AA):
-//    kahve zeminde beyaz            15.0
-//    Torea dolguda beyaz            11.9
-//    Shilo dolguda KOYU metin        8.7   <- Shilo acik, ustune beyaz gelmez
-//    Danube dolguda KOYU metin       5.0
+//  1) DORT MORUN HICBIRI METIN OLAMAZ. Deep Cove uzerinde kontrastlari
+//     1.73 - 3.63, hepsi 4.5 esiginin altinda. Dolgu olurlar (ustlerine beyaz
+//     gelir, 5.5 - 11.5), yazi olmazlar. Metin gereken yerde ayni tonun
+//     ACIK TUREVI kullanilir; asagidaki `...Text` jetonlari odur.
+//
+//  2) PALETTE YESIL DE KIRMIZI DA YOK. Kar/zarar icin renk ekseninde en uzak
+//     iki uc secildi ve ACIKLIK ekseninde de ayrildi:
+//
+//        pozitif  #C8C0EF  acik lavanta   kontrast 11.6
+//        negatif  #C836CA  magenta        kontrast  4.6
+//
+//     Renk farki dE 71, aciklik farki 29 L*. Karsilastirma: yesil/kirmizi
+//     dE 84 ama aciklik farki yalnizca 7. Yani bu cift renk ayriminda biraz
+//     geride, aciklik ayriminda ONDE — toplamda okunur bir cift.
 //
 //  KURAL: bilesenler hex yazmaz, jetonu kullanir.
 //
 // ============================================================================
 
-/** Oyuncunun sectigi dort renk. */
 export const palette = {
-    cocoa: '#31241F',
-    torea: '#0A2A92',
-    danube: '#5992C6',
-    shilo: '#E9B8C9',
+    eggplant: '#BA04BD',
+    purple: '#8504BD',
+    purpleDeep: '#6004BD',
+    blue: '#2304BD',
+    cove: '#020626',
 } as const;
 
 export const theme = {
     colors: {
-        // --- Zemin: Cocoa, kademeli acilarak. Kenarlik degil DOLGU. -------
-        background: '#31241F',
-        surface: '#42312A',
-        surfaceRaised: '#533D35',
-        surfaceHigh: '#674C41',
+        // --- Zemin: Deep Cove, mor yonunde kademeli acilarak --------------
+        background: '#020626',
+        surface: '#07062E',
+        surfaceRaised: '#0B0635',
+        surfaceHigh: '#11063D',
         border: 'rgba(255,255,255,0.08)',
-        borderStrong: '#7F5E51',
+        borderStrong: '#1A0A4A',
 
-        // --- Yazi: beyaz ---------------------------------------------------
+        // --- Yazi ----------------------------------------------------------
         textPrimary: '#FFFFFF',
         textSecondary: 'rgba(255,255,255,0.72)',
         textMuted: 'rgba(255,255,255,0.48)',
 
-        // --- Butonlar ------------------------------------------------------
-        //  Torea koyu  -> ustune BEYAZ
-        //  Danube orta -> ustune KOYU
-        //  Shilo acik  -> ustune KOYU
-        primary: '#0A2A92',
+        // --- Dolgu butonlar: ustune BEYAZ ---------------------------------
+        primary: '#6004BD',
         primaryText: '#FFFFFF',
-        secondary: '#5992C6',
-        secondaryText: '#31241F',
-        highlight: '#E9B8C9',
-        highlightText: '#31241F',
+        secondary: '#2304BD',
+        secondaryText: '#FFFFFF',
+        highlight: '#BA04BD',
+        highlightText: '#FFFFFF',
 
-        accentSoft: 'rgba(89,146,198,0.18)',
-        highlightSoft: 'rgba(233,184,201,0.16)',
+        // --- Vurgu METNI: morlarin acik turevleri -------------------------
+        //     Dolgu tonlari metin olarak okunmadigi icin bunlar var.
+        accentText: '#7B68D7',
+        highlightTextColor: '#C734CA',
+
+        accentSoft: 'rgba(35,4,189,0.22)',
+        highlightSoft: 'rgba(186,4,189,0.18)',
 
         // ------------------------------------------------------------------
-        //  KAR / ZARAR — ve BASKA HICBIR SEY
+        //  KAR / ZARAR — ve baska hicbir sey
         // ------------------------------------------------------------------
-        //  Oyuncunun uyarisi: "oyunda cok yerde yesil var, olmasin". Dogruydu
-        //  — 184 yesil kullanimindan yalnizca 15'i parayla ilgiliydi. Yesil
-        //  her yerde olunca hicbir sey ifade etmez.
-        //
-        //  Artik yesil ve kirmizi rozet, durum, ilerleme cubugu, aktif sekme
-        //  gibi yerlerde YOK. Yalnizca bir SAYININ isaretini gosterirler.
-        //  Onlarin yerini Danube (olumlu/bilgi) ve Shilo (dikkat) aldi.
-        // ------------------------------------------------------------------
-        positive: '#5FB37A',
-        negative: '#E06B6B',
+        positive: '#C8C0EF',
+        negative: '#C836CA',
 
-        // Eski adlar — kademeli gecis. Dikkat: success/danger ARTIK
-        // yesil-kirmizi DEGIL; durum bildirimi paletten yapilir.
-        card: '#42312A',
-        cardSoft: '#533D35',
-        success: '#5992C6',
-        danger: '#E9B8C9',
-        error: '#E9B8C9',
-        warning: '#E9B8C9',
-        accent: '#5992C6',
+        // Eski adlar — kademeli gecis
+        card: '#07062E',
+        cardSoft: '#0B0635',
+        success: '#7B68D7',
+        danger: '#C734CA',
+        error: '#C734CA',
+        warning: '#C734CA',
+        accent: '#7B68D7',
         neutral: 'rgba(255,255,255,0.48)',
     },
 
     elevation: {
-        flat: '#31241F',
-        low: '#42312A',
-        mid: '#533D35',
-        high: '#674C41',
+        flat: '#020626',
+        low: '#07062E',
+        mid: '#0B0635',
+        high: '#11063D',
     },
 
     radius: { xs: 6, sm: 10, md: 14, lg: 20, pill: 999 },

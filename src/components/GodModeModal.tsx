@@ -41,7 +41,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <MaterialCommunityIcons name="flash" size={24} color="#E9B8C9" />
+                            <MaterialCommunityIcons name="flash" size={24} color="#C734CA" />
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -54,19 +54,19 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                     <View style={styles.content}>
                         <TouchableOpacity style={styles.actionButton} onPress={handleAddMoney} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(89,146,198,0.2)', 'rgba(89,146,198,0.05)']}
+                                colors={['rgba(123,104,215,0.2)', 'rgba(123,104,215,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#5992C6" />
+                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#7B68D7" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(233,184,201,0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
+                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(199,52,202,0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(233,184,201,0.2)', 'rgba(233,184,201,0.05)']}
+                                colors={['rgba(199,52,202,0.2)', 'rgba(199,52,202,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="skull" size={24} color="#E9B8C9" />
+                            <MaterialCommunityIcons name="skull" size={24} color="#C734CA" />
                             <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '85%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 15,
@@ -104,20 +104,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(233,184,201,0.2)',
-        backgroundColor: 'rgba(233,184,201,0.05)',
+        borderBottomColor: 'rgba(199,52,202,0.2)',
+        backgroundColor: 'rgba(199,52,202,0.05)',
     },
     title: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#E9B8C9',
+        color: '#C734CA',
         letterSpacing: 2,
     },
     closeButton: {
         padding: 4,
     },
     subtitle: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 12,
         fontFamily: 'Courier',
         textAlign: 'center',
@@ -135,18 +135,18 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(89,146,198,0.3)',
+        borderColor: 'rgba(123,104,215,0.3)',
         gap: 12,
         overflow: 'hidden',
     },
     actionTextMoney: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,
     },
     actionTextReset: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

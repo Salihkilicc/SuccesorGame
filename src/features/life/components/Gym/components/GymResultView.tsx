@@ -44,16 +44,16 @@ const GymResultView = ({ lastResult, onClose }: GymResultViewProps) => {
 
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
-    resultTitle: { fontSize: 28, fontWeight: '900', color: '#E9B8C9', textAlign: 'center', marginTop: 40 },
-    resultMessage: { color: '#E9B8C9', textAlign: 'center', marginTop: 10, fontSize: 16 },
+    resultTitle: { fontSize: 28, fontWeight: '900', color: '#C734CA', textAlign: 'center', marginTop: 40 },
+    resultMessage: { color: '#C734CA', textAlign: 'center', marginTop: 10, fontSize: 16 },
     enjoymentBar: { marginTop: 30, alignItems: 'center' },
-    enjoymentLabel: { color: '#E9B8C9', fontSize: 12, marginBottom: 8 },
-    barBg: { width: '80%', height: 10, backgroundColor: '#31241F', borderRadius: 5, overflow: 'hidden' },
-    barFill: { height: '100%', backgroundColor: '#533D35' },
+    enjoymentLabel: { color: '#C734CA', fontSize: 12, marginBottom: 8 },
+    barBg: { width: '80%', height: 10, backgroundColor: '#020626', borderRadius: 5, overflow: 'hidden' },
+    barFill: { height: '100%', backgroundColor: '#0B0635' },
     enjoymentValue: { color: '#FFFFFF', marginTop: 5 },
-    promotionBadge: { marginTop: 20, backgroundColor: '#31241F', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    promotionText: { color: '#E9B8C9', fontWeight: '800', textAlign: 'center' },
-    doneBtn: { backgroundColor: '#533D35', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
+    promotionBadge: { marginTop: 20, backgroundColor: '#020626', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    promotionText: { color: '#C734CA', fontWeight: '800', textAlign: 'center' },
+    doneBtn: { backgroundColor: '#0B0635', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
     doneText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
 });
 

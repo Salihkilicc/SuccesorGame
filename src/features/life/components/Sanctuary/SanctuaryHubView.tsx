@@ -80,7 +80,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Massage */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('MASSAGE')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.MASSAGE}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.royalMassage')}</Text>
@@ -89,7 +89,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Grooming */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('GROOMING')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.GROOMING}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.groomingLounge')}</Text>
@@ -98,7 +98,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Surgery */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('SURGERY')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#31241F' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.SURGERY}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.plasticSurgery')}</Text>
@@ -120,11 +120,11 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     backdrop: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#5992C6', // Light gray background
+        backgroundColor: '#7B68D7', // Light gray background
     },
     safeArea: {
         flex: 1,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
     },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -176,19 +176,19 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 20,
         marginBottom: 24,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
         elevation: 5,
     },
     vipActive: {
-        backgroundColor: '#31241F', // Dark luxury
+        backgroundColor: '#020626', // Dark luxury
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     vipInactive: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     vipContent: {
         flex: 1,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     vipTitle: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#5992C6', // Gold -> Light Green
+        color: '#7B68D7', // Gold -> Light Green
         marginBottom: 4,
     },
     vipDesc: {
@@ -225,11 +225,11 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,

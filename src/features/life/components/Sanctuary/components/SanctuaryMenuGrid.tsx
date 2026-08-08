@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F', // Dark Navy
+        backgroundColor: '#020626', // Dark Navy
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
@@ -121,12 +121,12 @@ const styles = StyleSheet.create({
     },
     dangerCard: {
         borderColor: 'rgba(255,255,255,0.48)', // Bamboo
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     vipCard: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)', // Light Green
-        backgroundColor: '#5992C6', // Dark Pine
+        backgroundColor: '#7B68D7', // Dark Pine
     },
     cardPressed: {
         opacity: 0.8,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     vipText: {
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     cardSubtitle: {
         fontSize: 12,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     vipActiveBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: theme.radius.md,
         padding: 12,
         borderWidth: 1,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
     },
     vipActiveTitle: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 2,

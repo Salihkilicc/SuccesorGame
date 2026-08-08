@@ -36,7 +36,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                         <View style={styles.partnerStats}>
                             <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
                             <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
-                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#31241F', shadowColor: '#31241F', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#020626', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>
 
                             {/* ACTIVE PERKS DISPLAY */}
@@ -106,7 +106,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
     return (
         <View style={styles.partnerCardWrapper}>
             <LinearGradient
-                colors={['#31241F', '#31241F', '#674C41']}
+                colors={['#020626', '#020626', '#11063D']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.3,
         shadowRadius: 18,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.8)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 8,

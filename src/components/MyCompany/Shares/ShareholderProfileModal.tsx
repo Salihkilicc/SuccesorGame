@@ -208,16 +208,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
 
     const getTrustColor = (trust: number) => {
-        if (trust < 30) return '#E9B8C9'; // Red
-        if (trust < 50) return '#E9B8C9'; // Orange
-        if (trust < 70) return '#E9B8C9'; // Yellow
-        return '#5992C6'; // Green
+        if (trust < 30) return '#C734CA'; // Red
+        if (trust < 50) return '#C734CA'; // Orange
+        if (trust < 70) return '#C734CA'; // Yellow
+        return '#7B68D7'; // Green
     };
 
     const getReactionColor = () => {
-        if (offerPremium < 0) return '#E9B8C9'; // Red - Insulted
-        if (offerPremium <= 20) return '#E9B8C9'; // Yellow - Neutral
-        return '#5992C6'; // Green - Happy
+        if (offerPremium < 0) return '#C734CA'; // Red - Insulted
+        if (offerPremium <= 20) return '#C734CA'; // Yellow - Neutral
+        return '#7B68D7'; // Green - Happy
     };
 
     const getReactionLabel = () => {
@@ -242,9 +242,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
     const getAdviceBubbleStyle = () => {
         const baseStyle = styles.adviceBubble;
-        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(89,146,198,0.1)' }];
-        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' }];
-        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' }];
+        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(123,104,215,0.1)' }];
+        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
+        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
     };
 
     // ============================================================================
@@ -404,9 +404,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Current Stock Price Info */}
-                                <View style={{ backgroundColor: '#31241F', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
+                                <View style={{ backgroundColor: '#020626', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
-                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#5992C6' }}>{formatPrice(stockPrice)}</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#7B68D7' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
                                 {/* Context Text */}
@@ -502,7 +502,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <Text style={styles.priceLabel}>
                                         {tradeMode === 'buy' ? t('shp.youPay') : t('shp.youReceive')}
                                     </Text>
-                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#5992C6' }]}>
+                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#7B68D7' }]}>
                                         {formatMoney(calculateOfferPrice())}
                                     </Text>
                                 </View>
@@ -511,7 +511,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 <TouchableOpacity
                                     style={[
                                         styles.makeOfferButton,
-                                        { backgroundColor: tradeMode === 'buy' ? '#5992C6' : '#E9B8C9' }
+                                        { backgroundColor: tradeMode === 'buy' ? '#7B68D7' : '#C734CA' }
                                     ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
@@ -541,7 +541,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     >
                         {animationState === 'loading' && (
                             <View style={styles.animationContent}>
-                                <ActivityIndicator size="large" color="#0A2A92" />
+                                <ActivityIndicator size="large" color="#6004BD" />
                                 <Text style={styles.animationText}>
                                     {tradeMode === 'buy' ? t('shp.negotiating') : t('shp.processing')}
                                 </Text>
@@ -585,12 +585,12 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '85%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.5,
         shadowRadius: 16,
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#674C41',
+        backgroundColor: '#11063D',
     },
     header: {
         padding: 24,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     traitBadge: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 16,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     trustBarBg: {
         width: '100%',
         height: 10,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 5,
         overflow: 'hidden',
     },
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -713,13 +713,13 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     tabActive: {
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     tabText: {
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 20,
         borderRadius: 20,
         borderWidth: 1,
@@ -800,14 +800,14 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     stepperButtonDisabled: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
@@ -819,7 +819,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         height: 56,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -851,12 +851,12 @@ const styles = StyleSheet.create({
     reactionChance: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     reactionBarBg: {
         width: '100%',
         height: 16,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 8,
         overflow: 'hidden',
     },
@@ -869,7 +869,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         marginTop: 16,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -918,17 +918,17 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonBuyActive: {
-        backgroundColor: 'rgba(89,146,198,0.2)',
+        backgroundColor: 'rgba(123,104,215,0.2)',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonSellActive: {
-        backgroundColor: 'rgba(233,184,201,0.2)',
+        backgroundColor: 'rgba(199,52,202,0.2)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     modeButtonText: {
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     priceDisplay: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,
@@ -966,6 +966,6 @@ const styles = StyleSheet.create({
     priceValue: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#0A2A92',
+        color: '#6004BD',
     },
 });

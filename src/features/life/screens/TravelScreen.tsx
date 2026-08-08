@@ -57,7 +57,7 @@ const TravelScreen = () => {
         <AppLaunchLoader
             appName="Travel"
             appIcon={<MaterialCommunityIcons name="airplane" size={64} color="#FFFFFF" />}
-            backgroundColor="#0A2A92"
+            backgroundColor="#6004BD"
         >
             <View style={styles.container}>
                 <TravelHubModal
@@ -106,7 +106,7 @@ const TravelScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
     },
 });
 

@@ -33,7 +33,7 @@ const StockDetailScreen = () => {
     const currentChange = initialChange;
 
     const isPositive = currentChange >= 0;
-    const changeColor = isPositive ? '#5FB37A' : '#E06B6B';
+    const changeColor = isPositive ? '#C8C0EF' : '#C836CA';
 
     // Get current quarter for random chart selection
     const currentMonth = useGameStore(state => state.currentMonth);
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     },
     categoryText: {
         fontSize: 12,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
         marginTop: 4,
     },

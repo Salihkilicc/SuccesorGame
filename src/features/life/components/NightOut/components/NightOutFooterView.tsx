@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     totalLabel: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     confirmButton: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     closeText: {
-        color: '#5992C6',
+        color: '#7B68D7',
         fontSize: 14
     }
 });

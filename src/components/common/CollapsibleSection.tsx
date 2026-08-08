@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     headerText: { flex: 1, paddingRight: 10 },
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
     title: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 1.6,
@@ -141,13 +141,13 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     summary: { fontSize: 14, fontWeight: '800', maxWidth: 130, textAlign: 'right' },
     chevron: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontSize: 16,
         marginTop: -4,
         width: 14,
         textAlign: 'center',
     },
-    chevronOpen: { color: '#E9B8C9', transform: [{ rotate: '180deg' }], marginTop: 2 },
+    chevronOpen: { color: '#C734CA', transform: [{ rotate: '180deg' }], marginTop: 2 },
     body: {
         paddingHorizontal: 14,
         paddingBottom: 14,

@@ -74,17 +74,17 @@ const FitnessConfigView = ({
 const styles = StyleSheet.create({
     subViewContainer: { flex: 1, paddingHorizontal: 20 },
     subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
-    configLabel: { color: '#E9B8C9', fontSize: 12, fontWeight: '700', marginBottom: 12, letterSpacing: 1, textAlign: 'center' },
+    configLabel: { color: '#C734CA', fontSize: 12, fontWeight: '700', marginBottom: 12, letterSpacing: 1, textAlign: 'center' },
     optionsList: { gap: 10, marginBottom: 24 },
-    optionBtn: { padding: 16, backgroundColor: '#31241F', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    optionActive: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#31241F' },
-    optionText: { color: '#E9B8C9', fontWeight: '600', textAlign: 'center' },
-    optionTextActive: { color: '#E9B8C9', fontWeight: '700' },
-    startBtn: { backgroundColor: '#533D35', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+    optionBtn: { padding: 16, backgroundColor: '#020626', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    optionActive: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#020626' },
+    optionText: { color: '#C734CA', fontWeight: '600', textAlign: 'center' },
+    optionTextActive: { color: '#C734CA', fontWeight: '700' },
+    startBtn: { backgroundColor: '#0B0635', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
     startText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
-    disabledBtn: { backgroundColor: '#31241F' },
+    disabledBtn: { backgroundColor: '#020626' },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#E9B8C9', fontSize: 14 },
+    backText: { color: '#C734CA', fontSize: 14 },
 });
 
 export default FitnessConfigView;

@@ -27,8 +27,8 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
     const sentimentColor =
         company.boardSentiment === 'Supportive' ? theme.colors.success :
             company.boardSentiment === 'Hostile' ? theme.colors.danger :
-                company.boardSentiment === 'Skeptical' ? '#E9B8C9' :
-                    company.boardSentiment === 'Cautious' ? '#E9B8C9' : 'rgba(255,255,255,0.48)';
+                company.boardSentiment === 'Skeptical' ? '#C734CA' :
+                    company.boardSentiment === 'Cautious' ? '#C734CA' : 'rgba(255,255,255,0.48)';
 
     return (
         <Modal
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     },
     container: {
         height: '92%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: theme.spacing.lg,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     sectorBadge: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 8,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 20,
     },
     closeButtonText: {
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#7F5E51',
+        color: '#1A0A4A',
         letterSpacing: 1,
         marginBottom: 12,
     },
     gridContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     fitContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         marginVertical: 16,
     },
     sentimentBadge: {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: 20,
         right: 20,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 16,
         borderRadius: 16,
         flexDirection: 'row',
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: "#31241F",
+        shadowColor: "#020626",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,

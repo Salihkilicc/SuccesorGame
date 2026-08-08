@@ -60,7 +60,7 @@ export default CompanyHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#31241F', // Dark Gray
+    backgroundColor: '#020626', // Dark Gray
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   subtitle: {
-    color: '#E9B8C9', // Gold for CEO name
+    color: '#C734CA', // Gold for CEO name
     fontSize: theme.typography.caption + 1,
     marginTop: theme.spacing.xs,
   },
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   metricValue: {
-    color: '#5992C6', // Green for valuation
+    color: '#7B68D7', // Green for valuation
     fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
   },
@@ -103,16 +103,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#5992C6', // Green
+    color: '#7B68D7', // Green
   },
   changeDown: {
-    color: '#E9B8C9', // Red
+    color: '#C734CA', // Red
   },
   meta: {
     color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption + 1,
   },
   debt: {
-    color: '#E9B8C9', // Red
+    color: '#C734CA', // Red
   },
 });

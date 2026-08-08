@@ -92,7 +92,7 @@ export default TravelHubModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         alignItems: 'center', // Center children horizontally
     },
     container: {
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     headerButtonText: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontWeight: 'bold',
         fontSize: 12,
     },

@@ -76,11 +76,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#5992C6' };
-        if (trust >= 60) return { label: t('equity.supportive'), color: '#E9B8C9' };
-        if (trust >= 40) return { label: t('equity.neutral'), color: '#E9B8C9' };
-        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#E9B8C9' };
-        return { label: t('equity.hostileEnemy'), color: '#E9B8C9' };
+        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#7B68D7' };
+        if (trust >= 60) return { label: t('equity.supportive'), color: '#C734CA' };
+        if (trust >= 40) return { label: t('equity.neutral'), color: '#C734CA' };
+        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#C734CA' };
+        return { label: t('equity.hostileEnemy'), color: '#C734CA' };
     };
 
     const trustStatus = getTrustStatus(member.trust);
@@ -176,9 +176,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     const offerPrice = calculateOfferPrice();
 
     const getLikelihoodColor = () => {
-        if (offerPremium < 0) return '#E9B8C9'; // Insulted
-        if (offerPremium < 20) return '#E9B8C9'; // Hesitant
-        return '#5992C6'; // Interested
+        if (offerPremium < 0) return '#C734CA'; // Insulted
+        if (offerPremium < 20) return '#C734CA'; // Hesitant
+        return '#7B68D7'; // Interested
     };
 
     const getLikelihoodLabel = () => {
@@ -312,7 +312,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     </View>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.relationship')}</Text>
-                        <Text style={[styles.statValue, { color: '#5992C6' }]}>
+                        <Text style={[styles.statValue, { color: '#7B68D7' }]}>
                             {Math.round(member.relationship ?? 50)}
                         </Text>
                     </View>
@@ -364,7 +364,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🎁</Text>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
-                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#5992C6' : '#E9B8C9' }]}>
+                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#7B68D7' : '#C734CA' }]}>
                                     {fmtDelta(giftPreview)}
                                 </Text>
                             </Pressable>
@@ -380,7 +380,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🍽️</Text>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
-                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#5992C6' : '#E9B8C9' }]}>
+                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#7B68D7' : '#C734CA' }]}>
                                     {fmtDelta(dinnerPreview)}
                                 </Text>
                             </Pressable>
@@ -430,7 +430,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                     </Text>
                                     <Text style={[
                                         styles.stepperPremium,
-                                        { color: offerPremium >= 0 ? '#5992C6' : '#E9B8C9' }
+                                        { color: offerPremium >= 0 ? '#7B68D7' : '#C734CA' }
                                     ]}>
                                         {offerPremium >= 0 ? '+' : ''}{offerPremium}%
                                     </Text>
@@ -504,7 +504,7 @@ export default MemberInteractionModal;
 const styles = StyleSheet.create({
     heroSection: {
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 24,
         marginBottom: 20,
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 12,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     heroAvatarText: {
         fontSize: 40,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
     },
     heroName: {
         fontSize: 24,
@@ -548,10 +548,10 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#31241F', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterCard: { backgroundColor: '#020626', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
     characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
     characterValue: { color: '#FFFFFF', fontWeight: '700' },
-    characterHint: { color: '#5992C6', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
+    characterHint: { color: '#7B68D7', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
         gap: 24,
@@ -579,11 +579,11 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         alignItems: 'center',
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 8,
     },
     tabActive: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
     },
     tabText: {
         fontSize: 14,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     tabTextActive: {
-        color: '#31241F',
+        color: '#020626',
     },
     tabContent: {
         gap: 16,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '48%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -637,15 +637,15 @@ const styles = StyleSheet.create({
     },
     actionCost: {
         fontSize: 12,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
     },
     actionEffect: {
         fontSize: 11,
-        color: '#5992C6',
+        color: '#7B68D7',
     },
     stepperContainer: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         paddingVertical: 12,
     },
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     },
     reactionBarBg: {
         height: 12,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     makeOfferButton: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',
@@ -740,18 +740,18 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     makeOfferButtonDisabled: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
     makeOfferButtonText: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
         letterSpacing: 1,
     },
     infoBox: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 8,
         padding: 12,
         borderLeftWidth: 4,

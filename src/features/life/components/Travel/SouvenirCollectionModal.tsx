@@ -133,13 +133,13 @@ export default SouvenirCollectionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F', // Solid background
+        backgroundColor: '#020626', // Solid background
         alignItems: 'center', // Center children
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#31241F', // Solid background
+        backgroundColor: '#020626', // Solid background
     },
     header: {
         flexDirection: 'row',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         marginTop: 4,
     },
     closeButton: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         width: 60,
     },
     closeButtonText: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
         fontWeight: 'bold',
         fontSize: 12,
     },
@@ -179,13 +179,13 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 4,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 4,
     },
     gridContainer: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     lockedText: {
-        color: '#7F5E51',
+        color: '#1A0A4A',
     },
     spotName: {
         fontSize: 12,
@@ -244,18 +244,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     rarityLegendary: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
     },
     rarityRare: {
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
     },
     rarityCommon: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     rarityText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
         letterSpacing: 0.5,
     },
 });

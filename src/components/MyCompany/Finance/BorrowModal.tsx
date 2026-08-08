@@ -198,7 +198,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'shark' && styles.typeLabelActive]}>
                                     {t('bank.type.shark')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#E9B8C9' }]}>
+                                <Text style={[styles.typeRate, { color: '#C734CA' }]}>
                                     {shark.locked || `${shark.rate.toFixed(1)}%`}
                                 </Text>
                             </Pressable>
@@ -225,7 +225,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'mezzanine' && styles.typeLabelActive]}>
                                     {t('bank.type.mezzanine')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#E9B8C9' }]}>{mezz.rate.toFixed(1)}%</Text>
+                                <Text style={[styles.typeRate, { color: '#C734CA' }]}>{mezz.rate.toFixed(1)}%</Text>
                             </Pressable>
                         </View>
 
@@ -270,7 +270,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.previewRow}>
                                 <Text style={styles.previewLabel}>{t('bank.quarterlyPayment')}</Text>
-                                <Text style={[styles.previewValue, { color: '#E9B8C9' }]}>
+                                <Text style={[styles.previewValue, { color: '#C734CA' }]}>
                                     {formatMoney(preview.totalPayment)}
                                 </Text>
                             </View>
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         maxWidth: 420,
         // Ekranin en fazla %78'ini kaplasin; gerisi kaydirilir.
         maxHeight: '78%',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     },
     typeButton: {
         flex: 1,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     },
     typeButtonActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     typeEmoji: {
         fontSize: 24,
@@ -434,14 +434,14 @@ const styles = StyleSheet.create({
     },
     typeRate: {
         fontSize: 14,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '700',
     },
     sliderContainer: {
         marginBottom: 24,
     },
     previewContainer: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     },
     productDesc: {
         fontSize: 12,
-        color: '#E9B8C9',
+        color: '#C734CA',
         lineHeight: 17,
         marginBottom: 14,
         fontStyle: 'italic',
@@ -479,14 +479,14 @@ const styles = StyleSheet.create({
         opacity: 0.45,
     },
     errorText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
         fontWeight: '600',
     },
     warningText: {
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
     },
     cancelText: {
         color: '#FFFFFF',
@@ -512,8 +512,8 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#533D35',
-        shadowColor: '#31241F',
+        backgroundColor: '#0B0635',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmText: {
-        color: '#31241F',
+        color: '#020626',
         fontWeight: '800',
         fontSize: 15,
     },

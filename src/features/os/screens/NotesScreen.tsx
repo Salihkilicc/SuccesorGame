@@ -70,7 +70,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
         >
             {/* Gold left accent bar */}
             <LinearGradient
-                colors={['#E9B8C9', '#E9B8C9']}
+                colors={['#C734CA', '#C734CA']}
                 style={styles.noteAccentBar}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
@@ -89,7 +89,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                         <MaterialCommunityIcons
                             name="trash-can-outline"
                             size={18}
-                            color="#674C41"
+                            color="#11063D"
                         />
                     </TouchableOpacity>
                 </View>
@@ -104,7 +104,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                     <MaterialCommunityIcons
                         name="clock-outline"
                         size={11}
-                        color="#7F5E51"
+                        color="#1A0A4A"
                     />
                     <Text style={styles.noteDate}>{formatDate(note.date)}</Text>
                 </View>
@@ -145,7 +145,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                     onPress={onCancel}
                     style={({ pressed }) => [styles.editorHeaderBtn, pressed && { opacity: 0.6 }]}
                 >
-                    <MaterialCommunityIcons name="arrow-left" size={22} color="#E9B8C9" />
+                    <MaterialCommunityIcons name="arrow-left" size={22} color="#C734CA" />
                     <Text style={styles.editorHeaderBtnText}>{t('os.notes')}</Text>
                 </Pressable>
 
@@ -157,7 +157,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                     ]}
                 >
                     <LinearGradient
-                        colors={['#E9B8C9', '#E9B8C9']}
+                        colors={['#C734CA', '#C734CA']}
                         style={StyleSheet.absoluteFillObject}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
@@ -175,12 +175,12 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={title}
                 onChangeText={setTitle}
                 placeholder={t('os.title')}
-                placeholderTextColor="#674C41"
+                placeholderTextColor="#11063D"
                 returnKeyType="next"
                 onSubmitEditing={() => contentRef.current?.focus()}
                 autoFocus={!note}
                 maxLength={120}
-                selectionColor="#E9B8C9"
+                selectionColor="#C734CA"
             />
 
             {/* Divider */}
@@ -193,10 +193,10 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={content}
                 onChangeText={setContent}
                 placeholder={t('os.startWritingYourNote')}
-                placeholderTextColor="#42312A"
+                placeholderTextColor="#07062E"
                 multiline
                 textAlignVertical="top"
-                selectionColor="#E9B8C9"
+                selectionColor="#C734CA"
             />
         </KeyboardAvoidingView>
     );
@@ -207,12 +207,12 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
 const EmptyState = ({ onNew }: { onNew: () => void }) => (
     <View style={styles.emptyState}>
         <LinearGradient
-            colors={['rgba(233,184,201,0.12)', 'rgba(233,184,201,0.04)']}
+            colors={['rgba(199,52,202,0.12)', 'rgba(199,52,202,0.04)']}
             style={styles.emptyIconCircle}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
         >
-            <MaterialCommunityIcons name="note-text-outline" size={44} color="#E9B8C9" />
+            <MaterialCommunityIcons name="note-text-outline" size={44} color="#C734CA" />
         </LinearGradient>
         <Text style={styles.emptyTitle}>{t('os.noNotesYet')}</Text>
         <Text style={styles.emptySubtitle}>
@@ -281,7 +281,7 @@ const NotesScreen = () => {
             <View style={styles.root}>
                 <StatusBar barStyle="light-content" />
                 <LinearGradient
-                    colors={['#31241F', '#31241F', '#31241F']}
+                    colors={['#020626', '#020626', '#020626']}
                     style={StyleSheet.absoluteFill}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -304,7 +304,7 @@ const NotesScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#31241F', '#31241F', '#31241F']}
+                colors={['#020626', '#020626', '#020626']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -320,7 +320,7 @@ const NotesScreen = () => {
                             pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
                         ]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -336,7 +336,7 @@ const NotesScreen = () => {
                         ]}
                     >
                         <LinearGradient
-                            colors={['#E9B8C9', '#E9B8C9']}
+                            colors={['#C734CA', '#C734CA']}
                             style={StyleSheet.absoluteFillObject}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
@@ -388,7 +388,7 @@ export default NotesScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     safeArea: {
         flex: 1,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(233,184,201,0.15)',
+        borderBottomColor: 'rgba(199,52,202,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -413,10 +413,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12,
         zIndex: 10,
-        backgroundColor: 'rgba(233,184,201,0.08)',
+        backgroundColor: 'rgba(199,52,202,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(233,184,201,0.2)',
+        borderColor: 'rgba(199,52,202,0.2)',
     },
     headerCenter: {
         flex: 1,
@@ -433,10 +433,10 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
         zIndex: 10,
         borderRadius: 12,
         overflow: 'hidden',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 8,
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     },
     countBadge: {
         fontSize: 11,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
         fontWeight: '600',
@@ -483,13 +483,13 @@ const styles = StyleSheet.create({
         height: 10,
     },
     noteCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         flexDirection: 'row',
         overflow: 'hidden',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.4,
         shadowRadius: 8,
@@ -524,11 +524,11 @@ const styles = StyleSheet.create({
     deleteBtn: {
         padding: 4,
         borderRadius: 8,
-        backgroundColor: 'rgba(233,184,201,0.06)',
+        backgroundColor: 'rgba(199,52,202,0.06)',
     },
     notePreview: {
         fontSize: 13,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         lineHeight: 18,
     },
     noteFooter: {
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     },
     noteDate: {
         fontSize: 10,
-        color: '#674C41',
+        color: '#11063D',
         letterSpacing: 0.5,
         fontWeight: '500',
     },
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(233,184,201,0.2)',
+        borderColor: 'rgba(199,52,202,0.2)',
         marginBottom: 8,
     },
     emptyTitle: {
@@ -571,15 +571,15 @@ const styles = StyleSheet.create({
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#7F5E51',
+        color: '#1A0A4A',
         textAlign: 'center',
         lineHeight: 21,
     },
     emptyAction: {
         marginTop: 8,
-        backgroundColor: 'rgba(233,184,201,0.1)',
+        backgroundColor: 'rgba(199,52,202,0.1)',
         borderWidth: 1,
-        borderColor: 'rgba(233,184,201,0.3)',
+        borderColor: 'rgba(199,52,202,0.3)',
         borderRadius: 12,
         paddingVertical: 12,
         paddingHorizontal: 32,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
     emptyActionText: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#E9B8C9',
+        color: '#C734CA',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
     },
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
     },
     editorHeaderBtnText: {
         fontSize: 16,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
     },
     editorSaveBtn: {
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         paddingVertical: 9,
         paddingHorizontal: 20,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 8,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     },
     editorRule: {
         height: StyleSheet.hairlineWidth,
-        backgroundColor: 'rgba(233,184,201,0.15)',
+        backgroundColor: 'rgba(199,52,202,0.15)',
         marginHorizontal: 16,
         marginBottom: 12,
     },

@@ -141,14 +141,14 @@ export default SouvenirMiniGame;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#31241F', // Solid black
+        backgroundColor: '#020626', // Solid black
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
         paddingBottom: 100, // Add padding for bottom bar
     },
     container: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24, // Reduced padding
         width: '100%',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     },
     box: {
         aspectRatio: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     boxSelected: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     boxIcon: {
         fontSize: 24, // Smaller icon
@@ -223,18 +223,18 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     rarityLegendary: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
     },
     rarityRare: {
-        backgroundColor: '#0A2A92',
+        backgroundColor: '#6004BD',
     },
     rarityCommon: {
-        backgroundColor: '#5992C6',
+        backgroundColor: '#7B68D7',
     },
     rarityText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
         letterSpacing: 1,
     },
 });

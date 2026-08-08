@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     gap: 8,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -70,15 +70,15 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#31241F',
+    color: '#020626',
   },
   requirement: {
     fontSize: 13,
-    color: '#7F5E51',
+    color: '#1A0A4A',
   },
   lockedTag: {
     backgroundColor: '#FFFFFF',
-    color: '#E9B8C9',
+    color: '#C734CA',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

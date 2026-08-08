@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontSize: theme.typography.body,
-    color: '#E9B8C9',
+    color: '#C734CA',
     marginTop: theme.spacing.xs,
     fontWeight: '600',
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontWeight: '700',
   },
   itemQuantity: {
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profit: {
-    color: '#5992C6',
+    color: '#7B68D7',
   },
   loss: {
-    color: '#E9B8C9',
+    color: '#C734CA',
   },
   actions: {
     flexDirection: 'row',
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   buyButton: {
-    backgroundColor: 'rgba(89,146,198,0.12)',
+    backgroundColor: 'rgba(123,104,215,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)',
   },
   sellButton: {
-    backgroundColor: 'rgba(233,184,201,0.12)',
+    backgroundColor: 'rgba(199,52,202,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
@@ -271,12 +271,12 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: '#5992C6',
+    color: '#7B68D7',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
   sellButtonText: {
-    color: '#E9B8C9',
+    color: '#C734CA',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },

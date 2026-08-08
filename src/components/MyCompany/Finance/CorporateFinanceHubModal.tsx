@@ -67,13 +67,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     // Credit Rating Display
     const getCreditRating = () => {
-        if (creditScore >= 800) return { label: 'AAA', color: '#E9B8C9', description: t('finance.excellent') };
-        if (creditScore >= 750) return { label: 'AA', color: '#E9B8C9', description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: '#5992C6', description: t('finance.good') };
-        if (creditScore >= 650) return { label: 'BBB', color: '#E9B8C9', description: t('finance.fair') };
-        if (creditScore >= 600) return { label: 'BB', color: '#E9B8C9', description: t('finance.moderate') };
-        if (creditScore >= 500) return { label: 'B', color: '#E9B8C9', description: t('finance.risky') };
-        return { label: 'C', color: '#E9B8C9', description: t('finance.junk') };
+        if (creditScore >= 800) return { label: 'AAA', color: '#C734CA', description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: '#C734CA', description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: '#7B68D7', description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: '#C734CA', description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: '#C734CA', description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: '#C734CA', description: t('finance.risky') };
+        return { label: 'C', color: '#C734CA', description: t('finance.junk') };
     };
 
     const rating = getCreditRating();
@@ -101,14 +101,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.navGrid}>
                     {/* OWNER INJECTION BUTTON */}
                     <TouchableOpacity style={[styles.navCard, { borderColor: 'rgba(255,255,255,0.06)', flex: 1 }]} onPress={() => setShowInjection(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(89,146,198,0.2)' }]}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(123,104,215,0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
                             <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
                         </View>
-                        <Text style={{ color: '#5992C6', fontSize: 18 }}>→</Text>
+                        <Text style={{ color: '#7B68D7', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -136,7 +136,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     styles.progressFill,
                                     {
                                         width: `${Math.min(100, (totalDebt / (totalDebt + borrowingCapacity)) * 100)}%`,
-                                        backgroundColor: leverage > 60 ? '#E9B8C9' : '#E9B8C9'
+                                        backgroundColor: leverage > 60 ? '#C734CA' : '#C734CA'
                                     }
                                 ]}
                             />
@@ -151,19 +151,19 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.statsGrid}>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
-                        <Text style={[styles.statValue, { color: '#E9B8C9' }]}>
+                        <Text style={[styles.statValue, { color: '#C734CA' }]}>
                             {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
-                        <Text style={[styles.statValue, { color: '#E9B8C9' }]}>
+                        <Text style={[styles.statValue, { color: '#C734CA' }]}>
                             {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
-                        <Text style={[styles.statValue, { color: leverage > 60 ? '#E9B8C9' : '#5992C6' }]}>
+                        <Text style={[styles.statValue, { color: leverage > 60 ? '#C734CA' : '#7B68D7' }]}>
                             {leverage.toFixed(1)}%
                         </Text>
                     </View>
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         height: 8,
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     },
     capacityValue: {
         fontSize: 14,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '700',
         textAlign: 'right',
     },
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     emptyStateText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#5992C6',
+        color: '#7B68D7',
         marginBottom: 4,
     },
     emptyStateSubtext: {
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     loanRate: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#E9B8C9',
+        color: '#C734CA',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     repayButton: {
-        backgroundColor: '#42312A',
+        backgroundColor: '#07062E',
         borderRadius: 16,
         padding: 18,
         alignItems: 'center',
@@ -510,16 +510,16 @@ const styles = StyleSheet.create({
     repayButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#5992C6',
+        color: '#7B68D7',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     ctaButton: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -532,18 +532,18 @@ const styles = StyleSheet.create({
     ctaButtonText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#31241F',
+        color: '#020626',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     // Shark Deal Styles
     sharkDealCard: {
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 12,
@@ -563,14 +563,14 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
     },
     sharkAvatarText: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#31241F',
+        color: '#020626',
     },
     sharkDealInfo: {
         flex: 1,
@@ -583,11 +583,11 @@ const styles = StyleSheet.create({
     },
     sharkDealSubtitle: {
         fontSize: 12,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontWeight: '600',
     },
     instantBadge: {
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 8,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     instantBadgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#31241F',
+        color: '#020626',
         letterSpacing: 0.5,
     },
     sharkDealFooter: {
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     },
     sharkDealWarning: {
         fontSize: 11,
-        color: '#E9B8C9',
+        color: '#C734CA',
         fontStyle: 'italic',
         textAlign: 'center',
     },
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,

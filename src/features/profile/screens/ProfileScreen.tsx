@@ -17,7 +17,7 @@ const ProfileScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#31241F', '#31241F', '#31241F']}
+                colors={['#020626', '#020626', '#020626']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -33,7 +33,7 @@ const ProfileScreen = () => {
                             pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
                         ]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#E9B8C9" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -70,7 +70,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#31241F',
+        backgroundColor: '#020626',
     },
     safeArea: {
         flex: 1,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(233,184,201,0.15)',
+        borderBottomColor: 'rgba(199,52,202,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12,
         zIndex: 10,
-        backgroundColor: 'rgba(233,184,201,0.08)',
+        backgroundColor: 'rgba(199,52,202,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(233,184,201,0.2)',
+        borderColor: 'rgba(199,52,202,0.2)',
     },
     headerCenter: {
         flex: 1,
@@ -113,10 +113,10 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#533D35',
+        backgroundColor: '#0B0635',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#31241F',
+        shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,

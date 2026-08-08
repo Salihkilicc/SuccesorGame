@@ -370,7 +370,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   return (
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
-                      <Text style={[styles.infoValue, { color: '#5992C6' }]}>
+                      <Text style={[styles.infoValue, { color: '#7B68D7' }]}>
                         {found.competitor.share.toFixed(1)}% of {found.market.category}
                       </Text>
                     </View>
@@ -429,7 +429,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
   },
   header: {
     padding: 20,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   closeBtn: {
-    backgroundColor: '#42312A',
+    backgroundColor: '#07062E',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
@@ -494,12 +494,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
   activeTab: {
-    backgroundColor: '#533D35', // Gold
+    backgroundColor: '#0B0635', // Gold
     borderColor: 'rgba(255,255,255,0.08)',
   },
   tabText: {
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeTabText: {
-    color: '#31241F',
+    color: '#020626',
     fontWeight: '700',
   },
 
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#42312A',
+    backgroundColor: '#07062E',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   itemSector: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 12,
     fontWeight: '500',
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   valueLabel: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 11,
   },
   emptyState: {
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#674C41',
+    color: '#11063D',
   },
 
   // Negotiation Overlay
@@ -589,12 +589,12 @@ const styles = StyleSheet.create({
   },
   negotiationCard: {
     width: '100%',
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
     padding: 24,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
@@ -610,13 +610,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   negSubtitle: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 14,
   },
   negBody: {
     marginBottom: 24,
     gap: 12,
-    backgroundColor: '#31241F',
+    backgroundColor: '#020626',
     padding: 16,
     borderRadius: 12,
   },
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionBtn: {
-    backgroundColor: '#42312A',
+    backgroundColor: '#07062E',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
@@ -661,18 +661,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   optionDesc: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 12,
   },
   hostileBtn: {
-    backgroundColor: 'rgba(233,184,201,0.1)',
+    backgroundColor: 'rgba(199,52,202,0.1)',
     borderColor: theme.colors.danger,
   },
   hostileText: {
     color: theme.colors.danger,
   },
   hostileDesc: {
-    color: '#E9B8C9',
+    color: '#C734CA',
   },
   cancelBtn: {
     marginTop: 16,
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   cancelText: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontWeight: '600',
   },
 

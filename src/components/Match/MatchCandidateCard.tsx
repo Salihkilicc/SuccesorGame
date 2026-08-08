@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     gap: 12,
-    shadowColor: '#31241F',
+    shadowColor: '#020626',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoText: {
-    color: '#7F5E51',
+    color: '#1A0A4A',
     fontSize: 14,
   },
   info: {
@@ -56,10 +56,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#31241F',
+    color: '#020626',
   },
   meta: {
     fontSize: 14,
-    color: '#7F5E51',
+    color: '#1A0A4A',
   },
 });
