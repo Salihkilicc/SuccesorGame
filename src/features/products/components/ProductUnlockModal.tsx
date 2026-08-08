@@ -11,6 +11,7 @@ import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatNumber } from '../../../core/utils';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 type Props = {
     product: UnlockableProduct;
@@ -151,13 +152,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         >
             <Pressable style={styles.overlay} onPress={onClose}>
                 <Pressable style={styles.modal} onPress={(e) => e.stopPropagation()}>
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <Text style={styles.title}>{product.name}</Text>
-                        <Pressable onPress={onClose} style={styles.closeButton}>
-                            <Text style={styles.closeIcon}>✕</Text>
-                        </Pressable>
-                    </View>
+                    <ScreenHeader title={product.name} onBack={onClose} />
 
                     {/* Description */}
                     <View style={styles.descriptionContainer}>

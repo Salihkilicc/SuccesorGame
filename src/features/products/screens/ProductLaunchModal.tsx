@@ -7,6 +7,7 @@ import { theme } from '../../../core/theme';
 import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { Product } from '../data/productsData';
 import { useProductsLogic } from '../logic/useProductsLogic';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 interface ProductLaunchModalProps {
     visible: boolean;
@@ -131,12 +132,10 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 <View style={styles.card}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>{step === 1 ? t('product.newProductLaunch') : t('product.marketResearch')}</Text>
-                        <Pressable onPress={onClose}>
-                            <Text style={styles.closeIcon}>✕</Text>
-                        </Pressable>
-                    </View>
+                    <ScreenHeader
+                        title={step === 1 ? t('product.newProductLaunch') : t('product.marketResearch')}
+                        onBack={onClose}
+                    />
 
                     {step === 1 && renderStep1()}
                     {step === 2 && renderStep2()}

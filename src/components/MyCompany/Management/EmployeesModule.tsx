@@ -126,7 +126,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
             {/* This screen had no exit control of any kind - as a popup it was
                 dismissed by tapping outside, which a screen cannot be. */}
             <ScreenHeader title={t('ui.team')} onBack={onClose} />
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.screenPad}>
                 {/* ══ MORAL ŞERİDİ ══ */}
                 <View style={styles.stripe}>
                     <View style={{ flex: 1 }}>
@@ -293,6 +293,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
 };
 
 const styles = StyleSheet.create({
+    screenPad: { padding: theme.spacing.md },
     stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
     label: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },

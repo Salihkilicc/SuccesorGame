@@ -74,8 +74,11 @@ const styles = StyleSheet.create({
     },
     screenBody: {
         flex: 1,
-        padding: theme.spacing.md,
-        // Clear of the nav bar, which now sits above every screen.
+        // NO horizontal padding and no top padding on purpose. The screen's
+        // ScreenHeader is the first child, and padding here inset it from the
+        // edges - which is what read as a wide grey slab across the top. The
+        // header runs edge to edge like a header should; content below brings
+        // its own padding.
         paddingBottom: 110,
     },
     overlay: {

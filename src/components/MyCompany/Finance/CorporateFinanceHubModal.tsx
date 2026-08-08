@@ -107,7 +107,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 onBack={onClose}
             />
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg, paddingBottom: 24 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg, padding: theme.spacing.md, paddingBottom: 24 }}>
 
                 {/* --- NAVIGATION GRID --- */}
                 <View style={styles.navGrid}>

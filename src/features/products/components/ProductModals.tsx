@@ -33,6 +33,7 @@ import { scrapMultiplier } from '../../../core/market/workforce';
 import InfoDot from '../../../components/common/InfoDot';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 // Removed obsolete imports
 // import { ... } from '../../../features/products/logic/productUpgrades';
 
@@ -45,7 +46,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
-                    <Text style={styles.modalTitle}>🚀 New Product Opportunity</Text>
+                    <ScreenHeader title="🚀 New Product Opportunity" onBack={onClose} />
 
                     <View style={styles.header}>
                         <Text style={styles.icon}>{product.icon}</Text>
@@ -470,18 +471,15 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={[styles.content, { height: '85%' }]}>
-                    <View style={styles.headerRow}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <Text style={styles.modalTitle}>{product.icon} {displayName}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                            {/* RP Badge */}
+                    <ScreenHeader
+                        title={`${product.icon} ${displayName}`}
+                        onBack={onClose}
+                        right={
                             <View style={styles.rpBadge}>
                                 <Text style={styles.rpBadgeText}>{formatNumberShared(totalRP)} RP</Text>
                             </View>
-                            <Pressable onPress={onClose}><Text style={styles.closeIcon}>✕</Text></Pressable>
-                        </View>
-                    </View>
+                        }
+                    />
 
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {/* SHELVED: the "AI Insight" box.
