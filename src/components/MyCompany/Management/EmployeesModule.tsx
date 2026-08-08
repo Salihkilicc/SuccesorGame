@@ -46,6 +46,7 @@ import {
 } from '../../../core/market/workforce';
 import { formatMoney, formatNumber, formatPercent } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import ScreenHeader from '../../common/ScreenHeader';
 
 interface Props {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -121,7 +122,10 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
     const canBonus = !bonusDistributed && lastQuarterProfit > 0 && companyCapital >= bonusCost;
 
     return (
-        <GameModal visible={visible} onClose={onClose} title={t('ui.team')}>
+        <GameModal asScreen={asScreen} visible={visible} onClose={onClose}>
+            {/* This screen had no exit control of any kind - as a popup it was
+                dismissed by tapping outside, which a screen cannot be. */}
+            <ScreenHeader title={t('ui.team')} onBack={onClose} />
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* ══ MORAL ŞERİDİ ══ */}
                 <View style={styles.stripe}>

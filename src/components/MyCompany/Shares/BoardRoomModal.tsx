@@ -9,6 +9,7 @@ import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import ScreenHost from '../../common/ScreenHost';
+import ScreenHeader from '../../common/ScreenHeader';
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
@@ -147,12 +148,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
             <View style={styles.backdrop}>
                 <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
                 <View style={styles.container}>
-                    <View style={styles.titleRow}>
-                        <Text style={styles.title}>{t('board.title')}</Text>
-                        <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
-                            <Text style={styles.closeText}>✕</Text>
-                        </Pressable>
-                    </View>
+                    <ScreenHeader title={t('board.title')} onBack={onClose} />
 
                     {/* ---- KONTROL DURUMU: seyreltmenin bedeli burada gorunur ---- */}
                     <View style={styles.controlCard}>

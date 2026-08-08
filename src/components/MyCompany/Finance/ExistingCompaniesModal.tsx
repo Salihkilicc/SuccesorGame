@@ -14,6 +14,7 @@ import { useCorporateFinanceStore } from '../../../features/finance/stores/useCo
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import { formatMoney } from '../../../core/utils';
 import ScreenHost from '../../common/ScreenHost';
+import ScreenHeader from '../../common/ScreenHeader';
 
 type Props = {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -37,13 +38,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
         <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" presentationStyle="fullScreen">
             <SafeAreaView style={styles.container}>
                 {/* Header */}
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={onClose} style={styles.backBtn}>
-                        <Text style={styles.backText}>← Back</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.title}>{t('finance.myEmpire')}</Text>
-                    <View style={{ width: 50 }} />
-                </View>
+                <ScreenHeader title={t('finance.myEmpire')} onBack={onClose} />
 
                 <FlatList
                     data={subsidiaries}

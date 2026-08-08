@@ -10,6 +10,7 @@ import GameButton from '../../common/GameButton';
 import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
 import { formatMoney } from '../../../core/utils';
+import ScreenHeader from '../../common/ScreenHeader';
 
 
 type Props = {
@@ -96,20 +97,15 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     return (
         <GameModal
+            asScreen={asScreen}
             visible={visible}
             onClose={onClose}
         >
-            {/* Custom Header with Close Button */}
-            <View style={styles.customHeader}>
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <Text style={styles.closeButtonText}>✕</Text>
-                </TouchableOpacity>
-                <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>{t('finance.corporateFinance')}</Text>
-                    <Text style={styles.headerSubtitle}>{t('finance.premiumPrivateBanking')}</Text>
-                </View>
-                {/* Spacer to balance the absolute close button if needed, but absolute works best */}
-            </View>
+            <ScreenHeader
+                title={t('finance.corporateFinance')}
+                subtitle={t('finance.premiumPrivateBanking')}
+                onBack={onClose}
+            />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg, paddingBottom: 24 }}>
 

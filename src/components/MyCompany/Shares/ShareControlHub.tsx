@@ -30,6 +30,7 @@ import { StatRow, DetailLine, DetailRule, DetailNote, RowGroup } from '../../com
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 import ScreenHost from '../../common/ScreenHost';
+import ScreenHeader from '../../common/ScreenHeader';
 
 interface Props {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -164,17 +165,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
             <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
                 <SafeAreaView style={styles.container}>
                     {/* Header */}
-                    <View style={styles.header}>
-                        <TouchableOpacity
-                            onPress={onClose}
-                            style={styles.backButton}
-                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 20 }}
-                        >
-                            <Text style={styles.backButtonText}>← Close</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.headerTitle}>{t('equity.equityManagement')}</Text>
-                        <View style={styles.headerSpacer} />
-                    </View>
+                    <ScreenHeader title={t('equity.equityManagement')} onBack={onClose} />
 
                     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
                         {/* Kontrol uyarisi — %50 esigi oyunun en onemli sayisi */}

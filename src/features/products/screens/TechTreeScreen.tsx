@@ -11,6 +11,7 @@ import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
 import { formatNumber, formatMoney } from '../../../core/utils';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 const TechTreeScreen = () => {
     useLocale();
@@ -74,20 +75,16 @@ const TechTreeScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={[styles.header, { paddingTop: Math.max(insets.top, 20) + 10 }]}>
-                <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>←</Text>
-                </Pressable>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>{t('product.futureTechnologies')}</Text>
-                </View>
-
-                {/* The balance every price on this page is measured against. */}
-                <View style={styles.balance}>
-                    <Text style={styles.balanceValue}>{formatNumber(totalRP)} RP</Text>
-                    <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
-                </View>
-            </View>
+            <ScreenHeader
+                title={t('product.futureTechnologies')}
+                right={
+                    /* The balance every price on this page is measured against. */
+                    <View style={styles.balance}>
+                        <Text style={styles.balanceValue}>{formatNumber(totalRP)} RP</Text>
+                        <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
+                    </View>
+                }
+            />
 
             <ScrollView
                 style={styles.scrollView}

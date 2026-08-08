@@ -31,6 +31,7 @@ import { useShareholderStore } from '../../../features/shareholders/stores/useSh
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import ScreenHost from '../../common/ScreenHost';
+import ScreenHeader from '../../common/ScreenHeader';
 
 const { width } = Dimensions.get('window');
 
@@ -315,15 +316,11 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
       <View style={styles.container}>
 
         {/* HEADER */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>{t('action.mergersAcquisitions')}</Text>
-            <Text style={styles.subtitle}>{t('action.expandYourCorporateEmpire')}</Text>
-          </View>
-          <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Text style={styles.closeText}>{t('action.done')}</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader
+          title={t('action.mergersAcquisitions')}
+          subtitle={t('action.expandYourCorporateEmpire')}
+          onBack={onClose}
+        />
 
         {/* CAPITAL INDICATOR */}
         <View style={styles.capitalBar}>
