@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     name: {
         fontSize: 16,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginLeft: 16,
     },
     emptyContainer: {

@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 10, fontWeight: '600' },
 
   handCard: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2
   },
-  hiddenCard: { backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  hiddenCard: { backgroundColor: '#422B71', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   cardRank: { fontSize: 20, fontWeight: '900', color: '#FFFFFF' },
   cardSuit: { fontSize: 20 },
 
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,

@@ -193,7 +193,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     activeTabText: {
-        color: '#FFFFFF',
+        // The active tab is filled cyan, so this label inverts. White on that
+        // fill measures 2.34 - it was the "tab looks empty" case.
+        color: theme.colors.onLight,
     },
     section: {
         marginBottom: theme.spacing.lg,

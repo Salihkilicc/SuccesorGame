@@ -26,7 +26,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
 
     // 1. Determine Visuals based on Category/Value
     const isPremium = item.price > 10000000; // > $10M = Gold Border
-    const borderColor = isPremium ? '#6004BD' : '#07062E';
+    const borderColor = isPremium ? '#6004BD' : '#281F50';
     const emoji = getEmoji(item.category);
 
     // 2. Condition Color Logic
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     // Grid Tile specific styles
     containerTile: {
-        backgroundColor: '#0B0635', // Darker background
+        backgroundColor: '#422B71', // Darker background
         borderRadius: 12,
         borderWidth: 1,
         height: 130, // Much more compact
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     conditionBarBg: {
         height: 4,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 3,
         marginBottom: 4,
         overflow: 'hidden',

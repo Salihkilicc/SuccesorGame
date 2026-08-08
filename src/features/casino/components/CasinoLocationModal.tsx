@@ -54,7 +54,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                         pressed && isUnlocked && { transform: [{ scale: 0.98 }] }
                                     ]}
                                 >
-                                    <View style={[styles.icon, { backgroundColor: isLocked ? '#11063D' : loc.theme.primary }]}>
+                                    <View style={[styles.icon, { backgroundColor: isLocked ? '#5C3790' : loc.theme.primary }]}>
                                         <Text style={{ fontSize: 20 }}>{isLocked ? '🔒' : '🏛️'}</Text>
                                     </View>
 
@@ -62,7 +62,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                         <Text style={[styles.locName, isLocked && { color: '#FFFFFF' }]}>
                                             {loc.name.toUpperCase()}
                                         </Text>
-                                        <Text style={[styles.locSub, { color: isUnlocked ? loc.theme.secondary : '#1A0A4A' }]}>
+                                        <Text style={[styles.locSub, { color: isUnlocked ? loc.theme.secondary : '#7B46B7' }]}>
                                             {isLocked
                                                 ? `Req: ${loc.requirement} Rep`
                                                 : `Max Bet: $${loc.maxBet.toLocaleString()}`
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         padding: 20
     },
     modalContent: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 16,
         gap: 16,

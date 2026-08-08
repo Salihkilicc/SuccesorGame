@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 20,
         borderRadius: 4,
         borderLeftWidth: 3,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     dangerButton: {
         borderLeftColor: '#900',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     pressed: {
         transform: [{ scale: 0.98 }],

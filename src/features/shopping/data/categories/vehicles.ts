@@ -39,7 +39,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.ironhorse.com',
             category: 'VEHICLE',
             description: 'Indestructible.',
-            bannerColor: '#11063D',
+            bannerColor: '#5C3790',
             emoji: '🛡️',
         },
         {

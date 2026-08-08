@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   matchButtonText: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    // Sits on a cyan fill: white would measure 2.34 here.
+    color: theme.colors.onLight,
   },
 });

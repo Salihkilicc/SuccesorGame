@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     height: 180,
-    backgroundColor: '#07062E',
+    backgroundColor: '#281F50',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#0B0635', // Fallback color
+    backgroundColor: '#422B71', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     flex: 1,
     height: 8,
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#07062E',
+    backgroundColor: '#281F50',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,

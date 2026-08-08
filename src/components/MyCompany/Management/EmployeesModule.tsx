@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden', marginBottom: 8,
     },
     moraleFill: { height: '100%', borderRadius: 5 },
-    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#0B0635' },
+    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#422B71' },
 
     note: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginBottom: 14 },
     line: { color: 'rgba(255,255,255,0.48)', fontSize: 12, lineHeight: 17, marginTop: 6 },

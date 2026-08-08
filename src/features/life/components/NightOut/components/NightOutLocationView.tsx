@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     optionButton: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 8,
         padding: 12,
         borderWidth: 1,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     },
     optionButtonSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#0B0635', // subtle gold tint
+        backgroundColor: '#422B71', // subtle gold tint
     },
     optionText: {
         color: '#FFFFFF',

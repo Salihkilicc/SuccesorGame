@@ -184,7 +184,7 @@ const GymMartialArtsView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     selectionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     selectBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 8,
     },
     selectBtnText: {
@@ -294,13 +294,13 @@ const styles = StyleSheet.create({
     progressValue: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
     progressBarBg: {
         height: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
     },
     infoRow: {
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     infoValue: { fontSize: 14, color: '#FFFFFF', fontWeight: '700' },
     trainBtn: {
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 18,
         borderRadius: 16,
         alignItems: 'center',
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     trainBtnDisabled: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         shadowOpacity: 0,
     },
     trainBtnText: {

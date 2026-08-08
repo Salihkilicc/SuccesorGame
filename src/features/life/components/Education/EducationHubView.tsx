@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#0B0635', // Gold
+        backgroundColor: '#422B71', // Gold
         borderRadius: 6,
     },
 
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 12,
         left: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 6,

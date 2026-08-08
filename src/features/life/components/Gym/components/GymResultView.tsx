@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
     resultMessage: { color: '#C734CA', textAlign: 'center', marginTop: 10, fontSize: 16 },
     enjoymentBar: { marginTop: 30, alignItems: 'center' },
     enjoymentLabel: { color: '#C734CA', fontSize: 12, marginBottom: 8 },
-    barBg: { width: '80%', height: 10, backgroundColor: '#0B0635', borderRadius: 5, overflow: 'hidden' },
-    barFill: { height: '100%', backgroundColor: '#0B0635' },
+    barBg: { width: '80%', height: 10, backgroundColor: '#422B71', borderRadius: 5, overflow: 'hidden' },
+    barFill: { height: '100%', backgroundColor: '#422B71' },
     enjoymentValue: { color: '#FFFFFF', marginTop: 5 },
-    promotionBadge: { marginTop: 20, backgroundColor: '#0B0635', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    promotionBadge: { marginTop: 20, backgroundColor: '#422B71', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     promotionText: { color: '#C734CA', fontWeight: '800', textAlign: 'center' },
-    doneBtn: { backgroundColor: '#0B0635', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
+    doneBtn: { backgroundColor: '#422B71', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 40 },
     doneText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
 });
 

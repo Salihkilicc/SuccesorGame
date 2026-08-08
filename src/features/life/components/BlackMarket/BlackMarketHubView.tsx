@@ -114,7 +114,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                                 styles.fill,
                                 {
                                     width: `${Math.min(100, data.streetRep)}%`,
-                                    backgroundColor: '#0B0635'
+                                    backgroundColor: '#422B71'
                                 }
                             ]}
                         />
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     statusSection: {
         marginBottom: 30,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     },
     track: {
         height: 6,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 3,
         overflow: 'hidden'
     },
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     gridItem: {
         width: '47%',
         aspectRatio: 1,
-        backgroundColor: '#0B0635', // Dark card
+        backgroundColor: '#422B71', // Dark card
         borderRadius: 16,
         borderWidth: 1,
         alignItems: 'center',
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     },
     disconnectButton: {
         marginTop: 20,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 12,
         paddingHorizontal: 30,
         borderRadius: 8,

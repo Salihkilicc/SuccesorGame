@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     namingCard: {
         width: '100%',
         maxWidth: 360,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 24,
         padding: 28,
         alignItems: 'center',
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     },
     namingConfirm: {
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',

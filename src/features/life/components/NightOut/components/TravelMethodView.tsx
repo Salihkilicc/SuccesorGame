@@ -76,7 +76,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
-                        <View style={[styles.badge, { backgroundColor: '#0B0635' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#422B71' }]}>
                             <Text style={styles.badgeText}>{t('life.rep1')}</Text>
                         </View>
                     </View>
@@ -108,7 +108,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, { borderColor: 'rgba(255,255,255,0.08)' }, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
-                        <View style={[styles.badge, { backgroundColor: '#0B0635' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#422B71' }]}>
                             <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.06)',
         borderStyle: 'dashed',
     },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',

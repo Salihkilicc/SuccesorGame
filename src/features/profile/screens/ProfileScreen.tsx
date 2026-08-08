@@ -70,7 +70,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     safeArea: {
         flex: 1,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginTop: 6,
         borderRadius: 2,
         shadowColor: '#020626',

@@ -25,14 +25,14 @@ const RouletteGameScreen = () => {
   // Render Helpers
   const renderBetButton = (type: BetType, label: string) => {
     const active = selectedBet === type;
-    const color = active ? currentLocation.theme.primary : '#11063D';
+    const color = active ? currentLocation.theme.primary : '#5C3790';
 
     return (
       <Pressable
         onPress={() => actions.selectBet(type)}
         style={({ pressed }) => [
           styles.betButton,
-          { borderColor: active ? currentLocation.theme.primary : '#1A0A4A', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
+          { borderColor: active ? currentLocation.theme.primary : '#7B46B7', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
           pressed && styles.betButtonPressed,
         ]}>
         <Text style={[styles.betButtonText, active && { color: currentLocation.theme.primary }]}>{label}</Text>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', gap: 4 },
 
   tableCard: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
   spinText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
 
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  resultRed: { backgroundColor: '#0B0635' },
-  resultBlack: { backgroundColor: '#0B0635' },
+  resultRed: { backgroundColor: '#422B71' },
+  resultBlack: { backgroundColor: '#422B71' },
   resultGreen: { backgroundColor: '#C8C0EF' },
   resultText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
 });

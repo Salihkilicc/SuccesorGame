@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     card: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         alignItems: 'center',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.48)',
     },
     cardPressed: {
-        backgroundColor: '#11063D',
+        backgroundColor: '#5C3790',
         transform: [{ scale: 0.98 }],
     },
     emoji: {

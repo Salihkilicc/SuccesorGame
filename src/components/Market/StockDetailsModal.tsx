@@ -169,7 +169,8 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   buyText: {
-    color: theme.colors.textPrimary,
+    // Sits on a cyan fill: white would measure 2.34 here.
+    color: theme.colors.onLight,
     fontWeight: '800',
     fontSize: theme.typography.body,
   },

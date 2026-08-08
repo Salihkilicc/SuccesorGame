@@ -404,7 +404,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Current Stock Price Info */}
-                                <View style={{ backgroundColor: '#0B0635', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
+                                <View style={{ backgroundColor: '#422B71', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
                                     <Text style={{ fontSize: 24, fontWeight: '800', color: '#C8C0EF' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#11063D',
+        backgroundColor: '#5C3790',
     },
     header: {
         padding: 24,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     traitBadge: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 16,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     trustBarBg: {
         width: '100%',
         height: 10,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 5,
         overflow: 'hidden',
     },
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 20,
         borderRadius: 20,
         borderWidth: 1,
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     stepperButtonDisabled: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
@@ -819,7 +819,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         height: 56,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
     reactionBarBg: {
         width: '100%',
         height: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 8,
         overflow: 'hidden',
     },
@@ -918,7 +918,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     priceDisplay: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,

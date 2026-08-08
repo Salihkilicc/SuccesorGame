@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     },
     opaqueLayer: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#0B0635', // Base layer behind spot color
+        backgroundColor: '#422B71', // Base layer behind spot color
         zIndex: -1,
     },
     header: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     continueButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 18,
         borderRadius: 30,
         alignItems: 'center',

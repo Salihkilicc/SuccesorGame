@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#020626' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     errorText: { color: '#C734CA', fontSize: 16, marginBottom: 20 },
-    goBackBtn: { padding: 10, backgroundColor: '#0B0635', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+    goBackBtn: { padding: 10, backgroundColor: '#422B71', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     goBackText: { color: '#FFFFFF' },
     listContent: { padding: theme.spacing.lg },
 });

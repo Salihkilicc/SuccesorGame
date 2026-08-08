@@ -216,7 +216,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    noFloatCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    noFloatCard: { backgroundColor: '#422B71', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     noFloatTitle: { color: '#C734CA', fontWeight: '800', fontSize: 13, marginBottom: 4 },
     noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
     overlay: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         padding: 20, // Moved padding here
     },
     card: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         color: '#C8C0EF',
     },
     impactSection: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     costSection: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     executeButtonDisabled: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         opacity: 0.5,
     },
     executeButtonText: {

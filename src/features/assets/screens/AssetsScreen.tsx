@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     glassCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,

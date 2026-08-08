@@ -133,7 +133,7 @@ export default SouvenirCollectionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635', // Solid background
+        backgroundColor: '#422B71', // Solid background
         alignItems: 'center', // Center children
     },
     container: {
@@ -179,13 +179,13 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 4,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 4,
     },
     gridContainer: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     rarityLegendary: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     rarityRare: {
         backgroundColor: '#6004BD',

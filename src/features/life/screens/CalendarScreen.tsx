@@ -275,7 +275,7 @@ const CalendarScreen = () => {
 
                             {/* Star icon */}
                             <LinearGradient
-                                colors={['#C734CA', '#C734CA', '#0B0635']}
+                                colors={['#C734CA', '#C734CA', '#422B71']}
                                 style={styles.modalStar}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#0B0635', // Gold accent
+        backgroundColor: '#422B71', // Gold accent
         marginTop: 6,
         borderRadius: 2,
         shadowColor: '#020626',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(199,52,202,0.38)',

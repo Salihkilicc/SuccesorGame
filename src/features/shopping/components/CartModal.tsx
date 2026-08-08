@@ -176,7 +176,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             style={({ pressed }) => [
                                 styles.checkoutButton,
                                 pressed && { opacity: 0.9 },
-                                !canAfford && { backgroundColor: '#07062E' }
+                                !canAfford && { backgroundColor: '#281F50' }
                             ]}
                             onPress={handleProceedToCheckout}
                         >
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     headerTitle: {
         color: '#FFFFFF',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
 
     // Cart Item
     cartItemCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginBottom: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     actionButton: {
         paddingVertical: 6,
         paddingHorizontal: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -313,12 +313,12 @@ const styles = StyleSheet.create({
     divider: {
         width: 1,
         height: 16,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
     },
 
     // Order Summary
     summaryCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginTop: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
 
     // Checkout Footer (Above Stats Bar)
     checkoutFooter: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.06)',
         padding: 16,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     checkoutButton: {
-        backgroundColor: '#0B0635', // Amazon Yellow/Gold
+        backgroundColor: '#422B71', // Amazon Yellow/Gold
         paddingVertical: 14,
         borderRadius: 8,
         alignItems: 'center',
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
         marginBottom: 32,
     },
     continueButton: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 20,

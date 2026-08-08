@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flexBasis: '48%',
-    backgroundColor: '#0B0635', // Dark Gray - HARDCODED
+    backgroundColor: '#422B71', // Dark Gray - HARDCODED
     borderRadius: 16,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttonPressed: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     transform: [{ scale: 0.98 }],
     shadowOpacity: 0.6,
     elevation: 12,

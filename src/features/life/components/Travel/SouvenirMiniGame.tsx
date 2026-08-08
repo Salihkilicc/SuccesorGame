@@ -141,7 +141,7 @@ export default SouvenirMiniGame;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635', // Solid black
+        backgroundColor: '#422B71', // Solid black
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     },
     box: {
         aspectRatio: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     },
     boxSelected: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     boxIcon: {
         fontSize: 24, // Smaller icon
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     rarityLegendary: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     rarityRare: {
         backgroundColor: '#6004BD',

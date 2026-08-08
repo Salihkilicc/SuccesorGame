@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     venueCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,

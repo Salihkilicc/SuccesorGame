@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnActive: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnText: {

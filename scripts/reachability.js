@@ -171,7 +171,7 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
 //  not any single choice, is what made the app feel scattered from screen to
 //  screen. They are consolidated to fifteen; this keeps them there.
 const PALETTE = new Set([
-    '#020626', '#07062E', '#0B0635', '#11063D', '#1A0A4A',   // Deep Cove ground, 5 steps
+    '#020626', '#281F50', '#422B71', '#5C3790', '#7B46B7',   // Deep Cove ground, 5 steps
     '#FFFFFF', '#C8C0EF',                                     // text: white and lavender
     '#BA04BD', '#8504BD', '#6004BD', '#2304BD',               // the four purples, as fills
     '#C734CA',                                                // light magenta, for text
@@ -222,6 +222,114 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                 problems.contrast.push(`${rel(f)}:${i + 1}  white at ${faint[1]} alpha`);
             }
         });
+    }
+}
+
+// --- 0f) Text on a LIGHT fill ----------------------------------------------
+//  Pass 0e only ever compared text against the ground, so an entire class was
+//  invisible to it: a label is white, the ground is dark, but the button under
+//  the label is filled cyan. White on cyan measures 2.34 and white on lavender
+//  1.72 - painted, unreadable, and passing the audit. The player reported it as
+//  "the Directors tab and its text both look like they aren't there".
+//
+//  A style block alone cannot see this; the fill and the label live in separate
+//  blocks and are only related through the JSX tree. So this walks the tree:
+//  find a container whose style carries a light backgroundColor, then check
+//  every <Text> inside its span against that fill.
+{
+    const hx = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+    const lum = c => {
+        const [r, g, b] = c.map(v => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a, b) => {
+        const l1 = lum(a), l2 = lum(b);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+
+    // Resolve theme tokens to hex straight from theme.ts, so the audit cannot
+    // drift out of step with the palette the way a hardcoded copy would.
+    const TOKENS = new Map();
+    for (const m of read(path.join(SRC, 'core/theme.ts'))
+        .matchAll(/(\w+): *'(#[0-9A-Fa-f]{6})'/g)) {
+        if (!TOKENS.has(m[1])) TOKENS.set(m[1], m[2].toUpperCase());
+    }
+    const LIGHT = t => TOKENS.has(t) && lum(hx(TOKENS.get(t))) > 0.25;
+
+    // The open tag cannot be found with indexOf('>'): `style={({pressed}) => [`
+    // contains one. Track bracket depth and skip the arrow.
+    const endOpen = (s, i) => {
+        let d = 0;
+        for (; i < s.length; i++) {
+            const c = s[i];
+            if ('{(['.includes(c)) d++;
+            else if ('})]'.includes(c)) d--;
+            else if (c === '>' && d === 0 && s[i - 1] !== '=') return i;
+        }
+        return -1;
+    };
+    const TAGS = ['TouchableOpacity', 'Pressable', 'TouchableHighlight', 'View'];
+
+    for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+        const src = read(f);
+        const blocks = new Map();
+        for (const m of src.matchAll(/(\w+): *\{([^{}]*)\}/g)) blocks.set(m[1], m[2]);
+        const tokenOf = (name, prop) => {
+            const b = blocks.get(name);
+            if (!b) return null;
+            const re = prop === 'bg'
+                ? /backgroundColor: *(?:theme\.)?colors\.(\w+)/
+                : /(?:^|\n)\s*color: *(?:theme\.)?colors\.(\w+)/;
+            return (b.match(re) || [])[1] || null;
+        };
+        const seen = new Set();
+        for (const tag of TAGS) {
+            for (const m of src.matchAll(new RegExp(`<${esc(tag)}\\b`, 'g'))) {
+                const j = endOpen(src, m.index);
+                if (j < 0 || src[j - 1] === '/') continue;
+                // In a style ARRAY the last entry wins, so resolve to the last
+                // style that sets the property - not the first. Reading the
+                // first made `[tabText, active && activeTabText]` look broken
+                // when the override right after it was the fix.
+                let fill = null;
+                for (const s of src.slice(m.index, j).matchAll(/styles\.(\w+)/g)) {
+                    const t = tokenOf(s[1], 'bg');
+                    if (t) fill = t;
+                }
+                if (!LIGHT(fill)) continue;
+                // Walk to the matching close tag to bound the container.
+                const re = new RegExp(`<(/?)${esc(tag)}\\b`, 'g');
+                re.lastIndex = j + 1;
+                let depth = 1, end = src.length, hit;
+                while (depth > 0 && (hit = re.exec(src))) {
+                    depth += hit[1] === '/' ? -1 : 1;
+                    if (depth === 0) end = hit.index;
+                }
+                const span = src.slice(j, end);
+                if (span.length > 6000) continue;       // whole-screen wrapper, not a button
+                for (const tm of span.matchAll(/<Text\b/g)) {
+                    const te = endOpen(span, tm.index);
+                    if (te < 0) continue;
+                    let tok = null, styleName = null;
+                    for (const s of span.slice(tm.index, te).matchAll(/styles\.(\w+)/g)) {
+                        const t = tokenOf(s[1], 'color');
+                        if (t) { tok = t; styleName = s[1]; }
+                    }
+                    if (!tok || !TOKENS.has(tok)) continue;
+                    const r = ratio(hx(TOKENS.get(tok)), hx(TOKENS.get(fill)));
+                    const key = `${styleName}|${fill}`;
+                    if (r < 4.5 && !seen.has(key)) {
+                        seen.add(key);
+                        const ln = src.slice(0, m.index).split('\n').length;
+                        problems.contrast.push(
+                            `${rel(f)}:${ln}  ${tok} on ${fill} fill = ${r.toFixed(2)}`);
+                    }
+                }
+            }
+        }
     }
 }
 

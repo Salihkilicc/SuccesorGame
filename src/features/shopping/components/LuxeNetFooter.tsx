@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         width: '60%',
         marginBottom: 20,
     },

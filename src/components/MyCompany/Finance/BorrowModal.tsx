@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     },
     typeButton: {
         flex: 1,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     },
     typeButtonActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     typeEmoji: {
         fontSize: 24,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     previewContainer: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
     },
     cancelText: {
         color: '#FFFFFF',
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

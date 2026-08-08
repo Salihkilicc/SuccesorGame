@@ -113,7 +113,7 @@ export default NightConclusionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     container: {
         flex: 1,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 4,
         overflow: 'hidden',
         width: '100%'

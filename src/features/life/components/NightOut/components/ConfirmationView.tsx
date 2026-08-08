@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     venueCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,

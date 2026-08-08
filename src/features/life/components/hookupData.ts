@@ -144,7 +144,7 @@ export const COLORS = [
     '#C8C0EF', // Powder Blue
     '#C734CA', // Peach
     'rgba(255,255,255,0.48)', // Mauve
-    '#1A0A4A', // Purple
+    '#7B46B7', // Purple
     '#C8C0EF', // Navy Blue
     '#C836CA', // Pink
     '#FFFFFF', // Light Green

@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingBottom: 12, // Reduced from 20 to tighten layout
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     headerTop: {
         flexDirection: 'row',
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
         aspectRatio: 1.58, // Credit Card Ratio
-        backgroundColor: '#0B0635', // Matte Black
+        backgroundColor: '#422B71', // Matte Black
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     chipGraphic: {
         width: 44,
         height: 34,
-        backgroundColor: '#0B0635', // Gold/Copper Chip color
+        backgroundColor: '#422B71', // Gold/Copper Chip color
         borderRadius: 6,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -283,14 +283,14 @@ const styles = StyleSheet.create({
     chipLine1: {
         width: '100%',
         height: 1,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         marginBottom: 8,
     },
     chipLine2: {
         position: 'absolute',
         width: 1,
         height: '60%',
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
     },
     netWorthValue: {
         color: '#FFFFFF',
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20, // Pill shape
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     filterChipActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         shadowColor: "#C734CA",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     shopAction: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     },
     // Primary
     primaryButton: {
-        backgroundColor: '#0B0635', // Gold
+        backgroundColor: '#422B71', // Gold
         borderColor: 'rgba(255,255,255,0.08)',
     },
     primaryText: {
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     // Secondary
     secondaryButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     secondaryText: {

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     subTitle: { fontSize: 24, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', marginBottom: 10 },
     subSubtitle: { color: '#C734CA', textAlign: 'center', marginBottom: 20 },
     list: { gap: 12 },
-    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0B0635', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    supplementCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#422B71', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     supplementIcon: { fontSize: 24, marginRight: 12 },
     supplementName: { color: '#FFFFFF', fontWeight: '700' },
     supplementEffect: { color: '#C734CA', fontSize: 12 },

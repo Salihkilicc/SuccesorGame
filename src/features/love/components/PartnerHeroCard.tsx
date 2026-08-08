@@ -36,7 +36,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                         <View style={styles.partnerStats}>
                             <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
                             <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(2,6,38,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
-                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#0B0635', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#422B71', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>
 
                             {/* ACTIVE PERKS DISPLAY */}
@@ -106,7 +106,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
     return (
         <View style={styles.partnerCardWrapper}>
             <LinearGradient
-                colors={['#020626', '#020626', '#11063D']}
+                colors={['#020626', '#020626', '#5C3790']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}

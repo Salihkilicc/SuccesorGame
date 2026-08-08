@@ -123,12 +123,14 @@ const styles = StyleSheet.create({
     },
     warningText: {
         fontSize: 14,
-        color: theme.colors.textPrimary,
+        // Sits on the magenta warning fill: white measures 4.40 there.
+        color: theme.colors.onLight,
         marginBottom: theme.spacing.xs,
     },
     warningBullet: {
         fontSize: 13,
-        color: theme.colors.textSecondary,
+        // Sits on the magenta warning fill: lavender measures 2.57 there.
+        color: theme.colors.onLight,
         marginLeft: theme.spacing.sm,
     },
     projectionBox: {
@@ -184,7 +186,8 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 15,
         fontWeight: '700',
-        color: theme.colors.textPrimary,
+        // Sits on a cyan fill: white would measure 2.34 here.
+        color: theme.colors.onLight,
     },
 });
 

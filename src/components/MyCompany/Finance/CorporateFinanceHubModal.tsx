@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         height: 8,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     repayButton: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 16,
         padding: 18,
         alignItems: 'center',
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     ctaButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     },
     // Shark Deal Styles
     sharkDealCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     instantBadge: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 8,
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,

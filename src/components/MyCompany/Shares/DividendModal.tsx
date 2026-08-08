@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     titleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
     closeBtn: {
         width: 32, height: 32, borderRadius: 16,
-        backgroundColor: '#07062E', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#281F50', alignItems: 'center', justifyContent: 'center',
     },
     closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
     title: {
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     infoSection: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginVertical: 8,
     },
     profitHighlight: {
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',

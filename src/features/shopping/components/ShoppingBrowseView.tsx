@@ -179,7 +179,7 @@ const ShoppingBrowseView = ({
                                             styles.addButton,
                                             {
                                                 backgroundColor: owned
-                                                    ? '#07062E'
+                                                    ? '#281F50'
                                                     : inCart
                                                         ? '#6004BD'
                                                         : '#C734CA',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 10,
         minWidth: 20,
         height: 20,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: CARD_WIDTH,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: theme.spacing.md,
         borderWidth: 1,

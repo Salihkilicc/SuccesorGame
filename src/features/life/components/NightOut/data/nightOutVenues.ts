@@ -256,7 +256,7 @@ export const VENUES: Venue[] = [
         location: 'Tokyo',
         entryFee: 40,
         tier: 4,
-        themeColor: '#1A0A4A', // Dim Gray
+        themeColor: '#7B46B7', // Dim Gray
         emoji: '🥁',
         vibeText: 'The bass from the massive speaker stack controlled your heartbeat.',
     },

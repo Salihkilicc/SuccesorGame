@@ -89,7 +89,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                         <MaterialCommunityIcons
                             name="trash-can-outline"
                             size={18}
-                            color="#11063D"
+                            color="#5C3790"
                         />
                     </TouchableOpacity>
                 </View>
@@ -104,7 +104,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
                     <MaterialCommunityIcons
                         name="clock-outline"
                         size={11}
-                        color="#1A0A4A"
+                        color="#7B46B7"
                     />
                     <Text style={styles.noteDate}>{formatDate(note.date)}</Text>
                 </View>
@@ -175,7 +175,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={title}
                 onChangeText={setTitle}
                 placeholder={t('os.title')}
-                placeholderTextColor="#11063D"
+                placeholderTextColor="#5C3790"
                 returnKeyType="next"
                 onSubmitEditing={() => contentRef.current?.focus()}
                 autoFocus={!note}
@@ -193,7 +193,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 value={content}
                 onChangeText={setContent}
                 placeholder={t('os.startWritingYourNote')}
-                placeholderTextColor="#07062E"
+                placeholderTextColor="#281F50"
                 multiline
                 textAlignVertical="top"
                 selectionColor="#C734CA"
@@ -388,7 +388,7 @@ export default NotesScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     safeArea: {
         flex: 1,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginTop: 6,
         borderRadius: 2,
         shadowColor: '#020626',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
         height: 10,
     },
     noteCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

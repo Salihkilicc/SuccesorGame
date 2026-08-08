@@ -123,7 +123,7 @@ export default WeatherScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     safeArea: {
         flex: 1,

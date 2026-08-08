@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635', // Dark Navy
+        backgroundColor: '#422B71', // Dark Navy
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     },
     dangerCard: {
         borderColor: 'rgba(255,255,255,0.48)', // Bamboo
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     vipCard: {
         borderWidth: 1,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     vipActiveBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: theme.radius.md,
         padding: 12,
         borderWidth: 1,

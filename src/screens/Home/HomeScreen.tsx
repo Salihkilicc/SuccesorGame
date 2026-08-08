@@ -51,7 +51,7 @@ const GRADIENTS = {
   orangeYellow: ['#C734CA', '#C734CA'],
   blueSky: ['#C8C0EF', '#C8C0EF'],
   bluePurple: ['#C8C0EF', '#6004BD'],
-  darkGrey: ['#020626', '#11063D'],
+  darkGrey: ['#020626', '#5C3790'],
   networkBlue: ['#6004BD', '#C8C0EF'],
   tealCyan: ['#C8C0EF', '#C8C0EF'],
 };
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#C734CA', '#C734CA', '#0B0635']}
+                colors={['#C734CA', '#C734CA', '#422B71']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,7 +367,7 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#C734CA', '#C734CA', '#0B0635']}
+                colors={['#C734CA', '#C734CA', '#422B71']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -970,7 +970,7 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
   },
   entryLove: {
     flex: 1,
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,

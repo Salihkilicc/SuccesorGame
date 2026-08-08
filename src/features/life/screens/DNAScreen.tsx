@@ -57,7 +57,7 @@ const LuxuryBar = () => {
     const { netWorth, maxWealth, percentage, buffAmount } = useLuxurySystem();
     const isBuffActive = buffAmount > 0;
     const buffColor = isBuffActive ? '#C734CA' : 'rgba(255,255,255,0.08)';
-    const buffTextColor = isBuffActive ? '#020626' : '#1A0A4A';
+    const buffTextColor = isBuffActive ? '#020626' : '#7B46B7';
 
     return (
         <View style={[styles.card, styles.luxuryCard]}>
@@ -142,10 +142,10 @@ const DNAScreen = () => {
             green: '#C8C0EF',
             blue: '#C8C0EF',
             purple: '#6004BD',
-            brown: '#1A0A4A',
+            brown: '#7B46B7',
             black: '#020626'
         };
-        return colors[lowerBelt] || '#0B0635';
+        return colors[lowerBelt] || '#422B71';
     };
 
     const getHeatColor = (val: number) => {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 36,
         height: 2,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginTop: 8,
         borderRadius: 2,
         shadowColor: '#020626',
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     },
     luxuryProgressBarFill: {
         height: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 5,
         shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },

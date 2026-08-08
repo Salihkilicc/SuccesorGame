@@ -151,7 +151,7 @@ const SlotsGameScreen = () => {
               disabled={isSpinning || bet <= 0}
               style={({ pressed }) => [
                 styles.spinButton,
-                { backgroundColor: isSpinning || bet <= 0 ? '#1A0A4A' : currentLocation.theme.primary },
+                { backgroundColor: isSpinning || bet <= 0 ? '#7B46B7' : currentLocation.theme.primary },
                 pressed && styles.spinButtonPressed,
                 (isSpinning || bet <= 0) && styles.disabledButton
               ]}>
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
 
   machineContainer: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   reelsWrapper: {
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: 10,
     borderRadius: 12,
     overflow: 'hidden',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,

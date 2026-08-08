@@ -31,7 +31,7 @@ const COLORS = {
     textPrimary: '#FFFFFF',
     textSecondary: 'rgba(255,255,255,0.48)',
     gold: '#C734CA',
-    locked: '#07062E'
+    locked: '#281F50'
 };
 
 // --- COMPONENT ---
@@ -172,7 +172,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#1A0A4A',
+            1: '#7B46B7',
             2: '#C734CA',
             3: '#C734CA',
             4: '#C734CA'
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     lockedCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

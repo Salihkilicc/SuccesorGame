@@ -267,13 +267,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     },
     doctorCard: {
         padding: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: theme.radius.md,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     doctorCardPressed: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.48)',
     },
     doctorCardDisabled: {
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
         bottom: 12,
         left: 12,
         right: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 8,

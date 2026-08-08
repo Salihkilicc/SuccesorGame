@@ -53,12 +53,12 @@ export default PregnancyRevealModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 24,

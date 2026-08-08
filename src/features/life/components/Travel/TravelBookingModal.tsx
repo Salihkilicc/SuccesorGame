@@ -172,7 +172,7 @@ export default TravelBookingModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635', // Solid black background instead of transparent
+        backgroundColor: '#422B71', // Solid black background instead of transparent
         justifyContent: 'center',
         alignItems: 'center', // Center children
         padding: 20,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     planeIcon: {
         marginHorizontal: 8,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginBottom: -10,
     },
     content: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     classOption: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     costBadge: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 28,
         borderRadius: 14,
-        backgroundColor: '#11063D',
+        backgroundColor: '#5C3790',
         padding: 2,
         justifyContent: 'center',
     },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     closeText: {
         color: '#FFFFFF',

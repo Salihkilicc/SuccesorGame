@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 480,
     maxHeight: '92%',
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(199,52,202,0.18)',
@@ -1037,7 +1037,7 @@ const styles = StyleSheet.create({
 
   cashDivider: {
     height: 1,
-    backgroundColor: '#07062E',
+    backgroundColor: '#281F50',
     marginVertical: 12,
   },
   cashHeader: {
@@ -1150,7 +1150,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.07)',
   },
   primaryButton: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',

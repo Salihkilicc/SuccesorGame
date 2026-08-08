@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
     beltLabel: { color: '#C734CA', fontSize: 12, letterSpacing: 1 },
     beltName: { color: '#FFFFFF', fontSize: 28, fontWeight: '900', marginTop: 5 },
     beltVisual: { width: 100, height: 20, borderRadius: 4, marginTop: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    startBtn: { backgroundColor: '#0B0635', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+    startBtn: { backgroundColor: '#422B71', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
     startText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
-    disabledBtn: { backgroundColor: '#0B0635' },
+    disabledBtn: { backgroundColor: '#422B71' },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
     backText: { color: '#C734CA', fontSize: 14 },
 });

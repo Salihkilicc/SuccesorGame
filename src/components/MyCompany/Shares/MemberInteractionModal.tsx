@@ -504,7 +504,7 @@ export default MemberInteractionModal;
 const styles = StyleSheet.create({
     heroSection: {
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 24,
         marginBottom: 20,
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 12,
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#0B0635', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterCard: { backgroundColor: '#422B71', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
     characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
     characterValue: { color: '#FFFFFF', fontWeight: '700' },
     characterHint: { color: '#C8C0EF', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
@@ -579,11 +579,11 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         alignItems: 'center',
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 8,
     },
     tabActive: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     tabText: {
         fontSize: 14,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '48%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
         color: '#C8C0EF',
     },
     stepperContainer: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         paddingVertical: 12,
     },
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     },
     reactionBarBg: {
         height: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     makeOfferButtonDisabled: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     infoBox: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 8,
         padding: 12,
         borderLeftWidth: 4,

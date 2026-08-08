@@ -70,7 +70,7 @@ const SettingsRow = ({
                     ios_backgroundColor="#020626"
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#1A0A4A" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#7B46B7" />
             )}
         </TouchableOpacity>
     );
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     safeArea: {
         flex: 1,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginTop: 6,
         borderRadius: 2,
         shadowColor: '#020626',
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     rowFirst: {
         borderTopLeftRadius: 16,

@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     sectorBadge: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 8,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 20,
     },
     closeButtonText: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     gridContainer: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     fitContainer: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginVertical: 16,
     },
     sentimentBadge: {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: 20,
         right: 20,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 16,
         borderRadius: 16,
         flexDirection: 'row',

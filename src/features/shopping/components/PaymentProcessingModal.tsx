@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     securityBadge: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

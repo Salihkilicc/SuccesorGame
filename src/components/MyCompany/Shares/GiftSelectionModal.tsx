@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
     impactTextSmall: {
         fontSize: 10,
         fontWeight: '700',
-        color: theme.colors.success,
+        // The badge behind it is filled with this same colour: 1.00 contrast.
+        color: theme.colors.onLight,
     },
     cancelBtn: {
         marginTop: theme.spacing.lg,

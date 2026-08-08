@@ -91,7 +91,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, -1)}
                     disabled={strategy[field] === 0}
                 >
-                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#1A0A4A' : '#FFFFFF'} />
+                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#7B46B7' : '#FFFFFF'} />
                 </TouchableOpacity>
 
                 <View style={styles.valueBox}>
@@ -103,7 +103,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, 1)}
                     disabled={totalPoints >= maxPoints}
                 >
-                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#1A0A4A' : '#FFFFFF'} />
+                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#7B46B7' : '#FFFFFF'} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#020626',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     companyName: {
         fontSize: 22,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginHorizontal: 10,
     },
     kpiLabel: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     pointsBadge: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 12,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 10,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -392,11 +392,11 @@ const styles = StyleSheet.create({
         padding: 20,
         borderTopWidth: 1,
         borderTopColor: '#020626',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',

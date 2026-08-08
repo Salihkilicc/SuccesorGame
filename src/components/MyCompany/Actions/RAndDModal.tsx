@@ -512,7 +512,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.sm,
   },
   maxLevelText: {
-    color: theme.colors.success,
+    // The container is filled with this same colour, so the label was drawing
+    // itself invisible at 1.00 contrast.
+    color: theme.colors.onLight,
     fontWeight: '700',
     fontSize: 12,
     letterSpacing: 1,

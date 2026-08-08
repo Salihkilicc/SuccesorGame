@@ -73,18 +73,18 @@ export const PercentageSelector = ({
 
                 {/* 1. Satır: AZALTMA (Kırmızı/Turuncu Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("MIN", () => update('min', 0), '#07062E', '#C734CA')}
-                    {renderBtn("-50%", () => update('percent', -50), '#0B0635', '#C734CA')}
+                    {renderBtn("MIN", () => update('min', 0), '#281F50', '#C734CA')}
+                    {renderBtn("-50%", () => update('percent', -50), '#422B71', '#C734CA')}
                     {renderBtn("-10%", () => update('percent', -10), '#C734CA', '#C734CA')}
                     {renderBtn("-5%", () => update('percent', -5), '#C734CA', '#C734CA')}
                 </View>
 
                 {/* 2. Satır: ARTIRMA (Yeşil/Mavi Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("+5%", () => update('percent', 5), '#07062E', '#C8C0EF')}
-                    {renderBtn("+10%", () => update('percent', 10), '#07062E', '#C8C0EF')}
-                    {renderBtn("+50%", () => update('percent', 50), '#0B0635', '#C8C0EF')}
-                    {renderBtn("MAX", () => update('max', 0), '#07062E', '#0B0635')}
+                    {renderBtn("+5%", () => update('percent', 5), '#281F50', '#C8C0EF')}
+                    {renderBtn("+10%", () => update('percent', 10), '#281F50', '#C8C0EF')}
+                    {renderBtn("+50%", () => update('percent', 50), '#422B71', '#C8C0EF')}
+                    {renderBtn("MAX", () => update('max', 0), '#281F50', '#422B71')}
                 </View>
 
             </View>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     // Bar Stilleri
     barTrack: {
         height: 6,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 3,
         overflow: 'hidden',
     },

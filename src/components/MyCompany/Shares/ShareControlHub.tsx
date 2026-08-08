@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     heroCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 24,
         marginTop: 20,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     statCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         width: '48%',
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     actionRow: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,

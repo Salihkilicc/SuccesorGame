@@ -265,7 +265,7 @@ const ShoppingScreen = () => {
                                     onPress={() => isInCart ? setShowCart(true) : !owned && addToCart(item)}
                                     style={({ pressed }) => [
                                         styles.addButton,
-                                        { backgroundColor: owned ? '#07062E' : isInCart ? '#6004BD' : '#C734CA' },
+                                        { backgroundColor: owned ? '#281F50' : isInCart ? '#6004BD' : '#C734CA' },
                                         pressed && !owned && styles.pressed
                                     ]}
                                     disabled={owned}
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     },
     trendingCard: {
         width: 140,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: theme.spacing.md,
         gap: 6,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     },
     itemCard: {
         width: CARD_WIDTH,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 12,
         borderWidth: 1,

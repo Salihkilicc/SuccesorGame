@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     optionCard: {
-        backgroundColor: '#0B0635', // Deep Ocean Blue
+        backgroundColor: '#422B71', // Deep Ocean Blue
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -211,10 +211,10 @@ const styles = StyleSheet.create({
     optionCardVIP: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#0B0635', // Deep Ocean Blue
+        backgroundColor: '#422B71', // Deep Ocean Blue
     },
     optionCardPressed: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         transform: [{ scale: 0.98 }],
     },
     optionHeader: {

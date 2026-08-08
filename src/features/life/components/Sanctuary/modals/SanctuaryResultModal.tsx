@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     },
     barTrack: {
         height: 12,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     statTag: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 16,

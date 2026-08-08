@@ -260,7 +260,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🛡️',
                     title: 'Protection',
                     desc: `+${val} Personal Security`,
-                    color: '#11063D' // Navy
+                    color: '#5C3790' // Navy
                 });
                 break;
             case 'LUCK_BOOST':

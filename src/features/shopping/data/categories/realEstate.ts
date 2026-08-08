@@ -21,7 +21,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.skylinearch.com',
             category: 'REAL_ESTATE',
             description: 'Own the skyline.',
-            bannerColor: '#11063D',
+            bannerColor: '#5C3790',
             emoji: '🏢',
         },
         {
@@ -30,7 +30,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.dynasty8elite.com',
             category: 'REAL_ESTATE',
             description: 'Residences of distinction.',
-            bannerColor: '#11063D',
+            bannerColor: '#5C3790',
             emoji: '🏠',
         },
         {

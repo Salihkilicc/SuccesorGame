@@ -52,13 +52,35 @@ export const palette = {
 
 export const theme = {
     colors: {
-        // --- Zemin: Deep Cove, mor yonunde kademeli acilarak --------------
+        // --- Ground and the elevation ladder ------------------------------
+        //
+        //  The previous ladder failed when measured: all four surfaces sat
+        //  only 1.02 - 1.12 contrast from the ground, i.e. a card and the
+        //  background were effectively the same colour. That is why every
+        //  screen read as one flat sheet.
+        //
+        //  Rebuilt. Both pure directions were wrong:
+        //    - lightening toward the purple -> #340576, 96% saturation, the
+        //      cards themselves turn violet
+        //    - lightening toward white      -> #232642, saturation collapses
+        //      to 47% and keeps falling; the purple identity goes grey
+        //  So the two were combined: purple first, then white, holding
+        //  saturation at 62% while solving each step for a contrast target.
+        //
+        //    token          colour    from ground   from step below
+        //    surface        #281F50      1.32            1.32
+        //    surfaceRaised  #422B71      1.72            1.30
+        //    surfaceHigh    #5C3790      2.27            1.32
+        //
+        //  A card needs ~1.25-1.40 to separate from its ground. Each rung
+        //  clears that against the rung beneath it as well, so stacked
+        //  surfaces stay legible against each other and not just the floor.
         background: '#020626',
-        surface: '#07062E',
-        surfaceRaised: '#0B0635',
-        surfaceHigh: '#11063D',
+        surface: '#281F50',
+        surfaceRaised: '#422B71',
+        surfaceHigh: '#5C3790',
         border: 'rgba(255,255,255,0.08)',
-        borderStrong: '#1A0A4A',
+        borderStrong: '#7B46B7',
 
         // --- Yazi ----------------------------------------------------------
         textPrimary: '#FFFFFF',
@@ -78,6 +100,18 @@ export const theme = {
         accentText: '#04BDBA',
         highlightTextColor: '#C734CA',
         lavender: '#C8C0EF',
+
+        // --- Text sitting ON a light fill ---------------------------------
+        //
+        //  The rule "never dark text" applies to dark grounds. It inverts on
+        //  a light fill, and the codebase had been applying it there too:
+        //  white on cyan measures 2.34, white on lavender 1.72 - the label
+        //  was painted but unreadable. Against those same fills the ground
+        //  colour scores 8.51 and 11.59.
+        //
+        //  So: any button, badge or tab filled with cyan, magenta or
+        //  lavender takes `onLight` for its text, never textPrimary.
+        onLight: '#020626',
 
         accentSoft: 'rgba(35,4,189,0.22)',
         highlightSoft: 'rgba(186,4,189,0.18)',
@@ -100,8 +134,8 @@ export const theme = {
         negative: '#C836CA',
 
         // Eski adlar — kademeli gecis
-        card: '#07062E',
-        cardSoft: '#0B0635',
+        card: '#281F50',
+        cardSoft: '#422B71',
         success: '#04BDBA',
         danger: '#C734CA',
         error: '#C734CA',
@@ -112,9 +146,9 @@ export const theme = {
 
     elevation: {
         flat: '#020626',
-        low: '#07062E',
-        mid: '#0B0635',
-        high: '#11063D',
+        low: '#281F50',
+        mid: '#422B71',
+        high: '#5C3790',
     },
 
     radius: { xs: 6, sm: 10, md: 14, lg: 20, pill: 999 },

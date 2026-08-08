@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     valuationContainer: {
         alignItems: 'center',
         marginBottom: 24,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         padding: 12,
         borderRadius: 12,
     },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     incrementBtn: {
-        backgroundColor: '#07062E', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        backgroundColor: '#281F50', // Keep uniform dark, maybe blue tint? Sticking to dark.
         borderColor: 'rgba(255,255,255,0.06)', // Green border for positive
     },
     controlBtnText: {
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         alignItems: 'center',
     },
     cancelBtnText: {

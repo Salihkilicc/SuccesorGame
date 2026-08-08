@@ -21,7 +21,7 @@ export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.mach1defense.mil',
             category: 'AIRCRAFT',
             description: 'Supersonic superiority.',
-            bannerColor: '#11063D',
+            bannerColor: '#5C3790',
             emoji: '🚀',
         },
         {

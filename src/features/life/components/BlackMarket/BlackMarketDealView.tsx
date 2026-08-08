@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     drugIconContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#0B0635'
+        backgroundColor: '#422B71'
     },
     icon: {
         fontSize: 48
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     divider: {
         width: '100%',
         height: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         marginBottom: 20
     },
     statsContainer: {
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     passButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
@@ -250,12 +250,12 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)'
     },
     consumeButton: {
-        backgroundColor: '#0B0635', // Red-ish
+        backgroundColor: '#422B71', // Red-ish
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)'
     },
     disabledButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },

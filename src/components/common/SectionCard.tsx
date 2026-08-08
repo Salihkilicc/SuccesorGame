@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#0B0635', // Dark Gray
+        backgroundColor: '#422B71', // Dark Gray
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     selectedCard: {
         borderColor: 'rgba(255,255,255,0.08)', // Gold
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     pressed: {
         opacity: 0.8,

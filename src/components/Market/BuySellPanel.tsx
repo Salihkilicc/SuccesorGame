@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sellButton: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
   },
   buyButton: {
     backgroundColor: '#C8C0EF',

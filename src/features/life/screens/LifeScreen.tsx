@@ -51,7 +51,7 @@ const GRADIENTS = {
   greenTeal: ['#C8C0EF', '#C8C0EF'],
   bluePurple: ['#C8C0EF', '#6004BD'],
   redCasino: ['#C734CA', '#C734CA'], // Casino Red
-  darkGrey: ['#020626', '#11063D'],
+  darkGrey: ['#020626', '#5C3790'],
   hookupFire: ['#6004BD', '#6004BD'],
   networkBlue: ['#6004BD', '#C8C0EF'],
 };
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 44,
     height: 2,
-    backgroundColor: '#0B0635', // Gold accent
+    backgroundColor: '#422B71', // Gold accent
     marginTop: 14,
     borderRadius: 2,
     shadowColor: '#020626',

@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     borderRadius: 12,
     padding: 12,
     gap: 6,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   cardPressed: {
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
   },
   shareHeader: {
     flexDirection: 'row',

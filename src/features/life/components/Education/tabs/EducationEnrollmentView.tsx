@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
     },
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     },
     // Tabs
     tabContainer: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.08)',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     majorCard: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     enrollButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     enrollButtonDisabled: {
-        backgroundColor: '#11063D',
+        backgroundColor: '#5C3790',
         shadowOpacity: 0,
     },
     enrollButtonText: {

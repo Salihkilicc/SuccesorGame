@@ -246,7 +246,7 @@ export function HookupModal({
                                     </Text>
 
                                     <View style={styles.overlayAvatarRow}>
-                                        <View style={[styles.smallAvatar, { backgroundColor: '#0B0635' }]}>
+                                        <View style={[styles.smallAvatar, { backgroundColor: '#422B71' }]}>
                                             <Text style={{ fontSize: 40 }}>😎</Text>
                                         </View>
                                         <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
@@ -271,7 +271,7 @@ export function HookupModal({
                         {/* GHOSTED OVERLAY */}
                         {matchStatus === 'NO_MATCH' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#0B0635' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#422B71' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.ghosted')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         {candidate.name} wasn't interested...
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#0B0635', // Slightly lighter than pure black/card
+        backgroundColor: '#422B71', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         shadowColor: '#020626',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

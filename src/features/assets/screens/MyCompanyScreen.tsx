@@ -28,7 +28,7 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#0B0635' }: any) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#422B71' }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
@@ -222,7 +222,7 @@ const MyCompanyScreen = () => {
             </View>
 
             {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#0B0635', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#422B71', marginVertical: 16 }} />
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -238,7 +238,7 @@ const MyCompanyScreen = () => {
               />
             </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: '#0B0635', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#422B71', marginVertical: 16 }} />
 
             {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
                 su an yavas biriken bir itibar gostergesi.
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     marginTop: 6,
     borderRadius: 2,
     shadowColor: '#020626',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     // Dolgu, cerceve degil: bu kart eskiden saydamdi ve yalnizca ince bir
     // kenarlikla duruyordu, o yuzden zeminin uzerinde "yokmus gibi" goruntu
     // veriyordu. Renk artik yuzeyde.
-    backgroundColor: '#0B0635',
+    backgroundColor: '#422B71',
     flexBasis: '48%',
     borderRadius: 20,
     padding: 20,

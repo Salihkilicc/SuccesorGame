@@ -39,12 +39,12 @@ export const SectionHeader = ({ title }: { title: string }) => (
 );
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#0B0635', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
+  card: { backgroundColor: '#422B71', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' }, // White
   contentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   col: { flex: 1, gap: 4 },
-  separator: { width: 1, backgroundColor: '#0B0635', marginHorizontal: 12 },
+  separator: { width: 1, backgroundColor: '#422B71', marginHorizontal: 12 },
   label: { fontSize: 11, color: 'rgba(255,255,255,0.48)', textTransform: 'uppercase' }, // Text Secondary
   value: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' }, // White
   success: { color: '#C8C0EF' }, // Green

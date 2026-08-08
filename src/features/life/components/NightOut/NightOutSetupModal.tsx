@@ -169,12 +169,12 @@ export default NightOutSetupModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         paddingHorizontal: 24,
         paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,

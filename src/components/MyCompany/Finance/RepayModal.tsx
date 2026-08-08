@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loanCard: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     repayButtonFull: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     repayButtonPressed: {
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     closeButton: {
-        backgroundColor: '#07062E',
+        backgroundColor: '#281F50',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     confirmButton: {
-        backgroundColor: '#0B0635',
+        backgroundColor: '#422B71',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
