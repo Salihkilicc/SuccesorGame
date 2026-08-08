@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
@@ -9,6 +9,7 @@ import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
+import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatNumber } from '../../../core/utils';
 
 type Props = {
@@ -18,6 +19,10 @@ type Props = {
 };
 
 const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
+    const [panel, setPanel] = useState<null | {
+        title: string; summary?: string; lines?: ConfirmLine[];
+        confirmLabel: string; tone?: 'default' | 'danger'; onDismiss?: () => void;
+    }>(null);
     useLocale();
     const { unlockProduct } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
@@ -63,19 +68,30 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 
     const handleUnlock = () => {
         if (!entryGate.allowed) {
-            Alert.alert(
-                t('alert.marketClosed'),
-                t('alert.marketLockedBody', {
+            setPanel({
+                title: t('alert.marketClosed'),
+                summary: t('alert.marketLockedBody', {
                     v1: product.category,
                     v2: entryGate.weakest || '-',
                     v3: entryGate.have.toFixed(0),
                     v4: entryGate.required.toFixed(0),
                 }),
-            );
+                lines: [
+                    { label: 'Weakest requirement', value: entryGate.weakest || '-' },
+                    { label: 'You have', value: entryGate.have.toFixed(0) },
+                    { label: 'Needed', value: entryGate.required.toFixed(0), strong: true },
+                ],
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
             return;
         }
         if (product.isUnlocked) {
-            Alert.alert(t('alert.alreadyUnlocked'), t('alert.thisProductHasAlreadyBeen'));
+            setPanel({
+                title: t('alert.alreadyUnlocked'),
+                summary: t('alert.thisProductHasAlreadyBeen'),
+                confirmLabel: 'OK',
+            });
             return;
         }
 
@@ -110,13 +126,19 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         );
 
         if (result.success) {
-            Alert.alert(
-                '🎉 Success!',
-                t('product.v1HasBeenUnlockedN', { v1: product.name, v2: product.stockBoost }),
-                [{ text: t('product.continue'), onPress: onClose }]
-            );
+            setPanel({
+                title: '🎉 Success!',
+                summary: t('product.v1HasBeenUnlockedN', { v1: product.name, v2: product.stockBoost }),
+                confirmLabel: t('product.continue'),
+                onDismiss: onClose,
+            });
         } else {
-            Alert.alert(t('alert.cannotUnlock'), result.message);
+            setPanel({
+                title: t('alert.cannotUnlock'),
+                summary: result.message,
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
         }
     };
 
@@ -190,6 +212,16 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                     />
                 </Pressable>
             </Pressable>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                onCancel={() => { const done = panel?.onDismiss; setPanel(null); done?.(); }}
+            />
         </Modal>
     );
 };

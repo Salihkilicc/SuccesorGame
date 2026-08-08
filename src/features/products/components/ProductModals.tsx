@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
+import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
@@ -156,6 +157,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // Burada yapildiginda her acilista yeniden hesaplaniyordu ve deger
     // kendiliginden buyuyordu.
     const [marketing, setMarketing] = useState(product.marketingBudget || 0);
+    // Declared with the other hooks - this file has an early return below.
+    const [panel, setPanel] = useState<null | {
+        title: string; summary?: string; confirmLabel: string; tone?: 'default' | 'danger';
+    }>(null);
     // ---- FASON URETIM (bkz. core/market/contract.ts) ----
     const [partnerId, setPartnerId] = useState<string>(product.contractPartnerId || '');
     const [contractUnits, setContractUnits] = useState(product.contractUnits || 0);
@@ -223,7 +228,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
-            Alert.alert(t('alert.error'), result.message);
+            setPanel({ title: t('alert.error'), summary: result.message, confirmLabel: 'OK', tone: 'danger' });
         }
     };
 
@@ -232,7 +237,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
             useLaboratoryStore.getState().spendRP(amount);
         });
         if (!result.success) {
-            Alert.alert(t('alert.error'), result.message);
+            setPanel({ title: t('alert.error'), summary: result.message, confirmLabel: 'OK', tone: 'danger' });
         }
     };
 
@@ -488,7 +493,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             info={t('product.optimizingTheProcessLowersYour')}
                             infoDetail={t('product.eachLevelCostsMoreThan')}
                             summary={`${formatNumberShared(totalRP)} RP`}
-                            summaryColor="#05A8F6"
+                            summaryColor={theme.colors.textPrimary}
                         >
                         <View style={styles.rdSection}>
 
@@ -599,7 +604,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         styles.capacityFill,
                                         {
                                             width: `${maxUnits > 0 ? Math.min(100, (willBuild / maxUnits) * 100) : 0}%`,
-                                            backgroundColor: supplyGap < 0 ? '#FF8A8A' : '#05A8F6',
+                                            backgroundColor: supplyGap < 0 ? theme.colors.warning : theme.colors.primary,
                                         },
                                     ]}
                                 />
@@ -954,10 +959,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                             width: `${Math.min(100, (marketing / marketingMax) * 100)}%`,
                                             backgroundColor:
                                                 marketing < maintenancePoint
-                                                    ? '#FF8A8A'
-                                                    : isOverSaturated
-                                                        ? '#CFD0D2'
-                                                        : '#CFD0D2',
+                                                    ? theme.colors.warning
+                                                    : theme.colors.primary,
                                         },
                                     ]}
                                 />
@@ -1043,7 +1046,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text
                                             style={[
                                                 styles.previewValue,
-                                                { color: projectedMargin >= 0 ? '#05A8F6' : '#FF8A8A' },
+                                                { color: projectedMargin >= 0 ? theme.colors.positive : theme.colors.negative },
                                             ]}
                                         >
                                             {formatMoney(projectedMargin)}
@@ -1075,6 +1078,15 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                     </ScrollView>
                 </View>
             </View>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                onCancel={() => setPanel(null)}
+            />
         </Modal>
     );
 };
@@ -1117,9 +1129,9 @@ const styles = StyleSheet.create({
     compareLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
     compareValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 2 },
 
-    warnLine: { color: '#FF8A8A', fontSize: 11, lineHeight: 16, marginTop: 10 },
+    warnLine: { color: theme.colors.warning, fontSize: 11, lineHeight: 16, marginTop: 10 },
     okLine: { color: '#FFFFFF', fontSize: 11, marginTop: 10 },
-    capLine: { color: '#FF8A8A', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    capLine: { color: theme.colors.warning, fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, marginTop: 10 },
 
     matchBtn: {
@@ -1281,14 +1293,14 @@ const styles = StyleSheet.create({
         width: 44, height: 44, borderRadius: 10, backgroundColor: '#323A40',
         alignItems: 'center', justifyContent: 'center',
     },
-    stepBtnText: { fontSize: 22, color: '#FF8A8A', fontWeight: '800' },
+    stepBtnText: { fontSize: 22, color: theme.colors.textPrimary, fontWeight: '800' },
     contractCompare: { backgroundColor: '#323A40', borderRadius: 10, padding: 12, marginTop: 12, gap: 8 },
     cmRow: { flexDirection: 'row', justifyContent: 'space-between' },
     cmLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)' },
     cmValue: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
     compareGood: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
-    compareBad: { fontSize: 12, color: '#FF8A8A', fontWeight: '700' },
-    contractWarn: { fontSize: 11, color: '#FF8A8A', marginTop: 8, fontWeight: '600' },
+    compareBad: { fontSize: 12, color: theme.colors.warning, fontWeight: '700' },
+    contractWarn: { fontSize: 11, color: theme.colors.warning, marginTop: 8, fontWeight: '600' },
 
     // COMPACT UPGRADE CARD STYLES
     upgradeCardCompact: {
@@ -1354,8 +1366,8 @@ const styles = StyleSheet.create({
     sliderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#434B50', padding: 8, borderRadius: 8 },
     adjBtn: { width: 36, height: 36, backgroundColor: '#666E70', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
     adjText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-    scrapNote: { fontSize: 9, color: '#FF8A8A', marginTop: 2, lineHeight: 13 },
-    queuedLine: { fontSize: 10, color: '#FF8A8A', marginTop: 3, lineHeight: 14 },
+    scrapNote: { fontSize: 9, color: theme.colors.warning, marginTop: 2, lineHeight: 13 },
+    queuedLine: { fontSize: 10, color: theme.colors.textMuted, marginTop: 3, lineHeight: 14 },
     hint: { fontSize: 11, color: '#FFFFFF', marginTop: 4, textAlign: 'right' },
     realStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
     realStatsText: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '600' },

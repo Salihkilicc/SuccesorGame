@@ -15,6 +15,7 @@ import { useGameStore } from '../../../core/store/useGameStore';
 import { formatMoney, formatNumber, formatPercent, formatSignedMoney } from '../../../core/utils';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import InfoDot from '../../../components/common/InfoDot';
+import { theme } from '../../../core/theme';
 import { EXPENSE_EXPLANATIONS, type QuarterReport, normalizeQuarterReport } from '../../../core/reportTypes';
 
 // ============================================================================
@@ -65,14 +66,25 @@ type LineProps = {
   hint?: string;
 };
 
+// ---------------------------------------------------------------------------
+//  WHAT GETS COLOUR ON THE BILL
+// ---------------------------------------------------------------------------
+//  This was the loudest screen in the game and the reason was here. EVERY
+//  subtotal was drawn red - including a profitable one - and every expense
+//  line was red as well, so a good quarter and a disastrous one looked much
+//  the same: a wall of red. Meanwhile the one line that genuinely carries the
+//  verdict, the net result, was drawn BLUE when positive. Profit was the only
+//  number on the page that never got the profit colour.
+//
+//  Green and red mean profit and loss, so they appear on exactly one line:
+//  the emphasised result. An expense is not a loss - it is the cost of doing
+//  business, and the minus sign in front of it already says so. Subtotals are
+//  structure, not verdicts, so they get weight instead of colour.
+// ---------------------------------------------------------------------------
 const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanation, hint }: LineProps) => {
   const color = emphasis
-    ? (amount >= 0 ? '#05A8F6' : '#FF8A8A')
-    : negative
-      ? '#FF8A8A'
-      : subtotal
-        ? '#FF8A8A'
-        : '#FFFFFF';
+    ? (amount >= 0 ? theme.colors.positive : theme.colors.negative)
+    : theme.colors.textPrimary;
 
   return (
     <View style={[styles.line, subtotal && styles.lineSubtotal, emphasis && styles.lineEmphasis]}>
@@ -318,7 +330,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
         <Text style={styles.productName} numberOfLines={1}>{p.name}</Text>
         <View style={styles.productHeadRight}>
           <Text style={styles.productShareMini}>{(p.marketShare ?? 0).toFixed(2)}%</Text>
-          <Text style={[styles.productProfit, { color: p.profit >= 0 ? '#05A8F6' : '#FF8A8A' }]}>
+          <Text style={[styles.productProfit, { color: p.profit >= 0 ? theme.colors.positive : theme.colors.negative }]}>
             {formatSignedMoney(p.profit)}
           </Text>
           <Text style={[styles.productChevron, open && styles.productChevronOpen]}>⌄</Text>
@@ -381,13 +393,13 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
-              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? '#FF8A8A' : 'rgba(255,255,255,0.48)' }]}>
+              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? theme.colors.warning : theme.colors.textMuted }]}>
                 {formatNumber(p.unsold)}
               </Text>
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.stock')}</Text>
-              <Text style={[styles.productStatValue, { color: '#FF8A8A' }]}>{formatNumber(p.stock)}</Text>
+              <Text style={styles.productStatValue}>{formatNumber(p.stock)}</Text>
             </View>
           </View>
 
@@ -398,7 +410,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
                 {
                   width: `${Math.min(100, Math.max(0, p.sellThrough))}%`,
                   backgroundColor:
-                    p.sellThrough >= 60 ? '#CFD0D2' : p.sellThrough >= 30 ? '#FF8A8A' : '#FF8A8A',
+                    p.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning,
                 },
               ]}
             />
@@ -485,9 +497,9 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
             {/* Net sonuc */}
-            <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FF8A8A' : '#FF8A8A' }]}>
+            <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? theme.colors.positive : theme.colors.negative }]}>
               <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
-              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#05A8F6' : '#FF8A8A' }]}>
+              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? theme.colors.positive : theme.colors.negative }]}>
                 {formatSignedMoney(report.netProfit)}
               </Text>
               <Text style={styles.heroSub}>
@@ -502,7 +514,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.aStandardIncomeStatementRevenue')}
               infoDetail={t('company.tapTheNextToAny')} 
               summary={formatSignedMoney(report.netProfit)}
-              summaryColor={report.netProfit >= 0 ? '#05A8F6' : '#FF8A8A'}
+              summaryColor={report.netProfit >= 0 ? theme.colors.positive : theme.colors.negative}
             >
               <View style={styles.statement}>
                 <StatementLine
@@ -688,7 +700,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
                   : 'fully served'
               }
-              summaryColor={report.totalUnmetDemand > 0 ? '#FF8A8A' : '#CFD0D2'}
+              summaryColor={report.totalUnmetDemand > 0 ? theme.colors.warning : theme.colors.textPrimary}
             >
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
@@ -706,7 +718,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.totalUnmetDemand > 0 ? '#FF8A8A' : 'rgba(255,255,255,0.48)' },
+                      { color: report.totalUnmetDemand > 0 ? theme.colors.warning : theme.colors.textMuted },
                     ]}
                   >
                     {formatNumber(report.totalUnmetDemand)}
@@ -714,12 +726,12 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.brandValue")}</Text>
-                  <Text style={[styles.opsValue, { color: '#FF8A8A' }]}>
+                  <Text style={styles.opsValue}>
                     {(report.brandValue ?? 0).toFixed(1)}
                     <Text
                       style={{
                         fontSize: 11,
-                        color: report.brandChange >= 0 ? '#CFD0D2' : '#FF8A8A',
+                        color: report.brandChange >= 0 ? theme.colors.textPrimary : theme.colors.warning,
                       }}
                     >
                       {'  '}
@@ -742,7 +754,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.sellThroughIsTheShare')}
               infoDetail={t('company.unsoldUnitsCarryIntoNext')} 
               summary={`${formatPercent(report.sellThrough)} sold`}
-              summaryColor={report.sellThrough >= 60 ? '#CFD0D2' : '#FF8A8A'}
+              summaryColor={report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning}
             >
               {/* Tesis durumu — kapasite kullanimi oyuncunun bakacagi tek sayi */}
               <View style={styles.facilityBar}>
@@ -760,8 +772,8 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                       styles.facilityUtil,
                       {
                         color:
-                          report.utilization < 60 ? '#FF8A8A'
-                            : report.utilization > 95 ? '#FF8A8A' : '#CFD0D2',
+                          report.utilization < 60 || report.utilization > 95
+                            ? theme.colors.warning : theme.colors.textPrimary,
                       },
                     ]}
                   >
@@ -775,7 +787,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.headcount')}</Text>
                   <Text style={[
                     styles.opsValue,
-                    report.headcount < report.crewRequired && { color: '#FF8A8A' },
+                    report.headcount < report.crewRequired && { color: theme.colors.warning },
                   ]}>
                     {formatNumber(report.headcount)} / {formatNumber(report.crewRequired)}
                   </Text>
@@ -789,7 +801,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 {report.attrition > 0 && (
                   <View style={styles.opsCell}>
                     <Text style={styles.opsLabel}>{t('company.left')}</Text>
-                    <Text style={[styles.opsValue, { color: '#FF8A8A' }]}>
+                    <Text style={styles.opsValue}>
                       −{formatNumber(report.attrition)}
                     </Text>
                   </View>
@@ -798,7 +810,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.morale')}</Text>
                   <Text style={[
                     styles.opsValue,
-                    { color: report.employeeMorale < 50 ? '#FF8A8A' : report.employeeMorale < 70 ? '#FF8A8A' : '#CFD0D2' },
+                    { color: report.employeeMorale < 70 ? theme.colors.warning : theme.colors.textPrimary },
                   ]}>
                     {report.employeeMorale.toFixed(0)}
                     <Text style={styles.opsDelta}>
@@ -825,7 +837,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.sellThrough >= 60 ? '#CFD0D2' : '#FF8A8A' },
+                      { color: report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning },
                     ]}
                   >
                     {formatPercent(report.sellThrough)}
@@ -833,7 +845,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                  <Text style={[styles.opsValue, { color: '#FF8A8A' }]}>
+                  <Text style={styles.opsValue}>
                     {formatNumber(report.endingInventory)}
                   </Text>
                 </View>
@@ -857,12 +869,15 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                       style={[
                         styles.noteDot,
                         {
+                          // 'bad' is the only one that earns the loss colour.
+                          // 'warn' used the same red, so a caution and a real
+                          // problem were indistinguishable at a glance.
                           backgroundColor:
                             note.tone === 'bad'
-                              ? '#FF8A8A'
+                              ? theme.colors.negative
                               : note.tone === 'warn'
-                                ? '#FF8A8A'
-                                : '#CFD0D2',
+                                ? theme.colors.warning
+                                : theme.colors.positive,
                         },
                       ]}
                     />
@@ -973,7 +988,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'rgba(5,168,246,0.1)',
   },
-  periodText: { color: '#FF8A8A', fontSize: 10, fontWeight: '700' },
+  periodText: { color: theme.colors.textMuted, fontSize: 10, fontWeight: '700' },
 
   scrollContent: { padding: 16, paddingBottom: 24 },
 
@@ -989,7 +1004,7 @@ const styles = StyleSheet.create({
   heroSub: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 6 },
 
   sectionTitle: {
-    color: '#FF8A8A',
+    color: theme.colors.textMuted,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 2,
@@ -1049,7 +1064,7 @@ const styles = StyleSheet.create({
   },
   cashWarn: {
     fontSize: 11,
-    color: '#FF8A8A',
+    color: theme.colors.warning,
     fontWeight: '600',
     marginTop: 8,
     lineHeight: 16,
@@ -1084,7 +1099,7 @@ const styles = StyleSheet.create({
   },
   noteRow: { flexDirection: 'row', alignItems: 'flex-start' },
   noteDot: { width: 6, height: 6, borderRadius: 3, marginTop: 5, marginRight: 9 },
-  noteText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 17, flex: 1 },
+  noteText: { color: theme.colors.textSecondary, fontSize: 11.5, lineHeight: 17, flex: 1 },
 
   productCard: {
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -1102,7 +1117,7 @@ const styles = StyleSheet.create({
   productHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   productShareMini: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
   productChevron: { color: '#FFFFFF', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
-  productChevronOpen: { color: '#FF8A8A', transform: [{ rotate: '180deg' }], marginTop: 3 },
+  productChevronOpen: { color: theme.colors.textMuted, transform: [{ rotate: '180deg' }], marginTop: 3 },
   productName: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flex: 1 },
   productProfit: { fontSize: 14, fontWeight: '800', marginLeft: 10 },
   demandRow: {
@@ -1113,11 +1128,11 @@ const styles = StyleSheet.create({
   },
   demandText: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5 },
   demandStrong: { color: '#FFFFFF', fontWeight: '700' },
-  demandMiss: { color: '#FF8A8A', fontSize: 10.5, marginTop: 2, fontWeight: '600' },
+  demandMiss: { color: theme.colors.warning, fontSize: 10.5, marginTop: 2, fontWeight: '600' },
 
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
-  scrapLine: { fontSize: 9, color: '#FF8A8A', marginTop: 2 },
+  scrapLine: { fontSize: 9, color: theme.colors.warning, marginTop: 2 },
   productSplit: { fontSize: 9, color: '#FFFFFF', marginTop: 2 },
   productStatLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginTop: 2 },

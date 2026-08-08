@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
+import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { Product } from '../data/productsData';
 import { useProductsLogic } from '../logic/useProductsLogic';
 
@@ -18,6 +19,10 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
     useLocale();
     const [step, setStep] = useState(1);
     const [analysisData, setAnalysisData] = useState<any>(null);
+    const [panel, setPanel] = useState<null | {
+        title: string; summary?: string; confirmLabel: string;
+        tone?: 'default' | 'danger'; onDismiss?: () => void;
+    }>(null);
     const { actions } = useProductsLogic();
     const { performMarketAnalysis, launchProduct } = actions;
 
@@ -39,11 +44,19 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
     const handleLaunch = () => {
         const success = launchProduct(product);
         if (success) {
-            Alert.alert(t('alert.success'), `${product.name} has been launched successfully!`, [
-                { text: 'OK', onPress: onLaunchComplete }
-            ]);
+            setPanel({
+                title: t('alert.success'),
+                summary: `${product.name} has been launched successfully!`,
+                confirmLabel: 'OK',
+                onDismiss: onLaunchComplete,
+            });
         } else {
-            Alert.alert(t('alert.error'), t('alert.failedToLaunchProductCheck'));
+            setPanel({
+                title: t('alert.error'),
+                summary: t('alert.failedToLaunchProductCheck'),
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
         }
     };
 
@@ -129,6 +142,15 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
                     {step === 2 && renderStep2()}
                 </View>
             </View>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                onCancel={() => { const done = panel?.onDismiss; setPanel(null); done?.(); }}
+            />
         </Modal>
     );
 };

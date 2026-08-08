@@ -37,15 +37,12 @@ const Row = ({
     subtotal?: boolean;
     emphasis?: boolean;
 }) => {
+    // Same rule as the quarterly report: green and red mean profit and loss,
+    // so only the emphasised result line gets them. Expenses and subtotals
+    // were red here too, which made every statement look like a bad one.
     const color = emphasis
-        ? amount >= 0
-            ? theme.colors.success
-            : theme.colors.error
-        : negative
-            ? '#FF8A8A'
-            : subtotal
-                ? '#FF8A8A'
-                : theme.colors.textPrimary;
+        ? (amount >= 0 ? theme.colors.positive : theme.colors.negative)
+        : theme.colors.textPrimary;
 
     return (
         <View style={[styles.row, subtotal && styles.rowSubtotal, emphasis && styles.rowEmphasis]}>
@@ -114,7 +111,7 @@ const FinancialReportScreen = () => {
                 {header}
 
                 {/* Ozet */}
-                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FF8A8A' : theme.colors.error }]}>
+                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? theme.colors.positive : theme.colors.negative }]}>
                     <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
                     <Text
                         style={[
@@ -201,7 +198,7 @@ const FinancialReportScreen = () => {
                     note={t('company.howMuchYouBuiltAnd')}
                     info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
-                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#FF8A8A'}
+                    summaryColor={report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
@@ -219,7 +216,7 @@ const FinancialReportScreen = () => {
                             <Text
                                 style={[
                                     styles.opsValue,
-                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#FF8A8A' },
+                                    { color: report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning },
                                 ]}
                             >
                                 {formatPercent(report.sellThrough)}
@@ -227,7 +224,7 @@ const FinancialReportScreen = () => {
                         </View>
                         <View style={styles.opsCell}>
                             <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                            <Text style={[styles.opsValue, { color: '#FF8A8A' }]}>
+                            <Text style={styles.opsValue}>
                                 {formatNumber(report.endingInventory)}
                             </Text>
                         </View>
@@ -268,7 +265,7 @@ const FinancialReportScreen = () => {
                                     <Text style={[styles.cellText, styles.center, { color: theme.colors.success }]}>
                                         {formatNumber(p.sold)}
                                     </Text>
-                                    <Text style={[styles.cellText, styles.center, { color: '#FF8A8A' }]}>
+                                    <Text style={[styles.cellText, styles.center, { color: theme.colors.warning }]}>
                                         {formatNumber(p.stock)}
                                     </Text>
                                     <Text
@@ -364,7 +361,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     cardTitle: {
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 1.5,

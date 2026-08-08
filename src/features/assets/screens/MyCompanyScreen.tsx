@@ -23,6 +23,7 @@ import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
+import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
@@ -92,6 +93,17 @@ const MyCompanyScreen = () => {
   const [modals, setModals] = useState<any>({});
   const toggleModal = (key: string, val: boolean) => setModals((p: any) => ({ ...p, [key]: val }));
 
+  const [panel, setPanel] = useState<null | {
+    title: string;
+    summary?: string;
+    lines?: ConfirmLine[];
+    note?: string;
+    confirmLabel: string;
+    cancelLabel?: string;
+    onConfirm?: () => void;
+    tone?: 'default' | 'danger';
+  }>(null);
+
   const [borrowConfig, setBorrowConfig] = useState({ visible: false, type: '', rate: 0 });
   const [repayConfig, setRepayConfig] = useState({ visible: false });
 
@@ -120,60 +132,72 @@ const MyCompanyScreen = () => {
     const quote = quoteIpo(stats.companyValue, cap.totalShares, cap.playerShareCount, 0.20);
 
     if (stats.companyValue < IPO_MIN_VALUATION) {
-      Alert.alert(
-        t('alert.notReadyToList'),
-        `Underwriters will not take a company public below ${formatMoney(IPO_MIN_VALUATION)} in valuation.\n\n` +
-        `You are at ${formatMoney(stats.companyValue)}. Grow revenue and profit first — the multiple follows.`
-      );
+      setPanel({
+        title: t('alert.notReadyToList'),
+        summary: 'Underwriters will not take a company public at this valuation.',
+        lines: [
+          { label: 'Minimum', value: formatMoney(IPO_MIN_VALUATION) },
+          { label: 'You are at', value: formatMoney(stats.companyValue), strong: true },
+        ],
+        note: 'Grow revenue and profit first — the multiple follows.',
+        confirmLabel: 'OK',
+      });
       return;
     }
 
-    Alert.alert(
-      t('alert.launchIpo'),
-      `Selling 20% of the company to public investors.\n\n` +
-      `Fair value per share    ${formatPrice(quote.fairPrice)}\n` +
-      `Offer price (−12%)      ${formatPrice(quote.offerPrice)}\n` +
-      `Gross proceeds          ${formatMoney(quote.grossProceeds)}\n` +
-      `Underwriting fee (7%)   −${formatMoney(quote.underwritingFee)}\n` +
-      `Net to the company      ${formatMoney(quote.netProceeds)}\n\n` +
-      `Your ownership: ${stats.companyOwnership.toFixed(1)}% → ${quote.playerOwnershipAfter.toFixed(1)}%\n\n` +
-      `The shares are priced below fair value on purpose so the book fills. ` +
-      `That ${formatMoney(quote.moneyLeftOnTable)} is the cost of listing.\n\n` +
-      `Once public your multiples rise, but the market reprices you every quarter.`,
-      [
-        { text: t('company.notYet'), style: 'cancel' },
-        {
-          text: t('company.launchIpo'),
-          onPress: () => {
-            const result = goPublic(
-              stats.companyValue,
-              (amount) => {
-                const currentCapital = useStatsStore.getState().companyCapital;
-                stats.update({ companyCapital: currentCapital + amount });
-              },
-              0.20,
-            );
-
-            if (result.error) {
-              Alert.alert(t('alert.cannotLaunchIpo'), result.error);
-              return;
-            }
-
-            stats.update({
-              companyOwnership: result.newOwnershipPercent,
-              isPublic: true,
-            });
-
-            Alert.alert(
-              t('alert.ipoComplete'),
-              `${formatMoney(result.cashRaised)} raised, after ${formatMoney(result.fee)} in fees.\n\n` +
-              `Your ownership is now ${result.newOwnershipPercent.toFixed(1)}%.\n\n` +
-              `You are a public company. Every quarter is now a scorecard.`
-            );
+    // The IPO confirmation was nine lines of prose and a table faked with \n
+    // and spaces inside a system dialog. Same figures, rendered as rows.
+    setPanel({
+      title: t('alert.launchIpo'),
+      summary: 'Selling 20% of the company to public investors.',
+      lines: [
+        { label: 'Fair value per share', value: formatPrice(quote.fairPrice) },
+        { label: 'Offer price (−12%)', value: formatPrice(quote.offerPrice) },
+        { label: 'Gross proceeds', value: formatMoney(quote.grossProceeds) },
+        { label: 'Underwriting fee (7%)', value: `−${formatMoney(quote.underwritingFee)}`, tone: 'negative' },
+        { label: 'Net to the company', value: formatMoney(quote.netProceeds), strong: true },
+        { label: 'Your ownership', value: `${stats.companyOwnership.toFixed(1)}% → ${quote.playerOwnershipAfter.toFixed(1)}%` },
+      ],
+      note: `Shares are priced below fair value on purpose so the book fills — that ${formatMoney(quote.moneyLeftOnTable)} is the cost of listing. Once public your multiples rise, but the market reprices you every quarter.`,
+      confirmLabel: t('company.launchIpo'),
+      cancelLabel: t('company.notYet'),
+      onConfirm: () => {
+        const result = goPublic(
+          stats.companyValue,
+          (amount) => {
+            const currentCapital = useStatsStore.getState().companyCapital;
+            stats.update({ companyCapital: currentCapital + amount });
           },
-        },
-      ]
-    );
+          0.20,
+        );
+
+        if (result.error) {
+          setPanel({
+            title: t('alert.cannotLaunchIpo'),
+            summary: result.error,
+            confirmLabel: 'OK',
+            tone: 'danger',
+          });
+          return;
+        }
+
+        stats.update({
+          companyOwnership: result.newOwnershipPercent,
+          isPublic: true,
+        });
+
+        setPanel({
+          title: t('alert.ipoComplete'),
+          summary: 'You are a public company. Every quarter is now a scorecard.',
+          lines: [
+            { label: 'Raised', value: formatMoney(result.cashRaised) },
+            { label: 'Fees', value: `−${formatMoney(result.fee)}`, tone: 'negative' },
+            { label: 'Your ownership', value: `${result.newOwnershipPercent.toFixed(1)}%`, strong: true },
+          ],
+          confirmLabel: 'OK',
+        });
+      },
+    });
   };
 
   return (
@@ -314,6 +338,19 @@ const MyCompanyScreen = () => {
 
         </ScrollView>
 
+        <ConfirmPanel
+          visible={!!panel}
+          title={panel?.title || ''}
+          summary={panel?.summary}
+          lines={panel?.lines}
+          note={panel?.note}
+          tone={panel?.tone}
+          confirmLabel={panel?.confirmLabel || 'OK'}
+          cancelLabel={panel?.cancelLabel}
+          onConfirm={panel?.onConfirm}
+          onCancel={() => setPanel(null)}
+        />
+
         {/* Universal Crystal Navigation Bar (Dark Variant) */}
         <CrystalNavBar activeTab="Company" variant="dark" />
 
@@ -333,7 +370,10 @@ const MyCompanyScreen = () => {
                 amt, 0, 'term', 0,
                 (n: number) => stats.update({ companyCapital: (stats.companyCapital || 0) + n }),
               );
-              if (!res.success) { Alert.alert(t('alert.loanDeclined'), res.message); return; }
+              if (!res.success) {
+                setPanel({ title: t('alert.loanDeclined'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
+                return;
+              }
               setBorrowConfig(p => ({ ...p, visible: false }));
               setTimeout(() => toggleModal('finance', true), 300);
             },
