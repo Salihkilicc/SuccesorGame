@@ -163,7 +163,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
     return (
         <>
             <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
-                <SafeAreaView style={styles.container}>
+                <View style={styles.container}>
                     {/* Header */}
                     <ScreenHeader title={t('equity.equityManagement')} onBack={onClose} />
 
@@ -454,7 +454,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         onConfirm={panel?.onConfirm}
                         onCancel={() => setPanel(null)}
                     />
-                </SafeAreaView>
+                </View>
             </ScreenHost>
 
             <InfoTooltipModal

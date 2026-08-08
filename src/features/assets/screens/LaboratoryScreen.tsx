@@ -16,6 +16,7 @@ import {
     RESEARCHER_ECONOMICS,
 } from '../../../features/laboratory/data/laboratoryData';
 import { formatMoney as formatMoneyExact, formatNumber } from '../../../core/utils';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 // Paylasilan bicimlendiriciye devrediyor (core/utils).
 // Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
@@ -24,7 +25,7 @@ const formatMoney = (value: number = 0): string => formatMoneyExact(value);
 
 const formatRP = (value: number): string => `${formatNumber(value)} RP`;
 
-const LaboratoryScreen = () => {
+const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
     useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
@@ -120,18 +121,25 @@ const LaboratoryScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* HEADER */}
-            <View style={styles.header}>
-                <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Text style={styles.backText}>←</Text>
-                </Pressable>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.headerTitle}>{t('company.rDLaboratory')}</Text>
-                    <Text style={styles.headerSubtitle}>{t('company.targetOutputV1Q', { v1: formatRP(quarterlyRP) })}</Text>
-                </View>
-                <View style={styles.rpBadge}>
-                    <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
-                </View>
+            {/* ----------------------------------------------------------
+                This screen is RENDERED INSIDE ResearchScreen as a tab, not
+                pushed as its own route. Its back button called goBack(),
+                which popped the whole Research route and landed the player on
+                Home - skipping the screen they had just come from. It now
+                returns to the research hub, and only falls back to popping
+                when it really is standalone.
+               ---------------------------------------------------------- */}
+            <ScreenHeader
+                title={t('company.rDLaboratory')}
+                subtitle={t('company.targetOutputV1Q', { v1: formatRP(quarterlyRP) })}
+                onBack={onBack}
+                right={
+                    <View style={styles.rpBadge}>
+                        <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
+                    </View>
+                }
+            />
+            <View style={styles.shortcutRow}>
                 <Pressable
                     style={styles.techTreeBtn}
                     onPress={() => (navigation as any).navigate('TechTree')}
@@ -282,6 +290,7 @@ const LaboratoryScreen = () => {
 export default LaboratoryScreen;
 
 const styles = StyleSheet.create({
+    shortcutRow: { flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 16, paddingTop: 8 },
     container: {
         flex: 1,
         backgroundColor: theme.colors.background,

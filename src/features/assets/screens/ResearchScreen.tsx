@@ -97,7 +97,7 @@ const ResearchScreen = () => {
             {/* CONTENT AREA */}
             <View style={styles.content}>
                 {activeTab === 'HUB' && <ResearchHub onNavigate={setActiveTab} />}
-                {activeTab === 'LAB' && <LaboratoryScreen />}
+                {activeTab === 'LAB' && <LaboratoryScreen onBack={() => setActiveTab('HUB')} />}
                 {activeTab === 'TREE' && <TechTreeView />}
             </View>
         </View>

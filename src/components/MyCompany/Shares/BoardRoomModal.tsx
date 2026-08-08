@@ -145,9 +145,13 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
 
     return (
         <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <View style={styles.backdrop}>
-                <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-                <View style={styles.container}>
+            {/* As a SCREEN there is no backdrop to dim and nothing to tap
+                outside of - and the card must not stay a card. Left as-is it
+                rendered a 460px box capped at 85% height, centred, rounded and
+                bordered, which is what looked cramped and misshapen. */}
+            <View style={[styles.backdrop, asScreen && styles.backdropScreen]}>
+                {!asScreen && <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />}
+                <View style={[styles.container, asScreen && styles.containerScreen]}>
                     <ScreenHeader title={t('board.title')} onBack={onClose} />
 
                     {/* ---- KONTROL DURUMU: seyreltmenin bedeli burada gorunur ---- */}
@@ -383,17 +387,22 @@ export default BoardRoomModal;
 
 const styles = StyleSheet.create({
     backdrop: { flex: 1, backgroundColor: 'rgba(28,36,44,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+    backdropScreen: { backgroundColor: theme.colors.background, padding: 0, justifyContent: 'flex-start' },
     container: {
         width: '100%', maxWidth: 460, maxHeight: '85%',
-        backgroundColor: '#1C242C', borderRadius: 20, padding: 20,
+        backgroundColor: theme.colors.background, borderRadius: 20, padding: 20,
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    },
+    containerScreen: {
+        flex: 1, maxWidth: undefined, maxHeight: undefined,
+        borderRadius: 0, borderWidth: 0, padding: 0,
     },
     titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
     title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
     closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#323A40', alignItems: 'center', justifyContent: 'center' },
     closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
 
-    controlCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 12 },
+    controlCard: { backgroundColor: theme.colors.surface, borderRadius: 12, padding: 14, marginBottom: 12 },
     controlRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     controlLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     controlValue: { fontSize: 22, fontWeight: '800' },
@@ -412,8 +421,8 @@ const styles = StyleSheet.create({
     dangerBody: { fontSize: 11, color: '#FF8A8A', lineHeight: 16 },
 
     tabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#323A40', alignItems: 'center' },
-    tabActive: { backgroundColor: '#05A8F6' },
+    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: theme.colors.surface, alignItems: 'center' },
+    tabActive: { backgroundColor: theme.colors.primary },
     tabText: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
     tabTextActive: { color: theme.colors.onLight},
 

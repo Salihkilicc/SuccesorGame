@@ -15,6 +15,7 @@ import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import { formatMoney } from '../../../core/utils';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
+import { theme } from '../../../core/theme';
 
 type Props = {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -36,7 +37,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
 
     return (
         <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" presentationStyle="fullScreen">
-            <SafeAreaView style={styles.container}>
+            <View style={styles.container}>
                 {/* Header */}
                 <ScreenHeader title={t('finance.myEmpire')} onBack={onClose} />
 
@@ -75,7 +76,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                         onClose={() => setSelectedCompanyId(null)}
                     />
                 )}
-            </SafeAreaView>
+            </View>
         </ScreenHost>
     );
 };
@@ -116,7 +117,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#434B50',
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.radius.md,
+        marginBottom: theme.spacing.sm,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.border,
     },
     name: {
         fontSize: 16,
@@ -154,7 +159,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     listContent: {
-        paddingBottom: 100, // Space for BottomStatsBar
+        padding: theme.spacing.md,
+        paddingBottom: 120, // clear of the nav bar
     },
     emptyList: {
         flex: 1,
