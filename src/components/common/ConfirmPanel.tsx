@@ -52,6 +52,16 @@ type Props = {
     onCancel: () => void;
     /** `danger` is for irreversible actions, and colours the NOTE only. */
     tone?: 'default' | 'danger';
+    /**
+     * A decision with more than two answers - paying for an acquisition in
+     * cash, debt or stock, say. Rendered as stacked rows because each one
+     * needs a line of explanation; a system Alert could only give them a
+     * label, which is why the financing terms used to be crammed into the
+     * message body above the buttons.
+     *
+     * When present, `confirmLabel` is not shown - the choices ARE the answer.
+     */
+    choices?: { label: string; description?: string; onPress: () => void }[];
 };
 
 const ConfirmPanel = ({
@@ -65,6 +75,7 @@ const ConfirmPanel = ({
     onConfirm,
     onCancel,
     tone = 'default',
+    choices,
 }: Props) => {
     if (!visible) return null;
 
@@ -104,20 +115,42 @@ const ConfirmPanel = ({
                     </View>
                 )}
 
+                {!!choices?.length && (
+                    <View style={styles.choices}>
+                        {choices.map((c, i) => (
+                            <Pressable
+                                key={i}
+                                onPress={c.onPress}
+                                style={({ pressed }) => [styles.choice, pressed && styles.btnPressed]}>
+                                <Text style={styles.choiceLabel}>{c.label}</Text>
+                                {!!c.description && <Text style={styles.choiceDesc}>{c.description}</Text>}
+                            </Pressable>
+                        ))}
+                    </View>
+                )}
+
                 <View style={styles.actions}>
-                    {!!onConfirm && (
+                    {!choices?.length && !!onConfirm && (
                         <Pressable
                             onPress={onCancel}
                             style={({ pressed }) => [styles.btn, styles.btnCancel, pressed && styles.btnPressed]}>
                             <Text style={styles.btnCancelText}>{cancelLabel || 'Cancel'}</Text>
                         </Pressable>
                     )}
-                    <Pressable
-                        onPress={onConfirm || onCancel}
-                        style={({ pressed }) => [styles.btn, styles.btnConfirm, pressed && styles.btnPressed]}>
-                        {/* Primary is the bright blue: a light fill, so the label is black. */}
-                        <Text style={styles.btnConfirmText}>{confirmLabel}</Text>
-                    </Pressable>
+                    {choices?.length ? (
+                        <Pressable
+                            onPress={onCancel}
+                            style={({ pressed }) => [styles.btn, styles.btnCancel, pressed && styles.btnPressed]}>
+                            <Text style={styles.btnCancelText}>{cancelLabel || 'Cancel'}</Text>
+                        </Pressable>
+                    ) : (
+                        <Pressable
+                            onPress={onConfirm || onCancel}
+                            style={({ pressed }) => [styles.btn, styles.btnConfirm, pressed && styles.btnPressed]}>
+                            {/* Primary is the bright blue: a light fill, so the label is black. */}
+                            <Text style={styles.btnConfirmText}>{confirmLabel}</Text>
+                        </Pressable>
+                    )}
                 </View>
             </View>
         </View>
@@ -172,6 +205,16 @@ const styles = StyleSheet.create({
     },
     noteBoxDanger: { borderLeftColor: theme.colors.destructive },
     note: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, lineHeight: 17 },
+    choices: { gap: theme.spacing.xs, marginTop: theme.spacing.xs },
+    choice: {
+        backgroundColor: theme.colors.surfaceHigh,
+        borderRadius: theme.radius.md,
+        padding: theme.spacing.md,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.border,
+    },
+    choiceLabel: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    choiceDesc: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, marginTop: 3, lineHeight: 16 },
     actions: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.xs },
     btn: { flex: 1, paddingVertical: theme.spacing.md, borderRadius: theme.radius.md, alignItems: 'center' },
     btnCancel: {

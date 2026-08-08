@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import ConfirmPanel from '../../../components/common/ConfirmPanel';
+import { StatRow } from '../../../components/common/Disclosure';
 import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
@@ -117,6 +118,14 @@ const EMPTY_PRODUCT: any = Object.freeze({
     complexity: 50, sellingPrice: 0, suggestedPrice: 0, marketDemand: 50,
     productionUnits: 0, contractUnits: 0, reachIndex: 1,
 });
+
+/**
+ * SHELVED: the "why this product earns what it earns" explainer.
+ * Typed as boolean rather than written as `false &&` so TypeScript keeps
+ * narrowing `market` inside the block - the literal form broke the narrowing
+ * and produced four errors in code that is not even rendered.
+ */
+const SHOW_EARNINGS_EXPLAINER: boolean = false;
 
 export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity }: any) => {
     // Dil degisince yeniden ciz.
@@ -475,11 +484,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                     </View>
 
                     <ScrollView showsVerticalScrollIndicator={false}>
-                        {/* Insight */}
-                        <View style={styles.insightBox}>
-                            <Text style={styles.insightTitle}>💡 AI Insight</Text>
-                            <Text style={styles.insightText}>{getTip(product)}</Text>
-                        </View>
+                        {/* SHELVED: the "AI Insight" box.
+                            It sat above everything and restated what the rows
+                            below already said. `getTip` and its styles are kept
+                            so it can come back as a real advisor rather than a
+                            paragraph. Nothing was deleted. */}
 
                         {/* Pazar konumu — bu urunun kategorisindeki pay ve rakipler.
                             Bkz. core/market/productMarkets.ts */}
@@ -529,7 +538,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     <Text style={styles.upgradeLabel}>{t('product.improveQuality')}</Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
                                         <Text style={styles.heroValue}>${product.sellingPrice || product.suggestedPrice}</Text>
-                                        <Text style={{ color: theme.colors.success, fontWeight: 'bold' }}>(+3%)</Text>
+                                        <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(+3%)</Text>
                                     </View>
                                     <Text style={styles.hint}>Lvl {qualityLevel} ➜ {qualityLevel + 1}</Text>
                                     {/* Owned but not yet buildable — queued, not lost. */}
@@ -731,7 +740,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             bin, Auto-Drone 2 milyon kazandiriyor, neden?"
                             Cevap adet degil DOLAR — kategorinin buyuklugu ve
                             urunun kapasite tuketimi. */}
-                        {market && (
+                        {/* SHELVED: "Why this product earns what it earns".
+                            The explanation is real and the engine still feeds
+                            it, but it duplicated the market panel above. Kept
+                            behind `false &&` rather than removed. */}
+                        {SHOW_EARNINGS_EXPLAINER && market && (
                             <CollapsibleSection
                                 title={t('product.whyThisProductEarnsWhat')}
                                 note={t('product.categorySizeCapacityCostAnd')}
@@ -792,14 +805,20 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                         {/* ══ FASON URETIM ══
                             Make-or-buy karari. Kendi hattin ucuz ama
-                            yavas; fason hizli ama pahali. */}
+                            yavas; fason hizli ama pahali.
+
+                            Collapsed by default: most quarters the player is
+                            not outsourcing at all, and the partner list plus
+                            the quote is the longest block on the screen. The
+                            summary says whether it is in use, so it does not
+                            have to be open to be readable. */}
+                        <CollapsibleSection
+                            title={t('product.contractMfg')}
+                            note={t('product.contractHint')}
+                            summary={chosenPartner ? `${formatNumber(contractQuote?.units || 0)} units` : 'Own line only'}
+                            summaryColor={chosenPartner ? theme.colors.warning : theme.colors.textMuted}
+                        >
                         <View style={styles.controlGroup}>
-                            <View style={styles.controlHeader}>
-                                <Text style={styles.controlTitle}>{t('product.contractMfg')}</Text>
-                            </View>
-                            <Text style={styles.contractHint}>
-                                {t('product.contractHint')}
-                            </Text>
 
                             <View style={styles.partnerRow}>
                                 <Pressable
@@ -907,6 +926,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </>
                             )}
                         </View>
+                        </CollapsibleSection>
 
                         {/* ══ PAZARLAMA ══
                             Artik CEYREKLIK BUTCE. Barda iki isaret var:
@@ -1056,21 +1076,21 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             </View>
                         )}
 
-                        {/* Inventory Status - NEW */}
-                        <View style={styles.controlGroup}>
-                            <Text style={styles.controlTitle}>📦 Inventory Status</Text>
-                            <Text style={styles.heroValue}>{formatNumber(product.inventory || 0)} Units</Text>
-                            <Text style={styles.hint}>{t('product.estStorageCostV1Quarter', { v1: formatNumber((product.inventory || 0) * 5) })}</Text>
-                        </View>
+                        {/* Inventory. Was a 36pt hero number for a figure the
+                            player glances at - it dominated the bottom of the
+                            screen. Same information, one row. */}
+                        <StatRow
+                            label="📦 Inventory"
+                            value={`${formatNumber(product.inventory || 0)} units`}
+                            why={t('product.estStorageCostV1Quarter', { v1: formatNumber((product.inventory || 0) * 5) })}
+                        />
 
                         <Pressable style={styles.btnPrimary} onPress={handleSave}>
                             <Text style={styles.btnText}>{t('product.saveChanges')}</Text>
                         </Pressable>
 
-                        {/* Change Product Name Button */}
-                        <Pressable style={styles.btnOutline} onPress={handleRandomizeName}>
-                            <Text style={styles.btnOutlineText}>🎲 Change Product Name</Text>
-                        </Pressable>
+                        {/* SHELVED: the dice-roll rename button. `randomizeProductName`
+                            and `handleRandomizeName` are kept in place. */}
 
                         <Pressable style={styles.btnDanger} onPress={() => onRetire(product.id)}>
                             <Text style={[styles.btnText, styles.btnTextOnDark]}>{t('product.retireProduct')}</Text>
@@ -1198,7 +1218,7 @@ const styles = StyleSheet.create({
     modalTitle: { fontSize: 22, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
     header: { flexDirection: 'row', gap: 16, marginBottom: 20 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-    icon: { fontSize: 42 },
+    icon: { fontSize: 32 },
     name: { fontSize: 18, fontWeight: '700', color: '#FFFFFF' },
     desc: { fontSize: 13, color: 'rgba(255,255,255,0.48)' },
     statRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
@@ -1327,10 +1347,12 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5
     },
     heroValue: {
-        fontSize: 36,
-        fontWeight: '900',
-        color: '#FFFFFF',
-        letterSpacing: -1
+        // Was 36pt - bigger than the screen's own title, for a number sitting
+        // inside a collapsed section. Sized to the UI instead of shouting.
+        fontSize: 20,
+        fontWeight: '800',
+        color: theme.colors.textPrimary,
+        letterSpacing: -0.3
     },
     upgradeBtnCompact: {
         backgroundColor: theme.colors.accent,

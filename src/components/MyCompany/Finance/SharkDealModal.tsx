@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
@@ -7,6 +7,7 @@ import { useStatsStore } from '../../../core/store';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { absoluteMonth } from '../../../features/shareholders/hooks/useDebtEnforcer';
 import { formatMoney } from '../../../core/utils';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 type Props = {
     visible: boolean;
@@ -15,6 +16,17 @@ type Props = {
 };
 
 const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
     useLocale();
     const { takeSharkLoan, repaySharkLoan, sharkLoans, members } = useShareholderStore();
     const { update, money } = useStatsStore();
@@ -71,16 +83,22 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
         );
 
         if (result.success) {
-            Alert.alert(
-                t('alert.dealSigned'),
-                `${result.message}\n\n` +
-                `You owe ${formatMoney(totalOwed)} within ${DEADLINE_QUARTERS} quarters.\n` +
-                `Collateral pledged: ${formatMoney(collateralValue)} of your own shares.\n\n` +
-                `⚠️ Miss the date and he takes the shares — not the money.`,
-            );
-            onClose();
+            setPanel({
+                title: t('alert.dealSigned'),
+                summary: result.message,
+                lines: [
+                    { label: 'You receive', value: formatMoney(LOAN_AMOUNT) },
+                    { label: 'You owe', value: formatMoney(totalOwed), tone: 'negative' },
+                    { label: 'Due within', value: `${DEADLINE_QUARTERS} quarters` },
+                    { label: 'Collateral pledged', value: formatMoney(collateralValue), strong: true },
+                ],
+                note: 'Miss the date and he takes the shares — not the money. This is now enforced every quarter.',
+                confirmLabel: 'OK',
+                tone: 'danger',
+                onConfirm: undefined,
+            });
         } else {
-            Alert.alert(t('alert.dealFailed'), `❌ ${result.message}`);
+            setPanel({ title: t('alert.dealFailed'), summary: result.message, confirmLabel: 'OK', tone: 'danger' });
         }
     };
 
@@ -125,10 +143,12 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                                         update({ money: money - amount });
                                         return true;
                                     });
-                                    Alert.alert(
-                                        r.success ? t('finance.loanRepaid') : t('finance.cannotRepay'),
-                                        r.message,
-                                    );
+                                    setPanel({
+                                        title: r.success ? t('finance.loanRepaid') : t('finance.cannotRepay'),
+                                        summary: r.message,
+                                        confirmLabel: 'OK',
+                                        tone: r.success ? 'default' : 'danger',
+                                    });
                                 }}
                             >
                                 <Text style={styles.repayBtnText}>
@@ -271,6 +291,19 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
                     for consequences of default.
                 </Text>
             </ScrollView>
+        
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
         </GameModal>
     );
 };

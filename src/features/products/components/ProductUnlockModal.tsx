@@ -178,7 +178,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                             </View>
                             <View style={styles.financialItem}>
                                 <Text style={styles.financialLabel}>{t('product.stockBoost')}</Text>
-                                <Text style={[styles.financialValue, { color: theme.colors.success }]}>
+                                <Text style={styles.financialValue}>
                                     +{product.stockBoost}%
                                 </Text>
                             </View>

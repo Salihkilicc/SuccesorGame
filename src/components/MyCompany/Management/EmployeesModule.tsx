@@ -18,7 +18,7 @@
 //
 // ============================================================================
 
-import React from 'react';
+import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Switch } from 'react-native';
 import { theme } from '../../../core/theme';
@@ -45,6 +45,7 @@ import {
     wageMoraleTarget,
 } from '../../../core/market/workforce';
 import { formatMoney, formatNumber, formatPercent } from '../../../core/utils';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 interface Props {
     visible: boolean;
@@ -52,6 +53,17 @@ interface Props {
 }
 
 const EmployeesModule = ({ visible, onClose }: Props) => {
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
     useLocale();
     const employeeCount = useStatsStore(s => s.employeeCount);
     const facilityTier = useStatsStore(s => s.facilityTier);
@@ -81,15 +93,16 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
         const clamped = Math.min(SALARY_RATIO_MAX, Math.max(SALARY_RATIO_MIN, next));
         const shock = payCutShock(salaryRatio, clamped);
         if (shock > 0) {
-            Alert.alert(
-                t('alert.cutPay'),
-                `Raising pay is easy; taking it back is not. This will cost ${shock} morale points ` +
-                `immediately, on top of the lower level your pay will sustain.`,
-                [
-                    { text: t('ui.neverMind'), style: 'cancel' },
-                    { text: t('ui.cutAnyway'), style: 'destructive', onPress: () => setSalaryRatio(clamped) },
-                ],
-            );
+            setPanel({
+                title: t('alert.cutPay'),
+                summary: 'Raising pay is easy; taking it back is not.',
+                lines: [{ label: 'Immediate morale cost', value: `−${shock}`, tone: 'negative' }],
+                note: 'That is on top of the lower level your pay will sustain from here on.',
+                cancelLabel: t('ui.neverMind'),
+                confirmLabel: t('ui.cutAnyway'),
+                tone: 'danger',
+                onConfirm: () => { setSalaryRatio(clamped); setPanel(null); },
+            });
             return;
         }
         setSalaryRatio(clamped);
@@ -97,7 +110,9 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
 
     const handleEvent = (id: string) => {
         const result = organizeEvent(id);
-        if (!result.success) Alert.alert(t('alert.cannotHost'), result.message);
+        if (!result.success) {
+            setPanel({ title: t('alert.cannotHost'), summary: result.message, confirmLabel: 'OK', tone: 'danger' });
+        }
     };
 
     const bonusCost = Math.max(0, lastQuarterProfit) * 0.05;
@@ -254,6 +269,19 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     </Text>
                 )}
             </ScrollView>
+        
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
         </GameModal>
     );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import { checkAllAchievementsAfterStateChange } from '../../../achievements/chec
 import { theme } from '../../../core/theme';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 export type RAndDModalProps = {
   visible: boolean;
@@ -44,13 +45,35 @@ const TECH_TREE: Record<TechCategory, TechUpgrade[]> = {
 };
 
 const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
+    // This component is superseded by RAndDModalRevised below (which is the
+    // default export). Kept per the no-deletion rule, and kept compiling.
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
     useLocale();
   const navigation = useNavigation<any>();
   const { companyCapital, setField, techLevels, setTechLevel } = useStatsStore();
 
   const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
     if (companyCapital < cost) {
-      Alert.alert(t('alert.insufficientFunds'), "Your company doesn't have enough capital for this investment.");
+      setPanel({
+        title: t('alert.insufficientFunds'),
+        summary: "Your company doesn't have enough capital for this investment.",
+        lines: [
+          { label: 'Cost', value: formatMoney(cost) },
+          { label: 'You have', value: formatMoney(companyCapital), strong: true },
+        ],
+        confirmLabel: 'OK',
+        tone: 'danger',
+      });
       return;
     }
 
@@ -60,7 +83,12 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     // Find the upgrade info for messages
     const upgradeInfo = TECH_TREE[category].find(u => u.level === nextLevel);
     if (upgradeInfo) {
-      Alert.alert(t('alert.researchComplete'), `You have unlocked: ${upgradeInfo.title}!`);
+      setPanel({
+        title: t('alert.researchComplete'),
+        summary: `You have unlocked: ${upgradeInfo.title}`,
+        lines: [{ label: 'Spent', value: formatMoney(cost) }],
+        confirmLabel: 'OK',
+      });
     }
 
     checkAllAchievementsAfterStateChange();
@@ -206,6 +234,17 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
 };
 // Revamped Modal to allow Bottom Bar outside the centered card
 const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
   const navigation = useNavigation<any>();
   const { companyCapital, setField, techLevels, setTechLevel } = useStatsStore(); // Added missing props logic
 
@@ -214,7 +253,16 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
   const handleUpgrade = (category: TechCategory, nextLevel: number, cost: number) => {
     if (companyCapital < cost) {
-      Alert.alert(t('alert.insufficientFunds'), "Your company doesn't have enough capital for this investment.");
+      setPanel({
+        title: t('alert.insufficientFunds'),
+        summary: "Your company doesn't have enough capital for this investment.",
+        lines: [
+          { label: 'Cost', value: formatMoney(cost) },
+          { label: 'You have', value: formatMoney(companyCapital), strong: true },
+        ],
+        confirmLabel: 'OK',
+        tone: 'danger',
+      });
       return;
     }
 
@@ -224,7 +272,12 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
     // Find the upgrade info for messages
     const upgradeInfo = TECH_TREE[category].find(u => u.level === nextLevel);
     if (upgradeInfo) {
-      Alert.alert(t('alert.researchComplete'), `You have unlocked: ${upgradeInfo.title}!`);
+      setPanel({
+        title: t('alert.researchComplete'),
+        summary: `You have unlocked: ${upgradeInfo.title}`,
+        lines: [{ label: 'Spent', value: formatMoney(cost) }],
+        confirmLabel: 'OK',
+      });
     }
 
     checkAllAchievementsAfterStateChange();
@@ -342,7 +395,20 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
         {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}
         <CrystalNavBar activeTab="Company" variant="dark" />
       </View>
-    </Modal>
+    
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
+        </Modal>
   );
 };
 

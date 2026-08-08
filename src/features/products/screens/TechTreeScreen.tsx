@@ -224,11 +224,12 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
     },
     productNameUnlocked: {
-        color: theme.colors.success,
+        // "Unlocked" is a state, not a profit.
+        color: theme.colors.textPrimary,
     },
     stockBoostLabel: {
         fontSize: 11,
-        color: theme.colors.success,
+        color: theme.colors.warning,
         marginTop: 2,
     },
     statusContainer: {

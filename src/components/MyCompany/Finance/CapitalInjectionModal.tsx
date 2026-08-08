@@ -4,6 +4,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } 
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney } from '../../../core/utils';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 interface Props { visible: boolean; onClose: () => void; }
 
@@ -12,13 +13,24 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
     const { money } = useStatsStore();
     const { injectCapital } = useCorporateFinanceStore();
     const [percent, setPercent] = useState<number>(10);
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
 
     const amount = Math.floor(money * (percent / 100));
 
     const handleConfirm = () => {
         const res = injectCapital(amount);
         if (res.success) onClose();
-        else Alert.alert("Error", res.msg);
+        else setPanel({ title: 'Error', summary: res.msg, confirmLabel: 'OK', tone: 'danger' });
     };
 
     return (
@@ -54,6 +66,19 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
                     </View>
                 </View>
             </View>
+        
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
         </Modal>
     );
 };

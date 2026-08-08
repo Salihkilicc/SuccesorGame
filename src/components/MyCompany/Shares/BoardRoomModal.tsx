@@ -7,6 +7,7 @@ import { useStatsStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
@@ -65,6 +66,17 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 
     const companyValue = useStatsStore(s => s.companyValue);
     const [tab, setTab] = useState<'board' | 'log'>('board');
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
     // ------------------------------------------------------------------
     //  THE MEMBER SCREEN WAS UNREACHABLE
     // ------------------------------------------------------------------
@@ -93,11 +105,11 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
     const handleLobby = (memberId: string, name: string) => {
         const res = lobby(memberId, proposal);
         if (!res.success) {
-            Alert.alert(t('board.noCommitment'), res.message);
+            setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
             return;
         }
         if (!res.demands) {
-            Alert.alert(t('board.supportSecured'), res.message);
+            setPanel({ title: t('board.supportSecured'), summary: res.message, confirmLabel: 'OK' });
             return;
         }
 
@@ -108,27 +120,24 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
             share_grant: 'grant them additional shares',
             reduce_debt: 'bring the debt down',
         };
-        Alert.alert(
-            `${name} wants something`,
-            `${res.message}\n\nThey want you to ${labels[res.demands]}.\n\n` +
-            t('board.breakPromise'),
-            [
-                { text: t('board.walkAway'), style: 'cancel' },
-                {
-                    text: t('board.giveMyWord'),
-                    onPress: () => {
-                        makePromise(memberId, res.demands!, 1, 0.8, labels[res.demands!]);
-                        Alert.alert(t('board.committed'), `${name}`);
-                    },
-                },
-            ],
-        );
+        setPanel({
+            title: `${name} wants something`,
+            summary: res.message,
+            lines: [{ label: 'They want you to', value: labels[res.demands], strong: true }],
+            note: t('board.breakPromise'),
+            cancelLabel: t('board.walkAway'),
+            confirmLabel: t('board.giveMyWord'),
+            onConfirm: () => {
+                makePromise(memberId, res.demands!, 1, 0.8, labels[res.demands!]);
+                setPanel({ title: t('board.committed'), summary: name, confirmLabel: 'OK' });
+            },
+        });
     };
 
     const moodColor =
-        boardStance === 'Supportive' ? '#CFD0D2'
-            : boardStance === 'Neutral' ? 'rgba(255,255,255,0.48)'
-                : boardStance === 'Restless' ? '#FF8A8A' : '#FF8A8A';
+        boardStance === 'Supportive' ? theme.colors.textPrimary
+            : boardStance === 'Neutral' ? theme.colors.textMuted
+                : theme.colors.warning;
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -353,6 +362,19 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                 visible={!!openMemberId}
                 memberId={openMemberId || ''}
                 onClose={() => setOpenMemberId(null)}
+            />
+        
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
             />
         </Modal>
     );

@@ -30,6 +30,7 @@ import {
 } from '../../../core/market/mergers';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 const { width } = Dimensions.get('window');
 
@@ -51,6 +52,17 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [selectedTarget, setSelectedTarget] = useState<any | null>(null);
+  const [panel, setPanel] = useState<null | {
+    title: string;
+    summary?: string;
+    lines?: ConfirmLine[];
+    note?: string;
+    confirmLabel: string;
+    cancelLabel?: string;
+    onConfirm?: () => void;
+    tone?: 'default' | 'danger';
+    choices?: { label: string; description?: string; onPress: () => void }[];
+  }>(null);
 
   // 1. Prepare Data
   const availableCompanies = useMemo(() => {
@@ -130,10 +142,12 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 
     const feasible = options.filter(o => o.feasible);
     if (feasible.length === 0) {
-      Alert.alert(
-        t('alert.cannotFinanceThisDeal'),
-        options.map(o => `${o.method.toUpperCase()}: ${o.reason}`).join('\n\n')
-      );
+      setPanel({
+        title: t('alert.cannotFinanceThisDeal'),
+        lines: options.map(o => ({ label: o.method.toUpperCase(), value: o.reason || '' })),
+        confirmLabel: 'OK',
+        tone: 'danger',
+      });
       return;
     }
 
@@ -143,22 +157,24 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
       return t('acq.payStockDesc', { v1: o.playerOwnershipAfter.toFixed(2) });
     };
 
-    Alert.alert(
-      t('acq.howDoYouPay', { v1: selectedTarget.name }),
-      t('acq.financingHeader', {
-        v1: formatMoney(q.price),
-        v2: formatMoney(acquirerValuation),
-        v3: (q.relativeSize * 100).toFixed(1),
-      }) +
-      feasible.map(o => `${describe(o)}`).join('\n'),
-      [
-        { text: t('action.cancel'), style: 'cancel' },
-        ...feasible.map(o => ({
-          text: o.method === 'cash' ? t('acq.payCash') : o.method === 'debt' ? t('acq.borrow') : t('acq.issueShares'),
-          onPress: () => confirmDeal(q, o, hostile, acquirerValuation),
-        })),
-      ]
-    );
+    // Each financing route needs a sentence of its own, which a system Alert
+    // could not give it - the terms had to be packed into the message body
+    // above three unlabelled buttons. They are rows now.
+    setPanel({
+      title: t('acq.howDoYouPay', { v1: selectedTarget.name }),
+      lines: [
+        { label: 'Price', value: formatMoney(q.price) },
+        { label: 'Your valuation', value: formatMoney(acquirerValuation) },
+        { label: 'Relative size', value: `${(q.relativeSize * 100).toFixed(1)}%`, strong: true },
+      ],
+      choices: feasible.map(o => ({
+        label: o.method === 'cash' ? t('acq.payCash') : o.method === 'debt' ? t('acq.borrow') : t('acq.issueShares'),
+        description: describe(o),
+        onPress: () => { setPanel(null); confirmDeal(q, o, hostile, acquirerValuation); },
+      })),
+      cancelLabel: t('action.cancel'),
+      confirmLabel: '',
+    });
   };
 
   const confirmDeal = (
@@ -169,37 +185,41 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
   ) => {
     if (!selectedTarget) return;
 
-    Alert.alert(
-      hostile ? t('acq.hostileBidFor', { v1: selectedTarget.name }) : t('acq.acquireTitle', { v1: selectedTarget.name }),
-      t('acq.dealSheet', {
-        v1: formatMoney(q.fairValue),
-        v2: Math.round(q.premiumRatio * 100),
-        v3: formatMoney(q.premium),
-        v4: formatMoney(q.price),
-        v5: formatMoney(q.targetAnnualEbit),
-        v6: formatMoney(q.firstYearIntegration),
-        v7: formatMoney(q.annualSynergyAtFullRun),
-        v8: (q.firstYearEbitImpact >= 0 ? '+' : '') + formatMoney(q.firstYearEbitImpact),
-        v9: q.accretive ? t('acq.accretive') : t('acq.dilutive'),
-        v10: formatMoney(q.steadyStateEbitImpact),
-        v11: isFinite(q.paybackYears) ? t('acq.paybackYears', { v1: q.paybackYears.toFixed(1) }) : t('acq.neverAtThisPrice'),
-        v12: q.announcementImpactPercent.toFixed(1),
-      }) +
-      (fin.method === 'stock'
-        ? t('acq.paidInShares', {
-            v1: fin.sharesIssued.toLocaleString(),
-            v2: fin.playerOwnershipAfter.toFixed(2),
-          })
-        : fin.method === 'debt'
-          ? t('acq.paidWithDebt', { v1: formatMoney(fin.annualInterest) })
-          : '') +
-      t('acq.premiumWarning', { v1: formatMoney(q.premium) }),
-      [
-        { text: t('action.walkAway'), style: 'cancel' },
+    setPanel({
+      title: hostile ? t('acq.hostileBidFor', { v1: selectedTarget.name }) : t('acq.acquireTitle', { v1: selectedTarget.name }),
+      // The deal sheet: twelve figures that used to be one interpolated
+      // paragraph. Same numbers, one per row.
+      lines: [
+        { label: 'Fair value', value: formatMoney(q.fairValue) },
+        { label: `Premium (${Math.round(q.premiumRatio * 100)}%)`, value: formatMoney(q.premium) },
+        { label: 'Price', value: formatMoney(q.price), strong: true },
+        { label: 'Their annual EBIT', value: formatMoney(q.targetAnnualEbit) },
+        { label: 'First-year integration', value: `−${formatMoney(q.firstYearIntegration)}`, tone: 'negative' },
+        { label: 'Synergy at full run', value: formatMoney(q.annualSynergyAtFullRun) },
         {
-          text: hostile ? t('acq.launchHostile') : t('acq.signDeal'),
-          style: hostile ? 'destructive' : 'default',
-          onPress: () => {
+          label: 'First-year EBIT impact',
+          value: (q.firstYearEbitImpact >= 0 ? '+' : '') + formatMoney(q.firstYearEbitImpact),
+          tone: q.firstYearEbitImpact >= 0 ? 'positive' : 'negative',
+        },
+        { label: 'Steady state', value: formatMoney(q.steadyStateEbitImpact) },
+        { label: 'Payback', value: isFinite(q.paybackYears) ? t('acq.paybackYears', { v1: q.paybackYears.toFixed(1) }) : t('acq.neverAtThisPrice') },
+        { label: 'Announcement impact', value: `${q.announcementImpactPercent.toFixed(1)}%` },
+        { label: q.accretive ? t('acq.accretive') : t('acq.dilutive'), value: '', strong: true },
+      ],
+      note:
+        (fin.method === 'stock'
+          ? t('acq.paidInShares', {
+              v1: fin.sharesIssued.toLocaleString(),
+              v2: fin.playerOwnershipAfter.toFixed(2),
+            })
+          : fin.method === 'debt'
+            ? t('acq.paidWithDebt', { v1: formatMoney(fin.annualInterest) })
+            : '') + t('acq.premiumWarning', { v1: formatMoney(q.premium) }),
+      tone: hostile ? 'danger' : 'default',
+      cancelLabel: t('action.walkAway'),
+      confirmLabel: hostile ? t('acq.launchHostile') : t('acq.signDeal'),
+      onConfirm: () => {
+          {
             // TEK KAPI — finansman, anlasma kaydi, buff ve piyasa tepkisi
             // hepsi orada. Bkz. useCorporateFinanceStore.executeAcquisition
             const result = executeAcquisition({
@@ -226,34 +246,37 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
             const vote = useShareholderStore.getState().lastVote;
             const votedOnThis = vote && vote.title.includes(selectedTarget.name);
             if (votedOnThis) {
-              const lines = vote!.votes
-                .map(v => `${v.vote === 'YES' ? '✓' : '✕'}  ${v.name} — ${v.reason}`)
-                .join('\n');
-              Alert.alert(
-                vote!.passed ? t('acq.boardApproved') : t('acq.boardVotedDown'),
-                `${vote!.summary}\n\n${lines}` +
-                (vote!.overrode
-                  ? `\n\n${t('acq.carriedOnYourShares')}`
-                  : ''),
-              );
+              setPanel({
+                title: vote!.passed ? t('acq.boardApproved') : t('acq.boardVotedDown'),
+                summary: vote!.summary,
+                lines: vote!.votes.map(v => ({
+                  label: `${v.vote === 'YES' ? '✓' : '✕'}  ${v.name}`,
+                  value: v.reason,
+                })),
+                note: vote!.overrode ? t('acq.carriedOnYourShares') : undefined,
+                confirmLabel: 'OK',
+                tone: vote!.passed ? 'default' : 'danger',
+              });
             }
 
             if (!result.success) {
-              if (!votedOnThis) Alert.alert(t('alert.dealFailed'), result.message);
+              if (!votedOnThis) {
+                setPanel({ title: t('alert.dealFailed'), summary: result.message, confirmLabel: 'OK', tone: 'danger' });
+              }
               return;
             }
 
-            Alert.alert(
-              t('alert.dealClosed'),
-              t('acq.dealClosedBody', { v1: selectedTarget.name }) +
-              (q.accretive ? t('acq.accretiveNote') : t('acq.dilutiveNote'))
-            );
+            setPanel({
+              title: t('alert.dealClosed'),
+              summary: t('acq.dealClosedBody', { v1: selectedTarget.name })
+                + (q.accretive ? t('acq.accretiveNote') : t('acq.dilutiveNote')),
+              confirmLabel: 'OK',
+            });
             setSelectedTarget(null);
             onClose();
-          },
-        },
-      ]
-    );
+          }
+      },
+    });
   };
 
   const renderCompanyItem = ({ item }: { item: any }) => {
@@ -422,6 +445,20 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         )}
 
       </View>
+
+      <ConfirmPanel
+        visible={!!panel}
+        title={panel?.title || ''}
+        summary={panel?.summary}
+        lines={panel?.lines}
+        note={panel?.note}
+        tone={panel?.tone}
+        choices={panel?.choices}
+        confirmLabel={panel?.confirmLabel || 'OK'}
+        cancelLabel={panel?.cancelLabel}
+        onConfirm={panel?.onConfirm}
+        onCancel={() => setPanel(null)}
+      />
     </Modal>
   );
 };

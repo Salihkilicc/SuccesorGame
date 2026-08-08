@@ -210,12 +210,13 @@ const styles = StyleSheet.create({
     valueHighlight: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: theme.colors.success,
+        color: theme.colors.textPrimary,
     },
     costValue: {
+        // A cost is not a loss; the label already says what it is.
         fontSize: 14,
         fontWeight: 'bold',
-        color: theme.colors.error,
+        color: theme.colors.textPrimary,
     },
     divider: {
         height: 1,
