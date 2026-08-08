@@ -16,6 +16,20 @@ import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
+import ScreenHeader from '../../common/ScreenHeader';
+import { StatRow, RowGroup, DetailLine, DetailRule, DetailNote } from '../../common/Disclosure';
+
+/**
+ * The loan menu, in the order a company would actually work through it:
+ * cheapest and most demanding first, most expensive and least fussy last.
+ */
+const LOAN_CHOICES: { kind: LoanKind; icon: string; label: () => string }[] = [
+    { kind: 'term', icon: '🏛️', label: () => t('bank.type.term') },
+    { kind: 'bond', icon: '📜', label: () => t('bank.type.bond') },
+    { kind: 'secured', icon: '🏭', label: () => t('bank.type.secured') },
+    { kind: 'mezzanine', icon: '⚖️', label: () => t('bank.type.mezzanine') },
+    { kind: 'shark', icon: '🦈', label: () => t('bank.type.shark') },
+];
 
 type Props = {
     visible: boolean;
@@ -143,17 +157,12 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                 <Pressable style={styles.dismissArea} onPress={onClose} />
                 <View style={styles.centeredView} pointerEvents="box-none">
                     <View style={styles.container}>
-                        <View style={styles.titleRow}>
-                            <Text style={styles.title}>{t('bank.borrow.title')}</Text>
-                            <Pressable onPress={onClose} hitSlop={12} style={styles.closeButton}>
-                                <Text style={styles.closeText}>✕</Text>
-                            </Pressable>
-                        </View>
-                        <Text style={styles.subtitle}>
-                            {assessment.rating} • {assessment.leverage === Infinity ? '∞' : assessment.leverage.toFixed(1)}x leverage
-                            {' • '}
-                            {borrowingCapacity > 0 ? `${formatMoney(borrowingCapacity)} available` : 'No capacity'}
-                        </Text>
+                        <ScreenHeader
+                            inset={false}
+                            title={t('bank.borrow.title')}
+                            subtitle={`${assessment.rating} · ${assessment.leverage === Infinity ? '∞' : assessment.leverage.toFixed(1)}x leverage · ${borrowingCapacity > 0 ? `${formatMoney(borrowingCapacity)} available` : 'no capacity'}`}
+                            onBack={onClose}
+                        />
 
                         <ScrollView
                             style={styles.body}
@@ -161,80 +170,48 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                             showsVerticalScrollIndicator
                         >
 
-                        {/* Loan Type Selection */}
-                        <View style={styles.typeSelector}>
-                            <Pressable
-                                style={[styles.typeButton, selectedType === 'term' && styles.typeButtonActive, !!term.locked && styles.typeButtonLocked]}
-                                onPress={() => setSelectedType('term')}
-                            >
-                                <Text style={styles.typeEmoji}>🏛️</Text>
-                                <Text style={[styles.typeLabel, selectedType === 'term' && styles.typeLabelActive]}>
-                                    {t('bank.type.term')}
-                                </Text>
-                                <Text style={[styles.typeRate, null]}>
-                                    {term.locked || `${term.rate.toFixed(1)}%`}
-                                </Text>
-                            </Pressable>
+                        {/* ------------------------------------------------
+                            THE LOAN TYPES, AS A LIST
+                            ------------------------------------------------
+                            These were six chips in two rows of three, each
+                            showing an emoji, a name and a percentage. Nothing
+                            said what any of them WAS, so the only difference a
+                            player could see was the number - which is exactly
+                            the complaint that "bonds never change anything".
 
-                            <Pressable
-                                style={[styles.typeButton, selectedType === 'bond' && styles.typeButtonActive, !!bond.locked && styles.typeButtonLocked]}
-                                onPress={() => setSelectedType('bond')}
-                            >
-                                <Text style={styles.typeEmoji}>📜</Text>
-                                <Text style={[styles.typeLabel, selectedType === 'bond' && styles.typeLabelActive]}>
-                                    {t('bank.type.bond')}
-                                </Text>
-                                <Text style={[styles.typeRate, null]}>
-                                    {bond.locked || `${bond.rate.toFixed(1)}%`}
-                                </Text>
-                            </Pressable>
-
-                            <Pressable
-                                style={[styles.typeButton, selectedType === 'shark' && styles.typeButtonActive, !!shark.locked && styles.typeButtonLocked]}
-                                onPress={() => setSelectedType('shark')}
-                            >
-                                <Text style={styles.typeEmoji}>🦈</Text>
-                                <Text style={[styles.typeLabel, selectedType === 'shark' && styles.typeLabelActive]}>
-                                    {t('bank.type.shark')}
-                                </Text>
-                                <Text style={[styles.typeRate, { color: theme.colors.textPrimary }]}>
-                                    {shark.locked || `${shark.rate.toFixed(1)}%`}
-                                </Text>
-                            </Pressable>
-                        </View>
-
-                        {/* KATMAN 2 VE 3 — kazanc yetmedigi zaman */}
-                        <View style={styles.typeSelector}>
-                            <Pressable
-                                style={[styles.typeButton, selectedType === 'secured' && styles.typeButtonActive]}
-                                onPress={() => setSelectedType('secured')}
-                            >
-                                <Text style={styles.typeEmoji}>🏭</Text>
-                                <Text style={[styles.typeLabel, selectedType === 'secured' && styles.typeLabelActive]}>
-                                    {t('bank.type.secured')}
-                                </Text>
-                                <Text style={styles.typeRate}>{secured.rate.toFixed(1)}%</Text>
-                            </Pressable>
-
-                            <Pressable
-                                style={[styles.typeButton, selectedType === 'mezzanine' && styles.typeButtonActive]}
-                                onPress={() => setSelectedType('mezzanine')}
-                            >
-                                <Text style={styles.typeEmoji}>⚖️</Text>
-                                <Text style={[styles.typeLabel, selectedType === 'mezzanine' && styles.typeLabelActive]}>
-                                    {t('bank.type.mezzanine')}
-                                </Text>
-                                <Text style={[styles.typeRate, { color: theme.colors.textPrimary }]}>{mezz.rate.toFixed(1)}%</Text>
-                            </Pressable>
-                        </View>
-
-                        <Text style={styles.tierNote}>
-                            {selectedType === 'secured'
-                                ? t('bank.tierSecured', { amount: formatMoney(collateral.headroom) })
-                                : selectedType === 'mezzanine'
-                                    ? `${formatMoney(mezzQuote.maxAmount)} — ${mezzQuote.warning}`
-                                    : t('bank.tierEarnings', { amount: formatMoney(borrowingCapacity) })}
-                        </Text>
+                            One row per type: the rate is the number, the line
+                            underneath is what the money actually costs you.
+                           ------------------------------------------------ */}
+                        <RowGroup title={t('bank.borrow.title')}>
+                            {LOAN_CHOICES.map(({ kind, icon, label }) => {
+                                const info = productInfo(kind);
+                                const active = selectedType === kind;
+                                return (
+                                    <Pressable
+                                        key={kind}
+                                        onPress={() => !info.locked && setSelectedType(kind)}
+                                        style={({ pressed }) => [
+                                            styles.typeRow,
+                                            active && styles.typeRowActive,
+                                            !!info.locked && styles.typeRowLocked,
+                                            pressed && styles.typeRowPressed,
+                                        ]}>
+                                        <Text style={styles.typeIcon}>{icon}</Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={[styles.typeName, active && styles.typeNameActive]}>
+                                                {label()}
+                                            </Text>
+                                            <Text style={styles.typeWhy} numberOfLines={2}>
+                                                {info.locked || info.product.description}
+                                            </Text>
+                                        </View>
+                                        <Text style={[styles.typeRateText, active && styles.typeNameActive]}>
+                                            {info.locked ? '—' : `${info.rate.toFixed(1)}%`}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </RowGroup>
 
                         {selectedType === 'mezzanine' && amount > 0 && (
                             <Text style={styles.warningText}>
@@ -255,39 +232,35 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                             />
                         </View>
 
-                        {/* Bu kredinin NE OLDUGU. Once hicbir tur kendini
-                            anlatmiyordu; oyuncu "bonds falan hic degismiyor,
-                            arayuzu her sey ayni" dedi — hakliydi, tek fark
-                            bir yuzde sayisiydi. */}
-                        <Text style={styles.productDesc}>{selected.product.description}</Text>
-
-                        {/* Live Preview */}
-                        <View style={styles.previewContainer}>
-                            <View style={styles.previewRow}>
-                                <Text style={styles.previewLabel}>{t('bank.rate')}</Text>
-                                <Text style={styles.previewValue}>{currentRate.toFixed(1)}% APR</Text>
-                            </View>
-                            <View style={styles.previewRow}>
-                                <Text style={styles.previewLabel}>{t('bank.quarterlyPayment')}</Text>
-                                <Text style={[styles.previewValue, { color: theme.colors.textPrimary }]}>
-                                    {formatMoney(preview.totalPayment)}
-                                </Text>
-                            </View>
-                            <View style={styles.previewRow}>
-                                <Text style={styles.previewLabel}>{t('bank.firstSplit')}</Text>
-                                <Text style={styles.previewValue}>
-                                    {formatMoney(preview.interest)} interest / {formatMoney(preview.principalPaid)} principal
-                                </Text>
-                            </View>
-                            <View style={styles.previewRow}>
-                                <Text style={styles.previewLabel}>{t('bank.term')}</Text>
-                                <Text style={styles.previewValue}>
-                                    {selected.product.termQuarters === 0
+                        {/* What this loan actually costs, number first. */}
+                        <RowGroup title={t('bank.quarterlyPayment')}>
+                            <StatRow
+                                label={t('bank.quarterlyPayment')}
+                                value={formatMoney(preview.totalPayment)}
+                                why={`${currentRate.toFixed(1)}% APR · ${
+                                    selected.product.termQuarters === 0
                                         ? t('bank.revolving')
-                                        : `${selected.product.termQuarters} quarters`}
-                                </Text>
-                            </View>
-                        </View>
+                                        : `${selected.product.termQuarters} quarters`
+                                }`}
+                                detail={
+                                    <>
+                                        <DetailLine label={t('bank.rate')} value={`${currentRate.toFixed(1)}% APR`} />
+                                        <DetailLine label="Interest" value={formatMoney(preview.interest)} />
+                                        <DetailLine label="Principal" value={formatMoney(preview.principalPaid)} />
+                                        <DetailRule />
+                                        <DetailLine
+                                            label={t('bank.quarterlyPayment')}
+                                            value={formatMoney(preview.totalPayment)}
+                                            strong
+                                        />
+                                        <DetailNote>
+                                            The first payment is mostly interest. Principal only starts
+                                            coming down once the balance does.
+                                        </DetailNote>
+                                    </>
+                                }
+                            />
+                        </RowGroup>
 
                         {/* Warning */}
                         {/* Sozlesme esigi: motorun gercekten uyguladigi sinir. */}
@@ -344,6 +317,30 @@ const BorrowModal = ({ visible, onClose }: Props) => {
 export default BorrowModal;
 
 const styles = StyleSheet.create({
+    // --- The loan menu ----------------------------------------------------
+    typeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.md,
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical: theme.spacing.sm + 2,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: theme.colors.border,
+    },
+    typeRowActive: { backgroundColor: theme.colors.surfaceHigh },
+    typeRowPressed: { backgroundColor: theme.colors.surfaceRaised },
+    typeRowLocked: { opacity: 0.45 },
+    typeIcon: { fontSize: 22, width: 26, textAlign: 'center' },
+    typeName: { color: theme.colors.textSecondary, fontSize: theme.typography.body, fontWeight: '700' },
+    typeNameActive: { color: theme.colors.textPrimary },
+    typeWhy: { color: theme.colors.textMuted, fontSize: theme.typography.caption, marginTop: 2, lineHeight: 15 },
+    typeRateText: {
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.subtitle,
+        fontWeight: '800',
+        fontVariant: ['tabular-nums'],
+    },
+
     backdrop: {
         flex: 1,
         backgroundColor: 'rgba(28,36,44,0.85)',

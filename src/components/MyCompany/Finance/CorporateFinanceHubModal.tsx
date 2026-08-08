@@ -11,6 +11,7 @@ import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
+import { StatRow, RowGroup, DetailLine, DetailNote } from '../../common/Disclosure';
 
 
 type Props = {
@@ -107,177 +108,148 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 onBack={onClose}
             />
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: theme.spacing.lg, padding: theme.spacing.md, paddingBottom: 24 }}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.body}>
 
-                {/* --- NAVIGATION GRID --- */}
-                <View style={styles.navGrid}>
-                    {/* OWNER INJECTION BUTTON */}
-                    <TouchableOpacity style={[styles.navCard, { borderColor: 'rgba(255,255,255,0.06)', flex: 1 }]} onPress={() => setShowInjection(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.2)' }]}>
-                            <Text style={{ fontSize: 24 }}>💸</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
-                            <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
-                        </View>
-                        <Text style={{ color: '#FFFFFF', fontSize: 18 }}>→</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* HERO: Credit Score */}
-                <View style={styles.heroSection}>
+                {/* ------------------------------------------------------------
+                    THE CREDIT SCORE IS THE SCREEN'S ONE HEADLINE
+                    ------------------------------------------------------------
+                    Everything below is a consequence of it: what you can
+                    borrow, at what rate, and whether Marcus is your only
+                    remaining option. It stays big; the rest became rows.
+                   ------------------------------------------------------------ */}
+                <View style={styles.hero}>
                     <Text style={styles.heroLabel}>{t('finance.creditScore')}</Text>
-                    <View style={styles.scoreContainer}>
-                        <Text style={[styles.scoreNumber, { color: rating.color }]}>
-                            {creditScore}
-                        </Text>
-                        <View style={styles.ratingBadge}>
-                            <Text style={[styles.ratingText, { color: rating.color }]}>
-                                {rating.label}
-                            </Text>
-                            <Text style={styles.ratingDescription}>{rating.description}</Text>
+                    <View style={styles.heroRow}>
+                        <Text style={[styles.heroValue, { color: rating.color }]}>{creditScore}</Text>
+                        <View style={styles.heroBadge}>
+                            <Text style={[styles.heroGrade, { color: rating.color }]}>{rating.label}</Text>
+                            <Text style={styles.heroGradeNote}>{rating.description}</Text>
                         </View>
                     </View>
 
-                    {/* Borrowing Capacity Progress Bar */}
-                    <View style={styles.capacityContainer}>
-                        <Text style={styles.capacityLabel}>{t('finance.borrowingCapacity')}</Text>
-                        <View style={styles.progressBar}>
-                            <View
-                                style={[
-                                    styles.progressFill,
-                                    {
-                                        width: `${Math.min(100, (totalDebt / (totalDebt + borrowingCapacity)) * 100)}%`,
-                                        backgroundColor: leverage > 60 ? '#FF8A8A' : '#FF8A8A'
-                                    }
-                                ]}
-                            />
-                        </View>
-                        <Text style={styles.capacityValue}>
-                            {formatMoney(borrowingCapacity)} Available
-                        </Text>
+                    <View style={styles.capacityTrack}>
+                        <View
+                            style={[
+                                styles.capacityFill,
+                                {
+                                    width: `${Math.min(100, (totalDebt / Math.max(1, totalDebt + borrowingCapacity)) * 100)}%`,
+                                    backgroundColor: leverage > 60 ? theme.colors.warning : theme.colors.primary,
+                                },
+                            ]}
+                        />
                     </View>
+                    <Text style={styles.capacityNote}>
+                        {formatMoney(borrowingCapacity)} still available · {formatMoney(totalDebt)} drawn
+                    </Text>
                 </View>
 
-                {/* STATS GRID */}
-                <View style={styles.statsGrid}>
-                    <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
-                        <Text style={[styles.statValue, { color: theme.colors.textPrimary }]}>
-                            {formatMoney(totalDebt)}
-                        </Text>
-                    </View>
-                    <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
-                        <Text style={[styles.statValue, { color: theme.colors.textPrimary }]}>
-                            {formatMoney(monthlyInterest)}
-                        </Text>
-                    </View>
-                    <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
-                        <Text style={[styles.statValue, { color: leverage > 60 ? '#FF8A8A' : '#CFD0D2' }]}>
-                            {leverage.toFixed(1)}%
-                        </Text>
-                    </View>
-                </View>
+                {/* The position, number first, the working behind each one. */}
+                <RowGroup title={t('finance.totalDebt')}>
+                    <StatRow
+                        label={t('finance.totalDebt')}
+                        value={formatMoney(totalDebt)}
+                        why={loans.length ? `across ${loans.length} loan${loans.length > 1 ? 's' : ''}` : 'nothing borrowed'}
+                    />
+                    <StatRow
+                        label={t('finance.monthlyInterest')}
+                        value={formatMoney(monthlyInterest)}
+                        why="charged every quarter whether you profit or not"
+                    />
+                    <StatRow
+                        label={t('finance.leverage')}
+                        value={`${leverage.toFixed(1)}%`}
+                        why={leverage > 60 ? 'above the level lenders are comfortable with' : 'within a normal range'}
+                        valueColor={leverage > 60 ? theme.colors.warning : undefined}
+                    />
+                    <StatRow
+                        label={t('finance.borrowingCapacity')}
+                        value={formatMoney(borrowingCapacity)}
+                        why="what a bank would still lend against your earnings"
+                        detail={
+                            <DetailNote>
+                                Banks lend against EBITDA, not valuation. A high company value does
+                                not raise this number - profit does.
+                            </DetailNote>
+                        }
+                    />
+                </RowGroup>
 
-                {/* ACTIVE LOANS */}
-                <View>
-                    <Text style={styles.sectionTitle}>{t('finance.activeLoans')}</Text>
+                {/* Each loan is a row that opens into its terms. */}
+                <RowGroup title={t('finance.activeLoans')}>
                     {loans.length === 0 ? (
-                        <View style={styles.emptyState}>
-                            <Text style={styles.emptyStateIcon}>✓</Text>
-                            <Text style={styles.emptyStateText}>{t('finance.noActiveDebt')}</Text>
-                            <Text style={styles.emptyStateSubtext}>{t('finance.cleanBalanceSheet')}</Text>
-                        </View>
+                        <StatRow
+                            label={t('finance.noActiveDebt')}
+                            value="—"
+                            why={t('finance.cleanBalanceSheet')}
+                        />
                     ) : (
-                        <View style={styles.loansList}>
-                            {loans.map((loan) => (
-                                <View key={loan.id} style={styles.loanCard}>
-                                    <View style={styles.loanHeader}>
-                                        <Text style={styles.loanType}>{loan.name} Loan</Text>
-                                        <Text style={styles.loanRate}>{loan.rate}% APR</Text>
-                                    </View>
-                                    <View style={styles.loanDetails}>
-                                        <View>
-                                            <Text style={styles.loanDetailLabel}>{t('finance.remaining')}</Text>
-                                            <Text style={styles.loanDetailValue}>
-                                                {formatMoney(loan.balance)}
-                                            </Text>
-                                        </View>
-                                        <View>
-                                            <Text style={styles.loanDetailLabel}>{t('finance.monthly')}</Text>
-                                            <Text style={styles.loanDetailValue}>
-                                                {formatMoney(((loan.balance * loan.rate) / 4))}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))}
-                        </View>
+                        loans.map(loan => (
+                            <StatRow
+                                key={loan.id}
+                                label={`${loan.name} Loan`}
+                                value={formatMoney(loan.balance)}
+                                why={`${loan.rate}% APR`}
+                                detail={
+                                    <>
+                                        <DetailLine label={t('finance.remaining')} value={formatMoney(loan.balance)} />
+                                        <DetailLine
+                                            label={t('finance.monthly')}
+                                            value={formatMoney((loan.balance * loan.rate) / 4)}
+                                        />
+                                        <DetailLine label="Rate" value={`${loan.rate}% APR`} strong />
+                                    </>
+                                }
+                            />
+                        ))
+                    )}
+                </RowGroup>
+
+                {/* Ways to raise money, in order of how much they cost you. */}
+                <RowGroup title="Raise money">
+                    <StatRow
+                        label={`💸  ${t('finance.injection')}`}
+                        value="›"
+                        why={t('finance.personalInvestment')}
+                    />
+                    {!!sharkMember && (
+                        <StatRow
+                            label={`⚠️  ${t('finance.privateEquityInjection')}`}
+                            value="›"
+                            why={`from ${sharkMember.name} — no credit check, secured on your own shares`}
+                            valueColor={theme.colors.warning}
+                        />
+                    )}
+                </RowGroup>
+
+                <View style={styles.actions}>
+                    <Pressable
+                        onPress={() => setShowInjection(true)}
+                        style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
+                        <Text style={styles.btnSecondaryText}>{t('finance.injection')}</Text>
+                    </Pressable>
+                    {!!sharkMember && (
+                        <Pressable
+                            onPress={() => setSharkDealModalVisible(true)}
+                            style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
+                            <Text style={styles.btnSecondaryText}>{sharkMember.name.split(' ')[0]}</Text>
+                        </Pressable>
                     )}
                 </View>
 
-                {/* SHARK DEAL - SPECIAL OFFER */}
-                {sharkMember && (
-                    <View>
-                        <Text style={styles.sectionTitle}>⚠️ Special Offer</Text>
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.sharkDealCard,
-                                pressed && styles.sharkDealCardPressed
-                            ]}
-                            onPress={() => setSharkDealModalVisible(true)}
-                        >
-                            <View style={styles.sharkDealHeader}>
-                                <View style={styles.sharkAvatar}>
-                                    <Text style={styles.sharkAvatarText}>
-                                        {sharkMember.name.charAt(0)}
-                                    </Text>
-                                </View>
-                                <View style={styles.sharkDealInfo}>
-                                    <Text style={styles.sharkDealTitle}>{t('finance.privateEquityInjection')}</Text>
-                                    <Text style={styles.sharkDealSubtitle}>
-                                        from {sharkMember.name}
-                                    </Text>
-                                </View>
-                                <View style={styles.instantBadge}>
-                                    <Text style={styles.instantBadgeText}>{t('finance.instantCash')}</Text>
-                                </View>
-                            </View>
-                            <View style={styles.sharkDealFooter}>
-                                <Text style={styles.sharkDealWarning}>
-                                    ⚡ No credit check required • Equity-backed financing
-                                </Text>
-                            </View>
-                        </Pressable>
-                    </View>
-                )}
-
-
-
-                {/* CTA BUTTONS */}
-                <View style={styles.ctaContainer}>
+                <View style={styles.actions}>
                     {totalDebt > 0 && (
                         <Pressable
-                            style={({ pressed }) => [
-                                styles.repayButton,
-                                pressed && styles.repayButtonPressed
-                            ]}
                             onPress={onRepayDebt}
-                        >
-                            <Text style={styles.repayButtonText}>{t('finance.repayDebt')}</Text>
+                            style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
+                            <Text style={styles.btnSecondaryText}>{t('finance.repayDebt')}</Text>
                         </Pressable>
                     )}
-
                     <Pressable
-                        style={({ pressed }) => [
-                            styles.ctaButton,
-                            pressed && styles.ctaButtonPressed
-                        ]}
                         onPress={onRequestLoan}
-                    >
-                        <Text style={styles.ctaButtonText}>{t('finance.requestNewLoan')}</Text>
+                        style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}>
+                        <Text style={styles.btnPrimaryText}>{t('finance.requestNewLoan')}</Text>
                     </Pressable>
                 </View>
 
@@ -305,6 +277,57 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 export default CorporateFinanceHubModal;
 
 const styles = StyleSheet.create({
+    body: { padding: theme.spacing.md, paddingBottom: 120, gap: theme.spacing.md },
+
+    // --- The one headline -------------------------------------------------
+    hero: {
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.radius.lg,
+        padding: theme.spacing.lg,
+        gap: theme.spacing.sm,
+    },
+    heroLabel: {
+        color: theme.colors.textMuted,
+        fontSize: theme.typography.caption,
+        fontWeight: '700',
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+    },
+    heroRow: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.md },
+    heroValue: { fontSize: 44, fontWeight: '900', letterSpacing: -1.5, lineHeight: 48 },
+    heroBadge: { flex: 1, paddingBottom: 6 },
+    heroGrade: { fontSize: theme.typography.subtitle, fontWeight: '800', letterSpacing: 0.5 },
+    heroGradeNote: { color: theme.colors.textSecondary, fontSize: theme.typography.caption },
+
+    capacityTrack: {
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: theme.colors.surfaceHigh,
+        overflow: 'hidden',
+        marginTop: theme.spacing.xs,
+    },
+    capacityFill: { height: '100%', borderRadius: 3 },
+    capacityNote: { color: theme.colors.textMuted, fontSize: theme.typography.caption },
+
+    // --- Actions ----------------------------------------------------------
+    actions: { flexDirection: 'row', gap: theme.spacing.sm },
+    btn: {
+        flex: 1,
+        paddingVertical: theme.spacing.md,
+        borderRadius: theme.radius.md,
+        alignItems: 'center',
+    },
+    btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
+    btnPrimary: { backgroundColor: theme.colors.primary },
+    // Primary is the bright blue, a light fill - so the label is black.
+    btnPrimaryText: { color: theme.colors.onLight, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    btnSecondary: {
+        backgroundColor: theme.colors.surfaceHigh,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.border,
+    },
+    btnSecondaryText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body + 1 },
+
     customHeader: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -348,15 +371,6 @@ const styles = StyleSheet.create({
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
-    },
-    heroLabel: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.48)',
-        textTransform: 'uppercase',
-        letterSpacing: 1.5,
-        textAlign: 'center',
-        marginBottom: 12,
     },
     scoreContainer: {
         flexDirection: 'row',
