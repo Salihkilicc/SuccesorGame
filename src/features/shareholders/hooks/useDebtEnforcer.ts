@@ -1,118 +1,129 @@
 import { useShareholderStore } from '../stores/useShareholderStore';
 
 /**
- * Debt Enforcer Hook
- * Automatically triggers equity seizure when shark loan deadlines pass.
- * This creates unavoidable consequences for unpaid predatory loans.
+ * ============================================================================
+ *  SHARK LOAN ENFORCEMENT
+ * ============================================================================
+ *
+ *  Marcus lends without a credit check and takes shares, not money, when the
+ *  date passes. That was the design. In practice none of it happened, for
+ *  three separate reasons that each hid the next:
+ *
+ *  1) THE HOOK WAS CALLED BY NOTHING. `checkDeadlines` existed, was correct in
+ *     outline, and no file imported it. The loan paid out and was never
+ *     collected - free money with a menacing description.
+ *
+ *  2) IT READ FIELDS THAT DO NOT EXIST. It was written against an older
+ *     percentage-based API (`playerShares`, `seizedShares`,
+ *     `playerSharesRemaining`) while the store moved to absolute share COUNTS
+ *     (`playerShareCount`, `seizedShareCount`, `playerShareCountRemaining`).
+ *     Four of the project's baseline type errors lived here.
+ *
+ *  3) THE GAME-OVER TEST COMPARED A COUNT TO A PERCENTAGE. `remaining < 50.0`
+ *     was meant as "below 50% ownership", but remaining is a share count in
+ *     the millions, so it was false always. Losing control could not trigger
+ *     even if the seizure ran. It is a ratio against totalShares now.
+ *
+ *  And a fourth, in the modal rather than here: the deadline was set from
+ *  `currentMonth`, which wraps back to 1 every year. A loan due in twelve
+ *  months got a deadline of 17 on a counter that never exceeds 12, so the due
+ *  date could not arrive. Deadlines are absolute months now - see
+ *  `absoluteMonth` below, which is monotonic because `age` ticks over exactly
+ *  when the month wraps.
+ * ============================================================================
  */
 
 export interface DebtDefaultEvent {
     triggered: boolean;
     lenderName: string;
-    seizedShares: number;
+    seizedShareCount: number;
     loanAmount: number;
-    playerSharesRemaining: number;
-    isGameOver: boolean; // True if player lost majority control
+    playerShareCountRemaining: number;
+    /** Ownership after the seizure, as a percentage - for the report screen. */
+    ownershipAfter: number;
+    /** True if the seizure cost the player majority control. */
+    isGameOver: boolean;
 }
 
-export const useDebtEnforcer = () => {
-    const { sharkLoans, seizeCollateral, playerShares } = useShareholderStore();
+/**
+ * A month counter that never resets. `currentMonth` is 1-12 and wraps; `age`
+ * increments on exactly that wrap, so this is strictly increasing.
+ */
+export const absoluteMonth = (age: number, currentMonth: number): number =>
+    age * 12 + currentMonth;
 
-    /**
-     * Check all active shark loans for deadline violations.
-     * Automatically seize collateral for overdue loans.
-     * 
-     * @param currentTurn - The current game turn/month
-     * @param stockPrice - Current stock price for seizure calculation
-     * @returns Array of default events (empty if no defaults)
-     */
-    const checkDeadlines = (currentTurn: number, stockPrice: number): DebtDefaultEvent[] => {
-        const defaultEvents: DebtDefaultEvent[] = [];
+/**
+ * Seize collateral on every overdue loan.
+ *
+ * A plain function, not a hook, because the caller is the quarter tick inside
+ * the game store - React hooks cannot be called from there. That mismatch is
+ * part of why this was never wired up in the first place.
+ */
+export const enforceSharkDeadlines = (
+    currentAbsoluteMonth: number,
+    stockPrice: number,
+): DebtDefaultEvent[] => {
+    const { sharkLoans, seizeCollateral, totalShares } = useShareholderStore.getState();
 
-        // Find all active loans past their deadline
-        const overdueLoans = sharkLoans.filter(
-            (loan) => loan.isActive && loan.deadlineTurn <= currentTurn
-        );
+    const overdue = (sharkLoans || []).filter(
+        (loan) => loan.isActive && loan.deadlineTurn <= currentAbsoluteMonth,
+    );
+    if (overdue.length === 0) return [];
 
-        if (overdueLoans.length === 0) {
-            return defaultEvents; // No defaults
-        }
+    const events: DebtDefaultEvent[] = [];
 
-        console.log(`[Debt Enforcer] Found ${overdueLoans.length} overdue loan(s). Triggering seizures...`);
+    for (const loan of overdue) {
+        const seizure = seizeCollateral(loan.id, stockPrice);
+        if (!seizure) continue;
 
-        // Process each overdue loan
-        overdueLoans.forEach((loan) => {
-            const seizureResult = seizeCollateral(loan.id, stockPrice);
+        const ownershipAfter = totalShares > 0
+            ? (seizure.playerShareCountRemaining / totalShares) * 100
+            : 0;
 
-            if (seizureResult) {
-                // Check if player lost majority control (< 50%)
-                const isGameOver = seizureResult.playerSharesRemaining < 50.0;
-
-                const event: DebtDefaultEvent = {
-                    triggered: true,
-                    lenderName: seizureResult.lenderName,
-                    seizedShares: seizureResult.seizedShares,
-                    loanAmount: seizureResult.loanAmount,
-                    playerSharesRemaining: seizureResult.playerSharesRemaining,
-                    isGameOver,
-                };
-
-                defaultEvents.push(event);
-
-                console.log(`[Debt Enforcer] DEFAULT TRIGGERED:`, {
-                    lender: event.lenderName,
-                    seized: `${event.seizedShares.toFixed(1)}%`,
-                    remaining: `${event.playerSharesRemaining.toFixed(1)}%`,
-                    gameOver: event.isGameOver,
-                });
-            }
+        events.push({
+            triggered: true,
+            lenderName: seizure.lenderName,
+            seizedShareCount: seizure.seizedShareCount,
+            loanAmount: seizure.loanAmount,
+            playerShareCountRemaining: seizure.playerShareCountRemaining,
+            ownershipAfter,
+            isGameOver: ownershipAfter < 50,
         });
+    }
 
-        return defaultEvents;
-    };
+    return events;
+};
 
-    /**
-     * Get summary of upcoming deadlines for UI warnings.
-     * 
-     * @param currentTurn - The current game turn/month
-     * @returns Array of loans due within 3 turns
-     */
-    const getUpcomingDeadlines = (currentTurn: number) => {
-        return sharkLoans
-            .filter((loan) => loan.isActive)
-            .filter((loan) => {
-                const turnsRemaining = loan.deadlineTurn - currentTurn;
-                return turnsRemaining > 0 && turnsRemaining <= 3;
-            })
-            .map((loan) => ({
-                loanId: loan.id,
-                lenderId: loan.lenderId,
-                amount: loan.amount,
-                deadlineTurn: loan.deadlineTurn,
-                turnsRemaining: loan.deadlineTurn - currentTurn,
-            }));
-    };
+/** Loans coming due, for the warning shown before the date arrives. */
+export const upcomingSharkDeadlines = (currentAbsoluteMonth: number, withinMonths = 6) => {
+    const { sharkLoans } = useShareholderStore.getState();
+    return (sharkLoans || [])
+        .filter((loan) => loan.isActive)
+        .map((loan) => ({
+            loanId: loan.id,
+            lenderId: loan.lenderId,
+            amount: loan.amount,
+            deadlineTurn: loan.deadlineTurn,
+            monthsRemaining: loan.deadlineTurn - currentAbsoluteMonth,
+        }))
+        .filter((l) => l.monthsRemaining > 0 && l.monthsRemaining <= withinMonths);
+};
 
-    /**
-     * Check if player has any active shark loans.
-     */
-    const hasActiveLoans = () => {
-        return sharkLoans.some((loan) => loan.isActive);
-    };
+export const totalSharkDebt = (): number => {
+    const { sharkLoans } = useShareholderStore.getState();
+    return (sharkLoans || [])
+        .filter((loan) => loan.isActive)
+        .reduce((total, loan) => total + loan.amount, 0);
+};
 
-    /**
-     * Get total debt from all active shark loans.
-     */
-    const getTotalSharkDebt = () => {
-        return sharkLoans
-            .filter((loan) => loan.isActive)
-            .reduce((total, loan) => total + loan.amount, 0);
-    };
-
+/** Thin reactive wrapper, for screens that need to re-render on a change. */
+export const useDebtEnforcer = () => {
+    const sharkLoans = useShareholderStore((s) => s.sharkLoans);
     return {
-        checkDeadlines,
-        getUpcomingDeadlines,
-        hasActiveLoans,
-        getTotalSharkDebt,
+        sharkLoans,
+        enforceSharkDeadlines,
+        upcomingSharkDeadlines,
+        totalSharkDebt,
+        hasActiveLoans: () => (sharkLoans || []).some((loan) => loan.isActive),
     };
 };

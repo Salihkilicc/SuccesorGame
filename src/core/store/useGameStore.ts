@@ -75,6 +75,7 @@ import {
   volatilityDamping,
 } from '../market/equity';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
+import { enforceSharkDeadlines, absoluteMonth } from '../../features/shareholders/hooks/useDebtEnforcer';
 import { useUserStore } from './useUserStore';
 import * as AchievementChecker from '../../achievements/checker';
 
@@ -1721,6 +1722,31 @@ export const useGameStore = create<GameStore>()(
             });
           }
 
+          // ------------------------------------------------------------------
+          //  SHARK LOANS COME DUE
+          // ------------------------------------------------------------------
+          //  This call is the point of the whole enforcer, and its absence is
+          //  why the loan was free money: the module existed, was typed, and
+          //  no file imported it. Marcus handed out cash and never collected.
+          //
+          //  Placed here, before the board reacts, so a default lands in the
+          //  SAME quarter's board pass rather than a later one. Losing shares
+          //  to your own board member is exactly the kind of thing the board
+          //  should have an opinion about.
+          // ------------------------------------------------------------------
+          const { currentMonth: dueMonth, age: dueAge } = get();
+          const sharkDefaults = enforceSharkDeadlines(
+            absoluteMonth(dueAge, dueMonth),
+            useEquityStore.getState().stockPrice,
+          );
+          for (const d of sharkDefaults) {
+            events.push({
+              kind: 'covenant_breach',
+              magnitude: 1,
+              label: `${d.lenderName} seized ${Math.round(d.seizedShareCount).toLocaleString()} shares over an unpaid loan`,
+            });
+          }
+
           sh.resetQuarterlyBoard();
           events.forEach(e => sh.applyBoardEvent(e as any, boardCtx));
 
@@ -1849,6 +1875,7 @@ export const useGameStore = create<GameStore>()(
           for (let q = 0; q < quarters; q++) {
             useMarketStore.getState().simulateQuarter();
           }
+
 
 
           // 7b. STAT DECAY LOGIC (Paslanma Kuralı)

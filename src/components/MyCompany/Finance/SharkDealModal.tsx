@@ -5,6 +5,7 @@ import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { useGameStore } from '../../../core/store/useGameStore';
+import { absoluteMonth } from '../../../features/shareholders/hooks/useDebtEnforcer';
 import { formatMoney } from '../../../core/utils';
 
 type Props = {
@@ -17,7 +18,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
     useLocale();
     const { takeSharkLoan, repaySharkLoan, sharkLoans, members } = useShareholderStore();
     const { update, money } = useStatsStore();
-    const { currentMonth } = useGameStore();
+    const { currentMonth, age } = useGameStore();
 
     // ------------------------------------------------------------------
     //  ONCE SABIT 10 MILYON VE BELIRSIZ "6 AY" IDI
@@ -41,9 +42,16 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
     const [loanAmount, setLoanAmount] = React.useState(Math.round(maxLoan * 0.5));
     const LOAN_AMOUNT = Math.min(loanAmount, maxLoan);
 
-    /** Vade CEYREK cinsinden. Motor ay sayiyor, o yuzden x3. */
+    /**
+     * The deadline is in quarters; the engine counts months, hence x3.
+     *
+     * It has to be an ABSOLUTE month. This used to read `currentMonth + 12`,
+     * but currentMonth is 1-12 and wraps every year, so the due date was a
+     * number the counter could never reach - the loan was never collectable.
+     * `absoluteMonth` is monotonic because age ticks over on the wrap.
+     */
     const DEADLINE_QUARTERS = 4;
-    const deadlineTurn = currentMonth + DEADLINE_QUARTERS * 3;
+    const deadlineTurn = absoluteMonth(age, currentMonth) + DEADLINE_QUARTERS * 3;
 
     /** %30 yillik — bir yilda odenecek toplam. */
     const totalOwed = Math.round(LOAN_AMOUNT * (1 + 0.30));
