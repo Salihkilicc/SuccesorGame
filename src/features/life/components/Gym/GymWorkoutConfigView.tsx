@@ -59,7 +59,7 @@ const GymWorkoutConfigView = () => {
                     <View style={styles.statsCard}>
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>{t('life.fatigue')}</Text>
-                            <Text style={[styles.statValue, { color: fatigue > 80 ? '#E3A857' : '#E3A857' }]}>
+                            <Text style={[styles.statValue, { color: fatigue > 80 ? '#E9B8C9' : '#E9B8C9' }]}>
                                 {fatigue}%
                             </Text>
                         </View>
@@ -107,7 +107,7 @@ const GymWorkoutConfigView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#000',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     subtitle: {
@@ -155,21 +155,21 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     statsCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     statRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    divider: { height: 1, backgroundColor: '#E9B8C9', marginVertical: 8 },
+    divider: { height: 1, backgroundColor: '#533D35', marginVertical: 8 },
     statLabel: { fontSize: 12, fontWeight: '700', color: '#E9B8C9', letterSpacing: 0.5 },
-    statValue: { fontSize: 14, fontWeight: '900', color: '#EDE8E4' },
+    statValue: { fontSize: 14, fontWeight: '900', color: '#FFFFFF' },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
         width: '47%', // Reduced slightly to ensure fit
         marginBottom: 12, // vertical spacing
 
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#E3A857',
-        shadowColor: '#E3A857',
+        borderColor: 'rgba(255,255,255,0.08)',
+        shadowColor: '#31241F',
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 3,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     workoutLabel: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     workoutDesc: {
@@ -205,15 +205,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     infoFooter: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#E3A857',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     infoText: {
         fontSize: 12,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         lineHeight: 16,
     },

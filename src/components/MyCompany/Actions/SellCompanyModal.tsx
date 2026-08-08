@@ -35,9 +35,9 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     const successChance = Math.max(0, rawChance) * 100;
 
     // Color Logic
-    let chanceColor = '#E06B6B'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#5FB37A'; // Green
-    else if (successChance >= 40) chanceColor = '#E3A857'; // Yellow
+    let chanceColor = '#E9B8C9'; // Red (< 40%)
+    if (successChance >= 70) chanceColor = '#5992C6'; // Green
+    else if (successChance >= 40) chanceColor = '#E9B8C9'; // Yellow
 
     const formatMoney = (amount: number) => {
         return formatMoneyExact(amount);
@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
     },
     container: {
         width: '100%',
-        backgroundColor: '#0F0E0D', // Dark Gray
+        backgroundColor: '#31241F', // Dark Gray
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#181614',
+        borderBottomColor: '#42312A',
         paddingBottom: 16,
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         letterSpacing: 2,
         marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     valuationContainer: {
         alignItems: 'center',
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 4,
@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
     valuationValue: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     priceSection: {
         marginBottom: 24,
     },
     sectionTitle: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '700',
         marginBottom: 8,
         textAlign: 'center',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     askingPrice: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginHorizontal: 16,
         letterSpacing: -1,
@@ -237,30 +237,30 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
         minWidth: 70,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#2A2624',
+        borderColor: '#674C41',
     },
     incrementBtn: {
-        backgroundColor: '#181614', // Keep uniform dark, maybe blue tint? Sticking to dark.
-        borderColor: '#5FB37A', // Green border for positive
+        backgroundColor: '#42312A', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        borderColor: '#5992C6', // Green border for positive
     },
     controlBtnText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     btnPressed: {
         opacity: 0.7,
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         borderWidth: 2,
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         alignItems: 'center',
     },
     cancelBtnText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 14,
     },
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
         flex: 2,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         alignItems: 'center',
     },
     submitBtnText: {
-        color: '#0F0E0D',
+        color: '#31241F',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,

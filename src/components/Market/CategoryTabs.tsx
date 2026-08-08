@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
   tabActive: {
     backgroundColor: 'rgba(212,175,55,0.15)',
     borderWidth: 1,
-    borderColor: '#E9B8C9',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   tabPressed: {
     transform: [{ scale: 0.98 }],
   },
   label: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontWeight: '700',
     fontSize: theme.typography.body,
   },

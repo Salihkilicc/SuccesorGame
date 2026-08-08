@@ -31,9 +31,9 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 12,
     borderRadius: 10,
-    backgroundColor: '#EDE8E4',
+    backgroundColor: '#FFFFFF',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#EDE8E4',
+    borderColor: '#FFFFFF',
   },
   rowLocked: {
     opacity: 0.8,
@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F0E0D',
+    color: '#31241F',
   },
   description: {
     fontSize: 13,
-    color: '#3B3632',
+    color: '#7F5E51',
     marginTop: 2,
   },
   descriptionLocked: {
-    color: '#3B3632',
+    color: '#7F5E51',
   },
 });

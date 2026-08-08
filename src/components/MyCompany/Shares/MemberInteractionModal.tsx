@@ -76,11 +76,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#5FB37A' };
+        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#5992C6' };
         if (trust >= 60) return { label: t('equity.supportive'), color: '#E9B8C9' };
-        if (trust >= 40) return { label: t('equity.neutral'), color: '#E3A857' };
-        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#E06B6B' };
-        return { label: t('equity.hostileEnemy'), color: '#E06B6B' };
+        if (trust >= 40) return { label: t('equity.neutral'), color: '#E9B8C9' };
+        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#E9B8C9' };
+        return { label: t('equity.hostileEnemy'), color: '#E9B8C9' };
     };
 
     const trustStatus = getTrustStatus(member.trust);
@@ -176,9 +176,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     const offerPrice = calculateOfferPrice();
 
     const getLikelihoodColor = () => {
-        if (offerPremium < 0) return '#E06B6B'; // Insulted
-        if (offerPremium < 20) return '#E3A857'; // Hesitant
-        return '#5FB37A'; // Interested
+        if (offerPremium < 0) return '#E9B8C9'; // Insulted
+        if (offerPremium < 20) return '#E9B8C9'; // Hesitant
+        return '#5992C6'; // Interested
     };
 
     const getLikelihoodLabel = () => {
@@ -364,7 +364,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🎁</Text>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
-                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#5FB37A' : '#E06B6B' }]}>
+                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#5992C6' : '#E9B8C9' }]}>
                                     {fmtDelta(giftPreview)}
                                 </Text>
                             </Pressable>
@@ -380,7 +380,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🍽️</Text>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
-                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#5FB37A' : '#E06B6B' }]}>
+                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#5992C6' : '#E9B8C9' }]}>
                                     {fmtDelta(dinnerPreview)}
                                 </Text>
                             </Pressable>
@@ -430,7 +430,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                     </Text>
                                     <Text style={[
                                         styles.stepperPremium,
-                                        { color: offerPremium >= 0 ? '#5FB37A' : '#E06B6B' }
+                                        { color: offerPremium >= 0 ? '#5992C6' : '#E9B8C9' }
                                     ]}>
                                         {offerPremium >= 0 ? '+' : ''}{offerPremium}%
                                     </Text>
@@ -504,18 +504,18 @@ export default MemberInteractionModal;
 const styles = StyleSheet.create({
     heroSection: {
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 24,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
     },
     heroAvatar: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 12,
@@ -528,12 +528,12 @@ const styles = StyleSheet.create({
     heroName: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     heroRole: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 12,
     },
     trustBadge: {
@@ -548,9 +548,9 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#0F0E0D', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
-    characterLine: { color: '#8A807B', fontSize: 11, marginBottom: 3 },
-    characterValue: { color: '#EDE8E4', fontWeight: '700' },
+    characterCard: { backgroundColor: '#31241F', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
+    characterValue: { color: '#FFFFFF', fontWeight: '700' },
     characterHint: { color: '#5992C6', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
@@ -561,14 +561,14 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 10,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 4,
         textTransform: 'uppercase',
     },
     statValue: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     tabContainer: {
         flexDirection: 'row',
@@ -579,16 +579,16 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         alignItems: 'center',
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 8,
     },
     tabActive: {
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
     },
     tabText: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         letterSpacing: 1,
     },
     tabTextActive: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
     },
@@ -611,20 +611,20 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '48%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
         gap: 8,
         borderWidth: 2,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     actionButtonPressed: {
         opacity: 0.8,
         transform: [{ scale: 0.98 }],
     },
     actionButtonDisabled: {
-        borderColor: '#181614',
+        borderColor: '#42312A',
         opacity: 0.5,
     },
     actionIcon: {
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     actionTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     actionCost: {
         fontSize: 12,
@@ -642,17 +642,17 @@ const styles = StyleSheet.create({
     },
     actionEffect: {
         fontSize: 11,
-        color: '#5FB37A',
+        color: '#5992C6',
     },
     stepperContainer: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         gap: 12,
     },
     stepperLabel: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -665,36 +665,36 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     stepperButtonPressed: {
         opacity: 0.7,
         transform: [{ scale: 0.95 }],
     },
     stepperButtonDisabled: {
-        borderColor: '#181614',
+        borderColor: '#42312A',
         opacity: 0.3,
     },
     stepperButtonText: {
         fontSize: 32,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     stepperDisplay: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         paddingVertical: 12,
     },
     stepperPrice: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     stepperPremium: {
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     },
     reactionLabel: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     reactionStatus: {
         fontSize: 14,
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     },
     reactionBarBg: {
         height: 12,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -728,20 +728,20 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     makeOfferButton: {
-        backgroundColor: '#5FB37A',
+        backgroundColor: '#5992C6',
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#5FB37A',
+        borderColor: '#5992C6',
     },
     makeOfferButtonPressed: {
         opacity: 0.8,
         transform: [{ scale: 0.98 }],
     },
     makeOfferButtonDisabled: {
-        backgroundColor: '#181614',
-        borderColor: '#181614',
+        backgroundColor: '#42312A',
+        borderColor: '#42312A',
         opacity: 0.5,
     },
     makeOfferButtonText: {
@@ -751,15 +751,15 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     infoBox: {
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 8,
         padding: 12,
         borderLeftWidth: 4,
-        borderLeftColor: '#E9B8C9',
+        borderLeftColor: 'rgba(255,255,255,0.08)',
     },
     infoText: {
         fontSize: 12,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         lineHeight: 18,
     },
 });

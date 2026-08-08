@@ -88,7 +88,7 @@ export default SanctuaryResultModal;
 const styles = StyleSheet.create({
     message: {
         fontSize: 15,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: theme.spacing.xl,
         lineHeight: 22,
@@ -103,23 +103,23 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     barLabel: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '600',
     },
     barValue: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '700',
     },
     barTrack: {
         height: 12,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 6,
         overflow: 'hidden',
     },
     barFill: {
         height: '100%',
-        backgroundcolor: '#5FB37A', // Green for enjoyment
+        backgroundcolor: '#5992C6', // Green for enjoyment
     },
     statsContainer: {
         flexDirection: 'row',
@@ -129,17 +129,17 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     statTag: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#8A807B',
+        borderColor: 'rgba(255,255,255,0.48)',
     },
     statText: {
         fontSize: 13,
         fontWeight: '600',
     },
-    positive: { color: '#5FB37A' },
-    negative: { color: '#E06B6B' },
+    positive: { color: '#5992C6' },
+    negative: { color: '#E9B8C9' },
 });

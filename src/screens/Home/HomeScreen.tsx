@@ -47,13 +47,13 @@ type HomeNavProp = CompositeNavigationProp<
 
 const GRADIENTS = {
   purplePink: ['#0A2A92', '#0A2A92'],
-  pinkRed: ['#E06B6B', '#E06B6B'],
-  orangeYellow: ['#E3A857', '#E3A857'],
+  pinkRed: ['#E9B8C9', '#E9B8C9'],
+  orangeYellow: ['#E9B8C9', '#E9B8C9'],
   blueSky: ['#5992C6', '#5992C6'],
-  bluePurple: ['#5992C6', '#123AB8'],
-  darkGrey: ['#0F0E0D', '#2A2624'],
-  networkBlue: ['#0A2A92', '#5FB37A'],
-  tealCyan: ['#5FB37A', '#5FB37A'],
+  bluePurple: ['#5992C6', '#0A2A92'],
+  darkGrey: ['#31241F', '#674C41'],
+  networkBlue: ['#0A2A92', '#5992C6'],
+  tealCyan: ['#5992C6', '#5992C6'],
 };
 
 // Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
@@ -278,14 +278,14 @@ const HomeScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <MaterialCommunityIcons name={item.icon} size={32} color="#EDE8E4" style={styles.appIconVector} />
+        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
+    <View style={{ flex: 1, backgroundColor: '#31241F' }}>
       <ImageBackground
         source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
         style={StyleSheet.absoluteFill}
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#E9B8C9', '#E3A857', '#201D1C']}
+                colors={['#E9B8C9', '#E9B8C9', '#533D35']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,14 +367,14 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#E9B8C9', '#E3A857', '#201D1C']}
+                colors={['#E9B8C9', '#E9B8C9', '#533D35']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               />
               <View style={styles.nextMonthContent}>
                 <Text style={styles.nextMonthText}>{t('home.advanceToNextQuarter')}</Text>
-                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#EDE8E4" />
+                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#FFFFFF" />
               </View>
             </Pressable>
           </View>
@@ -388,10 +388,10 @@ const HomeScreen = () => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs, justifyContent: 'space-between' }}>
                 <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#8A807B" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               <LinearGradient
-                colors={['#8A807B', '#0F0E0D', '#0F0E0D', '#5992C6']}
+                colors={['rgba(255,255,255,0.48)', '#31241F', '#31241F', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['#8A807B', '#0F0E0D', '#0F0E0D', '#5992C6']}
+                colors={['rgba(255,255,255,0.48)', '#31241F', '#31241F', '#5992C6']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#E3A857', // Dark gold shadow
+    shadowColor: '#31241F', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 0.2,
   },
   gender: {
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.caption,
   },
   bio: {
-    color: '#3B3632',
+    color: '#7F5E51',
     fontSize: 11,
     letterSpacing: 0.1,
   },
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
   ageChipValue: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   ageChipDivider: {
     width: 1,
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
   ageValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
   monthBadge: { color: theme.colors.accent, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
   nextMonthButton: {
-    shadowColor: '#E3A857', // Dark gold shadow
+    shadowColor: '#31241F', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8, // Increased opacity for better glow
     shadowRadius: 12,
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.96 }],
   },
   nextMonthText: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontWeight: '800',
     fontSize: 11.3,
     letterSpacing: 4,
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   appIconLabel: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -878,11 +878,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   label: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   statusText: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
   },
   entryRow: {
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   },
   entryLife: {
     flex: 1,
-    backgroundColor: '#EDE8E4',
+    backgroundColor: '#FFFFFF',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -970,20 +970,20 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E9B8C9',
+    borderColor: 'rgba(255,255,255,0.08)',
     justifyContent: 'center',
   },
   entryLove: {
     flex: 1,
-    backgroundColor: '#E06B6B',
+    backgroundColor: '#533D35',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E9B8C9',
+    borderColor: 'rgba(255,255,255,0.08)',
     justifyContent: 'center',
   },
   entryTitleDark: {
@@ -1002,7 +1002,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   entrySubtitleLight: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     marginTop: 4 * 0.9,
     fontSize: (theme.typography.caption + 1) * 0.9,
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 6,
     textShadowColor: 'rgba(255, 255, 255, 0.7)',
     textShadowOffset: { width: 0, height: 0 },

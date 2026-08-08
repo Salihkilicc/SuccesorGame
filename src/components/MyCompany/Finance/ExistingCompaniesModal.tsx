@@ -92,7 +92,7 @@ export default ExistingCompaniesModal;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     header: {
         flexDirection: 'row',
@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
         paddingRight: 16,
     },
     backText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
     title: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     row: {
         flexDirection: 'row',
@@ -123,22 +123,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     name: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     sector: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     value: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     change: {
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
         paddingTop: 100,
     },
     empty: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 16,
     },
     listContent: {

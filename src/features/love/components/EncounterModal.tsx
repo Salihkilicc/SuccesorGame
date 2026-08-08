@@ -32,11 +32,11 @@ interface EncounterModalProps {
 const getTierBadgeColor = (tier: string): string => {
     switch (tier) {
         case 'HIGH_SOCIETY': return '#E9B8C9';
-        case 'CORPORATE_ELITE': return '#123AB8';
-        case 'UNDERGROUND': return '#E06B6B';
+        case 'CORPORATE_ELITE': return '#0A2A92';
+        case 'UNDERGROUND': return '#E9B8C9';
         case 'BLUE_COLLAR': return '#5992C6';
         case 'STUDENT_LIFE': return '#5992C6';
-        case 'ARTISTIC': return '#123AB8';
+        case 'ARTISTIC': return '#0A2A92';
         default: return theme.colors.accent;
     }
 };
@@ -342,26 +342,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         width: '100%',
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         padding: 12,
         borderRadius: 10,
         marginBottom: 16,
         borderLeftWidth: 4,
-        borderLeftColor: '#E06B6B',
+        borderLeftColor: 'rgba(255,255,255,0.08)',
     },
     costIcon: {
         fontSize: 24,
     },
     costLabel: {
         fontSize: 11,
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     costValue: {
         fontSize: 18,
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontWeight: '800',
     },
 

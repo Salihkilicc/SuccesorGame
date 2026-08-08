@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: theme.typography.title - 2,
     fontWeight: '800',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   chip: {
@@ -97,17 +97,17 @@ const styles = StyleSheet.create({
   price: {
     fontSize: theme.typography.subtitle + 6,
     fontWeight: '700',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   change: {
     fontSize: theme.typography.subtitle,
     fontWeight: '700',
   },
   up: {
-    color: '#5FB37A',
+    color: '#5992C6',
   },
   down: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
   },
   metaRow: {
     flexDirection: 'row',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
   },
   divider: {
     height: 1,

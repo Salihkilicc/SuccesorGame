@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 18,
         borderWidth: 1,
         borderColor: 'rgba(255,215,0,0.22)',
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
         letterSpacing: 0.6,
         marginBottom: 10,
     },
-    text: { color: '#EDE8E4', fontSize: 13, lineHeight: 20 },
+    text: { color: '#FFFFFF', fontSize: 13, lineHeight: 20 },
     detail: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 11.5,
         lineHeight: 17,
         marginTop: 10,

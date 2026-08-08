@@ -25,14 +25,14 @@ const RouletteGameScreen = () => {
   // Render Helpers
   const renderBetButton = (type: BetType, label: string) => {
     const active = selectedBet === type;
-    const color = active ? currentLocation.theme.primary : '#2A2624';
+    const color = active ? currentLocation.theme.primary : '#674C41';
 
     return (
       <Pressable
         onPress={() => actions.selectBet(type)}
         style={({ pressed }) => [
           styles.betButton,
-          { borderColor: active ? currentLocation.theme.primary : '#3B3632', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
+          { borderColor: active ? currentLocation.theme.primary : '#7F5E51', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
           pressed && styles.betButtonPressed,
         ]}>
         <Text style={[styles.betButtonText, active && { color: currentLocation.theme.primary }]}>{label}</Text>
@@ -125,7 +125,7 @@ const RouletteGameScreen = () => {
 export default RouletteGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0E0D' },
+  container: { flex: 1, backgroundColor: '#31241F' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -133,13 +133,13 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', gap: 4 },
 
   tableCard: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     gap: 16
   },
-  tableTitle: { color: '#8A807B', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
+  tableTitle: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
   betGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   betButton: {
     flexBasis: '48%',
@@ -150,22 +150,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   betButtonPressed: { opacity: 0.8 },
-  betButtonText: { color: '#EDE8E4', fontWeight: '800', letterSpacing: 1 },
+  betButtonText: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1 },
 
   controlsSection: { marginTop: 'auto', gap: 20 },
   bottomControls: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2A2624'
+    borderColor: '#674C41'
   },
   betDisplay: { gap: 2 },
-  betLabel: { color: '#8A807B', fontSize: 10, fontWeight: '700' },
-  betValueText: { color: '#EDE8E4', fontSize: 20, fontWeight: '800' },
+  betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700' },
+  betValueText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
 
   spinButton: {
     paddingHorizontal: 32,
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
   spinText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
 
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  resultRed: { backgroundColor: '#E06B6B' },
-  resultBlack: { backgroundColor: '#0F0E0D' },
-  resultGreen: { backgroundColor: '#5FB37A' },
+  resultRed: { backgroundColor: '#533D35' },
+  resultBlack: { backgroundColor: '#31241F' },
+  resultGreen: { backgroundColor: '#5992C6' },
   resultText: { color: '#FFF', fontSize: 10, fontWeight: '700' },
 });

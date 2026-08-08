@@ -70,7 +70,7 @@ const ShopPreviewCard = ({ shopId, name, emoji, description, color, onVisit }: S
                             pressed && styles.itemPressed
                         ]}
                     >
-                        <View style={[styles.itemImage, { backgroundColor: '#0F0E0D' }]}>
+                        <View style={[styles.itemImage, { backgroundColor: '#31241F' }]}>
                             <Text style={styles.itemEmoji}>
                                 {item.category === 'VEHICLE' ? '🏎️' :
                                     item.category === 'WATCH' ? '⌚' :
@@ -94,11 +94,11 @@ export default ShopPreviewCard;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         marginBottom: theme.spacing.lg,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
         overflow: 'hidden',
     },
     header: {
@@ -107,10 +107,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: theme.spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: '#181614',
+        borderBottomColor: '#42312A',
     },
     headerPressed: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     headerLeft: {
         flexDirection: 'row',
@@ -129,13 +129,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
     shopName: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         letterSpacing: -0.5,
     },
     description: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 13,
     },
     visitButton: {
@@ -174,12 +174,12 @@ const styles = StyleSheet.create({
         gap: 2,
     },
     itemName: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '600',
     },
     itemPrice: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '700',
     },

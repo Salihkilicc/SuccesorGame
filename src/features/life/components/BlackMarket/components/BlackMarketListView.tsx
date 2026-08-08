@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     itemPrice: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 16,
         fontWeight: 'bold',
     },

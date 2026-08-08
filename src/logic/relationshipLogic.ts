@@ -202,7 +202,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🤝',
                     title: 'Business Trust',
                     desc: `+${val} Business Reputation`,
-                    color: '#E3A857' // Gold
+                    color: '#E9B8C9' // Gold
                 });
                 break;
             case 'SOCIAL_STATUS_BOOST':
@@ -231,7 +231,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🧠',
                     title: 'Intellect Boost',
                     desc: `+${val} Intellect`,
-                    color: '#123AB8' // Purple
+                    color: '#0A2A92' // Purple
                 });
                 break;
             case 'CHARM_BOOST':
@@ -251,7 +251,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '💪',
                     title: 'Strength Boost',
                     desc: `+${val} Strength`,
-                    color: '#E3A857' // Orange
+                    color: '#E9B8C9' // Orange
                 });
                 break;
             case 'PROTECTION':
@@ -260,7 +260,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🛡️',
                     title: 'Protection',
                     desc: `+${val} Personal Security`,
-                    color: '#2A2624' // Navy
+                    color: '#674C41' // Navy
                 });
                 break;
             case 'LUCK_BOOST':
@@ -296,7 +296,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '📈',
                     title: 'Insider Info',
                     desc: `Better Investment Returns`,
-                    color: '#E3A857'
+                    color: '#E9B8C9'
                 });
                 break;
             default:
@@ -306,7 +306,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '✨',
                     title: 'Partner Bonus',
                     desc: `${buffType.replace(/_/g, ' ')}`,
-                    color: '#8A807B'
+                    color: 'rgba(255,255,255,0.48)'
                 });
                 break;
         }
@@ -364,7 +364,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '🥊',
             title: 'Corner Man',
             desc: '+10 Gym Progress, +10 Personal Security',
-            color: '#E3A857'
+            color: '#E9B8C9'
         });
     }
 
@@ -375,7 +375,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '⚖️',
             title: 'Legal Immunity',
             desc: 'Clears Police Heat, -10 Risk',
-            color: '#123AB8'
+            color: '#0A2A92'
         });
     }
 
@@ -432,7 +432,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '👑',
             title: 'Royal Treasury',
             desc: ' Chance for $50k Gifts, +20 Business Rep',
-            color: '#E3A857'
+            color: '#E9B8C9'
         });
     }
 
@@ -443,7 +443,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '🥂',
             title: 'Elite Network',
             desc: '+10 Social Rep, Exclusive Invites',
-            color: '#123AB8'
+            color: '#0A2A92'
         });
     }
 

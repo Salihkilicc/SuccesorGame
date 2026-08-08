@@ -73,18 +73,18 @@ export const PercentageSelector = ({
 
                 {/* 1. Satır: AZALTMA (Kırmızı/Turuncu Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("MIN", () => update('min', 0), '#181614', '#E06B6B')}
-                    {renderBtn("-50%", () => update('percent', -50), '#201D1C', '#E06B6B')}
-                    {renderBtn("-10%", () => update('percent', -10), '#E06B6B', '#E06B6B')}
-                    {renderBtn("-5%", () => update('percent', -5), '#E06B6B', '#E06B6B')}
+                    {renderBtn("MIN", () => update('min', 0), '#42312A', '#E9B8C9')}
+                    {renderBtn("-50%", () => update('percent', -50), '#533D35', '#E9B8C9')}
+                    {renderBtn("-10%", () => update('percent', -10), '#E9B8C9', '#E9B8C9')}
+                    {renderBtn("-5%", () => update('percent', -5), '#E9B8C9', '#E9B8C9')}
                 </View>
 
                 {/* 2. Satır: ARTIRMA (Yeşil/Mavi Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("+5%", () => update('percent', 5), '#181614', '#5FB37A')}
-                    {renderBtn("+10%", () => update('percent', 10), '#181614', '#5FB37A')}
-                    {renderBtn("+50%", () => update('percent', 50), '#201D1C', '#5FB37A')}
-                    {renderBtn("MAX", () => update('max', 0), '#181614', '#201D1C')}
+                    {renderBtn("+5%", () => update('percent', 5), '#42312A', '#5992C6')}
+                    {renderBtn("+10%", () => update('percent', 10), '#42312A', '#5992C6')}
+                    {renderBtn("+50%", () => update('percent', 50), '#533D35', '#5992C6')}
+                    {renderBtn("MAX", () => update('max', 0), '#42312A', '#533D35')}
                 </View>
 
             </View>
@@ -94,11 +94,11 @@ export const PercentageSelector = ({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#0F0E0D', // Koyu Kart Rengi
+        backgroundColor: '#31241F', // Koyu Kart Rengi
         padding: 12,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#201D1C',
+        borderColor: '#533D35',
         marginBottom: 12,
     },
     header: {
@@ -107,14 +107,14 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         marginBottom: 8,
     },
-    label: { color: '#8A807B', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
+    label: { color: 'rgba(255,255,255,0.48)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
     value: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' },
     unit: { fontSize: 12, color: '#5992C6', fontWeight: 'normal' },
 
     // Bar Stilleri
     barTrack: {
         height: 6,
-        backgroundColor: '#201D1C',
+        backgroundColor: '#533D35',
         borderRadius: 3,
         overflow: 'hidden',
     },

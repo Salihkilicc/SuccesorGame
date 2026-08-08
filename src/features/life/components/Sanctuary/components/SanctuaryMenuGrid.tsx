@@ -113,20 +113,20 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D', // Dark Navy
+        backgroundColor: '#31241F', // Dark Navy
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#0F0E0D', // Deep Forest Green
+        borderColor: '#31241F', // Deep Forest Green
     },
     dangerCard: {
-        borderColor: '#8A807B', // Bamboo
-        backgroundColor: '#0F0E0D',
+        borderColor: 'rgba(255,255,255,0.48)', // Bamboo
+        backgroundColor: '#31241F',
     },
     vipCard: {
         borderWidth: 2,
-        borderColor: '#5FB37A', // Light Green
-        backgroundColor: '#5FB37A', // Dark Pine
+        borderColor: '#5992C6', // Light Green
+        backgroundColor: '#5992C6', // Dark Pine
     },
     cardPressed: {
         opacity: 0.8,
@@ -142,44 +142,44 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     dangerText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     vipText: {
-        color: '#5FB37A',
+        color: '#5992C6',
     },
     cardSubtitle: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     chevron: {
         fontSize: 18,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     vipActiveBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: theme.radius.md,
         padding: 12,
         borderWidth: 2,
-        borderColor: '#5FB37A',
+        borderColor: '#5992C6',
         gap: 10,
     },
     vipActiveIcon: {
         fontSize: 28,
     },
     vipActiveTitle: {
-        color: '#5FB37A',
+        color: '#5992C6',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 2,
     },
     vipActiveText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
     },
 });

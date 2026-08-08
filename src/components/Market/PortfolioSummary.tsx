@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   label: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption,
     letterSpacing: 0.4,
   },
   value: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
   },
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#E9B8C9',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   buttonPressed: {
     transform: [{ scale: 0.99 }],

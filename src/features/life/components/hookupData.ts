@@ -137,17 +137,17 @@ export const COLORS = [
     '#E06B6B', // Coral Red
     '#5FB37A', // Turquoise
     '#5992C6', // Sky Blue
-    '#E3A857', // Light Salmon
+    '#E9B8C9', // Light Salmon
     '#5FB37A', // Mint
-    '#E3A857', // Soft Yellow
+    '#E9B8C9', // Soft Yellow
     '#E9B8C9', // Lavender
     '#5992C6', // Powder Blue
     '#E9B8C9', // Peach
-    '#8A807B', // Mauve
-    '#3B3632', // Purple
+    'rgba(255,255,255,0.48)', // Mauve
+    '#7F5E51', // Purple
     '#5992C6', // Navy Blue
     '#E06B6B', // Pink
-    '#EDE8E4', // Light Green
+    '#FFFFFF', // Light Green
     '#E9B8C9', // Light Orange
 ];
 

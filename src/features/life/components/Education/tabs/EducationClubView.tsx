@@ -176,7 +176,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
     },
     safeArea: {
         flex: 1,
@@ -187,21 +187,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 2,
-        borderBottomColor: '#E9B8C9',
+        borderBottomColor: 'rgba(255,255,255,0.08)',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#2A2624',
+        color: '#674C41',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#123AB8',
+        color: '#0A2A92',
     },
     subtitle: {
         fontSize: 12,
-        color: '#3B3632',
+        color: '#7F5E51',
         marginTop: 2,
     },
     scrollContent: {
@@ -223,11 +223,11 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     clubCard: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
         borderWidth: 2,
-        borderColor: '#EDE8E4',
+        borderColor: '#FFFFFF',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     clubCardActive: {
-        borderColor: '#123AB8',
-        backgroundColor: '#EDE8E4',
+        borderColor: '#0A2A92',
+        backgroundColor: '#FFFFFF',
     },
     clubHeader: {
         marginBottom: 16,
@@ -250,40 +250,40 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#0F0E0D',
+        color: '#31241F',
     },
     activeBadge: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#EDE8E4',
-        backgroundColor: '#123AB8',
+        color: '#FFFFFF',
+        backgroundColor: '#0A2A92',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     clubDescription: {
         fontSize: 14,
-        color: '#3B3632',
+        color: '#7F5E51',
         lineHeight: 20,
     },
     buffSection: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         padding: 12,
         borderRadius: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#E3A857',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     buffLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#E06B6B',
+        color: '#E9B8C9',
         marginBottom: 4,
     },
     buffText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#E3A857',
+        color: '#E9B8C9',
     },
     membersSection: {
         marginBottom: 16,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#2A2624',
+        color: '#674C41',
         marginBottom: 8,
     },
     avatarsContainer: {
@@ -303,32 +303,32 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#123AB8',
+        backgroundColor: '#0A2A92',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     avatarText: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     actionBtn: {
-        backgroundColor: '#123AB8',
+        backgroundColor: '#0A2A92',
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnActive: {
-        backgroundColor: '#E06B6B',
-        borderColor: '#E06B6B',
+        backgroundColor: '#533D35',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
 });

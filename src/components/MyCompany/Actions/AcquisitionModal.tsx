@@ -370,7 +370,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   return (
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
-                      <Text style={[styles.infoValue, { color: '#5FB37A' }]}>
+                      <Text style={[styles.infoValue, { color: '#5992C6' }]}>
                         {found.competitor.share.toFixed(1)}% of {found.market.category}
                       </Text>
                     </View>
@@ -429,7 +429,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
   },
   header: {
     padding: 20,
@@ -494,13 +494,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderWidth: 1,
     borderColor: '#333',
   },
   activeTab: {
-    backgroundColor: '#E9B8C9', // Gold
-    borderColor: '#E9B8C9',
+    backgroundColor: '#533D35', // Gold
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   tabText: {
     color: '#888',
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   negBody: {
     marginBottom: 24,
     gap: 12,
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     padding: 16,
     borderRadius: 12,
   },
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     color: theme.colors.danger,
   },
   hostileDesc: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
   },
   cancelBtn: {
     marginTop: 16,

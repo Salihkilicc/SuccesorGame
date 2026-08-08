@@ -12,7 +12,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.chronos.swiss',
             category: 'WATCH',
             description: 'Heritage and investment.',
-            bannerColor: '#E3A857',
+            bannerColor: '#E9B8C9',
             emoji: '⌚',
         },
         {
@@ -39,7 +39,7 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.genevaatelier.ch',
             category: 'WATCH',
             description: 'Bespoke brilliance.',
-            bannerColor: '#123AB8',
+            bannerColor: '#0A2A92',
             emoji: '💎',
         },
         // Removed low-end shops to maintain exclusivity

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     totalValue: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '700',
     },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmButtonText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 14,
     },

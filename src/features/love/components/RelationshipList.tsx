@@ -67,9 +67,9 @@ const RelationshipList: React.FC<Props> = ({
     };
 
     const getNpcBarColor = (npcType: string): string => {
-        if (npcType === 'Child') return '#E3A857';
-        if (npcType === 'Mother') return '#E06B6B';
-        return '#123AB8';
+        if (npcType === 'Child') return '#E9B8C9';
+        if (npcType === 'Mother') return '#E9B8C9';
+        return '#0A2A92';
     };
 
     const getBarValue = (item: FamilyMember | FriendMember | ExMember): number => {
@@ -159,14 +159,14 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
     },
     sectionTitle: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 13,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
     },
     sectionCount: {
-        color: '#3B3632',
+        color: '#7F5E51',
         fontSize: 11,
         fontWeight: '600',
     },

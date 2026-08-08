@@ -17,7 +17,7 @@ const ADS = [
         title: t('ui.velocityMotors'),
         subtitle: t('ui.startYourLegacy'),
         cta: 'Drive Now →',
-        color: '#E06B6B',
+        color: '#E9B8C9',
         emoji: '🏎️',
     },
     {
@@ -26,7 +26,7 @@ const ADS = [
         title: t('ui.dynasty8'),
         subtitle: t('ui.liveAboveTheClouds'),
         cta: 'View Estates →',
-        color: '#2A2624',
+        color: '#674C41',
         emoji: '🏠',
     },
     {
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         marginBottom: theme.spacing.xl,
     },
     sectionTitle: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '700',
         letterSpacing: -0.5,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.xl,
         justifyContent: 'space-between',
         elevation: 8,
-        shadowColor: '#0F0E0D',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 12,
@@ -135,19 +135,19 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     ctaText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
     },
     title: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '700',
         letterSpacing: -0.5,
         marginBottom: 4,
     },
     subtitle: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 14,
         letterSpacing: 0.3,
     },

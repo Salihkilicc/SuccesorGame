@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     container: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24, // Reduced padding
         width: '100%',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     },
     box: {
         aspectRatio: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#333',
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     boxSelected: {
-        borderColor: '#E9B8C9',
-        backgroundColor: '#0F0E0D',
+        borderColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: '#31241F',
     },
     boxIcon: {
         fontSize: 24, // Smaller icon
@@ -223,10 +223,10 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     rarityLegendary: {
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
     },
     rarityRare: {
-        backgroundColor: '#123AB8',
+        backgroundColor: '#0A2A92',
     },
     rarityCommon: {
         backgroundColor: '#5992C6',

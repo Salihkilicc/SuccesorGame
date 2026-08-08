@@ -41,7 +41,7 @@ interface Props {
 const BreakLine = ({ label, value, bold, negative }: { label: string; value: string; bold?: boolean; negative?: boolean }) => (
     <View style={styles.breakRow}>
         <Text style={[styles.breakLabel, bold && styles.breakBold]}>{label}</Text>
-        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#E06B6B' }]}>
+        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#E9B8C9' }]}>
             {value}
         </Text>
     </View>
@@ -177,11 +177,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
                                     styles.changeBadge,
-                                    { backgroundColor: companyDailyChange >= 0 ? '#5FB37A20' : '#E06B6B20' }
+                                    { backgroundColor: companyDailyChange >= 0 ? '#5992C620' : '#E9B8C920' }
                                 ]}>
                                     <Text style={[
                                         styles.changeBadgeText,
-                                        { color: companyDailyChange >= 0 ? '#5FB37A' : '#E06B6B' }
+                                        { color: companyDailyChange >= 0 ? '#5992C6' : '#E9B8C9' }
                                     ]}>
                                         {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
                                     </Text>
@@ -256,7 +256,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 onPress={onOpenIPO}
                                 activeOpacity={0.7}
                             >
-                                <View style={[styles.actionIconBox, { backgroundColor: '#123AB820' }]}>
+                                <View style={[styles.actionIconBox, { backgroundColor: '#0A2A9220' }]}>
                                     <Text style={styles.actionIcon}>🔔</Text>
                                 </View>
                                 <View style={styles.actionContent}>
@@ -290,7 +290,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#123AB820' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#0A2A9220' }]}>
                                 <Text style={styles.actionIcon}>📈</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -309,7 +309,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#E3A85720' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#E9B8C920' }]}>
                                 <Text style={styles.actionIcon}>📉</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -373,7 +373,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#5FB37A20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#5992C620' }]}>
                                 <Text style={styles.actionIcon}>💼</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -396,7 +396,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#5FB37A20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#5992C620' }]}>
                                 <Text style={styles.actionIcon}>💰</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -427,12 +427,12 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
 const styles = StyleSheet.create({
     controlBanner: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 12 },
-    controlPct: { color: '#EDE8E4', fontSize: 24, fontWeight: '800' },
-    controlLabel: { color: '#8A807B', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 3 },
-    controlShares: { color: '#8A807B', fontSize: 12, fontWeight: '700' },
-    controlNote: { color: '#8A807B', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    controlPct: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
+    controlLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 3 },
+    controlShares: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '700' },
+    controlNote: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
-    heroNote: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    heroNote: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
         backgroundColor: 'rgba(127,179,255,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
@@ -444,17 +444,17 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
         padding: 14, marginBottom: 12,
     },
-    breakdownTitle: { color: '#8A807B', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
+    breakdownTitle: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
     breakRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
-    breakLabel: { color: '#8A807B', fontSize: 12 },
-    breakValue: { color: '#EDE8E4', fontSize: 12, fontWeight: '600' },
+    breakLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },
+    breakValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
     breakBold: { fontWeight: '800', fontSize: 13 },
     breakDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
-    breakdownNote: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
+    breakdownNote: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 10 },
 
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     header: {
         flexDirection: 'row',
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#0F0E0D',
+        borderBottomColor: '#31241F',
     },
     backButton: {
         paddingVertical: 8,
@@ -471,13 +471,13 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#123AB8',
+        color: '#0A2A92',
         fontWeight: '600',
     },
     headerTitle: {
         fontSize: 17,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         position: 'absolute',
         left: 0,
         right: 0,
@@ -491,14 +491,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     heroCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 24,
         marginTop: 20,
     },
     heroLabel: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '500',
         marginBottom: 8,
     },
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     heroPrice: {
         fontSize: 48,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: -1,
     },
     changeBadge: {
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     statCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         width: '48%',
@@ -540,24 +540,24 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '500',
         marginBottom: 4,
     },
     statValue: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginTop: 32,
         marginBottom: 16,
     },
     actionRow: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -585,20 +585,20 @@ const styles = StyleSheet.create({
     actionTitle: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     actionDescription: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     actionArrow: {
         fontSize: 28,
-        color: '#201D1C',
+        color: '#533D35',
         fontWeight: '300',
     },
     textDisabled: {
-        color: '#201D1C',
+        color: '#533D35',
     },
 });
 

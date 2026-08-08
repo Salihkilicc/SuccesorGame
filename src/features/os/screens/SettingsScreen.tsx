@@ -65,12 +65,12 @@ const SettingsRow = ({
                 <Switch
                     value={value}
                     onValueChange={onToggle}
-                    trackColor={{ false: '#0F0E0D', true: '#E9B8C9' }}
-                    thumbColor={value ? '#EDE8E4' : '#8A807B'}
-                    ios_backgroundColor="#0F0E0D"
+                    trackColor={{ false: '#31241F', true: '#E9B8C9' }}
+                    thumbColor={value ? '#FFFFFF' : 'rgba(255,255,255,0.48)'}
+                    ios_backgroundColor="#31241F"
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#3B3632" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#7F5E51" />
             )}
         </TouchableOpacity>
     );
@@ -135,7 +135,7 @@ const SettingsScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+                colors={['#31241F', '#31241F', '#31241F']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -186,7 +186,7 @@ const SettingsScreen = () => {
                                     <MaterialCommunityIcons
                                         name="translate"
                                         size={22}
-                                        color={locale === l.code ? '#E9B8C9' : '#8A807B'}
+                                        color={locale === l.code ? '#E9B8C9' : 'rgba(255,255,255,0.48)'}
                                     />
                                     <Text
                                         style={[
@@ -228,7 +228,7 @@ const SettingsScreen = () => {
                             label={t('os.notifications')}
                             value={isNotificationsEnabled}
                             onToggle={toggleNotifications}
-                            color="#E06B6B"
+                            color="#E9B8C9"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -237,7 +237,7 @@ const SettingsScreen = () => {
                             value={isHapticsEnabled}
                             onToggle={toggleHaptics}
                             isLast
-                            color="#E3A857"
+                            color="#E9B8C9"
                         />
                     </View>
 
@@ -300,13 +300,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 14,
         paddingVertical: 15, paddingHorizontal: 16,
     },
-    langLabel: { flex: 1, fontSize: 15, color: '#8A807B', fontWeight: '600' },
+    langLabel: { flex: 1, fontSize: 15, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     langLabelActive: { color: '#FFF' },
     langCheck: { color: '#E9B8C9', fontSize: 16, fontWeight: '800' },
-    langNote: { fontSize: 11, color: '#8A807B', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
+    langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     safeArea: {
         flex: 1,
@@ -344,17 +344,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -370,13 +370,13 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         letterSpacing: 2,
         marginLeft: 16,
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     rowFirst: {
         borderTopLeftRadius: 16,
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     },
     rowLabel: {
         fontSize: 16,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '500',
         letterSpacing: 0.3,
     },
@@ -431,14 +431,14 @@ const styles = StyleSheet.create({
     },
     footerVersion: {
         fontSize: 13,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         letterSpacing: 1,
         marginBottom: 4,
     },
     footerTagline: {
         fontSize: 11,
-        color: '#3B3632',
+        color: '#7F5E51',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: theme.typography.title,
     fontWeight: '800',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 1,
   },
   totalValue: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   listContent: {
     padding: theme.spacing.lg,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
@@ -219,11 +219,11 @@ const styles = StyleSheet.create({
   },
   itemQuantity: {
     fontSize: theme.typography.caption,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
   },
   itemCostInfo: {
     fontSize: theme.typography.caption,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontWeight: '500',
   },
   itemRight: {
@@ -233,17 +233,17 @@ const styles = StyleSheet.create({
   itemValue: {
     fontSize: theme.typography.body,
     fontWeight: '700',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   itemPL: {
     fontSize: theme.typography.caption,
     fontWeight: '600',
   },
   profit: {
-    color: '#5FB37A',
+    color: '#5992C6',
   },
   loss: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
   },
   actions: {
     flexDirection: 'row',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#5FB37A',
+    borderColor: '#5992C6',
   },
   sellButton: {
     backgroundColor: 'rgba(255,59,48,0.12)',
@@ -264,19 +264,19 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#E06B6B',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   buttonPressed: {
     opacity: 0.7,
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: '#5FB37A',
+    color: '#5992C6',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
   sellButtonText: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: theme.typography.subtitle,
     fontWeight: '600',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   emptySubtext: {
     fontSize: theme.typography.caption,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
   },
 });
 

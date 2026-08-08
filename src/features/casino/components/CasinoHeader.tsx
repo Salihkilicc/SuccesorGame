@@ -31,15 +31,15 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
           fontWeight: '900' as '900',
           fontStyle: 'italic' as 'italic',
-          color: '#123AB8', // Neon Purple
-          textShadowColor: '#123AB8',
+          color: '#0A2A92', // Neon Purple
+          textShadowColor: '#0A2A92',
           textShadowRadius: 10
         };
       case 'macau':
         return {
           fontFamily: Platform.OS === 'ios' ? 'Palatino' : 'serif',
           fontWeight: '800' as '800',
-          color: '#E3A857', // Gold
+          color: '#E9B8C9', // Gold
           letterSpacing: 1
         };
       case 'athens':
@@ -70,7 +70,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
     <View style={[styles.container, { height: HEADER_HEIGHT, paddingTop: insets.top }]}>
       {/* Dynamic Background Simulation */}
       <View style={[styles.background, { backgroundColor: location.theme.primary }]} />
-      <View style={[styles.backgroundOverlay, { backgroundColor: '#0F0E0D' }]} />
+      <View style={[styles.backgroundOverlay, { backgroundColor: '#31241F' }]} />
 
       {/* Content */}
       <View style={styles.content}>
@@ -131,7 +131,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           </View>
           <View style={styles.repLabelContainer}>
             <Text style={styles.repText}>
-              Reputation: {reputation.toFixed(0)} / 1000 <Text style={{ color: '#E3A857' }}>({rankName})</Text>
+              Reputation: {reputation.toFixed(0)} / 1000 <Text style={{ color: '#E9B8C9' }}>({rankName})</Text>
             </Text>
           </View>
         </View>
@@ -146,9 +146,9 @@ export default CasinoHeader;
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2624'
+    borderBottomColor: '#674C41'
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -220,11 +220,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E3A857'
+    borderColor: 'rgba(255,255,255,0.08)'
   },
   cashLabel: { fontSize: 12 },
   cashValue: {
-    color: '#E3A857',
+    color: '#E9B8C9',
     fontWeight: '800',
     fontSize: 11, // Slightly reduced from 12.5 requested (12 is nice, 12.5 is specific, let's go 11 for safety/style)
     fontVariant: ['tabular-nums']
@@ -238,14 +238,14 @@ const styles = StyleSheet.create({
   },
   repTrack: {
     height: 4,
-    backgroundColor: '#2A2624',
+    backgroundColor: '#674C41',
     borderRadius: 2,
     width: '100%',
     overflow: 'hidden'
   },
   repFill: {
     height: '100%',
-    backgroundColor: '#E3A857',
+    backgroundColor: '#533D35',
   },
   repLabelContainer: {
     position: 'absolute',
@@ -254,10 +254,10 @@ const styles = StyleSheet.create({
     top: -12
   },
   repText: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: 9,
     fontWeight: '600',
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     paddingHorizontal: 4
   }
 });

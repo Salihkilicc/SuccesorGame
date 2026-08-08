@@ -30,7 +30,7 @@ const PokerGameScreen = () => {
       ) : (
         <>
           <Text style={styles.cardRank}>{card.rank}</Text>
-          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E06B6B' : '#EDE8E4' }]}>
+          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#E9B8C9' : '#FFFFFF' }]}>
             {card.suit}
           </Text>
         </>
@@ -138,7 +138,7 @@ const PokerGameScreen = () => {
 export default PokerGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0E0D' },
+  container: { flex: 1, backgroundColor: '#31241F' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 12, fontWeight: '800' },
 
   boardCard: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   tableCard: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -164,14 +164,14 @@ const styles = StyleSheet.create({
     minHeight: 140,
     alignItems: 'center'
   },
-  sectionLabel: { color: '#8A807B', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
+  sectionLabel: { color: 'rgba(255,255,255,0.48)', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
 
   cardRow: { flexDirection: 'row', gap: 8 },
   card: {
     width: 60,
     height: 84,
     borderRadius: 6,
-    backgroundColor: '#EDE8E4',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2
   },
-  cardHidden: { backgroundColor: '#E06B6B', borderWidth: 2, borderColor: '#FFF' },
+  cardHidden: { backgroundColor: '#533D35', borderWidth: 2, borderColor: '#FFF' },
   cardBack: { fontSize: 32 },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#0F0E0D' },
+  cardRank: { fontSize: 20, fontWeight: '900', color: '#31241F' },
   cardSuit: { fontSize: 20 },
 
   controlsSection: { marginTop: 'auto', gap: 16 },
@@ -189,16 +189,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2A2624',
+    borderColor: '#674C41',
     minHeight: 80
   },
   betDisplay: { gap: 2 },
-  betLabel: { color: '#8A807B', fontSize: 10, fontWeight: '700' },
-  betValueText: { color: '#EDE8E4', fontSize: 20, fontWeight: '800' },
+  betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700' },
+  betValueText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
 
   actionButtons: { flexDirection: 'row', gap: 12 },
   primaryButton: {
@@ -215,10 +215,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E06B6B',
+    borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     justifyContent: 'center'
   },
   secondaryButtonPressed: { opacity: 0.7 },
-  secondaryText: { color: '#E06B6B', fontWeight: '800', fontSize: 14 },
+  secondaryText: { color: '#E9B8C9', fontWeight: '800', fontSize: 14 },
 });

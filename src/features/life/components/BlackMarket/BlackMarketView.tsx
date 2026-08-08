@@ -24,14 +24,14 @@ interface BlackMarketViewProps {
 // --- CONSTANTS ---
 
 const COLORS = {
-    background: '#0F0E0D',
-    bloodRed: '#E06B6B',
-    neonRed: '#E06B6B',
-    darkGray: '#0F0E0D',
-    textPrimary: '#EDE8E4',
-    textSecondary: '#8A807B',
-    gold: '#E3A857',
-    locked: '#181614'
+    background: '#31241F',
+    bloodRed: '#E9B8C9',
+    neonRed: '#E9B8C9',
+    darkGray: '#31241F',
+    textPrimary: '#FFFFFF',
+    textSecondary: 'rgba(255,255,255,0.48)',
+    gold: '#E9B8C9',
+    locked: '#42312A'
 };
 
 // --- COMPONENT ---
@@ -172,10 +172,10 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#3B3632',
-            2: '#E06B6B',
-            3: '#E06B6B',
-            4: '#E06B6B'
+            1: '#7F5E51',
+            2: '#E9B8C9',
+            3: '#E9B8C9',
+            4: '#E9B8C9'
         };
         return colors[tier] || colors[1];
     };
@@ -226,7 +226,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
                                         data.suspicion > 80
                                             ? COLORS.neonRed
                                             : data.suspicion > 50
-                                                ? '#E06B6B'
+                                                ? '#E9B8C9'
                                                 : COLORS.bloodRed,
                                     transform: [{ scale: data.suspicion > 60 ? pulseAnim : 1 }]
                                 }
@@ -365,11 +365,11 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#2A2624'
+        borderColor: '#674C41'
     },
     suspicionBar: {
         height: '100%',
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginBottom: 15,
         borderWidth: 2,
-        borderColor: '#2A2624',
+        borderColor: '#674C41',
         overflow: 'hidden'
     },
     drugCard: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 2
     },
     lockedCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

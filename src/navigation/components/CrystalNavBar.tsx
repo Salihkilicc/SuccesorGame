@@ -82,7 +82,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
     const getIconStyle = (tabName: string) => {
         const isActive = activeTab === tabName;
         return {
-            color: isActive ? '#EDE8E4' : 'rgba(255,255,255,0.4)',
+            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
             fontSize: 26,
             textShadowColor: 'rgba(0,0,0,0.5)',
             textShadowOffset: { width: 0, height: 2 },
@@ -93,7 +93,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
     const getLabelStyle = (tabName: string) => {
         const isActive = activeTab === tabName;
         return {
-            color: isActive ? '#EDE8E4' : 'rgba(255,255,255,0.4)',
+            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
             fontSize: 10,
             fontWeight: '700' as '700',
             letterSpacing: 0.3,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
         width: 6,  // Circular inactive dot
     },
     lightDot: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         opacity: 0.9,
     },
     darkDot: {
@@ -273,13 +273,13 @@ const styles = StyleSheet.create({
     },
     statsIcon: {
         fontSize: 24,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textShadowColor: 'rgba(0,0,0,0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     },
     statsLabel: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.3,

@@ -91,7 +91,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             <Text style={styles.cashLabel}>{t('dividend.lastQuarterProfit')}</Text>
                             <Text style={[
                                 styles.cashValue,
-                                lastQuarterProfit <= 0 && { color: '#E06B6B' },
+                                lastQuarterProfit <= 0 && { color: '#E9B8C9' },
                             ]}>
                                 {formatMoney(lastQuarterProfit)}
                             </Text>
@@ -197,7 +197,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.infoLabel}>{t('dividend.remainingCapital')}</Text>
                                 <Text style={[
                                     styles.infoValue,
-                                    { color: isRisky ? '#E06B6B' : '#EDE8E4' }
+                                    { color: isRisky ? '#E9B8C9' : '#FFFFFF' }
                                 ]}>
                                     {formatMoney(remainingCapital)}
                                 </Text>
@@ -263,20 +263,20 @@ const DividendModal = ({ visible, onClose }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    cashHint: { color: '#8A807B', fontSize: 11, marginTop: 4 },
+    cashHint: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 4 },
     flagBox: {
         backgroundColor: 'rgba(255,69,58,0.10)', borderRadius: 12,
         borderWidth: 1, borderColor: 'rgba(255,69,58,0.30)',
         padding: 12, marginBottom: 12,
     },
-    flagText: { color: '#E06B6B', fontSize: 11.5, lineHeight: 16 },
+    flagText: { color: '#E9B8C9', fontSize: 11.5, lineHeight: 16 },
     yieldRow: {
         flexDirection: 'row', justifyContent: 'space-between',
         paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
         marginTop: 8,
     },
-    yieldLabel: { color: '#8A807B', fontSize: 11.5 },
-    yieldValue: { color: '#EDE8E4', fontSize: 12.5, fontWeight: '700' },
+    yieldLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5 },
+    yieldValue: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '700' },
 
     overlay: {
         flex: 1,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -303,18 +303,18 @@ const styles = StyleSheet.create({
     titleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
     closeBtn: {
         width: 32, height: 32, borderRadius: 16,
-        backgroundColor: '#181614', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#42312A', alignItems: 'center', justifyContent: 'center',
     },
-    closeText: { color: '#8A807B', fontSize: 16, fontWeight: '700' },
+    closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 16,
     },
     cashCard: {
@@ -324,32 +324,32 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#5FB37A40',
+        borderColor: '#5992C640',
     },
     cashLabel: {
         fontSize: 13,
-        color: '#5FB37A',
+        color: '#5992C6',
         fontWeight: '600',
         marginBottom: 6,
     },
     cashValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#5FB37A',
+        color: '#5992C6',
     },
     stepperSection: {
         marginBottom: 16,
     },
     label: {
         fontSize: 14,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '600',
         marginBottom: 12,
     },
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -358,14 +358,14 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#201D1C',
+        backgroundColor: '#533D35',
         alignItems: 'center',
         justifyContent: 'center',
     },
     stepperText: {
         fontSize: 28,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     stepperTextDisabled: {
         color: '#666',
@@ -377,12 +377,12 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     labelSmall: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -393,20 +393,20 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#201D1C',
+        borderColor: '#533D35',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     infoSection: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -419,17 +419,17 @@ const styles = StyleSheet.create({
     },
     infoLabel: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     infoValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 0,
     },
     divider: {
         height: 1,
-        backgroundColor: '#201D1C',
+        backgroundColor: '#533D35',
         marginVertical: 8,
     },
     profitHighlight: {
@@ -439,27 +439,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 2,
-        borderColor: '#5FB37A',
+        borderColor: '#5992C6',
     },
     profitLabel: {
         fontSize: 14,
-        color: '#5FB37A',
+        color: '#5992C6',
         fontWeight: '600',
         marginBottom: 8,
     },
     profitAmount: {
         fontSize: 36,
         fontWeight: '700',
-        color: '#5FB37A',
+        color: '#5992C6',
         marginBottom: 6,
     },
     profitNote: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 12,
     },
     profitBadge: {
-        backgroundColor: '#5FB37A',
+        backgroundColor: '#5992C6',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
@@ -467,19 +467,19 @@ const styles = StyleSheet.create({
     profitBadgeText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#0F0E0D',
+        color: '#31241F',
     },
     warningBox: {
-        backgroundColor: '#E06B6B20',
+        backgroundColor: '#E9B8C920',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#E06B6B40',
+        borderColor: '#E9B8C940',
     },
     warningText: {
         fontSize: 13,
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -497,11 +497,11 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     distributeButton: {
         flex: 1,
-        backgroundColor: '#5FB37A',
+        backgroundColor: '#5992C6',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     distributeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#0F0E0D',
+        color: '#31241F',
     },
 });
 

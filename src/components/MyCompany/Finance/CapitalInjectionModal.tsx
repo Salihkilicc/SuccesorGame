@@ -60,23 +60,23 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
 
 const styles = StyleSheet.create({
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 20 },
-    container: { backgroundColor: '#0F0E0D', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: '#333' },
+    container: { backgroundColor: '#31241F', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: '#333' },
     title: { fontSize: 22, fontWeight: 'bold', color: 'white', textAlign: 'center' },
     subtitle: { color: '#888', textAlign: 'center', marginBottom: 20 },
-    balanceCard: { backgroundColor: '#0F0E0D', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
+    balanceCard: { backgroundColor: '#31241F', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
     label: { color: '#AAA', fontSize: 12, fontWeight: '600' },
-    balance: { color: '#5FB37A', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
+    balance: { color: '#5992C6', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
     sectionTitle: { color: 'white', marginBottom: 10, fontWeight: '600' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
-    chip: { width: '22%', backgroundColor: '#201D1C', padding: 10, borderRadius: 8, alignItems: 'center' },
-    activeChip: { backgroundColor: '#5FB37A' },
+    chip: { width: '22%', backgroundColor: '#533D35', padding: 10, borderRadius: 8, alignItems: 'center' },
+    activeChip: { backgroundColor: '#5992C6' },
     chipText: { color: 'white', fontWeight: 'bold' },
     activeChipText: { color: 'black' },
     preview: { alignItems: 'center', marginBottom: 20 },
     previewAmount: { color: 'white', fontSize: 20, fontWeight: 'bold' },
     actions: { flexDirection: 'row', gap: 10 },
     cancelBtn: { flex: 1, padding: 15, backgroundColor: '#333', borderRadius: 10, alignItems: 'center' },
-    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#5FB37A', borderRadius: 10, alignItems: 'center' },
+    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#5992C6', borderRadius: 10, alignItems: 'center' },
     btnText: { color: 'white', fontWeight: 'bold' }
 });
 

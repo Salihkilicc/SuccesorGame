@@ -529,21 +529,21 @@ const LoveScreen = () => {
     const alreadyMadeLove = !!partnerNPC?.madeLoveThisQuarter;
 
     const getSatisfactionColor = (v: number) => {
-      if (v <= 30) return '#E06B6B';
-      if (v <= 60) return '#E3A857';
-      return '#123AB8';
+      if (v <= 30) return '#E9B8C9';
+      if (v <= 60) return '#E9B8C9';
+      return '#0A2A92';
     };
 
     return (
       <View style={styles.grid}>
         {[
-          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#E3A857' },
+          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#E9B8C9' },
           { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#5992C6' },
-          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#E06B6B' },
-          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#123AB8' },
-          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#5FB37A' },
-          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#123AB8' },
-          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#E06B6B' },
+          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#E9B8C9' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#0A2A92' },
+          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#5992C6' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#0A2A92' },
+          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#E9B8C9' },
         ].map((btn) => (
           <Pressable
             key={btn.action}
@@ -556,7 +556,7 @@ const LoveScreen = () => {
             <View style={[styles.gridTileIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '55' }]}>
               <Text style={styles.gridTileEmoji}>{btn.emoji}</Text>
             </View>
-            <Text style={[styles.gridTileLabel, btn.danger && { color: '#E06B6B' }]}>{btn.label}</Text>
+            <Text style={[styles.gridTileLabel, btn.danger && { color: '#E9B8C9' }]}>{btn.label}</Text>
             <Text style={styles.gridTileDesc}>{btn.desc}</Text>
           </Pressable>
         ))}
@@ -572,10 +572,10 @@ const LoveScreen = () => {
           onPress={handleMakeLove}
           disabled={alreadyMadeLove}
         >
-          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#E06B6B' + '22' : '#E06B6B' + '22', borderColor: alreadyMadeLove ? '#E06B6B' + '55' : '#E06B6B' + '55' }]}>
+          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#E9B8C9' + '22' : '#E9B8C9' + '22', borderColor: alreadyMadeLove ? '#E9B8C9' + '55' : '#E9B8C9' + '55' }]}>
             <Text style={styles.gridTileEmoji}>💗</Text>
           </View>
-          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#E06B6B' }]}>{t('love.makeLove')}</Text>
+          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#E9B8C9' }]}>{t('love.makeLove')}</Text>
           <Text style={styles.gridTileDesc}>
             {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
           </Text>
@@ -614,7 +614,7 @@ const LoveScreen = () => {
             ]}
             onPress={() => handlePartnerAction('Propose')}
           >
-            <View style={[styles.gridTileIcon, { backgroundColor: '#E3A857' + '22', borderColor: '#E3A857' + '55' }]}>
+            <View style={[styles.gridTileIcon, { backgroundColor: 'rgba(255,255,255,0.08)' + '22', borderColor: 'rgba(255,255,255,0.08)' + '55' }]}>
               <Text style={styles.gridTileEmoji}>💍</Text>
             </View>
             <Text style={styles.gridTileLabel}>{t('love.propose')}</Text>
@@ -645,10 +645,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#E3A857' },
+          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#E9B8C9' },
           { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#5992C6' },
-          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#5FB37A' },
-          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#E06B6B' },
+          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#5992C6' },
+          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#E9B8C9' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -662,10 +662,10 @@ const LoveScreen = () => {
               <Text style={{ fontSize: 20 }}>{btn.emoji}</Text>
             </View>
             <View style={styles.actionRowText}>
-              <Text style={[styles.actionRowLabel, btn.danger && { color: '#E06B6B' }]}>{btn.label}</Text>
+              <Text style={[styles.actionRowLabel, btn.danger && { color: '#E9B8C9' }]}>{btn.label}</Text>
               <Text style={styles.actionRowDesc}>{btn.desc}</Text>
             </View>
-            <Text style={[styles.actionRowChevron, btn.danger && { color: '#E06B6B' }]}>›</Text>
+            <Text style={[styles.actionRowChevron, btn.danger && { color: '#E9B8C9' }]}>›</Text>
           </Pressable>
         ))}
       </View>
@@ -694,9 +694,9 @@ const LoveScreen = () => {
       <View style={styles.actionList}>
         {[
           { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#5992C6' },
-          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#123AB8' },
-          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#123AB8' },
-          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#E3A857' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#0A2A92' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#0A2A92' },
+          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#E9B8C9' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -726,10 +726,10 @@ const LoveScreen = () => {
   const totalFamilyCount = family.length + npcFamily.length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
+    <View style={{ flex: 1, backgroundColor: '#31241F' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+        colors={['#31241F', '#31241F', '#31241F']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -922,17 +922,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#E9B8C9',
+    backgroundColor: '#533D35',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#E9B8C9',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -992,7 +992,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   gridTileLabel: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
     textAlign: 'center',
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   actionRowLabel: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
   },

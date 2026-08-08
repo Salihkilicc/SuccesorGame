@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         alignItems: 'center',
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     price: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 32,
         fontWeight: 'bold',
         textShadowColor: 'rgba(255, 68, 68, 0.3)',

@@ -198,7 +198,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'shark' && styles.typeLabelActive]}>
                                     {t('bank.type.shark')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#E06B6B' }]}>
+                                <Text style={[styles.typeRate, { color: '#E9B8C9' }]}>
                                     {shark.locked || `${shark.rate.toFixed(1)}%`}
                                 </Text>
                             </Pressable>
@@ -225,7 +225,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'mezzanine' && styles.typeLabelActive]}>
                                     {t('bank.type.mezzanine')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#E3A857' }]}>{mezz.rate.toFixed(1)}%</Text>
+                                <Text style={[styles.typeRate, { color: '#E9B8C9' }]}>{mezz.rate.toFixed(1)}%</Text>
                             </Pressable>
                         </View>
 
@@ -364,11 +364,11 @@ const styles = StyleSheet.create({
         maxWidth: 420,
         // Ekranin en fazla %78'ini kaplasin; gerisi kaydirilir.
         maxHeight: '78%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
         marginBottom: 80, // Space for Bottom Bar
     },
     body: { flexGrow: 0, flexShrink: 1 },
@@ -383,11 +383,11 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    closeText: { color: '#8A807B', fontSize: 16, fontWeight: '700' },
+    closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
     title: {
         flex: 1,
         fontSize: 22,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 13,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     },
     typeButton: {
         flex: 1,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -416,8 +416,8 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
     },
     typeButtonActive: {
-        borderColor: '#E9B8C9',
-        backgroundColor: '#0F0E0D',
+        borderColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: '#31241F',
     },
     typeEmoji: {
         fontSize: 24,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     },
     typeLabel: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         marginBottom: 2,
     },
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     previewContainer: {
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     },
     previewLabel: {
         fontSize: 13,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
     },
     previewValue: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     tierNote: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 16,
         lineHeight: 15,
     },
@@ -479,14 +479,14 @@ const styles = StyleSheet.create({
         opacity: 0.45,
     },
     errorText: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
         fontWeight: '600',
     },
     warningText: {
-        color: '#E3A857',
+        color: '#E9B8C9',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
     },
     cancelText: {
         color: '#AAA',
@@ -512,8 +512,8 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#E9B8C9',
-        shadowColor: '#E9B8C9',
+        backgroundColor: '#533D35',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

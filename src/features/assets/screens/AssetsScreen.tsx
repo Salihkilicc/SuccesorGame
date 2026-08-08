@@ -29,15 +29,15 @@ const AssetsScreen = () => {
             onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
             style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}
         >
-            <MaterialCommunityIcons name="chevron-left" size={28} color="#EDE8E4" />
+            <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
         </Pressable>
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#0F0E0D' }}>
+        <View style={{ flex: 1, backgroundColor: '#31241F' }}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+                colors={['#31241F', '#31241F', '#31241F']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -58,7 +58,7 @@ const AssetsScreen = () => {
                     <View style={styles.glassCard}>
                         <View style={styles.cardHeader}>
                             <Text style={styles.sectionTitle}>{t('company.quarterlyReport2')}</Text>
-                            <MaterialCommunityIcons name="finance" size={20} color="#8A807B" />
+                            <MaterialCommunityIcons name="finance" size={20} color="rgba(255,255,255,0.48)" />
                         </View>
 
                         <View style={styles.summaryRow}>
@@ -124,12 +124,12 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 2,
     },
     headerSubtitle: {
         fontSize: 10,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 1.2,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     glassCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     summaryRow: {
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     netFlowLabel: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 12,
         fontWeight: '700',
         textTransform: 'uppercase',

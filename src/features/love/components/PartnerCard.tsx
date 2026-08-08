@@ -13,21 +13,21 @@ type PartnerCardProps = {
 // --- HELPERS ---
 
 const getLoveColor = (love: number) => {
-  if (love >= 80) return '#E06B6B'; // Red
-  if (love >= 50) return '#E06B6B'; // Pink
-  if (love >= 30) return '#E3A857'; // Amber
+  if (love >= 80) return '#E9B8C9'; // Red
+  if (love >= 50) return '#E9B8C9'; // Pink
+  if (love >= 30) return '#E9B8C9'; // Amber
   return '#5992C6'; // Slate
 };
 
 const getTierColor = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY': return '#E3A857'; // Gold
+    case 'HIGH_SOCIETY': return '#E9B8C9'; // Gold
     case 'CORPORATE_ELITE': return '#5992C6'; // Blue
-    case 'UNDERGROUND': return '#E06B6B'; // Red
-    case 'BLUE_COLLAR': return '#8A807B'; // Slate
+    case 'UNDERGROUND': return '#E9B8C9'; // Red
+    case 'BLUE_COLLAR': return 'rgba(255,255,255,0.48)'; // Slate
     case 'STUDENT_LIFE': return '#5992C6'; // Cyan
-    case 'ARTISTIC': return '#123AB8'; // Purple
-    default: return '#8A807B';
+    case 'ARTISTIC': return '#0A2A92'; // Purple
+    default: return 'rgba(255,255,255,0.48)';
   }
 };
 
@@ -72,7 +72,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
   const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
-  const statusColor = (partner as PartnerProfile).isMarried ? '#123AB8' : '#E06B6B';
+  const statusColor = (partner as PartnerProfile).isMarried ? '#0A2A92' : '#E9B8C9';
 
   return (
     <View style={styles.container}>
@@ -134,7 +134,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>🧠</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#123AB8' }]} />
+                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#0A2A92' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(smartsLevel)}</Text>
             </View>
@@ -178,7 +178,7 @@ export default PartnerCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     height: 180,
-    backgroundColor: '#181614',
+    backgroundColor: '#42312A',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#201D1C', // Fallback color
+    backgroundColor: '#533D35', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   overlayJob: {
     fontSize: 14,
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontWeight: '500',
     marginTop: 2,
   },
@@ -303,23 +303,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#181614',
+    backgroundColor: '#42312A',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#201D1C',
+    borderColor: '#533D35',
   },
   chipText: {
     fontSize: 12,
-    color: '#EDE8E4',
+    color: '#FFFFFF',
   },
   costChip: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderColor: 'rgba(239, 68, 68, 0.3)',
   },
   costText: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
     fontWeight: '600',
   },
   actionButton: {
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   actionButtonPressed: {
-    backgroundColor: '#EDE8E4',
+    backgroundColor: '#FFFFFF',
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {

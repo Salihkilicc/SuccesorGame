@@ -106,7 +106,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
     },
     safeArea: {
         flex: 1,
@@ -117,21 +117,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 2,
-        borderBottomColor: '#E9B8C9',
+        borderBottomColor: 'rgba(255,255,255,0.08)',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#2A2624',
+        color: '#674C41',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#123AB8',
+        color: '#0A2A92',
     },
     subtitle: {
         fontSize: 12,
-        color: '#3B3632',
+        color: '#7F5E51',
         marginTop: 2,
     },
     scrollContent: {
@@ -152,12 +152,12 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     multiplierCard: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 24,
         marginBottom: 24,
         borderWidth: 2,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#3B3632',
+        color: '#7F5E51',
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#123AB8',
+        color: '#0A2A92',
         marginBottom: 8,
     },
     multiplierHint: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontStyle: 'italic',
     },
     section: {
@@ -188,16 +188,16 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#123AB8',
+        color: '#0A2A92',
         marginBottom: 16,
     },
     emptyState: {
         alignItems: 'center',
         padding: 40,
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#EDE8E4',
+        borderColor: '#FFFFFF',
         borderStyle: 'dashed',
     },
     emptyIcon: {
@@ -206,23 +206,23 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#3B3632',
+        color: '#7F5E51',
         fontWeight: '600',
         marginBottom: 8,
     },
     emptyHint: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     degreeCard: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
         marginBottom: 12,
         borderWidth: 2,
-        borderColor: '#123AB8',
+        borderColor: '#0A2A92',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#0F0E0D',
+        color: '#31241F',
     },
     degreeType: {
         fontSize: 14,
-        color: '#3B3632',
+        color: '#7F5E51',
         fontWeight: '600',
     },
     degreeBonus: {

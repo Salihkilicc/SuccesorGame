@@ -117,7 +117,7 @@ export default SanctuaryMassageView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#5FB37A',
+        backgroundColor: '#5992C6',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -138,19 +138,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#8A807B',
-        backgroundColor: '#5FB37A',
+        borderBottomColor: 'rgba(255,255,255,0.48)',
+        backgroundColor: '#5992C6',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         justifyContent: 'center',
     },
     backIcon: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -158,37 +158,37 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     vipBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#E3A85720',
+        backgroundColor: '#E9B8C920',
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
         borderWidth: 2,
-        borderColor: '#8A807B',
+        borderColor: 'rgba(255,255,255,0.48)',
         gap: 10,
     },
     vipIcon: {
         fontSize: 24,
     },
     vipTitle: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '700',
         fontSize: 14,
         marginBottom: 2,
     },
     vipText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     scrollContent: {
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     optionCard: {
-        backgroundColor: '#0F0E0D', // Deep Ocean Blue
+        backgroundColor: '#31241F', // Deep Ocean Blue
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#8A807B',
-        shadowColor: '#5FB37A',
+        borderColor: 'rgba(255,255,255,0.48)',
+        shadowColor: '#5992C6',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     },
     optionCardVIP: {
         borderWidth: 2,
-        borderColor: '#8A807B',
-        backgroundColor: '#0F0E0D', // Deep Ocean Blue
+        borderColor: 'rgba(255,255,255,0.48)',
+        backgroundColor: '#31241F', // Deep Ocean Blue
     },
     optionCardPressed: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         transform: [{ scale: 0.98 }],
     },
     optionHeader: {
@@ -226,15 +226,15 @@ const styles = StyleSheet.create({
     optionName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     optionCost: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     freeBadge: {
-        backgroundColor: '#8A807B',
+        backgroundColor: 'rgba(255,255,255,0.48)',
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: 12,
@@ -242,12 +242,12 @@ const styles = StyleSheet.create({
     freeText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
     optionDesc: {
         fontSize: 13,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     statsRow: {
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     },
     statText: {
         fontSize: 12,
-        color: '#5FB37A', // Green
+        color: '#5992C6', // Green
         fontWeight: '600',
     },
     healthText: {
-        color: '#123AB8', // Blue
+        color: '#0A2A92', // Blue
     },
 });

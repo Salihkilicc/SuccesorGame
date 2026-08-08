@@ -26,7 +26,7 @@ const StockItemSkeleton = ({
   const getRiskColor = (risk: string) => {
     const r = risk.toLowerCase();
     if (r.includes('low')) return theme.colors.success; // Green
-    if (r.includes('medium')) return theme.colors.warning || '#E3A857'; // Orange
+    if (r.includes('medium')) return theme.colors.warning || '#E9B8C9'; // Orange
     if (r.includes('high') || r.includes('extreme')) return theme.colors.danger; // Red
     return theme.colors.textSecondary;
   };
@@ -73,16 +73,16 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   name: {
     fontSize: theme.typography.caption + 1,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     marginTop: 2,
   },
   riskTag: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: 999,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: theme.typography.subtitle,
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   change: {
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#5FB37A',
+    color: '#5992C6',
   },
   changeDown: {
-    color: '#E06B6B',
+    color: '#E9B8C9',
   },
   meta: {
     fontSize: theme.typography.caption + 1,
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
   },
 });

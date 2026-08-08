@@ -15,7 +15,7 @@ const MarketHeader = ({ title, subtitle }: { title: string; subtitle?: string })
                 onPress={() => navigation.goBack()}
                 style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
             >
-                <MaterialCommunityIcons name="chevron-left" size={28} color="#EDE8E4" />
+                <MaterialCommunityIcons name="chevron-left" size={28} color="#FFFFFF" />
             </Pressable>
             <View>
                 <Text style={styles.title}>{title}</Text>
@@ -55,11 +55,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 2,
     },
     subtitle: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 11,
         fontWeight: '600',
         textTransform: 'uppercase',

@@ -25,18 +25,18 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                 >
                     <View style={[styles.partnerInfo, { paddingLeft: 16 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                            <Text style={[styles.partnerName, { color: '#EDE8E4', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
+                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
                                 {partner.name}
                             </Text>
                             <View style={[styles.partnerBadge, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.4)', flexShrink: 0 }]}>
-                                <Text style={[styles.partnerBadgeText, { color: '#EDE8E4', fontSize: 9 }]}>{getPartnerBadge(partner, partner.love)}</Text>
+                                <Text style={[styles.partnerBadgeText, { color: '#FFFFFF', fontSize: 9 }]}>{getPartnerBadge(partner, partner.love)}</Text>
                             </View>
                         </View>
 
                         <View style={styles.partnerStats}>
                             <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
                             <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
-                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#E06B6B', shadowColor: '#E06B6B', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#31241F', shadowColor: '#31241F', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>
 
                             {/* ACTIVE PERKS DISPLAY */}
@@ -106,7 +106,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
     return (
         <View style={styles.partnerCardWrapper}>
             <LinearGradient
-                colors={['#0F0E0D', '#0F0E0D', '#2A2624']}
+                colors={['#31241F', '#31241F', '#674C41']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        shadowColor: '#E06B6B',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.3,
         shadowRadius: 18,

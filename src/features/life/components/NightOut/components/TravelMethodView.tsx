@@ -76,7 +76,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>✈️</Text>
-                        <View style={[styles.badge, { backgroundColor: '#E3A857' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#533D35' }]}>
                             <Text style={styles.badgeText}>{t('life.rep1')}</Text>
                         </View>
                     </View>
@@ -105,16 +105,16 @@ const TravelMethodView = ({
                 {/* 3. Royal Charter */}
                 <Pressable
                     onPress={() => onSelectMethod('luxury')}
-                    style={({ pressed }) => [styles.card, { borderColor: '#E3A857' }, pressed && styles.pressed]}>
+                    style={({ pressed }) => [styles.card, { borderColor: 'rgba(255,255,255,0.08)' }, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🥂</Text>
-                        <View style={[styles.badge, { backgroundColor: '#E3A857' }]}>
-                            <Text style={[styles.badgeText, { color: '#EDE8E4' }]}>{t('life.rep12')}</Text>
+                        <View style={[styles.badge, { backgroundColor: '#533D35' }]}>
+                            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('life.rep12')}</Text>
                         </View>
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>Royal{'\n'}Charter</Text>
-                        <Text style={[styles.cardPrice, { color: '#E3A857' }]}>$50k</Text>
+                        <Text style={[styles.cardPrice, { color: '#E9B8C9' }]}>$50k</Text>
                     </View>
                 </Pressable>
 
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 2,
         textTransform: 'uppercase',
     },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     card: {
         width: '48%',
         aspectRatio: 1.5,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     hangarCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderColor: '#5992C6',
         borderStyle: 'dashed',
     },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     cardContent: {
         gap: 4,
@@ -220,13 +220,13 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         lineHeight: 20,
     },
     cardPrice: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     hangarAction: {
         fontSize: 12,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     jetListItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     jetListIcon: {
         width: 48,
         height: 48,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     jetListName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     jetListDesc: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     emptyText: {

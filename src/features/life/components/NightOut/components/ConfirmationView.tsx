@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 24,
         letterSpacing: 0.5,
     },
     venueCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         borderWidth: 2,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     breakdownValue: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     totalRow: {
         marginTop: 8,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     totalLabel: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     totalValue: {
         fontSize: 24,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     confirmButtonText: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

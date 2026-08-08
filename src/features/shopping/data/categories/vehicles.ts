@@ -21,7 +21,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.monarchauto.luxury',
             category: 'VEHICLE',
             description: 'Imperial transport.',
-            bannerColor: '#123AB8',
+            bannerColor: '#0A2A92',
             emoji: '👑',
         },
         {
@@ -30,7 +30,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.apeximports.jp',
             category: 'VEHICLE',
             description: 'The collector\'s holy grail.',
-            bannerColor: '#E3A857',
+            bannerColor: '#E9B8C9',
             emoji: '🎌',
         },
         {
@@ -39,7 +39,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.ironhorse.com',
             category: 'VEHICLE',
             description: 'Indestructible.',
-            bannerColor: '#2A2624',
+            bannerColor: '#674C41',
             emoji: '🛡️',
         },
         {

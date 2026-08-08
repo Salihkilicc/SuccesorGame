@@ -67,8 +67,8 @@ const NightOutScreen = () => {
         <View style={styles.container}>
             <AppLaunchLoader
                 appName="Night Out"
-                appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#EDE8E4" />}
-                backgroundColor="#0F0E0D"
+                appIcon={<MaterialCommunityIcons name="glass-cocktail" size={64} color="#FFFFFF" />}
+                backgroundColor="#31241F"
             >
                 {/* Main Setup Flow — shown as full screen */}
                 <NightOutSetupModal
@@ -129,6 +129,6 @@ export default NightOutScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
 });

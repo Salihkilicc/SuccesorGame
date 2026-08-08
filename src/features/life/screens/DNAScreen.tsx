@@ -136,34 +136,34 @@ const DNAScreen = () => {
     const getBeltBgColor = (belt: string) => {
         const lowerBelt = belt?.toLowerCase() || 'white';
         const colors: Record<string, string> = {
-            white: '#EDE8E4',
-            yellow: '#E3A857',
-            orange: '#E3A857',
-            green: '#5FB37A',
+            white: '#FFFFFF',
+            yellow: '#E9B8C9',
+            orange: '#E9B8C9',
+            green: '#5992C6',
             blue: '#5992C6',
-            purple: '#123AB8',
-            brown: '#3B3632',
-            black: '#0F0E0D'
+            purple: '#0A2A92',
+            brown: '#7F5E51',
+            black: '#31241F'
         };
         return colors[lowerBelt] || '#333';
     };
 
     const getHeatColor = (val: number) => {
-        if (val > 80) return '#E06B6B';
-        if (val < 30) return '#123AB8';
-        return '#E3A857';
+        if (val > 80) return '#E9B8C9';
+        if (val < 30) return '#0A2A92';
+        return '#E9B8C9';
     };
 
     return (
         <AppLaunchLoader
             appName="DNA"
-            appIcon={<MaterialCommunityIcons name="dna" size={64} color="#EDE8E4" />}
-            backgroundColor="#0F0E0D"
+            appIcon={<MaterialCommunityIcons name="dna" size={64} color="#FFFFFF" />}
+            backgroundColor="#31241F"
         >
             <View style={styles.container}>
                 {/* Premium background gradient */}
                 <LinearGradient
-                    colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+                    colors={['#31241F', '#31241F', '#31241F']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={StyleSheet.absoluteFill}
@@ -190,7 +190,7 @@ const DNAScreen = () => {
                         <View style={styles.card}>
                             <SectionHeader title={t('life.securitySafety')} icon="🛡️" />
                             <ProgressBar label={t('life.digitalShield')} value={getEffective(security?.digital, secBuffs.digital)} color="#5992C6" icon="💻" buff={getBuffString(secBuffs.digital)} />
-                            <ProgressBar label={t('life.bodyguardArmor')} value={getEffective(securityLevel, secBuffs.personal)} color="#E06B6B" icon="🥋" buff={getBuffString(secBuffs.personal)} />
+                            <ProgressBar label={t('life.bodyguardArmor')} value={getEffective(securityLevel, secBuffs.personal)} color="#E9B8C9" icon="🥋" buff={getBuffString(secBuffs.personal)} />
                             <ProgressBar label={t('life.policeHeat')} value={suspicion} color={getHeatColor(suspicion)} icon="🚨" />
                         </View>
 
@@ -202,7 +202,7 @@ const DNAScreen = () => {
                                     <Text style={styles.skillName}>{t('life.selfDefense')}</Text>
                                     <Text style={styles.skillDetail}>{martialArtsDisplay}</Text>
                                     <Text style={styles.skillDetail}>
-                                        Security Boost: <Text style={{ fontWeight: 'bold', color: '#5FB37A' }}>+{securityLevel}%</Text>
+                                        Security Boost: <Text style={{ fontWeight: 'bold', color: '#5992C6' }}>+{securityLevel}%</Text>
                                     </Text>
                                     <Text style={styles.skillDetail}>
                                         Body Type: <Text style={{ fontWeight: 'bold', color: '#E9B8C9' }}>{bodyType}</Text>
@@ -212,35 +212,35 @@ const DNAScreen = () => {
                                     <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>{beltTitle}</Text>
                                 </View>
                             </View>
-                            <ProgressBar label={t('life.fatigueLevel')} value={fatigue} max={100} color={fatigue > 80 ? '#E06B6B' : '#5FB37A'} icon="⚡" />
+                            <ProgressBar label={t('life.fatigueLevel')} value={fatigue} max={100} color={fatigue > 80 ? '#E9B8C9' : '#5992C6'} icon="⚡" />
                         </View>
 
                         {/* 🕸️ REPUTATION */}
                         <View style={styles.card}>
                             <SectionHeader title={t('life.reputationNetwork')} icon="🕸️" />
-                            <ProgressBar label={t('life.casinoVip')} value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E06B6B" icon="🎰" buff={getBuffString(repBuffs.casino)} />
-                            <ProgressBar label={t('life.streetCred')} value={getEffective(reputation?.street, repBuffs.street)} color="#E06B6B" icon="🗡️" buff={getBuffString(repBuffs.street)} />
+                            <ProgressBar label={t('life.casinoVip')} value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#E9B8C9" icon="🎰" buff={getBuffString(repBuffs.casino)} />
+                            <ProgressBar label={t('life.streetCred')} value={getEffective(reputation?.street, repBuffs.street)} color="#E9B8C9" icon="🗡️" buff={getBuffString(repBuffs.street)} />
                             <ProgressBar label={t('life.businessTrust')} value={getEffective(reputation?.business, repBuffs.business)} color="#5992C6" icon="💼" buff={getBuffString(repBuffs.business)} />
-                            <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#123AB8" icon="🥂" buff={getBuffString(repBuffs.social)} />
+                            <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#0A2A92" icon="🥂" buff={getBuffString(repBuffs.social)} />
                         </View>
 
                         {/* 🧬 GENETICS */}
                         <View style={styles.card}>
                             <SectionHeader title={t('life.coreGenetics')} icon="🧬" />
-                            <ProgressBar label={t('life.intellect')} value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#123AB8" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
-                            <ProgressBar label={t('life.charm')} value={getEffective(attributes?.charm, attrBuffs.charm)} color="#E06B6B" icon="👄" buff={getBuffString(attrBuffs.charm)} />
-                            <ProgressBar label={t('life.looks')} value={getEffective(attributes?.looks, attrBuffs.looks)} color="#E3A857" icon="✨" buff={getBuffString(attrBuffs.looks)} />
-                            <ProgressBar label={t('life.strength')} value={getEffective(attributes?.strength, attrBuffs.strength)} color="#E06B6B" icon="💪" buff={getBuffString(attrBuffs.strength)} />
+                            <ProgressBar label={t('life.intellect')} value={getEffective(attributes?.intellect, attrBuffs.intellect)} color="#0A2A92" icon="🧠" buff={getBuffString(attrBuffs.intellect)} />
+                            <ProgressBar label={t('life.charm')} value={getEffective(attributes?.charm, attrBuffs.charm)} color="#E9B8C9" icon="👄" buff={getBuffString(attrBuffs.charm)} />
+                            <ProgressBar label={t('life.looks')} value={getEffective(attributes?.looks, attrBuffs.looks)} color="#E9B8C9" icon="✨" buff={getBuffString(attrBuffs.looks)} />
+                            <ProgressBar label={t('life.strength')} value={getEffective(attributes?.strength, attrBuffs.strength)} color="#E9B8C9" icon="💪" buff={getBuffString(attrBuffs.strength)} />
                         </View>
 
                         {/* 🎭 PERSONALITY */}
                         <View style={styles.card}>
                             <SectionHeader title={t('life.personalityTraits')} icon="🎭" />
                             <ProgressBar label={t('life.ambition')} value={personality?.ambition} color="#E9B8C9" icon="🔥" />
-                            <ProgressBar label={t('life.riskAppetite')} value={personality?.riskAppetite} color="#E06B6B" icon="🎲" />
+                            <ProgressBar label={t('life.riskAppetite')} value={personality?.riskAppetite} color="#E9B8C9" icon="🎲" />
                             <ProgressBar label={t('life.strategicSense')} value={personality?.strategicSense ?? 50} color="#5992C6" icon="♟️" />
-                            <ProgressBar label={t('life.morality')} value={personality?.morality} color="#5FB37A" icon="😇" />
-                            <ProgressBar label={t('life.luck')} value={hidden?.luck} color="#5FB37A" icon="🍀" />
+                            <ProgressBar label={t('life.morality')} value={personality?.morality} color="#5992C6" icon="😇" />
+                            <ProgressBar label={t('life.luck')} value={hidden?.luck} color="#5992C6" icon="🍀" />
                         </View>
 
                         <View style={{ height: 40 }} />
@@ -254,7 +254,7 @@ const DNAScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     safeArea: {
         flex: 1,
@@ -283,17 +283,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 36,
         height: 2,
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         marginTop: 8,
         borderRadius: 2,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#3B3632',
+        color: '#7F5E51',
         textTransform: 'uppercase',
         letterSpacing: 3,
     },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     statLabel: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 13,
         fontWeight: '500',
     },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     buffText: {
         fontSize: 9,
         fontWeight: 'bold',
-        color: '#5FB37A',
+        color: '#5992C6',
     },
     progressContainer: {
         flex: 1,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     statValue: {
         width: 52,
         textAlign: 'right',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 11,
         fontWeight: '600',
         fontVariant: ['tabular-nums'],
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     skillName: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 4,
         letterSpacing: 0.5,
     },
     skillDetail: {
-        color: '#3B3632',
+        color: '#7F5E51',
         fontSize: 12,
         marginBottom: 2,
     },
@@ -457,9 +457,9 @@ const styles = StyleSheet.create({
     },
     luxuryProgressBarFill: {
         height: '100%',
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         borderRadius: 5,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.5,
         shadowRadius: 4,

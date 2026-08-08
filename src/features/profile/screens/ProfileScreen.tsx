@@ -17,7 +17,7 @@ const ProfileScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+                colors={['#31241F', '#31241F', '#31241F']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -70,7 +70,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     safeArea: {
         flex: 1,
@@ -106,17 +106,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,

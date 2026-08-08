@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     card: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#8A807B',
+        borderColor: 'rgba(255,255,255,0.48)',
     },
     cardPressed: {
-        backgroundColor: '#2A2624',
+        backgroundColor: '#674C41',
         transform: [{ scale: 0.98 }],
     },
     emoji: {
@@ -126,27 +126,27 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     cardPrice: {
         fontSize: 16,
-        color: '#E3A857',
+        color: '#E9B8C9',
         fontWeight: '600',
         marginBottom: 8,
     },
     cardDesc: {
         fontSize: 13,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 8,
     },
     statText: {
         fontSize: 12,
-        color: '#5FB37A',
+        color: '#5992C6',
         fontWeight: '600',
     },
     riskText: {
-        color: '#E3A857',
+        color: '#E9B8C9',
     },
 });

@@ -14,8 +14,8 @@ const AppDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    background: '#0F0E0D',
-    card: '#0F0E0D',
+    background: '#31241F',
+    card: '#31241F',
   },
 };
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -295,7 +295,7 @@ const SwipeNavigator = () => (
       tabBarStyle: { display: 'none' },
       swipeEnabled: true,
       lazy: true,
-      sceneStyle: { backgroundColor: '#0F0E0D' },
+      sceneStyle: { backgroundColor: '#31241F' },
     }}
   >
     {/* --- RAFA KALDIRILDI: lifestyle hub'ı --- */}

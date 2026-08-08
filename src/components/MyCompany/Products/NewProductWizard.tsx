@@ -283,7 +283,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                         title={`🚀 ${t('company.launchProduct')}`}
                                         variant="primary" // Could be 'success' color if available, but primary is fine
                                         onPress={handleLaunch}
-                                        style={{ backgroundColor: '#5FB37A', borderColor: '#5FB37A' }} // Custom override for success green
+                                        style={{ backgroundColor: '#5992C6', borderColor: '#5992C6' }} // Custom override for success green
                                     />
                                     <GameButton
                                         title={t('product.back')}

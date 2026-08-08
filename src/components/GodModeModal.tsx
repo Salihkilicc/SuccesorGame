@@ -45,7 +45,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <MaterialCommunityIcons name="close" size={24} color="#8A807B" />
+                            <MaterialCommunityIcons name="close" size={24} color="rgba(255,255,255,0.48)" />
                         </TouchableOpacity>
                     </View>
 
@@ -57,7 +57,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(39, 174, 96, 0.2)', 'rgba(39, 174, 96, 0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#5FB37A" />
+                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#5992C6" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
@@ -66,7 +66,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(192, 57, 43, 0.2)', 'rgba(192, 57, 43, 0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="skull" size={24} color="#E06B6B" />
+                            <MaterialCommunityIcons name="skull" size={24} color="#E9B8C9" />
                             <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '85%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#E9B8C9',
+        borderColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden',
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 15,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     subtitle: {
-        color: '#5FB37A',
+        color: '#5992C6',
         fontSize: 12,
         fontFamily: 'Courier',
         textAlign: 'center',
@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     actionTextMoney: {
-        color: '#5FB37A',
+        color: '#5992C6',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,
     },
     actionTextReset: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

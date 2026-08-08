@@ -42,7 +42,7 @@ const Row = ({
             ? theme.colors.success
             : theme.colors.error
         : negative
-            ? '#E06B6B'
+            ? '#E9B8C9'
             : subtotal
                 ? '#E9B8C9'
                 : theme.colors.textPrimary;
@@ -201,7 +201,7 @@ const FinancialReportScreen = () => {
                     note={t('company.howMuchYouBuiltAnd')}
                     info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
-                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#E06B6B'}
+                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#E9B8C9'}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
@@ -219,7 +219,7 @@ const FinancialReportScreen = () => {
                             <Text
                                 style={[
                                     styles.opsValue,
-                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#E06B6B' },
+                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#E9B8C9' },
                                 ]}
                             >
                                 {formatPercent(report.sellThrough)}
@@ -227,7 +227,7 @@ const FinancialReportScreen = () => {
                         </View>
                         <View style={styles.opsCell}>
                             <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                            <Text style={[styles.opsValue, { color: '#E3A857' }]}>
+                            <Text style={[styles.opsValue, { color: '#E9B8C9' }]}>
                                 {formatNumber(report.endingInventory)}
                             </Text>
                         </View>
@@ -244,7 +244,7 @@ const FinancialReportScreen = () => {
                     note={t('company.perProductDemandSalesAnd')}
                     info={t('company.productsInTheSameCategory')}
                     summary={`${report.products.length}`}
-                    summaryColor="#8A807B"
+                    summaryColor="rgba(255,255,255,0.48)"
                 >
 
                     <View style={styles.tableHeader}>
@@ -268,7 +268,7 @@ const FinancialReportScreen = () => {
                                     <Text style={[styles.cellText, styles.center, { color: theme.colors.success }]}>
                                         {formatNumber(p.sold)}
                                     </Text>
-                                    <Text style={[styles.cellText, styles.center, { color: '#E3A857' }]}>
+                                    <Text style={[styles.cellText, styles.center, { color: '#E9B8C9' }]}>
                                         {formatNumber(p.stock)}
                                     </Text>
                                     <Text
@@ -296,14 +296,14 @@ const FinancialReportScreen = () => {
                     note={t('company.whereYouStandAtThe')}
                     info={t('company.companyCapitalFundsTheBusiness2')}
                     summary={formatMoney(report.endingCapital)}
-                    summaryColor="#EDE8E4"
+                    summaryColor="#FFFFFF"
                     defaultOpen
                 >
                     <Row label={t('company.companyCapital')} amount={report.endingCapital} />
                     <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
                         <Text style={styles.label}>{t('company.researchPoints')}</Text>
-                        <Text style={[styles.value, { color: '#123AB8' }]}>
+                        <Text style={[styles.value, { color: '#0A2A92' }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>
                     </View>
@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
     labelStrong: { color: theme.colors.textPrimary, fontWeight: '700' },
     value: { fontSize: 14, fontWeight: '700', marginLeft: 10 },
     valueBig: { fontSize: 19, fontWeight: '800' },
-    explain: { color: '#3B3632', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
-    footnote: { color: '#3B3632', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
+    explain: { color: '#7F5E51', fontSize: 10.5, lineHeight: 15, marginTop: 4, paddingRight: 30 },
+    footnote: { color: '#7F5E51', fontSize: 10, marginTop: 10, fontStyle: 'italic' },
 
     opsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     opsCell: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     tableRow: { flexDirection: 'row', paddingVertical: 9, alignItems: 'center' },
     cellText: { color: theme.colors.textPrimary, fontSize: 12.5, flex: 1 },
     productEcon: {
-        color: '#3B3632',
+        color: '#7F5E51',
         fontSize: 10,
         paddingBottom: 8,
         borderBottomWidth: 1,

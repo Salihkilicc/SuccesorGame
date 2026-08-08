@@ -116,7 +116,7 @@ const ManagementCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#0F0E0D', // Dark Gray
+        backgroundColor: '#31241F', // Dark Gray
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: theme.radius.md,
-        backgroundColor: '#0F0E0D', // Light Gray for icon box
+        backgroundColor: '#31241F', // Light Gray for icon box
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -140,23 +140,23 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     title: {
-        color: '#EDE8E4', // White
+        color: '#FFFFFF', // White
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
     subtitle: {
-        color: '#8A807B', // Text Secondary
+        color: 'rgba(255,255,255,0.48)', // Text Secondary
         fontSize: theme.typography.caption,
     },
     badge: {
         marginLeft: 'auto',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         paddingHorizontal: theme.spacing.sm,
         paddingVertical: 4,
         borderRadius: theme.radius.sm,
     },
     badgeText: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: theme.typography.caption,
         fontWeight: '600',
     },
@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: theme.typography.caption,
     },
     value: {
-        color: '#123AB8', // Apple Blue for stat values
+        color: '#0A2A92', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         color: theme.colors.success,
     },
     limitLabel: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 10,
     },
     footer: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#333',
     },
     costLabel: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: theme.typography.caption,
     },
     costValue: {

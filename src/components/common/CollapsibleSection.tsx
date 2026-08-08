@@ -60,7 +60,7 @@ export const CollapsibleSection = ({
     info,
     infoDetail,
     summary,
-    summaryColor = '#EDE8E4',
+    summaryColor = '#FFFFFF',
     defaultOpen = false,
     hidden = false,
     style,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1.6,
     },
     note: {
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontSize: 10.5,
         marginTop: 3,
         lineHeight: 14,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     summary: { fontSize: 14, fontWeight: '800', maxWidth: 130, textAlign: 'right' },
     chevron: {
-        color: '#3B3632',
+        color: '#7F5E51',
         fontSize: 16,
         marginTop: -4,
         width: 14,

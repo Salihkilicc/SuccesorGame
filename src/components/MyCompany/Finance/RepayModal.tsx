@@ -109,7 +109,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             </View>
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>{t('finance.canRepay')}</Text>
-                                                <Text style={[styles.loanDetailValue, { color: '#5FB37A' }]}>
+                                                <Text style={[styles.loanDetailValue, { color: '#5992C6' }]}>
                                                     {formatMoney(maxRepayable)}
                                                 </Text>
                                             </View>
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 420,
         maxHeight: '80%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
         marginBottom: 80, // Space for Bottom Bar
     },
     title: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loanCard: {
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     },
     loanRemainingLabel: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 2,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     loanRemaining: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#E06B6B',
+        color: '#E9B8C9',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     },
     loanDetailLabel: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 4,
@@ -295,39 +295,39 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#5FB37A',
+        borderColor: '#5992C6',
     },
     repayButtonFull: {
-        backgroundColor: '#E9B8C9',
-        borderColor: '#E9B8C9',
+        backgroundColor: '#533D35',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     repayButtonPressed: {
         opacity: 0.7,
     },
     repayButtonLabel: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         marginBottom: 4,
     },
     repayButtonValue: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#5FB37A',
+        color: '#5992C6',
     },
     insufficientText: {
         fontSize: 12,
-        color: '#E06B6B',
+        color: '#E9B8C9',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     closeButton: {
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     confirmButton: {
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',

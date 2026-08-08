@@ -11,8 +11,8 @@ const EducationScreen = () => {
         <View style={styles.container}>
             <AppLaunchLoader
                 appName="Education"
-                appIcon={<MaterialCommunityIcons name="school" size={64} color="#EDE8E4" />}
-                backgroundColor="#0F0E0D"
+                appIcon={<MaterialCommunityIcons name="school" size={64} color="#FFFFFF" />}
+                backgroundColor="#31241F"
             >
                 <EducationMasterModal />
                 <EducationExamModal />
@@ -26,6 +26,6 @@ export default EducationScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
 });

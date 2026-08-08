@@ -81,9 +81,9 @@ const styles = StyleSheet.create({
         width: 80,
         height: SYMBOL_HEIGHT * 3, // Show 3 symbols
         overflow: 'hidden',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderWidth: 1,
-        borderColor: '#2A2624',
+        borderColor: '#674C41',
         borderRadius: 8,
     },
     strip: {

@@ -85,7 +85,7 @@ const DayCell = ({ day, dateKey, isToday, hasEvent, onPress }: DayCellProps) => 
         >
             {isToday ? (
                 <LinearGradient
-                    colors={['#E9B8C9', '#E3A857']}
+                    colors={['#E9B8C9', '#E9B8C9']}
                     style={styles.todayCircle}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -205,7 +205,7 @@ const CalendarScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#0F0E0D', '#0F0E0D', '#0F0E0D']}
+                colors={['#31241F', '#31241F', '#31241F']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -275,7 +275,7 @@ const CalendarScreen = () => {
 
                             {/* Star icon */}
                             <LinearGradient
-                                colors={['#E9B8C9', '#E3A857', '#201D1C']}
+                                colors={['#E9B8C9', '#E9B8C9', '#533D35']}
                                 style={styles.modalStar}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -309,7 +309,7 @@ export default CalendarScreen;
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: '#0F0E0D' },
+    root: { flex: 1, backgroundColor: '#31241F' },
     safeArea: { flex: 1 },
 
     // Header
@@ -344,17 +344,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 6,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#E9B8C9', // Gold accent
+        backgroundColor: '#533D35', // Gold accent
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     monthName: {
         fontSize: 18,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 4,
         textTransform: 'uppercase',
     },
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     weekLabel: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#3B3632',
+        color: '#7F5E51',
         textAlign: 'center',
         letterSpacing: 0.5,
     },
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     dayNumWeekend: { color: 'rgba(192,192,208,0.4)' },
-    dayNumWithEvent: { color: '#EDE8E4', fontWeight: '700' },
+    dayNumWithEvent: { color: '#FFFFFF', fontWeight: '700' },
 
     // Today
     todayCircle: {
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
         borderRadius: CELL_SIZE,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 8,
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     todayDayNum: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
     },
 
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
     },
-    eventStarToday: { color: '#E3A857' },
+    eventStarToday: { color: '#E9B8C9' },
 
     // Modal
     modalOverlay: {
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '100%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(197,160,89,0.38)',
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         alignItems: 'center',
         overflow: 'hidden',
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.25,
         shadowRadius: 30,
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 16,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.9,
         shadowRadius: 18,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     modalStarText: { fontSize: 24, color: '#FFF' },
     modalDate: {
         fontSize: 11,
-        color: '#3B3632',
+        color: '#7F5E51',
         letterSpacing: 2,
         textTransform: 'uppercase',
         marginBottom: 6,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textAlign: 'center',
         letterSpacing: 0.2,
         marginBottom: 18,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     },
     modalDesc: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 28,

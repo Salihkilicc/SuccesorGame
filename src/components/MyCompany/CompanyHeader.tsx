@@ -60,7 +60,7 @@ export default CompanyHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0F0E0D', // Dark Gray
+    backgroundColor: '#31241F', // Dark Gray
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   title: {
-    color: '#EDE8E4', // White
+    color: '#FFFFFF', // White
     fontSize: theme.typography.subtitle + 8,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   metricLabel: {
-    color: '#8A807B', // Text Secondary
+    color: 'rgba(255,255,255,0.48)', // Text Secondary
     fontSize: theme.typography.caption,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   metricValue: {
-    color: '#5FB37A', // Green for valuation
+    color: '#5992C6', // Green for valuation
     fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
   },
@@ -103,16 +103,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#5FB37A', // Green
+    color: '#5992C6', // Green
   },
   changeDown: {
-    color: '#E06B6B', // Red
+    color: '#E9B8C9', // Red
   },
   meta: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption + 1,
   },
   debt: {
-    color: '#E06B6B', // Red
+    color: '#E9B8C9', // Red
   },
 });

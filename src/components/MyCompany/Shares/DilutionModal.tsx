@@ -135,7 +135,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>💵 Cash Raised</Text>
-                                <Text style={[styles.impactValue, { color: '#5FB37A' }]}>
+                                <Text style={[styles.impactValue, { color: '#5992C6' }]}>
                                     +{formatMoney(capitalRaised)}
                                 </Text>
                             </View>
@@ -143,7 +143,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
                                 <Text style={[
                                     styles.impactValue,
-                                    { color: newOwnership < 50 ? '#E06B6B' : '#E3A857' }
+                                    { color: newOwnership < 50 ? '#E9B8C9' : '#E9B8C9' }
                                 ]}>
                                     {currentOwnership.toFixed(1)}% → {newOwnership.toFixed(1)}%
                                 </Text>
@@ -156,7 +156,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                             <View style={styles.stockWarningContent}>
                                 <Text style={styles.stockWarningTitle}>{t('equity.stockPriceImpact')}</Text>
                                 <Text style={styles.stockWarningText}>
-                                    Est. Price Drop: <Text style={{ color: '#E06B6B', fontWeight: '700' }}>
+                                    Est. Price Drop: <Text style={{ color: '#E9B8C9', fontWeight: '700' }}>
                                         -{(predictedDrop * 100).toFixed(1)}%
                                     </Text>
                                 </Text>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -221,12 +221,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 16,
     },
     warningBanner: {
@@ -235,11 +235,11 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#E3A85740',
+        borderColor: '#E9B8C940',
     },
     warningBannerText: {
         fontSize: 13,
-        color: '#E3A857',
+        color: '#E9B8C9',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -248,14 +248,14 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '600',
         marginBottom: 12,
     },
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -264,14 +264,14 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#201D1C',
+        backgroundColor: '#533D35',
         alignItems: 'center',
         justifyContent: 'center',
     },
     stepperText: {
         fontSize: 28,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     stepperTextDisabled: {
         color: '#666',
@@ -283,12 +283,12 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     labelSmall: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         letterSpacing: 1,
     },
@@ -299,20 +299,20 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#201D1C',
+        borderColor: '#533D35',
     },
     presetButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     impactSection: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     },
     impactLabel: {
         fontSize: 14,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: '500',
     },
     impactValue: {
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 16,
         borderWidth: 2,
-        borderColor: '#E3A857',
+        borderColor: 'rgba(255,255,255,0.08)',
         flexDirection: 'row',
         gap: 12,
     },
@@ -351,30 +351,30 @@ const styles = StyleSheet.create({
     stockWarningTitle: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#E3A857',
+        color: '#E9B8C9',
         marginBottom: 4,
     },
     stockWarningText: {
         fontSize: 13,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 6,
     },
     stockWarningValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#E3A857',
+        color: '#E9B8C9',
     },
     criticalBox: {
-        backgroundColor: '#E06B6B20',
+        backgroundColor: '#E9B8C920',
         borderRadius: 12,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#E06B6B40',
+        borderColor: '#E9B8C940',
     },
     criticalText: {
         fontSize: 14,
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -392,11 +392,11 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     authorizeButton: {
         flex: 1,
-        backgroundColor: '#E3A857',
+        backgroundColor: '#533D35',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     authorizeButtonText: {
         fontSize: 17,
         fontWeight: '600',
-        color: '#0F0E0D',
+        color: '#31241F',
     },
 });
 

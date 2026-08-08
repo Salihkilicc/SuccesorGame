@@ -86,11 +86,11 @@ const ShopDetailScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0F0E0D' },
+    container: { flex: 1, backgroundColor: '#31241F' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    errorText: { color: '#E06B6B', fontSize: 16, marginBottom: 20 },
-    goBackBtn: { padding: 10, backgroundColor: '#0F0E0D', borderRadius: 8, borderWidth: 1, borderColor: '#181614' },
-    goBackText: { color: '#EDE8E4' },
+    errorText: { color: '#E9B8C9', fontSize: 16, marginBottom: 20 },
+    goBackBtn: { padding: 10, backgroundColor: '#31241F', borderRadius: 8, borderWidth: 1, borderColor: '#42312A' },
+    goBackText: { color: '#FFFFFF' },
     listContent: { padding: theme.spacing.lg },
 });
 

@@ -62,11 +62,11 @@ const BelongingsScreen = () => {
     return (
         <AppLaunchLoader
             appName="Belongings"
-            appIcon={<MaterialCommunityIcons name="treasure-chest" size={64} color="#EDE8E4" />}
-            backgroundColor="#0F0E0D"
+            appIcon={<MaterialCommunityIcons name="treasure-chest" size={64} color="#FFFFFF" />}
+            backgroundColor="#31241F"
         >
             <View style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor="#0F0E0D" />
+                <StatusBar barStyle="light-content" backgroundColor="#31241F" />
                 <SafeAreaView style={{ flex: 1 }}>
 
                     {/* 1. Header (Black Card Style) */}
@@ -185,13 +185,13 @@ const BelongingsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D', // Deep Black
+        backgroundColor: '#31241F', // Deep Black
     },
     // Header
     header: {
         paddingHorizontal: 20,
         paddingBottom: 12, // Reduced from 20 to tighten layout
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     headerTop: {
         flexDirection: 'row',
@@ -205,13 +205,13 @@ const styles = StyleSheet.create({
         marginLeft: -8,
     },
     backButtonText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
     },
     headerTitle: {
-        color: '#123AB8',
+        color: '#0A2A92',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -225,12 +225,12 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
         aspectRatio: 1.58, // Credit Card Ratio
-        backgroundColor: '#0F0E0D', // Matte Black
+        backgroundColor: '#31241F', // Matte Black
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#181614',
-        shadowColor: "#0F0E0D",
+        borderColor: '#42312A',
+        shadowColor: "#31241F",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,
@@ -253,14 +253,14 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     cardBankName: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '800',
         letterSpacing: 2,
         marginBottom: 2,
     },
     cardLabelSmall: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -273,27 +273,27 @@ const styles = StyleSheet.create({
     chipGraphic: {
         width: 44,
         height: 34,
-        backgroundColor: '#E06B6B', // Gold/Copper Chip color
+        backgroundColor: '#533D35', // Gold/Copper Chip color
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
         justifyContent: 'center',
         alignItems: 'center',
     },
     chipLine1: {
         width: '100%',
         height: 1,
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
         marginBottom: 8,
     },
     chipLine2: {
         position: 'absolute',
         width: 1,
         height: '60%',
-        backgroundColor: '#181614',
+        backgroundColor: '#42312A',
     },
     netWorthValue: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 28, // Scaled for card
         fontWeight: '800',
         letterSpacing: 1,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 10,
     },
     netWorthLabel: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 9,
         letterSpacing: 2,
         marginTop: 2,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     memberName: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '600',
         letterSpacing: 1,
@@ -325,10 +325,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 51, 102, 0.1)',
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#E06B6B',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     badgeText: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 1,
@@ -346,26 +346,26 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20, // Pill shape
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
     },
     filterChipActive: {
-        borderColor: '#E06B6B',
-        backgroundColor: '#0F0E0D',
-        shadowColor: "#E06B6B",
+        borderColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: '#31241F',
+        shadowColor: "#E9B8C9",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
     },
     filterText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
     filterTextActive: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
     },
 
     // List
@@ -387,27 +387,27 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     emptyTitle: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,
         marginBottom: 8,
     },
     emptyText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 14,
         marginBottom: 24,
     },
     shopAction: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#181614',
+        borderColor: '#42312A',
     },
     shopActionText: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 1,

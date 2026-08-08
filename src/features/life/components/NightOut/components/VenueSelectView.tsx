@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
         letterSpacing: 0.5,
     },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     venueCard: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         borderWidth: 2,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     venueName: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     venueLocation: {
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     selectedBadgeText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
 });

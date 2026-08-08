@@ -151,7 +151,7 @@ const SlotsGameScreen = () => {
               disabled={isSpinning || bet <= 0}
               style={({ pressed }) => [
                 styles.spinButton,
-                { backgroundColor: isSpinning || bet <= 0 ? '#3B3632' : currentLocation.theme.primary },
+                { backgroundColor: isSpinning || bet <= 0 ? '#7F5E51' : currentLocation.theme.primary },
                 pressed && styles.spinButtonPressed,
                 (isSpinning || bet <= 0) && styles.disabledButton
               ]}>
@@ -169,7 +169,7 @@ export default SlotsGameScreen;
 
 // STYLES
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0E0D' },
+  container: { flex: 1, backgroundColor: '#31241F' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 100 },
 
   infoRow: {
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
 
   machineContainer: {
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     borderRadius: 24,
     padding: 20,
     borderWidth: 4,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     height: 84, // Slightly larger than symbol height
     marginTop: -42,
     borderWidth: 2,
-    borderColor: '#E9B8C9',
+    borderColor: 'rgba(255,255,255,0.08)',
     zIndex: 20,
     borderRadius: 4,
     opacity: 0.4,
@@ -239,23 +239,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#0F0E0D',
+    backgroundColor: '#31241F',
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#2A2624'
+    borderColor: '#674C41'
   },
   betDisplay: {
     gap: 4
   },
   betLabel: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
   betValueText: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '800',
     fontVariant: ['tabular-nums']
@@ -289,10 +289,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)'
   },
   bigWinText: {
-    color: '#E3A857',
+    color: '#E9B8C9',
     fontSize: 64,
     fontWeight: '900',
-    textShadowColor: '#E3A857',
+    textShadowColor: '#E9B8C9',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 20,
     transform: [{ rotate: '-5deg' }]

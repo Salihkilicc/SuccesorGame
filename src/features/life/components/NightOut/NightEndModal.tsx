@@ -47,7 +47,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress10')}</Text>
-                                <Text style={[styles.statGain, { color: '#E3A857' }]}>{t('life.cost2000')}</Text>
+                                <Text style={[styles.statGain, { color: '#E9B8C9' }]}>{t('life.cost2000')}</Text>
                             </View>
                         </Pressable>
 
@@ -66,7 +66,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress25')}</Text>
-                                <Text style={[styles.statGain, { color: '#E3A857' }]}>⚠️ Multiple Risks</Text>
+                                <Text style={[styles.statGain, { color: '#E9B8C9' }]}>⚠️ Multiple Risks</Text>
                             </View>
                         </Pressable>
                     </View>
@@ -81,19 +81,19 @@ export default NightEndModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         padding: 24,
         paddingBottom: 40,
         alignItems: 'center',
         justifyContent: 'center',
     },
     title: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '800',
         marginBottom: 24,
@@ -115,13 +115,13 @@ const styles = StyleSheet.create({
         minHeight: 280,
     },
     classyCard: {
-        backgroundColor: '#0F0E0D',
-        borderColor: '#E3A857', // Gold-ish
+        backgroundColor: '#31241F',
+        borderColor: 'rgba(255,255,255,0.08)', // Gold-ish
     },
     wildCard: {
-        backgroundColor: '#0F0E0D',
-        borderColor: '#E06B6B', // Neon Red
-        shadowColor: '#E06B6B',
+        backgroundColor: '#31241F',
+        borderColor: 'rgba(255,255,255,0.08)', // Neon Red
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.3)'
     },
     classyBadge: {
-        color: '#E3A857',
+        color: '#E9B8C9',
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
     },
     wildBadge: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     optionTitle: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 8,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         fontWeight: '700'
     },
     riskWarning: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 11,
         fontWeight: '700',
         marginTop: 4

@@ -171,7 +171,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 
                         {/* Info Note */}
                         <View style={styles.infoBox}>
-                            <Ionicons name="information-circle-outline" size={20} color="#8A807B" />
+                            <Ionicons name="information-circle-outline" size={20} color="rgba(255,255,255,0.48)" />
                             <Text style={styles.infoText}>
                                 {t('sub.pointsHint')}
                             </Text>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         width: '90%',
         maxWidth: 420,
         height: '80%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#0F0E0D',
-        backgroundColor: '#0F0E0D',
+        borderBottomColor: '#31241F',
+        backgroundColor: '#31241F',
     },
     companyName: {
         fontSize: 22,
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
     },
     sectorText: {
         fontSize: 13,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         textTransform: 'uppercase',
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#201D1C',
+        backgroundColor: '#533D35',
         marginHorizontal: 10,
     },
     kpiLabel: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         fontWeight: '700',
         marginBottom: 4,
     },
@@ -315,11 +315,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#0F0E0D',
+        borderColor: '#31241F',
     },
     strategyInfo: {
         flexDirection: 'row',
@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
     },
     strategyDesc: {
         fontSize: 11,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     controls: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -384,34 +384,34 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#123AB8',
+        color: '#0A2A92',
         fontSize: 12,
         lineHeight: 18,
     },
     footer: {
         padding: 20,
         borderTopWidth: 1,
-        borderTopColor: '#0F0E0D',
-        backgroundColor: '#0F0E0D',
+        borderTopColor: '#31241F',
+        backgroundColor: '#31241F',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#E06B6B',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     sellBtnText: {
-        color: '#E06B6B',
+        color: '#E9B8C9',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,
     },
     saveBtn: {
-        backgroundColor: '#EDE8E4',
+        backgroundColor: '#FFFFFF',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',

@@ -47,8 +47,8 @@ const BlackMarketScreen: React.FC = () => {
     return (
         <AppLaunchLoader
             appName="Black Market"
-            appIcon={<MaterialCommunityIcons name="incognito" size={64} color="#EDE8E4" />}
-            backgroundColor="#0F0E0D"
+            appIcon={<MaterialCommunityIcons name="incognito" size={64} color="#FFFFFF" />}
+            backgroundColor="#31241F"
         >
             <SafeAreaView style={styles.container}>
                 {/* Layer 1: Hub View */}

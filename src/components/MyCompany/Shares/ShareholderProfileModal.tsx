@@ -208,16 +208,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
 
     const getTrustColor = (trust: number) => {
-        if (trust < 30) return '#E06B6B'; // Red
-        if (trust < 50) return '#E3A857'; // Orange
-        if (trust < 70) return '#E3A857'; // Yellow
-        return '#5FB37A'; // Green
+        if (trust < 30) return '#E9B8C9'; // Red
+        if (trust < 50) return '#E9B8C9'; // Orange
+        if (trust < 70) return '#E9B8C9'; // Yellow
+        return '#5992C6'; // Green
     };
 
     const getReactionColor = () => {
-        if (offerPremium < 0) return '#E06B6B'; // Red - Insulted
-        if (offerPremium <= 20) return '#E3A857'; // Yellow - Neutral
-        return '#5FB37A'; // Green - Happy
+        if (offerPremium < 0) return '#E9B8C9'; // Red - Insulted
+        if (offerPremium <= 20) return '#E9B8C9'; // Yellow - Neutral
+        return '#5992C6'; // Green - Happy
     };
 
     const getReactionLabel = () => {
@@ -242,9 +242,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
     const getAdviceBubbleStyle = () => {
         const baseStyle = styles.adviceBubble;
-        if (adviceQuality === 'good') return [baseStyle, { borderColor: '#5FB37A', backgroundColor: 'rgba(48, 209, 88, 0.1)' }];
-        if (adviceQuality === 'bad') return [baseStyle, { borderColor: '#E06B6B', backgroundColor: 'rgba(255, 69, 58, 0.1)' }];
-        return [baseStyle, { borderColor: '#E3A857', backgroundColor: 'rgba(255, 214, 10, 0.1)' }];
+        if (adviceQuality === 'good') return [baseStyle, { borderColor: '#5992C6', backgroundColor: 'rgba(48, 209, 88, 0.1)' }];
+        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255, 69, 58, 0.1)' }];
+        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255, 214, 10, 0.1)' }];
     };
 
     // ============================================================================
@@ -404,9 +404,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Current Stock Price Info */}
-                                <View style={{ backgroundColor: '#0F0E0D', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
-                                    <Text style={{ fontSize: 14, color: '#8A807B', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
-                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#5FB37A' }}>{formatPrice(stockPrice)}</Text>
+                                <View style={{ backgroundColor: '#31241F', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
+                                    <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#5992C6' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
                                 {/* Context Text */}
@@ -502,7 +502,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <Text style={styles.priceLabel}>
                                         {tradeMode === 'buy' ? t('shp.youPay') : t('shp.youReceive')}
                                     </Text>
-                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#5FB37A' }]}>
+                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#5992C6' }]}>
                                         {formatMoney(calculateOfferPrice())}
                                     </Text>
                                 </View>
@@ -511,7 +511,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 <TouchableOpacity
                                     style={[
                                         styles.makeOfferButton,
-                                        { backgroundColor: tradeMode === 'buy' ? '#5FB37A' : '#E06B6B' }
+                                        { backgroundColor: tradeMode === 'buy' ? '#5992C6' : '#E9B8C9' }
                                     ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
@@ -541,7 +541,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     >
                         {animationState === 'loading' && (
                             <View style={styles.animationContent}>
-                                <ActivityIndicator size="large" color="#123AB8" />
+                                <ActivityIndicator size="large" color="#0A2A92" />
                                 <Text style={styles.animationText}>
                                     {tradeMode === 'buy' ? t('shp.negotiating') : t('shp.processing')}
                                 </Text>
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '85%',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         borderWidth: 1,
@@ -630,17 +630,17 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 40,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     memberName: {
         fontSize: 28,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 8,
         letterSpacing: 0.5,
     },
     traitBadge: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 16,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     traitText: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     trustContainer: {
         width: '100%',
@@ -666,19 +666,19 @@ const styles = StyleSheet.create({
     trustLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     trustValue: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     trustBarBg: {
         width: '100%',
         height: 10,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 5,
         overflow: 'hidden',
     },
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
     },
     closeButtonText: {
         fontSize: 16,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontWeight: 'bold',
     },
     tabSwitcher: {
@@ -713,22 +713,22 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#333',
     },
     tabActive: {
-        backgroundColor: '#123AB8',
-        borderColor: '#123AB8',
+        backgroundColor: '#0A2A92',
+        borderColor: '#0A2A92',
     },
     tabText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     tabTextActive: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     content: {
         flex: 1,
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         padding: 20,
         borderRadius: 20,
         borderWidth: 1,
@@ -759,12 +759,12 @@ const styles = StyleSheet.create({
     actionButtonText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     actionButtonSubtext: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
     },
     adviceBubble: {
         padding: 20,
@@ -774,7 +774,7 @@ const styles = StyleSheet.create({
     },
     adviceText: {
         fontSize: 16,
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         lineHeight: 24,
         fontStyle: 'italic',
     },
@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
     stepperLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -800,26 +800,26 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#123AB8',
+        backgroundColor: '#0A2A92',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#123AB8',
+        borderColor: '#0A2A92',
     },
     stepperButtonDisabled: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderColor: '#444',
         opacity: 0.5,
     },
     stepperButtonText: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     stepperDisplay: {
         flex: 1,
         height: 56,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: '#444',
@@ -829,11 +829,11 @@ const styles = StyleSheet.create({
     stepperValue: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     stepperPremium: {
         fontSize: 12,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginTop: 2,
     },
     reactionContainer: {
@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
     reactionLabel: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     reactionChance: {
         fontSize: 16,
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
     reactionBarBg: {
         width: '100%',
         height: 16,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         borderRadius: 8,
         overflow: 'hidden',
     },
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
     makeOfferButtonText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
     },
@@ -904,7 +904,7 @@ const styles = StyleSheet.create({
     animationText: {
         fontSize: 28,
         fontWeight: '900',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 2,
         textAlign: 'center',
     },
@@ -918,37 +918,37 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         alignItems: 'center',
         borderWidth: 2,
         borderColor: '#333',
     },
     modeButtonBuyActive: {
         backgroundColor: 'rgba(48, 209, 88, 0.2)',
-        borderColor: '#5FB37A',
+        borderColor: '#5992C6',
     },
     modeButtonSellActive: {
         backgroundColor: 'rgba(255, 69, 58, 0.2)',
-        borderColor: '#E06B6B',
+        borderColor: 'rgba(255,255,255,0.08)',
     },
     modeButtonText: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         letterSpacing: 1,
     },
     modeButtonTextActive: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
     },
     tradeContext: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         textAlign: 'center',
         marginBottom: 20,
         fontStyle: 'italic',
     },
     priceDisplay: {
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,
@@ -958,7 +958,7 @@ const styles = StyleSheet.create({
     },
     priceLabel: {
         fontSize: 14,
-        color: '#8A807B',
+        color: 'rgba(255,255,255,0.48)',
         marginBottom: 8,
         textTransform: 'uppercase',
         letterSpacing: 1,
@@ -966,6 +966,6 @@ const styles = StyleSheet.create({
     priceValue: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#123AB8',
+        color: '#0A2A92',
     },
 });

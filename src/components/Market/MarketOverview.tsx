@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: theme.typography.subtitle,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -79,17 +79,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#8A807B',
+    color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption + 1,
   },
   value: {
-    color: '#EDE8E4',
+    color: '#FFFFFF',
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
-  positive: { color: '#5FB37A' },
-  negative: { color: '#E06B6B' },
-  warning: { color: '#E3A857' },
+  positive: { color: '#5992C6' },
+  negative: { color: '#E9B8C9' },
+  warning: { color: '#E9B8C9' },
   helper: {
     color: 'rgba(160,160,160,0.6)',
     fontSize: theme.typography.caption,

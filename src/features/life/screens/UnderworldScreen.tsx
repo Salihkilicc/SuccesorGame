@@ -25,12 +25,12 @@ import GodModeModal from '../../../components/GodModeModal';
 
 const GRADIENTS = {
     purplePink: ['#0A2A92', '#0A2A92'],
-    greenTeal: ['#5FB37A', '#5FB37A'],
-    redCasino: ['#E06B6B', '#E06B6B'],
-    darkGrey: ['#0F0E0D', '#2A2624'],
+    greenTeal: ['#5992C6', '#5992C6'],
+    redCasino: ['#E9B8C9', '#E9B8C9'],
+    darkGrey: ['#31241F', '#674C41'],
     hookupFire: ['#0A2A92', '#0A2A92'],
-    networkBlue: ['#0A2A92', '#5FB37A'],
-    bluePurple: ['#5992C6', '#123AB8'],
+    networkBlue: ['#0A2A92', '#5992C6'],
+    bluePurple: ['#5992C6', '#0A2A92'],
 };
 
 const SECTION_ESSENTIALS = [
@@ -90,7 +90,7 @@ const UnderworldScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
-                <MaterialCommunityIcons name={item.icon} size={32} color="#EDE8E4" style={styles.appIconVector} />
+                <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
             </LinearGradient>
             <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
         </Pressable>
@@ -184,7 +184,7 @@ export default UnderworldScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0F0E0D',
+        backgroundColor: '#31241F',
     },
     safeArea: {
         flex: 1,
@@ -197,17 +197,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 36,
         fontWeight: '300',
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         letterSpacing: 8,
         textTransform: 'uppercase',
     },
     headerAccent: {
         width: 44,
         height: 2,
-        backgroundColor: '#E9B8C9',
+        backgroundColor: '#533D35',
         marginTop: 14,
         borderRadius: 2,
-        shadowColor: '#E9B8C9',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#3B3632',
+        color: '#7F5E51',
         marginBottom: 20,
         letterSpacing: 4,
         textTransform: 'uppercase',
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 3,
     },
     appIconLabel: {
-        color: '#EDE8E4',
+        color: '#FFFFFF',
         fontSize: 11,
         fontWeight: '500',
         textAlign: 'center',
