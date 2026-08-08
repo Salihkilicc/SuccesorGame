@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     activeTab: {
-        backgroundColor: 'rgba(199,52,202,0.18)',
+        backgroundColor: 'rgba(5,168,246,0.18)',
         borderColor: 'rgba(255,255,255,0.08)',
         shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },

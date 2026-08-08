@@ -65,15 +65,29 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
     const leverage = getCurrentLeverage(companyValue);
     const monthlyInterest = getMonthlyInterestTotal();
 
-    // Credit Rating Display
+    // ------------------------------------------------------------------
+    //  CREDIT RATING
+    // ------------------------------------------------------------------
+    //  Six of these seven grades used to be painted with the loss red -
+    //  including AAA. The best rating a company can hold was drawn in the
+    //  colour that means "you are losing money", which is worse than merely
+    //  ugly: it made the grade unreadable as information.
+    //
+    //  Red now appears on ONE grade, and only because junk debt genuinely is
+    //  the loss case. Everything investment grade is plain white; the letter
+    //  itself already carries the ranking, so colour does not need to repeat
+    //  it. Below investment grade gets the caution blue.
+    // ------------------------------------------------------------------
     const getCreditRating = () => {
-        if (creditScore >= 800) return { label: 'AAA', color: '#FF8A8A', description: t('finance.excellent') };
-        if (creditScore >= 750) return { label: 'AA', color: '#FF8A8A', description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: '#FFFFFF', description: t('finance.good') };
-        if (creditScore >= 650) return { label: 'BBB', color: '#FF8A8A', description: t('finance.fair') };
-        if (creditScore >= 600) return { label: 'BB', color: '#FF8A8A', description: t('finance.moderate') };
-        if (creditScore >= 500) return { label: 'B', color: '#FF8A8A', description: t('finance.risky') };
-        return { label: 'C', color: '#FF8A8A', description: t('finance.junk') };
+        const good = theme.colors.textPrimary;
+        const caution = theme.colors.warning;
+        if (creditScore >= 800) return { label: 'AAA', color: good, description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: good, description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: good, description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: good, description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: caution, description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: caution, description: t('finance.risky') };
+        return { label: 'C', color: theme.colors.negative, description: t('finance.junk') };
     };
 
     const rating = getCreditRating();
@@ -101,7 +115,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.navGrid}>
                     {/* OWNER INJECTION BUTTON */}
                     <TouchableOpacity style={[styles.navCard, { borderColor: 'rgba(255,255,255,0.06)', flex: 1 }]} onPress={() => setShowInjection(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(200,192,239,0.2)' }]}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
                         <View style={{ flex: 1 }}>

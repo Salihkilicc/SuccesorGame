@@ -315,8 +315,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   costChip: {
-    backgroundColor: 'rgba(199,52,202,0.1)',
-    borderColor: 'rgba(199,52,202,0.3)',
+    backgroundColor: 'rgba(5,168,246,0.1)',
+    borderColor: 'rgba(5,168,246,0.3)',
   },
   costText: {
     color: '#FF8A8A',

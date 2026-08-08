@@ -150,13 +150,13 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             styles.controlBanner,
                             {
                                 backgroundColor:
-                                    control === 'lost' ? 'rgba(199,52,202,0.12)'
-                                        : control === 'contested' ? 'rgba(199,52,202,0.12)'
-                                            : 'rgba(200,192,239,0.10)',
+                                    control === 'lost' ? 'rgba(5,168,246,0.12)'
+                                        : control === 'contested' ? 'rgba(5,168,246,0.12)'
+                                            : 'rgba(207,208,210,0.10)',
                                 borderColor:
-                                    control === 'lost' ? 'rgba(199,52,202,0.35)'
-                                        : control === 'contested' ? 'rgba(199,52,202,0.35)'
-                                            : 'rgba(200,192,239,0.30)',
+                                    control === 'lost' ? 'rgba(5,168,246,0.35)'
+                                        : control === 'contested' ? 'rgba(5,168,246,0.35)'
+                                            : 'rgba(207,208,210,0.30)',
                             },
                         ]}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
 
     heroNote: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
-        backgroundColor: 'rgba(200,192,239,0.10)', borderRadius: 8,
+        backgroundColor: 'rgba(207,208,210,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
     },
     dampText: { color: '#FFFFFF', fontSize: 10, lineHeight: 14, fontWeight: '600' },

@@ -207,7 +207,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
 const EmptyState = ({ onNew }: { onNew: () => void }) => (
     <View style={styles.emptyState}>
         <LinearGradient
-            colors={['rgba(199,52,202,0.12)', 'rgba(199,52,202,0.04)']}
+            colors={['rgba(5,168,246,0.12)', 'rgba(5,168,246,0.04)']}
             style={styles.emptyIconCircle}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(199,52,202,0.15)',
+        borderBottomColor: 'rgba(5,168,246,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -413,10 +413,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12,
         zIndex: 10,
-        backgroundColor: 'rgba(199,52,202,0.08)',
+        backgroundColor: 'rgba(5,168,246,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
     },
     headerCenter: {
         flex: 1,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     deleteBtn: {
         padding: 4,
         borderRadius: 8,
-        backgroundColor: 'rgba(199,52,202,0.06)',
+        backgroundColor: 'rgba(5,168,246,0.06)',
     },
     notePreview: {
         fontSize: 13,
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
         marginBottom: 8,
     },
     emptyTitle: {
@@ -577,9 +577,9 @@ const styles = StyleSheet.create({
     },
     emptyAction: {
         marginTop: 8,
-        backgroundColor: 'rgba(199,52,202,0.1)',
+        backgroundColor: 'rgba(5,168,246,0.1)',
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.3)',
+        borderColor: 'rgba(5,168,246,0.3)',
         borderRadius: 12,
         paddingVertical: 12,
         paddingHorizontal: 32,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     },
     editorRule: {
         height: StyleSheet.hairlineWidth,
-        backgroundColor: 'rgba(199,52,202,0.15)',
+        backgroundColor: 'rgba(5,168,246,0.15)',
         marginHorizontal: 16,
         marginBottom: 12,
     },

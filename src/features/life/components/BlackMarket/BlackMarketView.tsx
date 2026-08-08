@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     lockOverlay: {
         marginTop: 10,
         padding: 8,
-        backgroundColor: 'rgba(199,52,202,0.2)',
+        backgroundColor: 'rgba(5,168,246,0.2)',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: COLORS.bloodRed

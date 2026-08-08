@@ -111,7 +111,7 @@ const ProposalWizardView: React.FC<Props> = ({
                         style={[styles.actionButton, {
                             justifyContent: 'space-between',
                             backgroundColor: ring.instanceId === selectedRingInstanceId
-                                ? 'rgba(199,52,202,0.18)'
+                                ? 'rgba(5,168,246,0.18)'
                                 : 'rgba(255,255,255,0.04)',
                             borderWidth: ring.instanceId === selectedRingInstanceId ? 1 : 0,
                             borderColor: theme.colors.accent,
@@ -166,7 +166,7 @@ const ProposalWizardView: React.FC<Props> = ({
             {/* Ring Check */}
             <View style={[styles.actionButton, {
                 justifyContent: 'space-between',
-                backgroundColor: ownedRings.length > 0 ? 'rgba(200,192,239,0.1)' : 'rgba(199,52,202,0.1)',
+                backgroundColor: ownedRings.length > 0 ? 'rgba(207,208,210,0.1)' : 'rgba(5,168,246,0.1)',
             }]}>
                 {ownedRings.length === 0 ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>

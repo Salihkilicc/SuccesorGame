@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   tabActive: {
-    backgroundColor: 'rgba(199,52,202,0.15)',
+    backgroundColor: 'rgba(5,168,246,0.15)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
   },

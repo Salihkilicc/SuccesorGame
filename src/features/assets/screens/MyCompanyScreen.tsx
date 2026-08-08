@@ -5,7 +5,6 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, ScrollView, StyleSheet, Text, Pressable, Alert, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
@@ -28,13 +27,21 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#434B50' }: any) => (
+//
+//  Each of the four cards used to carry its own colour, and the colours were
+//  left over from two themes ago: the comments said Gold, Blue, Purple, Green
+//  while the values were all magenta or lavender. Four departments in four
+//  arbitrary colours is also the thing that made the screen look scattered -
+//  the colour said nothing, since none of them mean anything.
+//
+//  They share one surface now. The icon distinguishes them; the press state
+//  lifts the card by one rung of the elevation ladder instead of tinting it.
+const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
       styles.deptCard,
-      { borderColor: color },
-      pressed && { opacity: 0.8, backgroundColor: color.replace('0.5', '0.1') } // Subtle tint on press if rgba, or just opacity
+      pressed && styles.deptCardPressed,
     ]}>
     <Text style={{ fontSize: 32 }}>{icon}</Text>
     <Text style={styles.deptTitle}>{title}</Text>
@@ -170,14 +177,8 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
-        colors={['#1C242C', '#1C242C', '#1C242C']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* FIXED HEADER */}
         <View style={styles.header}>
@@ -188,7 +189,7 @@ const MyCompanyScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={theme.colors.textPrimary} />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -222,7 +223,7 @@ const MyCompanyScreen = () => {
             </View>
 
             {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#434B50', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: theme.colors.surfaceRaised, marginVertical: 16 }} />
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -238,7 +239,7 @@ const MyCompanyScreen = () => {
               />
             </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: '#434B50', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: theme.colors.surfaceRaised, marginVertical: 16 }} />
 
             {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
                 su an yavas biriken bir itibar gostergesi.
@@ -263,7 +264,6 @@ const MyCompanyScreen = () => {
               title={t('company.finance')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => toggleModal('finance', true)}
-              color="rgba(199,52,202,0.5)" // Gold
             />
 
             <DepartmentCard
@@ -271,7 +271,6 @@ const MyCompanyScreen = () => {
               title={t('company.products')}
               subtitle={`${activeProductsCount} Active`}
               onPress={() => navigation.navigate('Products')}
-              color="rgba(200,192,239,0.5)" // Blue
             />
 
             <DepartmentCard
@@ -279,14 +278,12 @@ const MyCompanyScreen = () => {
               title={t('company.financialReport')}
               subtitle={t('company.expensesProfitsRoi')}
               onPress={() => navigation.navigate('FinancialReport')}
-              color="rgba(199,52,202,0.5)" // Purple
             />
             <DepartmentCard
               icon="📈"
               title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => toggleModal('shareControl', true)}
-              color="rgba(200,192,239,0.5)" // Green
             />
           </View>
 
@@ -381,7 +378,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(199,52,202,0.15)',
+    borderBottomColor: theme.colors.border,
     minHeight: 80,
     backgroundColor: 'transparent',
   },
@@ -394,10 +391,10 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 12,
     zIndex: 10,
-    backgroundColor: 'rgba(199,52,202,0.08)',
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(199,52,202,0.2)',
+    borderColor: theme.colors.border,
   },
   headerCenter: {
     flex: 1,
@@ -407,17 +404,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#434B50',
+    backgroundColor: theme.colors.primary,
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#1C242C',
+    shadowColor: theme.colors.background,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -429,7 +426,7 @@ const styles = StyleSheet.create({
     // Dolgu, cerceve degil: bu kart eskiden saydamdi ve yalnizca ince bir
     // kenarlikla duruyordu, o yuzden zeminin uzerinde "yokmus gibi" goruntu
     // veriyordu. Renk artik yuzeyde.
-    backgroundColor: '#434B50',
+    backgroundColor: theme.colors.surfaceRaised,
     flexBasis: '48%',
     borderRadius: 20,
     padding: 20,
@@ -439,13 +436,17 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 120,
     justifyContent: 'center',
-    shadowColor: '#1C242C',
+    shadowColor: theme.colors.background,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
     elevation: 8,
   },
-  deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
+  deptCardPressed: { backgroundColor: theme.colors.surfaceHigh, transform: [{ scale: 0.98 }] },
+  deptTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: 0.3 },
   deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
-  sharePrice: { fontSize: 18, fontWeight: '700', color: '#FF8A8A' }, // Gold for money
+  // The share PRICE is not a gain or a loss, it is just a number - the
+  // percentage next to it carries the direction. It was painted with the loss
+  // red, so the headline figure always read as bad news.
+  sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
 });

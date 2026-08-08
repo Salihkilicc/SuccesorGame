@@ -267,7 +267,7 @@ const CalendarScreen = () => {
                         <View style={styles.modalCard}>
                             {/* Top glow strip */}
                             <LinearGradient
-                                colors={['rgba(199,52,202,0.3)', 'transparent']}
+                                colors={['rgba(5,168,246,0.3)', 'transparent']}
                                 style={styles.modalTopGlow}
                                 start={{ x: 0.5, y: 0 }}
                                 end={{ x: 0.5, y: 1 }}
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(199,52,202,0.15)',
+        borderBottomColor: 'rgba(5,168,246,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -331,10 +331,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12, // Align closer to the bottom of the header consistently
         zIndex: 10,
-        backgroundColor: 'rgba(199,52,202,0.08)',
+        backgroundColor: 'rgba(5,168,246,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
     },
     headerCenter: {
         flex: 1,
@@ -377,8 +377,8 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     monthBlockCurrent: {
-        backgroundColor: 'rgba(199,52,202,0.05)',
-        borderColor: 'rgba(199,52,202,0.18)',
+        backgroundColor: 'rgba(5,168,246,0.05)',
+        borderColor: 'rgba(5,168,246,0.18)',
     },
     monthHeader: {
         flexDirection: 'row',
@@ -400,10 +400,10 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     currentMonthBadge: {
-        backgroundColor: 'rgba(199,52,202,0.18)',
+        backgroundColor: 'rgba(5,168,246,0.18)',
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.35)',
+        borderColor: 'rgba(5,168,246,0.35)',
         paddingHorizontal: 6,
         paddingVertical: 2,
     },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         letterSpacing: 0.5,
     },
-    weekLabelWeekend: { color: 'rgba(200,192,239,0.6)' },
+    weekLabelWeekend: { color: 'rgba(207,208,210,0.6)' },
 
     // Week row
     weekRow: {
@@ -454,9 +454,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     dayCircleEvent: {
-        backgroundColor: 'rgba(199,52,202,0.1)',
+        backgroundColor: 'rgba(5,168,246,0.1)',
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.3)',
+        borderColor: 'rgba(5,168,246,0.3)',
     },
     dayNum: {
         fontSize: 14,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         bottom: 1,
         fontSize: 7,
         color: '#FF8A8A',
-        textShadowColor: 'rgba(199,52,202,0.9)',
+        textShadowColor: 'rgba(5,168,246,0.9)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
     },
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#434B50',
         borderRadius: 22,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.38)',
+        borderColor: 'rgba(5,168,246,0.38)',
         paddingHorizontal: 28,
         paddingTop: 32,
         paddingBottom: 24,
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     modalRule: {
         width: '75%',
         height: StyleSheet.hairlineWidth,
-        backgroundColor: 'rgba(199,52,202,0.3)',
+        backgroundColor: 'rgba(5,168,246,0.3)',
         marginBottom: 18,
     },
     modalDesc: {
@@ -575,8 +575,8 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.35)',
-        backgroundColor: 'rgba(199,52,202,0.08)',
+        borderColor: 'rgba(5,168,246,0.35)',
+        backgroundColor: 'rgba(5,168,246,0.08)',
         paddingVertical: 14,
         alignItems: 'center',
     },

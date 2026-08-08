@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     warningBanner: {
-        backgroundColor: 'rgba(199,52,202,0.15)',
+        backgroundColor: 'rgba(5,168,246,0.15)',
         borderRadius: 12,
         padding: 12,
         marginBottom: 20,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     stockWarningBox: {
-        backgroundColor: 'rgba(199,52,202,0.15)',
+        backgroundColor: 'rgba(5,168,246,0.15)',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,

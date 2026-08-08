@@ -65,7 +65,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 )
             } else {
                 ActionButton = (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(200,192,239,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(207,208,210,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
                         <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );

@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
     },
     maxTierBadge: {
-        backgroundColor: 'rgba(199,52,202,0.1)',
+        backgroundColor: 'rgba(5,168,246,0.1)',
         padding: 12,
         borderRadius: 12,
         alignItems: 'center',

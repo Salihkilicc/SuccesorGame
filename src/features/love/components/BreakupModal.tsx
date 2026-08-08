@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
     },
     costContainer: {
         width: '100%',
-        backgroundColor: 'rgba(199,52,202,0.15)', // Red tint
+        backgroundColor: 'rgba(5,168,246,0.15)', // Red tint
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.3)',
+        borderColor: 'rgba(5,168,246,0.3)',
     },
     costLabel: {
         color: theme.colors.danger,

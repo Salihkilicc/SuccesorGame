@@ -139,7 +139,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                 )}
 
                 <LinearGradient
-                    colors={['rgba(199,52,202,0.5)', 'rgba(199,52,202,0.4)', 'rgba(199,52,202,0.4)', 'rgba(200,192,239,0.5)']}
+                    colors={['rgba(5,168,246,0.5)', 'rgba(5,168,246,0.4)', 'rgba(5,168,246,0.4)', 'rgba(207,208,210,0.5)']}
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
                     locations={[0, 0.2, 0.8, 1]}

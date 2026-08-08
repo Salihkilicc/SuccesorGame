@@ -177,6 +177,14 @@ const PALETTE = new Set([
     '#8C9494', '#CFD0D2',                                     // the greys
     '#4ADE80', '#FF8A8A',                                     // profit and loss ONLY
 ]);
+//  Checked in rgba() form too. The last palette change only rewrote hex, so
+//  59 files quietly kept the previous theme's magenta as rgba(199,52,202,a) -
+//  including the four department cards on My Company, whose comments still
+//  read "Gold" and "Green" while the values were magenta. A colour spelled in
+//  decimal is the same colour; the audit has to read both spellings.
+const rgbToHex = (r, g, b) =>
+    '#' + [r, g, b].map(v => (+v).toString(16).padStart(2, '0')).join('').toUpperCase();
+
 for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith('theme.ts'))) {
     const seen = new Map();
     read(f).split('\n').forEach((line, i) => {
@@ -185,9 +193,39 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             const hex = m[0].toUpperCase();
             if (!PALETTE.has(hex) && !seen.has(hex)) seen.set(hex, i + 1);
         }
+        for (const m of line.matchAll(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*[,)]/g)) {
+            const hex = rgbToHex(m[1], m[2], m[3]);
+            if (!PALETTE.has(hex) && !seen.has(hex)) seen.set(hex, i + 1);
+        }
     });
     for (const [hex, ln] of seen) {
         problems.palette.push(`${rel(f)}:${ln}  ${hex}`);
+    }
+}
+
+// --- 0d2) The profit/loss colours used as decoration -------------------------
+//  Green and red are the only two colours in the app that MEAN something, and
+//  that only works if they appear nowhere else. They kept drifting: the credit
+//  rating painted six of its seven grades red (AAA included), the back arrow
+//  was red, and the share price - a number with no direction of its own - was
+//  red. At that point red no longer says "loss", it just says "text".
+//
+//  So: the signal tokens may be a text colour and nothing else. A fill or a
+//  border using them is the drift starting again.
+{
+    const SIGNAL = /(positive|negative|success|danger|error)\b/;
+    for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+        read(f).split('\n').forEach((line, i) => {
+            if (/^\s*(\/\/|\*)/.test(line)) return;
+            // matchAll, not match: these styles are often written one per line
+            // as `{ backgroundColor: x, borderColor: y }`, and stopping at the
+            // first hit reported the fill while missing the border beside it.
+            for (const m of line.matchAll(/(backgroundColor|border[A-Za-z]*Color):\s*(?:theme\.)?colors\.(\w+)/g)) {
+                if (SIGNAL.test(m[2])) {
+                    problems.palette.push(`${rel(f)}:${i + 1}  ${m[2]} used as ${m[1]}`);
+                }
+            }
+        });
     }
 }
 

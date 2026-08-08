@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         height: 36,
         backgroundColor: 'rgba(28,36,44,0.95)',
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(199,52,202,0.18)',
+        borderBottomColor: 'rgba(5,168,246,0.18)',
         justifyContent: 'center',
     },
     listContent: {

@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   buyButton: {
-    backgroundColor: 'rgba(200,192,239,0.12)',
+    backgroundColor: 'rgba(207,208,210,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)',
   },
   sellButton: {
-    backgroundColor: 'rgba(199,52,202,0.12)',
+    backgroundColor: 'rgba(5,168,246,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,

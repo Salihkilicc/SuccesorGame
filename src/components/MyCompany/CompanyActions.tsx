@@ -13,10 +13,10 @@ interface CompanyActionsProps {
 }
 
 const ACTIONS = [
-  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#FF8A8A' }, // Gold
-  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(200,192,239,0.5)', glowColor: '#CFD0D2' }, // Green
-  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(200,192,239,0.5)', glowColor: '#05A8F6' }, // Blue
-  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#05A8F6' }, // Purple
+  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(5,168,246,0.5)', glowColor: '#FF8A8A' }, // Gold
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(207,208,210,0.5)', glowColor: '#CFD0D2' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(207,208,210,0.5)', glowColor: '#05A8F6' }, // Blue
+  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(5,168,246,0.5)', glowColor: '#05A8F6' }, // Purple
 ] as const;
 
 const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {

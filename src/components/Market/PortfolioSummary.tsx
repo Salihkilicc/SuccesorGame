@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(199,52,202,0.12)',
+    backgroundColor: 'rgba(5,168,246,0.12)',
     borderRadius: 12,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,

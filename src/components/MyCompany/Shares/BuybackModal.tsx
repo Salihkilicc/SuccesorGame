@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     amountCard: {
-        backgroundColor: 'rgba(200,192,239,0.15)',
+        backgroundColor: 'rgba(207,208,210,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',

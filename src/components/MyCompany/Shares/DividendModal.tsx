@@ -266,8 +266,8 @@ const DividendModal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     cashHint: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 4 },
     flagBox: {
-        backgroundColor: 'rgba(199,52,202,0.10)', borderRadius: 12,
-        borderWidth: 1, borderColor: 'rgba(199,52,202,0.30)',
+        backgroundColor: 'rgba(5,168,246,0.10)', borderRadius: 12,
+        borderWidth: 1, borderColor: 'rgba(5,168,246,0.30)',
         padding: 12, marginBottom: 12,
     },
     flagText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16 },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     cashCard: {
-        backgroundColor: 'rgba(200,192,239,0.15)',
+        backgroundColor: 'rgba(207,208,210,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     profitHighlight: {
-        backgroundColor: 'rgba(200,192,239,0.2)',
+        backgroundColor: 'rgba(207,208,210,0.2)',
         borderRadius: 12,
         padding: 20,
         alignItems: 'center',

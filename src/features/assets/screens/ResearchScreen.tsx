@@ -25,7 +25,7 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => onNavigate('LAB')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(200,192,239,0.15)' }]}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.15)' }]}>
                         <Text style={styles.cardIcon}>🧪</Text>
                     </View>
                     <View style={styles.cardContent}>
@@ -40,7 +40,7 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => (navigation as any).navigate('TechTree')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(199,52,202,0.15)' }]}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(5,168,246,0.15)' }]}>
                         <Text style={styles.cardIcon}>🧬</Text>
                     </View>
                     <View style={styles.cardContent}>

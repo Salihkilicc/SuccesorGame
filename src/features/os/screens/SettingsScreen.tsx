@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(199,52,202,0.15)',
+        borderBottomColor: 'rgba(5,168,246,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -331,10 +331,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12,
         zIndex: 10,
-        backgroundColor: 'rgba(199,52,202,0.08)',
+        backgroundColor: 'rgba(5,168,246,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
     },
     headerCenter: {
         flex: 1,

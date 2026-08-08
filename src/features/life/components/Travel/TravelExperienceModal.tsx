@@ -279,12 +279,12 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     souvenirHint: {
-        backgroundColor: 'rgba(199,52,202,0.3)',
+        backgroundColor: 'rgba(5,168,246,0.3)',
         padding: 16,
         borderRadius: 12,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.5)',
+        borderColor: 'rgba(5,168,246,0.5)',
     },
     souvenirHintText: {
         color: '#FFFFFF',

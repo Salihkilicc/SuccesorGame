@@ -54,16 +54,16 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                     <View style={styles.content}>
                         <TouchableOpacity style={styles.actionButton} onPress={handleAddMoney} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(200,192,239,0.2)', 'rgba(200,192,239,0.05)']}
+                                colors={['rgba(207,208,210,0.2)', 'rgba(207,208,210,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="cash-multiple" size={24} color="#CFD0D2" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(199,52,202,0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
+                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(5,168,246,0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(199,52,202,0.2)', 'rgba(199,52,202,0.05)']}
+                                colors={['rgba(5,168,246,0.2)', 'rgba(5,168,246,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="skull" size={24} color="#FF8A8A" />
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(199,52,202,0.2)',
-        backgroundColor: 'rgba(199,52,202,0.05)',
+        borderBottomColor: 'rgba(5,168,246,0.2)',
+        backgroundColor: 'rgba(5,168,246,0.05)',
     },
     title: {
         fontSize: 18,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(200,192,239,0.3)',
+        borderColor: 'rgba(207,208,210,0.3)',
         gap: 12,
         overflow: 'hidden',
     },

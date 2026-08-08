@@ -676,10 +676,10 @@ const styles = StyleSheet.create({
   ageChips: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(199,52,202,0.12)',
+    backgroundColor: 'rgba(5,168,246,0.12)',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(199,52,202,0.25)',
+    borderColor: 'rgba(5,168,246,0.25)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 8,
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
   ageChipDivider: {
     width: 1,
     height: 22,
-    backgroundColor: 'rgba(199,52,202,0.3)',
+    backgroundColor: 'rgba(5,168,246,0.3)',
   },
   // --- Legacy stubs ---
   ageRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
     letterSpacing: 4,
     textTransform: 'uppercase',
     textAlign: 'center',
-    textShadowColor: 'rgba(199,52,202,0.4)', // Softer glow
+    textShadowColor: 'rgba(5,168,246,0.4)', // Softer glow
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 6,
   },

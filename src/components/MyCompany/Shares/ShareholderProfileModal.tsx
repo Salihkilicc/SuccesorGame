@@ -243,9 +243,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
     const getAdviceBubbleStyle = () => {
         const baseStyle = styles.adviceBubble;
-        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(200,192,239,0.1)' }];
-        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
-        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
+        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(207,208,210,0.1)' }];
+        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(5,168,246,0.1)' }];
+        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(5,168,246,0.1)' }];
     };
 
     // ============================================================================
@@ -925,11 +925,11 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonBuyActive: {
-        backgroundColor: 'rgba(200,192,239,0.2)',
+        backgroundColor: 'rgba(207,208,210,0.2)',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonSellActive: {
-        backgroundColor: 'rgba(199,52,202,0.2)',
+        backgroundColor: 'rgba(5,168,246,0.2)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     modeButtonText: {

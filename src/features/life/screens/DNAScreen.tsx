@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'rgba(199,52,202,0.12)',
+        backgroundColor: 'rgba(5,168,246,0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.25)',
+        borderColor: 'rgba(5,168,246,0.25)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -352,13 +352,13 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     buffBadge: {
-        backgroundColor: 'rgba(200,192,239,0.15)',
+        backgroundColor: 'rgba(207,208,210,0.15)',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 8,
         marginLeft: 6,
         borderWidth: 1,
-        borderColor: 'rgba(200,192,239,0.3)',
+        borderColor: 'rgba(207,208,210,0.3)',
     },
     buffText: {
         fontSize: 9,
@@ -421,9 +421,9 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     luxuryCard: {
-        borderColor: 'rgba(199,52,202,0.35)',
+        borderColor: 'rgba(5,168,246,0.35)',
         borderWidth: 1,
-        backgroundColor: 'rgba(199,52,202,0.04)',
+        backgroundColor: 'rgba(5,168,246,0.04)',
     },
     luxuryContent: {
         gap: 10,
@@ -449,11 +449,11 @@ const styles = StyleSheet.create({
     luxuryProgressBarBg: {
         flex: 1,
         height: 10,
-        backgroundColor: 'rgba(199,52,202,0.08)',
+        backgroundColor: 'rgba(5,168,246,0.08)',
         borderRadius: 5,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
     },
     luxuryProgressBarFill: {
         height: '100%',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(199,52,202,0.2)',
+        borderColor: 'rgba(5,168,246,0.2)',
     },
     luxuryBuffText: {
         fontSize: 10,

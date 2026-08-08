@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   hostileBtn: {
-    backgroundColor: 'rgba(199,52,202,0.1)',
+    backgroundColor: 'rgba(5,168,246,0.1)',
     borderColor: theme.colors.destructive,
   },
   hostileText: {

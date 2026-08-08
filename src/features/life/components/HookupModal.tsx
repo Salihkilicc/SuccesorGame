@@ -399,12 +399,12 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     chip: {
-        backgroundColor: 'rgba(200,192,239,0.15)', // Accent soft
+        backgroundColor: 'rgba(207,208,210,0.15)', // Accent soft
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(200,192,239,0.3)',
+        borderColor: 'rgba(207,208,210,0.3)',
     },
     chipText: {
         color: '#FFFFFF',

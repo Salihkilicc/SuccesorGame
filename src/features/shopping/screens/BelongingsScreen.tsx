@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         fontSize: 28, // Scaled for card
         fontWeight: '800',
         letterSpacing: 1,
-        textShadowColor: 'rgba(199,52,202,0.15)',
+        textShadowColor: 'rgba(5,168,246,0.15)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
     },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     badgeContainer: {
         paddingHorizontal: 8,
         paddingVertical: 2,
-        backgroundColor: 'rgba(199,52,202,0.1)',
+        backgroundColor: 'rgba(5,168,246,0.1)',
         borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',

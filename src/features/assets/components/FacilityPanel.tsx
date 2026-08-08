@@ -439,9 +439,9 @@ const styles = StyleSheet.create({
     stripeMeta: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, marginTop: 3 },
     stripeUtil: { alignItems: 'flex-end' },
     alertBox: {
-        backgroundColor: 'rgba(199,52,202,0.09)',
+        backgroundColor: 'rgba(5,168,246,0.09)',
         borderRadius: 12,
-        borderWidth: 1, borderColor: 'rgba(199,52,202,0.28)',
+        borderWidth: 1, borderColor: 'rgba(5,168,246,0.28)',
         padding: 12,
     },
     alertText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16.5 },
@@ -491,10 +491,10 @@ const styles = StyleSheet.create({
     utilNote: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 8 },
 
     queue: {
-        backgroundColor: 'rgba(200,192,239,0.07)',
+        backgroundColor: 'rgba(207,208,210,0.07)',
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(200,192,239,0.22)',
+        borderColor: 'rgba(207,208,210,0.22)',
         padding: 14,
     },
     queueTitle: { color: '#FFFFFF', fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     queueSub: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 2 },
     cancelBtn: {
         paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
-        borderWidth: 1, borderColor: 'rgba(199,52,202,0.4)',
+        borderWidth: 1, borderColor: 'rgba(5,168,246,0.4)',
     },
     cancelText: { color: '#FF8A8A', fontSize: 11, fontWeight: '700' },
 
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
 
     matchBtn: {
         paddingVertical: 9, borderRadius: 10, alignItems: 'center',
-        backgroundColor: 'rgba(200,192,239,0.12)', marginBottom: 4,
+        backgroundColor: 'rgba(207,208,210,0.12)', marginBottom: 4,
     },
     matchBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
 
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 10,
         paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
     },
-    ladderNow: { backgroundColor: 'rgba(200,192,239,0.08)', borderRadius: 8, paddingHorizontal: 8 },
+    ladderNow: { backgroundColor: 'rgba(207,208,210,0.08)', borderRadius: 8, paddingHorizontal: 8 },
     ladderNum: { color: '#FFFFFF', fontSize: 13, fontWeight: '800', width: 20 },
     ladderName: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '700' },
     ladderMeta: { color: '#FFFFFF', fontSize: 10, marginTop: 2 },

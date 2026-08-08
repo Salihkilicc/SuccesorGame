@@ -380,10 +380,10 @@ const styles = StyleSheet.create({
     },
 
     row: { paddingVertical: 8 },
-    rowSubtotal: { borderTopWidth: 1, borderTopColor: 'rgba(199,52,202,0.25)', marginTop: 4 },
+    rowSubtotal: { borderTopWidth: 1, borderTopColor: 'rgba(5,168,246,0.25)', marginTop: 4 },
     rowEmphasis: {
         borderTopWidth: 2,
-        borderTopColor: 'rgba(199,52,202,0.5)',
+        borderTopColor: 'rgba(5,168,246,0.5)',
         marginTop: 6,
         paddingTop: 12,
     },
