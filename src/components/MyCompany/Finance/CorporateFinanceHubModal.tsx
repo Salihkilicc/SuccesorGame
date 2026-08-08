@@ -100,8 +100,8 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 {/* --- NAVIGATION GRID --- */}
                 <View style={styles.navGrid}>
                     {/* OWNER INJECTION BUTTON */}
-                    <TouchableOpacity style={[styles.navCard, { borderColor: '#5992C6', flex: 1 }]} onPress={() => setShowInjection(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(74, 222, 128, 0.2)' }]}>
+                    <TouchableOpacity style={[styles.navCard, { borderColor: 'rgba(255,255,255,0.06)', flex: 1 }]} onPress={() => setShowInjection(true)}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(89,146,198,0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
                         <View style={{ flex: 1 }}>
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
     },
     heroLabel: {
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     statLabel: {
         fontSize: 11,
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     emptyStateIcon: {
         fontSize: 32,
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     loanHeader: {
         flexDirection: 'row',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     loanType: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     loanRate: {
         fontSize: 14,
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     loanDetailValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     ctaContainer: {
         gap: 12,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
         padding: 18,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     repayButtonPressed: {
         opacity: 0.8,
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     ctaButtonText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#000',
+        color: '#31241F',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 20,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 0 },
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     sharkAvatarText: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
     },
     sharkDealInfo: {
         flex: 1,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     instantBadgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#000',
+        color: '#31241F',
         letterSpacing: 0.5,
     },
     sharkDealFooter: {
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: 12,
     },
 

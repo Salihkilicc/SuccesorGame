@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         shadowColor: "#31241F",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#533D35', // Gold/Copper Chip color
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         fontSize: 28, // Scaled for card
         fontWeight: '800',
         letterSpacing: 1,
-        textShadowColor: 'rgba(255, 51, 102, 0.15)',
+        textShadowColor: 'rgba(233,184,201,0.15)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
     },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     badgeContainer: {
         paddingHorizontal: 8,
         paddingVertical: 2,
-        backgroundColor: 'rgba(255, 51, 102, 0.1)',
+        backgroundColor: 'rgba(233,184,201,0.1)',
         borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         borderRadius: 20, // Pill shape
         backgroundColor: '#31241F',
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     filterChipActive: {
         borderColor: 'rgba(255,255,255,0.08)',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     shopActionText: {
         color: '#FFFFFF',

@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         paddingBottom: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#5992C6',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     headerLeft: {
         width: 40,

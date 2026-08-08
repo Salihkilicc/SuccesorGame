@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
     content: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: 'rgba(30, 34, 48, 0.95)', // Glassy dark background
+        backgroundColor: 'rgba(89,146,198,0.95)', // Glassy dark background
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: {
             width: 0,
             height: 10,

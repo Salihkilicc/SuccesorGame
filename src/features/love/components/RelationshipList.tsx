@@ -55,9 +55,9 @@ const RelationshipList: React.FC<Props> = ({
     onItemPress,
 }) => {
     const getNpcIconBg = (npcType: string): string => {
-        if (npcType === 'Child') return 'rgba(250,204,21,0.12)';
-        if (npcType === 'Mother') return 'rgba(236,72,153,0.12)';
-        return 'rgba(99,102,241,0.12)';
+        if (npcType === 'Child') return 'rgba(233,184,201,0.12)';
+        if (npcType === 'Mother') return 'rgba(233,184,201,0.12)';
+        return 'rgba(89,146,198,0.12)';
     };
 
     const getNpcIcon = (npcType: string): string => {
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         marginBottom: 16,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        borderBottomColor: 'rgba(255,255,255,0.05)',
         paddingBottom: 8,
     },
     sectionTitle: {
@@ -173,11 +173,11 @@ const styles = StyleSheet.create({
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        backgroundColor: 'rgba(255,255,255,0.03)',
         padding: 16,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.05)',
+        borderColor: 'rgba(255,255,255,0.05)',
         gap: 16,
         marginBottom: 12,
     },

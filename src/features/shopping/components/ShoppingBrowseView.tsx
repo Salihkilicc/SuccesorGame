@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.spacing.lg,
         paddingVertical: theme.spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomColor: 'rgba(255,255,255,0.1)',
     },
     backButton: {
         flexDirection: 'row',
@@ -232,15 +232,15 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderRadius: 8,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255,255,255,0.2)',
     },
     backIcon: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
     },
     backText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
     brandName: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         letterSpacing: -0.3,
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 12,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255,255,255,0.2)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     cartBadgeText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 11,
         fontWeight: '700',
     },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.xl * 3,
     },
     emptyText: {
-        color: '#666',
+        color: '#7F5E51',
         fontSize: 16,
     },
 
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: theme.spacing.sm,
     },
     itemIcon: {
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     itemName: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
         lineHeight: 18,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     addButtonText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '700',
         letterSpacing: 0.3,

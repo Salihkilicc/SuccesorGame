@@ -172,7 +172,7 @@ export default TravelBookingModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000', // Solid black background instead of transparent
+        backgroundColor: '#31241F', // Solid black background instead of transparent
         justifyContent: 'center',
         alignItems: 'center', // Center children
         padding: 20,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     },
     airlineText: {
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
         letterSpacing: 2,
         fontSize: 12,
     },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     destCode: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
     },
     flightLine: {
         flex: 1,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#000',
+        backgroundColor: '#31241F',
     },
     planeIcon: {
         marginHorizontal: 8,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     },
     spotName: {
         fontSize: 18,
-        color: '#000',
+        color: '#31241F',
         fontWeight: '600',
         textAlign: 'center',
         textTransform: 'uppercase',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         padding: 24,
     },
     sectionTitle: {
-        color: '#666',
+        color: '#7F5E51',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 1,
@@ -285,14 +285,14 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     radio: {
         width: 20,
         height: 20,
         borderRadius: 10,
-        borderWidth: 2,
-        borderColor: '#666',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -306,23 +306,23 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     classTitle: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         marginBottom: 2,
     },
     classSubtitle: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 12,
     },
     costBadge: {
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     multiplierText: {
-        color: '#ccc',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: 'bold',
     },
@@ -334,11 +334,11 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 24,
     },
     partnerText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 28,
         borderRadius: 14,
-        backgroundColor: '#444',
+        backgroundColor: '#674C41',
         padding: 2,
         justifyContent: 'center',
     },
@@ -354,24 +354,24 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 12,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
     },
     footer: {
         padding: 24,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     totalLabel: {
-        color: '#666',
+        color: '#7F5E51',
         fontSize: 10,
         fontWeight: 'bold',
         marginBottom: 4,
     },
     totalCost: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '900',
     },
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
         borderRadius: 30,
     },
     bookButtonText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,
@@ -390,11 +390,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 16,
         borderTopWidth: 1,
-        borderTopColor: '#222',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         backgroundColor: '#31241F',
     },
     closeText: {
-        color: '#666',
+        color: '#7F5E51',
         fontSize: 12,
         fontWeight: 'bold',
         letterSpacing: 2,

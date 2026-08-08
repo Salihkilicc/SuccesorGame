@@ -81,7 +81,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                                 styles.btnConfirm,
                                 pressed && styles.btnPressed,
                             ]}>
-                            <Text style={[styles.btnText, { color: '#000' }]}>{t('equity.goPublic')}</Text>
+                            <Text style={[styles.btnText, { color: '#31241F' }]}>{t('equity.goPublic')}</Text>
                         </Pressable>
                     </View>
                 </View>

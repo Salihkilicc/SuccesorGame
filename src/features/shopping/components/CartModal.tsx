@@ -160,7 +160,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             </View>
                         </View>
 
-                        <LuxeNetFooter style={{ backgroundColor: 'transparent', marginTop: 10, borderTopColor: '#42312A' }} />
+                        <LuxeNetFooter style={{ backgroundColor: 'transparent', marginTop: 10, borderTopColor: 'rgba(255,255,255,0.06)' }} />
                     </ScrollView>
                 )}
 
@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#42312A',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
         backgroundColor: '#31241F',
     },
     headerTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '600',
     },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     itemRow: {
         flexDirection: 'row',
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginRight: 16,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     itemEmoji: {
         fontSize: 48,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     itemTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         marginBottom: 4,
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     soldByText: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 12,
         marginBottom: 4,
     },
     specText: {
-        color: '#666',
+        color: '#7F5E51',
         fontSize: 11,
     },
 
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     actionText: {
         color: '#FFFFFF',
@@ -323,10 +323,10 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     summaryTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 16,
@@ -337,11 +337,11 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     summaryLabel: {
-        color: '#AAA',
+        color: '#FFFFFF',
         fontSize: 14,
     },
     summaryValue: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontVariant: ['tabular-nums'],
     },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
-        borderTopColor: '#42312A',
+        borderTopColor: 'rgba(255,255,255,0.06)',
     },
     totalLabel: {
         color: '#E9B8C9', // Red for total
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     checkoutFooter: {
         backgroundColor: '#31241F',
         borderTopWidth: 1,
-        borderTopColor: '#42312A',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         padding: 16,
         paddingBottom: 68, // Exact spacing requested
     },
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     footerTotalLabel: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         gap: 8,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
@@ -426,14 +426,14 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     emptyCartTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '700',
         marginBottom: 12,
         textAlign: 'center',
     },
     emptyCartText: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 16,
         textAlign: 'center',
         lineHeight: 24,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     continueButtonText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },

@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         // No padding here
     },
     centeredView: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#666',
+        color: '#7F5E51',
     },
     valueContainer: {
         alignItems: 'center',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#533D35',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     presetButtonText: {
         fontSize: 14,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     amountCard: {
-        backgroundColor: 'rgba(10, 132, 255, 0.15)',
+        backgroundColor: 'rgba(89,146,198,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     executeButtonTextDisabled: {
-        color: '#666',
+        color: '#7F5E51',
     },
 });
 

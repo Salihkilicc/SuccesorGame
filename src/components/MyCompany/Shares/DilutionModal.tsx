@@ -201,7 +201,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         // No padding here
     },
     centeredView: {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     warningBanner: {
-        backgroundColor: 'rgba(255, 159, 10, 0.15)',
+        backgroundColor: 'rgba(233,184,201,0.15)',
         borderRadius: 12,
         padding: 12,
         marginBottom: 20,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#666',
+        color: '#7F5E51',
     },
     valueContainer: {
         alignItems: 'center',
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#533D35',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     presetButtonText: {
         fontSize: 14,
@@ -333,11 +333,11 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     stockWarningBox: {
-        backgroundColor: 'rgba(255, 159, 10, 0.15)',
+        backgroundColor: 'rgba(233,184,201,0.15)',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         flexDirection: 'row',
         gap: 12,

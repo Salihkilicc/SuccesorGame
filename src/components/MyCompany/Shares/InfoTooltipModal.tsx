@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#000',
+        color: '#31241F',
     },
 });
 

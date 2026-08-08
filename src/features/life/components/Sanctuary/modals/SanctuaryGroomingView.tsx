@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: theme.radius.md,
         padding: 16,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
         marginBottom: theme.spacing.md,
     },

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#5992C6'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     icon: {
         fontSize: 40

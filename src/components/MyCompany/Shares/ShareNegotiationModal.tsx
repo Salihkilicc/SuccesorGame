@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     activeTabText: {
-        color: '#000',
+        color: '#31241F',
     },
     section: {
         marginBottom: theme.spacing.lg,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.success,
     },
     mainBtnText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '800',
     },
     resultContent: {
@@ -311,11 +311,11 @@ const styles = StyleSheet.create({
     },
     successBorder: {
         borderColor: theme.colors.success,
-        borderWidth: 2,
+        borderWidth: 1,
     },
     failBorder: {
         borderColor: theme.colors.danger,
-        borderWidth: 2,
+        borderWidth: 1,
     },
     resultEmoji: {
         fontSize: 48,

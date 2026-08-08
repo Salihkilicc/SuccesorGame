@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#674C41'
+    borderColor: 'rgba(255,255,255,0.06)'
   },
   betDisplay: { gap: 2 },
   betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700' },
@@ -172,18 +172,18 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4
   },
   spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
-  spinText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
+  spinText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
 
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   resultRed: { backgroundColor: '#533D35' },
   resultBlack: { backgroundColor: '#31241F' },
   resultGreen: { backgroundColor: '#5992C6' },
-  resultText: { color: '#FFF', fontSize: 10, fontWeight: '700' },
+  resultText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
 });

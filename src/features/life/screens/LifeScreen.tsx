@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: 'rgba(255,255,255,0.15)',
   },
   appIconVector: {
     textShadowColor: 'rgba(0,0,0,0.3)',
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     overflow: 'hidden', // Ensures blur stays inside
     // Shadow for the dock itself
-    shadowColor: "#000",
+    shadowColor: "#31241F",
     shadowOffset: {
       width: 0,
       height: 10,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Slight tint on top of blur
+    backgroundColor: 'rgba(255,255,255,0.1)', // Slight tint on top of blur
     borderColor: 'rgba(255,255,255,0.2)',
     borderWidth: 1,
     borderRadius: 35,

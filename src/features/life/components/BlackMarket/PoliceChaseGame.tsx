@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
         width: '90%',
         marginBottom: 5,
         borderWidth: 1,
-        borderColor: '#674C41'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     statRow: {
         flexDirection: 'row',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     statValue: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#FFFFFF',
         marginLeft: 10,
         fontFamily: 'Courier New'
     },
@@ -496,8 +496,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 12,
         padding: 2,
-        borderWidth: 2,
-        borderColor: '#674C41',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         justifyContent: 'center'
     },
     cell: {
@@ -511,18 +511,18 @@ const styles = StyleSheet.create({
     },
     playerCell: {
         backgroundColor: '#0A2A92',
-        borderWidth: 2,
-        borderColor: '#0A2A92'
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     policeCell: {
         backgroundColor: '#533D35',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)'
     },
     safeHouseCell: {
         backgroundColor: '#5992C6',
-        borderWidth: 2,
-        borderColor: '#5992C6'
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     emoji: {
         fontSize: Math.min(30, cellSize * 0.7)
@@ -543,21 +543,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 12,
         marginHorizontal: 5,
-        borderWidth: 2,
-        borderColor: '#7F5E51',
-        shadowColor: '#000',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
     },
     controlButtonDisabled: {
         backgroundColor: '#31241F',
-        borderColor: '#674C41',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },
     controlText: {
         fontSize: 28,
-        color: '#fff',
+        color: '#FFFFFF',
         fontWeight: 'bold'
     },
     controlSpacer: {
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     quitText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: 'bold',
         fontFamily: 'Courier New'

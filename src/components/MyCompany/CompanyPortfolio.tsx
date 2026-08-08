@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#31241F',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   title: {
     fontSize: 16,
@@ -126,10 +126,10 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 6,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#31241F',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   shareCard: {
-    borderColor: '#0A2A92',
+    borderColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
   },
   cardPressed: {

@@ -94,17 +94,17 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         minHeight: 160, // Increased height for large cards
         justifyContent: 'center',
     },
     cardSelected: {
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
         backgroundColor: '#31241F',
     },
     cardLocal: {
-        borderColor: '#5992C6', // Blue for USA Local
+        borderColor: 'rgba(255,255,255,0.06)', // Blue for USA Local
     },
     cardPressed: {
         transform: [{ scale: 0.97 }],

@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
     },
     maxTierBadge: {
-        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+        backgroundColor: 'rgba(233,184,201,0.1)',
         padding: 12,
         borderRadius: 12,
         alignItems: 'center',
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         textAlign: 'center',
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         top: -1, // Adjust visually to center in bar
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmBtnText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontWeight: '700',
     },
     statRow: {

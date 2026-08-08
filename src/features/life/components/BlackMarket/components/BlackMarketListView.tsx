@@ -53,17 +53,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#222',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
         marginBottom: 10,
     },
     backButton: {
         padding: 10,
     },
     backText: {
-        color: '#888',
+        color: '#FFFFFF',
     },
     listTitle: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 2,
@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     listItem: {
-        backgroundColor: '#111',
+        backgroundColor: '#31241F',
         padding: 16,
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#222',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     pressed: {
         transform: [{ scale: 0.98 }],
@@ -93,12 +93,12 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     itemName: {
-        color: '#eee',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
     itemDesc: {
-        color: '#555',
+        color: '#7F5E51',
         fontSize: 12,
         marginTop: 4,
     },

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginBottom: theme.spacing.lg,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         overflow: 'hidden',
     },
     header: {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: theme.spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: '#42312A',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     headerPressed: {
         backgroundColor: '#31241F',

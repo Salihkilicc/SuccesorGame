@@ -141,7 +141,7 @@ export default SouvenirMiniGame;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#000', // Solid black
+        backgroundColor: '#31241F', // Solid black
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#fff',
+        color: '#FFFFFF',
         letterSpacing: 2,
         marginBottom: 8,
     },
     subtitle: {
         fontSize: 14,
-        color: '#999',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 24,
         lineHeight: 20,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -206,13 +206,13 @@ const styles = StyleSheet.create({
     resultTitle: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
         marginBottom: 8,
         textAlign: 'center',
     },
     resultDescription: {
         fontSize: 14,
-        color: '#999',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 16,
     },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     rarityText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
         letterSpacing: 1,
     },
 });

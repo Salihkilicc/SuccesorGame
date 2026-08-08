@@ -438,39 +438,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   title: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 22,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#888',
+    color: '#FFFFFF',
     fontSize: 14,
     marginTop: 2,
   },
   closeBtn: {
-    backgroundColor: '#222',
+    backgroundColor: '#42312A',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
   },
   closeText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   capitalBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#111',
+    backgroundColor: '#31241F',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   capitalLabel: {
-    color: '#888',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   tabsContainer: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   tabsContent: {
     paddingHorizontal: 16,
@@ -496,18 +496,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#31241F',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   activeTab: {
     backgroundColor: '#533D35', // Gold
     borderColor: 'rgba(255,255,255,0.08)',
   },
   tabText: {
-    color: '#888',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   activeTabText: {
-    color: '#000',
+    color: '#31241F',
     fontWeight: '700',
   },
 
@@ -520,17 +520,17 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111',
+    backgroundColor: '#31241F',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   itemIcon: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#222',
+    backgroundColor: '#42312A',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -538,19 +538,19 @@ const styles = StyleSheet.create({
   itemInitial: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#fff',
+    color: '#FFFFFF',
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
   },
   itemSector: {
-    color: '#666',
+    color: '#7F5E51',
     fontSize: 12,
     fontWeight: '500',
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -563,12 +563,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   marketCap: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
   valueLabel: {
-    color: '#666',
+    color: '#7F5E51',
     fontSize: 11,
   },
   emptyState: {
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#444',
+    color: '#674C41',
   },
 
   // Negotiation Overlay
@@ -589,12 +589,12 @@ const styles = StyleSheet.create({
   },
   negotiationCard: {
     width: '100%',
-    backgroundColor: '#111',
+    backgroundColor: '#31241F',
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255,255,255,0.06)',
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
@@ -604,13 +604,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   negTitle: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
   },
   negSubtitle: {
-    color: '#666',
+    color: '#7F5E51',
     fontSize: 14,
   },
   negBody: {
@@ -625,10 +625,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   infoLabel: {
-    color: '#888',
+    color: '#FFFFFF',
   },
   infoValue: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   buffValue: {
@@ -639,11 +639,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionBtn: {
-    backgroundColor: '#222',
+    backgroundColor: '#42312A',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   optionHeader: {
     flexDirection: 'row',
@@ -651,21 +651,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   optionTitle: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 15,
   },
   optionPrice: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 15,
   },
   optionDesc: {
-    color: '#666',
+    color: '#7F5E51',
     fontSize: 12,
   },
   hostileBtn: {
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    backgroundColor: 'rgba(233,184,201,0.1)',
     borderColor: theme.colors.danger,
   },
   hostileText: {
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   cancelText: {
-    color: '#666',
+    color: '#7F5E51',
     fontWeight: '600',
   },
 

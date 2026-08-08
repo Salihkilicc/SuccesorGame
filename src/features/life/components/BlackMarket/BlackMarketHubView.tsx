@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#FFFFFF',
         fontFamily: 'Courier New',
         letterSpacing: 2
     },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#333'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     barContainer: {
         width: '100%'
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     moneyContainer: {
         marginTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         paddingTop: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
         fontSize: 12
     },
     moneyValue: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
         fontFamily: 'Courier New'
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)'
     },
     disconnectButtonText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 14,
         letterSpacing: 1,

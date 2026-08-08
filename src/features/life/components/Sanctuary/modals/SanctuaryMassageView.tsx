@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
         gap: 10,
     },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     optionCardVIP: {
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
         backgroundColor: '#31241F', // Deep Ocean Blue
     },

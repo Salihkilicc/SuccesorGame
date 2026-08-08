@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 40,
         borderTopWidth: 1,
-        borderTopColor: '#42312A',
+        borderTopColor: 'rgba(255,255,255,0.06)',
     },
     divider: {
         height: 1,

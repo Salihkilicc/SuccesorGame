@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         gap: 16,
         paddingHorizontal: 20,
         paddingVertical: 15,
-        backgroundColor: 'rgba(10,10,12,0.98)',
+        backgroundColor: 'rgba(89,146,198,0.98)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.05)',
     },

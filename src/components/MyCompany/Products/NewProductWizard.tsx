@@ -283,7 +283,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                         title={`🚀 ${t('company.launchProduct')}`}
                                         variant="primary" // Could be 'success' color if available, but primary is fine
                                         onPress={handleLaunch}
-                                        style={{ backgroundColor: '#5992C6', borderColor: '#5992C6' }} // Custom override for success green
+                                        style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.06)' }} // Custom override for success green
                                     />
                                     <GameButton
                                         title={t('product.back')}
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     },
     gridCardOwned: {
         borderColor: theme.colors.success,
-        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+        backgroundColor: 'rgba(89,146,198,0.1)',
     },
     gridCardPressed: {
         backgroundColor: theme.colors.card,

@@ -188,12 +188,12 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
         justifyContent: 'space-between',
     },
     hangarCard: {
         backgroundColor: '#31241F',
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
         borderStyle: 'dashed',
     },
     cardHeader: {
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     jetListIcon: {
         width: 48,

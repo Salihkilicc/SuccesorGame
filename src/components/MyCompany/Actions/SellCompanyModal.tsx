@@ -163,8 +163,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#42312A',
-        shadowColor: '#000',
+        borderColor: 'rgba(255,255,255,0.06)',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#42312A',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
         paddingBottom: 16,
     },
     headerTitle: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     valuationContainer: {
         alignItems: 'center',
         marginBottom: 24,
-        backgroundColor: '#000',
+        backgroundColor: '#31241F',
         padding: 12,
         borderRadius: 12,
     },
@@ -244,11 +244,11 @@ const styles = StyleSheet.create({
         minWidth: 70,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#674C41',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     incrementBtn: {
         backgroundColor: '#42312A', // Keep uniform dark, maybe blue tint? Sticking to dark.
-        borderColor: '#5992C6', // Green border for positive
+        borderColor: 'rgba(255,255,255,0.06)', // Green border for positive
     },
     controlBtnText: {
         fontSize: 12,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
-        borderWidth: 2,
+        borderWidth: 1,
         alignItems: 'center',
         marginBottom: 24,
     },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     },
     markupText: {
         fontSize: 12,
-        color: '#666',
+        color: '#7F5E51',
         fontStyle: 'italic',
     },
     actionButtons: {

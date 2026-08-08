@@ -197,7 +197,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: theme.spacing.lg,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: theme.colors.success + '40',
     },
     costBadgeInsufficient: {

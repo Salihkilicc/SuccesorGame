@@ -265,8 +265,8 @@ const DividendModal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     cashHint: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginTop: 4 },
     flagBox: {
-        backgroundColor: 'rgba(255,69,58,0.10)', borderRadius: 12,
-        borderWidth: 1, borderColor: 'rgba(255,69,58,0.30)',
+        backgroundColor: 'rgba(233,184,201,0.10)', borderRadius: 12,
+        borderWidth: 1, borderColor: 'rgba(233,184,201,0.30)',
         padding: 12, marginBottom: 12,
     },
     flagText: { color: '#E9B8C9', fontSize: 11.5, lineHeight: 16 },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
 
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         // No padding here
     },
     centeredView: {
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     cashCard: {
-        backgroundColor: 'rgba(48, 209, 88, 0.15)',
+        backgroundColor: 'rgba(89,146,198,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     stepperTextDisabled: {
-        color: '#666',
+        color: '#7F5E51',
     },
     valueContainer: {
         alignItems: 'center',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#533D35',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     presetButtonText: {
         fontSize: 14,
@@ -433,13 +433,13 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     profitHighlight: {
-        backgroundColor: 'rgba(48, 209, 88, 0.2)',
+        backgroundColor: 'rgba(89,146,198,0.2)',
         borderRadius: 12,
         padding: 20,
         alignItems: 'center',
         marginBottom: 16,
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     profitLabel: {
         fontSize: 14,

@@ -242,9 +242,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
     const getAdviceBubbleStyle = () => {
         const baseStyle = styles.adviceBubble;
-        if (adviceQuality === 'good') return [baseStyle, { borderColor: '#5992C6', backgroundColor: 'rgba(48, 209, 88, 0.1)' }];
-        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255, 69, 58, 0.1)' }];
-        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255, 214, 10, 0.1)' }];
+        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(89,146,198,0.1)' }];
+        if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' }];
+        return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' }];
     };
 
     // ============================================================================
@@ -404,7 +404,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Current Stock Price Info */}
-                                <View style={{ backgroundColor: '#31241F', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: '#444' }}>
+                                <View style={{ backgroundColor: '#31241F', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
                                     <Text style={{ fontSize: 24, fontWeight: '800', color: '#5992C6' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
@@ -579,7 +579,7 @@ export default ShareholderProfileModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backgroundColor: 'rgba(0,0,0,0.7)',
         justifyContent: 'flex-end',
     },
     container: {
@@ -589,8 +589,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         borderWidth: 1,
-        borderColor: '#333',
-        shadowColor: '#000',
+        borderColor: 'rgba(255,255,255,0.06)',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.5,
         shadowRadius: 16,
@@ -607,12 +607,12 @@ const styles = StyleSheet.create({
         width: 48,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#444',
+        backgroundColor: '#674C41',
     },
     header: {
         padding: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
     },
     avatarContainer: {
@@ -624,8 +624,8 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 4,
-        borderColor: '#333',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     avatarText: {
         fontSize: 40,
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 20,
     },
     traitText: {
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     closeButtonText: {
         fontSize: 16,
@@ -716,11 +716,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     tabActive: {
         backgroundColor: '#0A2A92',
-        borderColor: '#0A2A92',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     tabText: {
         fontSize: 16,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: 16,
     },
     actionButtonIcon: {
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
     adviceBubble: {
         padding: 20,
         borderRadius: 20,
-        borderWidth: 2,
+        borderWidth: 1,
         marginTop: 8,
     },
     adviceText: {
@@ -804,11 +804,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#0A2A92',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     stepperButtonDisabled: {
         backgroundColor: '#31241F',
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
     stepperButtonText: {
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -869,7 +869,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         marginTop: 16,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        backgroundColor: 'rgba(0,0,0,0.95)',
         alignItems: 'center',
         justifyContent: 'center',
         borderTopLeftRadius: 32,
@@ -920,15 +920,15 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         backgroundColor: '#31241F',
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#333',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonBuyActive: {
-        backgroundColor: 'rgba(48, 209, 88, 0.2)',
-        borderColor: '#5992C6',
+        backgroundColor: 'rgba(89,146,198,0.2)',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonSellActive: {
-        backgroundColor: 'rgba(255, 69, 58, 0.2)',
+        backgroundColor: 'rgba(233,184,201,0.2)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     modeButtonText: {
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 20,
         alignItems: 'center',
     },

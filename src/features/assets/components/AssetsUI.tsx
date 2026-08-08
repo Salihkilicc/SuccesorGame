@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     actionTilePressed: { transform: [{ scale: 0.98 }], opacity: 0.94 },
     tileCta: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.subtitle, alignSelf: 'flex-end' },
     sectionHeader: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.48)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
-    breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255, 255, 255, 0.05)' },
+    breakdownRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
     breakdownLabel: { fontSize: 14, color: '#FFFFFF' },
     breakdownValue: { fontSize: 14, fontWeight: '700' },
 });

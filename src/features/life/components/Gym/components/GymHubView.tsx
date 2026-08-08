@@ -152,7 +152,7 @@ const getBodyTypeColor = (bodyType: string): string => {
         'Muscular': '#E9B8C9',
         'Godlike': '#E9B8C9'
     };
-    return colors[bodyType] || '#fff';
+    return colors[bodyType] || '#FFFFFF';
 };
 
 const styles = StyleSheet.create({
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         borderWidth: 0,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
         height: 24,
         backgroundColor: '#FFFFFF',
         borderRadius: 6,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
         flexDirection: 'row',
         padding: 2,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,

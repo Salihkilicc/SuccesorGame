@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#31241F',
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.18)',
+    borderColor: 'rgba(233,184,201,0.18)',
     overflow: 'hidden',
   },
 
@@ -971,7 +971,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 5,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,215,0,0.1)',
+    backgroundColor: 'rgba(233,184,201,0.1)',
   },
   periodText: { color: '#E9B8C9', fontSize: 10, fontWeight: '700' },
 
@@ -1008,12 +1008,12 @@ const styles = StyleSheet.create({
   line: { paddingVertical: 9 },
   lineSubtotal: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,215,0,0.25)',
+    borderTopColor: 'rgba(233,184,201,0.25)',
     marginTop: 4,
   },
   lineEmphasis: {
     borderTopWidth: 2,
-    borderTopColor: 'rgba(255,215,0,0.5)',
+    borderTopColor: 'rgba(233,184,201,0.5)',
     marginTop: 6,
     paddingTop: 12,
   },

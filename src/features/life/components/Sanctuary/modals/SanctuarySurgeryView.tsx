@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     insufficientFundsText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
     },
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     warningText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 30,

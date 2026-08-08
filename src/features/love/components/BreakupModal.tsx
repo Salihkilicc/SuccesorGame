@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 32,
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: theme.colors.danger,
         shadowColor: theme.colors.danger,
         shadowOffset: { width: 0, height: 0 },
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     message: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 18,
         textAlign: 'center',
         marginBottom: 8,
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
     },
     costContainer: {
         width: '100%',
-        backgroundColor: 'rgba(220, 38, 38, 0.15)', // Red tint
+        backgroundColor: 'rgba(233,184,201,0.15)', // Red tint
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: 'rgba(220, 38, 38, 0.3)',
+        borderColor: 'rgba(233,184,201,0.3)',
     },
     costLabel: {
         color: theme.colors.danger,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     costValue: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '800',
         marginBottom: 2,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     buttonText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 1,

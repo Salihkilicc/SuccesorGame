@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   cardLocked: {
     backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+    borderColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
   },
   headerRow: {

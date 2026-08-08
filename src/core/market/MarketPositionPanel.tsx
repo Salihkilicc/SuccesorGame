@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 6,
-        backgroundColor: 'rgba(255,215,0,0.12)',
+        backgroundColor: 'rgba(233,184,201,0.12)',
     },
     regionText: { color: '#E9B8C9', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
     description: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 6 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     rankingBox: { gap: 7 },
     rankRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3 },
     rankRowPlayer: {
-        backgroundColor: 'rgba(76,175,80,0.08)',
+        backgroundColor: 'rgba(89,146,198,0.08)',
         borderRadius: 6,
         paddingHorizontal: 4,
         marginHorizontal: -4,

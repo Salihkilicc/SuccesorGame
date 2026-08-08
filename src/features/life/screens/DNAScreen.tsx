@@ -57,7 +57,7 @@ const LuxuryBar = () => {
     const { netWorth, maxWealth, percentage, buffAmount } = useLuxurySystem();
     const isBuffActive = buffAmount > 0;
     const buffColor = isBuffActive ? '#E9B8C9' : 'rgba(255,255,255,0.08)';
-    const buffTextColor = isBuffActive ? '#000' : '#555';
+    const buffTextColor = isBuffActive ? '#31241F' : '#7F5E51';
 
     return (
         <View style={[styles.card, styles.luxuryCard]}>
@@ -129,8 +129,8 @@ const DNAScreen = () => {
 
     const getBeltTextColor = (belt: string) => {
         const lowerBelt = belt?.toLowerCase() || 'white';
-        if (['white', 'yellow'].includes(lowerBelt)) return '#000';
-        return '#fff';
+        if (['white', 'yellow'].includes(lowerBelt)) return '#31241F';
+        return '#FFFFFF';
     };
 
     const getBeltBgColor = (belt: string) => {
@@ -145,7 +145,7 @@ const DNAScreen = () => {
             brown: '#7F5E51',
             black: '#31241F'
         };
-        return colors[lowerBelt] || '#333';
+        return colors[lowerBelt] || '#533D35';
     };
 
     const getHeatColor = (val: number) => {
@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'rgba(212, 175, 55, 0.12)',
+        backgroundColor: 'rgba(233,184,201,0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(212, 175, 55, 0.25)',
+        borderColor: 'rgba(233,184,201,0.25)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -306,12 +306,12 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     card: {
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
         borderRadius: 20,
         padding: 20,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        shadowColor: '#000',
+        borderColor: 'rgba(255,255,255,0.08)',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.4,
         shadowRadius: 12,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
         marginBottom: 18,
         paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.07)',
+        borderBottomColor: 'rgba(255,255,255,0.07)',
     },
     sectionIcon: {
         fontSize: 20,
@@ -352,13 +352,13 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     buffBadge: {
-        backgroundColor: 'rgba(46, 204, 113, 0.15)',
+        backgroundColor: 'rgba(89,146,198,0.15)',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 8,
         marginLeft: 6,
         borderWidth: 1,
-        borderColor: 'rgba(46, 204, 113, 0.3)',
+        borderColor: 'rgba(89,146,198,0.3)',
     },
     buffText: {
         fontSize: 9,
@@ -421,9 +421,9 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     luxuryCard: {
-        borderColor: 'rgba(212, 175, 55, 0.35)',
+        borderColor: 'rgba(233,184,201,0.35)',
         borderWidth: 1,
-        backgroundColor: 'rgba(212, 175, 55, 0.04)',
+        backgroundColor: 'rgba(233,184,201,0.04)',
     },
     luxuryContent: {
         gap: 10,
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
         width: 60,
     },
     luxuryTarget: {
-        color: '#555',
+        color: '#7F5E51',
         fontWeight: '600',
         fontSize: 12,
         width: 60,
@@ -449,11 +449,11 @@ const styles = StyleSheet.create({
     luxuryProgressBarBg: {
         flex: 1,
         height: 10,
-        backgroundColor: 'rgba(212, 175, 55, 0.08)',
+        backgroundColor: 'rgba(233,184,201,0.08)',
         borderRadius: 5,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(212, 175, 55, 0.2)',
+        borderColor: 'rgba(233,184,201,0.2)',
     },
     luxuryProgressBarFill: {
         height: '100%',
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     luxuryPercentage: {
-        color: '#555',
+        color: '#7F5E51',
         fontSize: 11,
         textAlign: 'center',
         letterSpacing: 1,
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(212, 175, 55, 0.2)',
+        borderColor: 'rgba(233,184,201,0.2)',
     },
     luxuryBuffText: {
         fontSize: 10,

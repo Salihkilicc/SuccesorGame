@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 22,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     subtitle: {
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'transparent',
     },
     typeButtonActive: {
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     typeLabelActive: {
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     typeRate: {
         fontSize: 14,
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     },
     previewValue: {
         fontSize: 15,
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '700',
     },
     productDesc: {
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#42312A',
     },
     cancelText: {
-        color: '#AAA',
+        color: '#FFFFFF',
         fontWeight: '600',
     },
     confirmButton: {
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '800',
         fontSize: 15,
     },

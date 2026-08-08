@@ -183,9 +183,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255,255,255,0.06)',
     // Shadow
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 80,
     fontWeight: 'bold',
-    color: '#555',
+    color: '#7F5E51',
   },
   overlay: {
     position: 'absolute',
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   overlayName: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#fff',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   overlayJob: {
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   statusText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'uppercase',
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     flex: 1,
     height: 8,
-    backgroundColor: '#333',
+    backgroundColor: '#533D35',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     width: 35,
     fontSize: 12,
     fontWeight: '700',
-    color: '#fff',
+    color: '#FFFFFF',
     textAlign: 'right',
   },
   metaRow: {
@@ -308,22 +308,22 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#533D35',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   chipText: {
     fontSize: 12,
     color: '#FFFFFF',
   },
   costChip: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    backgroundColor: 'rgba(233,184,201,0.1)',
+    borderColor: 'rgba(233,184,201,0.3)',
   },
   costText: {
     color: '#E9B8C9',
     fontWeight: '600',
   },
   actionButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 12,
     borderRadius: 999,
     alignItems: 'center',
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {
-    color: '#000',
+    color: '#31241F',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 0.5,

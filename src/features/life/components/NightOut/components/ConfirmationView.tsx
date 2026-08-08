@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 20,
         padding: 24,
-        borderWidth: 2,
+        borderWidth: 1,
         marginBottom: 24,
     },
     venueHeader: {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#5992C6',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     venueEmoji: {
         fontSize: 48,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     },
     breakdownLabel: {
         fontSize: 15,
-        color: '#aaa',
+        color: '#FFFFFF',
     },
     breakdownValue: {
         fontSize: 15,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         paddingTop: 16,
         borderTopWidth: 2,
-        borderTopColor: '#5992C6',
+        borderTopColor: 'rgba(255,255,255,0.06)',
     },
     totalLabel: {
         fontSize: 18,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     cancelButtonText: {
         fontSize: 14,

@@ -72,12 +72,12 @@ const WeatherScreen = () => {
                 <View style={styles.mainContent}>
                     {loading ? (
                         <View style={styles.centerBox}>
-                            <ActivityIndicator size="large" color="rgba(100,180,255,0.9)" />
+                            <ActivityIndicator size="large" color="rgba(89,146,198,0.9)" />
                             <Text style={styles.statusText}>{t('life.detectingLocation')}</Text>
                         </View>
                     ) : error ? (
                         <View style={styles.centerBox}>
-                            <MaterialCommunityIcons name="weather-cloudy-alert" size={64} color="rgba(255,100,100,0.7)" />
+                            <MaterialCommunityIcons name="weather-cloudy-alert" size={64} color="rgba(233,184,201,0.7)" />
                             <Text style={styles.errorText}>{error}</Text>
                         </View>
                     ) : (
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     errorText: {
-        color: 'rgba(255,140,140,0.9)',
+        color: 'rgba(233,184,201,0.9)',
         fontSize: 15,
         textAlign: 'center',
         letterSpacing: 0.3,
@@ -285,9 +285,9 @@ const styles = StyleSheet.create({
         borderRadius: 14,
     },
     forecastDayFirst: {
-        backgroundColor: 'rgba(59,130,246,0.12)',
+        backgroundColor: 'rgba(89,146,198,0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(59,130,246,0.18)',
+        borderColor: 'rgba(89,146,198,0.18)',
     },
     forecastDayLabel: {
         color: 'rgba(255,255,255,0.45)',
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     forecastDayLabelToday: {
-        color: 'rgba(100,180,255,0.9)',
+        color: 'rgba(89,146,198,0.9)',
     },
     forecastEmoji: {
         fontSize: 20,

@@ -54,16 +54,16 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                     <View style={styles.content}>
                         <TouchableOpacity style={styles.actionButton} onPress={handleAddMoney} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(39, 174, 96, 0.2)', 'rgba(39, 174, 96, 0.05)']}
+                                colors={['rgba(89,146,198,0.2)', 'rgba(89,146,198,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="cash-multiple" size={24} color="#5992C6" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(192, 57, 43, 0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
+                        <TouchableOpacity style={[styles.actionButton, { borderColor: 'rgba(233,184,201,0.3)' }]} onPress={handleReset} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(192, 57, 43, 0.2)', 'rgba(192, 57, 43, 0.05)']}
+                                colors={['rgba(233,184,201,0.2)', 'rgba(233,184,201,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
                             <MaterialCommunityIcons name="skull" size={24} color="#E9B8C9" />
@@ -81,7 +81,7 @@ export default GodModeModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(212, 175, 55, 0.2)',
-        backgroundColor: 'rgba(212, 175, 55, 0.05)',
+        borderBottomColor: 'rgba(233,184,201,0.2)',
+        backgroundColor: 'rgba(233,184,201,0.05)',
     },
     title: {
         fontSize: 18,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(39, 174, 96, 0.3)',
+        borderColor: 'rgba(89,146,198,0.3)',
         gap: 12,
         overflow: 'hidden',
     },

@@ -142,7 +142,7 @@ export type RootStackParamList = {
 };
 
 const LifeStackNavigator = () => (
-  <LifeStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
+  <LifeStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#31241F' } }}>
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
     {/* TODO: Restore these screens or create new ones */}
     {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
@@ -152,7 +152,7 @@ const LifeStackNavigator = () => (
 );
 
 const LoveStackNavigator = () => (
-  <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
+  <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#31241F' } }}>
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
   </LoveStack.Navigator>
 );
@@ -166,7 +166,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const AssetsStackNavigator = () => (
-  <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
+  <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#31241F' } }}>
     <AssetsStack.Screen
       name="AssetsHome"
       component={AssetsScreen}
@@ -219,7 +219,7 @@ const AssetsStackNavigator = () => (
 );
 
 const CasinoStackNavigator = () => (
-  <CasinoStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
+  <CasinoStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#31241F' } }}>
     <CasinoStack.Screen
       name="CasinoLobby"
       component={CasinoScreen}
@@ -319,7 +319,7 @@ const RootNavigator = () => {
       }}>
       <View style={{ flex: 1 }}>
         <RootStack.Navigator
-          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}
+          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#31241F' } }}
           initialRouteName="Home">
           <RootStack.Screen name="Home" component={SwipeNavigator} />
           {/* MainTabs removed as we are replaced by SwipeNavigator on 'Home' */}

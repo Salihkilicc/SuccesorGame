@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 30,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20
@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
-        borderWidth: 2,
-        borderColor: '#533D35'
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     drugIconContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     itemName: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 8,
         fontFamily: 'Courier New'
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     divider: {
         width: '100%',
         height: 1,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         marginBottom: 20
     },
     statsContainer: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     statValue: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: 'bold'
     },
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     passButton: {
         backgroundColor: '#31241F',
         borderWidth: 1,
-        borderColor: '#533D35'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     passButtonText: {
         color: 'rgba(255,255,255,0.48)',
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     buyButton: {
         backgroundColor: '#5992C6', // Green
         borderWidth: 1,
-        borderColor: '#5992C6'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     consumeButton: {
         backgroundColor: '#533D35', // Red-ish
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
     },
     disabledButton: {
         backgroundColor: '#533D35',
-        borderColor: '#7F5E51',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },
     actionButtonText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 16
     },

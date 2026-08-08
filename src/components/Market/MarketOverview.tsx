@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   negative: { color: '#E9B8C9' },
   warning: { color: '#E9B8C9' },
   helper: {
-    color: 'rgba(160,160,160,0.6)',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: theme.typography.caption,
   },
 });

@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     venueCardPressed: {
         transform: [{ scale: 0.98 }],
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     },
     venueDetails: {
         borderTopWidth: 1,
-        borderTopColor: '#5992C6',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         paddingTop: 12,
     },
     detailRow: {

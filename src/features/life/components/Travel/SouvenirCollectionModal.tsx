@@ -133,13 +133,13 @@ export default SouvenirCollectionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#111', // Solid background
+        backgroundColor: '#31241F', // Solid background
         alignItems: 'center', // Center children
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#111', // Solid background
+        backgroundColor: '#31241F', // Solid background
     },
     header: {
         flexDirection: 'row',
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     headerCenter: {
         alignItems: 'center',
@@ -156,12 +156,12 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#666',
+        color: '#7F5E51',
         marginTop: 4,
     },
     closeButton: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         width: 60,
     },
     closeButtonText: {
-        color: '#666',
+        color: '#7F5E51',
         fontWeight: 'bold',
         fontSize: 12,
     },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     emojiContainer: {
         width: 60,
@@ -226,15 +226,15 @@ const styles = StyleSheet.create({
     souvenirName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#fff',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     lockedText: {
-        color: '#666',
+        color: '#7F5E51',
     },
     spotName: {
         fontSize: 12,
-        color: '#888',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     rarityBadge: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     rarityText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
         letterSpacing: 0.5,
     },
 });

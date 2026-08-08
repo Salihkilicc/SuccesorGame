@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     backBtn: {
         paddingVertical: 8,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         marginLeft: 16,
     },
     emptyContainer: {

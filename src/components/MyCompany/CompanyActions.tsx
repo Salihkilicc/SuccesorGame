@@ -13,10 +13,10 @@ interface CompanyActionsProps {
 }
 
 const ACTIONS = [
-  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(255, 215, 0, 0.5)', glowColor: '#E9B8C9' }, // Gold
-  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(48, 209, 88, 0.5)', glowColor: '#5992C6' }, // Green
-  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(10, 132, 255, 0.5)', glowColor: '#0A2A92' }, // Blue
-  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(191, 90, 242, 0.5)', glowColor: '#0A2A92' }, // Purple
+  { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(233,184,201,0.5)', glowColor: '#E9B8C9' }, // Gold
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(89,146,198,0.5)', glowColor: '#5992C6' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(89,146,198,0.5)', glowColor: '#0A2A92' }, // Blue
+  { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(233,184,201,0.5)', glowColor: '#0A2A92' }, // Purple
 ] as const;
 
 const CompanyActions = ({ onOpenFinance, onOpenBoard, onOpenProduction, onOpenHR }: CompanyActionsProps) => {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   headerRow: {
     flexDirection: 'row',
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333', // Subtle border - HARDCODED
+    borderColor: 'rgba(255,255,255,0.06)', // Subtle border - HARDCODED
     gap: theme.spacing.xs,
     // Premium shadows - CRUCIAL
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 5,

@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
         minHeight: 280,
     },
     classyCard: {
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     optionDescription: {
-        color: '#AAA',
+        color: '#FFFFFF',
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,

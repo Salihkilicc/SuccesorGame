@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: theme.spacing.md,
     },
     header: {
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
         minHeight: 36,
         borderTopWidth: 1,
-        borderTopColor: '#333',
+        borderTopColor: 'rgba(255,255,255,0.06)',
     },
     costLabel: {
         color: 'rgba(255,255,255,0.48)',

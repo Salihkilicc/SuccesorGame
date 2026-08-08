@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     statusText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '600',
         textAlign: 'center',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     securityText: {
         color: '#0A2A92',
@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: 'rgba(58, 134, 255, 0.2)',
+        backgroundColor: 'rgba(89,146,198,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 30,
-        borderWidth: 2,
-        borderColor: '#0A2A92',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     checkmarkIcon: {
         fontSize: 60,

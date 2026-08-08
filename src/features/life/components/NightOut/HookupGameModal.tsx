@@ -214,14 +214,14 @@ const styles = StyleSheet.create({
         padding: 24,
         paddingTop: 48,
         borderTopWidth: 2,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     partnerSection: {
         alignItems: 'center',
         marginBottom: 24,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#5992C6',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     partnerAvatar: {
         width: 80,
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 12,
     },
     avatarEmoji: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
-        borderLeftColor: '#5992C6',
+        borderLeftColor: 'rgba(255,255,255,0.06)',
     },
     clueText: {
         fontSize: 16,
@@ -286,15 +286,15 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     choiceButtonPressed: {
         backgroundColor: '#31241F',
         transform: [{ scale: 0.98 }],
     },
     choiceButtonCorrect: {
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
         backgroundColor: '#31241F',
     },
     choiceButtonWrong: {

@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#674C41'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     suspicionBar: {
         height: '100%',
@@ -411,13 +411,13 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.darkGray,
         borderRadius: 12,
         marginBottom: 15,
-        borderWidth: 2,
-        borderColor: '#674C41',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         overflow: 'hidden'
     },
     drugCard: {
         borderColor: COLORS.bloodRed,
-        borderWidth: 2
+        borderWidth: 1
     },
     lockedCard: {
         backgroundColor: '#31241F',
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     lockOverlay: {
         marginTop: 10,
         padding: 8,
-        backgroundColor: 'rgba(138, 3, 3, 0.2)',
+        backgroundColor: 'rgba(233,184,201,0.2)',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: COLORS.bloodRed

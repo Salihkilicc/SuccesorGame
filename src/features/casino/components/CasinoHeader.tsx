@@ -46,13 +46,13 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
         return {
           fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
           fontWeight: '600' as '600',
-          color: '#FFF',
+          color: '#FFFFFF',
           letterSpacing: 3
         };
       default:
         return {
           fontWeight: '800' as '800',
-          color: '#FFF',
+          color: '#FFFFFF',
           letterSpacing: 2
         };
     }
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#31241F',
     borderBottomWidth: 1,
-    borderBottomColor: '#674C41'
+    borderBottomColor: 'rgba(255,255,255,0.06)'
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   navIcon: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 18,
     marginTop: -2
   },

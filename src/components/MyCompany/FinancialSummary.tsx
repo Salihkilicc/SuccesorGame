@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: '#333', // Subtle border - HARDCODED
+    borderColor: 'rgba(255,255,255,0.06)', // Subtle border - HARDCODED
   },
   title: {
     fontSize: 16,

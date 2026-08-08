@@ -92,7 +92,7 @@ export default TravelHubModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#111',
+        backgroundColor: '#31241F',
         alignItems: 'center', // Center children horizontally
     },
     container: {
@@ -106,19 +106,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
         letterSpacing: 2,
     },
     headerButton: {
         padding: 8,
     },
     headerButtonText: {
-        color: '#666',
+        color: '#7F5E51',
         fontWeight: 'bold',
         fontSize: 12,
     },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     },
     spotCost: {
         fontSize: 12,
-        color: '#999',
+        color: '#FFFFFF',
         fontWeight: '600',
     },
     typeBadge: {
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     typeText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: 'bold',
         textTransform: 'uppercase',

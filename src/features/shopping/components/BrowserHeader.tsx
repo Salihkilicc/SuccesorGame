@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.md,
         backgroundColor: '#31241F',
         borderBottomWidth: 1,
-        borderBottomColor: '#42312A',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
         gap: theme.spacing.sm,
     },
     backButton: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.sm,
         gap: theme.spacing.sm,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     lockIcon: {
         fontSize: 14,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     cartIcon: {
         fontSize: 20,

@@ -217,7 +217,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     closeText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '600',
     },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,
         shadowRadius: 20,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         backgroundColor: theme.colors.accentSoft,
-        borderWidth: 3,
+        borderWidth: 1,
         borderColor: theme.colors.accent,
         justifyContent: 'center',
         alignItems: 'center',
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     dateButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     dateSubtext: {

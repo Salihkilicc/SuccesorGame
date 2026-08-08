@@ -65,7 +65,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 )
             } else {
                 ActionButton = (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(58, 134, 255, 0.2)', borderColor: '#0A2A92' }]}>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(89,146,198,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
                         <Text style={[styles.badgeText, { color: '#0A2A92' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         backgroundColor: '#31241F',
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 0,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 12,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: 'rgba(255,255,255,0.05)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-end',
         borderTopWidth: 1,
-        borderTopColor: 'rgba(255, 255, 255, 0.05)',
+        borderTopColor: 'rgba(255,255,255,0.05)',
         paddingTop: 12,
     },
     actionButton: {

@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 28,
         fontWeight: '900',
         letterSpacing: 4,
         marginBottom: 8,
     },
     headerSubtitle: {
-        color: '#444',
+        color: '#674C41',
         fontSize: 14,
         marginBottom: 50,
         fontStyle: 'italic',
@@ -104,11 +104,11 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#111',
+        backgroundColor: '#31241F',
         padding: 20,
         borderRadius: 4,
         borderLeftWidth: 3,
-        borderLeftColor: '#444',
+        borderLeftColor: 'rgba(255,255,255,0.06)',
     },
     dangerButton: {
         borderLeftColor: '#900',
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         marginRight: 20,
     },
     menuTitle: {
-        color: '#ddd',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
         letterSpacing: 1,
@@ -132,11 +132,11 @@ const styles = StyleSheet.create({
         color: '#E9B8C9',
     },
     menuSubtitle: {
-        color: '#555',
+        color: '#7F5E51',
         fontSize: 12,
     },
     arrow: {
-        color: '#333',
+        color: '#533D35',
         fontSize: 24,
         fontWeight: 'bold',
         marginLeft: 'auto',

@@ -199,10 +199,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#31241F',
     borderRadius: 24,
     padding: 20,
-    borderWidth: 4,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.6,
     shadowRadius: 20,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   reelsWrapper: {
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: '#000',
+    backgroundColor: '#31241F',
     padding: 10,
     borderRadius: 12,
     overflow: 'hidden',
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     right: -10,
     height: 84, // Slightly larger than symbol height
     marginTop: -42,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     zIndex: 20,
     borderRadius: 4,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#674C41'
+    borderColor: 'rgba(255,255,255,0.06)'
   },
   betDisplay: {
     gap: 4
@@ -267,16 +267,16 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 8,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)'
   },
   spinButtonPressed: { transform: [{ scale: 0.95 }], opacity: 0.9 },
-  spinText: { color: '#FFF', fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
+  spinText: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
 
   disabledButton: { opacity: 0.7 },
 
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-5deg' }]
   },
   winAmount: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 42,
     fontWeight: '800',
     marginTop: 12,

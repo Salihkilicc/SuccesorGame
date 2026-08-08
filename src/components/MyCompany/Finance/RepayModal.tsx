@@ -143,8 +143,8 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                                     ]}
                                                     onPress={() => handleRepay(loan.id, loan.balance)}
                                                 >
-                                                    <Text style={[styles.repayButtonLabel, { color: '#000' }]}>{t('finance.payFull')}</Text>
-                                                    <Text style={[styles.repayButtonValue, { color: '#000' }]}>
+                                                    <Text style={[styles.repayButtonLabel, { color: '#31241F' }]}>{t('finance.payFull')}</Text>
+                                                    <Text style={[styles.repayButtonValue, { color: '#31241F' }]}>
                                                         {formatMoney(loan.balance)}
                                                     </Text>
                                                 </Pressable>
@@ -210,13 +210,13 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 80, // Space for Bottom Bar
     },
     title: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 4,
     },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     loanHeader: {
         flexDirection: 'row',
@@ -244,12 +244,12 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#333',
+        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     loanType: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     loanRate: {
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     loanDetailValue: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     repayOptions: {
         flexDirection: 'row',
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         padding: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     repayButtonFull: {
         backgroundColor: '#533D35',
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeText: {
-        color: '#AAA',
+        color: '#FFFFFF',
         fontWeight: '600',
         fontSize: 15,
     },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     confirmText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '800',
         fontSize: 16,
     },

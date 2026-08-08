@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: "#000",
+        shadowColor: "#31241F",
         shadowOffset: {
             width: 0,
             height: 4,
@@ -144,11 +144,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#FFFFFF',
+        borderColor: 'rgba(255,255,255,0.06)',
         borderRadius: 12,
         padding: 12,
         marginBottom: 10,
-        shadowColor: "#000",
+        shadowColor: "#31241F",
         shadowOffset: {
             width: 0,
             height: 1,

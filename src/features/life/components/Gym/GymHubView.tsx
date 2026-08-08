@@ -51,7 +51,7 @@ const GymHubView = () => {
             >
                 <Text style={styles.menuIcon}>{isSelected ? '🥋' : '👊'}</Text>
                 <View>
-                    <Text style={[styles.menuLabel, isSelected && { color: '#FFF' }]}>{label}</Text>
+                    <Text style={[styles.menuLabel, isSelected && { color: '#FFFFFF' }]}>{label}</Text>
                     <Text style={[styles.menuSubLabel, isSelected && { color: 'rgba(255,255,255,0.8)' }]}>
                         {subtitle}
                     </Text>

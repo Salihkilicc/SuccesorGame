@@ -70,17 +70,17 @@ const styles = StyleSheet.create({
     travelSection: {
         marginTop: 10,
         borderTopWidth: 1,
-        borderTopColor: '#5992C6',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         paddingTop: 10,
     },
     charterBox: {
-        backgroundColor: '#222',
+        backgroundColor: '#42312A',
         padding: 12,
         borderRadius: 8,
         alignItems: 'center',
         borderStyle: 'dashed',
         borderWidth: 1,
-        borderColor: '#555',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     charterTitle: {
         color: '#FFFFFF',
@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     optionButton: {
-        backgroundColor: '#222',
+        backgroundColor: '#42312A',
         borderRadius: 8,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     optionButtonSelected: {
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
         backgroundColor: '#31241F', // subtle gold tint
     },
     optionText: {
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         color: '#5992C6',
     },
     optionSubText: {
-        color: '#AAA',
+        color: '#FFFFFF',
         fontSize: 12,
         marginTop: 2,
     },

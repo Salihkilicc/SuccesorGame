@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     closeText: {
-        color: '#666',
+        color: '#7F5E51',
         fontWeight: 'bold',
         fontSize: 12,
         letterSpacing: 2,

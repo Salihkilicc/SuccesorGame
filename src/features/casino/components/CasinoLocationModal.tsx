@@ -49,7 +49,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                     }}
                                     style={({ pressed }) => [
                                         styles.card,
-                                        isSelected && { borderColor: loc.theme.primary, borderWidth: 2, backgroundColor: 'rgba(255,255,255,0.05)' },
+                                        isSelected && { borderColor: loc.theme.primary, borderWidth: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
                                         isLocked && styles.cardLocked,
                                         pressed && isUnlocked && { transform: [{ scale: 0.98 }] }
                                     ]}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: 24,
         borderWidth: 1,
-        borderColor: '#674C41',
+        borderColor: 'rgba(255,255,255,0.06)',
         maxHeight: '80%',
         overflow: 'hidden'
     },
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     closeText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold'
     },
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         gap: 16,
         borderWidth: 1,
-        borderColor: '#674C41'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     cardLocked: {
         opacity: 0.5,
@@ -166,10 +166,10 @@ const styles = StyleSheet.create({
     badge: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        backgroundColor: 'rgba(16,185,129,0.2)',
+        backgroundColor: 'rgba(89,146,198,0.2)',
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#5992C6'
+        borderColor: 'rgba(255,255,255,0.06)'
     },
     badgeText: {
         color: '#5992C6',

@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
         padding: 24,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     heroAvatar: {
         width: 80,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     heroAvatarText: {
         fontSize: 40,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
     },
     heroName: {
         fontSize: 24,
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20,
-        borderWidth: 2,
+        borderWidth: 1,
         marginBottom: 16,
     },
     trustBadgeText: {
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     tabTextActive: {
-        color: '#000',
+        color: '#31241F',
     },
     tabContent: {
         gap: 16,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: 'center',
         gap: 8,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionButtonPressed: {
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     actionButtonDisabled: {
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
     actionIcon: {
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#42312A',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
     },
     stepperButtonPressed: {
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.95 }],
     },
     stepperButtonDisabled: {
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.3,
     },
     stepperButtonText: {
@@ -732,8 +732,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     makeOfferButtonPressed: {
         opacity: 0.8,
@@ -741,13 +741,13 @@ const styles = StyleSheet.create({
     },
     makeOfferButtonDisabled: {
         backgroundColor: '#42312A',
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
     makeOfferButtonText: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#000',
+        color: '#31241F',
         letterSpacing: 1,
     },
     infoBox: {

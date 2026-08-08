@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.lg,
         padding: theme.spacing.xl,
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: theme.colors.success,
     },
     resultTitle: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
     },
     closeBtnText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '700',
         fontSize: 16,
     },

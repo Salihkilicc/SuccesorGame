@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     },
     titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-    title: { fontSize: 22, fontWeight: '800', color: '#FFF' },
+    title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
     closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#42312A', alignItems: 'center', justifyContent: 'center' },
     closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
 
@@ -393,13 +393,13 @@ const styles = StyleSheet.create({
     tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#42312A', alignItems: 'center' },
     tabActive: { backgroundColor: '#533D35' },
     tabText: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
-    tabTextActive: { color: '#000' },
+    tabTextActive: { color: '#31241F' },
 
     body: { flexGrow: 0, flexShrink: 1 },
 
     memberCard: { backgroundColor: '#42312A', borderRadius: 12, padding: 14, marginBottom: 10 },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
-    memberName: { fontSize: 15, color: '#FFF', fontWeight: '700' },
+    memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#5992C6', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
@@ -414,19 +414,19 @@ const styles = StyleSheet.create({
     lobbyText: { fontSize: 12, color: '#E9B8C9', fontWeight: '700' },
 
     floatCard: { backgroundColor: '#31241F', borderRadius: 12, padding: 14, marginTop: 4 },
-    floatTitle: { fontSize: 13, color: '#FFF', fontWeight: '700', marginBottom: 4 },
+    floatTitle: { fontSize: 13, color: '#FFFFFF', fontWeight: '700', marginBottom: 4 },
     floatBody: { fontSize: 11, color: 'rgba(255,255,255,0.48)', lineHeight: 16 },
 
     voteCard: { backgroundColor: '#42312A', borderRadius: 12, padding: 14, marginBottom: 12 },
-    voteTitle: { fontSize: 14, color: '#FFF', fontWeight: '800' },
+    voteTitle: { fontSize: 14, color: '#FFFFFF', fontWeight: '800' },
     voteSummary: { fontSize: 12, color: '#E9B8C9', marginTop: 4, marginBottom: 10 },
     voteRow: { flexDirection: 'row', gap: 10, marginBottom: 8, alignItems: 'flex-start' },
     voteMark: { fontSize: 16, fontWeight: '800', width: 18 },
-    voteName: { fontSize: 13, color: '#FFF', fontWeight: '600' },
+    voteName: { fontSize: 13, color: '#FFFFFF', fontWeight: '600' },
     voteReason: { fontSize: 11, color: 'rgba(255,255,255,0.48)' },
 
-    logRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#42312A' },
-    logLabel: { fontSize: 12, color: '#FFF' },
+    logRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
+    logLabel: { fontSize: 12, color: '#FFFFFF' },
     logEffect: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     emptyLog: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center', paddingVertical: 24 },
 });

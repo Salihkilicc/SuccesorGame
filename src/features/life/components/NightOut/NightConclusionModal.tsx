@@ -83,7 +83,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
                             isVibeCheck && {
                                 fontSize: 18,
                                 opacity: Math.max(0.6, (data.enjoymentScore || 0) / 100),
-                                color: (data.enjoymentScore || 0) > 80 ? '#FFFFFF' : '#ccc'
+                                color: (data.enjoymentScore || 0) > 80 ? '#FFFFFF' : '#FFFFFF'
                             }
                         ]}>
                             {data.text}

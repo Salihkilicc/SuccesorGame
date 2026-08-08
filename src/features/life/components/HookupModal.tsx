@@ -246,7 +246,7 @@ export function HookupModal({
                                     </Text>
 
                                     <View style={styles.overlayAvatarRow}>
-                                        <View style={[styles.smallAvatar, { backgroundColor: '#333' }]}>
+                                        <View style={[styles.smallAvatar, { backgroundColor: '#533D35' }]}>
                                             <Text style={{ fontSize: 40 }}>😎</Text>
                                         </View>
                                         <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
@@ -315,13 +315,13 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 20,
         paddingHorizontal: 10,
-        borderWidth: 4,
+        borderWidth: 1,
         borderRadius: 8,
         transform: [{ rotate: '-15deg' }],
     },
     likeFeedback: {
         left: 20,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     nopeFeedback: {
         right: 20,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 28,
         fontWeight: '800',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     age: {
         fontSize: 24,
@@ -399,12 +399,12 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     chip: {
-        backgroundColor: 'rgba(76, 111, 255, 0.15)', // Accent soft
+        backgroundColor: 'rgba(89,146,198,0.15)', // Accent soft
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(76, 111, 255, 0.3)',
+        borderColor: 'rgba(89,146,198,0.3)',
     },
     chipText: {
         color: '#0A2A92',
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#42312A',
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     },
     likeButton: {
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     buttonIcon: {
         fontSize: 28,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
         padding: 30,
         borderRadius: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     overlayTitle: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#fff',
+        color: '#FFFFFF',
         marginBottom: 8,
         textAlign: 'center',
         fontStyle: 'italic',
@@ -500,11 +500,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginHorizontal: -10,
-        borderWidth: 3,
-        borderColor: '#fff',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     keepPlayingBtn: {
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         paddingVertical: 14,
         paddingHorizontal: 32,
         borderRadius: 30,

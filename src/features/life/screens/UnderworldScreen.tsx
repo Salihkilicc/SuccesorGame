@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
         aspectRatio: 0.75, // Matching Apple ratio
         marginBottom: 8,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 6,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.15)',
+        borderColor: 'rgba(255,255,255,0.15)',
     },
     appIconVector: {
         textShadowColor: 'rgba(0,0,0,0.3)',

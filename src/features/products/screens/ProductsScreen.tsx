@@ -53,7 +53,7 @@ const ProductsScreen = () => {
           ))}
           {/* Discover New Tech Card */}
           <Pressable
-            style={[styles.activeCard, { borderStyle: 'dashed', backgroundColor: 'transparent', borderWidth: 2, alignItems: 'center', justifyContent: 'center', gap: 8 }]}
+            style={[styles.activeCard, { borderStyle: 'dashed', backgroundColor: 'transparent', borderWidth: 1, alignItems: 'center', justifyContent: 'center', gap: 8 }]}
             onPress={() => navigation.navigate('TechTree' as never)}
           >
             <Text style={{ fontSize: 30 }}>⚛️</Text>
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: { padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 },
   backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.colors.card, alignItems: 'center', justifyContent: 'center' },
-  backText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  title: { fontSize: 24, fontWeight: '800', color: '#fff' },
+  backText: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
+  title: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
   content: { paddingBottom: 80 }, // Adjusted for BottomStatsBar
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginLeft: 20, marginBottom: 16, marginTop: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginLeft: 20, marginBottom: 16, marginTop: 20 },
   activeList: {
     paddingHorizontal: 20,
     flexDirection: 'row',
@@ -129,20 +129,20 @@ const styles = StyleSheet.create({
   },
   activeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   activeIcon: { fontSize: 32 },
-  statusBadge: { backgroundColor: 'rgba(76, 175, 80, 0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  statusBadge: { backgroundColor: 'rgba(89,146,198,0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   statusText: { color: theme.colors.success, fontSize: 8, fontWeight: 'bold' },
-  activeName: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  activeName: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   activeProfit: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },
   activePrice: { color: theme.colors.success, fontWeight: '800', fontSize: 16 },
-  emptyText: { color: '#666', fontStyle: 'italic', marginLeft: 20 },
+  emptyText: { color: '#7F5E51', fontStyle: 'italic', marginLeft: 20 },
   lockedList: { paddingHorizontal: 20, gap: 12 },
   lockedCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#533D35', padding: 16, borderRadius: 12, opacity: 0.8 },
   iconBox: { width: 48, height: 48, backgroundColor: '#31241F', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
   lockedIcon: { fontSize: 24 },
   infoBox: { flex: 1 },
-  lockedName: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  lockedName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
   lockedCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '600', marginTop: 2 },
-  arrow: { color: '#666', fontSize: 20, fontWeight: 'bold' },
+  arrow: { color: '#7F5E51', fontSize: 20, fontWeight: 'bold' },
 });
 
 export default ProductsScreen;

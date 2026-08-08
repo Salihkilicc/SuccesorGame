@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     vipActive: {
         backgroundColor: '#31241F', // Dark luxury
         borderWidth: 1,
-        borderColor: '#5992C6',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     vipInactive: {
         backgroundColor: '#31241F',

@@ -80,12 +80,12 @@ const styles = StyleSheet.create({
   },
   sentimentChip: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(212,175,55,0.10)',
+    backgroundColor: 'rgba(233,184,201,0.10)',
     borderRadius: 999,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.3)',
+    borderColor: 'rgba(233,184,201,0.3)',
   },
   sentimentText: {
     color: '#E9B8C9',

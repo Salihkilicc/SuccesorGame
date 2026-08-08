@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(197,160,89,0.15)',
+        borderBottomColor: 'rgba(233,184,201,0.15)',
         minHeight: 70,
     },
     backBtn: {
@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
         left: 16,
         bottom: 12,
         zIndex: 10,
-        backgroundColor: 'rgba(197,160,89,0.08)',
+        backgroundColor: 'rgba(233,184,201,0.08)',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(197,160,89,0.2)',
+        borderColor: 'rgba(233,184,201,0.2)',
     },
     headerCenter: {
         flex: 1,

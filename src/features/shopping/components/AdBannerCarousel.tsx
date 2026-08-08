@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         fontSize: 42,
     },
     ctaBadge: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255,255,255,0.2)',
         paddingHorizontal: theme.spacing.md,
         paddingVertical: 6,
         borderRadius: 8,

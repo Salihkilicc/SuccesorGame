@@ -470,7 +470,7 @@ const LoveScreen = () => {
       }
 
       return (
-        <View style={{ gap: 16, padding: 10, backgroundColor: 'rgba(255,0,0,0.05)', borderRadius: 12 }}>
+        <View style={{ gap: 16, padding: 10, backgroundColor: 'rgba(233,184,201,0.05)', borderRadius: 12 }}>
           <Text style={{ fontSize: 40, textAlign: 'center' }}>💔</Text>
           <Text style={[styles.modalSubtitle, { textAlign: 'center', color: theme.colors.danger }]}>{t('love.warning')}</Text>
           <Text style={{ textAlign: 'center', color: theme.colors.textSecondary }}>
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(197,160,89,0.15)',
+    borderBottomColor: 'rgba(233,184,201,0.15)',
     minHeight: 80,
     backgroundColor: 'transparent',
   },
@@ -909,10 +909,10 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 12,
     zIndex: 10,
-    backgroundColor: 'rgba(197,160,89,0.08)',
+    backgroundColor: 'rgba(233,184,201,0.08)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(197,160,89,0.2)',
+    borderColor: 'rgba(233,184,201,0.2)',
   },
   headerCenter: {
     flex: 1,
@@ -973,8 +973,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.07)',
   },
   gridTileDanger: {
-    backgroundColor: 'rgba(239,68,68,0.06)',
-    borderColor: 'rgba(239,68,68,0.25)',
+    backgroundColor: 'rgba(233,184,201,0.06)',
+    borderColor: 'rgba(233,184,201,0.25)',
   },
   gridTilePressed: {
     opacity: 0.75,
@@ -1019,8 +1019,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.07)',
   },
   actionRowDanger: {
-    backgroundColor: 'rgba(239,68,68,0.06)',
-    borderColor: 'rgba(239,68,68,0.2)',
+    backgroundColor: 'rgba(233,184,201,0.06)',
+    borderColor: 'rgba(233,184,201,0.2)',
   },
   actionRowPressed: {
     opacity: 0.72,
@@ -1088,9 +1088,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: 'rgba(99,102,241,0.12)',
+    backgroundColor: 'rgba(89,146,198,0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(99,102,241,0.35)',
+    borderColor: 'rgba(89,146,198,0.35)',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,

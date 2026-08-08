@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 24,
         padding: theme.spacing.lg,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     header: {
         flexDirection: 'row',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     sectorBadge: {
         backgroundColor: '#42312A',
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     closeButtonText: {
         fontSize: 20,
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         marginTop: -2,
     },
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#555',
+        color: '#7F5E51',
         letterSpacing: 1,
         marginBottom: 12,
     },
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     grid: {
         flexDirection: 'row',
@@ -225,14 +225,14 @@ const styles = StyleSheet.create({
     gridValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     fitContainer: {
         backgroundColor: '#31241F',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     fitRow: {
         gap: 8,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     },
     fitLabel: {
         fontSize: 14,
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '600',
     },
     fitValue: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         marginVertical: 16,
     },
     sentimentBadge: {
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderWidth: 1,
-        borderColor: '#333',
-        shadowColor: "#000",
+        borderColor: 'rgba(255,255,255,0.06)',
+        shadowColor: "#31241F",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     priceValue: {
         fontSize: 20,
         fontWeight: '900',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     buyButton: {
         backgroundColor: theme.colors.success,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     buyButtonText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 14,
     },

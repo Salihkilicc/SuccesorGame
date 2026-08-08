@@ -82,12 +82,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   chip: {
-    backgroundColor: 'rgba(212,175,55,0.12)',
+    backgroundColor: 'rgba(233,184,201,0.12)',
     borderRadius: 999,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.4)',
+    borderColor: 'rgba(233,184,201,0.4)',
   },
   chipText: {
     color: '#E9B8C9',

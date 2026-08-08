@@ -79,11 +79,11 @@ const ChipItem = ({
                     },
                 ]}
             >
-                <View style={[styles.chipInner, { borderColor: isSelected ? '#FFF' : color }]}>
+                <View style={[styles.chipInner, { borderColor: isSelected ? '#FFFFFF' : color }]}>
                     <Text
                         style={[
                             styles.chipText,
-                            { color: isSelected ? '#FFF' : color, fontWeight: '800' },
+                            { color: isSelected ? '#FFFFFF' : color, fontWeight: '800' },
                         ]}
                         adjustsFontSizeToFit
                         numberOfLines={1}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         borderRadius: 32,
-        borderWidth: 2,
+        borderWidth: 1,
         borderStyle: 'dashed', // Dashed border for poker chip look
         justifyContent: 'center',
         alignItems: 'center',

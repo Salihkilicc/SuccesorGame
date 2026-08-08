@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     footer: {
         marginTop: 20,
         borderTopWidth: 1,
-        borderTopColor: '#5992C6',
+        borderTopColor: 'rgba(255,255,255,0.06)',
         paddingTop: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',

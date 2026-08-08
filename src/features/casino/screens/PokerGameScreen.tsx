@@ -68,7 +68,7 @@ const PokerGameScreen = () => {
           <View style={styles.cardRow}>
             {board.slice(0, revealedBoard).map((card, idx) => renderCard(card, idx))}
             {Array.from({ length: 5 - revealedBoard }).map((_, idx) => (
-              <View key={`placeholder-${idx}`} style={[styles.card, { opacity: 0.1, backgroundColor: '#000' }]} />
+              <View key={`placeholder-${idx}`} style={[styles.card, { opacity: 0.1, backgroundColor: '#31241F' }]} />
             ))}
           </View>
         </View>
@@ -174,12 +174,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2
   },
-  cardHidden: { backgroundColor: '#533D35', borderWidth: 2, borderColor: '#FFF' },
+  cardHidden: { backgroundColor: '#533D35', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   cardBack: { fontSize: 32 },
   cardRank: { fontSize: 20, fontWeight: '900', color: '#31241F' },
   cardSuit: { fontSize: 20 },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#674C41',
+    borderColor: 'rgba(255,255,255,0.06)',
     minHeight: 80
   },
   betDisplay: { gap: 2 },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minWidth: 120
   },
-  primaryText: { color: '#FFF', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
+  primaryText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
   secondaryButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,

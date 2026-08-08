@@ -91,7 +91,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, -1)}
                     disabled={strategy[field] === 0}
                 >
-                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#555' : '#FFF'} />
+                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#7F5E51' : '#FFFFFF'} />
                 </TouchableOpacity>
 
                 <View style={styles.valueBox}>
@@ -103,7 +103,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, 1)}
                     disabled={totalPoints >= maxPoints}
                 >
-                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#555' : '#FFF'} />
+                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#7F5E51' : '#FFFFFF'} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -128,7 +128,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <Text style={styles.sectorText}>{company.sector} Sector</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                            <Ionicons name="close" size={24} color="#FFF" />
+                            <Ionicons name="close" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
 
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        shadowColor: "#000",
+        shadowColor: "#31241F",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     companyName: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
         letterSpacing: 0.5,
     },
     sectorText: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     kpiItem: {
         flex: 1,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     kpiValue: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -293,10 +293,10 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     pointsBadge: {
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 12,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     pointsText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     strategyList: {
         gap: 12,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#31241F',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     strategyInfo: {
         flexDirection: 'row',
@@ -331,14 +331,14 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 10,
-        backgroundColor: '#333',
+        backgroundColor: '#533D35',
         alignItems: 'center',
         justifyContent: 'center',
     },
     strategyLabel: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     strategyDesc: {
         fontSize: 11,
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     controlBtn: {
         width: 28,
@@ -372,11 +372,11 @@ const styles = StyleSheet.create({
     valueText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     infoBox: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(10, 132, 255, 0.1)',
+        backgroundColor: 'rgba(89,146,198,0.1)',
         padding: 12,
         borderRadius: 12,
         marginTop: 20,
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     saveBtnText: {
-        color: '#000',
+        color: '#31241F',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

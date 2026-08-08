@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#FFFFFF',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   rowLocked: {
     opacity: 0.8,

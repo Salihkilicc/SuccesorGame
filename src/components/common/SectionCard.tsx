@@ -46,11 +46,11 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#333',
+        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: theme.spacing.sm,
     },
     dangerCard: {
-        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+        backgroundColor: 'rgba(233,184,201,0.1)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     selectedCard: {

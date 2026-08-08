@@ -146,7 +146,7 @@ const ShoppingScreen = () => {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalRow}>
                     {trendingItems.map(item => {
                         const shop = SHOPS.find(s => s.id === item.shopId);
-                        const color = shop?.bannerColor || '#FFF';
+                        const color = shop?.bannerColor || '#FFFFFF';
                         return (
                             <Pressable
                                 key={item.id}
@@ -184,7 +184,7 @@ const ShoppingScreen = () => {
 
         return (
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <View style={[styles.categoryHeader, { borderColor: categoryMeta?.color || '#FFF' }]}>
+                <View style={[styles.categoryHeader, { borderColor: categoryMeta?.color || '#FFFFFF' }]}>
                     <Text style={styles.categoryHeaderEmoji}>{categoryMeta?.emoji}</Text>
                     <Text style={[styles.categoryHeaderTitle, { color: categoryMeta?.color }]}>
                         {categoryMeta?.name} Directorate
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
         marginBottom: theme.spacing.xl,
     },
     sectionTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '700',
         marginBottom: theme.spacing.md,
@@ -379,12 +379,12 @@ const styles = StyleSheet.create({
         marginBottom: theme.spacing.lg,
     },
     welcomeText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
     },
     subtitleText: {
-        color: '#888',
+        color: '#FFFFFF',
         fontSize: 14,
     },
 
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
         gap: 6,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     trendingIcon: {
         width: '100%',
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     },
     trendingEmoji: { fontSize: 32 },
     trendingName: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '600',
         minHeight: 34,
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     },
     shopBannerEmoji: { fontSize: 40 },
     shopBannerTitle: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '700',
         letterSpacing: -0.5,
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#42312A',
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: 8,
     },
     itemImage: {
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     itemEmoji: { fontSize: 40 },
     itemInfo: { gap: 4, flex: 1 },
     itemName: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
         height: 36,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     addButtonText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '700',
         textTransform: 'uppercase',

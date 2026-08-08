@@ -182,13 +182,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2
   },
-  hiddenCard: { backgroundColor: '#533D35', borderWidth: 2, borderColor: '#FFF' },
+  hiddenCard: { backgroundColor: '#533D35', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   cardRank: { fontSize: 20, fontWeight: '900', color: '#31241F' },
   cardSuit: { fontSize: 20 },
 
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#674C41',
+    borderColor: 'rgba(255,255,255,0.06)',
     minHeight: 80
   },
   betDisplay: { gap: 2 },
@@ -220,17 +220,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minWidth: 120
   },
-  primaryText: { color: '#FFF', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
+  primaryText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
 
   gameBtn: {
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
-    borderWidth: 2,
+    borderWidth: 1,
     minWidth: 90,
     alignItems: 'center'
   },
-  hitBtn: { borderColor: '#5992C6', backgroundColor: 'rgba(16,185,129,0.1)' },
-  standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(239,68,68,0.1)' },
-  gameBtnText: { color: '#FFF', fontWeight: '900' }
+  hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(89,146,198,0.1)' },
+  standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(233,184,201,0.1)' },
+  gameBtnText: { color: '#FFFFFF', fontWeight: '900' }
 });

@@ -28,7 +28,7 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#333' }: any) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#533D35' }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
@@ -222,7 +222,7 @@ const MyCompanyScreen = () => {
             </View>
 
             {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#333', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#533D35', marginVertical: 16 }} />
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -238,7 +238,7 @@ const MyCompanyScreen = () => {
               />
             </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: '#333', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#533D35', marginVertical: 16 }} />
 
             {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
                 su an yavas biriken bir itibar gostergesi.
@@ -263,7 +263,7 @@ const MyCompanyScreen = () => {
               title={t('company.finance')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => toggleModal('finance', true)}
-              color="rgba(255, 215, 0, 0.5)" // Gold
+              color="rgba(233,184,201,0.5)" // Gold
             />
 
             <DepartmentCard
@@ -271,7 +271,7 @@ const MyCompanyScreen = () => {
               title={t('company.products')}
               subtitle={`${activeProductsCount} Active`}
               onPress={() => navigation.navigate('Products')}
-              color="rgba(10, 132, 255, 0.5)" // Blue
+              color="rgba(89,146,198,0.5)" // Blue
             />
 
             <DepartmentCard
@@ -279,14 +279,14 @@ const MyCompanyScreen = () => {
               title={t('company.financialReport')}
               subtitle={t('company.expensesProfitsRoi')}
               onPress={() => navigation.navigate('FinancialReport')}
-              color="rgba(191, 90, 242, 0.5)" // Purple
+              color="rgba(233,184,201,0.5)" // Purple
             />
             <DepartmentCard
               icon="📈"
               title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => toggleModal('shareControl', true)}
-              color="rgba(48, 209, 88, 0.5)" // Green
+              color="rgba(89,146,198,0.5)" // Green
             />
           </View>
 
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(197,160,89,0.15)',
+    borderBottomColor: 'rgba(233,184,201,0.15)',
     minHeight: 80,
     backgroundColor: 'transparent',
   },
@@ -394,10 +394,10 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 12,
     zIndex: 10,
-    backgroundColor: 'rgba(197,160,89,0.08)',
+    backgroundColor: 'rgba(233,184,201,0.08)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(197,160,89,0.2)',
+    borderColor: 'rgba(233,184,201,0.2)',
   },
   headerCenter: {
     flex: 1,
@@ -427,16 +427,16 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {
     flexBasis: '48%',
-    backgroundColor: 'rgba(22, 22, 24, 0.8)',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     gap: 8,
     minHeight: 120,
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#31241F',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,

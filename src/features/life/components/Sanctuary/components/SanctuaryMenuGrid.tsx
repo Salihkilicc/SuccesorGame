@@ -117,15 +117,15 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: '#31241F', // Deep Forest Green
+        borderColor: 'rgba(255,255,255,0.06)', // Deep Forest Green
     },
     dangerCard: {
         borderColor: 'rgba(255,255,255,0.48)', // Bamboo
         backgroundColor: '#31241F',
     },
     vipCard: {
-        borderWidth: 2,
-        borderColor: '#5992C6', // Light Green
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)', // Light Green
         backgroundColor: '#5992C6', // Dark Pine
     },
     cardPressed: {
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         borderRadius: theme.radius.md,
         padding: 12,
-        borderWidth: 2,
-        borderColor: '#5992C6',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
         gap: 10,
     },
     vipActiveIcon: {

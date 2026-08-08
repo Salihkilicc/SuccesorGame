@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#31241F',
         marginBottom: 16,
         elevation: 4,
-        shadowColor: '#000',
+        shadowColor: '#31241F',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     title: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: '800',
         letterSpacing: 1,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     playText: {
-        color: '#FFF',
+        color: '#FFFFFF',
         fontWeight: '800',
         fontSize: 12,
         letterSpacing: 1,

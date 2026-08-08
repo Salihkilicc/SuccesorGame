@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.success,
     },
     activeText: {
-        color: '#000',
+        color: '#31241F',
         fontWeight: '800',
         fontSize: 10,
     },
