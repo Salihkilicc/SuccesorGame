@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#7B68D7',
+    color: '#C8C0EF',
   },
   changeDown: {
     color: '#C734CA',

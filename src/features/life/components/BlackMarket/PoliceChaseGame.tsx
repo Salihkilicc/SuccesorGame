@@ -338,7 +338,7 @@ export const PoliceChaseGame: React.FC<PoliceChaseGameProps> = ({ onComplete, on
                                     {
                                         width: `${staminaPercentage}%`,
                                         backgroundColor:
-                                            staminaPercentage > 50 ? '#7B68D7' :
+                                            staminaPercentage > 50 ? '#C8C0EF' :
                                                 staminaPercentage > 25 ? '#C734CA' : '#C734CA'
                                     }
                                 ]}
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)'
     },
     safeHouseCell: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },

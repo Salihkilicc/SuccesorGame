@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   separator: { width: 1, backgroundColor: '#0B0635', marginHorizontal: 12 },
   label: { fontSize: 11, color: 'rgba(255,255,255,0.48)', textTransform: 'uppercase' }, // Text Secondary
   value: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' }, // White
-  success: { color: '#7B68D7' }, // Green
+  success: { color: '#C8C0EF' }, // Green
   danger: { color: theme.colors.danger },
   sectionHeader: { marginTop: theme.spacing.sm },
   sectionTitle: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },

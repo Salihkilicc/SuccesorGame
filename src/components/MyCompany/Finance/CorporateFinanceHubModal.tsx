@@ -69,7 +69,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
     const getCreditRating = () => {
         if (creditScore >= 800) return { label: 'AAA', color: '#C734CA', description: t('finance.excellent') };
         if (creditScore >= 750) return { label: 'AA', color: '#C734CA', description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: '#7B68D7', description: t('finance.good') };
+        if (creditScore >= 700) return { label: 'A', color: '#C8C0EF', description: t('finance.good') };
         if (creditScore >= 650) return { label: 'BBB', color: '#C734CA', description: t('finance.fair') };
         if (creditScore >= 600) return { label: 'BB', color: '#C734CA', description: t('finance.moderate') };
         if (creditScore >= 500) return { label: 'B', color: '#C734CA', description: t('finance.risky') };
@@ -101,14 +101,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.navGrid}>
                     {/* OWNER INJECTION BUTTON */}
                     <TouchableOpacity style={[styles.navCard, { borderColor: 'rgba(255,255,255,0.06)', flex: 1 }]} onPress={() => setShowInjection(true)}>
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(123,104,215,0.2)' }]}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(200,192,239,0.2)' }]}>
                             <Text style={{ fontSize: 24 }}>💸</Text>
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
                             <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
                         </View>
-                        <Text style={{ color: '#7B68D7', fontSize: 18 }}>→</Text>
+                        <Text style={{ color: '#C8C0EF', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -163,7 +163,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
-                        <Text style={[styles.statValue, { color: leverage > 60 ? '#C734CA' : '#7B68D7' }]}>
+                        <Text style={[styles.statValue, { color: leverage > 60 ? '#C734CA' : '#C8C0EF' }]}>
                             {leverage.toFixed(1)}%
                         </Text>
                     </View>
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     emptyStateText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 4,
     },
     emptyStateSubtext: {
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     repayButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

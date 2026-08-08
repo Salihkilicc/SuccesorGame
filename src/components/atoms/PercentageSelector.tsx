@@ -81,9 +81,9 @@ export const PercentageSelector = ({
 
                 {/* 2. Satır: ARTIRMA (Yeşil/Mavi Tonlar) */}
                 <View style={styles.row}>
-                    {renderBtn("+5%", () => update('percent', 5), '#07062E', '#7B68D7')}
-                    {renderBtn("+10%", () => update('percent', 10), '#07062E', '#7B68D7')}
-                    {renderBtn("+50%", () => update('percent', 50), '#0B0635', '#7B68D7')}
+                    {renderBtn("+5%", () => update('percent', 5), '#07062E', '#C8C0EF')}
+                    {renderBtn("+10%", () => update('percent', 10), '#07062E', '#C8C0EF')}
+                    {renderBtn("+50%", () => update('percent', 50), '#0B0635', '#C8C0EF')}
                     {renderBtn("MAX", () => update('max', 0), '#07062E', '#0B0635')}
                 </View>
 
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     label: { color: 'rgba(255,255,255,0.48)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase' },
     value: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' },
-    unit: { fontSize: 12, color: '#7B68D7', fontWeight: 'normal' },
+    unit: { fontSize: 12, color: '#C8C0EF', fontWeight: 'normal' },
 
     // Bar Stilleri
     barTrack: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
         marginBottom: 10
     },
-    limitText: { fontSize: 10, color: '#7B68D7' },
+    limitText: { fontSize: 10, color: '#C8C0EF' },
 
     // Buton Stilleri
     controls: { gap: 6 },

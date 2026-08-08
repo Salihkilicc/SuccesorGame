@@ -76,7 +76,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     // Get trust status
     const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#7B68D7' };
+        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#C8C0EF' };
         if (trust >= 60) return { label: t('equity.supportive'), color: '#C734CA' };
         if (trust >= 40) return { label: t('equity.neutral'), color: '#C734CA' };
         if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#C734CA' };
@@ -178,7 +178,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     const getLikelihoodColor = () => {
         if (offerPremium < 0) return '#C734CA'; // Insulted
         if (offerPremium < 20) return '#C734CA'; // Hesitant
-        return '#7B68D7'; // Interested
+        return '#C8C0EF'; // Interested
     };
 
     const getLikelihoodLabel = () => {
@@ -312,7 +312,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     </View>
                     <View style={styles.statItem}>
                         <Text style={styles.statLabel}>{t('equity.relationship')}</Text>
-                        <Text style={[styles.statValue, { color: '#7B68D7' }]}>
+                        <Text style={[styles.statValue, { color: '#C8C0EF' }]}>
                             {Math.round(member.relationship ?? 50)}
                         </Text>
                     </View>
@@ -364,7 +364,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🎁</Text>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
-                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#7B68D7' : '#C734CA' }]}>
+                                <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#C8C0EF' : '#C734CA' }]}>
                                     {fmtDelta(giftPreview)}
                                 </Text>
                             </Pressable>
@@ -380,7 +380,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 <Text style={styles.actionIcon}>🍽️</Text>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
-                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#7B68D7' : '#C734CA' }]}>
+                                <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#C8C0EF' : '#C734CA' }]}>
                                     {fmtDelta(dinnerPreview)}
                                 </Text>
                             </Pressable>
@@ -430,7 +430,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                     </Text>
                                     <Text style={[
                                         styles.stepperPremium,
-                                        { color: offerPremium >= 0 ? '#7B68D7' : '#C734CA' }
+                                        { color: offerPremium >= 0 ? '#C8C0EF' : '#C734CA' }
                                     ]}>
                                         {offerPremium >= 0 ? '+' : ''}{offerPremium}%
                                     </Text>
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     characterCard: { backgroundColor: '#0B0635', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
     characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
     characterValue: { color: '#FFFFFF', fontWeight: '700' },
-    characterHint: { color: '#7B68D7', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
+    characterHint: { color: '#C8C0EF', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
         gap: 24,
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     },
     actionEffect: {
         fontSize: 11,
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     stepperContainer: {
         backgroundColor: '#0B0635',
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     makeOfferButton: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',

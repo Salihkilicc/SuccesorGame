@@ -166,13 +166,13 @@ const styles = StyleSheet.create({
     badge: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        backgroundColor: 'rgba(123,104,215,0.2)',
+        backgroundColor: 'rgba(200,192,239,0.2)',
         borderRadius: 8,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },
     badgeText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 10,
         fontWeight: '800'
     }

@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   up: {
-    color: '#7B68D7',
+    color: '#C8C0EF',
   },
   down: {
     color: '#C734CA',

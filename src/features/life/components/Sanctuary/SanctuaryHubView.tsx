@@ -120,11 +120,11 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     backdrop: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#7B68D7', // Light gray background
+        backgroundColor: '#C8C0EF', // Light gray background
     },
     safeArea: {
         flex: 1,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     vipTitle: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#7B68D7', // Gold -> Light Green
+        color: '#C8C0EF', // Gold -> Light Green
         marginBottom: 4,
     },
     vipDesc: {

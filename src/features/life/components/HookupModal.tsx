@@ -239,7 +239,7 @@ export function HookupModal({
                         {/* MATCHED OVERLAY */}
                         {matchStatus === 'MATCHED' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#7B68D7' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#C8C0EF' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.itSAMatch')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         You and {candidate.name} passed the vibe check.
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     likeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     nopeText: {
         fontSize: 32,
@@ -399,15 +399,15 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     chip: {
-        backgroundColor: 'rgba(123,104,215,0.15)', // Accent soft
+        backgroundColor: 'rgba(200,192,239,0.15)', // Accent soft
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(123,104,215,0.3)',
+        borderColor: 'rgba(200,192,239,0.3)',
     },
     chipText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     keepPlayingText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '800',
         textAlign: 'center',
         fontSize: 16,

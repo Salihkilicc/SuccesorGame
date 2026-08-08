@@ -53,7 +53,7 @@ const MarketTicker = ({ items }: { items: any[] }) => {
                 <Text style={styles.price}>
                     {price < 1 ? `$${price.toFixed(4)}` : formatPrice(price)}
                 </Text>
-                <Text style={[styles.change, { color: isUp ? '#7B68D7' : '#C734CA' }]}>
+                <Text style={[styles.change, { color: isUp ? '#C8C0EF' : '#C734CA' }]}>
                     {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
                 </Text>
                 <Text style={styles.separator}>|</Text>

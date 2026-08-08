@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     },
     barFill: {
         height: '100%',
-        backgroundcolor: '#7B68D7', // Green for enjoyment
+        backgroundcolor: '#C8C0EF', // Green for enjoyment
     },
     statsContainer: {
         flexDirection: 'row',
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
     },
-    positive: { color: '#7B68D7' },
+    positive: { color: '#C8C0EF' },
     negative: { color: '#C734CA' },
 });

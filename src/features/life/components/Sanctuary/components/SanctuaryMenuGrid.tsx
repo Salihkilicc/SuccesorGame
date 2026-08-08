@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     vipCard: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)', // Light Green
-        backgroundColor: '#7B68D7', // Dark Pine
+        backgroundColor: '#C8C0EF', // Dark Pine
     },
     cardPressed: {
         opacity: 0.8,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     vipText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     cardSubtitle: {
         fontSize: 12,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
     },
     vipActiveTitle: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '700',
         fontSize: 15,
         marginBottom: 2,

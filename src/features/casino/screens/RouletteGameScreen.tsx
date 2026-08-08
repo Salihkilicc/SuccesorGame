@@ -184,6 +184,6 @@ const styles = StyleSheet.create({
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   resultRed: { backgroundColor: '#0B0635' },
   resultBlack: { backgroundColor: '#0B0635' },
-  resultGreen: { backgroundColor: '#7B68D7' },
+  resultGreen: { backgroundColor: '#C8C0EF' },
   resultText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
 });

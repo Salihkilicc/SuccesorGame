@@ -31,7 +31,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
           fontWeight: '900' as '900',
           fontStyle: 'italic' as 'italic',
-          color: '#7B68D7', // Neon Purple
+          color: '#C8C0EF', // Neon Purple
           textShadowColor: '#6004BD',
           textShadowRadius: 10
         };

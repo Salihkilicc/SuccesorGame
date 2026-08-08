@@ -140,14 +140,14 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>📈 Stock Price</Text>
-                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
+                                <Text style={[styles.impactValue, { color: '#C8C0EF' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
+                                    <Text style={[styles.impactValue, { color: '#C8C0EF' }]}>
                                         +{(predictedImpact * 100).toFixed(1)}%
                                     </Text>
                                     <Text style={styles.impactSubValue}>{t('equity.targetV1', { v1: formatPrice(predictedPrice) })}</Text>
@@ -155,7 +155,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>👤 Your Ownership</Text>
-                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
+                                <Text style={[styles.impactValue, { color: '#C8C0EF' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
                             </View>
@@ -167,7 +167,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 <Text style={styles.costLabel}>{t('equity.availableCash')}</Text>
                                 <Text style={[
                                     styles.costValue,
-                                    { color: isAffordable ? '#7B68D7' : '#C734CA' }
+                                    { color: isAffordable ? '#C8C0EF' : '#C734CA' }
                                 ]}>
                                     {formatMoney(companyCapital)}
                                 </Text>
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     amountCard: {
-        backgroundColor: 'rgba(123,104,215,0.15)',
+        backgroundColor: 'rgba(200,192,239,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -328,14 +328,14 @@ const styles = StyleSheet.create({
     },
     amountLabel: {
         fontSize: 13,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '600',
         marginBottom: 6,
     },
     amountValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     impactSection: {
         backgroundColor: '#0B0635',

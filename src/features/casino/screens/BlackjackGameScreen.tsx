@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     minWidth: 90,
     alignItems: 'center'
   },
-  hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(123,104,215,0.1)' },
+  hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(200,192,239,0.1)' },
   standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' },
   gameBtnText: { color: '#FFFFFF', fontWeight: '900' }
 });

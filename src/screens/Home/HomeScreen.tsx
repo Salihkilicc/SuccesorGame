@@ -49,11 +49,11 @@ const GRADIENTS = {
   purplePink: ['#6004BD', '#6004BD'],
   pinkRed: ['#C734CA', '#C734CA'],
   orangeYellow: ['#C734CA', '#C734CA'],
-  blueSky: ['#7B68D7', '#7B68D7'],
-  bluePurple: ['#7B68D7', '#6004BD'],
+  blueSky: ['#C8C0EF', '#C8C0EF'],
+  bluePurple: ['#C8C0EF', '#6004BD'],
   darkGrey: ['#020626', '#11063D'],
-  networkBlue: ['#6004BD', '#7B68D7'],
-  tealCyan: ['#7B68D7', '#7B68D7'],
+  networkBlue: ['#6004BD', '#C8C0EF'],
+  tealCyan: ['#C8C0EF', '#C8C0EF'],
 };
 
 // Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
@@ -391,7 +391,7 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#7B68D7']}
+                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#C8C0EF']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#7B68D7']}
+                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#C8C0EF']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
   },
   gender: {
     fontSize: 13,
-    color: '#7B68D7',
+    color: '#C8C0EF',
   },
   premiumTag: {
     marginLeft: theme.spacing.xs,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   ageChipLabel: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#7B68D7',
+    color: '#C8C0EF',
     letterSpacing: 1,
   },
   ageChipValue: {
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 33,
     borderWidth: 0,
-    shadowColor: '#7B68D7',
+    shadowColor: '#C8C0EF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 20,

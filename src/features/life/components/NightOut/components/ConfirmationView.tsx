@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     },
     venueLocation: {
         fontSize: 14,
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     breakdown: {
         gap: 12,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     totalValue: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     actions: {
         gap: 12,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

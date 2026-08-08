@@ -318,24 +318,24 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     cashCard: {
-        backgroundColor: 'rgba(123,104,215,0.15)',
+        backgroundColor: 'rgba(200,192,239,0.15)',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#7B68D740',
+        borderColor: '#C8C0EF40',
     },
     cashLabel: {
         fontSize: 13,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '600',
         marginBottom: 6,
     },
     cashValue: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     stepperSection: {
         marginBottom: 16,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     profitHighlight: {
-        backgroundColor: 'rgba(123,104,215,0.2)',
+        backgroundColor: 'rgba(200,192,239,0.2)',
         borderRadius: 12,
         padding: 20,
         alignItems: 'center',
@@ -443,14 +443,14 @@ const styles = StyleSheet.create({
     },
     profitLabel: {
         fontSize: 14,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '600',
         marginBottom: 8,
     },
     profitAmount: {
         fontSize: 36,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 6,
     },
     profitNote: {
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     profitBadge: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     },
     distributeButton: {
         flex: 1,
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',

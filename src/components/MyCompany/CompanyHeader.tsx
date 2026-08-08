@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   metricValue: {
-    color: '#7B68D7', // Green for valuation
+    color: '#C8C0EF', // Green for valuation
     fontSize: theme.typography.subtitle + 4,
     fontWeight: '800',
   },
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   changeUp: {
-    color: '#7B68D7', // Green
+    color: '#C8C0EF', // Green
   },
   changeDown: {
     color: '#C734CA', // Red

@@ -271,7 +271,7 @@ const MyCompanyScreen = () => {
               title={t('company.products')}
               subtitle={`${activeProductsCount} Active`}
               onPress={() => navigation.navigate('Products')}
-              color="rgba(123,104,215,0.5)" // Blue
+              color="rgba(200,192,239,0.5)" // Blue
             />
 
             <DepartmentCard
@@ -286,7 +286,7 @@ const MyCompanyScreen = () => {
               title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => toggleModal('shareControl', true)}
-              color="rgba(123,104,215,0.5)" // Green
+              color="rgba(200,192,239,0.5)" // Green
             />
           </View>
 

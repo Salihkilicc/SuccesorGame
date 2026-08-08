@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profit: {
-    color: '#7B68D7',
+    color: '#C8C0EF',
   },
   loss: {
     color: '#C734CA',
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   buyButton: {
-    backgroundColor: 'rgba(123,104,215,0.12)',
+    backgroundColor: 'rgba(200,192,239,0.12)',
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.sm,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: '#7B68D7',
+    color: '#C8C0EF',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },

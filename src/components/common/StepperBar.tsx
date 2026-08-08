@@ -67,7 +67,7 @@ const StepperBar: React.FC<Props> = ({
     markers = [],
     steps = [1, 10, 100],
     percents = [25, 50, 75, 100],
-    fillColor = '#7B68D7',
+    fillColor = '#C8C0EF',
     disabled = false,
 }) => {
     const safeMax = Math.max(1, max);
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 9, paddingVertical: 5, borderRadius: 8,
         backgroundColor: 'rgba(255,255,255,0.05)',
     },
-    pctChipActive: { backgroundColor: 'rgba(123,104,215,0.22)' },
-    pctChipAccent: { backgroundColor: 'rgba(123,104,215,0.16)' },
+    pctChipActive: { backgroundColor: 'rgba(200,192,239,0.22)' },
+    pctChipAccent: { backgroundColor: 'rgba(200,192,239,0.16)' },
     pctText: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, fontWeight: '700' },
-    pctTextActive: { color: '#7B68D7' },
-    pctTextAccent: { color: '#7B68D7' },
+    pctTextActive: { color: '#C8C0EF' },
+    pctTextAccent: { color: '#C8C0EF' },
 });
 
 export default StepperBar;

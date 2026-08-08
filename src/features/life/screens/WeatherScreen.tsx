@@ -72,7 +72,7 @@ const WeatherScreen = () => {
                 <View style={styles.mainContent}>
                     {loading ? (
                         <View style={styles.centerBox}>
-                            <ActivityIndicator size="large" color="rgba(123,104,215,0.9)" />
+                            <ActivityIndicator size="large" color="rgba(200,192,239,0.9)" />
                             <Text style={styles.statusText}>{t('life.detectingLocation')}</Text>
                         </View>
                     ) : error ? (
@@ -285,9 +285,9 @@ const styles = StyleSheet.create({
         borderRadius: 14,
     },
     forecastDayFirst: {
-        backgroundColor: 'rgba(123,104,215,0.12)',
+        backgroundColor: 'rgba(200,192,239,0.12)',
         borderWidth: 1,
-        borderColor: 'rgba(123,104,215,0.18)',
+        borderColor: 'rgba(200,192,239,0.18)',
     },
     forecastDayLabel: {
         color: 'rgba(255,255,255,0.45)',
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     forecastDayLabelToday: {
-        color: 'rgba(123,104,215,0.9)',
+        color: 'rgba(200,192,239,0.9)',
     },
     forecastEmoji: {
         fontSize: 20,

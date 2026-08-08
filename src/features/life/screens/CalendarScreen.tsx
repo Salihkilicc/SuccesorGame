@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         letterSpacing: 0.5,
     },
-    weekLabelWeekend: { color: 'rgba(123,104,215,0.6)' },
+    weekLabelWeekend: { color: 'rgba(200,192,239,0.6)' },
 
     // Week row
     weekRow: {

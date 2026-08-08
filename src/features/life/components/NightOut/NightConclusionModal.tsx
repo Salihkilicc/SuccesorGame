@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     closeButtonText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 14,
         textTransform: 'uppercase',
         letterSpacing: 2

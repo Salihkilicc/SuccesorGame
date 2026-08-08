@@ -278,7 +278,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
                     icon: '🧘',
                     title: 'Stress Relief',
                     desc: `-${val} Stress / Turn`,
-                    color: '#7B68D7' // Blue
+                    color: '#C8C0EF' // Blue
                 });
                 break;
             case 'MEDICAL_DISCOUNT':
@@ -353,7 +353,7 @@ export const getPartnerPerks = (partner: PartnerProfile | any): Perk[] => {
             icon: '💻',
             title: 'Cyber Sentinel',
             desc: '+15 Digital Security, +2 Intellect',
-            color: '#7B68D7'
+            color: '#C8C0EF'
         });
     }
 

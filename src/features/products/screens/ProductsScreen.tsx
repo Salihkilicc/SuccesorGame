@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   activeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   activeIcon: { fontSize: 32 },
-  statusBadge: { backgroundColor: 'rgba(123,104,215,0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  statusBadge: { backgroundColor: 'rgba(200,192,239,0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   statusText: { color: theme.colors.success, fontSize: 8, fontWeight: 'bold' },
   activeName: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   activeProfit: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },

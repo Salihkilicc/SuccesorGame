@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.caption,
     },
     value: {
-        color: '#7B68D7', // Apple Blue for stat values
+        color: '#C8C0EF', // Apple Blue for stat values
         fontSize: theme.typography.body,
         fontWeight: '700',
     },

@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: 'rgba(123,104,215,0.5)',
+        backgroundColor: 'rgba(200,192,239,0.5)',
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginTop: 2,
     },
     // Tabs
@@ -531,16 +531,16 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 20,
         borderRadius: 20,
-        backgroundColor: 'rgba(123,104,215,0.1)',
+        backgroundColor: 'rgba(200,192,239,0.1)',
         borderWidth: 1,
-        borderColor: 'rgba(123,104,215,0.2)',
+        borderColor: 'rgba(200,192,239,0.2)',
     },
     activeTab: {
         backgroundColor: 'rgba(199,52,202,0.15)',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     tabText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     cardHeader: {
         marginBottom: 16,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(123,104,215,0.1)',
+        borderBottomColor: 'rgba(200,192,239,0.1)',
         paddingBottom: 12,
     },
     titleRow: {
@@ -611,14 +611,14 @@ const styles = StyleSheet.create({
     },
     masterSubtitle: {
         fontSize: 13,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontStyle: 'italic',
     },
     cardDetails: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 16,
-        backgroundColor: 'rgba(123,104,215,0.5)',
+        backgroundColor: 'rgba(200,192,239,0.5)',
         padding: 12,
         borderRadius: 8,
     },
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 2,
     },
     detailValue: {
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(199,52,202,0.3)',
     },
     statBadgeText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 13,
         fontWeight: '600',
     },

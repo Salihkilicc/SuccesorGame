@@ -14,8 +14,8 @@ interface CompanyActionsProps {
 
 const ACTIONS = [
   { label: t('action.financeHub'), key: 'finance', icon: '🏦', description: t('action.capitalDebt'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#C734CA' }, // Gold
-  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(123,104,215,0.5)', glowColor: '#7B68D7' }, // Green
-  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(123,104,215,0.5)', glowColor: '#6004BD' }, // Blue
+  { label: t('action.boardroom'), key: 'board', icon: '📈', description: t('action.boardShareholders'), borderColor: 'rgba(200,192,239,0.5)', glowColor: '#C8C0EF' }, // Green
+  { label: t('action.production'), key: 'production', icon: '🏭', description: t('action.factoriesOutput'), borderColor: 'rgba(200,192,239,0.5)', glowColor: '#6004BD' }, // Blue
   { label: t('action.workforce'), key: 'hr', icon: '👥', description: t('action.employeesMorale'), borderColor: 'rgba(199,52,202,0.5)', glowColor: '#6004BD' }, // Purple
 ] as const;
 

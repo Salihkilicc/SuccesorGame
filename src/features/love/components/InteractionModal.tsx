@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     content: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: 'rgba(123,104,215,0.95)', // Glassy dark background
+        backgroundColor: 'rgba(200,192,239,0.95)', // Glassy dark background
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,

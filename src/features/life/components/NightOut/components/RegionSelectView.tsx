@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     subheader: {
         fontSize: 14,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -122,15 +122,15 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textSelected: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     venueCount: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginTop: 4,
     },
     localBadge: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,

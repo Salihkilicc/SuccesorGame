@@ -370,7 +370,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   return (
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
-                      <Text style={[styles.infoValue, { color: '#7B68D7' }]}>
+                      <Text style={[styles.infoValue, { color: '#C8C0EF' }]}>
                         {found.competitor.share.toFixed(1)}% of {found.market.category}
                       </Text>
                     </View>

@@ -51,7 +51,7 @@ const GymHubView = ({
                             {[0, 1, 2, 3, 4].map((segment) => {
                                 const segmentValue = segment * 20;
                                 const isActive = (100 - fatigue) > segmentValue;
-                                let segmentColor = '#7B68D7'; // Green
+                                let segmentColor = '#C8C0EF'; // Green
                                 if (fatigue > 50 && fatigue <= 80) segmentColor = '#C734CA'; // Orange
                                 if (fatigue > 80) segmentColor = '#C734CA'; // Red
 
@@ -148,7 +148,7 @@ const GymHubView = ({
 const getBodyTypeColor = (bodyType: string): string => {
     const colors: Record<string, string> = {
         'Skinny': 'rgba(255,255,255,0.48)',
-        'Fit': '#7B68D7',
+        'Fit': '#C8C0EF',
         'Muscular': '#C734CA',
         'Godlike': '#C734CA'
     };
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     modContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modLabel: { color: '#7B68D7', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
+    modLabel: { color: '#C8C0EF', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
     changeText: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600' },
 });
 

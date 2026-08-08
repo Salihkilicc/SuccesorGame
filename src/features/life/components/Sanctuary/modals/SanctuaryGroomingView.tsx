@@ -166,7 +166,7 @@ export default SanctuaryGroomingView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     backBtn: {
         width: 40,
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     specialServicePrice: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 18,
         fontWeight: '700',
     },
     specialServiceBenefit: {
-        backgroundColor: '#7B68D720',
+        backgroundColor: '#C8C0EF20',
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -272,11 +272,11 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     specialServiceCardActive: {
-        backgroundColor: '#7B68D730',
+        backgroundColor: '#C8C0EF30',
         borderColor: 'rgba(255,255,255,0.48)',
     },
     activeBuffBadge: {
-        backgroundcolor: '#7B68D7',
+        backgroundcolor: '#C8C0EF',
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 8,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.48)',
     },
     gridItemSelected: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         borderColor: 'rgba(255,255,255,0.48)',
     },
     gridItemText: {

@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     fontWeight: '700',
   },
-  positive: { color: '#7B68D7' },
+  positive: { color: '#C8C0EF' },
   negative: { color: '#C734CA' },
   warning: { color: '#C734CA' },
   helper: {

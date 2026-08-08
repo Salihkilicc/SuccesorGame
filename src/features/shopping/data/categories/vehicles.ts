@@ -48,7 +48,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.futurewheels.tech',
             category: 'VEHICLE',
             description: 'Electric dreams.',
-            bannerColor: '#7B68D7',
+            bannerColor: '#C8C0EF',
             emoji: '⚡',
         },
         {

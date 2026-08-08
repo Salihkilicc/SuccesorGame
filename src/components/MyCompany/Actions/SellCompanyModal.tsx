@@ -36,7 +36,7 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
 
     // Color Logic
     let chanceColor = '#C734CA'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#7B68D7'; // Green
+    if (successChance >= 70) chanceColor = '#C8C0EF'; // Green
     else if (successChance >= 40) chanceColor = '#C734CA'; // Yellow
 
     const formatMoney = (amount: number) => {

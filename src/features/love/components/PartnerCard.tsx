@@ -16,16 +16,16 @@ const getLoveColor = (love: number) => {
   if (love >= 80) return '#C734CA'; // Red
   if (love >= 50) return '#C734CA'; // Pink
   if (love >= 30) return '#C734CA'; // Amber
-  return '#7B68D7'; // Slate
+  return '#C8C0EF'; // Slate
 };
 
 const getTierColor = (tier: SocialTier): string => {
   switch (tier) {
     case 'HIGH_SOCIETY': return '#C734CA'; // Gold
-    case 'CORPORATE_ELITE': return '#7B68D7'; // Blue
+    case 'CORPORATE_ELITE': return '#C8C0EF'; // Blue
     case 'UNDERGROUND': return '#C734CA'; // Red
     case 'BLUE_COLLAR': return 'rgba(255,255,255,0.48)'; // Slate
-    case 'STUDENT_LIFE': return '#7B68D7'; // Cyan
+    case 'STUDENT_LIFE': return '#C8C0EF'; // Cyan
     case 'ARTISTIC': return '#6004BD'; // Purple
     default: return 'rgba(255,255,255,0.48)';
   }
@@ -123,7 +123,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>💎</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#7B68D7' }]} />
+                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#C8C0EF' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(looksLevel)}</Text>
             </View>

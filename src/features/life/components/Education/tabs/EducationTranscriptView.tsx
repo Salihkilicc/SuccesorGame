@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     subtitle: {
         fontSize: 12,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 8,
     },
     multiplierHint: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 16,
     },
     emptyState: {

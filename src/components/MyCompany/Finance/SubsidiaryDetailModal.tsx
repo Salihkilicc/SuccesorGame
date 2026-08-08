@@ -144,7 +144,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <View style={styles.divider} />
                             <View style={styles.kpiItem}>
                                 <Text style={styles.kpiLabel}>{t('finance.lastQChange')}</Text>
-                                <Text style={[styles.kpiValue, { color: isPositive ? '#C8C0EF' : '#C836CA' }]}>
+                                <Text style={[styles.kpiValue, { color: isPositive ? '#04BDBA' : '#C836CA' }]}>
                                     {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
                                 </Text>
                             </View>
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     infoBox: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(123,104,215,0.1)',
+        backgroundColor: 'rgba(200,192,239,0.1)',
         padding: 12,
         borderRadius: 12,
         marginTop: 20,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 12,
         lineHeight: 18,
     },

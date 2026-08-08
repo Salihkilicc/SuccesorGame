@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#6004BD',
     },
     rarityCommon: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     rarityText: {
         fontSize: 12,

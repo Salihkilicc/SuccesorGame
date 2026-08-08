@@ -48,7 +48,7 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.ice.vip',
             category: 'JEWELRY',
             description: 'Frozen in time.',
-            bannerColor: '#7B68D7',
+            bannerColor: '#C8C0EF',
             emoji: '❄️',
         }
     ],

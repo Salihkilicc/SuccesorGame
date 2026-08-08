@@ -25,12 +25,12 @@ import GodModeModal from '../../../components/GodModeModal';
 
 const GRADIENTS = {
     purplePink: ['#6004BD', '#6004BD'],
-    greenTeal: ['#7B68D7', '#7B68D7'],
+    greenTeal: ['#C8C0EF', '#C8C0EF'],
     redCasino: ['#C734CA', '#C734CA'],
     darkGrey: ['#020626', '#11063D'],
     hookupFire: ['#6004BD', '#6004BD'],
-    networkBlue: ['#6004BD', '#7B68D7'],
-    bluePurple: ['#7B68D7', '#6004BD'],
+    networkBlue: ['#6004BD', '#C8C0EF'],
+    bluePurple: ['#C8C0EF', '#6004BD'],
 };
 
 const SECTION_ESSENTIALS = [

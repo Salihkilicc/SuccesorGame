@@ -213,7 +213,7 @@ const LaboratoryScreen = () => {
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
-                        <Text style={{ color: '#7B68D7', fontWeight: '800' }}>
+                        <Text style={{ color: '#C8C0EF', fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
                         </Text>{' '}
                         per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
@@ -225,9 +225,9 @@ const LaboratoryScreen = () => {
                         onChange={setTempCount}
                         max={facility.capacity}
                         unit="researchers"
-                        markers={[{ value: researcherCount, label: 'Now', color: '#7B68D7' }]}
+                        markers={[{ value: researcherCount, label: 'Now', color: '#C8C0EF' }]}
                         steps={[1, 10, 100]}
-                        fillColor={canAfford ? '#7B68D7' : '#C734CA'}
+                        fillColor={canAfford ? '#C8C0EF' : '#C734CA'}
                     />
 
                     {/* Summary & Confirm */}

@@ -538,11 +538,11 @@ const LoveScreen = () => {
       <View style={styles.grid}>
         {[
           { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#C734CA' },
-          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#7B68D7' },
+          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#C8C0EF' },
           { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#C734CA' },
-          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#7B68D7' },
-          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#7B68D7' },
-          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#7B68D7' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#C8C0EF' },
+          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#C8C0EF' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#C8C0EF' },
           { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#C734CA' },
         ].map((btn) => (
           <Pressable
@@ -646,8 +646,8 @@ const LoveScreen = () => {
       <View style={styles.actionList}>
         {[
           { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#C734CA' },
-          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#7B68D7' },
-          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#7B68D7' },
+          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#C8C0EF' },
+          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#C8C0EF' },
           { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#C734CA' },
         ].map(btn => (
           <Pressable
@@ -693,9 +693,9 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#7B68D7' },
-          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#7B68D7' },
-          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#7B68D7' },
+          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#C8C0EF' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#C8C0EF' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#C8C0EF' },
           { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#C734CA' },
         ].map(btn => (
           <Pressable
@@ -1088,9 +1088,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: 'rgba(123,104,215,0.12)',
+    backgroundColor: 'rgba(200,192,239,0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(123,104,215,0.35)',
+    borderColor: 'rgba(200,192,239,0.35)',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,

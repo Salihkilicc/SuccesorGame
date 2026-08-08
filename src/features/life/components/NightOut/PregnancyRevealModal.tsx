@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
         lineHeight: 22
     },
     subtext: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 13,
         textAlign: 'center',
         marginBottom: 32,
         fontStyle: 'italic'
     },
     button: {
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
         paddingVertical: 14,
         paddingHorizontal: 32,
         borderRadius: 10,

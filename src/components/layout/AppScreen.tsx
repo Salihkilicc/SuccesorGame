@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
-    backgroundColor: 'rgba(123,104,215,0.98)',
+    backgroundColor: 'rgba(200,192,239,0.98)',
   },
   headerCompact: {
     paddingTop: 12,

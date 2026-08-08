@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         letterSpacing: 1,
     },
     headerSubtitle: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     primaryType: {
-        color: '#7B68D7', // Light Blue
+        color: '#C8C0EF', // Light Blue
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 1,
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     secondaryType: {
-        color: '#7B68D7', // Teal
+        color: '#C8C0EF', // Teal
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
@@ -514,13 +514,13 @@ const styles = StyleSheet.create({
     },
     secondaryBarFill: {
         height: '100%',
-        backgroundColor: '#7B68D7', // Teal
+        backgroundColor: '#C8C0EF', // Teal
         borderRadius: 3,
     },
     secondaryPercent: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         width: 35,
         textAlign: 'right',
     },
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     addSkillIcon: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 18,
         fontWeight: 'bold',
     },
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     // Remaining Quarters Text
     remainingText: {
         fontSize: 11,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontStyle: 'italic',
         marginTop: 6,
         textAlign: 'right',

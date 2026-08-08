@@ -83,7 +83,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('os.yourShare')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#7B68D7' }]}>
+                    <Text style={[styles.summaryValue, { color: '#C8C0EF' }]}>
                         {formatShare(playerShare)}
                     </Text>
                     {ownedShare > 0 && (
@@ -119,7 +119,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                             <Text style={styles.brandChipCat}>{cat}</Text>
                             <Text style={[
                                 styles.brandChipVal,
-                                { color: (v as number) >= 200 ? '#7B68D7' : '#C734CA' },
+                                { color: (v as number) >= 200 ? '#C8C0EF' : '#C734CA' },
                             ]}>
                                 {Math.round(v as number)}
                             </Text>
@@ -138,7 +138,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 note={t('os.whoHoldsThisMarketAnd')}
                 info={t('os.theseAreRealCompaniesYou')}
                 summary={`#${playerRank} of ${ranking.length}`}
-                summaryColor="#7B68D7"
+                summaryColor="#C8C0EF"
                 style={styles.rankingSection}
             >
             <View style={styles.rankingBox}>
@@ -161,8 +161,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                                     {
                                         width: `${Math.min(100, p.share)}%`,
                                         backgroundColor: p.isPlayer
-                                            ? '#7B68D7'
-                                            : p.owned ? '#7B68D7' : 'rgba(255,255,255,0.28)',
+                                            ? '#C8C0EF'
+                                            : p.owned ? '#C8C0EF' : 'rgba(255,255,255,0.28)',
                                     },
                                 ]}
                             />
@@ -186,8 +186,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
 export default MarketPositionPanel;
 
 const styles = StyleSheet.create({
-    groupNote: { color: '#7B68D7', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
-    compactLine: { color: '#7B68D7', fontSize: 11, fontWeight: '600' },
+    groupNote: { color: '#C8C0EF', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
+    compactLine: { color: '#C8C0EF', fontSize: 11, fontWeight: '600' },
 
     panel: {
         backgroundColor: 'rgba(255,255,255,0.04)',
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     rankingBox: { gap: 7 },
     rankRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3 },
     rankRowPlayer: {
-        backgroundColor: 'rgba(123,104,215,0.08)',
+        backgroundColor: 'rgba(200,192,239,0.08)',
         borderRadius: 6,
         paddingHorizontal: 4,
         marginHorizontal: -4,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     rankNum: { color: '#FFFFFF', fontSize: 10, width: 18, fontWeight: '700' },
     rankName: { color: '#FFFFFF', fontSize: 11.5, flex: 1 },
     rankSymbol: { color: '#FFFFFF', fontSize: 9.5 },
-    rankTextPlayer: { color: '#7B68D7', fontWeight: '800' },
+    rankTextPlayer: { color: '#C8C0EF', fontWeight: '800' },
     rankBarTrack: {
         width: 70,
         height: 4,

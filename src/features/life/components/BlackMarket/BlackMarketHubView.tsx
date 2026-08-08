@@ -52,8 +52,8 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
     const categories: { id: BlackMarketCategory, label: string, icon: string, color: string }[] = [
         { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#C734CA' },
         { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#C734CA' },
-        { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#7B68D7' },
-        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#7B68D7' }
+        { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#C8C0EF' },
+        { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#C8C0EF' }
     ];
 
     const getRepTitle = (rep: number) => {
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#7B68D7', // Hacker green
+        color: '#C8C0EF', // Hacker green
         fontFamily: 'Courier New',
         marginTop: 4
     },

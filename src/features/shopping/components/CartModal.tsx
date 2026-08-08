@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     closeButtonText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     inStockText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 12,
         fontWeight: '600',
         marginBottom: 2,

@@ -136,16 +136,16 @@ export const BIOS = [
 export const COLORS = [
     '#C836CA', // Coral Red
     '#C8C0EF', // Turquoise
-    '#7B68D7', // Sky Blue
+    '#C8C0EF', // Sky Blue
     '#C734CA', // Light Salmon
     '#C8C0EF', // Mint
     '#C734CA', // Soft Yellow
     '#C734CA', // Lavender
-    '#7B68D7', // Powder Blue
+    '#C8C0EF', // Powder Blue
     '#C734CA', // Peach
     'rgba(255,255,255,0.48)', // Mauve
     '#1A0A4A', // Purple
-    '#7B68D7', // Navy Blue
+    '#C8C0EF', // Navy Blue
     '#C836CA', // Pink
     '#FFFFFF', // Light Green
     '#C734CA', // Light Orange

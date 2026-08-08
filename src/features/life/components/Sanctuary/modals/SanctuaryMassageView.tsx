@@ -117,7 +117,7 @@ export default SanctuaryMassageView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#7B68D7',
+        backgroundColor: '#C8C0EF',
     },
     backBtn: {
         width: 40,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        shadowColor: '#7B68D7',
+        shadowColor: '#C8C0EF',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     },
     statText: {
         fontSize: 12,
-        color: '#7B68D7', // Green
+        color: '#C8C0EF', // Green
         fontWeight: '600',
     },
     healthText: {
-        color: '#7B68D7', // Blue
+        color: '#C8C0EF', // Blue
     },
 });

@@ -65,18 +65,18 @@ const styles = StyleSheet.create({
     subtitle: { color: '#FFFFFF', textAlign: 'center', marginBottom: 20 },
     balanceCard: { backgroundColor: '#0B0635', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
     label: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
-    balance: { color: '#7B68D7', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
+    balance: { color: '#C8C0EF', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
     sectionTitle: { color: 'white', marginBottom: 10, fontWeight: '600' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
     chip: { width: '22%', backgroundColor: '#0B0635', padding: 10, borderRadius: 8, alignItems: 'center' },
-    activeChip: { backgroundColor: '#7B68D7' },
+    activeChip: { backgroundColor: '#C8C0EF' },
     chipText: { color: 'white', fontWeight: 'bold' },
     activeChipText: { color: 'black' },
     preview: { alignItems: 'center', marginBottom: 20 },
     previewAmount: { color: 'white', fontSize: 20, fontWeight: 'bold' },
     actions: { flexDirection: 'row', gap: 10 },
     cancelBtn: { flex: 1, padding: 15, backgroundColor: '#0B0635', borderRadius: 10, alignItems: 'center' },
-    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#7B68D7', borderRadius: 10, alignItems: 'center' },
+    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#C8C0EF', borderRadius: 10, alignItems: 'center' },
     btnText: { color: 'white', fontWeight: 'bold' }
 });
 

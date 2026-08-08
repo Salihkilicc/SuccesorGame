@@ -220,7 +220,7 @@ const SettingsScreen = () => {
                             label={t('os.soundEffects')}
                             value={isSoundEnabled}
                             onToggle={toggleSound}
-                            color="#7B68D7"
+                            color="#C8C0EF"
                         />
                         <View style={styles.divider} />
                         <SettingsRow

@@ -152,11 +152,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 backgroundColor:
                                     control === 'lost' ? 'rgba(199,52,202,0.12)'
                                         : control === 'contested' ? 'rgba(199,52,202,0.12)'
-                                            : 'rgba(123,104,215,0.10)',
+                                            : 'rgba(200,192,239,0.10)',
                                 borderColor:
                                     control === 'lost' ? 'rgba(199,52,202,0.35)'
                                         : control === 'contested' ? 'rgba(199,52,202,0.35)'
-                                            : 'rgba(123,104,215,0.30)',
+                                            : 'rgba(200,192,239,0.30)',
                             },
                         ]}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -177,11 +177,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
                                     styles.changeBadge,
-                                    { backgroundColor: companyDailyChange >= 0 ? '#7B68D720' : '#C734CA20' }
+                                    { backgroundColor: companyDailyChange >= 0 ? '#C8C0EF20' : '#C734CA20' }
                                 ]}>
                                     <Text style={[
                                         styles.changeBadgeText,
-                                        { color: companyDailyChange >= 0 ? '#7B68D7' : '#C734CA' }
+                                        { color: companyDailyChange >= 0 ? '#C8C0EF' : '#C734CA' }
                                     ]}>
                                         {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
                                     </Text>
@@ -373,7 +373,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#7B68D720' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#C8C0EF20' }]}>
                                 <Text style={styles.actionIcon}>💼</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -396,7 +396,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#7B68D720' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#C8C0EF20' }]}>
                                 <Text style={styles.actionIcon}>💰</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -434,10 +434,10 @@ const styles = StyleSheet.create({
 
     heroNote: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     dampBadge: {
-        backgroundColor: 'rgba(123,104,215,0.10)', borderRadius: 8,
+        backgroundColor: 'rgba(200,192,239,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
     },
-    dampText: { color: '#7B68D7', fontSize: 10, lineHeight: 14, fontWeight: '600' },
+    dampText: { color: '#C8C0EF', fontSize: 10, lineHeight: 14, fontWeight: '600' },
 
     breakdownCard: {
         backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '600',
     },
     headerTitle: {

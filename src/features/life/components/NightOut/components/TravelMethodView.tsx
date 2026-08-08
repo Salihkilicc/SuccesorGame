@@ -26,7 +26,7 @@ const TravelMethodView = ({
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, { color: '#7B68D7' }]}>{t('life.privateHangar')}</Text>
+                    <Text style={[styles.title, { color: '#C8C0EF' }]}>{t('life.privateHangar')}</Text>
                     <Text style={styles.subtitle}>{t('life.selectYourAircraft')}</Text>
                 </View>
 
@@ -92,7 +92,7 @@ const TravelMethodView = ({
                     style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardEmoji}>🛫</Text>
-                        <View style={[styles.badge, { backgroundColor: '#7B68D7' }]}>
+                        <View style={[styles.badge, { backgroundColor: '#C8C0EF' }]}>
                             <Text style={styles.badgeText}>{t('life.rep0')}</Text>
                         </View>
                     </View>
@@ -126,7 +126,7 @@ const TravelMethodView = ({
                         <Text style={styles.cardEmoji}>🛩️</Text>
                     </View>
                     <View style={styles.cardContent}>
-                        <Text style={[styles.cardTitle, { color: '#7B68D7' }]}>MY{'\n'}HANGAR</Text>
+                        <Text style={[styles.cardTitle, { color: '#C8C0EF' }]}>MY{'\n'}HANGAR</Text>
                         <Text style={styles.hangarAction}>{t('life.useOwnJet')}</Text>
                     </View>
                 </Pressable>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     backButtonText: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginTop: 2,
     },
     scrollView: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     hangarAction: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     pressed: {
         opacity: 0.8,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     },
     jetListDesc: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     jetListCost: {
         alignItems: 'flex-end',
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
     costText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     fuelText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     emptyState: {
         alignItems: 'center',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 14,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textAlign: 'center',
         lineHeight: 20,
     },

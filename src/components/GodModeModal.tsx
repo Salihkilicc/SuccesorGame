@@ -54,10 +54,10 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                     <View style={styles.content}>
                         <TouchableOpacity style={styles.actionButton} onPress={handleAddMoney} activeOpacity={0.8}>
                             <LinearGradient
-                                colors={['rgba(123,104,215,0.2)', 'rgba(123,104,215,0.05)']}
+                                colors={['rgba(200,192,239,0.2)', 'rgba(200,192,239,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#7B68D7" />
+                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#C8C0EF" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     subtitle: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 12,
         fontFamily: 'Courier',
         textAlign: 'center',
@@ -135,12 +135,12 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(123,104,215,0.3)',
+        borderColor: 'rgba(200,192,239,0.3)',
         gap: 12,
         overflow: 'hidden',
     },
     actionTextMoney: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

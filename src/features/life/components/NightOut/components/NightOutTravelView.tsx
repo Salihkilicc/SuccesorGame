@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     sectionHeader: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         marginBottom: 8,
         marginTop: 12,
         letterSpacing: 1,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     charterSub: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 12,
         marginVertical: 4,
     },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     optionTextSelected: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     optionSubText: {
         color: '#FFFFFF',

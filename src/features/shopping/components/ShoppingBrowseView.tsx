@@ -33,8 +33,8 @@ type BrandConfig = {
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
     Velocity: { name: t('ui.velocityMotors'), color: '#C734CA', emoji: '🏎️' },
-    Dynasty8: { name: t('ui.dynasty8'), color: '#7B68D7', emoji: '🏠' },
-    Luxe: { name: t('ui.luxeVault'), color: '#7B68D7', emoji: '💎' },
+    Dynasty8: { name: t('ui.dynasty8'), color: '#C8C0EF', emoji: '🏠' },
+    Luxe: { name: t('ui.luxeVault'), color: '#C8C0EF', emoji: '💎' },
     Elitas: { name: t('ui.elitasTravel'), color: '#C734CA', emoji: '✈️' },
 };
 

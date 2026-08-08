@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0B0635',
   },
   buyButton: {
-    backgroundColor: '#7B68D7',
+    backgroundColor: '#C8C0EF',
   },
   sellText: {
     fontSize: theme.typography.body,

@@ -33,7 +33,7 @@ const StockDetailScreen = () => {
     const currentChange = initialChange;
 
     const isPositive = currentChange >= 0;
-    const changeColor = isPositive ? '#C8C0EF' : '#C836CA';
+    const changeColor = isPositive ? '#04BDBA' : '#C836CA';
 
     // Get current quarter for random chart selection
     const currentMonth = useGameStore(state => state.currentMonth);

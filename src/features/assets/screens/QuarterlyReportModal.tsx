@@ -67,7 +67,7 @@ type LineProps = {
 
 const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanation, hint }: LineProps) => {
   const color = emphasis
-    ? (amount >= 0 ? '#C8C0EF' : '#C836CA')
+    ? (amount >= 0 ? '#04BDBA' : '#C836CA')
     : negative
       ? '#C734CA'
       : subtotal
@@ -318,7 +318,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
         <Text style={styles.productName} numberOfLines={1}>{p.name}</Text>
         <View style={styles.productHeadRight}>
           <Text style={styles.productShareMini}>{(p.marketShare ?? 0).toFixed(2)}%</Text>
-          <Text style={[styles.productProfit, { color: p.profit >= 0 ? '#C8C0EF' : '#C836CA' }]}>
+          <Text style={[styles.productProfit, { color: p.profit >= 0 ? '#04BDBA' : '#C836CA' }]}>
             {formatSignedMoney(p.profit)}
           </Text>
           <Text style={[styles.productChevron, open && styles.productChevronOpen]}>⌄</Text>
@@ -377,7 +377,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.sold')}</Text>
-              <Text style={[styles.productStatValue, { color: '#7B68D7' }]}>{formatNumber(p.sold)}</Text>
+              <Text style={[styles.productStatValue, { color: '#C8C0EF' }]}>{formatNumber(p.sold)}</Text>
             </View>
             <View style={styles.productStat}>
               <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
@@ -398,7 +398,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
                 {
                   width: `${Math.min(100, Math.max(0, p.sellThrough))}%`,
                   backgroundColor:
-                    p.sellThrough >= 60 ? '#7B68D7' : p.sellThrough >= 30 ? '#C734CA' : '#C734CA',
+                    p.sellThrough >= 60 ? '#C8C0EF' : p.sellThrough >= 30 ? '#C734CA' : '#C734CA',
                 },
               ]}
             />
@@ -487,7 +487,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
             {/* Net sonuc */}
             <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#C734CA' : '#C836CA' }]}>
               <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
-              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#C8C0EF' : '#C836CA' }]}>
+              <Text style={[styles.heroValue, { color: report.netProfit >= 0 ? '#04BDBA' : '#C836CA' }]}>
                 {formatSignedMoney(report.netProfit)}
               </Text>
               <Text style={styles.heroSub}>
@@ -502,7 +502,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.aStandardIncomeStatementRevenue')}
               infoDetail={t('company.tapTheNextToAny')} 
               summary={formatSignedMoney(report.netProfit)}
-              summaryColor={report.netProfit >= 0 ? '#C8C0EF' : '#C836CA'}
+              summaryColor={report.netProfit >= 0 ? '#04BDBA' : '#C836CA'}
             >
               <View style={styles.statement}>
                 <StatementLine
@@ -688,7 +688,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
                   : 'fully served'
               }
-              summaryColor={report.totalUnmetDemand > 0 ? '#C734CA' : '#7B68D7'}
+              summaryColor={report.totalUnmetDemand > 0 ? '#C734CA' : '#C8C0EF'}
             >
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
@@ -697,7 +697,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.youSupplied")}</Text>
-                  <Text style={[styles.opsValue, { color: '#7B68D7' }]}>
+                  <Text style={[styles.opsValue, { color: '#C8C0EF' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -719,7 +719,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                     <Text
                       style={{
                         fontSize: 11,
-                        color: report.brandChange >= 0 ? '#7B68D7' : '#C734CA',
+                        color: report.brandChange >= 0 ? '#C8C0EF' : '#C734CA',
                       }}
                     >
                       {'  '}
@@ -742,7 +742,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.sellThroughIsTheShare')}
               infoDetail={t('company.unsoldUnitsCarryIntoNext')} 
               summary={`${formatPercent(report.sellThrough)} sold`}
-              summaryColor={report.sellThrough >= 60 ? '#7B68D7' : '#C734CA'}
+              summaryColor={report.sellThrough >= 60 ? '#C8C0EF' : '#C734CA'}
             >
               {/* Tesis durumu — kapasite kullanimi oyuncunun bakacagi tek sayi */}
               <View style={styles.facilityBar}>
@@ -761,7 +761,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                       {
                         color:
                           report.utilization < 60 ? '#C734CA'
-                            : report.utilization > 95 ? '#C734CA' : '#7B68D7',
+                            : report.utilization > 95 ? '#C734CA' : '#C8C0EF',
                       },
                     ]}
                   >
@@ -798,7 +798,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.morale')}</Text>
                   <Text style={[
                     styles.opsValue,
-                    { color: report.employeeMorale < 50 ? '#C734CA' : report.employeeMorale < 70 ? '#C734CA' : '#7B68D7' },
+                    { color: report.employeeMorale < 50 ? '#C734CA' : report.employeeMorale < 70 ? '#C734CA' : '#C8C0EF' },
                   ]}>
                     {report.employeeMorale.toFixed(0)}
                     <Text style={styles.opsDelta}>
@@ -816,7 +816,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t('company.sold')}</Text>
-                  <Text style={[styles.opsValue, { color: '#7B68D7' }]}>
+                  <Text style={[styles.opsValue, { color: '#C8C0EF' }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -825,7 +825,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.sellThrough >= 60 ? '#7B68D7' : '#C734CA' },
+                      { color: report.sellThrough >= 60 ? '#C8C0EF' : '#C734CA' },
                     ]}
                   >
                     {formatPercent(report.sellThrough)}
@@ -862,7 +862,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                               ? '#C734CA'
                               : note.tone === 'warn'
                                 ? '#C734CA'
-                                : '#7B68D7',
+                                : '#C8C0EF',
                         },
                       ]}
                     />
@@ -909,7 +909,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
                   <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  <Text style={[styles.balanceValue, { color: '#7B68D7' }]}>
+                  <Text style={[styles.balanceValue, { color: '#C8C0EF' }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
                 </View>
@@ -1100,7 +1100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  productShareMini: { color: '#7B68D7', fontSize: 11, fontWeight: '700' },
+  productShareMini: { color: '#C8C0EF', fontSize: 11, fontWeight: '700' },
   productChevron: { color: '#FFFFFF', fontSize: 15, marginTop: -3, width: 12, textAlign: 'center' },
   productChevronOpen: { color: '#C734CA', transform: [{ rotate: '180deg' }], marginTop: 3 },
   productName: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flex: 1 },
@@ -1118,7 +1118,7 @@ const styles = StyleSheet.create({
   productStats: { flexDirection: 'row', marginTop: 12, marginBottom: 10 },
   productStat: { flex: 1 },
   scrapLine: { fontSize: 9, color: '#C734CA', marginTop: 2 },
-  productSplit: { fontSize: 9, color: '#7B68D7', marginTop: 2 },
+  productSplit: { fontSize: 9, color: '#C8C0EF', marginTop: 2 },
   productStatLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
   productStatValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginTop: 2 },
   sellThroughTrack: {

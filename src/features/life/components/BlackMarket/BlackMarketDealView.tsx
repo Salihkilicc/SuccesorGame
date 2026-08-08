@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     statGain: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontSize: 14,
         fontWeight: 'bold'
     },
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     buyButton: {
-        backgroundColor: '#7B68D7', // Green
+        backgroundColor: '#C8C0EF', // Green
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },

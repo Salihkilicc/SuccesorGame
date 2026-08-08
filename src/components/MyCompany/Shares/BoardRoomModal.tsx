@@ -125,7 +125,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
     };
 
     const moodColor =
-        boardStance === 'Supportive' ? '#7B68D7'
+        boardStance === 'Supportive' ? '#C8C0EF'
             : boardStance === 'Neutral' ? 'rgba(255,255,255,0.48)'
                 : boardStance === 'Restless' ? '#C734CA' : '#C734CA';
 
@@ -145,7 +145,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                     <View style={styles.controlCard}>
                         <View style={styles.controlRow}>
                             <Text style={styles.controlLabel}>{t('board.yourStake')}</Text>
-                            <Text style={[styles.controlValue, { color: hasControl ? '#7B68D7' : '#C734CA' }]}>
+                            <Text style={[styles.controlValue, { color: hasControl ? '#C8C0EF' : '#C734CA' }]}>
                                 {ownership.toFixed(1)}%
                             </Text>
                         </View>
@@ -227,7 +227,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                     const promised = promises.filter(p => p.memberId === m.id && !p.resolved);
                                     const alreadyLobbied = lobbied[m.id] !== undefined;
                                     const trustColor =
-                                        m.trust >= 60 ? '#7B68D7' : m.trust >= 35 ? '#C734CA' : '#C734CA';
+                                        m.trust >= 60 ? '#C8C0EF' : m.trust >= 35 ? '#C734CA' : '#C734CA';
 
                                     return (
                                         <View key={m.id} style={styles.memberCard}>
@@ -316,7 +316,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                             <View key={v.memberId} style={styles.voteRow}>
                                                 <Text style={[
                                                     styles.voteMark,
-                                                    { color: v.vote === 'YES' ? '#7B68D7' : '#C734CA' },
+                                                    { color: v.vote === 'YES' ? '#C8C0EF' : '#C734CA' },
                                                 ]}>
                                                     {v.vote === 'YES' ? '✓' : '✕'}
                                                 </Text>
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     demandCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     demandTag: { fontSize: 10, color: '#C734CA', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
     demandBody: { fontSize: 12, color: '#FFFFFF', lineHeight: 18, fontStyle: 'italic' },
-    demandPrivate: { fontSize: 10, color: '#7B68D7', marginTop: 6, lineHeight: 15 },
+    demandPrivate: { fontSize: 10, color: '#C8C0EF', marginTop: 6, lineHeight: 15 },
     demandDue: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 6, fontWeight: '700' },
 
     dangerCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     memberTop: { flexDirection: 'row', alignItems: 'center' },
     memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
-    memberRel: { fontSize: 9, color: '#7B68D7', marginTop: 2 },
+    memberRel: { fontSize: 9, color: '#C8C0EF', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
     trustBarBg: { height: 5, backgroundColor: '#0B0635', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },

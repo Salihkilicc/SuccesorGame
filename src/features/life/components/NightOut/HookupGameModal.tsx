@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     partnerJob: {
         fontSize: 14,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontStyle: 'italic',
     },
     clueSection: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     clueLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         letterSpacing: 2,
         marginBottom: 8,
     },
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     choicesLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         letterSpacing: 2,
         marginBottom: 12,
     },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     choiceTagText: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         letterSpacing: 1,
     },
     resultSection: {
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     resultSuccess: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     resultFail: {
         color: '#C734CA',

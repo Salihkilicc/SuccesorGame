@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     activeLoanCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     activeLoanTitle: { color: '#C734CA', fontWeight: '800', fontSize: 13, marginBottom: 4 },
     activeLoanBody: { color: '#C734CA', fontSize: 11, lineHeight: 16, marginBottom: 10 },
-    repayBtn: { backgroundColor: '#7B68D7', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
+    repayBtn: { backgroundColor: '#C8C0EF', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
     repayBtnDisabled: { backgroundColor: '#0B0635' },
     repayBtnText: { color: '#FFFFFF', fontWeight: '800', fontSize: 13 },
     amountCard: { backgroundColor: '#07062E', borderRadius: 12, padding: 16 },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     dealInterest: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     dealDeadline: {
         fontSize: 24,

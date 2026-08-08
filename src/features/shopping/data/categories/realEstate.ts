@@ -57,7 +57,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.urbancorp.global',
             category: 'REAL_ESTATE',
             description: 'Commercial dominance.',
-            bannerColor: '#7B68D7',
+            bannerColor: '#C8C0EF',
             emoji: '🏙️',
         },
     ],

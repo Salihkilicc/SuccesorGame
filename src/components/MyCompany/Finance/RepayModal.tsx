@@ -109,7 +109,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             </View>
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>{t('finance.canRepay')}</Text>
-                                                <Text style={[styles.loanDetailValue, { color: '#7B68D7' }]}>
+                                                <Text style={[styles.loanDetailValue, { color: '#C8C0EF' }]}>
                                                     {formatMoney(maxRepayable)}
                                                 </Text>
                                             </View>
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     repayButtonValue: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     insufficientText: {
         fontSize: 12,

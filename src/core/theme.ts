@@ -38,6 +38,16 @@ export const palette = {
     purpleDeep: '#6004BD',
     blue: '#2304BD',
     cove: '#020626',
+    /**
+     * Violet Eggplant's mirror: rgb(186,4,189) with red and blue swapped
+     * becomes rgb(4,189,186). Same saturation, opposite hue - so it belongs to
+     * the palette by construction rather than by taste, and it gives the
+     * magenta something to push against. That tension is what reads as
+     * cyberpunk; without it the screen was purple on purple.
+     */
+    cyan: '#04BDBA',
+    /** A tinted white rather than a signal - only dE 32 from white. */
+    lavender: '#C8C0EF',
 } as const;
 
 export const theme = {
@@ -52,7 +62,7 @@ export const theme = {
 
         // --- Yazi ----------------------------------------------------------
         textPrimary: '#FFFFFF',
-        textSecondary: 'rgba(255,255,255,0.72)',
+        textSecondary: '#C8C0EF',
         textMuted: 'rgba(255,255,255,0.48)',
 
         // --- Dolgu butonlar: ustune BEYAZ ---------------------------------
@@ -63,10 +73,11 @@ export const theme = {
         highlight: '#BA04BD',
         highlightText: '#FFFFFF',
 
-        // --- Vurgu METNI: morlarin acik turevleri -------------------------
+        // --- Vurgu METNI -------------------------------------------------
         //     Dolgu tonlari metin olarak okunmadigi icin bunlar var.
-        accentText: '#7B68D7',
+        accentText: '#04BDBA',
         highlightTextColor: '#C734CA',
+        lavender: '#C8C0EF',
 
         accentSoft: 'rgba(35,4,189,0.22)',
         highlightSoft: 'rgba(186,4,189,0.18)',
@@ -74,17 +85,28 @@ export const theme = {
         // ------------------------------------------------------------------
         //  KAR / ZARAR — ve baska hicbir sey
         // ------------------------------------------------------------------
-        positive: '#C8C0EF',
+        //  Cyan eklenince bu cift belirgin sekilde guclendi. Olculen
+        //  ayirt edilebilirlik (dE):
+        //
+        //    cyan - magenta        119     <- simdiki cift
+        //    eski yesil - kirmizi   84
+        //    lavanta - magenta      71     <- onceki cift
+        //
+        //  Yani kar/zarar artik yesil/kirmizidan bile daha ayrik. Lavanta bu
+        //  isi birakti cunku beyazdan yalnizca dE 32 uzakti: sinyal degil,
+        //  renkli beyaz olarak okunuyordu. Simdi ikincil metin rengi.
+        // ------------------------------------------------------------------
+        positive: '#04BDBA',
         negative: '#C836CA',
 
         // Eski adlar — kademeli gecis
         card: '#07062E',
         cardSoft: '#0B0635',
-        success: '#7B68D7',
+        success: '#04BDBA',
         danger: '#C734CA',
         error: '#C734CA',
         warning: '#C734CA',
-        accent: '#7B68D7',
+        accent: '#04BDBA',
         neutral: 'rgba(255,255,255,0.48)',
     },
 

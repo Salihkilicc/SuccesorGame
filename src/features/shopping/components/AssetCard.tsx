@@ -53,7 +53,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                     style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                     onPress={() => onRepair(item)}
                 >
-                    <Text style={[styles.actionText, { color: '#7B68D7' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
+                    <Text style={[styles.actionText, { color: '#C8C0EF' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
                 </Pressable>
             );
         } else {
@@ -65,8 +65,8 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 )
             } else {
                 ActionButton = (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(123,104,215,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
-                        <Text style={[styles.badgeText, { color: '#7B68D7' }]}>{t('ui.perfect')}</Text>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(200,192,239,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
+                        <Text style={[styles.badgeText, { color: '#C8C0EF' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );
             }

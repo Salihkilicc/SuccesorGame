@@ -25,7 +25,7 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => onNavigate('LAB')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(123,104,215,0.15)' }]}>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(200,192,239,0.15)' }]}>
                         <Text style={styles.cardIcon}>🧪</Text>
                     </View>
                     <View style={styles.cardContent}>

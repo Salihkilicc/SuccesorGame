@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     },
     statText: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '600',
     },
     riskText: {

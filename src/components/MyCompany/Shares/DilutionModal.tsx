@@ -135,7 +135,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
                                 <Text style={styles.impactLabel}>💵 Cash Raised</Text>
-                                <Text style={[styles.impactValue, { color: '#7B68D7' }]}>
+                                <Text style={[styles.impactValue, { color: '#C8C0EF' }]}>
                                     +{formatMoney(capitalRaised)}
                                 </Text>
                             </View>

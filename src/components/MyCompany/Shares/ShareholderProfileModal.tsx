@@ -211,13 +211,13 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         if (trust < 30) return '#C734CA'; // Red
         if (trust < 50) return '#C734CA'; // Orange
         if (trust < 70) return '#C734CA'; // Yellow
-        return '#7B68D7'; // Green
+        return '#C8C0EF'; // Green
     };
 
     const getReactionColor = () => {
         if (offerPremium < 0) return '#C734CA'; // Red - Insulted
         if (offerPremium <= 20) return '#C734CA'; // Yellow - Neutral
-        return '#7B68D7'; // Green - Happy
+        return '#C8C0EF'; // Green - Happy
     };
 
     const getReactionLabel = () => {
@@ -242,7 +242,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
     const getAdviceBubbleStyle = () => {
         const baseStyle = styles.adviceBubble;
-        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(123,104,215,0.1)' }];
+        if (adviceQuality === 'good') return [baseStyle, { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(200,192,239,0.1)' }];
         if (adviceQuality === 'bad') return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
         return [baseStyle, { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(199,52,202,0.1)' }];
     };
@@ -406,7 +406,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 {/* Current Stock Price Info */}
                                 <View style={{ backgroundColor: '#0B0635', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
-                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#7B68D7' }}>{formatPrice(stockPrice)}</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#C8C0EF' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
                                 {/* Context Text */}
@@ -502,7 +502,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <Text style={styles.priceLabel}>
                                         {tradeMode === 'buy' ? t('shp.youPay') : t('shp.youReceive')}
                                     </Text>
-                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#7B68D7' }]}>
+                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#C8C0EF' }]}>
                                         {formatMoney(calculateOfferPrice())}
                                     </Text>
                                 </View>
@@ -511,7 +511,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 <TouchableOpacity
                                     style={[
                                         styles.makeOfferButton,
-                                        { backgroundColor: tradeMode === 'buy' ? '#7B68D7' : '#C734CA' }
+                                        { backgroundColor: tradeMode === 'buy' ? '#C8C0EF' : '#C734CA' }
                                     ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
@@ -924,7 +924,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonBuyActive: {
-        backgroundColor: 'rgba(123,104,215,0.2)',
+        backgroundColor: 'rgba(200,192,239,0.2)',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     modeButtonSellActive: {
@@ -966,6 +966,6 @@ const styles = StyleSheet.create({
     priceValue: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
 });

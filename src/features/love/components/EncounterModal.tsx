@@ -34,8 +34,8 @@ const getTierBadgeColor = (tier: string): string => {
         case 'HIGH_SOCIETY': return '#C734CA';
         case 'CORPORATE_ELITE': return '#6004BD';
         case 'UNDERGROUND': return '#C734CA';
-        case 'BLUE_COLLAR': return '#7B68D7';
-        case 'STUDENT_LIFE': return '#7B68D7';
+        case 'BLUE_COLLAR': return '#C8C0EF';
+        case 'STUDENT_LIFE': return '#C8C0EF';
         case 'ARTISTIC': return '#6004BD';
         default: return theme.colors.accent;
     }

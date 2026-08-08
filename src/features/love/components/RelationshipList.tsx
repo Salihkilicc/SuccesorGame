@@ -57,7 +57,7 @@ const RelationshipList: React.FC<Props> = ({
     const getNpcIconBg = (npcType: string): string => {
         if (npcType === 'Child') return 'rgba(199,52,202,0.12)';
         if (npcType === 'Mother') return 'rgba(199,52,202,0.12)';
-        return 'rgba(123,104,215,0.12)';
+        return 'rgba(200,192,239,0.12)';
     };
 
     const getNpcIcon = (npcType: string): string => {

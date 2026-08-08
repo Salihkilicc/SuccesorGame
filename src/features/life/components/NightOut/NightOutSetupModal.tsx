@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '900',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textAlign: 'center',
         marginBottom: 4,
         letterSpacing: 2,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     progress: {
         fontSize: 12,
-        color: '#7B68D7',
+        color: '#C8C0EF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

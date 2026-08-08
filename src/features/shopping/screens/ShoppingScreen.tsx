@@ -26,10 +26,10 @@ const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
 // Categories for Hub Grid
 const CATEGORIES = [
     { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: '#C734CA' },
-    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#7B68D7' },
+    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#C8C0EF' },
     { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: '#C734CA' },
-    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#7B68D7' },
-    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#7B68D7' },
+    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#C8C0EF' },
+    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#C8C0EF' },
     { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: '#C734CA' },
 ];
 

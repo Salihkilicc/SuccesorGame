@@ -21,7 +21,7 @@ const formatCurrency = (value: number) => {
     return `$${value}`;
 };
 
-const ProgressBar = ({ label, value, max = 100, color = '#7B68D7', icon, buff }: {
+const ProgressBar = ({ label, value, max = 100, color = '#C8C0EF', icon, buff }: {
     label: string, value: number, max?: number, color?: string, icon?: string, buff?: string
 }) => {
     const safeValue = value || 0;
@@ -139,8 +139,8 @@ const DNAScreen = () => {
             white: '#FFFFFF',
             yellow: '#C734CA',
             orange: '#C734CA',
-            green: '#7B68D7',
-            blue: '#7B68D7',
+            green: '#C8C0EF',
+            blue: '#C8C0EF',
             purple: '#6004BD',
             brown: '#1A0A4A',
             black: '#020626'
@@ -189,7 +189,7 @@ const DNAScreen = () => {
                         {/* 🛡️ SECURITY */}
                         <View style={styles.card}>
                             <SectionHeader title={t('life.securitySafety')} icon="🛡️" />
-                            <ProgressBar label={t('life.digitalShield')} value={getEffective(security?.digital, secBuffs.digital)} color="#7B68D7" icon="💻" buff={getBuffString(secBuffs.digital)} />
+                            <ProgressBar label={t('life.digitalShield')} value={getEffective(security?.digital, secBuffs.digital)} color="#C8C0EF" icon="💻" buff={getBuffString(secBuffs.digital)} />
                             <ProgressBar label={t('life.bodyguardArmor')} value={getEffective(securityLevel, secBuffs.personal)} color="#C734CA" icon="🥋" buff={getBuffString(secBuffs.personal)} />
                             <ProgressBar label={t('life.policeHeat')} value={suspicion} color={getHeatColor(suspicion)} icon="🚨" />
                         </View>
@@ -202,7 +202,7 @@ const DNAScreen = () => {
                                     <Text style={styles.skillName}>{t('life.selfDefense')}</Text>
                                     <Text style={styles.skillDetail}>{martialArtsDisplay}</Text>
                                     <Text style={styles.skillDetail}>
-                                        Security Boost: <Text style={{ fontWeight: 'bold', color: '#7B68D7' }}>+{securityLevel}%</Text>
+                                        Security Boost: <Text style={{ fontWeight: 'bold', color: '#C8C0EF' }}>+{securityLevel}%</Text>
                                     </Text>
                                     <Text style={styles.skillDetail}>
                                         Body Type: <Text style={{ fontWeight: 'bold', color: '#C734CA' }}>{bodyType}</Text>
@@ -212,7 +212,7 @@ const DNAScreen = () => {
                                     <Text style={[styles.beltText, { color: getBeltTextColor(beltTitle) }]}>{beltTitle}</Text>
                                 </View>
                             </View>
-                            <ProgressBar label={t('life.fatigueLevel')} value={fatigue} max={100} color={fatigue > 80 ? '#C734CA' : '#7B68D7'} icon="⚡" />
+                            <ProgressBar label={t('life.fatigueLevel')} value={fatigue} max={100} color={fatigue > 80 ? '#C734CA' : '#C8C0EF'} icon="⚡" />
                         </View>
 
                         {/* 🕸️ REPUTATION */}
@@ -220,7 +220,7 @@ const DNAScreen = () => {
                             <SectionHeader title={t('life.reputationNetwork')} icon="🕸️" />
                             <ProgressBar label={t('life.casinoVip')} value={getEffective(reputation?.casino, repBuffs.casino)} max={1000} color="#C734CA" icon="🎰" buff={getBuffString(repBuffs.casino)} />
                             <ProgressBar label={t('life.streetCred')} value={getEffective(reputation?.street, repBuffs.street)} color="#C734CA" icon="🗡️" buff={getBuffString(repBuffs.street)} />
-                            <ProgressBar label={t('life.businessTrust')} value={getEffective(reputation?.business, repBuffs.business)} color="#7B68D7" icon="💼" buff={getBuffString(repBuffs.business)} />
+                            <ProgressBar label={t('life.businessTrust')} value={getEffective(reputation?.business, repBuffs.business)} color="#C8C0EF" icon="💼" buff={getBuffString(repBuffs.business)} />
                             <ProgressBar label={t('life.highSociety')} value={getEffective(reputation?.social, repBuffs.social)} color="#6004BD" icon="🥂" buff={getBuffString(repBuffs.social)} />
                         </View>
 
@@ -238,9 +238,9 @@ const DNAScreen = () => {
                             <SectionHeader title={t('life.personalityTraits')} icon="🎭" />
                             <ProgressBar label={t('life.ambition')} value={personality?.ambition} color="#C734CA" icon="🔥" />
                             <ProgressBar label={t('life.riskAppetite')} value={personality?.riskAppetite} color="#C734CA" icon="🎲" />
-                            <ProgressBar label={t('life.strategicSense')} value={personality?.strategicSense ?? 50} color="#7B68D7" icon="♟️" />
-                            <ProgressBar label={t('life.morality')} value={personality?.morality} color="#7B68D7" icon="😇" />
-                            <ProgressBar label={t('life.luck')} value={hidden?.luck} color="#7B68D7" icon="🍀" />
+                            <ProgressBar label={t('life.strategicSense')} value={personality?.strategicSense ?? 50} color="#C8C0EF" icon="♟️" />
+                            <ProgressBar label={t('life.morality')} value={personality?.morality} color="#C8C0EF" icon="😇" />
+                            <ProgressBar label={t('life.luck')} value={hidden?.luck} color="#C8C0EF" icon="🍀" />
                         </View>
 
                         <View style={{ height: 40 }} />
@@ -352,18 +352,18 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     buffBadge: {
-        backgroundColor: 'rgba(123,104,215,0.15)',
+        backgroundColor: 'rgba(200,192,239,0.15)',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 8,
         marginLeft: 6,
         borderWidth: 1,
-        borderColor: 'rgba(123,104,215,0.3)',
+        borderColor: 'rgba(200,192,239,0.3)',
     },
     buffText: {
         fontSize: 9,
         fontWeight: 'bold',
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     progressContainer: {
         flex: 1,

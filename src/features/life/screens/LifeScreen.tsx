@@ -43,17 +43,17 @@ import { useLuxurySystem } from '../../shopping/hooks/useLuxurySystem';
 // Gradients for Icons
 const GRADIENTS = {
   purplePink: ['#6004BD', '#6004BD'],
-  tealCyan: ['#7B68D7', '#7B68D7'],
+  tealCyan: ['#C8C0EF', '#C8C0EF'],
   orangeYellow: ['#C734CA', '#C734CA'],
   pinkRed: ['#C734CA', '#C734CA'],
-  blueSky: ['#7B68D7', '#7B68D7'],
+  blueSky: ['#C8C0EF', '#C8C0EF'],
   brownGold: ['#6004BD', '#6004BD'], // Belongings
-  greenTeal: ['#7B68D7', '#7B68D7'],
-  bluePurple: ['#7B68D7', '#6004BD'],
+  greenTeal: ['#C8C0EF', '#C8C0EF'],
+  bluePurple: ['#C8C0EF', '#6004BD'],
   redCasino: ['#C734CA', '#C734CA'], // Casino Red
   darkGrey: ['#020626', '#11063D'],
   hookupFire: ['#6004BD', '#6004BD'],
-  networkBlue: ['#6004BD', '#7B68D7'],
+  networkBlue: ['#6004BD', '#C8C0EF'],
 };
 
 const SECTION_LEISURE = [

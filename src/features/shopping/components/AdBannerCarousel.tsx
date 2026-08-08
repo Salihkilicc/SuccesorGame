@@ -35,7 +35,7 @@ const ADS = [
         title: t('ui.poseidonYards'),
         subtitle: t('ui.summerSaleConquerTheOcean'),
         cta: 'Set Sail →',
-        color: '#7B68D7',
+        color: '#C8C0EF',
         emoji: '⛵',
     },
 ];

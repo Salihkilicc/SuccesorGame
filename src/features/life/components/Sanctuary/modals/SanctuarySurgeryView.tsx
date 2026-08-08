@@ -111,7 +111,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
 
                                 // Risk/Reward labels
                                 const getRiskLabel = () => {
-                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#7B68D7' };
+                                    if (successPercent === 100) return { text: '✅ Guaranteed', color: '#C8C0EF' };
                                     if (successPercent >= 80) return { text: '⚠️ Low Risk', color: '#C734CA' };
                                     return { text: '⚠️ High Risk', color: '#C734CA' };
                                 };
@@ -150,7 +150,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                             <Text style={styles.successRateLabel}>{t('life.successRate')}</Text>
                                             <View style={[
                                                 styles.successRateBadge,
-                                                { backgroundColor: successPercent === 100 ? '#7B68D7' : successPercent >= 80 ? '#C734CA' : '#C734CA' }
+                                                { backgroundColor: successPercent === 100 ? '#C8C0EF' : successPercent >= 80 ? '#C734CA' : '#C734CA' }
                                             ]}>
                                                 <Text style={styles.successRateText}>{successPercent}%</Text>
                                             </View>
@@ -211,7 +211,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                     ${selectedDoctor ? getDiscountedPrice(selectedDoctor.cost).toLocaleString() : '0'}
                                 </Text>
                                 {hasDiscount && (
-                                    <Text style={{ color: '#7B68D7', fontSize: 12 }}>
+                                    <Text style={{ color: '#C8C0EF', fontSize: 12 }}>
                                         {' '}(Partner Discount!)
                                     </Text>
                                 )}?
@@ -245,7 +245,7 @@ export default SanctuarySurgeryView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#7B68D7', // Dark theme matching current modal style
+        backgroundColor: '#C8C0EF', // Dark theme matching current modal style
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     discountBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#7B68D720',
+        backgroundColor: '#C8C0EF20',
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
     discountTitle: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
         fontWeight: '700',
         fontSize: 14,
         marginBottom: 2,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     discountedPrice: {
-        color: '#7B68D7',
+        color: '#C8C0EF',
     },
     successRateContainer: {
         flexDirection: 'row',
