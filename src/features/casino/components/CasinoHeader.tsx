@@ -70,7 +70,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
     <View style={[styles.container, { height: HEADER_HEIGHT, paddingTop: insets.top }]}>
       {/* Dynamic Background Simulation */}
       <View style={[styles.background, { backgroundColor: location.theme.primary }]} />
-      <View style={[styles.backgroundOverlay, { backgroundColor: '#020626' }]} />
+      <View style={[styles.backgroundOverlay, { backgroundColor: '#0B0635' }]} />
 
       {/* Content */}
       <View style={styles.content}>
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(2,6,38,0.4)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.48)',
     fontSize: 9,
     fontWeight: '600',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     paddingHorizontal: 4
   }
 });

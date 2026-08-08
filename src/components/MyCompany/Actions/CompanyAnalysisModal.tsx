@@ -133,7 +133,7 @@ export default CompanyAnalysisModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         justifyContent: 'flex-end',
     },
     container: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     gridContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     fitContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: 20,
         right: 20,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 16,
         borderRadius: 16,
         flexDirection: 'row',

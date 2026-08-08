@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
     optionButtonSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#020626', // subtle gold tint
+        backgroundColor: '#0B0635', // subtle gold tint
     },
     optionText: {
         color: '#FFFFFF',

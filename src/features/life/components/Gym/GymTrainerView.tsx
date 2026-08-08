@@ -103,7 +103,7 @@ const GymTrainerView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     trainerCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     activeCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     icon: { fontSize: 32 },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     hiredBtn: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     hireText: { fontSize: 12, fontWeight: '800', color: '#FFFFFF' },
 });

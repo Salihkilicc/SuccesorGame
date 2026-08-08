@@ -504,7 +504,7 @@ export default MemberInteractionModal;
 const styles = StyleSheet.create({
     heroSection: {
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 24,
         marginBottom: 20,
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#020626', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    characterCard: { backgroundColor: '#0B0635', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
     characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
     characterValue: { color: '#FFFFFF', fontWeight: '700' },
     characterHint: { color: '#7B68D7', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '48%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
         color: '#7B68D7',
     },
     stepperContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         gap: 12,
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         paddingVertical: 12,
     },
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     },
     reactionBarBg: {
         height: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 6,
         overflow: 'hidden',
     },

@@ -64,7 +64,7 @@ export default LoanModal;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(2,6,38,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing.lg,

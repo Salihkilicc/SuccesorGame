@@ -103,7 +103,7 @@ export default GymSupplementModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         padding: 20
     },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     },
     warningContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#020626'
+        backgroundColor: '#0B0635'
     },
     title: {
         fontSize: 24,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 8
     },
     itemText: { color: '#FFFFFF', fontWeight: '700' },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
         borderRadius: 8,

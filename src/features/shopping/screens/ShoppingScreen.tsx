@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     },
     trendingCard: {
         width: 140,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: theme.spacing.md,
         gap: 6,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     },
     itemCard: {
         width: CARD_WIDTH,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 12,
         borderWidth: 1,

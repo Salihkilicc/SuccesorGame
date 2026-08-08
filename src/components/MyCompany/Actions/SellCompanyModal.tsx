@@ -152,7 +152,7 @@ export default SellCompanyModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     valuationContainer: {
         alignItems: 'center',
         marginBottom: 24,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 12,
         borderRadius: 12,
     },
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,

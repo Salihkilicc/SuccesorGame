@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   limitText: { color: theme.colors.textSecondary, fontSize: 10, fontWeight: '600' },
 
   handCard: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,

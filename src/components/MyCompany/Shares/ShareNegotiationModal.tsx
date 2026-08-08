@@ -150,7 +150,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
+        backgroundColor: 'rgba(2,6,38,0.95)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
         zIndex: 9999,

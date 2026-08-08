@@ -133,7 +133,7 @@ export default SouvenirCollectionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626', // Solid background
+        backgroundColor: '#0B0635', // Solid background
         alignItems: 'center', // Center children
     },
     container: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,

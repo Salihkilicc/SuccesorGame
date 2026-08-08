@@ -292,7 +292,7 @@ const HomeScreen = () => {
         resizeMode="cover"
       />
       <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
+        colors={['rgba(2,6,38,0.3)', 'rgba(2,6,38,0.7)', 'rgba(2,6,38,0.9)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.15)',
   },
   appIconVector: {
-    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowColor: 'rgba(2,6,38,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
@@ -970,7 +970,7 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
   },
   drawerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(2,6,38,0.35)',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
   },
@@ -1062,7 +1062,7 @@ const styles = StyleSheet.create({
   },
   newsOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(2,6,38,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.lg,
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   },
   gameOverOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(2,6,38,0.85)',
     zIndex: 999,
     justifyContent: 'center',
     alignItems: 'center',

@@ -134,7 +134,7 @@ const GymMembershipView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         borderWidth: 1,
         overflow: 'hidden',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     cardHeader: {
         paddingVertical: 12,
@@ -204,10 +204,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 8,
     },
-    disabledBtn: { backgroundColor: '#020626' },
+    disabledBtn: { backgroundColor: '#0B0635' },
     actionBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
     lockedContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 10,
         borderRadius: 8,
         alignItems: 'center',

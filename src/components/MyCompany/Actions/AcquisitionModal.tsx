@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
@@ -582,14 +582,14 @@ const styles = StyleSheet.create({
   // Negotiation Overlay
   overlayBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(2,6,38,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   negotiationCard: {
     width: '100%',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   negBody: {
     marginBottom: 24,
     gap: 12,
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 16,
     borderRadius: 12,
   },

@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
     },
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     },
     // Tabs
     tabContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.08)',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     majorCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,

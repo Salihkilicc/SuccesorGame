@@ -132,7 +132,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
+        backgroundColor: 'rgba(2,6,38,0.95)',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '100%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     drugIconContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#020626'
+        backgroundColor: '#0B0635'
     },
     icon: {
         fontSize: 48
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     passButton: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)'
     },

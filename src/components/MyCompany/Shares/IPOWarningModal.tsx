@@ -93,7 +93,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: 'rgba(2,6,38,0.9)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
         zIndex: 9999,

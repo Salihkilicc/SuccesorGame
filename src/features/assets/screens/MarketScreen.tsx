@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   seeInvestmentsButton: { flex: 1, backgroundColor: 'rgba(199,52,202,0.12)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
   seeInvestmentsButtonPressed: { backgroundColor: 'rgba(199,52,202,0.22)', transform: [{ scale: 0.98 }] },
   seeInvestmentsButtonText: { color: '#C734CA', fontWeight: '800', fontSize: theme.typography.body },
-  liquidateButton: { flex: 1, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
+  liquidateButton: { flex: 1, backgroundColor: '#0B0635', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingVertical: theme.spacing.sm, alignItems: 'center' },
   liquidateButtonPressed: { backgroundColor: 'rgba(199,52,202,0.1)', transform: [{ scale: 0.98 }] },
   liquidateButtonText: { color: '#C734CA', fontWeight: '700', fontSize: theme.typography.body },
 });

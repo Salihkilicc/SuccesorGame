@@ -270,7 +270,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
 export default SharkDealModal;
 
 const styles = StyleSheet.create({
-    activeLoanCard: { backgroundColor: '#020626', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    activeLoanCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     activeLoanTitle: { color: '#C734CA', fontWeight: '800', fontSize: 13, marginBottom: 4 },
     activeLoanBody: { color: '#C734CA', fontSize: 11, lineHeight: 16, marginBottom: 10 },
     repayBtn: { backgroundColor: '#7B68D7', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
@@ -280,11 +280,11 @@ const styles = StyleSheet.create({
     amountLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     amountValue: { fontSize: 26, color: '#FFFFFF', fontWeight: '800', marginVertical: 6 },
     amountRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
-    amountChip: { flex: 1, padding: 8, borderRadius: 8, backgroundColor: '#020626', alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
+    amountChip: { flex: 1, padding: 8, borderRadius: 8, backgroundColor: '#0B0635', alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
     amountChipActive: { borderColor: 'rgba(255,255,255,0.08)' },
     amountChipText: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
     amountNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 10, lineHeight: 16 },
-    termsCard: { backgroundColor: '#020626', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    termsCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     termRow: { flexDirection: 'row', justifyContent: 'space-between' },
     termLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)' },
     termValue: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         borderWidth: 1,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     dealSection: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         color: '#C734CA',
     },
     warningBox: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 20,
         borderWidth: 1,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     riskBox: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         borderWidth: 1,

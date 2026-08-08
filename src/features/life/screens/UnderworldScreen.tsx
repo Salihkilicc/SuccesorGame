@@ -105,7 +105,7 @@ const UnderworldScreen = () => {
                 resizeMode="cover"
             />
             <LinearGradient
-                colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
+                colors={['rgba(2,6,38,0.3)', 'rgba(2,6,38,0.7)', 'rgba(2,6,38,0.9)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.15)',
     },
     appIconVector: {
-        textShadowColor: 'rgba(0,0,0,0.3)',
+        textShadowColor: 'rgba(2,6,38,0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 3,
     },

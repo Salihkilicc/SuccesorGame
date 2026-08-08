@@ -87,7 +87,7 @@ const MarketTicker = ({ items }: { items: any[] }) => {
 const styles = StyleSheet.create({
     wrapper: {
         height: 36,
-        backgroundColor: 'rgba(0,0,0,0.95)',
+        backgroundColor: 'rgba(2,6,38,0.95)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(199,52,202,0.18)',
         justifyContent: 'center',

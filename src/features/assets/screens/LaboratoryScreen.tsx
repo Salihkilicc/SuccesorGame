@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '700',
         top: -1, // Adjust visually to center in bar
-        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowColor: 'rgba(2,6,38,0.5)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
     },

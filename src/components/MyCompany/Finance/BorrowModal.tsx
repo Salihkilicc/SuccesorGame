@@ -349,7 +349,7 @@ export default BorrowModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         // No padding here
     },
     dismissArea: { ...StyleSheet.absoluteFillObject },
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     },
     typeButtonActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     typeEmoji: {
         fontSize: 24,

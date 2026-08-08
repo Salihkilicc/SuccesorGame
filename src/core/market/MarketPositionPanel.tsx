@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },
     summaryCell: { flex: 1, alignItems: 'center' },
     brandRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-    brandChip: { backgroundColor: '#020626', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
+    brandChip: { backgroundColor: '#0B0635', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
     brandChipCat: { color: 'rgba(255,255,255,0.48)', fontSize: 9 },
     brandChipVal: { fontSize: 13, fontWeight: '800' },
     summaryLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },

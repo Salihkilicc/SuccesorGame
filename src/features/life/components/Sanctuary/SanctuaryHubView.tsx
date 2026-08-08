@@ -80,7 +80,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Massage */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('MASSAGE')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0B0635' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.MASSAGE}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.royalMassage')}</Text>
@@ -89,7 +89,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Grooming */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('GROOMING')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0B0635' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.GROOMING}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.groomingLounge')}</Text>
@@ -98,7 +98,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
                         {/* Surgery */}
                         <TouchableOpacity style={styles.card} onPress={() => navigate('SURGERY')}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#020626' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: '#0B0635' }]}>
                                 <Text style={styles.cardIcon}>{ICONS.SURGERY}</Text>
                             </View>
                             <Text style={styles.cardTitle}>{t('life.plasticSurgery')}</Text>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
     },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -183,12 +183,12 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     vipActive: {
-        backgroundColor: '#020626', // Dark luxury
+        backgroundColor: '#0B0635', // Dark luxury
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     vipInactive: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     vipContent: {
         flex: 1,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     card: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',

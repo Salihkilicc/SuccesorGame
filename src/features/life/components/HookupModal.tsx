@@ -290,7 +290,7 @@ export function HookupModal({
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: 'rgba(2,6,38,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#020626', // Slightly lighter than pure black/card
+        backgroundColor: '#0B0635', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(2,6,38,0.5)',
         zIndex: 100,
     },
     overlayCard: {

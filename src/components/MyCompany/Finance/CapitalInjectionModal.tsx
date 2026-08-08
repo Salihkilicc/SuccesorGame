@@ -59,11 +59,11 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-    overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 20 },
+    overlay: { flex: 1, backgroundColor: 'rgba(2,6,38,0.85)', justifyContent: 'center', padding: 20 },
     container: { backgroundColor: '#020626', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     title: { fontSize: 22, fontWeight: 'bold', color: 'white', textAlign: 'center' },
     subtitle: { color: '#FFFFFF', textAlign: 'center', marginBottom: 20 },
-    balanceCard: { backgroundColor: '#020626', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
+    balanceCard: { backgroundColor: '#0B0635', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
     label: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
     balance: { color: '#7B68D7', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
     sectionTitle: { color: 'white', marginBottom: 10, fontWeight: '600' },

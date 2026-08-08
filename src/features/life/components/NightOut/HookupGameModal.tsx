@@ -205,12 +205,12 @@ export default HookupGameModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 24,
         paddingTop: 48,
         borderTopWidth: 2,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     clueBox: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     choiceButton: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -290,16 +290,16 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     choiceButtonPressed: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         transform: [{ scale: 0.98 }],
     },
     choiceButtonCorrect: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     choiceButtonWrong: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     choiceContent: {
         gap: 8,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     },
     choiceTag: {
         alignSelf: 'flex-start',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,

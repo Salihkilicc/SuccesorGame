@@ -938,7 +938,7 @@ export default QuarterlyReportModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(2,6,38,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 480,
     maxHeight: '92%',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(199,52,202,0.18)',

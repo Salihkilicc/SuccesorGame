@@ -388,7 +388,7 @@ export default NotesScreen;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     safeArea: {
         flex: 1,
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
         height: 10,
     },
     noteCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

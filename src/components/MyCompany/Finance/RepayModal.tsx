@@ -193,7 +193,7 @@ export default RepayModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         // No padding here
     },
     centeredView: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',

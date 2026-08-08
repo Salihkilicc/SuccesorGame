@@ -59,7 +59,7 @@ const OfferModal = ({ visible, item, onBuy, onReject }: OfferModalProps) => {
 const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: 'rgba(2,6,38,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 80,
         height: 80,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 40,
         alignItems: 'center',
         justifyContent: 'center',

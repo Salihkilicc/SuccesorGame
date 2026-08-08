@@ -64,7 +64,7 @@ export default BreakupModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,

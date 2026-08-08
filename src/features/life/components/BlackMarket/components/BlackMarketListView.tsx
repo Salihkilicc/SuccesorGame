@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     listItem: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 16,
         borderRadius: 4,
         borderWidth: 1,

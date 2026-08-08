@@ -426,8 +426,11 @@ const styles = StyleSheet.create({
   subtitle: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   deptCard: {
+    // Dolgu, cerceve degil: bu kart eskiden saydamdi ve yalnizca ince bir
+    // kenarlikla duruyordu, o yuzden zeminin uzerinde "yokmus gibi" goruntu
+    // veriyordu. Renk artik yuzeyde.
+    backgroundColor: '#0B0635',
     flexBasis: '48%',
-    backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,

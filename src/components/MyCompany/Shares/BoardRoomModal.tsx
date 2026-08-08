@@ -360,7 +360,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 export default BoardRoomModal;
 
 const styles = StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+    backdrop: { flex: 1, backgroundColor: 'rgba(2,6,38,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
     container: {
         width: '100%', maxWidth: 460, maxHeight: '85%',
         backgroundColor: '#020626', borderRadius: 20, padding: 20,
@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
     moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
     moodValue: { fontSize: 13, fontWeight: '800' },
 
-    demandCard: { backgroundColor: '#020626', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    demandCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     demandTag: { fontSize: 10, color: '#C734CA', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
     demandBody: { fontSize: 12, color: '#FFFFFF', lineHeight: 18, fontStyle: 'italic' },
     demandPrivate: { fontSize: 10, color: '#7B68D7', marginTop: 6, lineHeight: 15 },
     demandDue: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 6, fontWeight: '700' },
 
-    dangerCard: { backgroundColor: '#020626', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    dangerCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     dangerTitle: { fontSize: 13, color: '#C734CA', fontWeight: '800', marginBottom: 4 },
     dangerBody: { fontSize: 11, color: '#C734CA', lineHeight: 16 },
 
@@ -403,17 +403,17 @@ const styles = StyleSheet.create({
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#7B68D7', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
-    trustBarBg: { height: 5, backgroundColor: '#020626', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
+    trustBarBg: { height: 5, backgroundColor: '#0B0635', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
     promiseNote: { fontSize: 11, color: '#C734CA', marginTop: 8 },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#020626', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#0B0635', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     openMemberText: { color: '#C734CA', fontSize: 12, fontWeight: '700' },
-    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#020626', alignItems: 'center' },
+    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#0B0635', alignItems: 'center' },
     lobbyBtnDone: { opacity: 0.4 },
     lobbyText: { fontSize: 12, color: '#C734CA', fontWeight: '700' },
 
-    floatCard: { backgroundColor: '#020626', borderRadius: 12, padding: 14, marginTop: 4 },
+    floatCard: { backgroundColor: '#0B0635', borderRadius: 12, padding: 14, marginTop: 4 },
     floatTitle: { fontSize: 13, color: '#FFFFFF', fontWeight: '700', marginBottom: 4 },
     floatBody: { fontSize: 11, color: 'rgba(255,255,255,0.48)', lineHeight: 16 },
 

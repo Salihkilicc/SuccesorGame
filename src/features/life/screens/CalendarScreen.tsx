@@ -502,14 +502,14 @@ const styles = StyleSheet.create({
     // Modal
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.78)',
+        backgroundColor: 'rgba(2,6,38,0.78)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
     },
     modalCard: {
         width: '100%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(199,52,202,0.38)',

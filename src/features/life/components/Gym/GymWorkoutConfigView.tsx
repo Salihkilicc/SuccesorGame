@@ -107,7 +107,7 @@ const GymWorkoutConfigView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     statsCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
         width: '47%', // Reduced slightly to ensure fit
         marginBottom: 12, // vertical spacing
 
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     infoFooter: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,

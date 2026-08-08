@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     headerTitle: {
         color: '#FFFFFF',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
 
     // Cart Item
     cartItemCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         marginBottom: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 8,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     actionButton: {
         paddingVertical: 6,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
 
     // Order Summary
     summaryCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         marginTop: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
 
     // Checkout Footer (Above Stats Bar)
     checkoutFooter: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.06)',
         padding: 16,

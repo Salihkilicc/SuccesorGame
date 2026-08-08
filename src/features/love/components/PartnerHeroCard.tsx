@@ -25,7 +25,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                 >
                     <View style={[styles.partnerInfo, { paddingLeft: 16 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
+                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(2,6,38,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
                                 {partner.name}
                             </Text>
                             <View style={[styles.partnerBadge, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.4)', flexShrink: 0 }]}>
@@ -35,8 +35,8 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
 
                         <View style={styles.partnerStats}>
                             <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
-                            <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
-                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#020626', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                            <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(2,6,38,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
+                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#0B0635', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>
 
                             {/* ACTIVE PERKS DISPLAY */}
@@ -84,7 +84,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                                     ) : (
                                         <View style={{
                                             padding: 12,
-                                            backgroundColor: 'rgba(0,0,0,0.2)',
+                                            backgroundColor: 'rgba(2,6,38,0.2)',
                                             borderRadius: 12,
                                             borderWidth: 1,
                                             borderColor: 'rgba(255,255,255,0.1)',
@@ -111,7 +111,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}
             >
-                <View style={[styles.partnerPhotoContainer, { borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.3)' }]}>
+                <View style={[styles.partnerPhotoContainer, { borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, backgroundColor: 'rgba(2,6,38,0.3)' }]}>
                     <Text style={styles.noPartnerIcon}>?</Text>
                 </View>
                 <View style={styles.partnerInfo}>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     partnerBarTrack: {
         height: 6,
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: 'rgba(2,6,38,0.2)',
         borderRadius: 999,
         overflow: 'hidden',
         marginTop: 2,

@@ -78,7 +78,7 @@ const formatMoney = (value: number) => formatMoneyExact(Math.max(0, value));
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(2,6,38,0.6)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing.lg,

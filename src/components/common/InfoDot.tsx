@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
 
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.75)',
+        backgroundColor: 'rgba(2,6,38,0.75)',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 28,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 18,
         borderWidth: 1,
         borderColor: 'rgba(199,52,202,0.22)',

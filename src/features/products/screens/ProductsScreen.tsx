@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   emptyText: { color: '#FFFFFF', fontStyle: 'italic', marginLeft: 20 },
   lockedList: { paddingHorizontal: 20, gap: 12 },
   lockedCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0B0635', padding: 16, borderRadius: 12, opacity: 0.8 },
-  iconBox: { width: 48, height: 48, backgroundColor: '#020626', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+  iconBox: { width: 48, height: 48, backgroundColor: '#0B0635', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
   lockedIcon: { fontSize: 24 },
   infoBox: { flex: 1 },
   lockedName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },

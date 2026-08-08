@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingBottom: 12, // Reduced from 20 to tighten layout
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     headerTop: {
         flexDirection: 'row',
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
         aspectRatio: 1.58, // Credit Card Ratio
-        backgroundColor: '#020626', // Matte Black
+        backgroundColor: '#0B0635', // Matte Black
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20, // Pill shape
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     filterChipActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         shadowColor: "#C734CA",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     shopAction: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

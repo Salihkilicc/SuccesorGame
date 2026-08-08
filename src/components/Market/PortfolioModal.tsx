@@ -149,11 +149,11 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(2,6,38,0.85)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',

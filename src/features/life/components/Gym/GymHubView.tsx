@@ -164,7 +164,7 @@ const GymHubView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626', // Changed to full black
+        backgroundColor: '#0B0635', // Changed to full black
     },
     safeArea: {
         flex: 1,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     glassCard: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#020626', // Dark premium background
+        backgroundColor: '#0B0635', // Dark premium background
         padding: 24,
         paddingBottom: 100, // Safe space for CrystalNavBar
         alignItems: 'center',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -210,14 +210,14 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
     },
-    badgeStandard: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#020626' },
-    badgeTitanium: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#020626' },
+    badgeStandard: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#0B0635' },
+    badgeTitanium: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#0B0635' },
     badgeText: { fontSize: 10, fontWeight: '700' },
     textStandard: { color: '#C734CA' },
     textTitanium: { color: '#C734CA' },
     statsCard: {
         width: '100%',
-        backgroundColor: '#020626', // Darker premium tint
+        backgroundColor: '#0B0635', // Darker premium tint
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626', // Dark mode card
+        backgroundColor: '#0B0635', // Dark mode card
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     maButtonInactive: {
         borderColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1.5,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
 });
 

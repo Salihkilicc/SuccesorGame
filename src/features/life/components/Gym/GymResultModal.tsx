@@ -68,7 +68,7 @@ export default GymResultModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 320,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: theme.radius.lg,
         padding: 24,
         alignItems: 'center',

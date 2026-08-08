@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
 
   machineContainer: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   reelsWrapper: {
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 10,
     borderRadius: 12,
     overflow: 'hidden',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 100,
-    backgroundColor: 'rgba(0,0,0,0.6)'
+    backgroundColor: 'rgba(2,6,38,0.6)'
   },
   bigWinText: {
     color: '#C734CA',
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontWeight: '800',
     marginTop: 12,
-    textShadowColor: 'rgba(0,0,0,1)',
+    textShadowColor: 'rgba(2,6,38,1)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },

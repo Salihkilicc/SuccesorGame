@@ -168,7 +168,7 @@ const LifeScreen = () => {
         resizeMode="cover"
       />
       <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
+        colors={['rgba(2,6,38,0.3)', 'rgba(2,6,38,0.7)', 'rgba(2,6,38,0.9)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.15)',
   },
   appIconVector: {
-    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowColor: 'rgba(2,6,38,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   bottomTabIcon: {
     fontSize: 24, // Slightly larger icons
     color: '#FFFFFF',
-    textShadowColor: 'rgba(0,0,0,0.3)', // Depth
+    textShadowColor: 'rgba(2,6,38,0.3)', // Depth
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.3,
-    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowColor: 'rgba(2,6,38,0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },

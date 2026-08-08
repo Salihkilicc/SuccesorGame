@@ -351,7 +351,7 @@ export default RAndDModalRevised;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(2,6,38,0.8)',
     justifyContent: 'center',
     padding: theme.spacing.md,
     paddingBottom: 80, // Make room for bottom bar if card is long

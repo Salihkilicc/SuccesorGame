@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     // Gradient simulation using background color with potential opacity if needed, 
     // but here solid semi-transparent background works best without external libs.
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(2,6,38,0.6)',
   },
   overlayName: {
     fontSize: 22,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(2,6,38,0.7)',
   },
   tierText: {
     fontSize: 10,

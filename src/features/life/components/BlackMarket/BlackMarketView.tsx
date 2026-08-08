@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     lockedCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

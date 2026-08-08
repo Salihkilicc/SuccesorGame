@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     overlayLayer: {
         ...StyleSheet.absoluteFillObject,
         zIndex: 10,
-        backgroundColor: '#020626', // Dark background for smooth fade
+        backgroundColor: '#0B0635', // Dark background for smooth fade
     },
 });
 

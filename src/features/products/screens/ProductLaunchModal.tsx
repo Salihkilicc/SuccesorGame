@@ -136,7 +136,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         justifyContent: 'center',
         padding: 20,
     },

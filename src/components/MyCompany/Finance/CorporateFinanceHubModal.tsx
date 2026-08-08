@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     },
     // Shark Deal Styles
     sharkDealCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,

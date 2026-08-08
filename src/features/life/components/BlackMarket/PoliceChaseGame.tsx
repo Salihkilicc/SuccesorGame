@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     statsContainer: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 5,
         width: '90%',
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: GRID_CONTAINER_WIDTH,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 2,
         borderWidth: 1,
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
         height: cellSize,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         margin: CELL_MARGIN,
         borderRadius: 8
     },
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
     },
     controlButtonDisabled: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5
     },

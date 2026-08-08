@@ -81,7 +81,7 @@ export default NightEndModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     container: {
         flex: 1,
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
         minHeight: 280,
     },
     classyCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)', // Gold-ish
     },
     wildCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)', // Neon Red
         shadowColor: '#020626',
         shadowOffset: { width: 0, height: 0 },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4,
-        backgroundColor: 'rgba(0,0,0,0.3)'
+        backgroundColor: 'rgba(2,6,38,0.3)'
     },
     classyBadge: {
         color: '#C734CA',

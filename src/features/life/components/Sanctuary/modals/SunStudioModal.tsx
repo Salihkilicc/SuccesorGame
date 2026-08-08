@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     card: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         alignItems: 'center',

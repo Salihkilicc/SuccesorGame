@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
 
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         // No padding here
     },
     centeredView: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 20,
         padding: 24,
         width: '100%',
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     stepperContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 8,
         justifyContent: 'space-between',
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 10,
         paddingVertical: 10,
         alignItems: 'center',
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     infoSection: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',

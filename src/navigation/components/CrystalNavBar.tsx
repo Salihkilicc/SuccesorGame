@@ -84,7 +84,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         return {
             color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
             fontSize: 26,
-            textShadowColor: 'rgba(0,0,0,0.5)',
+            textShadowColor: 'rgba(2,6,38,0.5)',
             textShadowOffset: { width: 0, height: 2 },
             textShadowRadius: 3,
         };
@@ -117,7 +117,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                     style={styles.statsOverlay}
                     onPress={() => setIsStatsMode(false)}
                 >
-                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }} />
+                    <View style={{ flex: 1, backgroundColor: 'rgba(2,6,38,0.5)' }} />
                 </Pressable>
             )}
 
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     statsIcon: {
         fontSize: 24,
         color: '#FFFFFF',
-        textShadowColor: 'rgba(0,0,0,0.3)',
+        textShadowColor: 'rgba(2,6,38,0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     },

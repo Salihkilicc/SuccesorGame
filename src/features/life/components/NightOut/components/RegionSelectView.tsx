@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '45%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     },
     cardSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     cardLocal: {
         borderColor: 'rgba(255,255,255,0.06)', // Blue for USA Local

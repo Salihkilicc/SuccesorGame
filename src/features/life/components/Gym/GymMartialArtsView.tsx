@@ -184,7 +184,7 @@ const GymMartialArtsView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     selectionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 16,
         borderRadius: 16,
         borderWidth: 1,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     selectBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 8,
     },
     selectBtnText: {
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     progressValue: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
     progressBarBg: {
         height: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     trainBtnDisabled: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         shadowOpacity: 0,
     },
     trainBtnText: {

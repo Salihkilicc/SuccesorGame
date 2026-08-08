@@ -118,7 +118,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
         >
             <View style={styles.overlay}>
                 {/* Darkened Background instead of Blur for safety */}
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.85)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(2,6,38,0.85)' }]} />
 
                 <View style={[styles.container, { marginTop: 60 }]}>
                     {/* Header */}
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(2,6,38,0.5)',
     },
     container: {
         width: '90%',
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#020626',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     companyName: {
         fontSize: 22,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -392,11 +392,11 @@ const styles = StyleSheet.create({
         padding: 20,
         borderTopWidth: 1,
         borderTopColor: '#020626',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',

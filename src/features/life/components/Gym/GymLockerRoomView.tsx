@@ -152,7 +152,7 @@ const GymLockerRoomView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '90%',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 24,
         shadowColor: '#020626',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     statsCard: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     supplementCard: {
         width: '47%',
         marginBottom: 12,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     supplementCardUsed: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
         opacity: 0.6,
     },
     supplementCardDanger: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     supplementIcon: { fontSize: 36, marginBottom: 8 },
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     infoFooter: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 12,
         padding: 12,
         borderWidth: 1,

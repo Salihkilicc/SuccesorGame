@@ -172,7 +172,7 @@ export default TravelBookingModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#020626', // Solid black background instead of transparent
+        backgroundColor: '#0B0635', // Solid black background instead of transparent
         justifyContent: 'center',
         alignItems: 'center', // Center children
         padding: 20,
@@ -230,13 +230,13 @@ const styles = StyleSheet.create({
     line: {
         flex: 1,
         height: 2,
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(2,6,38,0.3)',
     },
     dot: {
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     planeIcon: {
         marginHorizontal: 8,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         marginBottom: -10,
     },
     content: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     classOption: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     closeText: {
         color: '#FFFFFF',

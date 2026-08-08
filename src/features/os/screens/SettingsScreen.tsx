@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     safeArea: {
         flex: 1,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
     },
     rowFirst: {
         borderTopLeftRadius: 16,

@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', gap: 4 },
 
   tableCard: {
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#020626',
+    backgroundColor: '#0B0635',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
 
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   resultRed: { backgroundColor: '#0B0635' },
-  resultBlack: { backgroundColor: '#020626' },
+  resultBlack: { backgroundColor: '#0B0635' },
   resultGreen: { backgroundColor: '#7B68D7' },
   resultText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
 });

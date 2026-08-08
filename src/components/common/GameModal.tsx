@@ -43,7 +43,7 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         // padding removed to allow full screen absolute positioning
     },
     contentWrapper: {

@@ -75,7 +75,7 @@ export default BabyNamingModal;
 const styles = StyleSheet.create({
     namingOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        backgroundColor: 'rgba(2,6,38,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     namingCard: {
         width: '100%',
         maxWidth: 360,
-        backgroundColor: '#020626',
+        backgroundColor: '#0B0635',
         borderRadius: 24,
         padding: 28,
         alignItems: 'center',

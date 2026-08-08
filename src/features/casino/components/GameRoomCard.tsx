@@ -81,11 +81,11 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.3)', // Darken image for text readability
+        backgroundColor: 'rgba(2,6,38,0.3)', // Darken image for text readability
         // Optional: add gradient if library available, else solid overlay is fine
     },
     lockedOverlay: {
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(2,6,38,0.6)',
     },
     content: {
         flex: 1,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: '800',
         letterSpacing: 1,
-        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowColor: 'rgba(2,6,38,0.8)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         marginTop: 4,
-        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowColor: 'rgba(2,6,38,0.8)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
     },
