@@ -31,7 +31,7 @@ const ProductMarketSection = ({ researched, demand, competition, onResearch }: P
                         <View style={{ flex: 1 }}>
                             <Text style={styles.statLabel}>{t('product.demand')}</Text>
                             <View style={styles.barBg}>
-                                <View style={[styles.barFill, { width: `${demand}%`, backgroundColor: theme.colors.success }]} />
+                                <View style={[styles.barFill, { width: `${demand}%`, backgroundColor: theme.colors.accent }]} />
                             </View>
                         </View>
                         <Text style={styles.statValue}>{demand}%</Text>
@@ -41,7 +41,7 @@ const ProductMarketSection = ({ researched, demand, competition, onResearch }: P
                         <View style={{ flex: 1 }}>
                             <Text style={styles.statLabel}>{t('product.competition2')}</Text>
                             <View style={styles.barBg}>
-                                <View style={[styles.barFill, { width: `${competition}%`, backgroundColor: theme.colors.danger }]} />
+                                <View style={[styles.barFill, { width: `${competition}%`, backgroundColor: theme.colors.destructive }]} />
                             </View>
                         </View>
                         <Text style={styles.statValue}>{competition}%</Text>

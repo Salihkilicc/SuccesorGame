@@ -111,7 +111,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
         zIndex: 9999,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     walletText: {
         fontSize: 14,
         fontWeight: '700',
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
     },
     subtitle: {
         fontSize: 14,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
         color: theme.colors.textSecondary,
     },
     impactBadge: {
-        backgroundColor: theme.colors.success + '20',
+        backgroundColor: theme.colors.accent + '20',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
@@ -196,8 +196,9 @@ const styles = StyleSheet.create({
     impactTextSmall: {
         fontSize: 10,
         fontWeight: '700',
-        // The badge behind it is filled with this same colour: 1.00 contrast.
-        color: theme.colors.onLight,
+        // The badge is `success + '20'` - a 12.5% TINT, not a cyan fill, so
+        // cyan reads on it (4.23) rather than vanishing into it.
+        color: theme.colors.success,
     },
     cancelBtn: {
         marginTop: theme.spacing.lg,
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.xl,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: theme.colors.success,
+        borderColor: theme.colors.accent,
     },
     resultTitle: {
         fontSize: 24,
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         bottom: 0,
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
     },
     impactText: {
         fontSize: 16,
@@ -270,13 +271,13 @@ const styles = StyleSheet.create({
         marginTop: theme.spacing.sm,
     },
     closeBtn: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
         paddingHorizontal: 32,
         paddingVertical: 12,
         borderRadius: 24,
     },
     closeBtnText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: '700',
         fontSize: 16,
     },

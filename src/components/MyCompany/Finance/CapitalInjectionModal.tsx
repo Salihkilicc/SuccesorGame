@@ -59,24 +59,24 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-    overlay: { flex: 1, backgroundColor: 'rgba(2,6,38,0.85)', justifyContent: 'center', padding: 20 },
-    container: { backgroundColor: '#020626', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+    overlay: { flex: 1, backgroundColor: 'rgba(28,36,44,0.85)', justifyContent: 'center', padding: 20 },
+    container: { backgroundColor: '#1C242C', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     title: { fontSize: 22, fontWeight: 'bold', color: 'white', textAlign: 'center' },
     subtitle: { color: '#FFFFFF', textAlign: 'center', marginBottom: 20 },
-    balanceCard: { backgroundColor: '#422B71', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
+    balanceCard: { backgroundColor: '#434B50', padding: 15, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
     label: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
-    balance: { color: '#C8C0EF', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
+    balance: { color: '#FFFFFF', fontSize: 26, fontWeight: 'bold', marginTop: 4 },
     sectionTitle: { color: 'white', marginBottom: 10, fontWeight: '600' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
-    chip: { width: '22%', backgroundColor: '#422B71', padding: 10, borderRadius: 8, alignItems: 'center' },
-    activeChip: { backgroundColor: '#C8C0EF' },
+    chip: { width: '22%', backgroundColor: '#434B50', padding: 10, borderRadius: 8, alignItems: 'center' },
+    activeChip: { backgroundColor: '#CFD0D2' },
     chipText: { color: 'white', fontWeight: 'bold' },
     activeChipText: { color: 'black' },
     preview: { alignItems: 'center', marginBottom: 20 },
     previewAmount: { color: 'white', fontSize: 20, fontWeight: 'bold' },
     actions: { flexDirection: 'row', gap: 10 },
-    cancelBtn: { flex: 1, padding: 15, backgroundColor: '#422B71', borderRadius: 10, alignItems: 'center' },
-    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#C8C0EF', borderRadius: 10, alignItems: 'center' },
+    cancelBtn: { flex: 1, padding: 15, backgroundColor: '#434B50', borderRadius: 10, alignItems: 'center' },
+    confirmBtn: { flex: 2, padding: 15, backgroundColor: '#CFD0D2', borderRadius: 10, alignItems: 'center' },
     btnText: { color: 'white', fontWeight: 'bold' }
 });
 

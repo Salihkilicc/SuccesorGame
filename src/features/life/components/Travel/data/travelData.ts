@@ -36,7 +36,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CULTURE',
         baseCost: 37500,
         emoji: '🇯🇵',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '🚄',
         souvenir: { id: 'jp_katana', name: 'Samurai Katana', emoji: '⚔️', description: 'A sharp traditional blade.', rarity: 'LEGENDARY' },
         narratives: {
@@ -52,7 +52,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CITY',
         baseCost: 45000,
         emoji: '🇫🇷',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '✈️',
         souvenir: { id: 'fr_wine', name: '1982 Vintage Wine', emoji: '🍷', description: 'A bottle of exquisite red wine.', rarity: 'RARE' },
         narratives: {
@@ -68,7 +68,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'HISTORIC',
         baseCost: 42000,
         emoji: '🇮🇹',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         transportIcon: '🛵',
         souvenir: { id: 'it_mask', name: 'Venetian Mask', emoji: '🎭', description: 'A mysterious carnival mask.', rarity: 'COMMON' },
         narratives: {
@@ -84,7 +84,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'HISTORIC',
         baseCost: 22500,
         emoji: '🇪🇬',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '🐪',
         souvenir: { id: 'eg_scarab', name: 'Golden Scarab', emoji: '🪲', description: 'An ancient symbol of rebirth.', rarity: 'RARE' },
         narratives: {
@@ -100,7 +100,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 30000,
         emoji: '🇧🇷',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         transportIcon: '✈️',
         souvenir: { id: 'br_ball', name: 'Signed Football', emoji: '⚽', description: 'Signed by a local legend.', rarity: 'COMMON' },
         narratives: {
@@ -116,7 +116,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CITY',
         baseCost: 37500,
         emoji: '🇺🇸',
-        color: '#6004BD',
+        color: '#05A8F6',
         transportIcon: '🚁',
         souvenir: { id: 'us_bat', name: 'Babe Ruth Bat', emoji: '⚾', description: 'A legendary baseball bat.', rarity: 'LEGENDARY' },
         narratives: {
@@ -132,7 +132,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CULTURE',
         baseCost: 39000,
         emoji: '🇬🇧',
-        color: '#C836CA',
+        color: '#FF8A8A',
         transportIcon: '🚌',
         souvenir: { id: 'uk_tea', name: 'Royal Tea Set', emoji: '🫖', description: 'Fine china fit for a queen.', rarity: 'RARE' },
         narratives: {
@@ -148,7 +148,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'HISTORIC',
         baseCost: 27000,
         emoji: '🇹🇷',
-        color: '#C836CA',
+        color: '#FF8A8A',
         transportIcon: '🚢',
         souvenir: { id: 'tr_carpet', name: 'Hereke Carpet', emoji: '🧶', description: 'A hand-woven masterpiece.', rarity: 'LEGENDARY' },
         narratives: {
@@ -164,7 +164,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'NATURE',
         baseCost: 52500,
         emoji: '🇹🇿',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '🚙',
         souvenir: { id: 'tz_necklace', name: 'Lion Tooth Necklace', emoji: '🦁', description: 'A symbol of bravery.', rarity: 'RARE' },
         narratives: {
@@ -196,7 +196,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 24000,
         emoji: '🇹🇭',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '🚤',
         souvenir: { id: 'th_buddha', name: 'Golden Statue', emoji: '🙏', description: 'A peaceful golden figure.', rarity: 'COMMON' },
         narratives: {
@@ -212,7 +212,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 40500,
         emoji: '🇬🇷',
-        color: '#6004BD',
+        color: '#05A8F6',
         transportIcon: '⛴️',
         souvenir: { id: 'gr_amphora', name: 'Ancient Amphora', emoji: '🏺', description: 'Replica of ancient pottery.', rarity: 'RARE' },
         narratives: {
@@ -228,7 +228,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'HISTORIC',
         baseCost: 33000,
         emoji: '🇨🇳',
-        color: '#C836CA',
+        color: '#FF8A8A',
         transportIcon: '🚂',
         souvenir: { id: 'cn_dragon', name: 'Jade Dragon', emoji: '🐉', description: 'Exquisite green jade carving.', rarity: 'LEGENDARY' },
         narratives: {
@@ -244,7 +244,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CULTURE',
         baseCost: 27000,
         emoji: '🇲🇽',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         transportIcon: '✈️',
         souvenir: { id: 'mx_calendar', name: 'Aztec Calendar', emoji: '☀️', description: 'Stone carving of time.', rarity: 'COMMON' },
         narratives: {
@@ -260,7 +260,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CULTURE',
         baseCost: 36000,
         emoji: '🇷🇺',
-        color: '#6004BD',
+        color: '#05A8F6',
         transportIcon: '🚂',
         souvenir: { id: 'ru_egg', name: 'Fabergé Egg', emoji: '🥚', description: 'Jeweled egg of royalty.', rarity: 'LEGENDARY' },
         narratives: {
@@ -276,7 +276,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 43500,
         emoji: '🇦🇺',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '✈️',
         souvenir: { id: 'au_opal', name: 'Black Opal', emoji: '💎', description: 'Shimmering dark gemstone.', rarity: 'RARE' },
         narratives: {
@@ -292,7 +292,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'CULTURE',
         baseCost: 21000,
         emoji: '🇮🇳',
-        color: '#C734CA',
+        color: '#FF8A8A',
         transportIcon: '🛺',
         souvenir: { id: 'in_shawl', name: 'Cashmere Shawl', emoji: '🧣', description: 'Softest wool in the world.', rarity: 'COMMON' },
         narratives: {
@@ -308,7 +308,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 31500,
         emoji: '🇪🇸',
-        color: '#C836CA',
+        color: '#FF8A8A',
         transportIcon: '✈️',
         souvenir: { id: 'es_cape', name: 'Matador Cape', emoji: '💃', description: 'Red silk ceremonial cape.', rarity: 'RARE' },
         narratives: {
@@ -324,7 +324,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'NATURE',
         baseCost: 28500,
         emoji: '🇵🇪',
-        color: '#C836CA',
+        color: '#FF8A8A',
         transportIcon: '🦙',
         souvenir: { id: 'pe_poncho', name: 'Alpaca Poncho', emoji: '🧥', description: 'Warm and colorful wool.', rarity: 'COMMON' },
         narratives: {
@@ -340,7 +340,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         type: 'BEACH',
         baseCost: 60000,
         emoji: '🇲🇻',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         transportIcon: '🚤',
         souvenir: { id: 'mv_shell', name: 'Giant Conch Shell', emoji: '🐚', description: 'Echoes of the ocean.', rarity: 'RARE' },
         narratives: {

@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     placeholderText: {
         fontSize: 18,
         fontWeight: '600',
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         marginBottom: 12,
         textTransform: 'uppercase',
         letterSpacing: 1,

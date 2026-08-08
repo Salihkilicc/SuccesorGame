@@ -117,7 +117,7 @@ export default SanctuaryMassageView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
     },
     bottomBarContainer: {
         position: 'absolute',
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
     },
     backBtn: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -158,19 +158,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 16,
         fontWeight: '900',
         letterSpacing: 1,
     },
     subtitle: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 12,
     },
     vipBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#C734CA20',
+        backgroundColor: '#FF8A8A20',
         borderRadius: theme.radius.sm,
         padding: 12,
         marginBottom: theme.spacing.md,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     vipText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 12,
     },
     scrollContent: {
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
         gap: theme.spacing.md,
     },
     optionCard: {
-        backgroundColor: '#422B71', // Deep Ocean Blue
+        backgroundColor: '#434B50', // Deep Ocean Blue
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        shadowColor: '#C8C0EF',
+        shadowColor: '#CFD0D2',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
@@ -211,10 +211,10 @@ const styles = StyleSheet.create({
     optionCardVIP: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.48)',
-        backgroundColor: '#422B71', // Deep Ocean Blue
+        backgroundColor: '#434B50', // Deep Ocean Blue
     },
     optionCardPressed: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         transform: [{ scale: 0.98 }],
     },
     optionHeader: {
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     },
     statText: {
         fontSize: 12,
-        color: '#C8C0EF', // Green
+        color: '#FFFFFF', // Green
         fontWeight: '600',
     },
     healthText: {
-        color: '#C8C0EF', // Blue
+        color: '#FFFFFF', // Blue
     },
 });

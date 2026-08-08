@@ -41,7 +41,7 @@ const SettingsRow = ({
     onPress,
     isFirst,
     isLast,
-    color = '#C734CA',
+    color = '#FF8A8A',
 }: SettingsRowProps) => {
     return (
         <TouchableOpacity
@@ -65,12 +65,12 @@ const SettingsRow = ({
                 <Switch
                     value={value}
                     onValueChange={onToggle}
-                    trackColor={{ false: '#020626', true: '#C734CA' }}
+                    trackColor={{ false: '#1C242C', true: '#FF8A8A' }}
                     thumbColor={value ? '#FFFFFF' : 'rgba(255,255,255,0.48)'}
-                    ios_backgroundColor="#020626"
+                    ios_backgroundColor="#1C242C"
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#7B46B7" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#666E70" />
             )}
         </TouchableOpacity>
     );
@@ -135,7 +135,7 @@ const SettingsScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <LinearGradient
-                colors={['#020626', '#020626', '#020626']}
+                colors={['#1C242C', '#1C242C', '#1C242C']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -151,7 +151,7 @@ const SettingsScreen = () => {
                             pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
                         ]}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
                     </Pressable>
 
                     <View style={styles.headerCenter}>
@@ -186,7 +186,7 @@ const SettingsScreen = () => {
                                     <MaterialCommunityIcons
                                         name="translate"
                                         size={22}
-                                        color={locale === l.code ? '#C734CA' : 'rgba(255,255,255,0.48)'}
+                                        color={locale === l.code ? '#FF8A8A' : 'rgba(255,255,255,0.48)'}
                                     />
                                     <Text
                                         style={[
@@ -212,7 +212,7 @@ const SettingsScreen = () => {
                             value={isMusicEnabled}
                             onToggle={toggleMusic}
                             isFirst
-                            color="#6004BD"
+                            color="#05A8F6"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -220,7 +220,7 @@ const SettingsScreen = () => {
                             label={t('os.soundEffects')}
                             value={isSoundEnabled}
                             onToggle={toggleSound}
-                            color="#C8C0EF"
+                            color="#CFD0D2"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -228,7 +228,7 @@ const SettingsScreen = () => {
                             label={t('os.notifications')}
                             value={isNotificationsEnabled}
                             onToggle={toggleNotifications}
-                            color="#C734CA"
+                            color="#FF8A8A"
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -237,7 +237,7 @@ const SettingsScreen = () => {
                             value={isHapticsEnabled}
                             onToggle={toggleHaptics}
                             isLast
-                            color="#C734CA"
+                            color="#FF8A8A"
                         />
                     </View>
 
@@ -302,11 +302,11 @@ const styles = StyleSheet.create({
     },
     langLabel: { flex: 1, fontSize: 15, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     langLabelActive: { color: '#FFFFFF' },
-    langCheck: { color: '#C734CA', fontSize: 16, fontWeight: '800' },
+    langCheck: { color: '#FF8A8A', fontSize: 16, fontWeight: '800' },
     langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     safeArea: {
         flex: 1,
@@ -351,10 +351,10 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 32,
         height: 2,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginTop: 6,
         borderRadius: 2,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     group: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         marginBottom: 32,
         borderWidth: 1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     rowFirst: {
         borderTopLeftRadius: 16,

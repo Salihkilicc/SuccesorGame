@@ -25,12 +25,12 @@ const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
 
 // Categories for Hub Grid
 const CATEGORIES = [
-    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: '#C734CA' },
-    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#C8C0EF' },
-    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: '#C734CA' },
-    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#C8C0EF' },
-    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#C8C0EF' },
-    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: '#C734CA' },
+    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: '#FF8A8A' },
+    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#FFFFFF' },
+    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: '#FF8A8A' },
+    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#FFFFFF' },
+    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#FFFFFF' },
+    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: '#FF8A8A' },
 ];
 
 const ShoppingScreen = () => {
@@ -265,7 +265,7 @@ const ShoppingScreen = () => {
                                     onPress={() => isInCart ? setShowCart(true) : !owned && addToCart(item)}
                                     style={({ pressed }) => [
                                         styles.addButton,
-                                        { backgroundColor: owned ? '#281F50' : isInCart ? '#6004BD' : '#C734CA' },
+                                        { backgroundColor: owned ? '#323A40' : isInCart ? '#05A8F6' : '#FF8A8A' },
                                         pressed && !owned && styles.pressed
                                     ]}
                                     disabled={owned}
@@ -303,10 +303,10 @@ const ShoppingScreen = () => {
         <AppLaunchLoader
             appName="LuxeNet"
             appIcon={<MaterialCommunityIcons name="shopping" size={64} color="#FFFFFF" />}
-            backgroundColor="#020626"
+            backgroundColor="#1C242C"
         >
             <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor="#020626" />
+                <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
 
                 {/* Persistent Browser Header */}
                 <BrowserHeader
@@ -355,7 +355,7 @@ const ShoppingScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
     contentArea: {
         flex: 1,
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     },
     trendingCard: {
         width: 140,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: theme.spacing.md,
         gap: 6,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
         minHeight: 34,
     },
     trendingPrice: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 14,
         fontWeight: '700',
     },
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     },
     itemCard: {
         width: CARD_WIDTH,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 12,
         borderWidth: 1,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
         height: 36,
     },
     itemPrice: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 15,
         fontWeight: '700',
     },

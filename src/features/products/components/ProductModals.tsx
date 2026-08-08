@@ -70,7 +70,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 
                             <View style={styles.statRow}>
                                 <Text style={styles.label}>{t('product.competition2')}</Text>
-                                <Text style={[styles.value, { color: theme.colors.warning }]}>{product.competition}</Text>
+                                <Text style={[styles.value, { color: theme.colors.textPrimary }]}>{product.competition}</Text>
                             </View>
                             <View style={styles.statRow}>
                                 <Text style={styles.label}>{t('product.estBaseCost')}</Text>
@@ -488,7 +488,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             info={t('product.optimizingTheProcessLowersYour')}
                             infoDetail={t('product.eachLevelCostsMoreThan')}
                             summary={`${formatNumberShared(totalRP)} RP`}
-                            summaryColor="#6004BD"
+                            summaryColor="#05A8F6"
                         >
                         <View style={styles.rdSection}>
 
@@ -498,7 +498,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     <Text style={styles.upgradeLabel}>{t('product.optimizeProcess')}</Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
                                         <Text style={styles.heroValue}>${currentUnitCost}</Text>
-                                        <Text style={{ color: theme.colors.accent, fontWeight: 'bold' }}>(-2%)</Text>
+                                        <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(-2%)</Text>
                                     </View>
                                     <Text style={styles.hint}>Lvl {processLevel} ➜ {processLevel + 1}</Text>
                                 </View>
@@ -599,7 +599,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         styles.capacityFill,
                                         {
                                             width: `${maxUnits > 0 ? Math.min(100, (willBuild / maxUnits) * 100) : 0}%`,
-                                            backgroundColor: supplyGap < 0 ? '#C734CA' : '#04BDBA',
+                                            backgroundColor: supplyGap < 0 ? '#FF8A8A' : '#05A8F6',
                                         },
                                     ]}
                                 />
@@ -640,7 +640,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
                                     <Text style={styles.compareLabel}>{t('product.marketWants')}</Text>
-                                    <Text style={[styles.compareValue, { color: '#C8C0EF' }]}>
+                                    <Text style={[styles.compareValue, { color: '#FFFFFF' }]}>
                                         {formatNumber(expectedDemand)}
                                     </Text>
                                 </View>
@@ -954,10 +954,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                             width: `${Math.min(100, (marketing / marketingMax) * 100)}%`,
                                             backgroundColor:
                                                 marketing < maintenancePoint
-                                                    ? '#C734CA'
+                                                    ? '#FF8A8A'
                                                     : isOverSaturated
-                                                        ? '#C8C0EF'
-                                                        : '#C8C0EF',
+                                                        ? '#CFD0D2'
+                                                        : '#CFD0D2',
                                         },
                                     ]}
                                 />
@@ -1034,7 +1034,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     </View>
                                     <View style={styles.previewCell}>
                                         <Text style={styles.previewLabel}>{t('product.unitsSold')}</Text>
-                                        <Text style={[styles.previewValue, { color: '#C8C0EF' }]}>
+                                        <Text style={[styles.previewValue, { color: '#FFFFFF' }]}>
                                             {formatNumber(expectedSales)}
                                         </Text>
                                     </View>
@@ -1043,7 +1043,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text
                                             style={[
                                                 styles.previewValue,
-                                                { color: projectedMargin >= 0 ? '#04BDBA' : '#C734CA' },
+                                                { color: projectedMargin >= 0 ? '#05A8F6' : '#FF8A8A' },
                                             ]}
                                         >
                                             {formatMoney(projectedMargin)}
@@ -1070,7 +1070,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         </Pressable>
 
                         <Pressable style={styles.btnDanger} onPress={() => onRetire(product.id)}>
-                            <Text style={styles.btnText}>{t('product.retireProduct')}</Text>
+                            <Text style={[styles.btnText, styles.btnTextOnDark]}>{t('product.retireProduct')}</Text>
                         </Pressable>
                     </ScrollView>
                 </View>
@@ -1094,7 +1094,7 @@ const styles = StyleSheet.create({
     },
     capacityFill: { height: 10, borderRadius: 5 },
     scaleRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-    scaleHint: { color: '#C8C0EF', fontSize: 9.5 },
+    scaleHint: { color: '#FFFFFF', fontSize: 9.5 },
     scaleMax: { color: 'rgba(255,255,255,0.48)', fontSize: 9.5, fontWeight: '700' },
 
     compareTrack: {
@@ -1110,16 +1110,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 2,
         height: 16,
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
         borderRadius: 1,
     },
     compareRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
     compareLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
     compareValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 2 },
 
-    warnLine: { color: '#C734CA', fontSize: 11, lineHeight: 16, marginTop: 10 },
-    okLine: { color: '#C8C0EF', fontSize: 11, marginTop: 10 },
-    capLine: { color: '#C734CA', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
+    warnLine: { color: '#FF8A8A', fontSize: 11, lineHeight: 16, marginTop: 10 },
+    okLine: { color: '#FFFFFF', fontSize: 11, marginTop: 10 },
+    capLine: { color: '#FF8A8A', fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, marginTop: 10 },
 
     matchBtn: {
@@ -1131,7 +1131,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         alignItems: 'center',
     },
-    matchBtnText: { color: '#C8C0EF', fontSize: 12, fontWeight: '700' },
+    matchBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
 
     mktTrack: {
         height: 8,
@@ -1149,9 +1149,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(199,52,202,0.12)',
     },
     mktFill: { height: 8, borderRadius: 4 },
-    mktMarker: { position: 'absolute', width: 2, height: 14, backgroundColor: '#422B71' },
+    mktMarker: { position: 'absolute', width: 2, height: 14, backgroundColor: '#434B50' },
     // Kiyas butce isareti — bakim esiginden ayirt edilsin diye farkli renk
-    mktMarkerBenchmark: { backgroundColor: '#C8C0EF', width: 2, height: 14 },
+    mktMarkerBenchmark: { backgroundColor: '#CFD0D2', width: 2, height: 14 },
     mktScale: { color: '#FFFFFF', fontSize: 9.5, marginTop: 6 },
 
     whyRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5 },
@@ -1175,14 +1175,14 @@ const styles = StyleSheet.create({
         padding: 14,
         marginBottom: 16,
     },
-    previewTitle: { color: '#C8C0EF', fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
+    previewTitle: { color: '#FFFFFF', fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
     previewRow: { flexDirection: 'row', marginTop: 6 },
     previewCell: { flex: 1, alignItems: 'center' },
     previewLabel: { color: '#FFFFFF', fontSize: 9.5 },
     previewValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', marginTop: 3 },
 
-    overlay: { flex: 1, backgroundColor: 'rgba(2,6,38,0.9)', justifyContent: 'center', padding: 16 },
-    content: { backgroundColor: '#422B71', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+    overlay: { flex: 1, backgroundColor: 'rgba(28,36,44,0.9)', justifyContent: 'center', padding: 16 },
+    content: { backgroundColor: '#434B50', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     modalTitle: { fontSize: 22, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
     header: { flexDirection: 'row', gap: 16, marginBottom: 20 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
@@ -1192,18 +1192,18 @@ const styles = StyleSheet.create({
     statRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
     label: { color: 'rgba(255,255,255,0.48)', fontSize: 14 },
     value: { color: '#FFFFFF', fontWeight: '700' },
-    valueAccent: { color: theme.colors.accent, fontWeight: '800', fontSize: 16 },
-    analysisBox: { backgroundColor: '#422B71', padding: 12, borderRadius: 8, marginBottom: 20 },
+    valueAccent: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 16 },
+    analysisBox: { backgroundColor: '#434B50', padding: 12, borderRadius: 8, marginBottom: 20 },
     sectionHeader: { color: '#FFFFFF', fontWeight: '700', marginBottom: 12 },
-    barBg: { height: 6, backgroundColor: '#422B71', borderRadius: 3, marginBottom: 12 },
-    barFill: { height: '100%', backgroundColor: theme.colors.success, borderRadius: 3 },
+    barBg: { height: 6, backgroundColor: '#434B50', borderRadius: 3, marginBottom: 12 },
+    barFill: { height: '100%', backgroundColor: theme.colors.accent, borderRadius: 3 },
     blurBox: { height: 100, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderRadius: 8, marginBottom: 20, borderStyle: 'dashed', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     blurText: { color: '#FFFFFF', fontWeight: '700' },
     blurSubText: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },
     actions: { gap: 10 },
     btnPrimary: { backgroundColor: theme.colors.accent, padding: 14, borderRadius: 10, alignItems: 'center' },
-    btnSuccess: { backgroundColor: theme.colors.success, padding: 14, borderRadius: 10, alignItems: 'center' },
-    btnDanger: { backgroundColor: theme.colors.danger, padding: 14, borderRadius: 10, alignItems: 'center', marginTop: 20 },
+    btnSuccess: { backgroundColor: theme.colors.accent, padding: 14, borderRadius: 10, alignItems: 'center' },
+    btnDanger: { backgroundColor: theme.colors.destructive, padding: 14, borderRadius: 10, alignItems: 'center', marginTop: 20 },
     btnOutline: {
         backgroundColor: 'transparent',
         padding: 14,
@@ -1214,7 +1214,10 @@ const styles = StyleSheet.create({
         marginTop: 12
     },
     btnGhost: { padding: 14, alignItems: 'center' },
-    btnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+    // The default suits btnPrimary, which is the bright blue: light fill, so
+    // black. btnDanger is the deep blue and overrides this at its call site.
+    btnText: { color: theme.colors.onLight, fontWeight: '700', fontSize: 16 },
+    btnTextOnDark: { color: theme.colors.textPrimary },
     btnOutlineText: { color: 'rgba(255,255,255,0.48)', fontWeight: '700', fontSize: 16 },
     ghostText: { color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     closeIcon: { fontSize: 24, color: 'rgba(255,255,255,0.48)' },
@@ -1225,7 +1228,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     rpBadgeText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 14,
         fontWeight: '800',
     },
@@ -1234,7 +1237,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 4,
         overflow: 'hidden',
         marginBottom: 8,
@@ -1253,7 +1256,7 @@ const styles = StyleSheet.create({
     diceBtn: { padding: 4 },
     diceIcon: { fontSize: 20 },
     insightBox: { backgroundColor: theme.colors.cardSoft, padding: 12, borderRadius: 8, marginBottom: 20, borderLeftWidth: 4, borderLeftColor: theme.colors.accent },
-    insightTitle: { color: theme.colors.accent, fontWeight: '700', marginBottom: 4 },
+    insightTitle: { color: theme.colors.textPrimary, fontWeight: '700', marginBottom: 4 },
     insightText: { color: '#FFFFFF', fontSize: 13 },
     rdSection: { marginBottom: 20 },
     sectionTitle: { fontSize: 18, fontWeight: '800', color: '#FFFFFF', marginBottom: 12 },
@@ -1262,10 +1265,10 @@ const styles = StyleSheet.create({
     contractDesc: { fontSize: 11, color: 'rgba(255,255,255,0.48)', fontStyle: 'italic', marginTop: 10, marginBottom: 4 },
     partnerRow: { gap: 8 },
     partnerChip: {
-        backgroundColor: '#281F50', borderRadius: 10, padding: 10,
+        backgroundColor: '#323A40', borderRadius: 10, padding: 10,
         borderWidth: 1, borderColor: 'transparent',
     },
-    partnerChipActive: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#422B71' },
+    partnerChipActive: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#434B50' },
     partnerName: { fontSize: 13, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
     partnerNameActive: { color: '#FFFFFF' },
     partnerMeta: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
@@ -1275,21 +1278,21 @@ const styles = StyleSheet.create({
     contractValue: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
     contractUnitLabel: { fontSize: 10, color: 'rgba(255,255,255,0.48)' },
     stepBtn: {
-        width: 44, height: 44, borderRadius: 10, backgroundColor: '#281F50',
+        width: 44, height: 44, borderRadius: 10, backgroundColor: '#323A40',
         alignItems: 'center', justifyContent: 'center',
     },
-    stepBtnText: { fontSize: 22, color: '#C734CA', fontWeight: '800' },
-    contractCompare: { backgroundColor: '#281F50', borderRadius: 10, padding: 12, marginTop: 12, gap: 8 },
+    stepBtnText: { fontSize: 22, color: '#FF8A8A', fontWeight: '800' },
+    contractCompare: { backgroundColor: '#323A40', borderRadius: 10, padding: 12, marginTop: 12, gap: 8 },
     cmRow: { flexDirection: 'row', justifyContent: 'space-between' },
     cmLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)' },
     cmValue: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
-    compareGood: { fontSize: 12, color: '#C8C0EF', fontWeight: '700' },
-    compareBad: { fontSize: 12, color: '#C734CA', fontWeight: '700' },
-    contractWarn: { fontSize: 11, color: '#C734CA', marginTop: 8, fontWeight: '600' },
+    compareGood: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
+    compareBad: { fontSize: 12, color: '#FF8A8A', fontWeight: '700' },
+    contractWarn: { fontSize: 11, color: '#FF8A8A', marginTop: 8, fontWeight: '600' },
 
     // COMPACT UPGRADE CARD STYLES
     upgradeCardCompact: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 12,
         borderRadius: 12,
         marginBottom: 10,
@@ -1335,25 +1338,25 @@ const styles = StyleSheet.create({
     upgradeCard: { backgroundColor: 'rgba(255,255,255,0.06)', padding: 16, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     upgradeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
     upgradeTitle: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
-    upgradeLevel: { fontSize: 12, color: theme.colors.accent, fontWeight: '600' },
+    upgradeLevel: { fontSize: 12, color: theme.colors.textPrimary, fontWeight: '600' },
     upgradeStats: { marginBottom: 12 },
     statItem: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
     statLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 13 },
     statValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-    rpCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '700' },
+    rpCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '700' },
     upgradeBtn: { backgroundColor: theme.colors.accent, padding: 12, borderRadius: 8, alignItems: 'center' },
-    upgradeBtnDisabled: { backgroundColor: '#7B46B7', opacity: 0.5 },
+    upgradeBtnDisabled: { backgroundColor: '#666E70', opacity: 0.5 },
     upgradeBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
 
     controlGroup: { marginBottom: 20 },
     controlTitle: { color: '#FFFFFF', fontWeight: '600', marginBottom: 8 },
     controlValue: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
-    sliderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#422B71', padding: 8, borderRadius: 8 },
-    adjBtn: { width: 36, height: 36, backgroundColor: '#7B46B7', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
+    sliderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#434B50', padding: 8, borderRadius: 8 },
+    adjBtn: { width: 36, height: 36, backgroundColor: '#666E70', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
     adjText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-    scrapNote: { fontSize: 9, color: '#C734CA', marginTop: 2, lineHeight: 13 },
-    queuedLine: { fontSize: 10, color: '#C734CA', marginTop: 3, lineHeight: 14 },
-    hint: { fontSize: 11, color: '#C8C0EF', marginTop: 4, textAlign: 'right' },
+    scrapNote: { fontSize: 9, color: '#FF8A8A', marginTop: 2, lineHeight: 13 },
+    queuedLine: { fontSize: 10, color: '#FF8A8A', marginTop: 3, lineHeight: 14 },
+    hint: { fontSize: 11, color: '#FFFFFF', marginTop: 4, textAlign: 'right' },
     realStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
     realStatsText: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '600' },
 });

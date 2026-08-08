@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     menuButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 20,
         borderRadius: 4,
         borderLeftWidth: 3,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     dangerButton: {
         borderLeftColor: '#900',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     pressed: {
         transform: [{ scale: 0.98 }],
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     dangerText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     menuSubtitle: {
         color: '#FFFFFF',

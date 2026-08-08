@@ -12,7 +12,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.edenislands.luxury',
             category: 'REAL_ESTATE',
             description: 'Buy the horizon.',
-            bannerColor: '#C8C0EF',
+            bannerColor: '#CFD0D2',
             emoji: '🏝️',
         },
         {
@@ -21,7 +21,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.skylinearch.com',
             category: 'REAL_ESTATE',
             description: 'Own the skyline.',
-            bannerColor: '#5C3790',
+            bannerColor: '#535B5F',
             emoji: '🏢',
         },
         {
@@ -30,7 +30,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.dynasty8elite.com',
             category: 'REAL_ESTATE',
             description: 'Residences of distinction.',
-            bannerColor: '#5C3790',
+            bannerColor: '#535B5F',
             emoji: '🏠',
         },
         {
@@ -48,7 +48,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.heritage-estates.eu',
             category: 'REAL_ESTATE',
             description: 'History is yours.',
-            bannerColor: '#6004BD',
+            bannerColor: '#05A8F6',
             emoji: '🏰',
         },
         {
@@ -57,7 +57,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.urbancorp.global',
             category: 'REAL_ESTATE',
             description: 'Commercial dominance.',
-            bannerColor: '#C8C0EF',
+            bannerColor: '#CFD0D2',
             emoji: '🏙️',
         },
     ],

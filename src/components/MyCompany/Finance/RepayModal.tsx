@@ -109,7 +109,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                                             </View>
                                             <View style={styles.loanDetailItem}>
                                                 <Text style={styles.loanDetailLabel}>{t('finance.canRepay')}</Text>
-                                                <Text style={[styles.loanDetailValue, { color: '#C8C0EF' }]}>
+                                                <Text style={[styles.loanDetailValue, { color: '#FFFFFF' }]}>
                                                     {formatMoney(maxRepayable)}
                                                 </Text>
                                             </View>
@@ -193,7 +193,7 @@ export default RepayModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         // No padding here
     },
     centeredView: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 420,
         maxHeight: '80%',
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loanCard: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     loanRate: {
         fontSize: 13,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '600',
     },
     loanRemainingLabel: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     loanRemaining: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     repayButton: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         padding: 12,
         alignItems: 'center',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     repayButtonFull: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     repayButtonPressed: {
@@ -318,16 +318,16 @@ const styles = StyleSheet.create({
     repayButtonValue: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     insufficientText: {
         fontSize: 12,
-        color: '#C734CA',
+        color: '#FF8A8A',
         textAlign: 'center',
         fontStyle: 'italic',
     },
     closeButton: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     confirmButton: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',

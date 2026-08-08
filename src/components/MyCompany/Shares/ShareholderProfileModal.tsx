@@ -18,6 +18,7 @@ import { useEquityStore } from '../../../features/finance/stores/useEquityStore'
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
+import { theme } from '../../../core/theme';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -208,16 +209,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // ============================================================================
 
     const getTrustColor = (trust: number) => {
-        if (trust < 30) return '#C734CA'; // Red
-        if (trust < 50) return '#C734CA'; // Orange
-        if (trust < 70) return '#C734CA'; // Yellow
-        return '#C8C0EF'; // Green
+        if (trust < 30) return '#FF8A8A'; // Red
+        if (trust < 50) return '#FF8A8A'; // Orange
+        if (trust < 70) return '#FF8A8A'; // Yellow
+        return '#CFD0D2'; // Green
     };
 
     const getReactionColor = () => {
-        if (offerPremium < 0) return '#C734CA'; // Red - Insulted
-        if (offerPremium <= 20) return '#C734CA'; // Yellow - Neutral
-        return '#C8C0EF'; // Green - Happy
+        if (offerPremium < 0) return '#FF8A8A'; // Red - Insulted
+        if (offerPremium <= 20) return '#FF8A8A'; // Yellow - Neutral
+        return '#CFD0D2'; // Green - Happy
     };
 
     const getReactionLabel = () => {
@@ -404,9 +405,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Current Stock Price Info */}
-                                <View style={{ backgroundColor: '#422B71', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
+                                <View style={{ backgroundColor: '#434B50', padding: 16, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', marginBottom: 4 }}>{t('equity.currentStockPrice')}</Text>
-                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#C8C0EF' }}>{formatPrice(stockPrice)}</Text>
+                                    <Text style={{ fontSize: 24, fontWeight: '800', color: '#FFFFFF' }}>{formatPrice(stockPrice)}</Text>
                                 </View>
 
                                 {/* Context Text */}
@@ -502,7 +503,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <Text style={styles.priceLabel}>
                                         {tradeMode === 'buy' ? t('shp.youPay') : t('shp.youReceive')}
                                     </Text>
-                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#C8C0EF' }]}>
+                                    <Text style={[styles.priceValue, tradeMode === 'sell' && { color: '#FFFFFF' }]}>
                                         {formatMoney(calculateOfferPrice())}
                                     </Text>
                                 </View>
@@ -511,7 +512,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 <TouchableOpacity
                                     style={[
                                         styles.makeOfferButton,
-                                        { backgroundColor: tradeMode === 'buy' ? '#C8C0EF' : '#C734CA' }
+                                        { backgroundColor: tradeMode === 'buy' ? '#CFD0D2' : '#FF8A8A' }
                                     ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
@@ -541,7 +542,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     >
                         {animationState === 'loading' && (
                             <View style={styles.animationContent}>
-                                <ActivityIndicator size="large" color="#6004BD" />
+                                <ActivityIndicator size="large" color="#05A8F6" />
                                 <Text style={styles.animationText}>
                                     {tradeMode === 'buy' ? t('shp.negotiating') : t('shp.processing')}
                                 </Text>
@@ -579,18 +580,18 @@ export default ShareholderProfileModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.7)',
+        backgroundColor: 'rgba(28,36,44,0.7)',
         justifyContent: 'flex-end',
     },
     container: {
         width: '100%',
         height: '85%',
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.5,
         shadowRadius: 16,
@@ -607,7 +608,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#5C3790',
+        backgroundColor: '#535B5F',
     },
     header: {
         padding: 24,
@@ -640,7 +641,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     traitBadge: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 16,
@@ -678,7 +679,7 @@ const styles = StyleSheet.create({
     trustBarBg: {
         width: '100%',
         height: 10,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 5,
         overflow: 'hidden',
     },
@@ -693,7 +694,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -713,13 +714,13 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     tabActive: {
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
         borderColor: 'rgba(255,255,255,0.06)',
     },
     tabText: {
@@ -728,7 +729,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
     },
     tabTextActive: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
     },
     content: {
         flex: 1,
@@ -743,7 +744,7 @@ const styles = StyleSheet.create({
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 20,
         borderRadius: 20,
         borderWidth: 1,
@@ -800,14 +801,14 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     stepperButtonDisabled: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
     },
@@ -819,7 +820,7 @@ const styles = StyleSheet.create({
     stepperDisplay: {
         flex: 1,
         height: 56,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -851,12 +852,12 @@ const styles = StyleSheet.create({
     reactionChance: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     reactionBarBg: {
         width: '100%',
         height: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 8,
         overflow: 'hidden',
     },
@@ -869,7 +870,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         marginTop: 16,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -888,7 +889,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(2,6,38,0.95)',
+        backgroundColor: 'rgba(28,36,44,0.95)',
         alignItems: 'center',
         justifyContent: 'center',
         borderTopLeftRadius: 32,
@@ -918,7 +919,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 14,
         borderRadius: 14,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -948,7 +949,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     priceDisplay: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,
@@ -966,6 +967,6 @@ const styles = StyleSheet.create({
     priceValue: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
 });

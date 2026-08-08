@@ -195,8 +195,8 @@ const FacilityPanel: React.FC = () => {
                         <View style={styles.utilTrack}>
                             <View style={[styles.utilFill, {
                                 width: `${Math.min(100, utilization)}%`,
-                                backgroundColor: verdict === 'idle' ? '#C734CA'
-                                    : verdict === 'tight' ? '#C734CA' : '#C8C0EF',
+                                backgroundColor: verdict === 'idle' ? '#FF8A8A'
+                                    : verdict === 'tight' ? '#FF8A8A' : '#CFD0D2',
                             }]} />
                         </View>
                         <Text style={styles.utilNote}>{UTILIZATION_NOTES[verdict]}</Text>
@@ -251,7 +251,7 @@ const FacilityPanel: React.FC = () => {
                     info={t('company.youCannotSkipTiersYou')}
                     infoDetail={t('company.thatDowntimeIsTheReal')}
                     summary={companyCapital >= next.upgradeCost ? t('fac.affordable') : t('fac.saving')}
-                    summaryColor={companyCapital >= next.upgradeCost ? '#C8C0EF' : 'rgba(255,255,255,0.48)'}
+                    summaryColor={companyCapital >= next.upgradeCost ? '#CFD0D2' : 'rgba(255,255,255,0.48)'}
                 >
                     <Text style={styles.nextName}>{next.name}</Text>
                     <Text style={styles.tierDesc}>{next.description}</Text>
@@ -321,7 +321,7 @@ const FacilityPanel: React.FC = () => {
                 info={t('company.youSetATargetAnd')}
                 infoDetail={`Hiring costs ${formatMoney(hiringFee(tier.level, salaryRatio))} per person. Severance is ${formatMoney(severancePay(tier.level, salaryRatio))} per person, and cutting a large share of the workforce hits morale hard — worse if you just reported a profit.`}
                 summary={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
-                summaryColor={staffing < 1 ? '#C734CA' : '#C8C0EF'}
+                summaryColor={staffing < 1 ? '#FF8A8A' : '#CFD0D2'}
                 defaultOpen={staffing < 1}
             >
                 {/* Yuzdelik stepper KALDIRILDI. Kadro artik mutlak sayi;
@@ -335,7 +335,7 @@ const FacilityPanel: React.FC = () => {
                     softLimit={tier.crew}
                     softLimitLabel="Crew"
                     markers={[
-                        { value: employeeCount, label: 'Now', color: '#C8C0EF' },
+                        { value: employeeCount, label: 'Now', color: '#FFFFFF' },
                     ]}
                     steps={[1, 10, 100]}
                 />
@@ -444,8 +444,8 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(199,52,202,0.28)',
         padding: 12,
     },
-    alertText: { color: '#C734CA', fontSize: 11.5, lineHeight: 16.5 },
-    alertCta: { color: '#C734CA', fontSize: 11, fontWeight: '800', marginTop: 6 },
+    alertText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16.5 },
+    alertCta: { color: '#FF8A8A', fontSize: 11, fontWeight: '800', marginTop: 6 },
     card: {
         backgroundColor: 'rgba(255,255,255,0.04)',
         borderRadius: 16,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     cardHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-    tierLabel: { color: '#C8C0EF', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+    tierLabel: { color: '#FFFFFF', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
     tierName: { color: theme.colors.textPrimary, fontSize: 22, fontWeight: '800', marginTop: 2 },
     tierDesc: { color: 'rgba(255,255,255,0.48)', fontSize: 12, lineHeight: 17, marginBottom: 12 },
     sectionTitle: { color: theme.colors.textPrimary, fontSize: 12, fontWeight: '800', letterSpacing: 1, flex: 1 },
@@ -464,25 +464,25 @@ const styles = StyleSheet.create({
     stat: { flex: 1 },
     statLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
     statValue: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700', marginTop: 2 },
-    statWarn: { color: '#C734CA' },
+    statWarn: { color: '#FF8A8A' },
 
     compareRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     compareValue: { marginTop: 2 },
     compareFrom: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
     compareArrow: { color: '#FFFFFF', fontSize: 11 },
-    compareTo: { color: '#C8C0EF', fontSize: 14, fontWeight: '800' },
+    compareTo: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
 
-    warn: { color: '#C734CA', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
-    okLine: { color: '#C8C0EF', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    warn: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    okLine: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 6 },
 
     utilBox: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)' },
     utilHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
     utilLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     utilValue: { fontSize: 18, fontWeight: '800' },
-    util_idle: { color: '#C734CA' },
-    util_healthy: { color: '#C8C0EF' },
-    util_tight: { color: '#C734CA' },
+    util_idle: { color: '#FF8A8A' },
+    util_healthy: { color: '#FFFFFF' },
+    util_tight: { color: '#FF8A8A' },
     utilTrack: {
         height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden', marginTop: 6,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(200,192,239,0.22)',
         padding: 14,
     },
-    queueTitle: { color: '#C8C0EF', fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
+    queueTitle: { color: '#FFFFFF', fontSize: 10, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
     queueRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
     queueIcon: { fontSize: 18 },
     queueName: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '700' },
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
         borderWidth: 1, borderColor: 'rgba(199,52,202,0.4)',
     },
-    cancelText: { color: '#C734CA', fontSize: 11, fontWeight: '700' },
+    cancelText: { color: '#FF8A8A', fontSize: 11, fontWeight: '700' },
 
     headRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 8 },
     adjBtn: {
@@ -522,21 +522,21 @@ const styles = StyleSheet.create({
         paddingVertical: 9, borderRadius: 10, alignItems: 'center',
         backgroundColor: 'rgba(200,192,239,0.12)', marginBottom: 4,
     },
-    matchBtnText: { color: '#C8C0EF', fontSize: 12, fontWeight: '700' },
+    matchBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
 
     primaryBtn: {
         marginTop: 12, paddingVertical: 13, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#C8C0EF',
+        alignItems: 'center', backgroundColor: '#CFD0D2',
     },
     primaryBtnOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
-    primaryBtnText: { color: '#FFFFFF', fontSize: 13.5, fontWeight: '800' },
+    primaryBtnText: { color: theme.colors.onLight, fontSize: 13.5, fontWeight: '800' },
 
     ladderRow: {
         flexDirection: 'row', alignItems: 'center', gap: 10,
         paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
     },
     ladderNow: { backgroundColor: 'rgba(200,192,239,0.08)', borderRadius: 8, paddingHorizontal: 8 },
-    ladderNum: { color: '#C8C0EF', fontSize: 13, fontWeight: '800', width: 20 },
+    ladderNum: { color: '#FFFFFF', fontSize: 13, fontWeight: '800', width: 20 },
     ladderName: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '700' },
     ladderMeta: { color: '#FFFFFF', fontSize: 10, marginTop: 2 },
     ladderCost: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '700' },

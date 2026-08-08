@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   filterLabelActive: {
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
   },
   card: {
     backgroundColor: theme.colors.card,

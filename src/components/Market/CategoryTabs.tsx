@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   labelActive: {
-    color: '#C734CA',
+    color: '#FF8A8A',
   },
 });

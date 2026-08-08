@@ -51,9 +51,9 @@ const GymHubView = ({
                             {[0, 1, 2, 3, 4].map((segment) => {
                                 const segmentValue = segment * 20;
                                 const isActive = (100 - fatigue) > segmentValue;
-                                let segmentColor = '#C8C0EF'; // Green
-                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#C734CA'; // Orange
-                                if (fatigue > 80) segmentColor = '#C734CA'; // Red
+                                let segmentColor = '#CFD0D2'; // Green
+                                if (fatigue > 50 && fatigue <= 80) segmentColor = '#FF8A8A'; // Orange
+                                if (fatigue > 80) segmentColor = '#FF8A8A'; // Red
 
                                 return (
                                     <View
@@ -148,9 +148,9 @@ const GymHubView = ({
 const getBodyTypeColor = (bodyType: string): string => {
     const colors: Record<string, string> = {
         'Skinny': 'rgba(255,255,255,0.48)',
-        'Fit': '#C8C0EF',
-        'Muscular': '#C734CA',
-        'Godlike': '#C734CA'
+        'Fit': '#CFD0D2',
+        'Muscular': '#FF8A8A',
+        'Godlike': '#FF8A8A'
     };
     return colors[bodyType] || '#FFFFFF';
 };
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         borderWidth: 0,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     fatigueText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 14,
         fontWeight: '700',
         width: 45,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         borderWidth: 0,
-        shadowColor: '#6004BD',
+        shadowColor: '#05A8F6',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 14,
         borderWidth: 0,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 6,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     modContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modLabel: { color: '#C8C0EF', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
+    modLabel: { color: '#FFFFFF', fontWeight: '700', letterSpacing: 0.3, fontSize: 14 },
     changeText: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600' },
 });
 

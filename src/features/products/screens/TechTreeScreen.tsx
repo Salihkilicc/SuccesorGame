@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     productRowUnlocked: {
-        backgroundColor: '#422B71', // Dark green tint for unlocked
-        borderColor: theme.colors.success,
+        backgroundColor: '#434B50', // Dark green tint for unlocked
+        borderColor: theme.colors.accent,
     },
     iconPlaceholder: {
         width: 48,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     iconUnlocked: {
-        backgroundColor: theme.colors.success + '20', // Light green bg
+        backgroundColor: theme.colors.accent + '20', // Light green bg
     },
     productIcon: {
         fontSize: 24,
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4,
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
     },
     activeText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: '800',
         fontSize: 10,
     },

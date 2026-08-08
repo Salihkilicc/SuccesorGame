@@ -94,7 +94,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                                 {/* Row Layout */}
                                 <View style={styles.itemRow}>
                                     {/* Thumbnail (Left) */}
-                                    <View style={[styles.itemThumbnail, { backgroundColor: item.brandColor ? `${item.brandColor}20` : '#020626' }]}>
+                                    <View style={[styles.itemThumbnail, { backgroundColor: item.brandColor ? `${item.brandColor}20` : '#1C242C' }]}>
                                         <Text style={styles.itemEmoji}>
                                             {item.category === 'VEHICLE' ? '🏎️' :
                                                 item.category === 'WATCH' ? '⌚' :
@@ -176,7 +176,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             style={({ pressed }) => [
                                 styles.checkoutButton,
                                 pressed && { opacity: 0.9 },
-                                !canAfford && { backgroundColor: '#281F50' }
+                                !canAfford && { backgroundColor: '#323A40' }
                             ]}
                             onPress={handleProceedToCheckout}
                         >
@@ -200,7 +200,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626', // Dark background like ShoppingScreen
+        backgroundColor: '#1C242C', // Dark background like ShoppingScreen
     },
     header: {
         flexDirection: 'row',
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     headerTitle: {
         color: '#FFFFFF',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     closeButtonText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
 
     // Cart Item
     cartItemCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginBottom: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,
@@ -269,13 +269,13 @@ const styles = StyleSheet.create({
         lineHeight: 22,
     },
     itemPrice: {
-        color: '#C734CA', // Amazon-ish red for price/deal, or Gold
+        color: '#FF8A8A', // Amazon-ish red for price/deal, or Gold
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 6,
     },
     inStockText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '600',
         marginBottom: 2,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     actionButton: {
         paddingVertical: 6,
         paddingHorizontal: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -313,12 +313,12 @@ const styles = StyleSheet.create({
     divider: {
         width: 1,
         height: 16,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
     },
 
     // Order Summary
     summaryCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginTop: 12,
         padding: 16,
         borderTopWidth: 1,
@@ -354,19 +354,19 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(255,255,255,0.06)',
     },
     totalLabel: {
-        color: '#C734CA', // Red for total
+        color: '#FF8A8A', // Red for total
         fontSize: 20,
         fontWeight: '700',
     },
     totalValue: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 20,
         fontWeight: '700',
     },
 
     // Checkout Footer (Above Stats Bar)
     checkoutFooter: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.06)',
         padding: 16,
@@ -384,19 +384,19 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     footerTotalValue: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 22,
         fontWeight: '700',
     },
     checkoutButton: {
-        backgroundColor: '#422B71', // Amazon Yellow/Gold
+        backgroundColor: '#434B50', // Amazon Yellow/Gold
         paddingVertical: 14,
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
         gap: 8,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
         marginBottom: 32,
     },
     continueButton: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 20,

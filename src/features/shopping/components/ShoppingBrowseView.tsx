@@ -32,10 +32,10 @@ type BrandConfig = {
 };
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
-    Velocity: { name: t('ui.velocityMotors'), color: '#C734CA', emoji: '🏎️' },
-    Dynasty8: { name: t('ui.dynasty8'), color: '#C8C0EF', emoji: '🏠' },
-    Luxe: { name: t('ui.luxeVault'), color: '#C8C0EF', emoji: '💎' },
-    Elitas: { name: t('ui.elitasTravel'), color: '#C734CA', emoji: '✈️' },
+    Velocity: { name: t('ui.velocityMotors'), color: '#FF8A8A', emoji: '🏎️' },
+    Dynasty8: { name: t('ui.dynasty8'), color: '#FFFFFF', emoji: '🏠' },
+    Luxe: { name: t('ui.luxeVault'), color: '#FFFFFF', emoji: '💎' },
+    Elitas: { name: t('ui.elitasTravel'), color: '#FF8A8A', emoji: '✈️' },
 };
 
 const ShoppingBrowseView = ({
@@ -85,7 +85,7 @@ const ShoppingBrowseView = ({
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#020626" />
+            <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
 
             {/* Header */}
             <View style={[styles.header, { backgroundColor: brandConfig.color }]}>
@@ -179,10 +179,10 @@ const ShoppingBrowseView = ({
                                             styles.addButton,
                                             {
                                                 backgroundColor: owned
-                                                    ? '#281F50'
+                                                    ? '#323A40'
                                                     : inCart
-                                                        ? '#6004BD'
-                                                        : '#C734CA',
+                                                        ? '#05A8F6'
+                                                        : '#FF8A8A',
                                             },
                                             pressed && !owned && !inCart && styles.addButtonPressed,
                                         ]}
@@ -212,7 +212,7 @@ export default ShoppingBrowseView;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
 
     // Header
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 10,
         minWidth: 20,
         height: 20,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: CARD_WIDTH,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: theme.spacing.md,
         borderWidth: 1,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
     },
     itemPrice: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 16,
         fontWeight: '700',
         marginTop: 2,

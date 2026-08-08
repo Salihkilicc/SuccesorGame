@@ -135,7 +135,7 @@ export function HookupModal({
                 <AppLaunchLoader
                     appName="Hookup"
                     appIcon={<MaterialCommunityIcons name="fire" size={64} color="#FFFFFF" />}
-                    backgroundColor="#020626"
+                    backgroundColor="#1C242C"
                 >
                     <View style={styles.backdrop}>
 
@@ -239,14 +239,14 @@ export function HookupModal({
                         {/* MATCHED OVERLAY */}
                         {matchStatus === 'MATCHED' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#C8C0EF' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#CFD0D2' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.itSAMatch')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         You and {candidate.name} passed the vibe check.
                                     </Text>
 
                                     <View style={styles.overlayAvatarRow}>
-                                        <View style={[styles.smallAvatar, { backgroundColor: '#422B71' }]}>
+                                        <View style={[styles.smallAvatar, { backgroundColor: '#434B50' }]}>
                                             <Text style={{ fontSize: 40 }}>😎</Text>
                                         </View>
                                         <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
@@ -271,7 +271,7 @@ export function HookupModal({
                         {/* GHOSTED OVERLAY */}
                         {matchStatus === 'NO_MATCH' && candidate && (
                             <View style={styles.overlayContainer}>
-                                <View style={[styles.overlayCard, { backgroundColor: '#422B71' }]}>
+                                <View style={[styles.overlayCard, { backgroundColor: '#434B50' }]}>
                                     <Text style={styles.overlayTitle}>{t('life.ghosted')}</Text>
                                     <Text style={styles.overlaySubtitle}>
                                         {candidate.name} wasn't interested...
@@ -290,7 +290,7 @@ export function HookupModal({
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -331,17 +331,17 @@ const styles = StyleSheet.create({
     likeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     nopeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     infoSection: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#422B71', // Slightly lighter than pure black/card
+        backgroundColor: '#434B50', // Slightly lighter than pure black/card
     },
     headerRow: {
         flexDirection: 'row',
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     },
     jobText: {
         fontSize: 16,
-        color: theme.colors.primary,
+        color: theme.colors.textPrimary,
         fontWeight: '600',
         marginTop: 2,
     },
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(200,192,239,0.3)',
     },
     chipText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -431,8 +431,8 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#281F50',
-        shadowColor: '#020626',
+        backgroundColor: '#323A40',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(2,6,38,0.5)',
+        backgroundColor: 'rgba(28,36,44,0.5)',
         zIndex: 100,
     },
     overlayCard: {
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
         padding: 30,
         borderRadius: 24,
         alignItems: 'center',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     keepPlayingText: {
-        color: '#C8C0EF',
+        color: theme.colors.onLight,
         fontWeight: '800',
         textAlign: 'center',
         fontSize: 16,

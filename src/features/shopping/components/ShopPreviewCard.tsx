@@ -70,7 +70,7 @@ const ShopPreviewCard = ({ shopId, name, emoji, description, color, onVisit }: S
                             pressed && styles.itemPressed
                         ]}
                     >
-                        <View style={[styles.itemImage, { backgroundColor: '#422B71' }]}>
+                        <View style={[styles.itemImage, { backgroundColor: '#434B50' }]}>
                             <Text style={styles.itemEmoji}>
                                 {item.category === 'VEHICLE' ? '🏎️' :
                                     item.category === 'WATCH' ? '⌚' :
@@ -94,7 +94,7 @@ export default ShopPreviewCard;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 20,
         marginBottom: theme.spacing.lg,
         borderWidth: 1,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'rgba(255,255,255,0.06)',
     },
     headerPressed: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     headerLeft: {
         flexDirection: 'row',

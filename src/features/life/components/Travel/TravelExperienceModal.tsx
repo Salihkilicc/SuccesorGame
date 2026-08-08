@@ -170,14 +170,14 @@ export default TravelExperienceModal;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626', // Solid base background
+        backgroundColor: '#1C242C', // Solid base background
         padding: 24,
         paddingBottom: 100, // Add padding for bottom bar
         justifyContent: 'center',
     },
     opaqueLayer: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: '#422B71', // Base layer behind spot color
+        backgroundColor: '#434B50', // Base layer behind spot color
         zIndex: -1,
     },
     header: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 16,
-        color: 'rgba(2,6,38,0.6)',
+        color: 'rgba(28,36,44,0.6)',
         fontWeight: '600',
     },
     progressSection: {
@@ -207,13 +207,13 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 12,
-        backgroundColor: 'rgba(2,6,38,0.2)',
+        backgroundColor: 'rgba(28,36,44,0.2)',
         borderRadius: 6,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: 'rgba(2,6,38,0.5)',
+        backgroundColor: 'rgba(28,36,44,0.5)',
         borderRadius: 6,
     },
     transportIcon: {
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
         fontSize: 32,
     },
     narrativeBox: {
-        backgroundColor: 'rgba(2,6,38,0.15)',
+        backgroundColor: 'rgba(28,36,44,0.15)',
         padding: 24,
         borderRadius: 16,
         marginBottom: 24,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     statBadge: {
-        backgroundColor: 'rgba(2,6,38,0.2)',
+        backgroundColor: 'rgba(28,36,44,0.2)',
         paddingHorizontal: 16,
         paddingVertical: 10,
         borderRadius: 20,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     continueButton: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingVertical: 18,
         borderRadius: 30,
         alignItems: 'center',

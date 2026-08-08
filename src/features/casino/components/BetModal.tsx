@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
   },
   betButtonText: {
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
   },
   closeButton: {
     marginTop: theme.spacing.sm,

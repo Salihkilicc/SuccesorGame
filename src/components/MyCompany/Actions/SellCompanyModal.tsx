@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert, ToastAndroid, Platform } from 'react-native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
+import { theme } from '../../../core/theme';
 
 type Props = {
     visible: boolean;
@@ -35,9 +36,9 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     const successChance = Math.max(0, rawChance) * 100;
 
     // Color Logic
-    let chanceColor = '#C734CA'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#C8C0EF'; // Green
-    else if (successChance >= 40) chanceColor = '#C734CA'; // Yellow
+    let chanceColor = '#FF8A8A'; // Red (< 40%)
+    if (successChance >= 70) chanceColor = '#CFD0D2'; // Green
+    else if (successChance >= 40) chanceColor = '#FF8A8A'; // Yellow
 
     const formatMoney = (amount: number) => {
         return formatMoneyExact(amount);
@@ -152,19 +153,19 @@ export default SellCompanyModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
     },
     container: {
         width: '100%',
-        backgroundColor: '#020626', // Dark Gray
+        backgroundColor: '#1C242C', // Dark Gray
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     valuationContainer: {
         alignItems: 'center',
         marginBottom: 24,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 12,
         borderRadius: 12,
     },
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     controlBtn: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderRadius: 8,
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     incrementBtn: {
-        backgroundColor: '#281F50', // Keep uniform dark, maybe blue tint? Sticking to dark.
+        backgroundColor: '#323A40', // Keep uniform dark, maybe blue tint? Sticking to dark.
         borderColor: 'rgba(255,255,255,0.06)', // Green border for positive
     },
     controlBtnText: {
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.96 }],
     },
     probabilityBox: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         alignItems: 'center',
     },
     cancelBtnText: {
@@ -303,11 +304,11 @@ const styles = StyleSheet.create({
         flex: 2,
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         alignItems: 'center',
     },
     submitBtnText: {
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,

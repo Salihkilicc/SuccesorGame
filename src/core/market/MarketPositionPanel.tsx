@@ -83,7 +83,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('os.yourShare')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#C8C0EF' }]}>
+                    <Text style={[styles.summaryValue, { color: '#FFFFFF' }]}>
                         {formatShare(playerShare)}
                     </Text>
                     {ownedShare > 0 && (
@@ -98,7 +98,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('brand.thisCategory')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#C734CA' }]}>
+                    <Text style={[styles.summaryValue, { color: '#FF8A8A' }]}>
                         {Math.round((brandByCategory || {})[category ?? ""] ?? 0)}
                     </Text>
                     <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: brandValue.toFixed(0) })}</Text>
@@ -119,7 +119,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                             <Text style={styles.brandChipCat}>{cat}</Text>
                             <Text style={[
                                 styles.brandChipVal,
-                                { color: (v as number) >= 200 ? '#C8C0EF' : '#C734CA' },
+                                { color: (v as number) >= 200 ? '#CFD0D2' : '#FF8A8A' },
                             ]}>
                                 {Math.round(v as number)}
                             </Text>
@@ -138,7 +138,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 note={t('os.whoHoldsThisMarketAnd')}
                 info={t('os.theseAreRealCompaniesYou')}
                 summary={`#${playerRank} of ${ranking.length}`}
-                summaryColor="#C8C0EF"
+                summaryColor="#CFD0D2"
                 style={styles.rankingSection}
             >
             <View style={styles.rankingBox}>
@@ -161,8 +161,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                                     {
                                         width: `${Math.min(100, p.share)}%`,
                                         backgroundColor: p.isPlayer
-                                            ? '#C8C0EF'
-                                            : p.owned ? '#C8C0EF' : 'rgba(255,255,255,0.28)',
+                                            ? '#CFD0D2'
+                                            : p.owned ? '#CFD0D2' : 'rgba(255,255,255,0.28)',
                                     },
                                 ]}
                             />
@@ -186,8 +186,8 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
 export default MarketPositionPanel;
 
 const styles = StyleSheet.create({
-    groupNote: { color: '#C8C0EF', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
-    compactLine: { color: '#C8C0EF', fontSize: 11, fontWeight: '600' },
+    groupNote: { color: '#FFFFFF', fontSize: 10.5, lineHeight: 15, marginTop: 4, fontWeight: '600' },
+    compactLine: { color: '#FFFFFF', fontSize: 11, fontWeight: '600' },
 
     panel: {
         backgroundColor: 'rgba(255,255,255,0.04)',
@@ -206,13 +206,13 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: 'rgba(199,52,202,0.12)',
     },
-    regionText: { color: '#C734CA', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+    regionText: { color: '#FF8A8A', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
     description: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 6 },
 
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },
     summaryCell: { flex: 1, alignItems: 'center' },
     brandRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-    brandChip: { backgroundColor: '#422B71', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
+    brandChip: { backgroundColor: '#434B50', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5 },
     brandChipCat: { color: 'rgba(255,255,255,0.48)', fontSize: 9 },
     brandChipVal: { fontSize: 13, fontWeight: '800' },
     summaryLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     rankNum: { color: '#FFFFFF', fontSize: 10, width: 18, fontWeight: '700' },
     rankName: { color: '#FFFFFF', fontSize: 11.5, flex: 1 },
     rankSymbol: { color: '#FFFFFF', fontSize: 9.5 },
-    rankTextPlayer: { color: '#C8C0EF', fontWeight: '800' },
+    rankTextPlayer: { color: '#FFFFFF', fontWeight: '800' },
     rankBarTrack: {
         width: 70,
         height: 4,

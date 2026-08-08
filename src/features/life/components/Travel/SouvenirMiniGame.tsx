@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Souvenir } from './data/travelData';
 import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
+import { theme } from '../../../../core/theme';
 
 type SouvenirMiniGameProps = {
     visible: boolean;
@@ -141,14 +142,14 @@ export default SouvenirMiniGame;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71', // Solid black
+        backgroundColor: '#434B50', // Solid black
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
         paddingBottom: 100, // Add padding for bottom bar
     },
     container: {
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 20,
         padding: 24, // Reduced padding
         width: '100%',
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
     },
     box: {
         aspectRatio: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     },
     boxSelected: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     boxIcon: {
         fontSize: 24, // Smaller icon
@@ -223,18 +224,18 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     rarityLegendary: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     rarityRare: {
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
     },
     rarityCommon: {
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
     },
     rarityText: {
         fontSize: 12,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         letterSpacing: 1,
     },
 });

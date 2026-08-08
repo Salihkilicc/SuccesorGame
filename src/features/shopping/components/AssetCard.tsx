@@ -26,13 +26,13 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
 
     // 1. Determine Visuals based on Category/Value
     const isPremium = item.price > 10000000; // > $10M = Gold Border
-    const borderColor = isPremium ? '#6004BD' : '#281F50';
+    const borderColor = isPremium ? '#05A8F6' : '#323A40';
     const emoji = getEmoji(item.category);
 
     // 2. Condition Color Logic
-    let conditionColor = '#6004BD'; // Blue
-    if (item.condition < 50) conditionColor = '#C734CA'; // Red
-    else if (item.condition < 80) conditionColor = '#C734CA'; // Pink
+    let conditionColor = '#05A8F6'; // Blue
+    if (item.condition < 50) conditionColor = '#FF8A8A'; // Red
+    else if (item.condition < 80) conditionColor = '#FF8A8A'; // Pink
 
     // 3. Action Logic
     let ActionButton = null;
@@ -43,7 +43,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onSell(item)}
             >
-                <Text style={[styles.actionText, { color: '#C734CA' }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
+                <Text style={[styles.actionText, { color: '#FF8A8A' }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
             </Pressable>
         );
     } else if (item.category === 'REAL_ESTATE') {
@@ -53,7 +53,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                     style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                     onPress={() => onRepair(item)}
                 >
-                    <Text style={[styles.actionText, { color: '#C8C0EF' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
+                    <Text style={[styles.actionText, { color: '#FFFFFF' }, isGrid && styles.actionIconTile]}>{isGrid ? '🔨' : 'RENOVATE'}</Text>
                 </Pressable>
             );
         } else {
@@ -66,7 +66,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
             } else {
                 ActionButton = (
                     <View style={[styles.badge, { backgroundColor: 'rgba(200,192,239,0.2)', borderColor: 'rgba(255,255,255,0.06)' }]}>
-                        <Text style={[styles.badgeText, { color: '#C8C0EF' }]}>{t('ui.perfect')}</Text>
+                        <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{t('ui.perfect')}</Text>
                     </View>
                 );
             }
@@ -78,7 +78,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onPropose && onPropose(item)}
             >
-                <Text style={[styles.actionText, { color: '#C734CA' }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
+                <Text style={[styles.actionText, { color: '#FF8A8A' }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
             </Pressable>
         );
     }
@@ -172,12 +172,12 @@ const getEmoji = (category: string) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 16,
         borderWidth: 1,
         padding: 16,
         marginBottom: 16,
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 4.65,
@@ -185,14 +185,14 @@ const styles = StyleSheet.create({
     },
     // Grid Tile specific styles
     containerTile: {
-        backgroundColor: '#422B71', // Darker background
+        backgroundColor: '#434B50', // Darker background
         borderRadius: 12,
         borderWidth: 1,
         height: 130, // Much more compact
         padding: 10,
         overflow: 'hidden',
         justifyContent: 'space-between',
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 3,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     },
     conditionBarBg: {
         height: 4,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 3,
         marginBottom: 4,
         overflow: 'hidden',

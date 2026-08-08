@@ -149,11 +149,11 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(2,6,38,0.85)',
+    backgroundColor: 'rgba(28,36,44,0.85)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontSize: theme.typography.body,
-    color: '#C734CA',
+    color: '#FF8A8A',
     marginTop: theme.spacing.xs,
     fontWeight: '600',
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontWeight: '700',
   },
   itemQuantity: {
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profit: {
-    color: '#C8C0EF',
+    color: '#FFFFFF',
   },
   loss: {
-    color: '#C734CA',
+    color: '#FF8A8A',
   },
   actions: {
     flexDirection: 'row',
@@ -271,12 +271,12 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.97 }],
   },
   buyButtonText: {
-    color: '#C8C0EF',
+    color: '#FFFFFF',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },
   sellButtonText: {
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },

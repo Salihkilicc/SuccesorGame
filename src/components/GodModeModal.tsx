@@ -41,7 +41,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <MaterialCommunityIcons name="flash" size={24} color="#C734CA" />
+                            <MaterialCommunityIcons name="flash" size={24} color="#FF8A8A" />
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -57,7 +57,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(200,192,239,0.2)', 'rgba(200,192,239,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#C8C0EF" />
+                            <MaterialCommunityIcons name="cash-multiple" size={24} color="#CFD0D2" />
                             <Text style={styles.actionTextMoney}>{t('ui.add100m')}</Text>
                         </TouchableOpacity>
 
@@ -66,7 +66,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(199,52,202,0.2)', 'rgba(199,52,202,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="skull" size={24} color="#C734CA" />
+                            <MaterialCommunityIcons name="skull" size={24} color="#FF8A8A" />
                             <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -81,18 +81,18 @@ export default GodModeModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContainer: {
         width: '85%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 15,
@@ -110,14 +110,14 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#C734CA',
+        color: '#FF8A8A',
         letterSpacing: 2,
     },
     closeButton: {
         padding: 4,
     },
     subtitle: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontFamily: 'Courier',
         textAlign: 'center',
@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     actionTextMoney: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,
     },
     actionTextReset: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

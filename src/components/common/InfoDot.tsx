@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     dotSmall: { width: 15, height: 15, borderRadius: 7.5 },
     dotPressed: { backgroundColor: 'rgba(199,52,202,0.25)' },
     dotText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 11,
         fontWeight: '800',
         lineHeight: 14,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
 
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.75)',
+        backgroundColor: 'rgba(28,36,44,0.75)',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 28,
@@ -102,14 +102,14 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 18,
         borderWidth: 1,
         borderColor: 'rgba(199,52,202,0.22)',
         padding: 20,
     },
     title: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 13,
         fontWeight: '800',
         letterSpacing: 0.6,
@@ -130,5 +130,5 @@ const styles = StyleSheet.create({
         paddingVertical: 11,
         alignItems: 'center',
     },
-    buttonText: { color: '#C734CA', fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
+    buttonText: { color: '#FF8A8A', fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
 });

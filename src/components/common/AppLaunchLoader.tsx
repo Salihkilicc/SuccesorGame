@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         marginBottom: 20,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

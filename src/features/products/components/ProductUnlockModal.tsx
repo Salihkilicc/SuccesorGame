@@ -197,7 +197,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: theme.spacing.lg,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     financialValue: {
         fontSize: 14,
         fontWeight: '700',
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
     },
     costContainer: {
         marginBottom: theme.spacing.lg,
@@ -297,10 +297,10 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
         borderWidth: 1,
-        borderColor: theme.colors.success + '40',
+        borderColor: theme.colors.accent + '40',
     },
     costBadgeInsufficient: {
-        borderColor: theme.colors.error + '40',
+        borderColor: theme.colors.destructive + '40',
     },
     costLabel: {
         fontSize: 11,

@@ -46,14 +46,14 @@ type HomeNavProp = CompositeNavigationProp<
 
 
 const GRADIENTS = {
-  purplePink: ['#6004BD', '#6004BD'],
-  pinkRed: ['#C734CA', '#C734CA'],
-  orangeYellow: ['#C734CA', '#C734CA'],
-  blueSky: ['#C8C0EF', '#C8C0EF'],
-  bluePurple: ['#C8C0EF', '#6004BD'],
-  darkGrey: ['#020626', '#5C3790'],
-  networkBlue: ['#6004BD', '#C8C0EF'],
-  tealCyan: ['#C8C0EF', '#C8C0EF'],
+  purplePink: ['#05A8F6', '#05A8F6'],
+  pinkRed: ['#FF8A8A', '#FF8A8A'],
+  orangeYellow: ['#FF8A8A', '#FF8A8A'],
+  blueSky: ['#CFD0D2', '#CFD0D2'],
+  bluePurple: ['#CFD0D2', '#05A8F6'],
+  darkGrey: ['#1C242C', '#535B5F'],
+  networkBlue: ['#05A8F6', '#CFD0D2'],
+  tealCyan: ['#CFD0D2', '#CFD0D2'],
 };
 
 // Home artık CEO hub'ı. Kapalı modüller `feature` alanı üzerinden süzülür.
@@ -285,14 +285,14 @@ const HomeScreen = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#020626' }}>
+    <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
       <ImageBackground
         source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
       />
       <LinearGradient
-        colors={['rgba(2,6,38,0.3)', 'rgba(2,6,38,0.7)', 'rgba(2,6,38,0.9)']}
+        colors={['rgba(28,36,44,0.3)', 'rgba(28,36,44,0.7)', 'rgba(28,36,44,0.9)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -325,7 +325,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#C734CA', '#C734CA', '#422B71']}
+                colors={['#FF8A8A', '#FF8A8A', '#434B50']}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -367,7 +367,7 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#C734CA', '#C734CA', '#422B71']}
+                colors={['#FF8A8A', '#FF8A8A', '#434B50']}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -391,7 +391,7 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#C8C0EF']}
+                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -424,7 +424,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#020626', '#020626', '#C8C0EF']}
+                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
     marginBottom: 4,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#020626', // Dark gold shadow
+    shadowColor: '#1C242C', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -656,12 +656,12 @@ const styles = StyleSheet.create({
   },
   gender: {
     fontSize: 13,
-    color: '#C8C0EF',
+    color: '#FFFFFF',
   },
   premiumTag: {
     marginLeft: theme.spacing.xs,
     backgroundColor: theme.colors.accentSoft,
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
     borderRadius: 999,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   ageChipLabel: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#C8C0EF',
+    color: '#FFFFFF',
     letterSpacing: 1,
   },
   ageChipValue: {
@@ -708,9 +708,9 @@ const styles = StyleSheet.create({
   ageGroup: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   ageLabel: { color: theme.colors.textMuted, fontSize: theme.typography.caption },
   ageValue: { color: theme.colors.textPrimary, fontSize: theme.typography.subtitle, fontWeight: '700' },
-  monthBadge: { color: theme.colors.accent, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
+  monthBadge: { color: theme.colors.textPrimary, paddingHorizontal: theme.spacing.sm, paddingVertical: theme.spacing.xs },
   nextMonthButton: {
-    shadowColor: '#020626', // Dark gold shadow
+    shadowColor: '#1C242C', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8, // Increased opacity for better glow
     shadowRadius: 12,
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.15)',
   },
   appIconVector: {
-    textShadowColor: 'rgba(2,6,38,0.3)',
+    textShadowColor: 'rgba(28,36,44,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
@@ -860,13 +860,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl || 24,
   },
   card: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     gap: theme.spacing.sm,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   primaryCardButtonText: {
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
     fontWeight: '800',
     fontSize: theme.typography.body,
   },
@@ -928,13 +928,13 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   statusCard: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
     gap: theme.spacing.md,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
@@ -970,7 +970,7 @@ const styles = StyleSheet.create({
   },
   entryAssets: {
     flex: 1.15,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
   },
   entryLove: {
     flex: 1,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: theme.spacing.lg * 0.9,
     borderRadius: theme.radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
   },
   drawerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2,6,38,0.35)',
+    backgroundColor: 'rgba(28,36,44,0.35)',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
   },
@@ -1062,7 +1062,7 @@ const styles = StyleSheet.create({
   },
   newsOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(2,6,38,0.4)',
+    backgroundColor: 'rgba(28,36,44,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.lg,
@@ -1088,7 +1088,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   newsClose: {
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
     fontWeight: '700',
   },
   newsItem: {
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   },
   gameOverOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2,6,38,0.85)',
+    backgroundColor: 'rgba(28,36,44,0.85)',
     zIndex: 999,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   restartButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.onLight,
     fontWeight: '800',
     fontSize: 16,
   },
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 33,
     borderWidth: 0,
-    shadowColor: '#C8C0EF',
+    shadowColor: '#CFD0D2',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 20,

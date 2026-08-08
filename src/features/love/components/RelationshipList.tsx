@@ -67,9 +67,9 @@ const RelationshipList: React.FC<Props> = ({
     };
 
     const getNpcBarColor = (npcType: string): string => {
-        if (npcType === 'Child') return '#C734CA';
-        if (npcType === 'Mother') return '#C734CA';
-        return '#6004BD';
+        if (npcType === 'Child') return '#FF8A8A';
+        if (npcType === 'Mother') return '#FF8A8A';
+        return '#05A8F6';
     };
 
     const getBarValue = (item: FamilyMember | FriendMember | ExMember): number => {

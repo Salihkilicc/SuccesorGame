@@ -25,7 +25,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                 >
                     <View style={[styles.partnerInfo, { paddingLeft: 16 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(2,6,38,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
+                            <Text style={[styles.partnerName, { color: '#FFFFFF', textShadowColor: 'rgba(28,36,44,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }]}>
                                 {partner.name}
                             </Text>
                             <View style={[styles.partnerBadge, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.4)', flexShrink: 0 }]}>
@@ -35,8 +35,8 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
 
                         <View style={styles.partnerStats}>
                             <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
-                            <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(2,6,38,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
-                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#422B71', shadowColor: '#020626', shadowOpacity: 0.8, shadowRadius: 6 }]} />
+                            <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(28,36,44,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
+                                <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#434B50', shadowColor: '#1C242C', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>
 
                             {/* ACTIVE PERKS DISPLAY */}
@@ -84,7 +84,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                                     ) : (
                                         <View style={{
                                             padding: 12,
-                                            backgroundColor: 'rgba(2,6,38,0.2)',
+                                            backgroundColor: 'rgba(28,36,44,0.2)',
                                             borderRadius: 12,
                                             borderWidth: 1,
                                             borderColor: 'rgba(255,255,255,0.1)',
@@ -106,12 +106,12 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
     return (
         <View style={styles.partnerCardWrapper}>
             <LinearGradient
-                colors={['#020626', '#020626', '#5C3790']}
+                colors={['#1C242C', '#1C242C', '#535B5F']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.partnerCardGradient, { opacity: 0.8 }]}
             >
-                <View style={[styles.partnerPhotoContainer, { borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, backgroundColor: 'rgba(2,6,38,0.3)' }]}>
+                <View style={[styles.partnerPhotoContainer, { borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, backgroundColor: 'rgba(28,36,44,0.3)' }]}>
                     <Text style={styles.noPartnerIcon}>?</Text>
                 </View>
                 <View style={styles.partnerInfo}>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.3,
         shadowRadius: 18,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.8)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 8,
@@ -179,13 +179,13 @@ const styles = StyleSheet.create({
         gap: 2,
     },
     partnerStatLabel: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 10,
         fontWeight: '700',
     },
     partnerBarTrack: {
         height: 6,
-        backgroundColor: 'rgba(2,6,38,0.2)',
+        backgroundColor: 'rgba(28,36,44,0.2)',
         borderRadius: 999,
         overflow: 'hidden',
         marginTop: 2,

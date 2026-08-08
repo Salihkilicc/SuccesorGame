@@ -80,19 +80,19 @@ const ProposalWizardView: React.FC<Props> = ({
                 <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
                     She is emotional and waiting for the ring. This is your moment.
                     {"\n\n"}
-                    <Text style={{ fontWeight: 'bold', color: theme.colors.accent }}>{t('love.doYouWantToAsk')}</Text>
+                    <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary }}>{t('love.doYouWantToAsk')}</Text>
                     {"\n"}
                     (Protects assets, but might offend her)
                 </Text>
 
                 <Pressable
-                    style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
+                    style={[styles.actionButton, { backgroundColor: theme.colors.destructive }]}
                     onPress={() => onDecidePrenup(true)}>
                     <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>📝 Sign Prenup (Risk)</Text>
                 </Pressable>
 
                 <Pressable
-                    style={[styles.actionButton, { backgroundColor: theme.colors.success }]}
+                    style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
                     onPress={() => onDecidePrenup(false)}>
                     <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>❤️ No Prenup (Trust)</Text>
                 </Pressable>
@@ -131,7 +131,7 @@ const ProposalWizardView: React.FC<Props> = ({
                             </View>
                         </View>
                         {ring.instanceId === selectedRingInstanceId && (
-                            <Text style={{ color: theme.colors.accent, fontSize: 18, fontWeight: 'bold' }}>✓</Text>
+                            <Text style={{ color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' }}>✓</Text>
                         )}
                     </Pressable>
                 ))}
@@ -183,7 +183,7 @@ const ProposalWizardView: React.FC<Props> = ({
                             <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
                                 {selectedRing?.name ?? 'Ring Selected'}
                             </Text>
-                            <Text style={{ color: theme.colors.accent, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>{t('love.tapToChange')}</Text>
+                            <Text style={{ color: theme.colors.textPrimary, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>{t('love.tapToChange')}</Text>
                         </View>
                     </Pressable>
                 )}
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     locationBonus: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 12,
         fontWeight: '600',
     },
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     smallButtonText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 12,
         fontWeight: '700',
     },

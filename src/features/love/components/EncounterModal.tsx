@@ -31,12 +31,12 @@ interface EncounterModalProps {
 // Helper functions for Deep Persona display
 const getTierBadgeColor = (tier: string): string => {
     switch (tier) {
-        case 'HIGH_SOCIETY': return '#C734CA';
-        case 'CORPORATE_ELITE': return '#6004BD';
-        case 'UNDERGROUND': return '#C734CA';
-        case 'BLUE_COLLAR': return '#C8C0EF';
-        case 'STUDENT_LIFE': return '#C8C0EF';
-        case 'ARTISTIC': return '#6004BD';
+        case 'HIGH_SOCIETY': return '#FF8A8A';
+        case 'CORPORATE_ELITE': return '#05A8F6';
+        case 'UNDERGROUND': return '#FF8A8A';
+        case 'BLUE_COLLAR': return '#CFD0D2';
+        case 'STUDENT_LIFE': return '#CFD0D2';
+        case 'ARTISTIC': return '#05A8F6';
         default: return theme.colors.accent;
     }
 };
@@ -217,7 +217,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,
         shadowRadius: 20,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 40,
         fontWeight: '700',
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
     },
 
     // Name & Job
@@ -354,14 +354,14 @@ const styles = StyleSheet.create({
     },
     costLabel: {
         fontSize: 11,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     costValue: {
         fontSize: 18,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '800',
     },
 
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     dateButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         marginBottom: 2,
     },
     dateSubtext: {

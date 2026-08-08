@@ -53,7 +53,7 @@ const MarketTicker = ({ items }: { items: any[] }) => {
                 <Text style={styles.price}>
                     {price < 1 ? `$${price.toFixed(4)}` : formatPrice(price)}
                 </Text>
-                <Text style={[styles.change, { color: isUp ? '#C8C0EF' : '#C734CA' }]}>
+                <Text style={[styles.change, { color: isUp ? '#CFD0D2' : '#FF8A8A' }]}>
                     {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
                 </Text>
                 <Text style={styles.separator}>|</Text>
@@ -87,7 +87,7 @@ const MarketTicker = ({ items }: { items: any[] }) => {
 const styles = StyleSheet.create({
     wrapper: {
         height: 36,
-        backgroundColor: 'rgba(2,6,38,0.95)',
+        backgroundColor: 'rgba(28,36,44,0.95)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(199,52,202,0.18)',
         justifyContent: 'center',
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         width: 150,
     },
     symbol: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '800',
         marginRight: 5,
         fontSize: 11,

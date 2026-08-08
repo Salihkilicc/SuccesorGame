@@ -67,7 +67,7 @@ export default MatchPopup;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(2,6,38,0.5)',
+    backgroundColor: 'rgba(28,36,44,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   matchButton: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: theme.colors.accent,
   },
   buttonText: {
     fontSize: theme.typography.body,

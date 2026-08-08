@@ -74,12 +74,12 @@ export default NightOutOutcomeModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 10,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 5,
         overflow: 'hidden'
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: theme.colors.success
+        backgroundColor: theme.colors.accent
     },
     barValue: {
         alignSelf: 'flex-end',

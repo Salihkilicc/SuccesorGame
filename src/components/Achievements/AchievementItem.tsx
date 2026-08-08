@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   cardUnlocked: {
-    borderColor: theme.colors.success,
+    borderColor: theme.colors.accent,
   },
   cardLocked: {
     opacity: 0.95,

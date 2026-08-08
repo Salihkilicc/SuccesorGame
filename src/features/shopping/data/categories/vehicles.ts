@@ -12,7 +12,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.velocity.com',
             category: 'VEHICLE',
             description: 'Beyond speed.',
-            bannerColor: '#C836CA',
+            bannerColor: '#FF8A8A',
             emoji: '🏎️',
         },
         {
@@ -21,7 +21,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.monarchauto.luxury',
             category: 'VEHICLE',
             description: 'Imperial transport.',
-            bannerColor: '#6004BD',
+            bannerColor: '#05A8F6',
             emoji: '👑',
         },
         {
@@ -30,7 +30,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.apeximports.jp',
             category: 'VEHICLE',
             description: 'The collector\'s holy grail.',
-            bannerColor: '#C734CA',
+            bannerColor: '#FF8A8A',
             emoji: '🎌',
         },
         {
@@ -39,7 +39,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.ironhorse.com',
             category: 'VEHICLE',
             description: 'Indestructible.',
-            bannerColor: '#5C3790',
+            bannerColor: '#535B5F',
             emoji: '🛡️',
         },
         {
@@ -48,7 +48,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.futurewheels.tech',
             category: 'VEHICLE',
             description: 'Electric dreams.',
-            bannerColor: '#C8C0EF',
+            bannerColor: '#CFD0D2',
             emoji: '⚡',
         },
         {
@@ -57,7 +57,7 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
             url: 'www.classiclegends.auction',
             category: 'VEHICLE',
             description: 'Priceless history.',
-            bannerColor: '#C734CA',
+            bannerColor: '#FF8A8A',
             emoji: '🏆',
         },
     ],

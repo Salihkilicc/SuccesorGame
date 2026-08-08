@@ -14,7 +14,7 @@ type Props = {
 const AppScreen = ({ title, subtitle, leftNode, rightNode, children, compact = false }: Props) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#020626" />
+      <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
       <View style={[styles.header, compact && styles.headerCompact]}>
         {leftNode ? <View style={styles.sideNode}>{leftNode}</View> : null}
         <View style={styles.titleGroup}>
@@ -33,7 +33,7 @@ export default AppScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#020626',
+    backgroundColor: '#1C242C',
   },
   header: {
     flexDirection: 'row',

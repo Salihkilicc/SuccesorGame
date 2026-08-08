@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     listItem: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 16,
         borderRadius: 4,
         borderWidth: 1,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     itemPrice: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 16,
         fontWeight: 'bold',
     },

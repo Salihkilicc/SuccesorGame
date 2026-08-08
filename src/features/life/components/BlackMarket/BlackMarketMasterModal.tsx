@@ -81,7 +81,7 @@ export const BlackMarketMasterModal: React.FC<BlackMarketMasterModalProps> = ({ 
                 <AppLaunchLoader
                     appName="Black Market"
                     appIcon={<MaterialCommunityIcons name="incognito" size={64} color="#FFFFFF" />}
-                    backgroundColor="#020626"
+                    backgroundColor="#1C242C"
                 >
                     <SafeAreaView style={styles.container}>
 
@@ -125,6 +125,6 @@ export const BlackMarketMasterModal: React.FC<BlackMarketMasterModalProps> = ({ 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
 });

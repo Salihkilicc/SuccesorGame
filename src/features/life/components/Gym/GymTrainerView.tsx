@@ -84,7 +84,7 @@ const GymTrainerView = () => {
                                             onPress={() => !isHired && handleHire(trainer.id)}
                                             disabled={isHired}
                                         >
-                                            <Text style={[styles.hireText, isHired && { color: '#C734CA' }]}>
+                                            <Text style={[styles.hireText, isHired && { color: '#FF8A8A' }]}>
                                                 {isHired ? 'HIRED' : 'HIRE'}
                                             </Text>
                                         </TouchableOpacity>
@@ -103,7 +103,7 @@ const GymTrainerView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -111,10 +111,10 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 24,
         padding: 24,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.25,
         shadowRadius: 20,
@@ -129,21 +129,21 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#C734CA', fontWeight: '700' },
+    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: { fontSize: 24, fontWeight: '900', color: '#FFFFFF' },
-    subtitle: { fontSize: 14, color: '#C734CA', marginTop: 4 },
+    subtitle: { fontSize: 14, color: '#FF8A8A', marginTop: 4 },
     list: { gap: 16 },
 
     trainerCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -151,25 +151,25 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     activeCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     icon: { fontSize: 32 },
     info: { flex: 1 },
     name: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
-    role: { fontSize: 12, color: '#C734CA', fontWeight: '600' },
-    boost: { fontSize: 12, color: '#C734CA', fontWeight: '700', marginTop: 2 },
+    role: { fontSize: 12, color: '#FF8A8A', fontWeight: '600' },
+    boost: { fontSize: 12, color: '#FF8A8A', fontWeight: '700', marginTop: 2 },
 
     actions: { alignItems: 'flex-end', gap: 6 },
     price: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
     hireBtn: {
         paddingVertical: 6,
         paddingHorizontal: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 8,
     },
     hiredBtn: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     hireText: { fontSize: 12, fontWeight: '800', color: '#FFFFFF' },
 });

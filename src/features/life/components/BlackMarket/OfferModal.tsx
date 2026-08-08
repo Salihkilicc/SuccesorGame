@@ -59,7 +59,7 @@ const OfferModal = ({ visible, item, onBuy, onReject }: OfferModalProps) => {
 const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 20,
         padding: 24,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 80,
         height: 80,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 40,
         alignItems: 'center',
         justifyContent: 'center',
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     price: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 32,
         fontWeight: 'bold',
         textShadowColor: 'rgba(199,52,202,0.3)',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     buyText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 1,

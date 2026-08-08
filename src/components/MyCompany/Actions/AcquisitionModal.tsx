@@ -370,7 +370,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
                   return (
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
-                      <Text style={[styles.infoValue, { color: '#C8C0EF' }]}>
+                      <Text style={[styles.infoValue, { color: '#FFFFFF' }]}>
                         {found.competitor.share.toFixed(1)}% of {found.market.category}
                       </Text>
                     </View>
@@ -429,7 +429,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020626',
+    backgroundColor: '#1C242C',
   },
   header: {
     padding: 20,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   closeBtn: {
-    backgroundColor: '#281F50',
+    backgroundColor: '#323A40',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
@@ -494,12 +494,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
   activeTab: {
-    backgroundColor: '#422B71', // Gold
+    backgroundColor: '#434B50', // Gold
     borderColor: 'rgba(255,255,255,0.08)',
   },
   tabText: {
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#281F50',
+    backgroundColor: '#323A40',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -582,19 +582,19 @@ const styles = StyleSheet.create({
   // Negotiation Overlay
   overlayBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2,6,38,0.85)',
+    backgroundColor: 'rgba(28,36,44,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   negotiationCard: {
     width: '100%',
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
     padding: 24,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   negBody: {
     marginBottom: 24,
     gap: 12,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: 16,
     borderRadius: 12,
   },
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionBtn: {
-    backgroundColor: '#281F50',
+    backgroundColor: '#323A40',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
@@ -666,13 +666,13 @@ const styles = StyleSheet.create({
   },
   hostileBtn: {
     backgroundColor: 'rgba(199,52,202,0.1)',
-    borderColor: theme.colors.danger,
+    borderColor: theme.colors.destructive,
   },
   hostileText: {
     color: theme.colors.danger,
   },
   hostileDesc: {
-    color: '#C734CA',
+    color: '#FF8A8A',
   },
   cancelBtn: {
     marginTop: 16,

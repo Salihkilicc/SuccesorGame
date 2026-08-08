@@ -6,6 +6,7 @@ import MemberInteractionModal from './MemberInteractionModal';
 import { useStatsStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
+import { theme } from '../../../core/theme';
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
@@ -125,9 +126,9 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
     };
 
     const moodColor =
-        boardStance === 'Supportive' ? '#C8C0EF'
+        boardStance === 'Supportive' ? '#CFD0D2'
             : boardStance === 'Neutral' ? 'rgba(255,255,255,0.48)'
-                : boardStance === 'Restless' ? '#C734CA' : '#C734CA';
+                : boardStance === 'Restless' ? '#FF8A8A' : '#FF8A8A';
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -145,7 +146,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                     <View style={styles.controlCard}>
                         <View style={styles.controlRow}>
                             <Text style={styles.controlLabel}>{t('board.yourStake')}</Text>
-                            <Text style={[styles.controlValue, { color: hasControl ? '#C8C0EF' : '#C734CA' }]}>
+                            <Text style={[styles.controlValue, { color: hasControl ? '#CFD0D2' : '#FF8A8A' }]}>
                                 {ownership.toFixed(1)}%
                             </Text>
                         </View>
@@ -227,7 +228,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                     const promised = promises.filter(p => p.memberId === m.id && !p.resolved);
                                     const alreadyLobbied = lobbied[m.id] !== undefined;
                                     const trustColor =
-                                        m.trust >= 60 ? '#C8C0EF' : m.trust >= 35 ? '#C734CA' : '#C734CA';
+                                        m.trust >= 60 ? '#CFD0D2' : m.trust >= 35 ? '#FF8A8A' : '#FF8A8A';
 
                                     return (
                                         <View key={m.id} style={styles.memberCard}>
@@ -316,7 +317,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                                             <View key={v.memberId} style={styles.voteRow}>
                                                 <Text style={[
                                                     styles.voteMark,
-                                                    { color: v.vote === 'YES' ? '#C8C0EF' : '#C734CA' },
+                                                    { color: v.vote === 'YES' ? '#CFD0D2' : '#FF8A8A' },
                                                 ]}>
                                                     {v.vote === 'YES' ? '✓' : '✕'}
                                                 </Text>
@@ -360,66 +361,66 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
 export default BoardRoomModal;
 
 const styles = StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: 'rgba(2,6,38,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+    backdrop: { flex: 1, backgroundColor: 'rgba(28,36,44,0.85)', justifyContent: 'center', alignItems: 'center', padding: 20 },
     container: {
         width: '100%', maxWidth: 460, maxHeight: '85%',
-        backgroundColor: '#020626', borderRadius: 20, padding: 20,
+        backgroundColor: '#1C242C', borderRadius: 20, padding: 20,
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     },
     titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
     title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
-    closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#281F50', alignItems: 'center', justifyContent: 'center' },
+    closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#323A40', alignItems: 'center', justifyContent: 'center' },
     closeText: { color: 'rgba(255,255,255,0.48)', fontSize: 16, fontWeight: '700' },
 
-    controlCard: { backgroundColor: '#281F50', borderRadius: 12, padding: 14, marginBottom: 12 },
+    controlCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 12 },
     controlRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     controlLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     controlValue: { fontSize: 22, fontWeight: '800' },
-    controlNote: { fontSize: 11, color: '#C734CA', lineHeight: 16, marginTop: 6 },
+    controlNote: { fontSize: 11, color: '#FF8A8A', lineHeight: 16, marginTop: 6 },
     moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
     moodValue: { fontSize: 13, fontWeight: '800' },
 
-    demandCard: { backgroundColor: '#422B71', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    demandTag: { fontSize: 10, color: '#C734CA', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
+    demandCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    demandTag: { fontSize: 10, color: '#FF8A8A', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
     demandBody: { fontSize: 12, color: '#FFFFFF', lineHeight: 18, fontStyle: 'italic' },
-    demandPrivate: { fontSize: 10, color: '#C8C0EF', marginTop: 6, lineHeight: 15 },
+    demandPrivate: { fontSize: 10, color: '#FFFFFF', marginTop: 6, lineHeight: 15 },
     demandDue: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 6, fontWeight: '700' },
 
-    dangerCard: { backgroundColor: '#422B71', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    dangerTitle: { fontSize: 13, color: '#C734CA', fontWeight: '800', marginBottom: 4 },
-    dangerBody: { fontSize: 11, color: '#C734CA', lineHeight: 16 },
+    dangerCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    dangerTitle: { fontSize: 13, color: '#FF8A8A', fontWeight: '800', marginBottom: 4 },
+    dangerBody: { fontSize: 11, color: '#FF8A8A', lineHeight: 16 },
 
     tabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#281F50', alignItems: 'center' },
-    tabActive: { backgroundColor: '#6004BD' },
+    tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#323A40', alignItems: 'center' },
+    tabActive: { backgroundColor: '#05A8F6' },
     tabText: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
-    tabTextActive: { color: '#FFFFFF' },
+    tabTextActive: { color: theme.colors.onLight},
 
     body: { flexGrow: 0, flexShrink: 1 },
 
-    memberCard: { backgroundColor: '#281F50', borderRadius: 12, padding: 14, marginBottom: 10 },
+    memberCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 10 },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
     memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
-    memberRel: { fontSize: 9, color: '#C8C0EF', marginTop: 2 },
+    memberRel: { fontSize: 9, color: '#FFFFFF', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
-    trustBarBg: { height: 5, backgroundColor: '#422B71', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
+    trustBarBg: { height: 5, backgroundColor: '#434B50', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
-    promiseNote: { fontSize: 11, color: '#C734CA', marginTop: 8 },
+    promiseNote: { fontSize: 11, color: '#FF8A8A', marginTop: 8 },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#422B71', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    openMemberText: { color: '#C734CA', fontSize: 12, fontWeight: '700' },
-    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#422B71', alignItems: 'center' },
+    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#434B50', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    openMemberText: { color: '#FF8A8A', fontSize: 12, fontWeight: '700' },
+    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#434B50', alignItems: 'center' },
     lobbyBtnDone: { opacity: 0.4 },
-    lobbyText: { fontSize: 12, color: '#C734CA', fontWeight: '700' },
+    lobbyText: { fontSize: 12, color: '#FF8A8A', fontWeight: '700' },
 
-    floatCard: { backgroundColor: '#422B71', borderRadius: 12, padding: 14, marginTop: 4 },
+    floatCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginTop: 4 },
     floatTitle: { fontSize: 13, color: '#FFFFFF', fontWeight: '700', marginBottom: 4 },
     floatBody: { fontSize: 11, color: 'rgba(255,255,255,0.48)', lineHeight: 16 },
 
-    voteCard: { backgroundColor: '#281F50', borderRadius: 12, padding: 14, marginBottom: 12 },
+    voteCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 12 },
     voteTitle: { fontSize: 14, color: '#FFFFFF', fontWeight: '800' },
-    voteSummary: { fontSize: 12, color: '#C734CA', marginTop: 4, marginBottom: 10 },
+    voteSummary: { fontSize: 12, color: '#FF8A8A', marginTop: 4, marginBottom: 10 },
     voteRow: { flexDirection: 'row', gap: 10, marginBottom: 8, alignItems: 'flex-start' },
     voteMark: { fontSize: 16, fontWeight: '800', width: 18 },
     voteName: { fontSize: 13, color: '#FFFFFF', fontWeight: '600' },

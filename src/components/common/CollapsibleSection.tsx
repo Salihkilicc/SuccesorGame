@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     headerText: { flex: 1, paddingRight: 10 },
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
     title: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 1.6,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         width: 14,
         textAlign: 'center',
     },
-    chevronOpen: { color: '#C734CA', transform: [{ rotate: '180deg' }], marginTop: 2 },
+    chevronOpen: { color: '#FF8A8A', transform: [{ rotate: '180deg' }], marginTop: 2 },
     body: {
         paddingHorizontal: 14,
         paddingBottom: 14,

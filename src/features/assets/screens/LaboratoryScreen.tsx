@@ -213,7 +213,7 @@ const LaboratoryScreen = () => {
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
-                        <Text style={{ color: '#C8C0EF', fontWeight: '800' }}>
+                        <Text style={{ color: '#FFFFFF', fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
                         </Text>{' '}
                         per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
@@ -225,9 +225,9 @@ const LaboratoryScreen = () => {
                         onChange={setTempCount}
                         max={facility.capacity}
                         unit="researchers"
-                        markers={[{ value: researcherCount, label: 'Now', color: '#C8C0EF' }]}
+                        markers={[{ value: researcherCount, label: 'Now', color: '#FFFFFF' }]}
                         steps={[1, 10, 100]}
-                        fillColor={canAfford ? '#C8C0EF' : '#C734CA'}
+                        fillColor={canAfford ? '#CFD0D2' : '#FF8A8A'}
                     />
 
                     {/* Summary & Confirm */}
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.accent,
     },
     rpBadgeText: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '800',
     },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     tierBadgeText: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 12,
         fontWeight: '700',
     },
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     upgradeBtnText: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: '800',
     },
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
     },
     upgradeCost: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 12,
         fontWeight: '600',
         marginTop: 4,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     maxTierText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 14,
         fontWeight: '700',
     },
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '700',
         top: -1, // Adjust visually to center in bar
-        textShadowColor: 'rgba(2,6,38,0.5)',
+        textShadowColor: 'rgba(28,36,44,0.5)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
     },
@@ -524,14 +524,14 @@ const styles = StyleSheet.create({
     },
     immediateCost: {
         fontSize: 10,
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         marginTop: 2,
     },
     textDanger: {
         color: theme.colors.danger,
     },
     confirmBtn: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 10,
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.border,
     },
     confirmBtnDanger: {
-        backgroundColor: theme.colors.danger,
+        backgroundColor: theme.colors.destructive,
         opacity: 0.8,
     },
     confirmBtnText: {

@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     venueCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     },
     venueLocation: {
         fontSize: 14,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     breakdown: {
         gap: 12,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     totalValue: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     actions: {
         gap: 12,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

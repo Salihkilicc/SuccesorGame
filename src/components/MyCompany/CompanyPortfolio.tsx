@@ -104,7 +104,7 @@ export default CompanyPortfolio;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#020626',
+    backgroundColor: '#1C242C',
     borderRadius: 14,
     padding: 16,
     gap: 12,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: 12,
     padding: 12,
     gap: 6,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   cardPressed: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
   },
   shareHeader: {
     flexDirection: 'row',
@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
   ownershipBadge: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#C8C0EF',
-    backgroundColor: '#6004BD20',
+    color: '#FFFFFF',
+    backgroundColor: '#05A8F620',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,

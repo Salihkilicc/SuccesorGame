@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     activeTab: {
         backgroundColor: 'rgba(199,52,202,0.18)',
         borderColor: 'rgba(255,255,255,0.08)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     activeTabText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '800',
     },
 });

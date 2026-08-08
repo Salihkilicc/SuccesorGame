@@ -169,12 +169,12 @@ export default NightOutSetupModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 24,
         paddingTop: Platform.OS === 'ios' ? 70 : 50, // Screen pulled down further 
         paddingBottom: 80,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '900',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 4,
         letterSpacing: 2,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     progress: {
         fontSize: 12,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },

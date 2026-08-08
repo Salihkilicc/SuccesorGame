@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     subheader: {
         fontSize: 14,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: '45%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     },
     cardSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     cardLocal: {
         borderColor: 'rgba(255,255,255,0.06)', // Blue for USA Local
@@ -122,15 +122,15 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     textSelected: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     venueCount: {
         fontSize: 12,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         marginTop: 4,
     },
     localBadge: {
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     localBadgeText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         letterSpacing: 1,
     },
 });

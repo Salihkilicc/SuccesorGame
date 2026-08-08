@@ -36,7 +36,7 @@ const LuxeNetFooter: React.FC<LuxeNetFooterProps> = ({ style }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         paddingVertical: 30,
         paddingHorizontal: 20,
         alignItems: 'center',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 1,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         width: '60%',
         marginBottom: 20,
     },
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     linkText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 12,
         fontWeight: '500',
     },

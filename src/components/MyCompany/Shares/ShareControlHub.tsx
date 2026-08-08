@@ -41,7 +41,7 @@ interface Props {
 const BreakLine = ({ label, value, bold, negative }: { label: string; value: string; bold?: boolean; negative?: boolean }) => (
     <View style={styles.breakRow}>
         <Text style={[styles.breakLabel, bold && styles.breakBold]}>{label}</Text>
-        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#C734CA' }]}>
+        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#FF8A8A' }]}>
             {value}
         </Text>
     </View>
@@ -177,11 +177,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
                                 <View style={[
                                     styles.changeBadge,
-                                    { backgroundColor: companyDailyChange >= 0 ? '#C8C0EF20' : '#C734CA20' }
+                                    { backgroundColor: companyDailyChange >= 0 ? '#CFD0D220' : '#FF8A8A20' }
                                 ]}>
                                     <Text style={[
                                         styles.changeBadgeText,
-                                        { color: companyDailyChange >= 0 ? '#C8C0EF' : '#C734CA' }
+                                        { color: companyDailyChange >= 0 ? '#CFD0D2' : '#FF8A8A' }
                                     ]}>
                                         {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
                                     </Text>
@@ -256,7 +256,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 onPress={onOpenIPO}
                                 activeOpacity={0.7}
                             >
-                                <View style={[styles.actionIconBox, { backgroundColor: '#6004BD20' }]}>
+                                <View style={[styles.actionIconBox, { backgroundColor: '#05A8F620' }]}>
                                     <Text style={styles.actionIcon}>🔔</Text>
                                 </View>
                                 <View style={styles.actionContent}>
@@ -290,7 +290,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#6004BD20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#05A8F620' }]}>
                                 <Text style={styles.actionIcon}>📈</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -309,7 +309,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#C734CA20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#FF8A8A20' }]}>
                                 <Text style={styles.actionIcon}>📉</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -373,7 +373,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#C8C0EF20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#CFD0D220' }]}>
                                 <Text style={styles.actionIcon}>💼</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -396,7 +396,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#C8C0EF20' }]}>
+                            <View style={[styles.actionIconBox, { backgroundColor: '#CFD0D220' }]}>
                                 <Text style={styles.actionIcon}>💰</Text>
                             </View>
                             <View style={styles.actionContent}>
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(200,192,239,0.10)', borderRadius: 8,
         paddingHorizontal: 10, paddingVertical: 7, marginTop: 8,
     },
-    dampText: { color: '#C8C0EF', fontSize: 10, lineHeight: 14, fontWeight: '600' },
+    dampText: { color: '#FFFFFF', fontSize: 10, lineHeight: 14, fontWeight: '600' },
 
     breakdownCard: {
         backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
     header: {
         flexDirection: 'row',
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#020626',
+        borderBottomColor: '#1C242C',
     },
     backButton: {
         paddingVertical: 8,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 17,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontWeight: '600',
     },
     headerTitle: {
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     heroCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 24,
         marginTop: 20,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     statCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         padding: 16,
         width: '48%',
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     actionRow: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 16,

@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
     },
     barTrack: {
         height: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 6,
         overflow: 'hidden',
     },
     barFill: {
         height: '100%',
-        backgroundcolor: '#C8C0EF', // Green for enjoyment
+        backgroundcolor: '#CFD0D2', // Green for enjoyment
     },
     statsContainer: {
         flexDirection: 'row',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     statTag: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 16,
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
     },
-    positive: { color: '#C8C0EF' },
-    negative: { color: '#C734CA' },
+    positive: { color: '#FFFFFF' },
+    negative: { color: '#FF8A8A' },
 });

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     rightBtnText: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '600',
     },

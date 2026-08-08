@@ -14,6 +14,7 @@ import { useEducationSystem } from './store/useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, MASTERS_DATA, MastersType } from './data/educationData';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
 import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
+import { theme } from '../../../../core/theme';
 
 // ========================================
 // TYPES
@@ -301,7 +302,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
     },
     mainContainer: {
         flex: 1,
@@ -319,10 +320,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderBottomWidth: 1,
         borderBottomColor: '#FFFFFF',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
@@ -339,42 +340,42 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
         letterSpacing: 1,
     },
     headerSubtitle: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#C734CA', // Gold
+        color: '#FF8A8A', // Gold
         letterSpacing: 2,
     },
     closeBtn: {
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         justifyContent: 'center',
         alignItems: 'center',
     },
     closeIcon: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
     },
 
     // Primary Card (Degree)
     primaryCard: {
-        backgroundColor: '#6004BD', // Dark Blue
+        backgroundColor: '#05A8F6', // Dark Blue
         borderRadius: 20,
         padding: 24,
         marginBottom: 4, // Tight spacing with secondary
-        shadowColor: '#6004BD',
+        shadowColor: '#05A8F6',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 5,
     },
     primaryCardEmpty: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 20,
         padding: 24,
         marginBottom: 20,
@@ -386,22 +387,22 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 4,
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 16,
     },
     enrollBtnPrimary: {
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     enrollBtnText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: 'bold',
     },
     primaryHeader: {
@@ -411,7 +412,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     primaryType: {
-        color: '#C8C0EF', // Light Blue
+        color: '#FFFFFF', // Light Blue
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 1,
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#422B71', // Gold
+        backgroundColor: '#434B50', // Gold
         borderRadius: 6,
     },
 
@@ -468,12 +469,12 @@ const styles = StyleSheet.create({
     },
     secondaryCard: {
         width: '90%',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
@@ -487,7 +488,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     secondaryType: {
-        color: '#C8C0EF', // Teal
+        color: '#FFFFFF', // Teal
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
@@ -508,19 +509,19 @@ const styles = StyleSheet.create({
     secondaryBarBg: {
         flex: 1,
         height: 6,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 3,
         overflow: 'hidden',
     },
     secondaryBarFill: {
         height: '100%',
-        backgroundColor: '#C8C0EF', // Teal
+        backgroundColor: '#CFD0D2', // Teal
         borderRadius: 3,
     },
     secondaryPercent: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
         width: 35,
         textAlign: 'right',
     },
@@ -548,13 +549,13 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
     },
     addSkillIcon: {
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
         fontSize: 18,
         fontWeight: 'bold',
     },
@@ -579,13 +580,13 @@ const styles = StyleSheet.create({
     },
     menuItemHalf: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -593,7 +594,7 @@ const styles = StyleSheet.create({
     },
     menuItemDisabled: {
         opacity: 0.5,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
     },
     menuIcon: {
         fontSize: 36,
@@ -602,13 +603,13 @@ const styles = StyleSheet.create({
     menuTitle: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 4,
         textAlign: 'center',
     },
     menuSubtitle: {
         fontSize: 11,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         textAlign: 'center',
     },
     menuSubtitleDisabled: {
@@ -616,13 +617,13 @@ const styles = StyleSheet.create({
     },
     menuItemFull: {
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -638,18 +639,18 @@ const styles = StyleSheet.create({
     menuTitleLarge: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 4,
     },
     menuSubtitleLarge: {
         fontSize: 13,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
     },
 
     // Remaining Quarters Text
     remainingText: {
         fontSize: 11,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontStyle: 'italic',
         marginTop: 6,
         textAlign: 'right',
@@ -666,11 +667,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 12,
         left: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 6,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,

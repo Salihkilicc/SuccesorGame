@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     iconText: {
         fontSize: 24,
         fontWeight: '800',
-        color: theme.colors.primary,
+        color: theme.colors.textPrimary,
     },
     title: {
         fontSize: 20,

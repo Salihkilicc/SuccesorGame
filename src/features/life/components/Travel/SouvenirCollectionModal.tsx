@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { VACATION_SPOTS } from './data/travelData';
 import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
+import { theme } from '../../../../core/theme';
 
 type SouvenirCollectionModalProps = {
     visible: boolean;
@@ -133,13 +134,13 @@ export default SouvenirCollectionModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71', // Solid background
+        backgroundColor: '#434B50', // Solid background
         alignItems: 'center', // Center children
     },
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#020626', // Solid background
+        backgroundColor: '#1C242C', // Solid background
     },
     header: {
         flexDirection: 'row',
@@ -179,13 +180,13 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 4,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 4,
     },
     gridContainer: {
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100, // Add padding for bottom bar
     },
     card: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -244,18 +245,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     rarityLegendary: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     rarityRare: {
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
     },
     rarityCommon: {
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
     },
     rarityText: {
         fontSize: 10,
         fontWeight: '900',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         letterSpacing: 0.5,
     },
 });

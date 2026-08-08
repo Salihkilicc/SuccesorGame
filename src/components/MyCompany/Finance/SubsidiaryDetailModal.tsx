@@ -91,7 +91,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, -1)}
                     disabled={strategy[field] === 0}
                 >
-                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#7B46B7' : '#FFFFFF'} />
+                    <Ionicons name="remove" size={20} color={strategy[field] === 0 ? '#666E70' : '#FFFFFF'} />
                 </TouchableOpacity>
 
                 <View style={styles.valueBox}>
@@ -103,7 +103,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onPress={() => handleChange(field, 1)}
                     disabled={totalPoints >= maxPoints}
                 >
-                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#7B46B7' : '#FFFFFF'} />
+                    <Ionicons name="add" size={20} color={totalPoints >= maxPoints ? '#666E70' : '#FFFFFF'} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -118,7 +118,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
         >
             <View style={styles.overlay}>
                 {/* Darkened Background instead of Blur for safety */}
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(2,6,38,0.85)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(28,36,44,0.85)' }]} />
 
                 <View style={[styles.container, { marginTop: 60 }]}>
                     {/* Header */}
@@ -144,7 +144,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <View style={styles.divider} />
                             <View style={styles.kpiItem}>
                                 <Text style={styles.kpiLabel}>{t('finance.lastQChange')}</Text>
-                                <Text style={[styles.kpiValue, { color: isPositive ? '#04BDBA' : '#C836CA' }]}>
+                                <Text style={[styles.kpiValue, { color: isPositive ? '#05A8F6' : '#FF8A8A' }]}>
                                     {isPositive ? '+' : ''}{company.lastChangePercent.toFixed(2)}%
                                 </Text>
                             </View>
@@ -208,18 +208,18 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(2,6,38,0.5)',
+        backgroundColor: 'rgba(28,36,44,0.5)',
     },
     container: {
         width: '90%',
         maxWidth: 420,
         height: '80%',
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#020626',
-        backgroundColor: '#422B71',
+        borderBottomColor: '#1C242C',
+        backgroundColor: '#434B50',
     },
     companyName: {
         fontSize: 22,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     },
     closeBtn: {
         padding: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 50,
     },
     content: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
     kpiContainer: {
         flexDirection: 'row',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     },
     divider: {
         width: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginHorizontal: 10,
     },
     kpiLabel: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     pointsBadge: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 12,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 10,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 4,
         borderRadius: 12,
         borderWidth: 1,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     disabledBtn: {
         opacity: 0.3,
@@ -384,19 +384,19 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 12,
         lineHeight: 18,
     },
     footer: {
         padding: 20,
         borderTopWidth: 1,
-        borderTopColor: '#020626',
-        backgroundColor: '#422B71',
+        borderTopColor: '#1C242C',
+        backgroundColor: '#434B50',
         gap: 12,
     },
     sellBtn: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     sellBtnText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     saveBtnText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

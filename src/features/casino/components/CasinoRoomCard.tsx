@@ -1,6 +1,7 @@
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
+import { theme } from '../../../core/theme';
 
 type Props = {
   name: string;
@@ -43,22 +44,22 @@ export default CasinoRoomCard;
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     borderRadius: 12,
     padding: 14,
     gap: 8,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
   cardPressed: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     transform: [{scale: 0.99}],
   },
   cardLocked: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     borderColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
   },
@@ -70,15 +71,15 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
   },
   requirement: {
     fontSize: 13,
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
   },
   lockedTag: {
-    backgroundColor: '#FFFFFF',
-    color: '#C734CA',
+    backgroundColor: '#323A40',
+    color: '#FF8A8A',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

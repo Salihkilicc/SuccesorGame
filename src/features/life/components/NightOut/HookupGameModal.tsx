@@ -205,12 +205,12 @@ export default HookupGameModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     card: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 24,
         paddingTop: 48,
         borderTopWidth: 2,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     partnerJob: {
         fontSize: 14,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontStyle: 'italic',
     },
     clueSection: {
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
     clueLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         letterSpacing: 2,
         marginBottom: 8,
     },
     clueBox: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
     choicesLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         letterSpacing: 2,
         marginBottom: 12,
     },
     choiceButton: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -290,16 +290,16 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)',
     },
     choiceButtonPressed: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         transform: [{ scale: 0.98 }],
     },
     choiceButtonCorrect: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     choiceButtonWrong: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     choiceContent: {
         gap: 8,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     },
     choiceTag: {
         alignSelf: 'flex-start',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     choiceTagText: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         letterSpacing: 1,
     },
     resultSection: {
@@ -334,9 +334,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     resultSuccess: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     resultFail: {
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
 });

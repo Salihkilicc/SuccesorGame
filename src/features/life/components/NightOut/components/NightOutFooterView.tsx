@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     totalLabel: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     confirmButton: {
-        backgroundColor: '#C8C0EF',
+        backgroundColor: '#CFD0D2',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmButtonText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: '800',
         fontSize: 14,
     },
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     closeText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 14
     }
 });

@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(199,52,202,0.3)',
   },
   sentimentText: {
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontSize: theme.typography.caption + 1,
   },
 });

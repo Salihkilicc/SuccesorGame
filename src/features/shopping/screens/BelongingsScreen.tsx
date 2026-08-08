@@ -63,10 +63,10 @@ const BelongingsScreen = () => {
         <AppLaunchLoader
             appName="Belongings"
             appIcon={<MaterialCommunityIcons name="treasure-chest" size={64} color="#FFFFFF" />}
-            backgroundColor="#020626"
+            backgroundColor="#1C242C"
         >
             <View style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor="#020626" />
+                <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
                 <SafeAreaView style={{ flex: 1 }}>
 
                     {/* 1. Header (Black Card Style) */}
@@ -185,13 +185,13 @@ const BelongingsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626', // Deep Black
+        backgroundColor: '#1C242C', // Deep Black
     },
     // Header
     header: {
         paddingHorizontal: 20,
         paddingBottom: 12, // Reduced from 20 to tighten layout
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     headerTop: {
         flexDirection: 'row',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     headerTitle: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,
@@ -225,12 +225,12 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
         aspectRatio: 1.58, // Credit Card Ratio
-        backgroundColor: '#422B71', // Matte Black
+        backgroundColor: '#434B50', // Matte Black
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     cardLabelSmall: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     chipGraphic: {
         width: 44,
         height: 34,
-        backgroundColor: '#422B71', // Gold/Copper Chip color
+        backgroundColor: '#434B50', // Gold/Copper Chip color
         borderRadius: 6,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -283,14 +283,14 @@ const styles = StyleSheet.create({
     chipLine1: {
         width: '100%',
         height: 1,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         marginBottom: 8,
     },
     chipLine2: {
         position: 'absolute',
         width: 1,
         height: '60%',
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
     },
     netWorthValue: {
         color: '#FFFFFF',
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     badgeText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 1,
@@ -346,14 +346,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20, // Pill shape
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     filterChipActive: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#422B71',
-        shadowColor: "#C734CA",
+        backgroundColor: '#434B50',
+        shadowColor: "#FF8A8A",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     filterTextActive: {
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
 
     // List
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     shopAction: {
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',

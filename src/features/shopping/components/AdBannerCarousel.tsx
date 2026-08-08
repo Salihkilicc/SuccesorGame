@@ -17,7 +17,7 @@ const ADS = [
         title: t('ui.velocityMotors'),
         subtitle: t('ui.startYourLegacy'),
         cta: 'Drive Now →',
-        color: '#C734CA',
+        color: '#FF8A8A',
         emoji: '🏎️',
     },
     {
@@ -35,7 +35,7 @@ const ADS = [
         title: t('ui.poseidonYards'),
         subtitle: t('ui.summerSaleConquerTheOcean'),
         cta: 'Set Sail →',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         emoji: '⛵',
     },
 ];
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.xl,
         justifyContent: 'space-between',
         elevation: 8,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 12,

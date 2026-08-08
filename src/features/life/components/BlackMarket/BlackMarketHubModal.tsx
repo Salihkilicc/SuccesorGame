@@ -103,7 +103,7 @@ const BlackMarketHubModal = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
     closeOverlay: {
         position: 'absolute',

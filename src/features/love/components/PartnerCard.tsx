@@ -13,20 +13,20 @@ type PartnerCardProps = {
 // --- HELPERS ---
 
 const getLoveColor = (love: number) => {
-  if (love >= 80) return '#C734CA'; // Red
-  if (love >= 50) return '#C734CA'; // Pink
-  if (love >= 30) return '#C734CA'; // Amber
-  return '#C8C0EF'; // Slate
+  if (love >= 80) return '#FF8A8A'; // Red
+  if (love >= 50) return '#FF8A8A'; // Pink
+  if (love >= 30) return '#FF8A8A'; // Amber
+  return '#CFD0D2'; // Slate
 };
 
 const getTierColor = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY': return '#C734CA'; // Gold
-    case 'CORPORATE_ELITE': return '#C8C0EF'; // Blue
-    case 'UNDERGROUND': return '#C734CA'; // Red
+    case 'HIGH_SOCIETY': return '#FF8A8A'; // Gold
+    case 'CORPORATE_ELITE': return '#CFD0D2'; // Blue
+    case 'UNDERGROUND': return '#FF8A8A'; // Red
     case 'BLUE_COLLAR': return 'rgba(255,255,255,0.48)'; // Slate
-    case 'STUDENT_LIFE': return '#C8C0EF'; // Cyan
-    case 'ARTISTIC': return '#6004BD'; // Purple
+    case 'STUDENT_LIFE': return '#CFD0D2'; // Cyan
+    case 'ARTISTIC': return '#05A8F6'; // Purple
     default: return 'rgba(255,255,255,0.48)';
   }
 };
@@ -72,7 +72,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
   const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
-  const statusColor = (partner as PartnerProfile).isMarried ? '#6004BD' : '#C734CA';
+  const statusColor = (partner as PartnerProfile).isMarried ? '#05A8F6' : '#FF8A8A';
 
   return (
     <View style={styles.container}>
@@ -123,7 +123,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>💎</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#C8C0EF' }]} />
+                <View style={[styles.progressBarFill, { width: `${looksLevel}%`, backgroundColor: '#CFD0D2' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(looksLevel)}</Text>
             </View>
@@ -134,7 +134,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
             <View style={styles.statRow}>
               <Text style={styles.statIcon}>🧠</Text>
               <View style={styles.progressBarContainer}>
-                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#6004BD' }]} />
+                <View style={[styles.progressBarFill, { width: `${smartsLevel}%`, backgroundColor: '#05A8F6' }]} />
               </View>
               <Text style={styles.statValue}>{Math.round(smartsLevel)}</Text>
             </View>
@@ -178,14 +178,14 @@ export default PartnerCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#020626',
+    backgroundColor: '#1C242C',
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
     // Shadow
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     height: 180,
-    backgroundColor: '#281F50',
+    backgroundColor: '#323A40',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#422B71', // Fallback color
+    backgroundColor: '#434B50', // Fallback color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     // Gradient simulation using background color with potential opacity if needed, 
     // but here solid semi-transparent background works best without external libs.
-    backgroundColor: 'rgba(2,6,38,0.6)',
+    backgroundColor: 'rgba(28,36,44,0.6)',
   },
   overlayName: {
     fontSize: 22,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: 'rgba(2,6,38,0.7)',
+    backgroundColor: 'rgba(28,36,44,0.7)',
   },
   tierText: {
     fontSize: 10,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     flex: 1,
     height: 8,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: '#281F50',
+    backgroundColor: '#323A40',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(199,52,202,0.3)',
   },
   costText: {
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontWeight: '600',
   },
   actionButton: {
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.onLight,
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 0.5,

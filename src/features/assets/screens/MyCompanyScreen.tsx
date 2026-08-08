@@ -28,7 +28,7 @@ import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
-const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#422B71' }: any) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress, color = '#434B50' }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
@@ -170,10 +170,10 @@ const MyCompanyScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#020626' }}>
+    <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#020626', '#020626', '#020626']}
+        colors={['#1C242C', '#1C242C', '#1C242C']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -188,7 +188,7 @@ const MyCompanyScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -222,7 +222,7 @@ const MyCompanyScreen = () => {
             </View>
 
             {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#422B71', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#434B50', marginVertical: 16 }} />
 
             {/* Row 2: Shares */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -238,7 +238,7 @@ const MyCompanyScreen = () => {
               />
             </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: '#422B71', marginVertical: 16 }} />
+            <View style={{ width: '100%', height: 1, backgroundColor: '#434B50', marginVertical: 16 }} />
 
             {/* Row 3: Marka. Pazar payi hesabinda carpan olacak;
                 su an yavas biriken bir itibar gostergesi.
@@ -414,10 +414,10 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     // Dolgu, cerceve degil: bu kart eskiden saydamdi ve yalnizca ince bir
     // kenarlikla duruyordu, o yuzden zeminin uzerinde "yokmus gibi" goruntu
     // veriyordu. Renk artik yuzeyde.
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     flexBasis: '48%',
     borderRadius: 20,
     padding: 20,
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 120,
     justifyContent: 'center',
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
@@ -447,5 +447,5 @@ const styles = StyleSheet.create({
   },
   deptTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.3 },
   deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
-  sharePrice: { fontSize: 18, fontWeight: '700', color: '#C734CA' }, // Gold for money
+  sharePrice: { fontSize: 18, fontWeight: '700', color: '#FF8A8A' }, // Gold for money
 });

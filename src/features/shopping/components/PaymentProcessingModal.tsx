@@ -77,7 +77,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
             <View style={styles.container}>
                 {!showSuccess ? (
                     <View style={styles.content}>
-                        <ActivityIndicator size="large" color="#C734CA" style={styles.spinner} />
+                        <ActivityIndicator size="large" color="#FF8A8A" style={styles.spinner} />
                         <Text style={styles.statusText}>{statusText}</Text>
                         <Text style={styles.amountText}>-${amount.toLocaleString()}</Text>
 
@@ -102,7 +102,7 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626', // Pure black
+        backgroundColor: '#1C242C', // Pure black
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     amountText: {
-        color: '#C734CA', // Red for debit
+        color: '#FF8A8A', // Red for debit
         fontSize: 32,
         fontWeight: '700',
         marginBottom: 60,
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     securityBadge: {
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
     securityText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 2,

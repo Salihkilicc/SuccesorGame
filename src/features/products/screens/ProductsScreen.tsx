@@ -58,7 +58,7 @@ const ProductsScreen = () => {
           >
             <Text style={{ fontSize: 30 }}>⚛️</Text>
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ color: theme.colors.accent, fontWeight: '700', fontSize: 13, textAlign: 'center' }}>{t('product.discoverNewTech')}</Text>
+              <Text style={{ color: theme.colors.textPrimary, fontWeight: '700', fontSize: 13, textAlign: 'center' }}>{t('product.discoverNewTech')}</Text>
               <Text style={{ color: theme.colors.textMuted, fontSize: 10, marginTop: 4 }}>{t('product.goToRDLab')}</Text>
             </View>
           </Pressable>
@@ -136,12 +136,12 @@ const styles = StyleSheet.create({
   activePrice: { color: theme.colors.success, fontWeight: '800', fontSize: 16 },
   emptyText: { color: '#FFFFFF', fontStyle: 'italic', marginLeft: 20 },
   lockedList: { paddingHorizontal: 20, gap: 12 },
-  lockedCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#422B71', padding: 16, borderRadius: 12, opacity: 0.8 },
-  iconBox: { width: 48, height: 48, backgroundColor: '#422B71', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+  lockedCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#434B50', padding: 16, borderRadius: 12, opacity: 0.8 },
+  iconBox: { width: 48, height: 48, backgroundColor: '#434B50', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
   lockedIcon: { fontSize: 24 },
   infoBox: { flex: 1 },
   lockedName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
-  lockedCost: { color: theme.colors.accent, fontSize: 13, fontWeight: '600', marginTop: 2 },
+  lockedCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '600', marginTop: 2 },
   arrow: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
 });
 

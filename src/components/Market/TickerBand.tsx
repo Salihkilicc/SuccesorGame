@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   symbol: {
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontWeight: '800',
     fontSize: theme.typography.body,
     letterSpacing: 0.4,

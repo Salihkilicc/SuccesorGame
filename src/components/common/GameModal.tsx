@@ -43,7 +43,7 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         // padding removed to allow full screen absolute positioning
     },
     contentWrapper: {
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxHeight: '90%',
-        backgroundColor: '#020626', // Default dark theme background
+        backgroundColor: '#1C242C', // Default dark theme background
         borderRadius: theme.radius.lg,
         padding: theme.spacing.lg,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

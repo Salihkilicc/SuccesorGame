@@ -52,7 +52,7 @@ const GymMembershipView = () => {
             id: 'STANDARD' as MembershipTier,
             title: t('life.standard'),
             price: `$${prices.STANDARD.annual.toLocaleString()}/yr`,
-            color: '#C734CA',
+            color: '#FF8A8A',
             features: ['Access to Equipment', 'Basic Classes', 'Locker Room'],
             req: null
         },
@@ -60,7 +60,7 @@ const GymMembershipView = () => {
             id: 'TITANIUM' as MembershipTier,
             title: t('life.titanium'),
             price: `$${prices.TITANIUM.annual.toLocaleString()}/yr`,
-            color: '#C734CA',
+            color: '#FF8A8A',
             features: ['Grandmaster Trainers', '2x Workout Gains', 'Private Spa Access', 'Networking Events'],
             req: 'Requires Godlike Body'
         }
@@ -134,7 +134,7 @@ const GymMembershipView = () => {
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -142,10 +142,10 @@ const styles = StyleSheet.create({
     card: {
         width: '90%',
         maxHeight: '80%',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 24,
         padding: 24,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.25,
         shadowRadius: 20,
@@ -160,21 +160,21 @@ const styles = StyleSheet.create({
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#C734CA', fontWeight: '700' },
+    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: { fontSize: 24, fontWeight: '900', color: '#FFFFFF' },
-    subtitle: { fontSize: 14, color: '#C734CA', marginTop: 4 },
+    subtitle: { fontSize: 14, color: '#FF8A8A', marginTop: 4 },
     list: { gap: 20 },
     membershipCard: {
         borderRadius: 16,
         borderWidth: 1,
         overflow: 'hidden',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     cardHeader: {
         paddingVertical: 12,
@@ -196,24 +196,24 @@ const styles = StyleSheet.create({
     cardContent: { padding: 12, gap: 8 },
     price: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
     features: { gap: 4 },
-    featureItem: { fontSize: 14, color: '#C734CA', fontWeight: '500' },
+    featureItem: { fontSize: 14, color: '#FF8A8A', fontWeight: '500' },
     actionBtn: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center',
         marginTop: 8,
     },
-    disabledBtn: { backgroundColor: '#422B71' },
+    disabledBtn: { backgroundColor: '#434B50' },
     actionBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
     lockedContainer: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 10,
         borderRadius: 8,
         alignItems: 'center',
         marginTop: 8,
     },
-    lockedText: { color: '#C734CA', fontWeight: '700', fontSize: 12 },
+    lockedText: { color: '#FF8A8A', fontWeight: '700', fontSize: 12 },
 });
 
 export default GymMembershipView;

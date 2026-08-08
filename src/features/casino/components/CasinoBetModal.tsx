@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
     },
     betValue: {
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
         fontSize: 42,
         fontWeight: '900',
         fontVariant: ['tabular-nums'],

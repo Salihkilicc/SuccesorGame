@@ -67,7 +67,7 @@ const StepperBar: React.FC<Props> = ({
     markers = [],
     steps = [1, 10, 100],
     percents = [25, 50, 75, 100],
-    fillColor = '#C8C0EF',
+    fillColor = '#CFD0D2',
     disabled = false,
 }) => {
     const safeMax = Math.max(1, max);
@@ -101,7 +101,7 @@ const StepperBar: React.FC<Props> = ({
                 <View
                     style={[
                         styles.fill,
-                        { width: `${fillPct}%`, backgroundColor: overSoft ? '#C734CA' : fillColor },
+                        { width: `${fillPct}%`, backgroundColor: overSoft ? '#FF8A8A' : fillColor },
                     ]}
                 />
                 {markers.map((m, i) => (
@@ -111,7 +111,7 @@ const StepperBar: React.FC<Props> = ({
                             styles.marker,
                             {
                                 left: `${Math.min(100, (m.value / safeMax) * 100)}%`,
-                                backgroundColor: m.color || '#C734CA',
+                                backgroundColor: m.color || '#FF8A8A',
                             },
                         ]}
                     />
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     pctChipActive: { backgroundColor: 'rgba(200,192,239,0.22)' },
     pctChipAccent: { backgroundColor: 'rgba(200,192,239,0.16)' },
     pctText: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, fontWeight: '700' },
-    pctTextActive: { color: '#C8C0EF' },
-    pctTextAccent: { color: '#C8C0EF' },
+    pctTextActive: { color: '#FFFFFF' },
+    pctTextAccent: { color: '#FFFFFF' },
 });
 
 export default StepperBar;

@@ -103,12 +103,12 @@ export default GymSupplementModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         justifyContent: 'center',
         padding: 20
     },
     container: {
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
         borderRadius: 16,
         padding: 24,
         borderWidth: 1,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     },
     warningContainer: {
         borderColor: 'rgba(255,255,255,0.08)',
-        backgroundColor: '#422B71'
+        backgroundColor: '#434B50'
     },
     title: {
         fontSize: 24,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         textAlign: 'center',
-        color: '#C734CA',
+        color: '#FF8A8A',
         marginBottom: 30
     },
     grid: {
@@ -136,31 +136,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 8
     },
     itemText: { color: '#FFFFFF', fontWeight: '700' },
-    itemPrice: { color: '#C734CA' },
+    itemPrice: { color: '#FF8A8A' },
     dangerItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
         borderRadius: 8,
         marginTop: 20
     },
-    dangerText: { color: '#C734CA', fontWeight: '900' },
-    dangerPrice: { color: '#C734CA', fontWeight: '700' },
+    dangerText: { color: '#FF8A8A', fontWeight: '900' },
+    dangerPrice: { color: '#FF8A8A', fontWeight: '700' },
     closeBtn: { marginTop: 20, alignItems: 'center', padding: 10 },
-    closeText: { color: '#C734CA', textDecorationLine: 'underline' },
+    closeText: { color: '#FF8A8A', textDecorationLine: 'underline' },
     warningBox: { alignItems: 'center' },
-    warningTitle: { color: '#C734CA', fontSize: 22, fontWeight: '900', marginBottom: 20 },
-    warningBody: { color: '#C734CA', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
+    warningTitle: { color: '#FF8A8A', fontSize: 22, fontWeight: '900', marginBottom: 20 },
+    warningBody: { color: '#FF8A8A', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
     warningActions: { flexDirection: 'row', gap: 20 },
     cancelBtn: { padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 8 },
-    cancelText: { color: '#C734CA' },
-    injectBtn: { padding: 12, backgroundColor: '#422B71', borderRadius: 8 },
+    cancelText: { color: '#FF8A8A' },
+    injectBtn: { padding: 12, backgroundColor: '#434B50', borderRadius: 8 },
     injectText: { color: '#FFFFFF', fontWeight: '900' }
 });

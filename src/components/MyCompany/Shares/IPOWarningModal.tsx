@@ -81,7 +81,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
                                 styles.btnConfirm,
                                 pressed && styles.btnPressed,
                             ]}>
-                            <Text style={[styles.btnText, { color: '#FFFFFF' }]}>{t('equity.goPublic')}</Text>
+                            <Text style={[styles.btnText, { color: theme.colors.onLight }]}>{t('equity.goPublic')}</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -93,7 +93,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
         zIndex: 9999,
@@ -114,23 +114,24 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     warningBox: {
-        backgroundColor: theme.colors.danger + '20',
+        backgroundColor: theme.colors.destructive + '20',
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: theme.colors.danger,
+        borderColor: theme.colors.destructive,
         gap: theme.spacing.xs,
     },
     warningText: {
         fontSize: 14,
-        // Sits on the magenta warning fill: white measures 4.40 there.
-        color: theme.colors.onLight,
+        // The box is `danger + '20'`, i.e. 12.5% alpha - it resolves to #3C225F
+        // over the surface, a DARK tint rather than a magenta fill. So the text
+        // stays light here; dark text measured 1.50 against it.
+        color: theme.colors.textPrimary,
         marginBottom: theme.spacing.xs,
     },
     warningBullet: {
         fontSize: 13,
-        // Sits on the magenta warning fill: lavender measures 2.57 there.
-        color: theme.colors.onLight,
+        color: theme.colors.textSecondary,
         marginLeft: theme.spacing.sm,
     },
     projectionBox: {
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     btnConfirm: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
     },
     btnPressed: {
         transform: [{ scale: 0.98 }],
@@ -186,8 +187,10 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 15,
         fontWeight: '700',
-        // Sits on a cyan fill: white would measure 2.34 here.
-        color: theme.colors.onLight,
+        // Shared by BOTH buttons, and they have opposite grounds: Cancel is a
+        // dark cardSoft, Confirm is a light cyan. The shared default has to
+        // suit the dark one; Confirm overrides it at the call site.
+        color: theme.colors.textPrimary,
     },
 });
 

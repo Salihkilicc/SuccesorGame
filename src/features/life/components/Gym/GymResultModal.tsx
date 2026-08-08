@@ -68,7 +68,7 @@ export default GymResultModal;
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 320,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: theme.radius.lg,
         padding: 24,
         alignItems: 'center',
@@ -102,15 +102,15 @@ const styles = StyleSheet.create({
         paddingBottom: 8
     },
     statLabel: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 16
     },
     statValue: {
         fontSize: 16,
         fontWeight: '700'
     },
-    green: { color: '#C734CA' },
-    red: { color: '#C734CA' },
+    green: { color: '#FF8A8A' },
+    red: { color: '#FF8A8A' },
     message: {
         color: '#FFFFFF',
         textAlign: 'center',
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         opacity: 0.8
     },
     button: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingVertical: 12,
         paddingHorizontal: 32,
         borderRadius: 8

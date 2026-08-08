@@ -474,7 +474,7 @@ const getMajorIcon = (majorId: MajorType) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626', // Navy Blue
+        backgroundColor: '#1C242C', // Navy Blue
     },
     safeArea: {
         flex: 1,
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.06)',
     },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -513,12 +513,12 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 12,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         marginTop: 2,
     },
     // Tabs
     tabContainer: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.08)',
@@ -540,12 +540,12 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     tabText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
     },
     activeTabText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: 'bold',
     },
     // Status Section
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     warningText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -571,12 +571,12 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     majorCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(199,52,202,0.3)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     },
     masterSubtitle: {
         fontSize: 13,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontStyle: 'italic',
     },
     cardDetails: {
@@ -627,13 +627,13 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: 12,
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         marginBottom: 2,
     },
     detailValue: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     badgeContainer: {
         flexDirection: 'row',
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(199,52,202,0.3)',
     },
     statBadgeText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -669,13 +669,13 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(199,52,202,0.3)',
     },
     prerequisiteText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 12,
         fontWeight: '600',
         textAlign: 'center',
     },
     enrollButton: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 12,
         paddingVertical: 14,
         alignItems: 'center',
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
     enrollButtonDisabled: {
-        backgroundColor: '#5C3790',
+        backgroundColor: '#535B5F',
         shadowOpacity: 0,
     },
     enrollButtonText: {

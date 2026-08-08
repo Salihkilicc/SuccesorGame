@@ -351,7 +351,7 @@ export default RAndDModalRevised;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(2,6,38,0.8)',
+    backgroundColor: 'rgba(28,36,44,0.8)',
     justifyContent: 'center',
     padding: theme.spacing.md,
     paddingBottom: 80, // Make room for bottom bar if card is long
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   levelText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.colors.onLight,
   },
   stepsContainer: {
     flexDirection: 'row',
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.border,
   },
   stepDotActive: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: theme.colors.accent,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -483,11 +483,14 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   upgradeBtnDisabled: {
-    backgroundColor: theme.colors.border,
-    opacity: 0.5,
+    // Grey rather than a dark tone, so the label stays black in BOTH states.
+    // The enabled fill is the bright blue and takes black text; if disabled
+    // went dark, the same label would have to be white and could not be.
+    backgroundColor: theme.colors.disabled,
+    opacity: 0.6,
   },
   upgradeBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onLight,
     fontWeight: '700',
     fontSize: 14,
   },
@@ -508,13 +511,13 @@ const styles = StyleSheet.create({
   maxLevelContainer: {
     alignItems: 'center',
     padding: theme.spacing.sm,
-    backgroundColor: theme.colors.success + '20',
+    backgroundColor: theme.colors.accent + '20',
     borderRadius: theme.radius.sm,
   },
   maxLevelText: {
-    // The container is filled with this same colour, so the label was drawing
-    // itself invisible at 1.00 contrast.
-    color: theme.colors.onLight,
+    // The badge is `success + '20'` - a 12.5% TINT, not a cyan fill. It
+    // resolves to #23335D over the card, and cyan on that measures 5.28.
+    color: theme.colors.success,
     fontWeight: '700',
     fontSize: 12,
     letterSpacing: 1,

@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     sectionHeader: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         marginBottom: 8,
         marginTop: 12,
         letterSpacing: 1,
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     optionButton: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 8,
         padding: 12,
         borderWidth: 1,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     },
     optionButtonSelected: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#422B71', // subtle gold tint
+        backgroundColor: '#434B50', // subtle gold tint
     },
     optionText: {
         color: '#FFFFFF',
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     optionTextSelected: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
     },
     optionSubText: {
         color: '#FFFFFF',
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     feeText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 12,
         marginTop: 4,
         fontStyle: 'italic',

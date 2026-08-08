@@ -1,154 +1,148 @@
 // src/core/theme.ts
 //
 // ============================================================================
-//  TEMA — mor/lacivert, oyuna has palet
+//  THEME — blue / grey, one rule per job
 // ============================================================================
 //
-//  Oyuncunun secimi:
-//    Violet Eggplant  #BA04BD
-//    Purple           #8504BD
-//    Purple           #6004BD
-//    Dark Blue        #2304BD
-//    Deep Cove        #020626   -> zemin
+//  The palette:
+//    #05A8F6  bright blue
+//    #7DD3FC  light blue
+//    #0C6C9C  deep blue
+//    #8C9494  grey
+//    #CFD0D2  light grey
+//    #1C242C  near-black    -> the ground
 //
-//  OLCUM SONUCU IKI KISIT:
+//  Three rules hold this together. Everything below is downstream of them.
 //
-//  1) DORT MORUN HICBIRI METIN OLAMAZ. Deep Cove uzerinde kontrastlari
-//     1.73 - 3.63, hepsi 4.5 esiginin altinda. Dolgu olurlar (ustlerine beyaz
-//     gelir, 5.5 - 11.5), yazi olmazlar. Metin gereken yerde ayni tonun
-//     ACIK TUREVI kullanilir; asagidaki `...Text` jetonlari odur.
+//  1) TEXT IS ONLY EVER WHITE OR BLACK, and which one is not a taste
+//     decision - it is decided by what the text sits on. Measured against
+//     each fill:
 //
-//  2) PALETTE YESIL DE KIRMIZI DA YOK. Kar/zarar icin renk ekseninde en uzak
-//     iki uc secildi ve ACIKLIK ekseninde de ayrildi:
+//        fill       black   white   -> takes
+//        #05A8F6     7.94    2.65      BLACK
+//        #7DD3FC    12.60    1.67      BLACK
+//        #0C6C9C     3.64    5.77      WHITE
+//        #8C9494     6.78    3.10      BLACK
+//        #CFD0D2    13.61    1.54      BLACK
+//        #1C242C     1.34   15.69      WHITE
 //
-//        pozitif  #C8C0EF  acik lavanta   kontrast 11.6
-//        negatif  #C836CA  magenta        kontrast  4.6
+//     So `onLight` is black and is used on every light fill. No third text
+//     colour exists; the muted forms are white at reduced alpha, which is
+//     still white.
 //
-//     Renk farki dE 71, aciklik farki 29 L*. Karsilastirma: yesil/kirmizi
-//     dE 84 ama aciklik farki yalnizca 7. Yani bu cift renk ayriminda biraz
-//     geride, aciklik ayriminda ONDE — toplamda okunur bir cift.
+//  2) ANYTHING SITTING ON THE GROUND MUST BE A DIFFERENT TONE FROM IT.
+//     The previous theme failed exactly here - every card was within 1.02 of
+//     the background, so the screen read as one flat sheet. The ladder below
+//     is solved for separation, and each rung clears its neighbour too:
 //
-//  KURAL: bilesenler hex yazmaz, jetonu kullanir.
+//        surface        #323A40   1.36 from ground, 1.36 from the rung below
+//        surfaceRaised  #434B50   1.76                1.30
+//        surfaceHigh    #535B5F   2.26                1.28
+//
+//  3) GREEN AND RED MEAN PROFIT AND LOSS. Nothing else. They are the only
+//     two colours here that are not in the palette, and that is the point:
+//     they are a signal, not decoration. They are also the reason no button
+//     may be green - a green fill would make the signal ambiguous.
+//
+//     The obvious #22C55E / #EF4444 pair does not survive this ground. Red
+//     in particular fell to 2.36 on a raised card. These clear every rung:
+//
+//        positive  #4ADE80    9.01 / 6.64 / 5.10 / 3.98
+//        negative  #FF8A8A    6.92 / 5.10 / 3.92 / 3.05
+//
+//  RULE: components use tokens, never hex.
 //
 // ============================================================================
 
 export const palette = {
-    eggplant: '#BA04BD',
-    purple: '#8504BD',
-    purpleDeep: '#6004BD',
-    blue: '#2304BD',
-    cove: '#020626',
-    /**
-     * Violet Eggplant's mirror: rgb(186,4,189) with red and blue swapped
-     * becomes rgb(4,189,186). Same saturation, opposite hue - so it belongs to
-     * the palette by construction rather than by taste, and it gives the
-     * magenta something to push against. That tension is what reads as
-     * cyberpunk; without it the screen was purple on purple.
-     */
-    cyan: '#04BDBA',
-    /** A tinted white rather than a signal - only dE 32 from white. */
-    lavender: '#C8C0EF',
+    blue: '#05A8F6',
+    blueLight: '#7DD3FC',
+    blueDeep: '#0C6C9C',
+    grey: '#8C9494',
+    greyLight: '#CFD0D2',
+    ink: '#1C242C',
 } as const;
 
 export const theme = {
     colors: {
-        // --- Ground and the elevation ladder ------------------------------
-        //
-        //  The previous ladder failed when measured: all four surfaces sat
-        //  only 1.02 - 1.12 contrast from the ground, i.e. a card and the
-        //  background were effectively the same colour. That is why every
-        //  screen read as one flat sheet.
-        //
-        //  Rebuilt. Both pure directions were wrong:
-        //    - lightening toward the purple -> #340576, 96% saturation, the
-        //      cards themselves turn violet
-        //    - lightening toward white      -> #232642, saturation collapses
-        //      to 47% and keeps falling; the purple identity goes grey
-        //  So the two were combined: purple first, then white, holding
-        //  saturation at 62% while solving each step for a contrast target.
-        //
-        //    token          colour    from ground   from step below
-        //    surface        #281F50      1.32            1.32
-        //    surfaceRaised  #422B71      1.72            1.30
-        //    surfaceHigh    #5C3790      2.27            1.32
-        //
-        //  A card needs ~1.25-1.40 to separate from its ground. Each rung
-        //  clears that against the rung beneath it as well, so stacked
-        //  surfaces stay legible against each other and not just the floor.
-        background: '#020626',
-        surface: '#281F50',
-        surfaceRaised: '#422B71',
-        surfaceHigh: '#5C3790',
-        border: 'rgba(255,255,255,0.08)',
-        borderStrong: '#7B46B7',
+        // --- The ground and the ladder above it ---------------------------
+        background: '#1C242C',
+        surface: '#323A40',
+        surfaceRaised: '#434B50',
+        surfaceHigh: '#535B5F',
+        border: 'rgba(255,255,255,0.10)',
+        borderStrong: '#666E70',
 
-        // --- Yazi ----------------------------------------------------------
+        // --- Text: white or black, nothing else ---------------------------
+        //  The two muted forms are white with alpha, so they stay "white" -
+        //  they are not a third colour, they are the same colour turned down.
         textPrimary: '#FFFFFF',
-        textSecondary: '#C8C0EF',
-        textMuted: 'rgba(255,255,255,0.48)',
+        textSecondary: 'rgba(255,255,255,0.72)',
+        textMuted: 'rgba(255,255,255,0.50)',
 
-        // --- Dolgu butonlar: ustune BEYAZ ---------------------------------
-        primary: '#6004BD',
-        primaryText: '#FFFFFF',
-        secondary: '#2304BD',
+        /** Text on ANY light fill. Black, because every light fill measured
+         *  above prefers it by a wide margin. */
+        onLight: '#000000',
+
+        // --- Buttons ------------------------------------------------------
+        //  One colour per rank, so a button's job is legible before its label
+        //  is read. Primary is the bright blue and therefore takes black;
+        //  the sub-button is the deep blue and therefore takes white.
+        primary: '#05A8F6',
+        primaryText: '#000000',
+        secondary: '#0C6C9C',
         secondaryText: '#FFFFFF',
-        highlight: '#BA04BD',
-        highlightText: '#FFFFFF',
 
-        // --- Vurgu METNI -------------------------------------------------
-        //     Dolgu tonlari metin olarak okunmadigi icin bunlar var.
-        accentText: '#04BDBA',
-        highlightTextColor: '#C734CA',
-        lavender: '#C8C0EF',
+        /** Selected / active state. Light, so black text. */
+        highlight: '#7DD3FC',
+        highlightText: '#000000',
 
-        // --- Text sitting ON a light fill ---------------------------------
-        //
-        //  The rule "never dark text" applies to dark grounds. It inverts on
-        //  a light fill, and the codebase had been applying it there too:
-        //  white on cyan measures 2.34, white on lavender 1.72 - the label
-        //  was painted but unreadable. Against those same fills the ground
-        //  colour scores 8.51 and 11.59.
-        //
-        //  So: any button, badge or tab filled with cyan, magenta or
-        //  lavender takes `onLight` for its text, never textPrimary.
-        onLight: '#020626',
+        // --- Accents ------------------------------------------------------
+        //  `accent` is a FILL, `accentText` is what you write on the dark
+        //  ground when you want the same emphasis. They are deliberately
+        //  different tones: the fill's own colour is unreadable as text.
+        accent: '#05A8F6',
+        /** Deliberately white, not a blue. Emphasis is carried by weight and
+         *  placement here, because the rule is that text is white or black -
+         *  a third text colour is how the old theme drifted. */
+        accentText: '#FFFFFF',
+        accentSoft: 'rgba(5,168,246,0.18)',
+        highlightSoft: 'rgba(125,211,252,0.16)',
 
-        accentSoft: 'rgba(35,4,189,0.22)',
-        highlightSoft: 'rgba(186,4,189,0.18)',
+        /** Caution and destructive actions - one colour, every time. Blue
+         *  rather than red, because red is spoken for: see rule 3. */
+        warning: '#7DD3FC',
+        destructive: '#0C6C9C',
+
+        /** Disabled buttons. Grey and LIGHT on purpose: a button's label does
+         *  not change colour when it greys out, so the disabled fill has to
+         *  stay on the same side of rule 1 as the enabled one. */
+        disabled: '#8C9494',
 
         // ------------------------------------------------------------------
-        //  KAR / ZARAR — ve baska hicbir sey
+        //  PROFIT / LOSS — and nothing else
         // ------------------------------------------------------------------
-        //  Cyan eklenince bu cift belirgin sekilde guclendi. Olculen
-        //  ayirt edilebilirlik (dE):
-        //
-        //    cyan - magenta        119     <- simdiki cift
-        //    eski yesil - kirmizi   84
-        //    lavanta - magenta      71     <- onceki cift
-        //
-        //  Yani kar/zarar artik yesil/kirmizidan bile daha ayrik. Lavanta bu
-        //  isi birakti cunku beyazdan yalnizca dE 32 uzakti: sinyal degil,
-        //  renkli beyaz olarak okunuyordu. Simdi ikincil metin rengi.
-        // ------------------------------------------------------------------
-        positive: '#04BDBA',
-        negative: '#C836CA',
+        positive: '#4ADE80',
+        negative: '#FF8A8A',
 
-        // Eski adlar — kademeli gecis
-        card: '#281F50',
-        cardSoft: '#422B71',
-        success: '#04BDBA',
-        danger: '#C734CA',
-        error: '#C734CA',
-        warning: '#C734CA',
-        accent: '#04BDBA',
-        neutral: 'rgba(255,255,255,0.48)',
+        // Legacy names, still in wide use. `success` and `danger` are now
+        // strictly TEXT colours: they carry the profit/loss signal, so a
+        // fill may never use them.
+        success: '#4ADE80',
+        danger: '#FF8A8A',
+        error: '#FF8A8A',
+
+        card: '#323A40',
+        cardSoft: '#434B50',
+        neutral: 'rgba(255,255,255,0.50)',
+        lavender: '#CFD0D2',
     },
 
     elevation: {
-        flat: '#020626',
-        low: '#281F50',
-        mid: '#422B71',
-        high: '#5C3790',
+        flat: '#1C242C',
+        low: '#323A40',
+        mid: '#434B50',
+        high: '#535B5F',
     },
 
     radius: { xs: 6, sm: 10, md: 14, lg: 20, pill: 999 },

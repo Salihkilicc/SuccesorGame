@@ -84,7 +84,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         return {
             color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
             fontSize: 26,
-            textShadowColor: 'rgba(2,6,38,0.5)',
+            textShadowColor: 'rgba(28,36,44,0.5)',
             textShadowOffset: { width: 0, height: 2 },
             textShadowRadius: 3,
         };
@@ -117,7 +117,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                     style={styles.statsOverlay}
                     onPress={() => setIsStatsMode(false)}
                 >
-                    <View style={{ flex: 1, backgroundColor: 'rgba(2,6,38,0.5)' }} />
+                    <View style={{ flex: 1, backgroundColor: 'rgba(28,36,44,0.5)' }} />
                 </Pressable>
             )}
 
@@ -183,7 +183,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                                 </Pressable>
 
                                 <Pressable style={styles.bottomTab} onPress={() => setIsStatsMode(false)}>
-                                    <MaterialCommunityIcons name="diamond-stone" style={[styles.statsIcon, { color: theme.colors.accent }]} />
+                                    <MaterialCommunityIcons name="diamond-stone" style={[styles.statsIcon, { color: theme.colors.textPrimary }]} />
                                     <Text style={styles.statsLabel}>{playerAttributes.charm}%</Text>
                                 </Pressable>
                             </>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         borderRadius: 3,
         marginHorizontal: 4,
         // Added subtle shadow for dots
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.3,
         shadowRadius: 1,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     blurContainer: {
         borderRadius: 20,
         overflow: 'hidden',
-        shadowColor: "#C8C0EF",
+        shadowColor: "#CFD0D2",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.6,
         shadowRadius: 20,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     statsIcon: {
         fontSize: 24,
         color: '#FFFFFF',
-        textShadowColor: 'rgba(2,6,38,0.3)',
+        textShadowColor: 'rgba(28,36,44,0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
     },

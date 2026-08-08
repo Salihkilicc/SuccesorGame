@@ -25,14 +25,14 @@ const RouletteGameScreen = () => {
   // Render Helpers
   const renderBetButton = (type: BetType, label: string) => {
     const active = selectedBet === type;
-    const color = active ? currentLocation.theme.primary : '#5C3790';
+    const color = active ? currentLocation.theme.primary : '#535B5F';
 
     return (
       <Pressable
         onPress={() => actions.selectBet(type)}
         style={({ pressed }) => [
           styles.betButton,
-          { borderColor: active ? currentLocation.theme.primary : '#7B46B7', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
+          { borderColor: active ? currentLocation.theme.primary : '#666E70', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
           pressed && styles.betButtonPressed,
         ]}>
         <Text style={[styles.betButtonText, active && { color: currentLocation.theme.primary }]}>{label}</Text>
@@ -125,7 +125,7 @@ const RouletteGameScreen = () => {
 export default RouletteGameScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#020626' },
+  container: { flex: 1, backgroundColor: '#1C242C' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', gap: 4 },
 
   tableCard: {
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
   spinText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
 
   resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  resultRed: { backgroundColor: '#422B71' },
-  resultBlack: { backgroundColor: '#422B71' },
-  resultGreen: { backgroundColor: '#C8C0EF' },
-  resultText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
+  resultRed: { backgroundColor: '#434B50' },
+  resultBlack: { backgroundColor: '#434B50' },
+  resultGreen: { backgroundColor: '#CFD0D2' },
+  resultText: { color: theme.colors.onLight, fontSize: 10, fontWeight: '700' },
 });

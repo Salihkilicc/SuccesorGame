@@ -3,6 +3,7 @@
 import React from 'react';
 import { t, useLocale } from '../../core/i18n';
 import {View, Text, StyleSheet} from 'react-native';
+import { theme } from '../../core/theme';
 
 type Props = {
   hasPremium: boolean;
@@ -29,10 +30,10 @@ const styles = StyleSheet.create({
   fallbackContainer: {
     padding: 12,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
   },
   fallbackText: {
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
     fontSize: 13,
     fontWeight: '600',
   },

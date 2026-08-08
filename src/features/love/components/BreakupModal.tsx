@@ -64,7 +64,7 @@ export default BreakupModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -72,12 +72,12 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: 340,
-        backgroundColor: '#020626', // Very dark red/black
+        backgroundColor: '#1C242C', // Very dark red/black
         borderRadius: 24,
         padding: 32,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: theme.colors.danger,
+        borderColor: theme.colors.destructive,
         shadowColor: theme.colors.danger,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.4,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '100%',
-        backgroundColor: theme.colors.danger,
+        backgroundColor: theme.colors.destructive,
         paddingVertical: 16,
         borderRadius: 12,
         alignItems: 'center',

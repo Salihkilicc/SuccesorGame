@@ -449,7 +449,7 @@ const LoveScreen = () => {
               You have ended your relationship with {partner.name}.
             </Text>
             {settlement > 0 && (
-              <View style={{ backgroundColor: theme.colors.danger, padding: 10, borderRadius: 8, marginTop: 10 }}>
+              <View style={{ backgroundColor: theme.colors.destructive, padding: 10, borderRadius: 8, marginTop: 10 }}>
                 <Text style={{ color: 'white', fontWeight: 'bold' }}>
                   SETTLEMENT PAID: -${settlement.toLocaleString()}
                 </Text>
@@ -487,7 +487,7 @@ const LoveScreen = () => {
             )}
           </Text>
           <Pressable
-            style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
+            style={[styles.actionButton, { backgroundColor: theme.colors.destructive }]}
             onPress={() => setSubmenu('breakup_result')}
           >
             <Text style={[styles.actionButtonText, { color: 'white' }]}>{t('love.yesItSOver')}</Text>
@@ -529,21 +529,21 @@ const LoveScreen = () => {
     const alreadyMadeLove = !!partnerNPC?.madeLoveThisQuarter;
 
     const getSatisfactionColor = (v: number) => {
-      if (v <= 30) return '#C734CA';
-      if (v <= 60) return '#C734CA';
-      return '#6004BD';
+      if (v <= 30) return '#FF8A8A';
+      if (v <= 60) return '#FF8A8A';
+      return '#05A8F6';
     };
 
     return (
       <View style={styles.grid}>
         {[
-          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#C734CA' },
-          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#C8C0EF' },
-          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#C734CA' },
-          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#C8C0EF' },
-          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#C8C0EF' },
-          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#C8C0EF' },
-          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#C734CA' },
+          { label: t('love.gift'), desc: t('love.showYourLove'), emoji: '🎁', action: 'Gift', color: '#FF8A8A' },
+          { label: t('love.compliment'), desc: t('love.liftHerSpirits'), emoji: '💬', action: 'Compliment', color: '#FFFFFF' },
+          { label: t('love.breakUp'), desc: t('love.endThingsHere'), emoji: '💔', action: 'Break Up', danger: true, color: '#FF8A8A' },
+          { label: t('love.elope'), desc: t('love.secretWedding'), emoji: '🏃', action: 'Elope', color: '#FFFFFF' },
+          { label: t('love.birthControl'), desc: t('love.planAhead'), emoji: '💊', action: 'Birth Control', color: '#FFFFFF' },
+          { label: t('love.counseling'), desc: t('love.saveTheBond'), emoji: '🗣️', action: 'Counseling', color: '#FFFFFF' },
+          { label: t('love.insult'), desc: t('love.riskyMove'), emoji: '🤬', action: 'Insult', danger: true, color: '#FF8A8A' },
         ].map((btn) => (
           <Pressable
             key={btn.action}
@@ -556,7 +556,7 @@ const LoveScreen = () => {
             <View style={[styles.gridTileIcon, { backgroundColor: btn.color + '22', borderColor: btn.color + '55' }]}>
               <Text style={styles.gridTileEmoji}>{btn.emoji}</Text>
             </View>
-            <Text style={[styles.gridTileLabel, btn.danger && { color: '#C734CA' }]}>{btn.label}</Text>
+            <Text style={[styles.gridTileLabel, btn.danger && { color: '#FF8A8A' }]}>{btn.label}</Text>
             <Text style={styles.gridTileDesc}>{btn.desc}</Text>
           </Pressable>
         ))}
@@ -572,10 +572,10 @@ const LoveScreen = () => {
           onPress={handleMakeLove}
           disabled={alreadyMadeLove}
         >
-          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#C734CA' + '22' : '#C734CA' + '22', borderColor: alreadyMadeLove ? '#C734CA' + '55' : '#C734CA' + '55' }]}>
+          <View style={[styles.gridTileIcon, { backgroundColor: alreadyMadeLove ? '#FF8A8A' + '22' : '#FF8A8A' + '22', borderColor: alreadyMadeLove ? '#FF8A8A' + '55' : '#FF8A8A' + '55' }]}>
             <Text style={styles.gridTileEmoji}>💗</Text>
           </View>
-          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#C734CA' }]}>{t('love.makeLove')}</Text>
+          <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: '#FF8A8A' }]}>{t('love.makeLove')}</Text>
           <Text style={styles.gridTileDesc}>
             {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
           </Text>
@@ -645,10 +645,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#C734CA' },
-          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#C8C0EF' },
-          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#C8C0EF' },
-          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#C734CA' },
+          { label: t('love.spendTimeTogether'), desc: t('love.qualityTimeBoostsBond'), emoji: '☕', action: 'Spend Time', color: '#FF8A8A' },
+          { label: t('love.compliment'), desc: t('love.positiveWordsGoFar'), emoji: '💬', action: 'Compliment', color: '#FFFFFF' },
+          { label: t('love.sendAGift'), desc: t('love.moneyTalks'), emoji: '🎁', action: 'Gift', color: '#FFFFFF' },
+          { label: t('love.insult'), desc: t('love.thisWillHurt'), emoji: '🤬', action: 'Insult', danger: true, color: '#FF8A8A' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -662,10 +662,10 @@ const LoveScreen = () => {
               <Text style={{ fontSize: 20 }}>{btn.emoji}</Text>
             </View>
             <View style={styles.actionRowText}>
-              <Text style={[styles.actionRowLabel, btn.danger && { color: '#C734CA' }]}>{btn.label}</Text>
+              <Text style={[styles.actionRowLabel, btn.danger && { color: '#FF8A8A' }]}>{btn.label}</Text>
               <Text style={styles.actionRowDesc}>{btn.desc}</Text>
             </View>
-            <Text style={[styles.actionRowChevron, btn.danger && { color: '#C734CA' }]}>›</Text>
+            <Text style={[styles.actionRowChevron, btn.danger && { color: '#FF8A8A' }]}>›</Text>
           </Pressable>
         ))}
       </View>
@@ -693,10 +693,10 @@ const LoveScreen = () => {
     return (
       <View style={styles.actionList}>
         {[
-          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#C8C0EF' },
-          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#C8C0EF' },
-          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#C8C0EF' },
-          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#C734CA' },
+          { label: t('love.textHer'), desc: t('love.sendAMessage'), emoji: '📱', action: 'Text Her', color: '#FFFFFF' },
+          { label: t('love.goOnVacation'), desc: t('love.comingSoon'), emoji: '✈️', action: 'Go Vacation', color: '#FFFFFF' },
+          { label: t('love.stalkHer'), desc: t('love.checkHerSocials'), emoji: '👁️', action: 'Stalk Her', color: '#FFFFFF' },
+          { label: t('love.startDatingAgain'), desc: t('love.rekindleTheFlame'), emoji: '🔥', action: 'Start Dating Again', color: '#FF8A8A' },
         ].map(btn => (
           <Pressable
             key={btn.action}
@@ -726,10 +726,10 @@ const LoveScreen = () => {
   const totalFamilyCount = family.length + npcFamily.length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#020626' }}>
+    <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#020626', '#020626', '#020626']}
+        colors={['#1C242C', '#1C242C', '#1C242C']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -744,7 +744,7 @@ const LoveScreen = () => {
               pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
             ]}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#C734CA" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
           </Pressable>
 
           <View style={styles.headerCenter}>
@@ -929,10 +929,10 @@ const styles = StyleSheet.create({
   headerAccent: {
     width: 32,
     height: 2,
-    backgroundColor: '#422B71',
+    backgroundColor: '#434B50',
     marginTop: 6,
     borderRadius: 2,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   priceText: {
-    color: theme.colors.accent,
+    color: theme.colors.textPrimary,
     fontWeight: '700',
   },
   modalSubtitle: {
@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
   },
   feedbackBannerText: {
     flex: 1,
-    color: '#C734CA',
+    color: '#FF8A8A',
     fontSize: 13,
     fontWeight: '600',
     lineHeight: 18,

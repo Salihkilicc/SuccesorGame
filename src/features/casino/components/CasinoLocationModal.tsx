@@ -54,7 +54,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                         pressed && isUnlocked && { transform: [{ scale: 0.98 }] }
                                     ]}
                                 >
-                                    <View style={[styles.icon, { backgroundColor: isLocked ? '#5C3790' : loc.theme.primary }]}>
+                                    <View style={[styles.icon, { backgroundColor: isLocked ? '#535B5F' : loc.theme.primary }]}>
                                         <Text style={{ fontSize: 20 }}>{isLocked ? '🔒' : '🏛️'}</Text>
                                     </View>
 
@@ -62,7 +62,7 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                                         <Text style={[styles.locName, isLocked && { color: '#FFFFFF' }]}>
                                             {loc.name.toUpperCase()}
                                         </Text>
-                                        <Text style={[styles.locSub, { color: isUnlocked ? loc.theme.secondary : '#7B46B7' }]}>
+                                        <Text style={[styles.locSub, { color: isUnlocked ? loc.theme.secondary : '#666E70' }]}>
                                             {isLocked
                                                 ? `Req: ${loc.requirement} Rep`
                                                 : `Max Bet: $${loc.maxBet.toLocaleString()}`
@@ -90,12 +90,12 @@ export default CasinoLocationModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.8)',
+        backgroundColor: 'rgba(28,36,44,0.8)',
         justifyContent: 'center',
         padding: 20
     },
     modalContent: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#020626'
+        borderBottomColor: '#1C242C'
     },
     title: {
         color: '#FFFFFF',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 16,
         borderRadius: 16,
         gap: 16,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.06)'
     },
     badgeText: {
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '800'
     }

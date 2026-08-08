@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, DegreeType, MASTERS_DATA, MastersType } from '../data/educationData';
 import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
+import { theme } from '../../../../../core/theme';
 
 // ========================================
 // TYPES
@@ -106,7 +107,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
     },
     safeArea: {
         flex: 1,
@@ -117,21 +118,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderBottomWidth: 2,
         borderBottomColor: 'rgba(255,255,255,0.08)',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -140,11 +141,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
     },
     subtitle: {
         fontSize: 12,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginTop: 2,
     },
     scrollContent: {
@@ -152,14 +153,14 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     multiplierCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 24,
         marginBottom: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
         alignItems: 'center',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -167,14 +168,14 @@ const styles = StyleSheet.create({
     },
     multiplierLabel: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 8,
         fontWeight: '600',
     },
     multiplierValue: {
         fontSize: 48,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
         marginBottom: 8,
     },
     multiplierHint: {
@@ -188,13 +189,13 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
         marginBottom: 16,
     },
     emptyState: {
         alignItems: 'center',
         padding: 40,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -217,13 +218,13 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     degreeCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 20,
         marginBottom: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -238,16 +239,16 @@ const styles = StyleSheet.create({
     degreeMajor: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
     },
     degreeType: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
     },
     degreeBonus: {
         fontSize: 14,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '700',
     },
 });

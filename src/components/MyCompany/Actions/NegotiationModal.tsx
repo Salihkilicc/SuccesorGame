@@ -184,7 +184,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                         <TextInput
                             style={styles.input}
                             placeholder="e.g. 52.5"
-                            placeholderTextColor="#7B46B7"
+                            placeholderTextColor="#666E70"
                             keyboardType="numeric"
                             value={offerAmount}
                             onChangeText={setOfferAmount}

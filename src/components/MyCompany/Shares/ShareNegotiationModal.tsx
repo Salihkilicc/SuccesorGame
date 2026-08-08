@@ -150,7 +150,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.95)',
+        backgroundColor: 'rgba(28,36,44,0.95)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
         zIndex: 9999,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: theme.colors.success,
+        borderColor: theme.colors.accent,
         alignItems: 'center',
         marginBottom: theme.spacing.lg,
     },
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     totalAmount: {
         fontSize: 20,
         fontWeight: '800',
-        color: theme.colors.accent,
+        color: theme.colors.textPrimary,
     },
     actions: {
         flexDirection: 'row',
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.md,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: theme.colors.danger,
+        borderColor: theme.colors.destructive,
     },
     rejectText: {
         color: theme.colors.danger,
@@ -301,10 +301,10 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.accent,
     },
     acceptBtn: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
     },
     mainBtnText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: '800',
     },
     resultContent: {
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
         paddingVertical: 40,
     },
     successBorder: {
-        borderColor: theme.colors.success,
+        borderColor: theme.colors.accent,
         borderWidth: 1,
     },
     failBorder: {
-        borderColor: theme.colors.danger,
+        borderColor: theme.colors.destructive,
         borderWidth: 1,
     },
     resultEmoji: {

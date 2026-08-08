@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { CLUB_DATA, ClubType } from '../data/educationData';
 import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
+import { theme } from '../../../../../core/theme';
 
 // ========================================
 // TYPES
@@ -176,7 +177,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
     },
     safeArea: {
         flex: 1,
@@ -187,21 +188,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderBottomWidth: 2,
         borderBottomColor: 'rgba(255,255,255,0.08)',
     },
     backBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 12,
         minWidth: 60,
         alignItems: 'center',
     },
     backText: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -210,11 +211,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#C8C0EF',
+        color: theme.colors.textPrimary,
     },
     subtitle: {
         fontSize: 12,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginTop: 2,
     },
     scrollContent: {
@@ -223,12 +224,12 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     clubCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     },
     clubCardActive: {
         borderColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
     },
     clubHeader: {
         marginBottom: 16,
@@ -250,24 +251,24 @@ const styles = StyleSheet.create({
     clubName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
     },
     activeBadge: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#FFFFFF',
-        backgroundColor: '#6004BD',
+        color: theme.colors.textPrimary,
+        backgroundColor: '#05A8F6',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     clubDescription: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         lineHeight: 20,
     },
     buffSection: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#323A40',
         padding: 12,
         borderRadius: 12,
         marginBottom: 16,
@@ -277,13 +278,13 @@ const styles = StyleSheet.create({
     buffLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#C734CA',
+        color: '#FF8A8A',
         marginBottom: 4,
     },
     buffText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     membersSection: {
         marginBottom: 16,
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
     membersLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         marginBottom: 8,
     },
     avatarsContainer: {
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
@@ -312,10 +313,10 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
     },
     actionBtn: {
-        backgroundColor: '#6004BD',
+        backgroundColor: '#05A8F6',
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnActive: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.08)',
     },
     actionBtnText: {

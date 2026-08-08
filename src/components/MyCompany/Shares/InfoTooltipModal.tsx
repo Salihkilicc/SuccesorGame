@@ -61,7 +61,7 @@ const InfoTooltipModal = ({ visible, term, onClose }: Props) => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.9)',
+        backgroundColor: 'rgba(28,36,44,0.9)',
         justifyContent: 'center',
         padding: theme.spacing.lg,
     },
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
     },
 });
 

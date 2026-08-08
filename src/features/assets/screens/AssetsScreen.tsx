@@ -34,10 +34,10 @@ const AssetsScreen = () => {
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#020626' }}>
+        <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
             <StatusBar barStyle="light-content" />
             <LinearGradient
-                colors={['#020626', '#020626', '#020626']}
+                colors={['#1C242C', '#1C242C', '#1C242C']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
         paddingBottom: 120,
     },
     glassCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 24,
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.5,
         shadowRadius: 20,

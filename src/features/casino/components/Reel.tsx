@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: SYMBOL_HEIGHT * 3, // Show 3 symbols
         overflow: 'hidden',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         borderRadius: 8,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: 40,
-        backgroundColor: 'rgba(2,6,38,0.5)',
+        backgroundColor: 'rgba(28,36,44,0.5)',
         zIndex: 10,
     },
     shadeBottom: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: 40,
-        backgroundColor: 'rgba(2,6,38,0.5)',
+        backgroundColor: 'rgba(28,36,44,0.5)',
         zIndex: 10,
     }
 });

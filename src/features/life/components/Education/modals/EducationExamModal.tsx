@@ -78,7 +78,7 @@ export const EducationExamModal: React.FC = () => {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: theme.colors.border,
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: {
             width: 0,
             height: 4,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     headerTitle: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 18,
         fontWeight: 'bold',
         textTransform: 'uppercase',
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     questionText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         lineHeight: 28,
         textAlign: 'center',
     },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         marginBottom: 10,
-        shadowColor: "#020626",
+        shadowColor: "#1C242C",
         shadowOffset: {
             width: 0,
             height: 1,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     optionLetter: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontSize: 14,
         fontWeight: 'bold',
     },

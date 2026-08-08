@@ -44,7 +44,7 @@ const CasinoScreen = () => {
     <AppLaunchLoader
       appName="Casino"
       appIcon={<MaterialCommunityIcons name="cards-playing-outline" size={64} color="#FFFFFF" />}
-      backgroundColor="#020626"
+      backgroundColor="#1C242C"
     >
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
 
@@ -116,7 +116,7 @@ export default CasinoScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020626'
+    backgroundColor: '#1C242C'
   },
   content: {
     paddingBottom: 40,

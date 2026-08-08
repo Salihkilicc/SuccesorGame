@@ -166,7 +166,7 @@ export const CompanyModals = ({
 };
 
 const localStyles = StyleSheet.create({
-  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(2,6,38,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20, zIndex: 999 },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(28,36,44,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20, zIndex: 999 },
   card: { backgroundColor: theme.colors.card, borderRadius: 16, padding: 20, width: '90%', maxWidth: 400, gap: 16, borderWidth: 1, borderColor: theme.colors.border },
   title: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: '800' },
 });

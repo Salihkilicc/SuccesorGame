@@ -136,7 +136,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         padding: 20,
     },
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     successBtn: {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.accent,
         padding: 14,
         borderRadius: 8,
         alignItems: 'center',
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     btnText: {
-        color: '#FFFFFF',
+        color: theme.colors.onLight,
         fontWeight: 'bold',
         fontSize: 14,
     },

@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#422B71', // Dark Gray
+        backgroundColor: '#434B50', // Dark Gray
         padding: theme.spacing.md,
         borderRadius: theme.radius.md,
         borderWidth: 1,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     selectedCard: {
         borderColor: 'rgba(255,255,255,0.08)', // Gold
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     pressed: {
         opacity: 0.8,
@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
     rightText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C8C0EF', // Apple Blue
+        color: '#FFFFFF', // Apple Blue
     },
     dangerText: {
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     selectedText: {
-        color: '#C734CA', // Gold
+        color: '#FF8A8A', // Gold
     },
 });
 

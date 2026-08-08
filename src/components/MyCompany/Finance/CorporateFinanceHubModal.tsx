@@ -67,13 +67,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     // Credit Rating Display
     const getCreditRating = () => {
-        if (creditScore >= 800) return { label: 'AAA', color: '#C734CA', description: t('finance.excellent') };
-        if (creditScore >= 750) return { label: 'AA', color: '#C734CA', description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: '#C8C0EF', description: t('finance.good') };
-        if (creditScore >= 650) return { label: 'BBB', color: '#C734CA', description: t('finance.fair') };
-        if (creditScore >= 600) return { label: 'BB', color: '#C734CA', description: t('finance.moderate') };
-        if (creditScore >= 500) return { label: 'B', color: '#C734CA', description: t('finance.risky') };
-        return { label: 'C', color: '#C734CA', description: t('finance.junk') };
+        if (creditScore >= 800) return { label: 'AAA', color: '#FF8A8A', description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: '#FF8A8A', description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: '#FFFFFF', description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: '#FF8A8A', description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: '#FF8A8A', description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: '#FF8A8A', description: t('finance.risky') };
+        return { label: 'C', color: '#FF8A8A', description: t('finance.junk') };
     };
 
     const rating = getCreditRating();
@@ -108,7 +108,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             <Text style={styles.cardTitle}>{t('finance.injection')}</Text>
                             <Text style={styles.cardDesc}>{t('finance.personalInvestment')}</Text>
                         </View>
-                        <Text style={{ color: '#C8C0EF', fontSize: 18 }}>→</Text>
+                        <Text style={{ color: '#FFFFFF', fontSize: 18 }}>→</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -136,7 +136,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     styles.progressFill,
                                     {
                                         width: `${Math.min(100, (totalDebt / (totalDebt + borrowingCapacity)) * 100)}%`,
-                                        backgroundColor: leverage > 60 ? '#C734CA' : '#C734CA'
+                                        backgroundColor: leverage > 60 ? '#FF8A8A' : '#FF8A8A'
                                     }
                                 ]}
                             />
@@ -151,19 +151,19 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.statsGrid}>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
-                        <Text style={[styles.statValue, { color: '#C734CA' }]}>
+                        <Text style={[styles.statValue, { color: '#FF8A8A' }]}>
                             {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
-                        <Text style={[styles.statValue, { color: '#C734CA' }]}>
+                        <Text style={[styles.statValue, { color: '#FF8A8A' }]}>
                             {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.leverage')}</Text>
-                        <Text style={[styles.statValue, { color: leverage > 60 ? '#C734CA' : '#C8C0EF' }]}>
+                        <Text style={[styles.statValue, { color: leverage > 60 ? '#FF8A8A' : '#CFD0D2' }]}>
                             {leverage.toFixed(1)}%
                         </Text>
                     </View>
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     heroSection: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         height: 8,
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     },
     capacityValue: {
         fontSize: 14,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '700',
         textAlign: 'right',
     },
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     emptyState: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     emptyStateText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
     emptyStateSubtext: {
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     loanCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     loanRate: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#C734CA',
+        color: '#FF8A8A',
     },
     loanDetails: {
         flexDirection: 'row',
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     repayButton: {
-        backgroundColor: '#281F50',
+        backgroundColor: '#323A40',
         borderRadius: 16,
         padding: 18,
         alignItems: 'center',
@@ -510,16 +510,16 @@ const styles = StyleSheet.create({
     repayButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#C8C0EF',
+        color: '#FFFFFF',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     ctaButton: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -538,12 +538,12 @@ const styles = StyleSheet.create({
     },
     // Shark Deal Styles
     sharkDealCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 12,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -583,11 +583,11 @@ const styles = StyleSheet.create({
     },
     sharkDealSubtitle: {
         fontSize: 12,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontWeight: '600',
     },
     instantBadge: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 8,
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     },
     sharkDealWarning: {
         fontSize: 11,
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontStyle: 'italic',
         textAlign: 'center',
     },
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         padding: 12,
         borderRadius: 16,
         borderWidth: 1,

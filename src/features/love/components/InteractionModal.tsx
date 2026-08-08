@@ -40,7 +40,7 @@ const InteractionModal = ({ visible, onClose, title, children }: InteractionModa
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(2,6,38,0.85)',
+        backgroundColor: 'rgba(28,36,44,0.85)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: theme.spacing.lg,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         padding: 24,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: {
             width: 0,
             height: 10,

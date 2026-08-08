@@ -263,14 +263,14 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                             <View>
                                                 <Text style={styles.statLabel}>{t('product.demand')}</Text>
                                                 <View style={styles.barBg}>
-                                                    <View style={[styles.barFill, { width: `${currentMarketData.demand}%`, backgroundColor: theme.colors.success }]} />
+                                                    <View style={[styles.barFill, { width: `${currentMarketData.demand}%`, backgroundColor: theme.colors.accent }]} />
                                                 </View>
                                                 <Text style={styles.statValue}>{currentMarketData.demand}%</Text>
                                             </View>
                                             <View>
                                                 <Text style={styles.statLabel}>{t('product.competition2')}</Text>
                                                 <View style={styles.barBg}>
-                                                    <View style={[styles.barFill, { width: `${currentMarketData.competition}%`, backgroundColor: theme.colors.danger }]} />
+                                                    <View style={[styles.barFill, { width: `${currentMarketData.competition}%`, backgroundColor: theme.colors.destructive }]} />
                                                 </View>
                                                 <Text style={styles.statValue}>{currentMarketData.competition}%</Text>
                                             </View>
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
         opacity: 0.6,
     },
     gridCardOwned: {
-        borderColor: theme.colors.success,
+        borderColor: theme.colors.accent,
         backgroundColor: 'rgba(200,192,239,0.1)',
     },
     gridCardPressed: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: theme.colors.success,
+        borderColor: theme.colors.accent,
     },
     resultsTitle: {
         fontSize: 14,

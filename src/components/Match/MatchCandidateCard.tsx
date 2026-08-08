@@ -2,6 +2,7 @@ import React from 'react';
 import { t, useLocale } from '../../core/i18n';
 import {View, Text, StyleSheet} from 'react-native';
 import type {MatchCandidate} from './useMatchSystem';
+import { theme } from '../../core/theme';
 
 type Props = {
   candidate: MatchCandidate;
@@ -29,11 +30,11 @@ export default MatchCandidateCard;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     borderRadius: 16,
     padding: 16,
     gap: 12,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -42,12 +43,12 @@ const styles = StyleSheet.create({
   photoPlaceholder: {
     height: 160,
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     alignItems: 'center',
     justifyContent: 'center',
   },
   photoText: {
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
     fontSize: 14,
   },
   info: {

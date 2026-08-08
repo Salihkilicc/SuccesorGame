@@ -115,7 +115,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.label}>{t('ui.output')}</Text>
-                        <Text style={[styles.big, { color: efficiency >= 1 ? '#C8C0EF' : '#C734CA' }]}>
+                        <Text style={[styles.big, { color: efficiency >= 1 ? '#CFD0D2' : '#FF8A8A' }]}>
                             ×{efficiency.toFixed(2)}
                         </Text>
                         <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
@@ -125,7 +125,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                 <View style={styles.moraleTrack}>
                     <View style={[styles.moraleFill, {
                         width: `${morale}%`,
-                        backgroundColor: morale < 40 ? '#C734CA' : morale < 65 ? '#C734CA' : '#C8C0EF',
+                        backgroundColor: morale < 40 ? '#FF8A8A' : morale < 65 ? '#FF8A8A' : '#CFD0D2',
                     }]} />
                     {/* Maasin tasidigi seviye isareti */}
                     <View style={[styles.moraleMarker, { left: `${target}%` }]} />
@@ -139,7 +139,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     info={WORKFORCE_EXPLANATIONS.salaryRatio}
                     infoDetail={`Market rate for a ${tier.name} is ${formatMoney(market)} per person per quarter. You are paying ${formatMoney(perPerson)}.`}
                     summary={`${Math.round(salaryRatio * 100)}%`}
-                    summaryColor={salaryRatio < 0.95 ? '#C734CA' : '#C8C0EF'}
+                    summaryColor={salaryRatio < 0.95 ? '#FF8A8A' : '#CFD0D2'}
                     defaultOpen
                 >
                     <View style={styles.row}>
@@ -212,7 +212,7 @@ const EmployeesModule = ({ visible, onClose }: Props) => {
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
                     summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
-                    summaryColor={canBonus ? '#C8C0EF' : 'rgba(255,255,255,0.48)'}
+                    summaryColor={canBonus ? '#CFD0D2' : 'rgba(255,255,255,0.48)'}
                 >
                     <Text style={styles.line}>
                         5% of last quarter's profit: {formatMoney(bonusCost)}
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
         overflow: 'hidden', marginBottom: 8,
     },
     moraleFill: { height: '100%', borderRadius: 5 },
-    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#422B71' },
+    moraleMarker: { position: 'absolute', width: 2, height: 10, backgroundColor: '#434B50' },
 
     note: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginBottom: 14 },
     line: { color: 'rgba(255,255,255,0.48)', fontSize: 12, lineHeight: 17, marginTop: 6 },
-    warn: { color: '#C734CA', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
-    ok: { color: '#C8C0EF', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    warn: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
+    ok: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 16, marginTop: 8 },
 
     row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 6 },
     rowTight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -293,14 +293,14 @@ const styles = StyleSheet.create({
     eventName: { color: theme.colors.textPrimary, fontSize: 13.5, fontWeight: '700' },
     eventDesc: { color: '#FFFFFF', fontSize: 10.5, marginTop: 2 },
     eventCost: { color: theme.colors.textPrimary, fontSize: 13, fontWeight: '800' },
-    eventGain: { color: '#C8C0EF', fontSize: 11, marginTop: 2 },
+    eventGain: { color: '#FFFFFF', fontSize: 11, marginTop: 2 },
 
     primary: {
         marginTop: 10, paddingVertical: 12, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#C8C0EF',
+        alignItems: 'center', backgroundColor: '#CFD0D2',
     },
     primaryOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
-    primaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+    primaryText: { color: theme.colors.onLight, fontSize: 13, fontWeight: '800' },
 
     overtimeBox: {
         flexDirection: 'row', alignItems: 'center', gap: 12,

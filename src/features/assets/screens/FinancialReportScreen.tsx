@@ -42,9 +42,9 @@ const Row = ({
             ? theme.colors.success
             : theme.colors.error
         : negative
-            ? '#C734CA'
+            ? '#FF8A8A'
             : subtotal
-                ? '#C734CA'
+                ? '#FF8A8A'
                 : theme.colors.textPrimary;
 
     return (
@@ -114,7 +114,7 @@ const FinancialReportScreen = () => {
                 {header}
 
                 {/* Ozet */}
-                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#C734CA' : theme.colors.error }]}>
+                <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? '#FF8A8A' : theme.colors.error }]}>
                     <Text style={styles.heroLabel}>{t('company.netIncome')}</Text>
                     <Text
                         style={[
@@ -201,7 +201,7 @@ const FinancialReportScreen = () => {
                     note={t('company.howMuchYouBuiltAnd')}
                     info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
-                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#C734CA'}
+                    summaryColor={report.sellThrough >= 60 ? theme.colors.success : '#FF8A8A'}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
@@ -219,7 +219,7 @@ const FinancialReportScreen = () => {
                             <Text
                                 style={[
                                     styles.opsValue,
-                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#C734CA' },
+                                    { color: report.sellThrough >= 60 ? theme.colors.success : '#FF8A8A' },
                                 ]}
                             >
                                 {formatPercent(report.sellThrough)}
@@ -227,7 +227,7 @@ const FinancialReportScreen = () => {
                         </View>
                         <View style={styles.opsCell}>
                             <Text style={styles.opsLabel}>{t('company.inStock')}</Text>
-                            <Text style={[styles.opsValue, { color: '#C734CA' }]}>
+                            <Text style={[styles.opsValue, { color: '#FF8A8A' }]}>
                                 {formatNumber(report.endingInventory)}
                             </Text>
                         </View>
@@ -268,7 +268,7 @@ const FinancialReportScreen = () => {
                                     <Text style={[styles.cellText, styles.center, { color: theme.colors.success }]}>
                                         {formatNumber(p.sold)}
                                     </Text>
-                                    <Text style={[styles.cellText, styles.center, { color: '#C734CA' }]}>
+                                    <Text style={[styles.cellText, styles.center, { color: '#FF8A8A' }]}>
                                         {formatNumber(p.stock)}
                                     </Text>
                                     <Text
@@ -303,7 +303,7 @@ const FinancialReportScreen = () => {
                     <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
                         <Text style={styles.label}>{t('company.researchPoints')}</Text>
-                        <Text style={[styles.value, { color: '#C8C0EF' }]}>
+                        <Text style={[styles.value, { color: '#FFFFFF' }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>
                     </View>
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.border,
     },
     cardTitle: {
-        color: '#C734CA',
+        color: '#FF8A8A',
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 1.5,

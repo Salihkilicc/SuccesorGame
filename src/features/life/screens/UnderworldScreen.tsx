@@ -24,13 +24,13 @@ import { HookupModal } from '../components/HookupModal';
 import GodModeModal from '../../../components/GodModeModal';
 
 const GRADIENTS = {
-    purplePink: ['#6004BD', '#6004BD'],
-    greenTeal: ['#C8C0EF', '#C8C0EF'],
-    redCasino: ['#C734CA', '#C734CA'],
-    darkGrey: ['#020626', '#5C3790'],
-    hookupFire: ['#6004BD', '#6004BD'],
-    networkBlue: ['#6004BD', '#C8C0EF'],
-    bluePurple: ['#C8C0EF', '#6004BD'],
+    purplePink: ['#05A8F6', '#05A8F6'],
+    greenTeal: ['#CFD0D2', '#CFD0D2'],
+    redCasino: ['#FF8A8A', '#FF8A8A'],
+    darkGrey: ['#1C242C', '#535B5F'],
+    hookupFire: ['#05A8F6', '#05A8F6'],
+    networkBlue: ['#05A8F6', '#CFD0D2'],
+    bluePurple: ['#CFD0D2', '#05A8F6'],
 };
 
 const SECTION_ESSENTIALS = [
@@ -105,7 +105,7 @@ const UnderworldScreen = () => {
                 resizeMode="cover"
             />
             <LinearGradient
-                colors={['rgba(2,6,38,0.3)', 'rgba(2,6,38,0.7)', 'rgba(2,6,38,0.9)']}
+                colors={['rgba(28,36,44,0.3)', 'rgba(28,36,44,0.7)', 'rgba(28,36,44,0.9)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -184,7 +184,7 @@ export default UnderworldScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
     safeArea: {
         flex: 1,
@@ -204,10 +204,10 @@ const styles = StyleSheet.create({
     headerAccent: {
         width: 44,
         height: 2,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginTop: 14,
         borderRadius: 2,
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.6,
         shadowRadius: 6,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
         aspectRatio: 0.75, // Matching Apple ratio
         marginBottom: 8,
         alignItems: 'center',
-        shadowColor: '#020626',
+        shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.15)',
     },
     appIconVector: {
-        textShadowColor: 'rgba(2,6,38,0.3)',
+        textShadowColor: 'rgba(28,36,44,0.3)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 3,
     },

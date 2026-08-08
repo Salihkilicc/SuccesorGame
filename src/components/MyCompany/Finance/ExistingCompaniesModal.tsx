@@ -54,7 +54,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
                                 <Text style={styles.value}>{formatMoney(item.valuation)}</Text>
-                                <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#04BDBA' } : { color: '#C836CA' }]}>
+                                <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#7DD3FC' } : { color: '#FF8A8A' }]}>
                                     {item.lastChangePercent > 0 ? '+' : ''}{item.lastChangePercent.toFixed(1)}%
                                 </Text>
                             </View>
@@ -92,7 +92,7 @@ export default ExistingCompaniesModal;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#020626',
+        backgroundColor: '#1C242C',
     },
     header: {
         flexDirection: 'row',
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
     },
     name: {
         fontSize: 16,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         marginLeft: 16,
     },
     emptyContainer: {

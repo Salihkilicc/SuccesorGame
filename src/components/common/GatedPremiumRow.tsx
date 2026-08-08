@@ -3,6 +3,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PremiumBadge from './PremiumBadge';
+import { theme } from '../../core/theme';
 
 type Props = {
   title: string;
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 12,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#323A40',
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(255,255,255,0.06)',
   },
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
   },
   description: {
     fontSize: 13,
@@ -49,6 +50,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   descriptionLocked: {
-    color: '#FFFFFF',
+    color: theme.colors.textPrimary,
   },
 });

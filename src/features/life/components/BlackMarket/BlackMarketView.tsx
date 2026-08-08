@@ -24,14 +24,14 @@ interface BlackMarketViewProps {
 // --- CONSTANTS ---
 
 const COLORS = {
-    background: '#020626',
-    bloodRed: '#C734CA',
-    neonRed: '#C734CA',
-    darkGray: '#020626',
+    background: '#1C242C',
+    bloodRed: '#FF8A8A',
+    neonRed: '#FF8A8A',
+    darkGray: '#1C242C',
     textPrimary: '#FFFFFF',
     textSecondary: 'rgba(255,255,255,0.48)',
-    gold: '#C734CA',
-    locked: '#281F50'
+    gold: '#FF8A8A',
+    locked: '#323A40'
 };
 
 // --- COMPONENT ---
@@ -172,10 +172,10 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
 
     const getTierColor = (tier: number): string => {
         const colors: Record<number, string> = {
-            1: '#7B46B7',
-            2: '#C734CA',
-            3: '#C734CA',
-            4: '#C734CA'
+            1: '#666E70',
+            2: '#FF8A8A',
+            3: '#FF8A8A',
+            4: '#FF8A8A'
         };
         return colors[tier] || colors[1];
     };
@@ -226,7 +226,7 @@ export const BlackMarketView: React.FC<BlackMarketViewProps> = ({ data, onBuyIte
                                         data.suspicion > 80
                                             ? COLORS.neonRed
                                             : data.suspicion > 50
-                                                ? '#C734CA'
+                                                ? '#FF8A8A'
                                                 : COLORS.bloodRed,
                                     transform: [{ scale: data.suspicion > 60 ? pulseAnim : 1 }]
                                 }
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     },
     barContainer: {
         height: 12,
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderRadius: 6,
         overflow: 'hidden',
         borderWidth: 1,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     lockedCard: {
-        backgroundColor: '#422B71',
+        backgroundColor: '#434B50',
         borderColor: COLORS.locked,
         opacity: 0.6
     },

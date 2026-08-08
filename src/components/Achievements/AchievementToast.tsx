@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    shadowColor: '#020626',
+    shadowColor: '#1C242C',
     shadowOpacity: 0.2,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
