@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import GameModal from '../../common/GameModal';
+import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
-import { formatMoney } from '../../../core/utils';
+import { formatMoney, formatNumber } from '../../../core/utils';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 interface Props {
     visible: boolean;
@@ -17,7 +19,7 @@ type TabType = 'LOBBYING' | 'BUYOUT';
 
 const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     useLocale();
-    const { members, calculateBuyoutPrice, offerGesture } = useShareholderStore();
+    const { members, calculateBuyoutPrice, offerGesture, negotiateSharePurchase } = useShareholderStore();
     const { money, companySharePrice, update: updateStats } = useStatsStore();
 
     // ----------------------------------------------------------------------
@@ -34,6 +36,17 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     //  rule for this file: no early return above this line.
     // ----------------------------------------------------------------------
     const [activeTab, setActiveTab] = useState<TabType>('LOBBYING');
+    // Every confirmation on this screen is one piece of state. Declared with
+    // the other hooks, ABOVE the early return - see the note above.
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
     const [offerPremium, setOfferPremium] = useState(0); // Percentage premium (-20 to +100)
     const totalShares = useShareholderStore(st => st.totalShares);
     const playerPercent = useShareholderStore(st =>
@@ -75,12 +88,18 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
               : t('mem.relNone');
 
     // Get trust status
+    //
+    //  Four of these five used to be the loss red, so "Supportive" and
+    //  "Hostile Enemy" were the same colour - the label was doing all the work
+    //  and the colour was actively misleading. Same fault as the credit rating
+    //  on the finance screen. Red is reserved for loss; only outright hostility
+    //  keeps the caution blue, and the rest is plain white.
     const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: t('equity.loyalAlly'), color: '#FFFFFF' };
-        if (trust >= 60) return { label: t('equity.supportive'), color: '#FF8A8A' };
-        if (trust >= 40) return { label: t('equity.neutral'), color: '#FF8A8A' };
-        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: '#FF8A8A' };
-        return { label: t('equity.hostileEnemy'), color: '#FF8A8A' };
+        if (trust >= 80) return { label: t('equity.loyalAlly'), color: theme.colors.textPrimary };
+        if (trust >= 60) return { label: t('equity.supportive'), color: theme.colors.textPrimary };
+        if (trust >= 40) return { label: t('equity.neutral'), color: theme.colors.textSecondary };
+        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: theme.colors.warning };
+        return { label: t('equity.hostileEnemy'), color: theme.colors.warning };
     };
 
     const trustStatus = getTrustStatus(member.trust);
@@ -90,18 +109,24 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const GIFT_COST = 50000;
 
         if (money < GIFT_COST) {
-            Alert.alert(t('alert.insufficientFunds'), t('mem.needForGift', { v1: formatMoney(GIFT_COST) }));
+            setPanel({
+                title: t('alert.insufficientFunds'),
+                summary: t('mem.needForGift', { v1: formatMoney(GIFT_COST) }),
+                confirmLabel: 'OK',
+            });
             return;
         }
 
-        Alert.alert(
-            t('mem.sendGiftTitle'),
-            t('mem.sendGiftBody2', { v1: formatMoney(GIFT_COST), v2: member.name }),
-            [
-                { text: t('equity.cancel'), style: 'cancel' },
-                {
-                    text: t('equity.sendGift'),
-                    onPress: () => {
+        setPanel({
+            title: t('mem.sendGiftTitle'),
+            summary: t('mem.sendGiftBody2', { v1: formatMoney(GIFT_COST), v2: member.name }),
+            lines: [
+                { label: 'Cost', value: formatMoney(GIFT_COST) },
+                { label: 'Your cash after', value: formatMoney(money - GIFT_COST), strong: true },
+            ],
+            note: 'A gift is a MONEY gesture. It pleases a member who cares about money and insults one thinking about their legacy.',
+            confirmLabel: t('equity.sendGift'),
+            onConfirm: () => {
                         updateStats({ money: money - GIFT_COST });
                         // ------------------------------------------------
                         //  ARTIK GERCEKTEN BIR SEY OLUYOR
@@ -114,52 +139,46 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         //  memnun eder, mirasini dusunen uyeyi asagilar.
                         //  Bkz. core/market/governance.ts -> giftEffect
                         // ------------------------------------------------
-                        const r = offerGesture(member.id, 'money', 1);
-                        Alert.alert(
-                            r.success ? t('mem.giftSent') : t('mem.giftBackfired'),
-                            r.success
-                                ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
-                                : t('mem.giftBackfiredBody', { v1: member.name }),
-                        );
-                    },
-                },
-            ]
-        );
+                const r = offerGesture(member.id, 'money', 1);
+                setPanel({
+                    title: r.success ? t('mem.giftSent') : t('mem.giftBackfired'),
+                    summary: r.success
+                        ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
+                        : t('mem.giftBackfiredBody', { v1: member.name }),
+                    confirmLabel: 'OK',
+                });
+            },
+        });
     };
 
     const handlePrivateDinner = () => {
         const ENERGY_COST = 20;
 
         // TODO: Check energy from stats store
-        Alert.alert(
-            t('mem.dinnerTitle'),
-            t('mem.dinnerBody2', { v1: member.name, v2: String(ENERGY_COST) }),
-            [
-                { text: t('equity.cancel'), style: 'cancel' },
-                {
-                    text: t('equity.arrangeDinner'),
-                    onPress: () => {
-                        // Ozel yemek bir TANINMA jestidir: adinin gecmesini
-                        // isteyen uyeye para degil ilgi lazimdir.
-                        const r = offerGesture(member.id, 'legacy', 1);
-                        Alert.alert(
-                            r.success ? t('mem.dinnerArranged') : t('mem.giftBackfired'),
-                            r.success
-                                ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
-                                : t('mem.giftBackfiredBody', { v1: member.name }),
-                        );
-                    },
-                },
-            ]
-        );
+        setPanel({
+            title: t('mem.dinnerTitle'),
+            summary: t('mem.dinnerBody2', { v1: member.name, v2: String(ENERGY_COST) }),
+            note: 'Dinner is a RECOGNITION gesture. A member who wants their name remembered needs attention, not money.',
+            confirmLabel: t('equity.arrangeDinner'),
+            onConfirm: () => {
+                const r = offerGesture(member.id, 'legacy', 1);
+                setPanel({
+                    title: r.success ? t('mem.dinnerArranged') : t('mem.giftBackfired'),
+                    summary: r.success
+                        ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
+                        : t('mem.giftBackfiredBody', { v1: member.name }),
+                    confirmLabel: 'OK',
+                });
+            },
+        });
     };
 
     const handleBlackmail = () => {
-        Alert.alert(
-            '🕵️ Blackmail',
-            t('alert.thisFeatureIsLockedN'),
-            [{ text: 'OK' }]
-        );
+        setPanel({
+            title: '🕵️ Blackmail',
+            summary: t('alert.thisFeatureIsLockedN'),
+            confirmLabel: 'OK',
+        });
     };
 
     // `member.shares` never existed on BoardMember - the field is shareCount -
@@ -197,7 +216,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
 
     const handleMakeOffer = () => {
         if (money < offerPrice) {
-            Alert.alert(t('alert.insufficientFunds'), t('mem.needForOffer', { v1: formatMoney(offerPrice) }));
+            setPanel({
+                title: t('alert.insufficientFunds'),
+                summary: t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
+                confirmLabel: 'OK',
+            });
             return;
         }
 
@@ -205,16 +228,21 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const buyoutResult = calculateBuyoutPrice(member.id, companySharePrice);
 
         if (!buyoutResult) {
-            Alert.alert(t('alert.error'), t('alert.unableToCalculateBuyoutPrice'));
+            setPanel({
+                title: t('alert.error'),
+                summary: t('alert.unableToCalculateBuyoutPrice'),
+                confirmLabel: 'OK',
+            });
             return;
         }
 
         if (!buyoutResult.canSell) {
-            Alert.alert(
-                '❌ Offer Rejected',
-                buyoutResult.refusalReason || `${member.name} refuses to sell their shares.`,
-                [{ text: 'OK', style: 'destructive' }]
-            );
+            setPanel({
+                title: 'Offer rejected',
+                summary: buyoutResult.refusalReason || `${member.name} refuses to sell their shares.`,
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
             return;
         }
 
@@ -223,38 +251,59 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         const offerAcceptable = offerPrice >= requiredPrice;
 
         if (offerAcceptable) {
-            Alert.alert(
-                t('mem.offerAccepted'),
-                `${member.name} has accepted your offer!\n\n` +
-                t('mem.offerAcceptedBody', {
-                    v1: formatMoney(offerPrice),
-                    v2: memberPercent.toFixed(1),
-                    v3: (memberPercent + playerPercent).toFixed(1),
-                }),
-                [
-                    { text: t('equity.cancel'), style: 'cancel' },
-                    {
-                        text: t('equity.completePurchase'),
-                        onPress: () => {
-                            // TODO: Implement actual share transfer
-                            updateStats({ money: money - offerPrice });
-                            Alert.alert(t('mem.purchaseComplete'), t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }));
-                            console.log(`[Buyout] Purchased ${memberPercent.toFixed(1)}% from ${member.name} for $${offerPrice}`);
-                            onClose();
-                        },
-                    },
-                ]
-            );
+            setPanel({
+                title: t('mem.offerAccepted'),
+                summary: `${member.name} has accepted your offer.`,
+                lines: [
+                    { label: 'You pay', value: formatMoney(offerPrice) },
+                    { label: 'Shares acquired', value: `${memberPercent.toFixed(1)}%` },
+                    { label: 'Your stake after', value: `${(memberPercent + playerPercent).toFixed(1)}%`, strong: true },
+                ],
+                confirmLabel: t('equity.completePurchase'),
+                onConfirm: () => {
+                    // ------------------------------------------------------
+                    //  THE SHARES ACTUALLY MOVE NOW
+                    // ------------------------------------------------------
+                    //  This branch used to read `// TODO: Implement actual
+                    //  share transfer`, deduct the cash and stop. The player
+                    //  paid the full buyout price, saw "purchase complete",
+                    //  and received nothing - the member kept every share.
+                    //  The store has always had negotiateSharePurchase; it
+                    //  was simply never called from here.
+                    // ------------------------------------------------------
+                    const r = negotiateSharePurchase(member.id, member.shareCount, offerPremium);
+
+                    if (!r.success) {
+                        setPanel({
+                            title: 'Purchase failed',
+                            summary: r.message,
+                            confirmLabel: 'OK',
+                            tone: 'danger',
+                        });
+                        return;
+                    }
+
+                    updateStats({ money: money - offerPrice });
+                    setPanel({
+                        title: t('mem.purchaseComplete'),
+                        summary: t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }),
+                        lines: [{ label: 'Shares transferred', value: formatNumber(r.sharesBought) }],
+                        confirmLabel: 'OK',
+                        onConfirm: undefined,
+                    });
+                },
+            });
         } else {
-            Alert.alert(
-                '❌ Offer Too Low',
-                `${member.name} rejected your offer.\n\n` +
-                t('mem.offerRejectedBody', {
-                    v1: formatMoney(offerPrice),
-                    v2: formatMoney(requiredPrice),
-                }),
-                [{ text: 'OK', style: 'destructive' }]
-            );
+            setPanel({
+                title: 'Offer too low',
+                summary: `${member.name} rejected your offer.`,
+                lines: [
+                    { label: 'You offered', value: formatMoney(offerPrice) },
+                    { label: 'They want', value: formatMoney(requiredPrice), strong: true },
+                ],
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
         }
     };
 
@@ -495,6 +544,19 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     </View>
                 )}
             </ScrollView>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={t('equity.cancel')}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
         </GameModal>
     );
 };

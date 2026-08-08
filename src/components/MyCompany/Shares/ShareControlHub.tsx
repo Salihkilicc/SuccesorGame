@@ -26,6 +26,8 @@ import {
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import InfoTooltipModal from './InfoTooltipModal';
+import { StatRow, DetailLine, DetailRule, DetailNote, RowGroup } from '../../common/Disclosure';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 
@@ -97,26 +99,54 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         }
     }, [companyValue, syncStockPrice]);
 
+    // ------------------------------------------------------------------
+    //  Confirmations happen in place now, not in a system Alert.
+    //
+    //  One piece of state drives all of them. Each decision is a small
+    //  descriptor rather than a string built with \n, so the figures render
+    //  as real rows and the panel inherits the theme - a system Alert is a
+    //  white iOS sheet no matter what the rest of the app looks like.
+    // ------------------------------------------------------------------
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
+
     const handleStockSplit = () => {
         if (stockPrice <= 1000) {
-            Alert.alert(t('alert.notAvailable'), t('alert.stockSplitIsOnlyAvailable'));
+            setPanel({
+                title: t('alert.notAvailable'),
+                summary: t('alert.stockSplitIsOnlyAvailable'),
+                confirmLabel: 'OK',
+            });
             return;
         }
 
-        Alert.alert(
-            t('alert.stockSplit'),
-            t('alert.thisWillDivideYourShare'),
-            [
-                { text: t('equity.cancel'), style: 'cancel' },
-                {
-                    text: t('equity.split'),
-                    onPress: () => {
-                        performStockSplit();
-                        Alert.alert(t('alert.success'), t('alert.stockSplitCompletedSuccessfully'));
-                    },
-                },
-            ]
-        );
+        setPanel({
+            title: t('alert.stockSplit'),
+            summary: t('alert.thisWillDivideYourShare'),
+            lines: [
+                { label: t('equity.currentStockPrice'), value: formatPrice(stockPrice) },
+                { label: 'After the split', value: formatPrice(stockPrice / 2) },
+                { label: t('equity.totalShares'), value: formatNumber(totalShares) },
+                { label: 'After the split', value: formatNumber(totalShares * 2), strong: true },
+            ],
+            note: 'Your ownership percentage does not change. Twice as many shares at half the price is the same company.',
+            confirmLabel: t('equity.split'),
+            onConfirm: () => {
+                performStockSplit();
+                setPanel({
+                    title: t('alert.success'),
+                    summary: t('alert.stockSplitCompletedSuccessfully'),
+                    confirmLabel: 'OK',
+                });
+            },
+        });
     };
 
     const handleHomePress = () => {
@@ -170,81 +200,90 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <Text style={styles.controlNote}>{CONTROL_NOTES[control]}</Text>
                         </View>
 
-                        {/* Stock Price Hero Card */}
-                        <View style={styles.heroCard}>
-                            <Text style={styles.heroLabel}>{t('equity.currentStockPrice')}</Text>
-                            <View style={styles.heroRow}>
-                                <Text style={styles.heroPrice}>{formatPrice(stockPrice)}</Text>
-                                <View style={[
-                                    styles.changeBadge,
-                                    { backgroundColor: companyDailyChange >= 0 ? '#CFD0D220' : '#FF8A8A20' }
-                                ]}>
-                                    <Text style={[
-                                        styles.changeBadgeText,
-                                        { color: companyDailyChange >= 0 ? '#CFD0D2' : '#FF8A8A' }
-                                    ]}>
-                                        {companyDailyChange >= 0 ? '↑' : '↓'} {Math.abs(companyDailyChange).toFixed(2)}%
-                                    </Text>
-                                </View>
-                            </View>
-                            <Text style={styles.heroNote}>{t('equity.sinceLastQuarterV1', { v1: EQUITY_EXPLANATIONS.change })}</Text>
-                            {damping < 0.95 && (
-                                <View style={styles.dampBadge}>
-                                    <Text style={styles.dampText}>
-                                        SIZE DAMPING {Math.round((1 - damping) * 100)}% — a company
-                                        this large absorbs shocks a small one cannot
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
+                        {/* ------------------------------------------------------
+                            LAYERED ROWS
+                            ------------------------------------------------------
+                            This was a hero card, a seven-line valuation table, a
+                            note under the table, a damping badge and a four-card
+                            stat grid - all permanently open, all at once. The
+                            figures are unchanged; what changed is that the
+                            working is now behind the number that needed it,
+                            instead of beside it.
+                           ------------------------------------------------------ */}
+                        <RowGroup title={t('equity.marketCap')}>
+                            <StatRow
+                                label={t('equity.currentStockPrice')}
+                                value={formatPrice(stockPrice)}
+                                why={`${companyDailyChange >= 0 ? '↑' : '↓'} ${Math.abs(companyDailyChange).toFixed(2)}% since last quarter`}
+                                valueColor={companyDailyChange >= 0 ? theme.colors.positive : theme.colors.negative}
+                                detail={
+                                    <>
+                                        <DetailNote>{EQUITY_EXPLANATIONS.change}</DetailNote>
+                                        {damping < 0.95 && (
+                                            <DetailLine
+                                                label="Size damping"
+                                                value={`${Math.round((1 - damping) * 100)}%`}
+                                            />
+                                        )}
+                                        {damping < 0.95 && (
+                                            <DetailNote>
+                                                A company this large absorbs shocks a small one cannot.
+                                            </DetailNote>
+                                        )}
+                                    </>
+                                }
+                            />
+                            <StatRow
+                                label={t('equity.valuation')}
+                                value={formatMoney(vb.total)}
+                                why={`Cash + profit × ${vb.earningsMultiple.toFixed(1)} + revenue × ${vb.revenueMultiple.toFixed(2)}${vb.debt > 0 ? ' − debt' : ''}`}
+                                detail={
+                                    <>
+                                        <DetailLine label={t('equity.cashOnHand')} value={formatMoney(vb.cash)} />
+                                        <DetailLine
+                                            label={`Annual profit × ${vb.earningsMultiple.toFixed(1)}`}
+                                            value={formatMoney(vb.earnings)}
+                                        />
+                                        <DetailLine
+                                            label={`Annual revenue × ${vb.revenueMultiple.toFixed(2)}`}
+                                            value={formatMoney(vb.revenue)}
+                                        />
+                                        {vb.debt > 0 && (
+                                            <DetailLine
+                                                label={t('equity.lessDebt')}
+                                                value={`−${formatMoney(vb.debt)}`}
+                                                tone="negative"
+                                            />
+                                        )}
+                                        <DetailRule />
+                                        <DetailLine label={t('equity.valuation')} value={formatMoney(vb.total)} strong />
+                                        <DetailLine
+                                            label={`÷ ${formatNumber(totalShares)} shares`}
+                                            value={formatPrice(vb.total / Math.max(1, totalShares))}
+                                        />
+                                        <DetailNote>{EQUITY_EXPLANATIONS.valuation}</DetailNote>
+                                    </>
+                                }
+                            />
+                            <StatRow
+                                label={t('equity.marketCap')}
+                                value={formatMoney(marketCap)}
+                                why={`${formatNumber(totalShares)} shares × ${formatPrice(stockPrice)}`}
+                            />
+                        </RowGroup>
 
-                        {/* Degerleme kirilimi — fiyatin NEDEN o rakam oldugunu goster */}
-                        <View style={styles.breakdownCard}>
-                            <Text style={styles.breakdownTitle}>{t('equity.whatTheCompanyIsWorth')}</Text>
-                            <BreakLine label={t('equity.cashOnHand')} value={formatMoney(vb.cash)} />
-                            <BreakLine
-                                label={`Annual profit × ${vb.earningsMultiple.toFixed(1)}`}
-                                value={formatMoney(vb.earnings)}
+                        <RowGroup title={t('equity.myOwnership')}>
+                            <StatRow
+                                label={t('equity.myOwnership')}
+                                value={`${playerOwnership.toFixed(1)}%`}
+                                why={`${formatNumber(playerShares)} of ${formatNumber(totalShares)} shares`}
                             />
-                            <BreakLine
-                                label={`Annual revenue × ${vb.revenueMultiple.toFixed(2)}`}
-                                value={formatMoney(vb.revenue)}
+                            <StatRow
+                                label={t('equity.publicFloat')}
+                                value={`${((publicShares / totalShares) * 100).toFixed(1)}%`}
+                                why={`${formatNumber(publicShares)} shares held by the market`}
                             />
-                            {vb.debt > 0 && (
-                                <BreakLine label={t('equity.lessDebt')} value={`−${formatMoney(vb.debt)}`} negative />
-                            )}
-                            <View style={styles.breakDivider} />
-                            <BreakLine label={t('equity.valuation')} value={formatMoney(vb.total)} bold />
-                            <BreakLine
-                                label={`÷ ${formatNumber(totalShares)} shares`}
-                                value={formatPrice(vb.total / Math.max(1, totalShares))}
-                            />
-                            <Text style={styles.breakdownNote}>{EQUITY_EXPLANATIONS.valuation}</Text>
-                        </View>
-
-                        {/* Stats Grid */}
-                        <View style={styles.statsGrid}>
-                            <View style={styles.statCard}>
-                                <Text style={styles.statIcon}>📊</Text>
-                                <Text style={styles.statLabel}>{t('equity.totalShares')}</Text>
-                                <Text style={styles.statValue}>{formatNumber(totalShares)}</Text>
-                            </View>
-                            <View style={styles.statCard}>
-                                <Text style={styles.statIcon}>💎</Text>
-                                <Text style={styles.statLabel}>{t('equity.marketCap')}</Text>
-                                <Text style={styles.statValue}>{formatMoney(marketCap)}</Text>
-                            </View>
-                            <View style={styles.statCard}>
-                                <Text style={styles.statIcon}>🌐</Text>
-                                <Text style={styles.statLabel}>{t('equity.publicFloat')}</Text>
-                                <Text style={styles.statValue}>{((publicShares / totalShares) * 100).toFixed(1)}%</Text>
-                            </View>
-                            <View style={styles.statCard}>
-                                <Text style={styles.statIcon}>👤</Text>
-                                <Text style={styles.statLabel}>{t('equity.myOwnership')}</Text>
-                                <Text style={styles.statValue}>{playerOwnership.toFixed(1)}%</Text>
-                            </View>
-                        </View>
+                        </RowGroup>
 
                         {/* Actions Section */}
                         <Text style={styles.sectionTitle}>{t('equity.marketActions')}</Text>
@@ -340,35 +379,32 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 const chunk = Math.round(cap * 0.05);
                                 const price = useStatsStore.getState().companySharePrice || 0;
                                 const q = quoteSecondarySale(chunk, price, eq.playerShares, cap);
-                                Alert.alert(
-                                    t('equity.sellOwnConfirm'),
-                                    `Gross: ${formatMoney(q.grossProceeds)}\n` +
-                                    `Capital gains tax: −${formatMoney(q.tax)}\n` +
-                                    `Block discount: −${q.discountPercent.toFixed(1)}%\n\n` +
-                                    `You receive ${formatMoney(q.netToFounder)} personally. ` +
-                                    `The company gets nothing — these are your shares, not new ones.\n\n` +
-                                    `Your stake falls to ${q.newOwnershipPercent.toFixed(1)}%. ` +
-                                    `The market reads insider selling as a warning.`,
-                                    [
-                                        { text: t('equity.cancel'), style: 'cancel' },
-                                        {
-                                            text: t('equity.sell'),
-                                            style: 'destructive',
-                                            onPress: () => {
-                                                const r = eq.sellOwnShares(chunk, (n) => {
-                                                    const st = useStatsStore.getState();
-                                                    st.update({ money: (st.money || 0) + n });
-                                                });
-                                                Alert.alert(
-                                                    r.error ? 'Blocked' : 'Sold',
-                                                    r.error ||
-                                                    `${formatMoney(r.netToFounder)} is in your personal account ` +
-                                                    `after ${formatMoney(r.tax)} of tax.`,
-                                                );
-                                            },
-                                        },
+                                setPanel({
+                                    title: t('equity.sellOwnConfirm'),
+                                    summary: `Selling ${formatNumber(chunk)} of your own shares — the company gets nothing, these are yours, not new ones.`,
+                                    lines: [
+                                        { label: 'Gross', value: formatMoney(q.grossProceeds) },
+                                        { label: 'Capital gains tax', value: `−${formatMoney(q.tax)}`, tone: 'negative' },
+                                        { label: 'Block discount', value: `−${q.discountPercent.toFixed(1)}%`, tone: 'negative' },
+                                        { label: 'You receive', value: formatMoney(q.netToFounder), strong: true },
+                                        { label: 'Your stake after', value: `${q.newOwnershipPercent.toFixed(1)}%` },
                                     ],
-                                );
+                                    note: 'The market reads insider selling as a warning.',
+                                    confirmLabel: t('equity.sell'),
+                                    tone: 'danger',
+                                    onConfirm: () => {
+                                        const r = eq.sellOwnShares(chunk, (n) => {
+                                            const st = useStatsStore.getState();
+                                            st.update({ money: (st.money || 0) + n });
+                                        });
+                                        setPanel({
+                                            title: r.error ? 'Blocked' : 'Sold',
+                                            summary: r.error
+                                                || `${formatMoney(r.netToFounder)} is in your personal account after ${formatMoney(r.tax)} of tax.`,
+                                            confirmLabel: 'OK',
+                                        });
+                                    },
+                                });
                             }}
                             disabled={!isPublic}
                             activeOpacity={0.7}
@@ -413,6 +449,21 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
                     {/* Persistent Bottom Bar */}
                     <CrystalNavBar activeTab="Company" variant="dark" />
+
+                    {/* Draws INSIDE this screen, over the content it refers to,
+                        rather than as a system dialog that replaces it. */}
+                    <ConfirmPanel
+                        visible={!!panel}
+                        title={panel?.title || ''}
+                        summary={panel?.summary}
+                        lines={panel?.lines}
+                        note={panel?.note}
+                        tone={panel?.tone}
+                        confirmLabel={panel?.confirmLabel || 'OK'}
+                        cancelLabel={t('equity.cancel')}
+                        onConfirm={panel?.onConfirm}
+                        onCancel={() => setPanel(null)}
+                    />
                 </SafeAreaView>
             </Modal>
 

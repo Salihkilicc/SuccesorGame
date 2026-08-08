@@ -19,6 +19,7 @@ import type { BoardMember } from '../../../features/shareholders/stores/useShare
 import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 import { theme } from '../../../core/theme';
+import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -47,6 +48,15 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     const [animationState, setAnimationState] = useState<AnimationStateType>('idle');
     const [adviceText, setAdviceText] = useState<string | null>(null);
     const [adviceQuality, setAdviceQuality] = useState<'good' | 'bad' | 'neutral' | null>(null);
+    // Results are shown in place rather than in a system Alert - see
+    // components/common/ConfirmPanel.
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        confirmLabel: string;
+        tone?: 'default' | 'danger';
+    }>(null);
 
     // ============================================================================
     // STORES
@@ -117,11 +127,12 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
         const result = giftMember(member.id, giftType);
 
-        if (result.success) {
-            Alert.alert(t('mem.giftSent'), result.message);
-        } else {
-            Alert.alert(`❌ ${t('common.failed')}`, result.message);
-        }
+        setPanel({
+            title: result.success ? t('mem.giftSent') : t('common.failed'),
+            summary: result.message,
+            confirmLabel: 'OK',
+            tone: result.success ? 'default' : 'danger',
+        });
     };
 
     const handleStepperChange = (direction: 'up' | 'down') => {
@@ -192,7 +203,12 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
         // Show alert with result message
         if (!result.success) {
-            Alert.alert(tradeMode === 'buy' ? '❌ Purchase Failed' : '❌ Sale Failed', result.message);
+            setPanel({
+                title: tradeMode === 'buy' ? 'Purchase failed' : 'Sale failed',
+                summary: result.message,
+                confirmLabel: 'OK',
+                tone: 'danger',
+            });
         }
 
         // Close modal after 2s
@@ -567,6 +583,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                     </Animated.View>
                 )}
             </View>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                onCancel={() => setPanel(null)}
+            />
         </Modal>
     );
 };
