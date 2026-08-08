@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -234,6 +234,29 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             for (const m of line.matchAll(/\bcolor:\s*'(#FF8A8A|#4ADE80)'/gi)) {
                 problems.palette.push(
                     `${rel(f)}:${i + 1}  ${m[1]} as raw hex - use colors.negative / colors.positive`);
+            }
+        });
+    }
+}
+
+// --- 0d3) `{someString && <JSX/>}` -------------------------------------------
+//  A guard on a STRING renders the string when it is empty: `'' && <Text/>`
+//  evaluates to `''`, and React Native refuses to draw a bare string with
+//  "Text strings must be rendered within a <Text> component". The crash gives
+//  a stack of nothing but React internals - no component name, no file - so it
+//  cost several passes to find by hand. `!!` costs nothing and ends it.
+//
+//  Same hazard with a number: `{count && <X/>}` prints 0.
+{
+    const STRINGY = /^(title|subtitle|name|label|text|message|note|hint|desc|description|reason|symbol|summary|caption|error|msg|value|unit|why|detail|placeholder|tag|category|region|count|total|length)$/i;
+    for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+        read(f).split('\n').forEach((line, i) => {
+            if (/^\s*(\/\/|\*)/.test(line)) return;
+            for (const m of line.matchAll(/\{\s*(?:[\w.?]+\.)?(\w+)\s*&&\s*[(<]/g)) {
+                if (STRINGY.test(m[1]) && !/\{\s*!!/.test(m[0])) {
+                    problems.stringGuards.push(
+                        `${rel(f)}:${i + 1}  {${m[1]} && ...} - use !! or it renders '' / 0`);
+                }
             }
         });
     }
@@ -493,6 +516,8 @@ total += section('Translations frozen at module load', problems.frozenText,
     'Evaluated once on import, so they never follow a language change. Use a getter.');
 total += section('Hooks called after an early return', problems.hooks,
     'React will crash with "Rendered more hooks than during the previous render".');
+total += section('String used as a render guard', problems.stringGuards,
+    'An empty string renders as a bare text node: "Text strings must be rendered within a <Text>".');
 total += section('Components nothing renders', problems.components,
     'Written, compiles, and no screen mounts it.');
 total += section('Store actions nothing calls', problems.storeActions,

@@ -19,7 +19,7 @@ const MarketHeader = ({ title, subtitle }: { title: string; subtitle?: string })
             </Pressable>
             <View>
                 <Text style={styles.title}>{title}</Text>
-                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
         </View>
     );

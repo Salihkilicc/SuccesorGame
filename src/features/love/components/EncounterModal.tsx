@@ -114,7 +114,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                         </Text>
 
                         {/* Job Title */}
-                        {deepPartner?.job?.title && (
+                        {!!deepPartner?.job?.title && (
                             <Text style={styles.jobTitle}>
                                 {deepPartner.job.title}
                             </Text>
@@ -137,7 +137,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                         )}
 
                         {/* Personality Trait */}
-                        {deepPartner?.personality?.label && (
+                        {!!deepPartner?.personality?.label && (
                             <View style={styles.traitRow}>
                                 <Text style={styles.traitLabel}>{t('love.trait')}</Text>
                                 <Text style={styles.traitValue}>

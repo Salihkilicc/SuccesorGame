@@ -28,7 +28,7 @@ const SectionCard = ({ title, subtitle, rightText, onPress, style, danger, selec
             ]}>
             <View style={styles.content}>
                 <Text style={[styles.title, danger && styles.dangerText, selected && styles.selectedText]}>{title}</Text>
-                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
             {rightText && (
                 <Text style={[styles.rightText, danger && styles.dangerText, selected && styles.selectedText]}>{rightText}</Text>

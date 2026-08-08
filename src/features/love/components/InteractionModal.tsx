@@ -20,7 +20,7 @@ const InteractionModal = ({ visible, onClose, title, children }: InteractionModa
             onRequestClose={onClose}>
             <Pressable style={styles.overlay} onPress={onClose}>
                 <Pressable style={styles.content} onPress={e => e.stopPropagation()}>
-                    {title && <Text style={styles.title}>{title}</Text>}
+                    {!!title && <Text style={styles.title}>{title}</Text>}
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={styles.body}>
                             {children}

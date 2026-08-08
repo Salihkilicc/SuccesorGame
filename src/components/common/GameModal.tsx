@@ -27,8 +27,8 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
                 <View style={styles.screenBody}>
                     {(title || subtitle) && (
                         <View style={styles.header}>
-                            {title && <Text style={styles.title}>{title}</Text>}
-                            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                            {!!title && <Text style={styles.title}>{title}</Text>}
+                            {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
                         </View>
                     )}
                     {children}
@@ -53,8 +53,8 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
                     <View style={styles.container}>
                         {(title || subtitle) && (
                             <View style={styles.header}>
-                                {title && <Text style={styles.title}>{title}</Text>}
-                                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                                {!!title && <Text style={styles.title}>{title}</Text>}
+                                {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
                             </View>
                         )}
                         {children}
