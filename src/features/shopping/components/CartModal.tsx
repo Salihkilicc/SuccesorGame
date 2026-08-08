@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
         lineHeight: 22,
     },
     itemPrice: {
-        color: '#FF8A8A', // Amazon-ish red for price/deal, or Gold
+        color: theme.colors.textPrimary, // Amazon-ish red for price/deal, or Gold
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 6,
@@ -349,12 +349,12 @@ const styles = StyleSheet.create({
         borderTopColor: 'rgba(255,255,255,0.06)',
     },
     totalLabel: {
-        color: '#FF8A8A', // Red for total
+        color: theme.colors.textMuted, // Red for total
         fontSize: 20,
         fontWeight: '700',
     },
     totalValue: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 20,
         fontWeight: '700',
     },
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     footerTotalValue: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 22,
         fontWeight: '700',
     },

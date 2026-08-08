@@ -2,6 +2,7 @@ import React from 'react';
 import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useGymSystem, WorkoutType } from './useGymSystem';
+import { theme } from '../../../../core/theme';
 
 const WORKOUTS: { type: WorkoutType; icon: string; label: string; desc: string }[] = [
     { type: 'Weights', icon: '🏋️', label: t('life.weights'), desc: t('life.buildRawPower') },
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
+    backText: { fontSize: 14, color: theme.colors.textPrimary, fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         marginTop: 4,
     },
     statsCard: {
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     divider: { height: 1, backgroundColor: '#434B50', marginVertical: 8 },
-    statLabel: { fontSize: 12, fontWeight: '700', color: '#FF8A8A', letterSpacing: 0.5 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: theme.colors.textMuted, letterSpacing: 0.5 },
     statValue: { fontSize: 14, fontWeight: '900', color: '#FFFFFF' },
     grid: {
         flexDirection: 'row',
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     },
     workoutDesc: {
         fontSize: 11,
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         textAlign: 'center',
     },
     infoFooter: {

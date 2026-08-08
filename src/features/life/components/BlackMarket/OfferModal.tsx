@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     price: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 32,
         fontWeight: 'bold',
         textShadowColor: 'rgba(5,168,246,0.3)',

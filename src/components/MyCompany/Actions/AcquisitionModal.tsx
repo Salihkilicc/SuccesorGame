@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
     color: theme.colors.danger,
   },
   hostileDesc: {
-    color: '#FF8A8A',
+    color: theme.colors.textMuted,
   },
   cancelBtn: {
     marginTop: 16,

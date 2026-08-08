@@ -55,12 +55,12 @@ const styles = StyleSheet.create({
     trainerIcon: { fontSize: 20 },
     trainerInfo: { flex: 1 },
     trainerName: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
-    trainerRole: { color: '#FF8A8A', fontSize: 12 },
-    trainerBonus: { color: '#FF8A8A', fontSize: 12, marginTop: 2 },
+    trainerRole: { color: theme.colors.textMuted, fontSize: 12 },
+    trainerBonus: { color: theme.colors.textPrimary, fontSize: 12, marginTop: 2 },
     trainerPrice: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
-    activeText: { color: '#FF8A8A' },
+    activeText: { color: theme.colors.textPrimary },
     backBtn: { marginTop: 30, alignItems: 'center', padding: 10 },
-    backText: { color: '#FF8A8A', fontSize: 14 },
+    backText: { color: theme.colors.textPrimary, fontSize: 14 },
 });
 
 export default TrainerSelectionView;

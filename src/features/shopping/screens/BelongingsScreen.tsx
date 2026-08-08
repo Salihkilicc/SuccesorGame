@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     cardLabelSmall: {
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     badgeText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 9,
         fontWeight: '800',
         letterSpacing: 1,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     filterTextActive: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
 
     // List

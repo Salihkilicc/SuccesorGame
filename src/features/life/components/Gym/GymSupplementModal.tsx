@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         textAlign: 'center',
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         marginBottom: 30
     },
     grid: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     itemText: { color: '#FFFFFF', fontWeight: '700' },
-    itemPrice: { color: '#FF8A8A' },
+    itemPrice: { color: theme.colors.textPrimary },
     dangerItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -151,16 +151,16 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginTop: 20
     },
-    dangerText: { color: '#FF8A8A', fontWeight: '900' },
-    dangerPrice: { color: '#FF8A8A', fontWeight: '700' },
+    dangerText: { color: theme.colors.warning, fontWeight: '900' },
+    dangerPrice: { color: theme.colors.warning, fontWeight: '700' },
     closeBtn: { marginTop: 20, alignItems: 'center', padding: 10 },
-    closeText: { color: '#FF8A8A', textDecorationLine: 'underline' },
+    closeText: { color: theme.colors.textPrimary, textDecorationLine: 'underline' },
     warningBox: { alignItems: 'center' },
-    warningTitle: { color: '#FF8A8A', fontSize: 22, fontWeight: '900', marginBottom: 20 },
-    warningBody: { color: '#FF8A8A', textAlign: 'center', lineHeight: 24, marginBottom: 30 },
+    warningTitle: { color: theme.colors.warning, fontSize: 22, fontWeight: '900', marginBottom: 20 },
+    warningBody: { color: theme.colors.warning, textAlign: 'center', lineHeight: 24, marginBottom: 30 },
     warningActions: { flexDirection: 'row', gap: 20 },
     cancelBtn: { padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 8 },
-    cancelText: { color: '#FF8A8A' },
+    cancelText: { color: theme.colors.textPrimary },
     injectBtn: { padding: 12, backgroundColor: '#434B50', borderRadius: 8 },
     injectText: { color: '#FFFFFF', fontWeight: '900' }
 });

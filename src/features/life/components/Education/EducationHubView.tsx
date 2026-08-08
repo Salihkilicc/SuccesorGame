@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     headerSubtitle: {
         fontSize: 10,
         fontWeight: '600',
-        color: '#FF8A8A', // Gold
+        color: theme.colors.textMuted, // Gold
         letterSpacing: 2,
     },
     closeBtn: {

@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(28,36,44,0.6)'
   },
   bigWinText: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontSize: 64,
     fontWeight: '900',
     textShadowColor: '#FF8A8A',

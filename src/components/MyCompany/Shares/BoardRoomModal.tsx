@@ -152,7 +152,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
             <View style={[styles.backdrop, asScreen && styles.backdropScreen]}>
                 {!asScreen && <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />}
                 <View style={[styles.container, asScreen && styles.containerScreen]}>
-                    <ScreenHeader title={t('board.title')} onBack={onClose} />
+                    <ScreenHeader inset={!!asScreen} title={t('board.title')} onBack={onClose} />
 
                     {/* ---- KONTROL DURUMU: seyreltmenin bedeli burada gorunur ---- */}
                     <View style={styles.controlCard}>
@@ -406,19 +406,19 @@ const styles = StyleSheet.create({
     controlRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     controlLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     controlValue: { fontSize: 22, fontWeight: '800' },
-    controlNote: { fontSize: 11, color: '#FF8A8A', lineHeight: 16, marginTop: 6 },
+    controlNote: { fontSize: 11, color: theme.colors.textMuted, lineHeight: 16, marginTop: 6 },
     moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
     moodValue: { fontSize: 13, fontWeight: '800' },
 
     demandCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    demandTag: { fontSize: 10, color: '#FF8A8A', fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
+    demandTag: { fontSize: 10, color: theme.colors.textPrimary, fontWeight: '800', letterSpacing: 1, marginBottom: 6 },
     demandBody: { fontSize: 12, color: '#FFFFFF', lineHeight: 18, fontStyle: 'italic' },
     demandPrivate: { fontSize: 10, color: '#FFFFFF', marginTop: 6, lineHeight: 15 },
     demandDue: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 6, fontWeight: '700' },
 
     dangerCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    dangerTitle: { fontSize: 13, color: '#FF8A8A', fontWeight: '800', marginBottom: 4 },
-    dangerBody: { fontSize: 11, color: '#FF8A8A', lineHeight: 16 },
+    dangerTitle: { fontSize: 13, color: theme.colors.warning, fontWeight: '800', marginBottom: 4 },
+    dangerBody: { fontSize: 11, color: theme.colors.warning, lineHeight: 16 },
 
     tabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
     tab: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: theme.colors.surface, alignItems: 'center' },
@@ -436,13 +436,13 @@ const styles = StyleSheet.create({
     memberTrust: { fontSize: 20, fontWeight: '800' },
     trustBarBg: { height: 5, backgroundColor: '#434B50', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
-    promiseNote: { fontSize: 11, color: '#FF8A8A', marginTop: 8 },
+    promiseNote: { fontSize: 11, color: theme.colors.textMuted, marginTop: 8 },
     actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
     openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#434B50', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    openMemberText: { color: '#FF8A8A', fontSize: 12, fontWeight: '700' },
+    openMemberText: { color: theme.colors.textPrimary, fontSize: 12, fontWeight: '700' },
     lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#434B50', alignItems: 'center' },
     lobbyBtnDone: { opacity: 0.4 },
-    lobbyText: { fontSize: 12, color: '#FF8A8A', fontWeight: '700' },
+    lobbyText: { fontSize: 12, color: theme.colors.textPrimary, fontWeight: '700' },
 
     floatCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginTop: 4 },
     floatTitle: { fontSize: 13, color: '#FFFFFF', fontWeight: '700', marginBottom: 4 },
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
 
     voteCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 12 },
     voteTitle: { fontSize: 14, color: '#FFFFFF', fontWeight: '800' },
-    voteSummary: { fontSize: 12, color: '#FF8A8A', marginTop: 4, marginBottom: 10 },
+    voteSummary: { fontSize: 12, color: theme.colors.textMuted, marginTop: 4, marginBottom: 10 },
     voteRow: { flexDirection: 'row', gap: 10, marginBottom: 8, alignItems: 'flex-start' },
     voteMark: { fontSize: 16, fontWeight: '800', width: 18 },
     voteName: { fontSize: 13, color: '#FFFFFF', fontWeight: '600' },

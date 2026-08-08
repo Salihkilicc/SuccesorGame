@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
     },
     actionCost: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
     },
     actionEffect: {

@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     nopeText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     infoSection: {
         flex: 1,

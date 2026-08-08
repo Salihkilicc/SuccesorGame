@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   changeDown: {
-    color: '#FF8A8A',
+    color: theme.colors.negative,
   },
   meta: {
     fontSize: theme.typography.caption + 1,

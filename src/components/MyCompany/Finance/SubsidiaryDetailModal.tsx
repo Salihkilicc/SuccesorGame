@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     sellBtnText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,

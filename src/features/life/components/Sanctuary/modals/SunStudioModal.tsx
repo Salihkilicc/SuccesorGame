@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     cardPrice: {
         fontSize: 16,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -147,6 +147,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     riskText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
 });

@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(5,168,246,0.3)',
   },
   costText: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '600',
   },
   actionButton: {

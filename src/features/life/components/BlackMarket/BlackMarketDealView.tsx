@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image, Dimensions } from 'react-native';
 import { BlackMarketItem } from './blackMarketData';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { theme } from '../../../../core/theme';
 
 // --- PROPS ---
 
@@ -84,7 +85,7 @@ export const BlackMarketDealView: React.FC<BlackMarketDealViewProps> = ({
                     {deal.tier === 4 && (
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>{t('life.highSociety2')}</Text>
-                            <Text style={[styles.statGain, { color: '#FF8A8A' }]}>+5</Text>
+                            <Text style={[styles.statGain, { color: theme.colors.textPrimary }]}>+5</Text>
                         </View>
                     )}
                 </View>
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         marginBottom: 30,
         textShadowColor: '#FF8A8A',
         textShadowOffset: { width: 0, height: 0 },
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
         marginTop: 2
     },
     warningText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         marginTop: 15,
         fontWeight: 'bold',
         letterSpacing: 1

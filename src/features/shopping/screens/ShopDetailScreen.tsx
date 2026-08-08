@@ -88,7 +88,7 @@ const ShopDetailScreen = () => {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#1C242C' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    errorText: { color: '#FF8A8A', fontSize: 16, marginBottom: 20 },
+    errorText: { color: theme.colors.warning, fontSize: 16, marginBottom: 20 },
     goBackBtn: { padding: 10, backgroundColor: '#434B50', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     goBackText: { color: '#FFFFFF' },
     listContent: { padding: theme.spacing.lg },

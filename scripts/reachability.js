@@ -225,6 +225,16 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                     problems.palette.push(`${rel(f)}:${i + 1}  ${m[2]} used as ${m[1]}`);
                 }
             }
+            // The profit/loss colours written as RAW HEX rather than through
+            // their tokens. This is how the red kept leaking back in after
+            // every sweep: CollapsibleSection painted every section HEADING
+            // with #FF8A8A, so "Competitors" and "R&D Upgrades" read as
+            // problems on every screen in the app. A signal spelled as a
+            // literal is a signal nobody can grep for by token.
+            for (const m of line.matchAll(/\bcolor:\s*'(#FF8A8A|#4ADE80)'/gi)) {
+                problems.palette.push(
+                    `${rel(f)}:${i + 1}  ${m[1]} as raw hex - use colors.negative / colors.positive`);
+            }
         });
     }
 }

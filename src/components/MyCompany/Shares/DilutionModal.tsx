@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
 import { formatMoney, formatPrice } from '../../../core/utils';
+import { theme } from '../../../core/theme';
 
 interface Props {
     visible: boolean;
@@ -155,7 +156,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                             <View style={styles.stockWarningContent}>
                                 <Text style={styles.stockWarningTitle}>{t('equity.stockPriceImpact')}</Text>
                                 <Text style={styles.stockWarningText}>
-                                    Est. Price Drop: <Text style={{ color: '#FF8A8A', fontWeight: '700' }}>
+                                    Est. Price Drop: <Text style={{ color: theme.colors.textPrimary, fontWeight: '700' }}>
                                         -{(predictedDrop * 100).toFixed(1)}%
                                     </Text>
                                 </Text>
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     },
     warningBannerText: {
         fontSize: 13,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
     stockWarningTitle: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         marginBottom: 4,
     },
     stockWarningText: {
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     stockWarningValue: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
     criticalBox: {
         backgroundColor: '#FF8A8A20',
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     },
     criticalText: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
         textAlign: 'center',
     },

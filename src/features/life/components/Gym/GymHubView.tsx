@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useGymSystem } from './useGymSystem';
+import { theme } from '../../../../core/theme';
 
 /**
  * GYM HUB VIEW
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    closeIcon: { fontSize: 18, color: '#FF8A8A' },
+    closeIcon: { fontSize: 18, color: theme.colors.textPrimary },
     titleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -210,8 +211,8 @@ const styles = StyleSheet.create({
     badgeStandard: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#434B50' },
     badgeTitanium: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#434B50' },
     badgeText: { fontSize: 10, fontWeight: '700' },
-    textStandard: { color: '#FF8A8A' },
-    textTitanium: { color: '#FF8A8A' },
+    textStandard: { color: theme.colors.textPrimary },
+    textTitanium: { color: theme.colors.textPrimary },
     statsCard: {
         width: '100%',
         backgroundColor: '#434B50', // Darker premium tint
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     divider: { height: 1, backgroundColor: '#434B50', marginVertical: 12 },
-    statLabel: { fontSize: 12, fontWeight: '700', color: '#FF8A8A', letterSpacing: 0.5 },
+    statLabel: { fontSize: 12, fontWeight: '700', color: theme.colors.textMuted, letterSpacing: 0.5 },
     statValue: { fontSize: 16, fontWeight: '900', color: '#FFFFFF' },
     fatigueContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     fatigueBar: {
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     fatigueFill: { height: '100%', borderRadius: 4 },
-    fatigueText: { fontSize: 12, fontWeight: '700', color: '#FF8A8A' },
+    fatigueText: { fontSize: 12, fontWeight: '700', color: theme.colors.textPrimary },
     grid: {
         width: '100%',
         gap: 12,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     },
     menuIcon: { fontSize: 28 },
     menuLabel: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
-    menuSubLabel: { fontSize: 12, color: '#FF8A8A', marginTop: 2 },
+    menuSubLabel: { fontSize: 12, color: theme.colors.textMuted, marginTop: 2 },
     maButtonActive: {
         backgroundColor: '#434B50',
         borderColor: 'rgba(255,255,255,0.08)',

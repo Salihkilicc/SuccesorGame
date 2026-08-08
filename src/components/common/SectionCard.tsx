@@ -81,10 +81,10 @@ const styles = StyleSheet.create({
         color: '#FFFFFF', // Apple Blue
     },
     dangerText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
     selectedText: {
-        color: '#FF8A8A', // Gold
+        color: theme.colors.textPrimary, // Gold
     },
 });
 

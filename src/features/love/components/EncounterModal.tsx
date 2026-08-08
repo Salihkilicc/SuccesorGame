@@ -354,14 +354,14 @@ const styles = StyleSheet.create({
     },
     costLabel: {
         fontSize: 11,
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     costValue: {
         fontSize: 18,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '800',
     },
 

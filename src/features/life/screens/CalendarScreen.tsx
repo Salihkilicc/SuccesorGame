@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useCalendarStore, CalendarEvent } from '../../../core/store/useCalendarStore';
+import { theme } from '../../../core/theme';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -393,7 +394,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     monthNameCurrent: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
     },
     currentMonthBadge: {
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
     currentMonthBadgeText: {
         fontSize: 8,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         letterSpacing: 1.5,
     },
 
@@ -458,7 +459,7 @@ const styles = StyleSheet.create({
     dayNum: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         textAlign: 'center',
     },
     dayNumWeekend: { color: 'rgba(255,255,255,0.4)' },
@@ -489,12 +490,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 1,
         fontSize: 7,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         textShadowColor: 'rgba(5,168,246,0.9)',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 6,
     },
-    eventStarToday: { color: '#FF8A8A' },
+    eventStarToday: { color: theme.colors.textPrimary },
 
     // Modal
     modalOverlay: {
@@ -580,7 +581,7 @@ const styles = StyleSheet.create({
     modalDismissText: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         letterSpacing: 2.5,
     },
 });

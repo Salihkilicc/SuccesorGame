@@ -46,8 +46,9 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
-                    <ScreenHeader title="🚀 New Product Opportunity" onBack={onClose} />
+                    <ScreenHeader inset title="🚀 New Product Opportunity" onBack={onClose} />
 
+                    <View style={styles.contentPad}>
                     <View style={styles.header}>
                         <Text style={styles.icon}>{product.icon}</Text>
                         <View style={{ flex: 1 }}>
@@ -100,6 +101,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
                         <Pressable style={styles.btnGhost} onPress={onClose}>
                             <Text style={styles.ghostText}>{t('product.cancel')}</Text>
                         </Pressable>
+                    </View>
                     </View>
                 </View>
             </View>
@@ -470,8 +472,9 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
-                <View style={[styles.content, { height: '85%' }]}>
+                <View style={styles.content}>
                     <ScreenHeader
+                        inset={false}
                         title={`${product.icon} ${displayName}`}
                         onBack={onClose}
                         right={
@@ -481,7 +484,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         }
                     />
 
-                    <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentPad}>
                         {/* SHELVED: the "AI Insight" box.
                             It sat above everything and restated what the rows
                             below already said. `getTip` and its styles are kept
@@ -1211,8 +1214,9 @@ const styles = StyleSheet.create({
     previewLabel: { color: '#FFFFFF', fontSize: 9.5 },
     previewValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', marginTop: 3 },
 
-    overlay: { flex: 1, backgroundColor: 'rgba(28,36,44,0.9)', justifyContent: 'center', padding: 16 },
-    content: { backgroundColor: '#434B50', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+    overlay: { flex: 1, backgroundColor: theme.colors.background },
+    content: { flex: 1, backgroundColor: theme.colors.background },
+    contentPad: { padding: theme.spacing.md, paddingBottom: 120 },
     modalTitle: { fontSize: 22, fontWeight: '800', color: '#FFFFFF', textAlign: 'center' },
     header: { flexDirection: 'row', gap: 16, marginBottom: 20 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },

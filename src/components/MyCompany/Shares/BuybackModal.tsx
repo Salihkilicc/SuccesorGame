@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useBuybackLogic } from './logic/useBuybackLogic';
 import { formatMoney, formatPrice } from '../../../core/utils';
+import { theme } from '../../../core/theme';
 
 interface Props {
     visible: boolean;
@@ -214,7 +215,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 
 const styles = StyleSheet.create({
     noFloatCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    noFloatTitle: { color: '#FF8A8A', fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    noFloatTitle: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 13, marginBottom: 4 },
     noFloatBody: { color: '#FFFFFF', fontSize: 11, lineHeight: 16 },
     overlay: {
         flex: 1,
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     },
     warningText: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontWeight: '600',
         textAlign: 'center',
     },

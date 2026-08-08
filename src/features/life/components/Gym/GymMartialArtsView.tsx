@@ -2,6 +2,7 @@ import React from 'react';
 import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
 import { useGymSystem, MartialArtStyle } from './useGymSystem';
+import { theme } from '../../../../core/theme';
 
 const MARTIAL_ARTS_LIST: { id: MartialArtStyle; name: string; icon: string; desc: string }[] = [
     { id: 'boxing', name: t('life.boxing'), icon: '🥊', desc: t('life.focusOnPunchesAndFootwork') },
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
+    backText: { fontSize: 14, color: theme.colors.textPrimary, fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: {
         fontSize: 24,
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         marginTop: 4,
     },
     listContainer: {
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     artIcon: { fontSize: 32 },
     artInfo: { flex: 1 },
     artName: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
-    artDesc: { fontSize: 12, color: '#FF8A8A', marginTop: 2 },
+    artDesc: { fontSize: 12, color: theme.colors.textMuted, marginTop: 2 },
     selectBtn: {
         paddingVertical: 8,
         paddingHorizontal: 12,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     selectBtnText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
         fontSize: 12,
     },
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    progressLabel: { fontSize: 12, fontWeight: '700', color: '#FF8A8A' },
+    progressLabel: { fontSize: 12, fontWeight: '700', color: theme.colors.textMuted },
     progressValue: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
     progressBarBg: {
         height: 12,
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.08)',
     },
-    infoLabel: { fontSize: 14, color: '#FF8A8A', fontWeight: '500' },
+    infoLabel: { fontSize: 14, color: theme.colors.textMuted, fontWeight: '500' },
     infoValue: { fontSize: 14, color: '#FFFFFF', fontWeight: '700' },
     trainBtn: {
         width: '100%',
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     trainBtnSub: {
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontSize: 12,
         marginTop: 2,
     },

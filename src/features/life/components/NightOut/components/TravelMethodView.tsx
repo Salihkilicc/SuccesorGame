@@ -114,7 +114,7 @@ const TravelMethodView = ({
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>Royal{'\n'}Charter</Text>
-                        <Text style={[styles.cardPrice, { color: '#FF8A8A' }]}>$50k</Text>
+                        <Text style={[styles.cardPrice, { color: theme.colors.textPrimary }]}>$50k</Text>
                     </View>
                 </Pressable>
 

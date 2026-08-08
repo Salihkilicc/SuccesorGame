@@ -102,15 +102,15 @@ const styles = StyleSheet.create({
         paddingBottom: 8
     },
     statLabel: {
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontSize: 16
     },
     statValue: {
         fontSize: 16,
         fontWeight: '700'
     },
-    green: { color: '#FF8A8A' },
-    red: { color: '#FF8A8A' },
+    green: { color: theme.colors.textPrimary },
+    red: { color: theme.colors.textPrimary },
     message: {
         color: '#FFFFFF',
         textAlign: 'center',

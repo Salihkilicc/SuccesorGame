@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from '
 import { useBlackMarketSystem } from './useBlackMarketSystem';
 import { BlackMarketCategory } from './blackMarketData';
 import { useStatsStore } from '../../../../core/store/useStatsStore';
+import { theme } from '../../../../core/theme';
 
 // --- PROPS ---
 
@@ -50,8 +51,8 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
     });
 
     const categories: { id: BlackMarketCategory, label: string, icon: string, color: string }[] = [
-        { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: '#FF8A8A' },
-        { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: '#FF8A8A' },
+        { id: 'art_antique', label: t('life.fineArtsAntiques'), icon: '🏛️', color: theme.colors.textPrimary },
+        { id: 'weapon', label: t('life.weaponsDefense'), icon: '🔫', color: theme.colors.textPrimary },
         { id: 'jewelry', label: t('life.jewelryGems'), icon: '💎', color: '#FFFFFF' },
         { id: 'substance', label: t('life.prohibitedSubstances'), icon: '🧪', color: '#FFFFFF' }
     ];
@@ -103,7 +104,7 @@ export const BlackMarketHubView: React.FC<BlackMarketHubViewProps> = ({ onOpenCa
                 <View style={[styles.barContainer, { marginTop: 15 }]}>
                     <View style={styles.barHeader}>
                         <Text style={styles.barLabel}>👑 STREET REP</Text>
-                        <Text style={[styles.barValue, { color: '#FF8A8A' }]}>
+                        <Text style={[styles.barValue, { color: theme.colors.textPrimary }]}>
                             {data.streetRep.toFixed(1)} / 100
                         </Text>
                     </View>
@@ -206,12 +207,12 @@ const styles = StyleSheet.create({
         letterSpacing: 1
     },
     barValue: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: 'bold'
     },
     repTier: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 10,
         marginBottom: 4,
         fontFamily: 'Courier New'
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
         borderRadius: 3
     },
     warningText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 10,
         fontWeight: 'bold',
         marginTop: 4,

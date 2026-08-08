@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
     },
     headerTitleContainer: {
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     activeTabText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: 'bold',
     },
     // Status Section
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     warningText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 13,
         fontWeight: '600',
     },
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     detailValue: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     badgeContainer: {
         flexDirection: 'row',
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(5,168,246,0.3)',
     },
     prerequisiteText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 12,
         fontWeight: '600',
         textAlign: 'center',

@@ -47,7 +47,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress10')}</Text>
-                                <Text style={[styles.statGain, { color: '#FF8A8A' }]}>{t('life.cost2000')}</Text>
+                                <Text style={[styles.statGain, { color: theme.colors.textPrimary }]}>{t('life.cost2000')}</Text>
                             </View>
                         </Pressable>
 
@@ -66,7 +66,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
                             </Text>
                             <View style={styles.statsRow}>
                                 <Text style={styles.statGain}>{t('life.stress25')}</Text>
-                                <Text style={[styles.statGain, { color: '#FF8A8A' }]}>⚠️ Multiple Risks</Text>
+                                <Text style={[styles.statGain, { color: theme.colors.textPrimary }]}>⚠️ Multiple Risks</Text>
                             </View>
                         </Pressable>
                     </View>
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(28,36,44,0.3)'
     },
     classyBadge: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
     },
     wildBadge: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 10,
         fontWeight: '900',
         letterSpacing: 1
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         fontWeight: '700'
     },
     riskWarning: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 11,
         fontWeight: '700',
         marginTop: 4

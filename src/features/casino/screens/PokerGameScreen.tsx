@@ -220,5 +220,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   secondaryButtonPressed: { opacity: 0.7 },
-  secondaryText: { color: '#FF8A8A', fontWeight: '800', fontSize: 14 },
+  secondaryText: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 14 },
 });

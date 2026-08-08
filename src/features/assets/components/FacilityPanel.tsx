@@ -444,8 +444,8 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(5,168,246,0.28)',
         padding: 12,
     },
-    alertText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16.5 },
-    alertCta: { color: '#FF8A8A', fontSize: 11, fontWeight: '800', marginTop: 6 },
+    alertText: { color: theme.colors.warning, fontSize: 11.5, lineHeight: 16.5 },
+    alertCta: { color: theme.colors.warning, fontSize: 11, fontWeight: '800', marginTop: 6 },
     card: {
         backgroundColor: 'rgba(255,255,255,0.04)',
         borderRadius: 16,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     stat: { flex: 1 },
     statLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
     statValue: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700', marginTop: 2 },
-    statWarn: { color: '#FF8A8A' },
+    statWarn: { color: theme.colors.warning },
 
     compareRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
     compareValue: { marginTop: 2 },
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     compareArrow: { color: '#FFFFFF', fontSize: 11 },
     compareTo: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
 
-    warn: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    warn: { color: theme.colors.warning, fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     okLine: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 6 },
 
@@ -480,9 +480,9 @@ const styles = StyleSheet.create({
     utilHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
     utilLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     utilValue: { fontSize: 18, fontWeight: '800' },
-    util_idle: { color: '#FF8A8A' },
+    util_idle: { color: theme.colors.textPrimary },
     util_healthy: { color: '#FFFFFF' },
-    util_tight: { color: '#FF8A8A' },
+    util_tight: { color: theme.colors.textPrimary },
     utilTrack: {
         height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden', marginTop: 6,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
         borderWidth: 1, borderColor: 'rgba(5,168,246,0.4)',
     },
-    cancelText: { color: '#FF8A8A', fontSize: 11, fontWeight: '700' },
+    cancelText: { color: theme.colors.textPrimary, fontSize: 11, fontWeight: '700' },
 
     headRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 8 },
     adjBtn: {

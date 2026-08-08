@@ -91,7 +91,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                             <Text style={styles.cashLabel}>{t('dividend.lastQuarterProfit')}</Text>
                             <Text style={[
                                 styles.cashValue,
-                                lastQuarterProfit <= 0 && { color: '#FF8A8A' },
+                                lastQuarterProfit <= 0 && { color: theme.colors.textPrimary },
                             ]}>
                                 {formatMoney(lastQuarterProfit)}
                             </Text>
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
         borderWidth: 1, borderColor: 'rgba(5,168,246,0.30)',
         padding: 12, marginBottom: 12,
     },
-    flagText: { color: '#FF8A8A', fontSize: 11.5, lineHeight: 16 },
+    flagText: { color: theme.colors.textPrimary, fontSize: 11.5, lineHeight: 16 },
     yieldRow: {
         flexDirection: 'row', justifyContent: 'space-between',
         paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     },
     warningText: {
         fontSize: 13,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontWeight: '600',
         textAlign: 'center',
     },

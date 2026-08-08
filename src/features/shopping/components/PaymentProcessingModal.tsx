@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     amountText: {
-        color: '#FF8A8A', // Red for debit
+        color: theme.colors.textPrimary, // Red for debit
         fontSize: 32,
         fontWeight: '700',
         marginBottom: 60,

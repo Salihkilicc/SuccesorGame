@@ -337,6 +337,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     resultFail: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
 });

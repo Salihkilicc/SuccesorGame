@@ -18,6 +18,7 @@ import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import { startNewGame } from '../../../core/newGame';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
 import { START_EMPLOYEES } from '../../../core/store/useStatsStore';
+import { theme } from '../../../core/theme';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     },
     langLabel: { flex: 1, fontSize: 15, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     langLabelActive: { color: '#FFFFFF' },
-    langCheck: { color: '#FF8A8A', fontSize: 16, fontWeight: '800' },
+    langCheck: { color: theme.colors.textPrimary, fontSize: 16, fontWeight: '800' },
     langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,

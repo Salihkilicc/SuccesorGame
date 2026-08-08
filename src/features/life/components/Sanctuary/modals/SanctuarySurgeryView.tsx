@@ -111,8 +111,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                 // Risk/Reward labels
                                 const getRiskLabel = () => {
                                     if (successPercent === 100) return { text: '✅ Guaranteed', color: '#FFFFFF' };
-                                    if (successPercent >= 80) return { text: '⚠️ Low Risk', color: '#FF8A8A' };
-                                    return { text: '⚠️ High Risk', color: '#FF8A8A' };
+                                    if (successPercent >= 80) return { text: '⚠️ Low Risk', color: theme.colors.textPrimary };
+                                    return { text: '⚠️ High Risk', color: theme.colors.textPrimary };
                                 };
                                 const riskLabel = getRiskLabel();
 
@@ -163,7 +163,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                                                     {doctor.success.highSociety && ` | +${doctor.success.highSociety} High Society 🎩`}
                                                 </Text>
                                                 {/* Looks Reward Display */}
-                                                <Text style={[styles.outcomeText, { marginTop: 2, color: '#FF8A8A' }]}>
+                                                <Text style={[styles.outcomeText, { marginTop: 2, color: theme.colors.textPrimary }]}>
                                                     ✨ Looks: +{doctor.looksMin}-{doctor.looksMax}
                                                 </Text>
                                             </View>
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
     },
     warningTitle: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 20,
         fontWeight: '900',
         marginBottom: 20,

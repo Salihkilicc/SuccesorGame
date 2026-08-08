@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNotesStore, Note } from '../../../core/store/useNotesStore';
+import { theme } from '../../../core/theme';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -584,7 +585,7 @@ const styles = StyleSheet.create({
     emptyActionText: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         letterSpacing: 1.5,
         textTransform: 'uppercase',
     },
@@ -609,7 +610,7 @@ const styles = StyleSheet.create({
     },
     editorHeaderBtnText: {
         fontSize: 16,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
     },
     editorSaveBtn: {

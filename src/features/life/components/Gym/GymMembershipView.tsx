@@ -11,6 +11,7 @@ import {
     SafeAreaView
 } from 'react-native';
 import { useGymSystem, MEMBERSHIP_PRICING, MembershipTier } from './useGymSystem';
+import { theme } from '../../../../core/theme';
 
 interface Props {
     visible?: boolean;
@@ -52,7 +53,7 @@ const GymMembershipView = () => {
             id: 'STANDARD' as MembershipTier,
             title: t('life.standard'),
             price: `$${prices.STANDARD.annual.toLocaleString()}/yr`,
-            color: '#FF8A8A',
+            color: theme.colors.textPrimary,
             features: ['Access to Equipment', 'Basic Classes', 'Locker Room'],
             req: null
         },
@@ -60,7 +61,7 @@ const GymMembershipView = () => {
             id: 'TITANIUM' as MembershipTier,
             title: t('life.titanium'),
             price: `$${prices.TITANIUM.annual.toLocaleString()}/yr`,
-            color: '#FF8A8A',
+            color: theme.colors.textPrimary,
             features: ['Grandmaster Trainers', '2x Workout Gains', 'Private Spa Access', 'Networking Events'],
             req: 'Requires Godlike Body'
         }
@@ -165,10 +166,10 @@ const styles = StyleSheet.create({
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
+    backText: { fontSize: 14, color: theme.colors.textPrimary, fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: { fontSize: 24, fontWeight: '900', color: '#FFFFFF' },
-    subtitle: { fontSize: 14, color: '#FF8A8A', marginTop: 4 },
+    subtitle: { fontSize: 14, color: theme.colors.textMuted, marginTop: 4 },
     list: { gap: 20 },
     membershipCard: {
         borderRadius: 16,
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     cardContent: { padding: 12, gap: 8 },
     price: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
     features: { gap: 4 },
-    featureItem: { fontSize: 14, color: '#FF8A8A', fontWeight: '500' },
+    featureItem: { fontSize: 14, color: theme.colors.textPrimary, fontWeight: '500' },
     actionBtn: {
         backgroundColor: '#434B50',
         paddingVertical: 12,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 8,
     },
-    lockedText: { color: '#FF8A8A', fontWeight: '700', fontSize: 12 },
+    lockedText: { color: theme.colors.warning, fontWeight: '700', fontSize: 12 },
 });
 
 export default GymMembershipView;

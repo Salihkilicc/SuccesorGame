@@ -133,6 +133,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
             <View style={styles.backdrop}>
                 <View style={styles.card}>
                     <ScreenHeader
+                        inset={false}
                         title={step === 1 ? t('product.newProductLaunch') : t('product.marketResearch')}
                         onBack={onClose}
                     />

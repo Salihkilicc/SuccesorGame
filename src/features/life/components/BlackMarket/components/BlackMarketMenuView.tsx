@@ -1,6 +1,7 @@
 import React from 'react';
 import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { theme } from '../../../../../core/theme';
 
 type BlackMarketMenuViewProps = {
     onSelectArt: () => void;
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     dangerText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
     menuSubtitle: {
         color: '#FFFFFF',

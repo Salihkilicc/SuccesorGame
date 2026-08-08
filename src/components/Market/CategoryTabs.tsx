@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
   },
   labelActive: {
-    color: '#FF8A8A',
+    color: theme.colors.textMuted,
   },
 });

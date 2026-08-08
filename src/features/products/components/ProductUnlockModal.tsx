@@ -152,7 +152,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         >
             <Pressable style={styles.overlay} onPress={onClose}>
                 <Pressable style={styles.modal} onPress={(e) => e.stopPropagation()}>
-                    <ScreenHeader title={product.name} onBack={onClose} />
+                    <ScreenHeader inset={false} title={product.name} onBack={onClose} />
 
                     {/* Description */}
                     <View style={styles.descriptionContainer}>

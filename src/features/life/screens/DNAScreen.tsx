@@ -205,7 +205,7 @@ const DNAScreen = () => {
                                         Security Boost: <Text style={{ fontWeight: 'bold', color: '#FFFFFF' }}>+{securityLevel}%</Text>
                                     </Text>
                                     <Text style={styles.skillDetail}>
-                                        Body Type: <Text style={{ fontWeight: 'bold', color: '#FF8A8A' }}>{bodyType}</Text>
+                                        Body Type: <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary }}>{bodyType}</Text>
                                     </Text>
                                 </View>
                                 <View style={[styles.beltBadge, { backgroundColor: getBeltBgColor(beltTitle) }]}>
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     luxuryValue: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
         fontSize: 12,
         width: 60,

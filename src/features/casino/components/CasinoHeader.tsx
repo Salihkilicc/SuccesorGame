@@ -39,7 +39,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
         return {
           fontFamily: Platform.OS === 'ios' ? 'Palatino' : 'serif',
           fontWeight: '800' as '800',
-          color: '#FF8A8A', // Gold
+          color: theme.colors.textPrimary, // Gold
           letterSpacing: 1
         };
       case 'athens':
@@ -131,7 +131,7 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           </View>
           <View style={styles.repLabelContainer}>
             <Text style={styles.repText}>
-              Reputation: {reputation.toFixed(0)} / 1000 <Text style={{ color: '#FF8A8A' }}>({rankName})</Text>
+              Reputation: {reputation.toFixed(0)} / 1000 <Text style={{ color: theme.colors.textPrimary }}>({rankName})</Text>
             </Text>
           </View>
         </View>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   cashLabel: { fontSize: 12 },
   cashValue: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '800',
     fontSize: 11, // Slightly reduced from 12.5 requested (12 is nice, 12.5 is specific, let's go 11 for safety/style)
     fontVariant: ['tabular-nums']

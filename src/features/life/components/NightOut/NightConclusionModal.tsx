@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         lineHeight: 32,
     },
     wildText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600'
     },
     minimalStatsRow: {

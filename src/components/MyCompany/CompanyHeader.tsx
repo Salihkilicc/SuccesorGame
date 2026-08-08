@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   subtitle: {
-    color: '#FF8A8A', // Gold for CEO name
+    color: theme.colors.textMuted, // Gold for CEO name
     fontSize: theme.typography.caption + 1,
     marginTop: theme.spacing.xs,
   },
@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF', // Green
   },
   changeDown: {
-    color: '#FF8A8A', // Red
+    color: theme.colors.negative, // Red
   },
   meta: {
     color: 'rgba(255,255,255,0.48)',
     fontSize: theme.typography.caption + 1,
   },
   debt: {
-    color: '#FF8A8A', // Red
+    color: theme.colors.textPrimary, // Red
   },
 });

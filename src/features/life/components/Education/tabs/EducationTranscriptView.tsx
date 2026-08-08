@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     degreeBonus: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
     },
 });

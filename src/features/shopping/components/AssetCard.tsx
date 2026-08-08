@@ -43,7 +43,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onSell(item)}
             >
-                <Text style={[styles.actionText, { color: '#FF8A8A' }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
+                <Text style={[styles.actionText, { color: theme.colors.textPrimary }, isGrid && styles.actionIconTile]}>{isGrid ? '💰' : 'SELL'}</Text>
             </Pressable>
         );
     } else if (item.category === 'REAL_ESTATE') {
@@ -78,7 +78,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ item, onSell, onRepair, onPropose
                 style={[styles.actionButton, isGrid && styles.actionButtonTile]}
                 onPress={() => onPropose && onPropose(item)}
             >
-                <Text style={[styles.actionText, { color: '#FF8A8A' }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
+                <Text style={[styles.actionText, { color: theme.colors.textPrimary }, isGrid && styles.actionIconTile]}>{isGrid ? '💍' : 'PROPOSE'}</Text>
             </Pressable>
         );
     }

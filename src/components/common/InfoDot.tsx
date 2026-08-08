@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import { theme } from '../../core/theme';
 
 // ============================================================================
 //  INFO NOKTASI
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     dotSmall: { width: 15, height: 15, borderRadius: 7.5 },
     dotPressed: { backgroundColor: 'rgba(5,168,246,0.25)' },
     dotText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 11,
         fontWeight: '800',
         lineHeight: 14,
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 13,
         fontWeight: '800',
         letterSpacing: 0.6,
@@ -130,5 +131,5 @@ const styles = StyleSheet.create({
         paddingVertical: 11,
         alignItems: 'center',
     },
-    buttonText: { color: '#FF8A8A', fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
+    buttonText: { color: theme.colors.textPrimary, fontSize: 12.5, fontWeight: '800', letterSpacing: 0.8 },
 });

@@ -52,7 +52,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
                                 <Text style={styles.value}>{formatMoney(item.valuation)}</Text>
-                                <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#7DD3FC' } : { color: '#FF8A8A' }]}>
+                                <Text style={[styles.change, item.lastChangePercent >= 0 ? { color: '#7DD3FC' } : { color: theme.colors.textPrimary }]}>
                                     {item.lastChangePercent > 0 ? '+' : ''}{item.lastChangePercent.toFixed(1)}%
                                 </Text>
                             </View>

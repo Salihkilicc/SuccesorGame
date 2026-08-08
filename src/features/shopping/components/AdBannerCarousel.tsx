@@ -17,7 +17,7 @@ const ADS = [
         title: t('ui.velocityMotors'),
         subtitle: t('ui.startYourLegacy'),
         cta: 'Drive Now →',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         emoji: '🏎️',
     },
     {

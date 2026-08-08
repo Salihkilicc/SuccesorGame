@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
     reactionChance: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     reactionBarBg: {
         width: '100%',

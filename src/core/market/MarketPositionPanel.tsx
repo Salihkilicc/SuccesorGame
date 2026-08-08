@@ -6,6 +6,7 @@ import { useStatsStore } from '../store/useStatsStore';
 import { formatNumber, formatPercent } from '../utils';
 import CollapsibleSection from '../../components/common/CollapsibleSection';
 import InfoDot from '../../components/common/InfoDot';
+import { theme } from '../theme';
 
 // ============================================================================
 //  PAZAR KONUMU PANELI
@@ -98,7 +99,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 </View>
                 <View style={styles.summaryCell}>
                     <Text style={styles.summaryLabel}>{t('brand.thisCategory')}</Text>
-                    <Text style={[styles.summaryValue, { color: '#FF8A8A' }]}>
+                    <Text style={styles.summaryValue}>
                         {Math.round((brandByCategory || {})[category ?? ""] ?? 0)}
                     </Text>
                     <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: brandValue.toFixed(0) })}</Text>
@@ -119,7 +120,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                             <Text style={styles.brandChipCat}>{cat}</Text>
                             <Text style={[
                                 styles.brandChipVal,
-                                { color: (v as number) >= 200 ? '#CFD0D2' : '#FF8A8A' },
+                                { color: (v as number) >= 200 ? theme.colors.textPrimary : theme.colors.warning },
                             ]}>
                                 {Math.round(v as number)}
                             </Text>
@@ -138,7 +139,7 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                 note={t('os.whoHoldsThisMarketAnd')}
                 info={t('os.theseAreRealCompaniesYou')}
                 summary={`#${playerRank} of ${ranking.length}`}
-                summaryColor="#CFD0D2"
+                summaryColor={theme.colors.textPrimary}
                 style={styles.rankingSection}
             >
             <View style={styles.rankingBox}>
@@ -160,9 +161,9 @@ export const MarketPositionPanel = ({ category, compact }: Props) => {
                                     styles.rankBarFill,
                                     {
                                         width: `${Math.min(100, p.share)}%`,
-                                        backgroundColor: p.isPlayer
-                                            ? '#CFD0D2'
-                                            : p.owned ? '#CFD0D2' : 'rgba(255,255,255,0.28)',
+                                        backgroundColor: (p.isPlayer || p.owned)
+                                            ? theme.colors.primary
+                                            : 'rgba(255,255,255,0.28)',
                                     },
                                 ]}
                             />
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: 'rgba(5,168,246,0.12)',
     },
-    regionText: { color: '#FF8A8A', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+    regionText: { color: theme.colors.textSecondary, fontSize: 9, fontWeight: '800', letterSpacing: 1 },
     description: { color: 'rgba(255,255,255,0.48)', fontSize: 11, lineHeight: 16, marginTop: 6 },
 
     summaryRow: { flexDirection: 'row', marginTop: 14, marginBottom: 10 },

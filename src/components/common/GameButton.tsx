@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.08)',
     },
     dangerText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
     // Ghost
     ghostButton: {

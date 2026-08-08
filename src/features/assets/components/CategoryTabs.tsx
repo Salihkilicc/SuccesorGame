@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { theme } from '../../../core/theme';
 
 export type TabKey = 'stocks' | 'crypto' | 'bonds' | 'funds';
 
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     activeTabText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '800',
     },
 });

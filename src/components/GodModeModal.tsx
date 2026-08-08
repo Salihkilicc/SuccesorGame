@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-na
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useStatsStore, useGameStore } from '../core/store';
+import { theme } from '../core/theme';
 
 interface GodModeModalProps {
     visible: boolean;
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         letterSpacing: 2,
     },
     closeButton: {
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     actionTextReset: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: '700',
         letterSpacing: 1,

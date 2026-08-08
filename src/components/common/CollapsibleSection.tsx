@@ -10,6 +10,7 @@ import {
     type ViewStyle,
 } from 'react-native';
 import InfoDot from './InfoDot';
+import { theme } from '../../core/theme';
 
 // ============================================================================
 //  ACILIR BOLUM
@@ -127,7 +128,9 @@ const styles = StyleSheet.create({
     headerText: { flex: 1, paddingRight: 10 },
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
     title: {
-        color: '#FF8A8A',
+        // Was the loss red, which made EVERY section heading in the app read
+        // as a problem - "Competitors", "R&D Upgrades", "Income Statement".
+        color: theme.colors.textMuted,
         fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 1.6,
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
         width: 14,
         textAlign: 'center',
     },
-    chevronOpen: { color: '#FF8A8A', transform: [{ rotate: '180deg' }], marginTop: 2 },
+    chevronOpen: { color: theme.colors.textPrimary, transform: [{ rotate: '180deg' }], marginTop: 2 },
     body: {
         paddingHorizontal: 14,
         paddingBottom: 14,

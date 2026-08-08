@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     },
     categoryText: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
         marginTop: 4,
     },

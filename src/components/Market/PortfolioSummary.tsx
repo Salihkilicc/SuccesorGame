@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.99 }],
   },
   buttonText: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '800',
     fontSize: theme.typography.body,
   },
   buttonArrow: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontSize: theme.typography.subtitle,
   },
 });

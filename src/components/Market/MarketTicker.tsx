@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { formatPrice } from '../../core/utils';
+import { theme } from '../../core/theme';
 
 const MarketTicker = ({ items }: { items: any[] }) => {
     const flatListRef = useRef<FlatList>(null);
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
         width: 150,
     },
     symbol: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '800',
         marginRight: 5,
         fontSize: 11,

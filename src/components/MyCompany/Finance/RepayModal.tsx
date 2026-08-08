@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     },
     loanRate: {
         fontSize: 13,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '600',
     },
     loanRemainingLabel: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     loanRemaining: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     loanDetails: {
         flexDirection: 'row',
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     },
     insufficientText: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         textAlign: 'center',
         fontStyle: 'italic',
     },

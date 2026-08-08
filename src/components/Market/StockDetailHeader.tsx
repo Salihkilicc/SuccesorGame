@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(5,168,246,0.4)',
   },
   chipText: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '700',
     fontSize: theme.typography.caption + 1,
   },
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   down: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
   },
   metaRow: {
     flexDirection: 'row',

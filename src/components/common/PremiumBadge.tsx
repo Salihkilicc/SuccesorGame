@@ -1,6 +1,7 @@
 import React from 'react';
 import { t, useLocale } from '../../core/i18n';
 import {Text, StyleSheet, ViewStyle, TextStyle, View} from 'react-native';
+import { theme } from '../../core/theme';
 
 type BadgeSize = 'small' | 'large';
 
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   label: {
-    color: '#FF8A8A',
+    color: theme.colors.textMuted,
     fontWeight: '800',
     letterSpacing: 0.5,
   },

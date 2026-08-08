@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontSize: theme.typography.body,
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     marginTop: theme.spacing.xs,
     fontWeight: '600',
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   itemSymbol: {
     fontSize: theme.typography.caption,
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '700',
   },
   itemQuantity: {
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   loss: {
-    color: '#FF8A8A',
+    color: theme.colors.negative,
   },
   actions: {
     flexDirection: 'row',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sellButtonText: {
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontSize: theme.typography.caption,
     fontWeight: '700',
   },

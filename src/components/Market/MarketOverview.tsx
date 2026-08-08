@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   positive: { color: '#FFFFFF' },
-  negative: { color: '#FF8A8A' },
-  warning: { color: '#FF8A8A' },
+  negative: { color: theme.colors.negative },
+  warning: { color: theme.colors.warning },
   helper: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: theme.typography.caption,

@@ -8,6 +8,7 @@ import { useGameStore } from '../../../core/store/useGameStore';
 import { absoluteMonth } from '../../../features/shareholders/hooks/useDebtEnforcer';
 import { formatMoney } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import { theme } from '../../../core/theme';
 
 type Props = {
     visible: boolean;
@@ -312,8 +313,8 @@ export default SharkDealModal;
 
 const styles = StyleSheet.create({
     activeLoanCard: { backgroundColor: '#434B50', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    activeLoanTitle: { color: '#FF8A8A', fontWeight: '800', fontSize: 13, marginBottom: 4 },
-    activeLoanBody: { color: '#FF8A8A', fontSize: 11, lineHeight: 16, marginBottom: 10 },
+    activeLoanTitle: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 13, marginBottom: 4 },
+    activeLoanBody: { color: theme.colors.textPrimary, fontSize: 11, lineHeight: 16, marginBottom: 10 },
     repayBtn: { backgroundColor: '#CFD0D2', borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
     repayBtnDisabled: { backgroundColor: '#434B50' },
     repayBtnText: { color: '#FFFFFF', fontWeight: '800', fontSize: 13 },
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     termRow: { flexDirection: 'row', justifyContent: 'space-between' },
     termLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)' },
     termValue: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
-    termBad: { fontSize: 12, color: '#FF8A8A', fontWeight: '700' },
+    termBad: { fontSize: 12, color: theme.colors.negative, fontWeight: '700' },
     header: {
         alignItems: 'center',
         marginBottom: 24,
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     },
     headerSubtitle: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontStyle: 'italic',
     },
     lenderCard: {
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
     dealDeadline: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     warningBox: {
         backgroundColor: '#434B50',
@@ -448,7 +449,7 @@ const styles = StyleSheet.create({
     warningHeaderText: {
         fontSize: 14,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         letterSpacing: 1,
     },
     warningText: {
@@ -458,11 +459,11 @@ const styles = StyleSheet.create({
     },
     warningTextBold: {
         fontWeight: '900',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
     },
     warningSubtext: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontStyle: 'italic',
         marginTop: 8,
     },
@@ -477,13 +478,13 @@ const styles = StyleSheet.create({
     riskTitle: {
         fontSize: 12,
         fontWeight: '800',
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         letterSpacing: 1,
         marginBottom: 8,
     },
     riskItem: {
         fontSize: 13,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         lineHeight: 20,
     },
     buttonContainer: {

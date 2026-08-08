@@ -11,6 +11,7 @@ import {
     SafeAreaView
 } from 'react-native';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
+import { theme } from '../../../../core/theme';
 
 // --- TYPES ---
 
@@ -432,7 +433,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         textShadowColor: '#FF8A8A',
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,

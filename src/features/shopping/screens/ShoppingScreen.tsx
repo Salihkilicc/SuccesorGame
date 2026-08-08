@@ -24,12 +24,12 @@ const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
 
 // Categories for Hub Grid
 const CATEGORIES = [
-    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: '#FF8A8A' },
+    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: theme.colors.textPrimary },
     { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#FFFFFF' },
-    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: '#FF8A8A' },
+    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: theme.colors.textPrimary },
     { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#FFFFFF' },
     { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#FFFFFF' },
-    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: '#FF8A8A' },
+    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: theme.colors.textPrimary },
 ];
 
 const ShoppingScreen = () => {
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
         minHeight: 34,
     },
     trendingPrice: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '700',
     },
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
         height: 36,
     },
     itemPrice: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 15,
         fontWeight: '700',
     },

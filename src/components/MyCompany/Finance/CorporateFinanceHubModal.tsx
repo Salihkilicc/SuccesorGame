@@ -163,13 +163,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.statsGrid}>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.totalDebt')}</Text>
-                        <Text style={[styles.statValue, { color: '#FF8A8A' }]}>
+                        <Text style={[styles.statValue, { color: theme.colors.textPrimary }]}>
                             {formatMoney(totalDebt)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{t('finance.monthlyInterest')}</Text>
-                        <Text style={[styles.statValue, { color: '#FF8A8A' }]}>
+                        <Text style={[styles.statValue, { color: theme.colors.textPrimary }]}>
                             {formatMoney(monthlyInterest)}
                         </Text>
                     </View>
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     },
     capacityValue: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
         textAlign: 'right',
     },
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     loanRate: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     loanDetails: {
         flexDirection: 'row',
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     },
     sharkDealSubtitle: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         fontWeight: '600',
     },
     instantBadge: {
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     },
     sharkDealWarning: {
         fontSize: 11,
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontStyle: 'italic',
         textAlign: 'center',
     },

@@ -141,5 +141,5 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     positive: { color: '#FFFFFF' },
-    negative: { color: '#FF8A8A' },
+    negative: { color: theme.colors.negative },
 });

@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     maxTierText: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '700',
     },

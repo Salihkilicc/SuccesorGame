@@ -46,7 +46,7 @@ interface Props {
 const BreakLine = ({ label, value, bold, negative }: { label: string; value: string; bold?: boolean; negative?: boolean }) => (
     <View style={styles.breakRow}>
         <Text style={[styles.breakLabel, bold && styles.breakBold]}>{label}</Text>
-        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: '#FF8A8A' }]}>
+        <Text style={[styles.breakValue, bold && styles.breakBold, negative && { color: theme.colors.textPrimary }]}>
             {value}
         </Text>
     </View>

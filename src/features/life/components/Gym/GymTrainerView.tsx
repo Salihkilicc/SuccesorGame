@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useGymSystem, TrainerTier } from './useGymSystem';
 import { TRAINER_COSTS } from './gymData';
+import { theme } from '../../../../core/theme';
 
 interface Props {
     visible?: boolean;
@@ -84,7 +85,7 @@ const GymTrainerView = () => {
                                             onPress={() => !isHired && handleHire(trainer.id)}
                                             disabled={isHired}
                                         >
-                                            <Text style={[styles.hireText, isHired && { color: '#FF8A8A' }]}>
+                                            <Text style={[styles.hireText, isHired && { color: theme.colors.textPrimary }]}>
                                                 {isHired ? 'HIRED' : 'HIRE'}
                                             </Text>
                                         </TouchableOpacity>
@@ -134,10 +135,10 @@ const styles = StyleSheet.create({
         minWidth: 60,
         alignItems: 'center',
     },
-    backText: { fontSize: 14, color: '#FF8A8A', fontWeight: '700' },
+    backText: { fontSize: 14, color: theme.colors.textPrimary, fontWeight: '700' },
     headerTitleContainer: { alignItems: 'center' },
     title: { fontSize: 24, fontWeight: '900', color: '#FFFFFF' },
-    subtitle: { fontSize: 14, color: '#FF8A8A', marginTop: 4 },
+    subtitle: { fontSize: 14, color: theme.colors.textMuted, marginTop: 4 },
     list: { gap: 16 },
 
     trainerCard: {
@@ -157,8 +158,8 @@ const styles = StyleSheet.create({
     icon: { fontSize: 32 },
     info: { flex: 1 },
     name: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
-    role: { fontSize: 12, color: '#FF8A8A', fontWeight: '600' },
-    boost: { fontSize: 12, color: '#FF8A8A', fontWeight: '700', marginTop: 2 },
+    role: { fontSize: 12, color: theme.colors.textMuted, fontWeight: '600' },
+    boost: { fontSize: 12, color: theme.colors.textPrimary, fontWeight: '700', marginTop: 2 },
 
     actions: { alignItems: 'flex-end', gap: 6 },
     price: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },

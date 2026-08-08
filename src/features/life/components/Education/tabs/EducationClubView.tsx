@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
     buffLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         marginBottom: 4,
     },
     buffText: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
     },
     membersSection: {
         marginBottom: 16,

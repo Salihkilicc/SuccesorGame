@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   ownedText: {
     fontSize: theme.typography.caption,
-    color: '#FF8A8A',
+    color: theme.colors.textPrimary,
     fontWeight: '600',
     marginTop: -8,
   },

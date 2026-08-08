@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { theme } from '../../../../../core/theme';
 
 type BlackMarketListViewProps = {
     title: string;
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     itemPrice: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: 'bold',
     },

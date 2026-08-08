@@ -197,7 +197,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'shark' && styles.typeLabelActive]}>
                                     {t('bank.type.shark')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#FF8A8A' }]}>
+                                <Text style={[styles.typeRate, { color: theme.colors.textPrimary }]}>
                                     {shark.locked || `${shark.rate.toFixed(1)}%`}
                                 </Text>
                             </Pressable>
@@ -224,7 +224,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                                 <Text style={[styles.typeLabel, selectedType === 'mezzanine' && styles.typeLabelActive]}>
                                     {t('bank.type.mezzanine')}
                                 </Text>
-                                <Text style={[styles.typeRate, { color: '#FF8A8A' }]}>{mezz.rate.toFixed(1)}%</Text>
+                                <Text style={[styles.typeRate, { color: theme.colors.textPrimary }]}>{mezz.rate.toFixed(1)}%</Text>
                             </Pressable>
                         </View>
 
@@ -269,7 +269,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                             </View>
                             <View style={styles.previewRow}>
                                 <Text style={styles.previewLabel}>{t('bank.quarterlyPayment')}</Text>
-                                <Text style={[styles.previewValue, { color: '#FF8A8A' }]}>
+                                <Text style={[styles.previewValue, { color: theme.colors.textPrimary }]}>
                                     {formatMoney(preview.totalPayment)}
                                 </Text>
                             </View>
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     },
     typeRate: {
         fontSize: 14,
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontWeight: '700',
     },
     sliderContainer: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     },
     productDesc: {
         fontSize: 12,
-        color: '#FF8A8A',
+        color: theme.colors.textMuted,
         lineHeight: 17,
         marginBottom: 14,
         fontStyle: 'italic',
@@ -476,14 +476,14 @@ const styles = StyleSheet.create({
         opacity: 0.45,
     },
     errorText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,
         fontWeight: '600',
     },
     warningText: {
-        color: '#FF8A8A',
+        color: theme.colors.warning,
         fontSize: 12,
         textAlign: 'center',
         marginBottom: 16,

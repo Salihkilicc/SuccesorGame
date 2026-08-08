@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     itemName: { color: '#FFFFFF', fontSize: theme.typography.body, fontWeight: '700', marginBottom: 4 },
     itemMetaRow: { flexDirection: 'column', gap: 2 },
     itemBrand: { color: '#FFFFFF', fontSize: theme.typography.caption },
-    itemPrice: { color: '#FF8A8A', fontSize: theme.typography.body, fontWeight: '700', marginTop: 2 },
+    itemPrice: { color: theme.colors.textPrimary, fontSize: theme.typography.body, fontWeight: '700', marginTop: 2 },
     buyButton: { backgroundColor: '#434B50', paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.sm, borderRadius: theme.radius.sm, minWidth: 80, alignItems: 'center' },
     buyButtonPressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
     buyButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: theme.typography.caption },

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   lockedTag: {
     backgroundColor: '#323A40',
-    color: '#FF8A8A',
+    color: theme.colors.warning,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

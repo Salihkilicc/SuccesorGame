@@ -31,10 +31,10 @@ type BrandConfig = {
 };
 
 const BRAND_CONFIGS: Record<string, BrandConfig> = {
-    Velocity: { name: t('ui.velocityMotors'), color: '#FF8A8A', emoji: '🏎️' },
+    Velocity: { name: t('ui.velocityMotors'), color: theme.colors.textPrimary, emoji: '🏎️' },
     Dynasty8: { name: t('ui.dynasty8'), color: '#FFFFFF', emoji: '🏠' },
     Luxe: { name: t('ui.luxeVault'), color: '#FFFFFF', emoji: '💎' },
-    Elitas: { name: t('ui.elitasTravel'), color: '#FF8A8A', emoji: '✈️' },
+    Elitas: { name: t('ui.elitasTravel'), color: theme.colors.textPrimary, emoji: '✈️' },
 };
 
 const ShoppingBrowseView = ({
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
     },
     itemPrice: {
-        color: '#FF8A8A',
+        color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: '700',
         marginTop: 2,
