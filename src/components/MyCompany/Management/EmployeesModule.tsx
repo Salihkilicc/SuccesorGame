@@ -48,11 +48,13 @@ import { formatMoney, formatNumber, formatPercent } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
 interface Props {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
 }
 
-const EmployeesModule = ({ visible, onClose }: Props) => {
+const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
     const [panel, setPanel] = useState<null | {
         title: string;
         summary?: string;

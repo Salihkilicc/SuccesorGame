@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useCalendarStore, CalendarEvent } from '../../../core/store/useCalendarStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -250,9 +249,7 @@ const CalendarScreen = () => {
                     <View style={{ height: 140 }} />
                 </ScrollView>
 
-                {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
-            </View>
+                {/* Universal Crystal Navigation Bar */}            </View>
 
             {/* ── Event Detail Modal ── */}
             <Modal

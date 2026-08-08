@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../../core/theme';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import { VENUES, Venue, RegionCode } from './data/nightOutVenues';
 import { SetupStep, TravelMethod } from './useNightOutSystem';
 
@@ -158,9 +157,7 @@ const NightOutSetupModal = ({
                 </View>
             </SafeAreaView>
 
-            {/* Bottom Stats Footer */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Bottom Stats Footer */}        </View>
     );
 };
 

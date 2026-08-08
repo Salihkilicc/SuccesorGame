@@ -3,7 +3,6 @@ import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useGymSystem } from './useGymSystem';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 /**
  * GYM HUB VIEW
@@ -154,9 +153,7 @@ const GymHubView = () => {
                 </View>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Universal Crystal Navigation Bar */}        </View>
     );
 };
 

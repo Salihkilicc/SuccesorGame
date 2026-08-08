@@ -7,7 +7,6 @@ import { useGameStore } from '../../../core/store/useGameStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney, formatNumber, formatPercent, formatSignedMoney } from '../../../core/utils';
 import { EXPENSE_EXPLANATIONS, normalizeQuarterReport } from '../../../core/reportTypes';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import InfoDot from '../../../components/common/InfoDot';
 
@@ -97,9 +96,7 @@ const FinancialReportScreen = () => {
                         <Row label={t('company.companyCapital')} amount={companyCapital || 0} />
                         <Row label={t('company.personalCash')} amount={money || 0} />
                     </View>
-                </ScrollView>
-                <CrystalNavBar activeTab="Company" variant="dark" hideDots />
-            </SafeAreaView>
+                </ScrollView>            </SafeAreaView>
         );
     }
 
@@ -307,10 +304,7 @@ const FinancialReportScreen = () => {
                 </CollapsibleSection>
 
                 <View style={{ height: 120 }} />
-            </ScrollView>
-
-            <CrystalNavBar activeTab="Company" variant="dark" hideDots />
-        </SafeAreaView>
+            </ScrollView>        </SafeAreaView>
     );
 };
 

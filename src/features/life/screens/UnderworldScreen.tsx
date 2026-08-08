@@ -11,7 +11,6 @@ import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import { theme } from '../../../core/theme';
 import { useUserStore, useStatsStore, usePlayerStore } from '../../../core/store';
 import type { RootStackParamList } from '../../../navigation';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // Type Definitions
 type UnderworldNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -133,10 +132,7 @@ const UnderworldScreen = () => {
                         </View>
                     </View>
                     <View style={{ height: 100 }} />
-                </ScrollView>
-
-                <CrystalNavBar activeTab="Home" variant="dark" />
-            </SafeAreaView>
+                </ScrollView>            </SafeAreaView>
 
             {/* --- MODALS --- */}
             <HookupModal

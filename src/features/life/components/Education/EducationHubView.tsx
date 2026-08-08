@@ -13,7 +13,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from './store/useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, MASTERS_DATA, MastersType } from './data/educationData';
 import { usePlayerStore } from '../../../../core/store/usePlayerStore';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../../core/theme';
 
 // ========================================
@@ -289,9 +288,7 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                 </SafeAreaView>
             </View>
 
-            {/* Bottom Stats Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Bottom Stats Bar */}        </View>
     );
 };
 

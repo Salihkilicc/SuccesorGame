@@ -24,7 +24,6 @@ import { formatMoney } from '../../core/utils';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
 import type { RootStackParamList, SwipeTabParamList } from '../../navigation';
-import CrystalNavBar from '../../navigation/components/CrystalNavBar';
 import QuarterlyReportModal, { FinancialData as ReportFinancialData } from '../../features/assets/screens/QuarterlyReportModal';
 // ADDED: Education System Import
 import { useEducationSystem } from '../../features/life/components/Education/store/useEducationSystem';
@@ -563,10 +562,7 @@ const HomeScreen = () => {
         {/* Education Exam Modal - Only show when report is closed */}
         {FEATURES.education && !reportVisible && <EducationExamModal />}
 
-        {/* Universal Crystal Navigation Bar (Dark Variant) */}
-        <CrystalNavBar activeTab="Home" variant="dark" />
-
-      </SafeAreaView >
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}      </SafeAreaView >
     </View>
   );
 };

@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useAssetPortfolio } from '../hooks/useAssetPortfolio';
 import AssetCard from '../components/AssetCard';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -171,9 +170,7 @@ const BelongingsScreen = () => {
                     />
                 </SafeAreaView>
 
-                {/* 4. Footer Stats */}
-                <CrystalNavBar activeTab="Life" variant="dark" />
-            </View>
+                {/* 4. Footer Stats */}            </View>
         </AppLaunchLoader>
     );
 };

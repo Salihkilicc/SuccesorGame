@@ -24,7 +24,6 @@ import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 
 // Helper Component
@@ -287,7 +286,7 @@ const MyCompanyScreen = () => {
               icon="🏦"
               title={t('company.finance')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
-              onPress={() => toggleModal('finance', true)}
+              onPress={() => navigation.navigate('Finance')}
             />
 
             <DepartmentCard
@@ -307,7 +306,7 @@ const MyCompanyScreen = () => {
               icon="📈"
               title={t('company.stockMarket')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
-              onPress={() => toggleModal('shareControl', true)}
+              onPress={() => navigation.navigate('StockMarket', { onOpenIPO: handleLaunchIPO })}
             />
           </View>
 
@@ -323,7 +322,7 @@ const MyCompanyScreen = () => {
             <SectionCard
               title={`🎉 ${t('company.teamMorale')}`}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
-              onPress={() => toggleModal('employees', true)}
+              onPress={() => navigation.navigate('TeamMorale')}
             />
           </View>
 
@@ -331,9 +330,9 @@ const MyCompanyScreen = () => {
           <SectionHeader title={t('company.quickActions')} />
           <View style={{ gap: 8 }}>
             <SectionCard title={`🔬 ${t('company.rDInvestment')}`} subtitle={t('company.investInFutureGrowth')} onPress={() => navigation.navigate('Research')} />
-            <SectionCard title={`🏢 ${t('company.hostileTakeover')}`} subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => toggleModal('acquire', true)} />
-            <SectionCard title={`👔 ${t('company.boardMembers')}`} subtitle={t('company.viewShareholders')} onPress={() => toggleModal('boardMembers', true)} />
-            <SectionCard title={`🏆 ${t('company.myEmpire')}`} subtitle={t('company.manageSubsidiaries')} onPress={() => toggleModal('existingCompanies', true)} />
+            <SectionCard title={`🏢 ${t('company.hostileTakeover')}`} subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => navigation.navigate('HostileTakeover')} />
+            <SectionCard title={`👔 ${t('company.boardMembers')}`} subtitle={t('company.viewShareholders')} onPress={() => navigation.navigate('BoardMembers')} />
+            <SectionCard title={`🏆 ${t('company.myEmpire')}`} subtitle={t('company.manageSubsidiaries')} onPress={() => navigation.navigate('MyEmpire')} />
           </View>
 
         </ScrollView>
@@ -351,10 +350,7 @@ const MyCompanyScreen = () => {
           onCancel={() => setPanel(null)}
         />
 
-        {/* Universal Crystal Navigation Bar (Dark Variant) */}
-        <CrystalNavBar activeTab="Company" variant="dark" />
-
-        {/* --- MODAL MANAGER --- */}
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}        {/* --- MODAL MANAGER --- */}
         <CompanyModals
           modals={modals}
           toggleModal={toggleModal}

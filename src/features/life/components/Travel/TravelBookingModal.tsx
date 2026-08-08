@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { theme } from '../../../../core/theme';
 import { VacationSpot, TravelClass } from './data/travelData';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 type TravelBookingModalProps = {
     visible: boolean;
@@ -160,9 +159,7 @@ const TravelBookingModal = ({
                         <Text style={styles.closeText}>{t('life.cancelFlight')}</Text>
                     </Pressable>
                 </View>
-                {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Life" variant="dark" />
-            </View>
+                {/* Universal Crystal Navigation Bar */}            </View>
         </Modal>
     );
 };

@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
 
 type Props = {
@@ -64,9 +63,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                             </Pressable>
                         </View>
                     </View>
-                    {/* Persistent Bottom Bar */}
-                    <CrystalNavBar activeTab="Company" variant="dark" />
-                </View>
+                    {/* Persistent Bottom Bar */}                </View>
             </Modal>
         );
     }
@@ -181,9 +178,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}
-                <CrystalNavBar activeTab="Company" variant="dark" />
-            </View>
+                {/* Persistent Bottom Bar */}            </View>
         </Modal>
     );
 };

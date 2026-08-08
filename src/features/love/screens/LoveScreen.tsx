@@ -16,7 +16,6 @@ import { EncounterModal } from '../components/EncounterModal';
 import BreakupModal from '../components/BreakupModal';
 import { useEncounterSystem } from '../components/useEncounterSystem';
 import { applyPartnerBuffs, getPartnerPerks } from '../../../logic/relationshipLogic';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
 
 // Extracted components
@@ -849,10 +848,7 @@ const LoveScreen = () => {
           />
         )}
 
-        {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}
-        <CrystalNavBar activeTab="Love" variant="dark" />
-
-        {/* BABY NAMING MODAL — extracted component */}
+        {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}        {/* BABY NAMING MODAL — extracted component */}
         <BabyNamingModal
           visible={isNamingChild}
           pendingChildGender={pendingChildGender}

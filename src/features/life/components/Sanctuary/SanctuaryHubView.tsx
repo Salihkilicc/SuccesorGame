@@ -1,7 +1,6 @@
 import React from 'react';
 import { t, useLocale } from '../../../../core/i18n';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 
 // Icons
 const ICONS = {
@@ -111,9 +110,7 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Universal Crystal Navigation Bar */}        </View>
     );
 };
 

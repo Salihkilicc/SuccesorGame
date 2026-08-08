@@ -11,7 +11,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { MAJOR_DATA, MajorType, CERTIFICATE_DATA, CertificateType, DegreeType, MASTERS_DATA, MastersType } from '../data/educationData';
-import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../../../core/theme';
 
 // ========================================
@@ -94,9 +93,7 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Bottom Stats Bar */}        </View>
     );
 };
 

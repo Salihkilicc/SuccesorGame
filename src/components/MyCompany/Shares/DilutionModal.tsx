@@ -3,7 +3,6 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDilutionLogic } from '../../../features/finance/hooks/useDilutionLogic';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice } from '../../../core/utils';
 
 interface Props {
@@ -191,9 +190,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}
-                <CrystalNavBar activeTab="Company" variant="dark" />
-            </View>
+                {/* Persistent Bottom Bar */}            </View>
         </Modal>
     );
 };

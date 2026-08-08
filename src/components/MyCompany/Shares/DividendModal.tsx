@@ -3,7 +3,6 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDividendLogic } from '../../../features/finance/hooks/useDividendLogic';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatPrice } from '../../../core/utils';
 import { DIVIDEND_TAX } from '../../../core/market/equity';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
@@ -256,9 +255,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}
-                <CrystalNavBar activeTab="Company" variant="dark" />
-            </View>
+                {/* Persistent Bottom Bar */}            </View>
         </Modal>
     );
 };

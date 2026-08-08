@@ -16,7 +16,6 @@ import { useShareholderStore } from '../../../features/shareholders/stores/useSh
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
@@ -541,9 +540,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         )}
                     </ScrollView>
 
-                    {/* Persistent Bottom Bar */}
-                    <CrystalNavBar activeTab="Company" variant="dark" />
-                </View>
+                    {/* Persistent Bottom Bar */}                </View>
 
                 {/* ANIMATION OVERLAY */}
                 {animationState !== 'idle' && (

@@ -6,7 +6,6 @@ import BrowserHeader from './BrowserHeader';
 import LuxeNetFooter from './LuxeNetFooter';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 
 const { width, height } = Dimensions.get('window');
@@ -188,11 +187,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                     </View>
                 )}
 
-                {/* Info / Stats Bar */}
-                <CrystalNavBar activeTab="Life" variant="dark" />
-
-
-            </SafeAreaView>
+                {/* Info / Stats Bar */}            </SafeAreaView>
         </Modal>
     );
 };

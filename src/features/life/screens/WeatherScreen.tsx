@@ -14,7 +14,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import useWeatherLogic, { DailyForecast } from '../hooks/useWeatherLogic';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const ForecastDay = ({ item, isFirst }: { item: DailyForecast; isFirst: boolean }) => (
     <View style={[styles.forecastDay, isFirst && styles.forecastDayFirst]}>
@@ -111,9 +110,7 @@ const WeatherScreen = () => {
                     )}
                 </View>
 
-                {/* Universal Crystal Navigation Bar (Dark Variant) */}
-                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
-            </SafeAreaView>
+                {/* Universal Crystal Navigation Bar (Dark Variant) */}            </SafeAreaView>
         </View>
     );
 };

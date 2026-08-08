@@ -15,7 +15,6 @@ import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
 
 type Props = {
@@ -337,9 +336,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}
-                <CrystalNavBar activeTab="Company" variant="dark" />
-            </View>
+                {/* Persistent Bottom Bar */}            </View>
         </Modal>
     );
 };

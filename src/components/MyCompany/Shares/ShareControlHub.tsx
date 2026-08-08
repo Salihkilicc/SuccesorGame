@@ -28,10 +28,12 @@ import { useEquityStore } from '../../../features/finance/stores/useEquityStore'
 import InfoTooltipModal from './InfoTooltipModal';
 import { StatRow, DetailLine, DetailRule, DetailNote, RowGroup } from '../../common/Disclosure';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
+import ScreenHost from '../../common/ScreenHost';
 
 interface Props {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
     onOpenIPO: () => void;
@@ -49,7 +51,7 @@ const BreakLine = ({ label, value, bold, negative }: { label: string; value: str
     </View>
 );
 
-const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback }: Props) => {
+const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDividend, onOpenBuyback, asScreen }: Props) => {
     // Dil degisince yeniden ciz.
     useLocale();
     const navigation = useNavigation<any>();
@@ -159,7 +161,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
 
     return (
         <>
-            <Modal visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
+            <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
                 <SafeAreaView style={styles.container}>
                     {/* Header */}
                     <View style={styles.header}>
@@ -447,10 +449,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         <View style={{ height: 40 }} />
                     </ScrollView>
 
-                    {/* Persistent Bottom Bar */}
-                    <CrystalNavBar activeTab="Company" variant="dark" />
-
-                    {/* Draws INSIDE this screen, over the content it refers to,
+                    {/* Persistent Bottom Bar */}                    {/* Draws INSIDE this screen, over the content it refers to,
                         rather than as a system dialog that replaces it. */}
                     <ConfirmPanel
                         visible={!!panel}
@@ -465,7 +464,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         onCancel={() => setPanel(null)}
                     />
                 </SafeAreaView>
-            </Modal>
+            </ScreenHost>
 
             <InfoTooltipModal
                 visible={!!tooltipTerm}

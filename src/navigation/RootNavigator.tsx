@@ -60,6 +60,31 @@ import CalendarScreen from '../features/life/screens/CalendarScreen';
 import NotesScreen from '../features/os/screens/NotesScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
+import CrystalNavBar from './components/CrystalNavBar';
+import {
+  BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
+  MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
+} from '../features/assets/screens/CompanyScreens';
+import { theme } from '../core/theme';
+
+/**
+ * Which swipe tab the bar should highlight for a given route.
+ *
+ * The company screens are pushed on top of the Company tab, so they keep it
+ * lit rather than dropping the highlight the moment you open a detail page.
+ */
+const COMPANY_ROUTES = new Set([
+    'MyCompany', 'Products', 'Research', 'TechTree', 'Assets', 'FinancialReport',
+    'BoardMembers', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
+]);
+
+const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
+    if (!route) return 'Home';
+    if (COMPANY_ROUTES.has(route)) return 'Company';
+    if (route === 'Life' || route === 'LifeHome') return 'Life';
+    if (route === 'Love' || route === 'LoveHome') return 'Love';
+    return 'Home';
+};
 
 export type LifeStackParamList = {
   LifeHome: undefined;
@@ -123,6 +148,13 @@ export type RootStackParamList = {
   Casino: NavigatorScreenParams<CasinoStackParamList> | undefined;
   Products: undefined;
   Research: undefined;
+  // The company sections - routes now, not popups.
+  BoardMembers: undefined;
+  TeamMorale: undefined;
+  Finance: undefined;
+  MyEmpire: undefined;
+  HostileTakeover: undefined;
+  StockMarket: { onOpenIPO?: () => void } | undefined;
   TechTree: undefined;
   FinancialReport: undefined;
   Assets: NavigatorScreenParams<AssetsStackParamList>;
@@ -319,7 +351,21 @@ const RootNavigator = () => {
       }}>
       <View style={{ flex: 1 }}>
         <RootStack.Navigator
-          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.colors.background },
+            // ----------------------------------------------------------------
+            //  ONE DIRECTION FOR EVERYTHING
+            // ----------------------------------------------------------------
+            //  Products slid in from the right while My Empire, the stock
+            //  market and the takeover screen came up from the bottom, because
+            //  those were Modals and Products was a screen. Two different
+            //  gestures for the same kind of navigation is what made the app
+            //  feel like separate pieces bolted together. Everything pushes
+            //  from the right now.
+            // ----------------------------------------------------------------
+            animation: 'slide_from_right',
+          }}
           initialRouteName="Home">
           <RootStack.Screen name="Home" component={SwipeNavigator} />
           {/* MainTabs removed as we are replaced by SwipeNavigator on 'Home' */}
@@ -337,6 +383,15 @@ const RootNavigator = () => {
 
           {/* ✅ PRODUCTS EKRANI ARTIK ROOT'TA */}
           <RootStack.Screen name="Products" component={ProductsScreen} />
+
+          {/* The company sections are routes, not popups - see
+              features/assets/screens/CompanyScreens.tsx */}
+          <RootStack.Screen name="BoardMembers" component={BoardMembersScreen} />
+          <RootStack.Screen name="TeamMorale" component={TeamMoraleScreen} />
+          <RootStack.Screen name="Finance" component={FinanceScreen} />
+          <RootStack.Screen name="MyEmpire" component={MyEmpireScreen} />
+          <RootStack.Screen name="HostileTakeover" component={HostileTakeoverScreen} />
+          <RootStack.Screen name="StockMarket" component={StockMarketScreen} />
           {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
           <RootStack.Screen name="Research" component={ResearchScreen} />
           <RootStack.Screen
@@ -378,6 +433,22 @@ const RootNavigator = () => {
           <RootStack.Screen name="Profile" component={ProfileScreen} />
         </RootStack.Navigator>
 
+        {/* --------------------------------------------------------------
+            ONE NAV BAR, RENDERED ONCE
+            --------------------------------------------------------------
+            44 files used to render their own CrystalNavBar. The bar is
+            positioned absolutely, so "the bottom" meant the bottom of
+            whatever that screen happened to wrap it in - a SafeAreaView on
+            one screen, a plain View on another, a modal on a third. That is
+            why it drifted between screens, and why on some screens (My
+            Empire among them) it was drawn but sat outside the touchable
+            area and did nothing.
+
+            Rendered here it is absolute against the window, so it is in the
+            same place on every screen by construction rather than by each
+            screen remembering to place it correctly.
+           -------------------------------------------------------------- */}
+        <CrystalNavBar activeTab={navTabFor(currentRouteName)} variant="dark" />
       </View>
     </NavigationContainer>
   );

@@ -5,7 +5,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import SellCompanyModal from '../Actions/SellCompanyModal';
 import { formatMoney } from '../../../core/utils';
 
@@ -189,10 +188,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     </View>
                 </View>
 
-                {/* Bottom Bar */}
-                <CrystalNavBar activeTab="Company" variant="dark" />
-
-                {/* Sell Modal */}
+                {/* Bottom Bar */}                {/* Sell Modal */}
                 {company && <SellCompanyModal
                     visible={isSellModalVisible}
                     companyId={company.id}

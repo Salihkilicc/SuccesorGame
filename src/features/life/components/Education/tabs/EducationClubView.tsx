@@ -12,7 +12,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useEducationSystem } from '../store/useEducationSystem';
 import { CLUB_DATA, ClubType } from '../data/educationData';
-import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../../../core/theme';
 
 // ========================================
@@ -164,9 +163,7 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Bottom Stats Bar */}        </View>
     );
 };
 

@@ -13,13 +13,15 @@ import { formatMoney } from '../../../core/utils';
 
 
 type Props = {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
     onRequestLoan: () => void;
     onRepayDebt: () => void;
 };
 
-const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt }: Props) => {
+const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt, asScreen }: Props) => {
     useLocale();
     // Navigation removed as it was only used for BottomStatsBar
     const { companyValue, companyCapital } = useStatsStore();

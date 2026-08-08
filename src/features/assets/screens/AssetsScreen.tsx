@@ -11,7 +11,6 @@ import {
     SummaryRow,
     BreakdownSection
 } from '../components/AssetsUI';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 
 const AssetsScreen = () => {
@@ -96,10 +95,7 @@ const AssetsScreen = () => {
                         <BreakdownSection title={t('company.incomeSources')} items={report.incomeBreakdown} isIncome />
                         <BreakdownSection title={t('company.quarterlyExpenses')} items={report.expenseBreakdown} />
                     </View>
-                </ScrollView>
-
-                <CrystalNavBar activeTab="Company" variant="dark" />
-            </SafeAreaView>
+                </ScrollView>            </SafeAreaView>
         </View>
     );
 };

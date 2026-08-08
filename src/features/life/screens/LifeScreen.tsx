@@ -11,7 +11,6 @@ import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import { theme } from '../../../core/theme';
 import { useUserStore, useStatsStore, usePlayerStore, useGameStore } from '../../../core/store';
 import type { RootStackParamList } from '../../../navigation';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // Type Definitions
 type LifeNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -203,10 +202,7 @@ const LifeScreen = () => {
           <View style={{ height: 100 }} />
         </ScrollView>
 
-        {/* Universal Crystal Navigation Bar */}
-        <CrystalNavBar activeTab="Life" variant="dark" />
-
-      </SafeAreaView>
+        {/* Universal Crystal Navigation Bar */}      </SafeAreaView>
 
       {/* --- MODALS --- */}
       < MatchPopup

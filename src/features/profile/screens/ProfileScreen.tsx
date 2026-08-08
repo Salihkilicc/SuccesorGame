@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 const ProfileScreen = () => {
     useLocale();
@@ -56,9 +55,7 @@ const ProfileScreen = () => {
                     The navbar component expects: activeTab: 'Life' | 'Home' | 'Company' | 'Love';
                     I'll use 'Home' but visually activeTab highlights the specific icon.
                     Actually, let's just use 'Life' as it's a fallback.
-                */}
-                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
-            </View>
+                */}            </View>
         </View>
     );
 };

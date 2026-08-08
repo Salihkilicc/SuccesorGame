@@ -18,7 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNotesStore, Note } from '../../../core/store/useNotesStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -374,9 +373,7 @@ const NotesScreen = () => {
                     />
                 )}
 
-                {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
-            </View>
+                {/* Universal Crystal Navigation Bar */}            </View>
         </View>
     );
 };

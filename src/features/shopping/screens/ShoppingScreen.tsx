@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useUserStore } from '../../../core/store/useUserStore';
 import { useAssetStore } from '../store/useAssetStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import CartModal from '../components/CartModal';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -324,10 +323,7 @@ const ShoppingScreen = () => {
                     {currentView === 'SHOP_DETAIL' && renderShopDetail()}
                 </View>
 
-                {/* Footer */}
-                <CrystalNavBar activeTab="Life" variant="dark" />
-
-                {/* Cart Modal */}
+                {/* Footer */}                {/* Cart Modal */}
                 <CartModal
                     visible={showCart}
                     onClose={() => setShowCart(false)}

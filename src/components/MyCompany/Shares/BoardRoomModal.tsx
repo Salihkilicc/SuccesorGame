@@ -8,6 +8,7 @@ import { useCorporateFinanceStore } from '../../../features/finance/stores/useCo
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import ScreenHost from '../../common/ScreenHost';
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
@@ -39,13 +40,15 @@ import {
  */
 
 type Props = {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
     /** Bekleyen bir teklif varsa lobi ona gore hesaplanir */
     pendingProposal?: Proposal;
 };
 
-const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
+const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) => {
     // Dil degisince yeniden ciz. Bu satir olmadan ekran eski dilde donar.
     useLocale();
     const {
@@ -140,7 +143,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                 : theme.colors.warning;
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
                 <View style={styles.container}>
@@ -376,7 +379,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal }: Props) => {
                 onConfirm={panel?.onConfirm}
                 onCancel={() => setPanel(null)}
             />
-        </Modal>
+        </ScreenHost>
     );
 };
 

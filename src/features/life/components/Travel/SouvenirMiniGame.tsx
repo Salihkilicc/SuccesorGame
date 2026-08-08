@@ -9,7 +9,6 @@ import {
     Animated,
 } from 'react-native';
 import { Souvenir } from './data/travelData';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../../core/theme';
 
 type SouvenirMiniGameProps = {
@@ -130,9 +129,7 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
                     )}
                 </View>
 
-                {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Life" variant="dark" />
-            </View>
+                {/* Universal Crystal Navigation Bar */}            </View>
         </Modal>
     );
 };

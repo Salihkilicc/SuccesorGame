@@ -3,7 +3,6 @@ import { t, useLocale } from '../../../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { theme } from '../../../../../core/theme';
 import GameButton from '../../../../../components/common/GameButton';
-import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 
 import { useStatsStore } from '../../../../../core/store/useStatsStore';
 import { usePlayerStore } from '../../../../../core/store/usePlayerStore';
@@ -131,9 +130,7 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Universal Crystal Navigation Bar */}        </View>
     );
 };
 

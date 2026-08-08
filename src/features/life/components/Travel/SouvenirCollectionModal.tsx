@@ -10,7 +10,6 @@ import {
     SafeAreaView,
 } from 'react-native';
 import { VACATION_SPOTS } from './data/travelData';
-import CrystalNavBar from '../../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../../core/theme';
 
 type SouvenirCollectionModalProps = {
@@ -123,9 +122,7 @@ const SouvenirCollectionModal = ({
 
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </Modal>
+            {/* Universal Crystal Navigation Bar */}        </Modal>
     );
 };
 

@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useStatsStore, TechLevels } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
 import { theme } from '../../../core/theme';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
@@ -212,9 +211,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
               
               Let's put it fixed at the bottom of the BACKDROP (screen).
           */}
-          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-            <CrystalNavBar activeTab="Company" variant="dark" />
-          </View>
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>          </View>
 
         </View>
 
@@ -392,9 +389,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         </View>
 
-        {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}
-        <CrystalNavBar activeTab="Company" variant="dark" />
-      </View>
+        {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}      </View>
     
             <ConfirmPanel
                 visible={!!panel}

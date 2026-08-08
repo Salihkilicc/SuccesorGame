@@ -12,15 +12,17 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import SubsidiaryDetailModal from './SubsidiaryDetailModal';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../core/utils';
+import ScreenHost from '../../common/ScreenHost';
 
 type Props = {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
 };
 
-const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
+const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
     useLocale();
     const navigation = useNavigation<any>();
     const { subsidiaries } = useCorporateFinanceStore();
@@ -32,7 +34,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
+        <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" presentationStyle="fullScreen">
             <SafeAreaView style={styles.container}>
                 {/* Header */}
                 <View style={styles.header}>
@@ -70,11 +72,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                         styles.listContent,
                         subsidiaries.length === 0 && styles.emptyList
                     ]}
-                />
-
-                <CrystalNavBar activeTab="Company" variant="dark" />
-
-                {/* Detail Modal Integration */}
+                />                {/* Detail Modal Integration */}
                 {selectedCompanyId && (
                     <SubsidiaryDetailModal
                         visible={!!selectedCompanyId}
@@ -83,7 +81,7 @@ const ExistingCompaniesModal = ({ visible, onClose }: Props) => {
                     />
                 )}
             </SafeAreaView>
-        </Modal>
+        </ScreenHost>
     );
 };
 

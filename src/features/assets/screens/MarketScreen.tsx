@@ -19,7 +19,6 @@ import StockItemSkeleton from '../../../components/Market/StockItemSkeleton';
 import PortfolioModal from '../../../components/Market/PortfolioModal';
 import MarketTicker from '../../../components/Market/MarketTicker';
 import { CategoryTabs, TabKey, TabOption } from '../components/CategoryTabs';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -209,9 +208,7 @@ const MarketScreen = () => {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
-        <CrystalNavBar activeTab="Company" variant="dark" />
-      </AppScreen>
+        <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />      </AppScreen>
     </AppLaunchLoader>
   );
 };

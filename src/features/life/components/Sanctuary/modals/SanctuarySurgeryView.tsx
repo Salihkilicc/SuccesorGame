@@ -22,7 +22,6 @@ import GameModal from '../../../../../components/common/GameModal'; // Wait, I s
 // CORRECT IMPLEMENTATION FOR SanctuarySurgeryView (View-based):
 import { SafeAreaView } from 'react-native';
 import GameButton from '../../../../../components/common/GameButton';
-import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 import { useRelationshipBuffs } from '../../../../love/hooks/useRelationshipBuffs';
 import { DOCTORS, Doctor } from '../data/sanctuaryData';
 
@@ -234,9 +233,7 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Universal Crystal Navigation Bar */}        </View>
     );
 };
 

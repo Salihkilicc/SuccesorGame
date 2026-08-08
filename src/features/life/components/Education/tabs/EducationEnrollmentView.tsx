@@ -24,7 +24,6 @@ import {
     PhDType
 } from '../data/educationData';
 import { theme } from '../../../../../core/theme';
-import CrystalNavBar from '../../../../../navigation/components/CrystalNavBar';
 import { formatMoney } from '../../../../../core/utils';
 
 // ========================================
@@ -438,9 +437,7 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}
-            <CrystalNavBar activeTab="Life" variant="dark" />
-        </View>
+            {/* Bottom Stats Bar */}        </View>
     );
 };
 

@@ -8,9 +8,36 @@ type GameModalProps = {
     title?: string;
     subtitle?: string;
     children: React.ReactNode;
+    /**
+     * Render as a plain full-screen view instead of a Modal.
+     *
+     * Needed because an RN Modal draws above EVERYTHING in the tree - the
+     * app's single nav bar included. A section that is a destination rather
+     * than a transient decision is now a route, and a route must not put a
+     * Modal between itself and the bar.
+     */
+    asScreen?: boolean;
 };
 
-const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomContent }: GameModalProps & { fixedBottomContent?: React.ReactNode }) => {
+const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomContent, asScreen }: GameModalProps & { fixedBottomContent?: React.ReactNode }) => {
+    if (asScreen) {
+        if (!visible) return null;
+        return (
+            <View style={styles.screenRoot}>
+                <View style={styles.screenBody}>
+                    {(title || subtitle) && (
+                        <View style={styles.header}>
+                            {title && <Text style={styles.title}>{title}</Text>}
+                            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                        </View>
+                    )}
+                    {children}
+                </View>
+                {fixedBottomContent}
+            </View>
+        );
+    }
+
     return (
         <Modal
             visible={visible}
@@ -41,6 +68,16 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
 };
 
 const styles = StyleSheet.create({
+    screenRoot: {
+        flex: 1,
+        backgroundColor: theme.colors.background,
+    },
+    screenBody: {
+        flex: 1,
+        padding: theme.spacing.md,
+        // Clear of the nav bar, which now sits above every screen.
+        paddingBottom: 110,
+    },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(28,36,44,0.85)',

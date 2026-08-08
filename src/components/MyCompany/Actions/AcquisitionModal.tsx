@@ -18,7 +18,6 @@ import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 import { findCompetitorByStockId } from '../../../core/market/productMarkets';
 import {
@@ -31,10 +30,13 @@ import {
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import ScreenHost from '../../common/ScreenHost';
 
 const { width } = Dimensions.get('window');
 
 interface AcquisitionModalProps {
+  /** Render as a route rather than a popup - see components/common/ScreenHost. */
+  asScreen?: boolean;
   visible: boolean;
   onClose: () => void;
 }
@@ -43,7 +45,7 @@ const formatMoney = (value: number) => {
   return formatMoneyExact(value);
 };
 
-export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) => {
+export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModalProps) => {
     useLocale();
   const navigation = useNavigation<any>();
   const { marketPrices } = useMarketStore();
@@ -309,7 +311,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
   };
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <ScreenHost asScreen={asScreen} visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={styles.container}>
 
         {/* HEADER */}
@@ -359,10 +361,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
           }
         />
 
-        {/* Persistent Bottom Bar */}
-        <CrystalNavBar activeTab="Company" variant="dark" />
-
-        {/* NEGOTIATION OVERLAY */}
+        {/* Persistent Bottom Bar */}        {/* NEGOTIATION OVERLAY */}
         {selectedTarget && (
           <View style={styles.overlayBackdrop}>
             <View style={styles.negotiationCard}>
@@ -459,7 +458,7 @@ export const AcquisitionModal = ({ visible, onClose }: AcquisitionModalProps) =>
         onConfirm={panel?.onConfirm}
         onCancel={() => setPanel(null)}
       />
-    </Modal>
+    </ScreenHost>
   );
 };
 

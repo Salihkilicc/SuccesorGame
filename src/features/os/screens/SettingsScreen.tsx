@@ -15,7 +15,6 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import { startNewGame } from '../../../core/newGame';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
 import { START_EMPLOYEES } from '../../../core/store/useStatsStore';
@@ -284,9 +283,7 @@ const SettingsScreen = () => {
                     </View>
                 </ScrollView>
 
-                {/* Universal Crystal Navigation Bar */}
-                <CrystalNavBar activeTab="Home" variant="dark" hideDots={true} />
-            </View>
+                {/* Universal Crystal Navigation Bar */}            </View>
         </View>
     );
 };

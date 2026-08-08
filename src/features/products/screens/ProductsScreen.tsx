@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
-import CrystalNavBar from '../../../navigation/components/CrystalNavBar';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney } from '../../../core/utils';
 
@@ -69,10 +68,7 @@ const ProductsScreen = () => {
         {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}
       </ScrollView>
 
-      {/* Persistent Bottom Bar */}
-      <CrystalNavBar activeTab="Company" variant="dark" />
-
-      {/* MODALS */}
+      {/* Persistent Bottom Bar */}      {/* MODALS */}
       {selectedProduct?.status === 'locked' && (
         <ProductLaunchModal
           visible={!!selectedProduct}
