@@ -70,10 +70,14 @@ const HOMESCREEN_APPS: Array<{
     { key: 'education', get label() { return t('home.education'); }, icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
     { key: 'financials', get label() { return t('home.financials'); }, icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
     { key: 'news', get label() { return t('home.news'); }, icon: 'newspaper', gradient: GRADIENTS.tealCyan },
-    // Settings'e giden tek yol Underworld sekmesiydi; o sekme rafa
-    // kaldirilinca ekran yetim kalmisti (featureFlags.underworld = false).
-    { key: 'settings', get label() { return t('home.settings'); }, icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
+    // SHELVED as a home-screen app: the gear in the header is the single way
+    // in now. The route stays registered and `handleNavigateStack('Settings')`
+    // still reaches it - only the duplicate icon is gone.
+    // { key: 'settings', get label() { return t('home.settings'); }, icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
   ];
+
+/** SHELVED: see the gear button in the header. */
+const SHOW_SETTINGS_DRAWER: boolean = false;
 
 const ACTIVE_HOMESCREEN_APPS = filterByFeature(HOMESCREEN_APPS);
 
@@ -305,11 +309,14 @@ const HomeScreen = () => {
           {/* ── Brand Logo + Ayarlar ── */}
           <View style={styles.brandContainer}>
             <Text style={styles.brandText}>{t('home.successor')}</Text>
-            {/* Drawer'i acan tek buton. Onceden drawer JSX'i vardi ama
-                setDrawerOpen(true) hicbir yerde cagrilmiyordu — yani
-                icindeki Dil/Bildirim/Yeni Oyun secenekleri erisilemezdi. */}
+            {/* The gear is now the ONE way into settings.
+                It used to open a small drawer that duplicated the real
+                Settings screen - language, notifications, terms, new game -
+                while the screen itself sat behind an app icon further down.
+                Two half-copies of the same thing, and the drawer's version
+                was the poorer one. */}
             <Pressable
-              onPress={() => setDrawerOpen(true)}
+              onPress={() => handleNavigateStack('Settings')}
               hitSlop={12}
               style={styles.brandSettingsButton}
               accessibilityLabel="Settings"
@@ -454,8 +461,10 @@ const HomeScreen = () => {
 
         </ScrollView>
 
+        {/* SHELVED: the settings drawer. Superseded by the Settings screen
+            the gear now opens; kept behind the flag rather than removed. */}
         {
-          drawerOpen ? (
+          SHOW_SETTINGS_DRAWER && drawerOpen ? (
             <View style={styles.drawerOverlay}>
               <Pressable style={StyleSheet.absoluteFill} onPress={() => setDrawerOpen(false)} />
               <View style={styles.drawer}>

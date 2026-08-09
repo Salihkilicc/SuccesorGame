@@ -277,7 +277,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 export default CorporateFinanceHubModal;
 
 const styles = StyleSheet.create({
-    body: { padding: theme.spacing.md, paddingBottom: 120, gap: theme.spacing.md },
+    body: { padding: theme.spacing.md, paddingBottom: 100, gap: theme.spacing.md },
 
     // --- The one headline -------------------------------------------------
     hero: {

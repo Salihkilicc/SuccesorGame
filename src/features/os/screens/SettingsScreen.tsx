@@ -13,12 +13,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import LinearGradient from 'react-native-linear-gradient';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import { startNewGame } from '../../../core/newGame';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
 import { START_EMPLOYEES } from '../../../core/store/useStatsStore';
 import { theme } from '../../../core/theme';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 // ─── Settings Row ────────────────────────────────────────────────────────────
 
@@ -133,32 +133,8 @@ const SettingsScreen = () => {
     return (
         <View style={styles.root}>
             <StatusBar barStyle="light-content" />
-
-            <LinearGradient
-                colors={['#1C242C', '#1C242C', '#1C242C']}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-            />
-
             <View style={styles.safeArea}>
-                {/* ── Header ── */}
-                <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-                    <Pressable
-                        onPress={() => navigation.goBack()}
-                        style={({ pressed }) => [
-                            styles.backBtn,
-                            pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
-                        ]}
-                    >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
-                    </Pressable>
-
-                    <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>{t('os.settings')}</Text>
-                        <View style={styles.headerAccent} />
-                    </View>
-                </View>
+                <ScreenHeader title={t('os.settings')} />
 
                 {/* ── Content ── */}
                 <ScrollView
