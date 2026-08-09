@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BootSplash from 'react-native-bootsplash';
 import RootNavigator from './src/navigation/RootNavigator';
 import { useStatsStore } from './src/core/store/useStatsStore';
@@ -30,11 +31,29 @@ const App = () => {
     return null; // Bootsplash arkada kalmaya devam eder
   }
 
+  // ==========================================================================
+  //  SafeAreaProvider BELONGS HERE, AND HAD BEEN MISSING ALL ALONG
+  // ==========================================================================
+  //  `useSafeAreaInsets` throws without a provider above it, and the app has
+  //  been calling it from ScreenHeader on every screen. It worked because
+  //  react-navigation mounts its own SafeAreaProviderCompat INSIDE the
+  //  navigator - so every screen had one by accident of where it happened to
+  //  be rendered, not because the app supplied it.
+  //
+  //  The onboarding gate is the first thing that renders ABOVE the navigator,
+  //  and it fell straight through the hole: "No safe area value available."
+  //  The gate is not the bug; it is the first caller that was outside the
+  //  accident.
+  //
+  //  The library's own instruction is to mount this once at the top of the
+  //  app, which is what this is. Navigation's compat provider detects an
+  //  existing one and steps aside, so nothing below changes.
+  // ==========================================================================
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar barStyle="dark-content" />
       <RootNavigator />
-    </>
+    </SafeAreaProvider>
   );
 };
 
