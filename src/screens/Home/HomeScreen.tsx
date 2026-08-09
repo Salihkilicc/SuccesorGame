@@ -63,7 +63,8 @@ const HOMESCREEN_APPS: Array<{
   gradient: string[];
   feature?: FeatureKey;
 }> = [
-    { key: 'calendar', get label() { return t('home.calendar'); }, icon: 'calendar', gradient: GRADIENTS.orangeYellow },
+    // SHELVED from the home grid. The route stays registered.
+    // { key: 'calendar', get label() { return t('home.calendar'); }, icon: 'calendar', gradient: GRADIENTS.orangeYellow },
     { key: 'mail', get label() { return t('home.mail'); }, icon: 'email', gradient: GRADIENTS.blueSky },
     { key: 'myCompany', get label() { return t('home.myCompany'); }, icon: 'office-building', gradient: GRADIENTS.networkBlue },
     // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
@@ -302,9 +303,20 @@ const HomeScreen = () => {
         pointerEvents="none"
       />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
+        {/* ------------------------------------------------------------
+            A FIXED DASHBOARD, NOT A SCROLLING PAGE
+            ------------------------------------------------------------
+            With Calendar off the grid the content fits, so the vertical
+            drift served no purpose - the screen just wobbled under the
+            thumb. `scrollEnabled={false}` keeps the ScrollView (nothing
+            below needs rewriting) while pinning it, and the content is
+            centred so it sits slightly lower rather than jammed under the
+            wordmark.
+           ------------------------------------------------------------ */}
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
+          scrollEnabled={false}
           showsVerticalScrollIndicator={false}>
           {/* ── Brand Logo + Ayarlar ── */}
           <View style={styles.brandContainer}>
@@ -600,9 +612,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    flexGrow: 1,
+    justifyContent: 'center',
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
-    paddingBottom: 160, // Increased to ensure scroll reaches bottom safely
+    // Clear of the nav bar. The old 160 was there so a scrolling page could
+    // reach its end; nothing scrolls now.
+    paddingBottom: 110,
   },
   // ── Premium Header Card ──
   headerCard: {
@@ -810,12 +826,13 @@ const styles = StyleSheet.create({
   appsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: 16,
+    justifyContent: 'space-between',
+    rowGap: 16,
     paddingHorizontal: 4,
   },
   appCard: {
-    width: '21%',
+    // 18% x 5 leaves room for the gaps, so the whole set is one row.
+    width: '18%',
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',

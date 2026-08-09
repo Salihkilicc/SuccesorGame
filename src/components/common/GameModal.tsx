@@ -74,12 +74,9 @@ const styles = StyleSheet.create({
     },
     screenBody: {
         flex: 1,
-        // NO horizontal padding and no top padding on purpose. The screen's
-        // ScreenHeader is the first child, and padding here inset it from the
-        // edges - which is what read as a wide grey slab across the top. The
-        // header runs edge to edge like a header should; content below brings
-        // its own padding.
-        paddingBottom: 110,
+        // NO padding at all. The header must run edge to edge, and the bottom
+        // clearance belongs to the screen's own scroll body - having BOTH pay
+        // for the nav bar stacked 210px of dead space under Finance's buttons.
     },
     overlay: {
         flex: 1,

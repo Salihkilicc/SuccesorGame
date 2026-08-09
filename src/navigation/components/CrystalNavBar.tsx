@@ -122,21 +122,10 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
             )}
 
             <View style={[styles.bottomBarContainer, { zIndex: 1000 }]}>
-                {/* Pagination Dots */}
-                {!hideDots && (
-                    <View style={styles.paginationContainer}>
-                        {dots.map((dot, index) => (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.dot,
-                                    activeDotIndex === index ? styles.activeDot : styles.inactiveDot,
-                                    isLight ? styles.lightDot : styles.darkDot
-                                ]}
-                            />
-                        ))}
-                    </View>
-                )}
+                {/* SHELVED: the pagination dots.
+                    With the shelved modules off there are only two swipe tabs
+                    left, so the dots were two marks that said almost nothing -
+                    and the bar underneath already shows which tab is lit. */}
 
                 <LinearGradient
                     colors={['rgba(5,168,246,0.5)', 'rgba(5,168,246,0.4)', 'rgba(5,168,246,0.4)', 'rgba(207,208,210,0.5)']}
