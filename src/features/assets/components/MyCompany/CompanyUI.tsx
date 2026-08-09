@@ -19,17 +19,44 @@ export const StatColumn = ({ label, value, colorType = 'default' }: { label: str
 );
 
 // ANA KART BİLEŞENİ (Hem Şirket hem Kişisel Finans için)
-export const DashboardCard = ({ title, children, rightContent }: { title: string, children: React.ReactNode, rightContent?: React.ReactNode }) => (
-  <View style={styles.card}>
-    <View style={styles.headerRow}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      {rightContent}
-    </View>
-    <View style={styles.contentRow}>
-      {children}
-    </View>
-  </View>
-);
+//
+// `onPress` makes the whole card a way in. On My Company it opens the
+// financial report, which is the obvious destination and had no obvious door:
+// the card is nine numbers summarising the quarter, and the report is those
+// nine numbers explained. A chevron marks it, because a card that reacts to
+// being pressed without ever saying it would is a trap the second time.
+export const DashboardCard = ({ title, children, rightContent, onPress }: {
+  title: string,
+  children: React.ReactNode,
+  rightContent?: React.ReactNode,
+  onPress?: () => void,
+}) => {
+  const body = (
+    <>
+      <View style={styles.headerRow}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <View style={styles.headerRight}>
+          {rightContent}
+          {!!onPress && <Text style={styles.cardChevron}>›</Text>}
+        </View>
+      </View>
+      <View style={styles.contentRow}>
+        {children}
+      </View>
+    </>
+  );
+
+  if (!onPress) return <View style={styles.card}>{body}</View>;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      accessibilityRole="button">
+      {body}
+    </Pressable>
+  );
+};
 
 // Bölüm Başlığı
 export const SectionHeader = ({ title }: { title: string }) => (
@@ -40,7 +67,10 @@ export const SectionHeader = ({ title }: { title: string }) => (
 
 const styles = StyleSheet.create({
   card: { backgroundColor: '#434B50', borderRadius: theme.radius.lg, padding: theme.spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: theme.spacing.sm, gap: 8 }, // Gold border
+  cardPressed: { backgroundColor: theme.colors.surfaceHigh },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  cardChevron: { color: theme.colors.textMuted, fontSize: 22, marginTop: -2 },
   cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' }, // White
   contentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   col: { flex: 1, gap: 4 },
@@ -50,5 +80,15 @@ const styles = StyleSheet.create({
   success: { color: '#FFFFFF' }, // Green
   danger: { color: theme.colors.danger },
   sectionHeader: { marginTop: theme.spacing.sm },
-  sectionTitle: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
+  /**
+   * OPERATIONS, QUICK ACTIONS and the rest. They were 48% white - the same
+   * colour as every muted label on the screen - so the things that divide
+   * the page read as more page.
+   *
+   * The washed-out brand orange gives the dividers a colour of their own
+   * without letting them shout. It is the brand hue at about half
+   * saturation, so a heading cannot be mistaken for the brand-value figure.
+   * See rule 4 in core/theme.ts.
+   */
+  sectionTitle: { color: theme.colors.brandMuted, fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginLeft: 4 },
 });

@@ -216,8 +216,14 @@ const FacilityPanel: React.FC = () => {
                         <View style={styles.utilTrack}>
                             <View style={[styles.utilFill, {
                                 width: `${Math.min(100, utilization)}%`,
-                                backgroundColor: verdict === 'idle' ? '#FF8A8A'
-                                    : verdict === 'tight' ? '#FF8A8A' : '#CFD0D2',
+                                // A FILL, so it cannot use the signal tokens -
+                                // see the note on util_tight. `borderStrong`
+                                // stands in for the red at the ceiling: the
+                                // bar being full is already the alarm, and the
+                                // figure above it is red.
+                                backgroundColor: verdict === 'idle' ? theme.colors.disabled
+                                    : verdict === 'tight' ? theme.colors.borderStrong
+                                        : theme.colors.primary,
                             }]} />
                         </View>
                         <Text style={styles.utilNote}>{UTILIZATION_NOTES[verdict]}</Text>
@@ -266,6 +272,9 @@ const FacilityPanel: React.FC = () => {
             )}
 
             {/* ══ YUKSELTME ══ */}
+            {/* "Affordable" was light grey and "Saving" was a fainter grey -
+                the same colour twice, so the word was doing all the work.
+                Blue when you can pay for it, grey when you cannot. */}
             {next ? (
                 <CollapsibleSection
                     title={t('company.nextTier')}
@@ -273,7 +282,9 @@ const FacilityPanel: React.FC = () => {
                     info={t('company.youCannotSkipTiersYou')}
                     infoDetail={t('company.thatDowntimeIsTheReal')}
                     summary={companyCapital >= next.upgradeCost ? t('fac.affordable') : t('fac.saving')}
-                    summaryColor={companyCapital >= next.upgradeCost ? '#CFD0D2' : 'rgba(255,255,255,0.48)'}
+                    summaryColor={
+                        companyCapital >= next.upgradeCost ? theme.colors.up : theme.colors.down
+                    }
                 >
                     <Text style={styles.nextName}>{next.name}</Text>
                     <Text style={styles.tierDesc}>{next.description}</Text>
@@ -499,9 +510,28 @@ const styles = StyleSheet.create({
     utilHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
     utilLabel: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     utilValue: { fontSize: 18, fontWeight: '800' },
-    util_idle: { color: theme.colors.textPrimary },
-    util_healthy: { color: '#FFFFFF' },
-    util_tight: { color: theme.colors.textPrimary },
+    // ------------------------------------------------------------------
+    //  "99% USED" AND YOU COULD NOT TELL IF THAT WAS GOOD
+    // ------------------------------------------------------------------
+    //  All three verdicts were white. The engine had been sorting
+    //  utilization into idle / healthy / tight since the day it was
+    //  written, and the screen threw that away by painting the answer the
+    //  same colour in every case. The player's words: "99% used yaziyor ama
+    //  ben iyi mi kotu mu anlamiyorum."
+    //
+    //  TIGHT IS RED, and this is the widened red doing exactly the job it
+    //  was widened for: a ceiling you have hit is not a loss on the books,
+    //  but it costs you the same way - the next jump in demand becomes a
+    //  stockout, and stockouts burn brand.
+    //
+    //  IDLE IS GREY rather than red. Paying for plant you are not using is
+    //  waste, but it is not a wall; nothing good is happening, which is
+    //  what grey says. Two different problems should not look identical,
+    //  and before this they did - both were painted #FF8A8A on the bar.
+    // ------------------------------------------------------------------
+    util_idle: { color: theme.colors.down },
+    util_healthy: { color: theme.colors.up },
+    util_tight: { color: theme.colors.negative },
     utilTrack: {
         height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
         overflow: 'hidden', marginTop: 6,

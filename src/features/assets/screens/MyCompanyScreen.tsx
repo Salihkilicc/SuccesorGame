@@ -224,9 +224,15 @@ const MyCompanyScreen = () => {
         <ScrollView
           contentContainerStyle={[styles.content, { paddingBottom: 120, paddingTop: 0 }]}>
 
-          {/* COMPANY STATS CARD */}
+          {/* COMPANY STATS CARD
+              Pressing it opens the financial report. The card is nine numbers
+              summarising the quarter and the report is those nine numbers
+              explained, so it is the one destination the card was always
+              implying - and until now the only way there was the app grid on
+              Home, two screens away from the figures it explains. */}
           <DashboardCard
             title={t('company.myCompany')}
+            onPress={() => navigation.navigate('FinancialReport')}
             rightContent={
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <Text style={styles.sharePrice}>{formatPrice(stockPrice)}</Text>

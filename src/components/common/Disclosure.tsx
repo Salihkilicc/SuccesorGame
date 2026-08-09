@@ -141,7 +141,11 @@ export const RowGroup = ({ title, children }: { title?: string; children: React.
 const styles = StyleSheet.create({
     group: { gap: theme.spacing.xs, marginBottom: theme.spacing.md },
     groupTitle: {
-        color: theme.colors.textMuted,
+        // The same job as My Company's OPERATIONS and QUICK ACTIONS - a
+        // divider, not a label - so it takes the same washed-out orange.
+        // Leaving these grey while those went orange would have made two
+        // screens in the same section disagree about what a heading is.
+        color: theme.colors.brandMuted,
         fontSize: theme.typography.caption,
         fontWeight: '700',
         letterSpacing: 1,
