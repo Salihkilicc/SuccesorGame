@@ -655,31 +655,56 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                     Bu blok tam o farki kapatiyor. Gercek CEO'larin "karliyim
                     ama param yok" dedigi yer de burasidir.
                    ============================================================ */}
-                {(report.principalRepaid ?? 0) > 0 && (
+                {((report.principalRepaid ?? 0) > 0 || (report.ceoBonusPaid ?? 0) > 0) && (
                   <>
                     <View style={styles.cashDivider} />
                     <Text style={styles.cashHeader}>{t("report.cashReconciliation")}</Text>
-                    <StatementLine
-                      label={t("report.principalRepaid")}
-                      amount={report.principalRepaid ?? 0}
-                      negative
-                      explanation={
-                        'Not an expense — it does not touch your profit. It pays down what you owe, ' +
-                        'so your debt falls by the same amount. But it leaves the bank account all ' +
-                        'the same. This is why a profitable company can still run out of cash.'
-                      }
-                    />
+                    {(report.principalRepaid ?? 0) > 0 && (
+                      <StatementLine
+                        label={t("report.principalRepaid")}
+                        amount={report.principalRepaid ?? 0}
+                        negative
+                        explanation={
+                          'Not an expense — it does not touch your profit. It pays down what you owe, ' +
+                          'so your debt falls by the same amount. But it leaves the bank account all ' +
+                          'the same. This is why a profitable company can still run out of cash.'
+                        }
+                      />
+                    )}
+                    {/* The bonus belongs HERE and not among the expenses. It is
+                        paid out of profit the company already earned and already
+                        paid tax on; charging it above the line would shrink the
+                        very number it is a percentage of. */}
+                    {(report.ceoBonusPaid ?? 0) > 0 && (
+                      <StatementLine
+                        label="CEO annual bonus"
+                        amount={report.ceoBonusPaid ?? 0}
+                        negative
+                        explanation={
+                          `Your year is up. This is 2% of the ${formatMoney(report.ceoBonusBase ?? 0)} ` +
+                          'the company kept after tax over the last four quarters, moved out of ' +
+                          'company capital and into your personal cash. Unlike a dividend, none of ' +
+                          'it goes to the other shareholders — and a year that lost money pays nothing.'
+                        }
+                      />
+                    )}
                     <StatementLine
                       label={t("report.cashChange")}
-                      amount={report.netProfit - (report.principalRepaid ?? 0)}
+                      amount={
+                        report.netProfit
+                        - (report.principalRepaid ?? 0)
+                        - (report.ceoBonusPaid ?? 0)
+                      }
                       emphasis
                       explanation={
-                        'Net income minus principal repaid. This is the number your company balance ' +
-                        'actually moved by this quarter.'
+                        'Net income minus principal repaid and anything paid out. This is the number ' +
+                        'your company balance actually moved by this quarter.'
                       }
                     />
                     {report.netProfit > 0 &&
-                      report.netProfit - (report.principalRepaid ?? 0) < 0 && (
+                      report.netProfit
+                        - (report.principalRepaid ?? 0)
+                        - (report.ceoBonusPaid ?? 0) < 0 && (
                         <Text style={styles.cashWarn}>
                           ⚠️ {t('report.profitButLostCash')}
                         </Text>

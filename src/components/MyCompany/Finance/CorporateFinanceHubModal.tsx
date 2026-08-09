@@ -3,6 +3,10 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
+import { useGameStore } from '../../../core/store/useGameStore';
+import {
+    BONUS_PERIOD_QUARTERS, EMPTY_ACCRUAL, projectedBonus, quartersToBonus,
+} from '../../../core/market/compensation';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import GameModal from '../../common/GameModal';
@@ -96,6 +100,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
     };
 
     const rating = getCreditRating();
+
+    // The bonus year, read straight from the engine's accrual so this screen
+    // shows the same number the tick will actually pay.
+    const bonusAccrual = useGameStore(s => s.ceoBonusAccrual) || EMPTY_ACCRUAL;
+    const lastCeoBonus = useGameStore(s => s.lastCeoBonus);
+    const bonusProjected = projectedBonus(bonusAccrual);
+    const bonusQuartersLeft = quartersToBonus(bonusAccrual);
 
     return (
         <GameModal
@@ -222,6 +233,57 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             valueColor={theme.colors.warning}
                         />
                     )}
+                </RowGroup>
+
+                {/* ------------------------------------------------------------
+                    WHAT THE COMPANY PAYS YOU
+
+                    Money used to move one way only: the player put cash IN
+                    through an injection and the only route back out was a
+                    dividend, which pays every shareholder and so mostly pays
+                    other people. The bonus is the route that pays only you.
+
+                    Shown as a running number rather than a surprise once a
+                    year, because a payout you cannot see coming cannot be
+                    planned around - and planning around it is the point.
+                    ------------------------------------------------------------ */}
+                <RowGroup title="Your pay">
+                    <StatRow
+                        label="Annual bonus"
+                        value={formatMoney(bonusProjected)}
+                        why={
+                            bonusQuartersLeft <= 0
+                                ? 'settles at the end of this quarter'
+                                : `${bonusQuartersLeft} quarter${bonusQuartersLeft > 1 ? 's' : ''} to go`
+                        }
+                        detail={
+                            <>
+                                <DetailLine
+                                    label="Year to date, after tax"
+                                    value={formatMoney(bonusAccrual.profitAccrued)}
+                                    tone={bonusAccrual.profitAccrued >= 0 ? 'positive' : 'negative'}
+                                />
+                                <DetailLine label="Your share" value="2%" />
+                                <DetailLine
+                                    label="Paid on"
+                                    value={`quarter ${BONUS_PERIOD_QUARTERS} of ${BONUS_PERIOD_QUARTERS}`}
+                                />
+                                {!!lastCeoBonus && (
+                                    <DetailLine
+                                        label={`Last paid (${lastCeoBonus.periodLabel})`}
+                                        value={formatMoney(lastCeoBonus.amount)}
+                                        strong
+                                    />
+                                )}
+                                <DetailNote>
+                                    2% of what the company keeps after tax over four quarters, paid
+                                    into your personal cash. It comes out of company capital, so it
+                                    is real money leaving the business. A year that lost money pays
+                                    nothing, and that loss does not follow you into the next year.
+                                </DetailNote>
+                            </>
+                        }
+                    />
                 </RowGroup>
 
                 <View style={styles.actions}>

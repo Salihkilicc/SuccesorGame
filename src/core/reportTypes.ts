@@ -247,6 +247,20 @@ export interface QuarterReport {
     moraleChange?: number;
     /** Moralin uretime carpani */
     moraleEfficiency?: number;
+    // --- CEO ücreti ---
+    /**
+     * Bu çeyrek CEO'ya ödenen yıllık prim. Dört çeyrekte bir dolar,
+     * diğer üç çeyrekte 0'dır. Şirket sermayesinden çıkıp kişisel
+     * nakde geçer. Bkz. core/market/compensation.ts
+     */
+    ceoBonusPaid?: number;
+    /** Primin hesaplandığı yıllık vergi sonrası kâr. Yalnızca ödeme çeyreğinde dolu. */
+    ceoBonusBase?: number;
+    /** Bir sonraki prim için şu ana kadar biriken vergi sonrası kâr. */
+    ceoBonusAccrued?: number;
+    /** Prime kaç çeyrek kaldı. 0 ise bu çeyrek ödendi. */
+    ceoBonusQuartersLeft?: number;
+
     /** Odenen maasin piyasaya orani */
     salaryRatio?: number;
     /** Fazla mesai acik miydi */

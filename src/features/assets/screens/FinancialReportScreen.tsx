@@ -166,23 +166,48 @@ const FinancialReportScreen = () => {
                         Anapara odemesi gider degildir (kari dusurmez) ama
                         nakit goturur. Ikisini ayirmadan "karliyim ama param
                         yok" durumu oyuncuya hic aciklanamiyordu. */}
-                    {(report.principalRepaid ?? 0) > 0 && (
+                    {((report.principalRepaid ?? 0) > 0 || (report.ceoBonusPaid ?? 0) > 0) && (
                         <>
-                            <Row
-                                label={t('company.loanPrincipalRepaid')}
-                                amount={report.principalRepaid ?? 0}
-                                negative
-                                explanation={
-                                    'Not an expense — it does not reduce profit. It pays down what you ' +
-                                    'owe, so your debt falls by the same amount. But the cash leaves ' +
-                                    'the account all the same.'
-                                }
-                            />
+                            {(report.principalRepaid ?? 0) > 0 && (
+                                <Row
+                                    label={t('company.loanPrincipalRepaid')}
+                                    amount={report.principalRepaid ?? 0}
+                                    negative
+                                    explanation={
+                                        'Not an expense — it does not reduce profit. It pays down what you ' +
+                                        'owe, so your debt falls by the same amount. But the cash leaves ' +
+                                        'the account all the same.'
+                                    }
+                                />
+                            )}
+                            {/* The bonus sits BELOW net income, not among the
+                                expenses, because it is paid out of profit the
+                                company already earned and was already taxed on.
+                                Putting it in operating expenses would shrink
+                                the very number it is calculated from. */}
+                            {(report.ceoBonusPaid ?? 0) > 0 && (
+                                <Row
+                                    label="CEO annual bonus"
+                                    amount={report.ceoBonusPaid ?? 0}
+                                    negative
+                                    explanation={
+                                        `2% of the year's after-tax profit of ` +
+                                        `${formatMoney(report.ceoBonusBase ?? 0)}, paid once every four ` +
+                                        'quarters. It leaves the company and lands in your personal cash — ' +
+                                        'unlike a dividend, none of it goes to the other shareholders. ' +
+                                        'A year that lost money pays nothing.'
+                                    }
+                                />
+                            )}
                             <Row
                                 label={t('company.changeInCompanyCash')}
-                                amount={report.netProfit - (report.principalRepaid ?? 0)}
+                                amount={
+                                    report.netProfit
+                                    - (report.principalRepaid ?? 0)
+                                    - (report.ceoBonusPaid ?? 0)
+                                }
                                 emphasis
-                                explanation={'Net income minus principal repaid.'}
+                                explanation={'Net income minus principal repaid and anything paid out.'}
                             />
                         </>
                     )}

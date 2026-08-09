@@ -13,6 +13,9 @@ import {
   advanceCategoryBrand, corporateBrandFrom, applyCorporateShock, brandIndex, earnedFloor,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
+import {
+  BONUS_PERIOD_QUARTERS, EMPTY_ACCRUAL, accrueCeoBonus, type BonusAccrual,
+} from '../market/compensation';
 import { updateReachIndex } from '../market/attraction';
 import {
   availableStandardUnits,
@@ -161,6 +164,16 @@ export type GameState = {
   lastQuarterProfit: number;
   bonusDistributedThisQuarter: boolean;
   /**
+   * CEO'S ANNUAL BONUS, MID-FLIGHT.
+   *
+   * After-tax profit piles up here quarter by quarter; on the fourth
+   * quarter 2% of it moves from company capital to personal cash and the
+   * counter goes back to zero. Bkz. core/market/compensation.ts
+   */
+  ceoBonusAccrual: BonusAccrual;
+  /** The last payout, kept so the finance screen can show what landed. */
+  lastCeoBonus: { amount: number; base: number; periodLabel: string } | null;
+  /**
    * Son tamamlanan ceyregin tam finansal fotografi.
    * TUM rapor ekranlari bunu okur — kendi tahminlerini uretmezler.
    */
@@ -197,6 +210,8 @@ export const initialGameState: GameState = {
   eventsHostedThisQuarter: 0,
   lastQuarterProfit: 0,
   bonusDistributedThisQuarter: false,
+  ceoBonusAccrual: { ...EMPTY_ACCRUAL },
+  lastCeoBonus: null,
   lastQuarterReport: null,
 };
 
@@ -1047,11 +1062,33 @@ export const useGameStore = create<GameStore>()(
         );
         const netProfit = taxResult.netProfit;
 
+        // ==================================================================
+        //  CEO'S ANNUAL BONUS — 2% OF THE YEAR, AFTER TAX
+        // ==================================================================
+        //  Struck here, one line below the tax, because that is the only
+        //  place the base is unambiguous: `netProfit` is what the company
+        //  kept once the taxman was paid. Anything computed further down
+        //  would have principal repayments and share movements mixed in.
+        //
+        //  It accrues every quarter and settles on the fourth. The money
+        //  is not created - it leaves company capital and lands in personal
+        //  cash, which is the point: this is the second way to get money
+        //  out of your own company, and unlike a dividend it does not also
+        //  pay every other shareholder.
+        //  Bkz. core/market/compensation.ts
+        // ==================================================================
+        const bonus = accrueCeoBonus(
+          get().ceoBonusAccrual || EMPTY_ACCRUAL,
+          netProfit,
+          Math.max(1, quarters),
+        );
+
         // 6. UPDATE CAPITAL
         // Anapara geri odemesi kardan degil NAKITTEN cikar — bilanco
         // hareketidir, gider degildir. Gider yazsaydik kari iki kez
         // dusurmus olurduk.
-        const newCompanyCapital = (stats.companyCapital || 0) + netProfit - principalRepaid;
+        const newCompanyCapital =
+          (stats.companyCapital || 0) + netProfit - principalRepaid - bonus.paid;
 
         // 7. PLAYER FINANCIALS (Using Quarterly Economy Engine)
         // Calculate quarterly finances once and apply to player cash
@@ -1061,8 +1098,10 @@ export const useGameStore = create<GameStore>()(
           useStatsStore.getState()
         );
 
-        // Apply Net Flow to Cash
-        const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow;
+        // Apply Net Flow to Cash. The bonus rides in here rather than being
+        // written separately, so cash is settled in ONE place - two writes
+        // to `money` in the same tick is how the last one silently wins.
+        const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow + bonus.paid;
 
         // ------------------------------------------------------------------
         //  6b. CEYREK RAPORUNU KUR
@@ -1413,6 +1452,12 @@ export const useGameStore = create<GameStore>()(
           forcedSaleProceeds,
           lossCarryforward: taxResult.lossCarryforward,
 
+          // --- CEO ucreti ---
+          ceoBonusPaid: bonus.paid,
+          ceoBonusBase: bonus.closed ? bonus.base : undefined,
+          ceoBonusAccrued: bonus.next.profitAccrued,
+          ceoBonusQuartersLeft: BONUS_PERIOD_QUARTERS - bonus.next.quartersAccrued,
+
           // --- Devralmalar ---
           acquisitionEbit: dealEffect.netEbit,
           acquisitionEarnings: dealEffect.earnings,
@@ -1449,7 +1494,17 @@ export const useGameStore = create<GameStore>()(
           products: productBreakdownList,
         };
 
-        set(state => ({ ...state, lastQuarterReport: quarterReport }));
+        set(state => ({
+          ...state,
+          lastQuarterReport: quarterReport,
+          ceoBonusAccrual: bonus.next,
+          // Only overwritten when a year actually closed, so the finance
+          // screen keeps showing the last real payout for the three
+          // quarters in between rather than blanking out.
+          lastCeoBonus: bonus.closed
+            ? { amount: bonus.paid, base: bonus.base, periodLabel: quarterReport.periodLabel }
+            : state.lastCeoBonus,
+        }));
 
 
 
@@ -2180,6 +2235,11 @@ export const useGameStore = create<GameStore>()(
         eventsHostedThisQuarter: state.eventsHostedThisQuarter,
         lastQuarterProfit: state.lastQuarterProfit,
         bonusDistributedThisQuarter: state.bonusDistributedThisQuarter,
+        // The bonus year is four quarters long, so it MUST survive a
+        // restart - otherwise closing the app resets the counter and the
+        // payout never arrives.
+        ceoBonusAccrual: state.ceoBonusAccrual,
+        lastCeoBonus: state.lastCeoBonus,
         // Rapor ekranlari uygulama yeniden acildiginda da son ceyregi
         // gosterebilsin diye kalici.
         lastQuarterReport: state.lastQuarterReport,
