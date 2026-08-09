@@ -221,7 +221,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
-                        <Text style={{ color: '#FFFFFF', fontWeight: '800' }}>
+                        <Text style={{ color: theme.colors.rp, fontWeight: '800' }}>
                             {formatNumber(researchOutput(tempCount))} RP
                         </Text>{' '}
                         per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
@@ -274,7 +274,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                     </View>
                     <View style={styles.statRow}>
                         <Text style={styles.statLabel}>{t('company.totalRpOutput')}</Text>
-                        <Text style={[styles.statValue, styles.statSuccess]}>+{formatRP(quarterlyRP)}</Text>
+                        <Text style={[styles.statValue, styles.statRp]}>+{formatRP(quarterlyRP)}</Text>
                     </View>
                     <View style={styles.statRow}>
                         <Text style={styles.statLabel}>{t('company.availableCapital')}</Text>
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.accent,
     },
     rpBadgeText: {
-        color: theme.colors.textPrimary,
+        color: theme.colors.rp,
         fontSize: 14,
         fontWeight: '800',
     },
@@ -576,6 +576,14 @@ const styles = StyleSheet.create({
     },
     statSuccess: {
         color: theme.colors.success,
+    },
+    /**
+     * RP output. It used to wear `statSuccess` - the PROFIT GREEN - which
+     * said this quarter's research was money earned. Green means one thing
+     * and research is not it.
+     */
+    statRp: {
+        color: theme.colors.rp,
     },
     errorText: {
         color: theme.colors.danger,

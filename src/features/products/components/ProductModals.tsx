@@ -502,7 +502,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             info={t('product.optimizingTheProcessLowersYour')}
                             infoDetail={t('product.eachLevelCostsMoreThan')}
                             summary={`${formatNumberShared(totalRP)} RP`}
-                            summaryColor={theme.colors.textPrimary}
+                            summaryColor={theme.colors.rp}
                         >
                         <View style={styles.rdSection}>
 
@@ -1255,13 +1255,13 @@ const styles = StyleSheet.create({
     ghostText: { color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
     closeIcon: { fontSize: 24, color: 'rgba(255,255,255,0.48)' },
     rpBadge: {
-        backgroundColor: theme.colors.accent,
+        backgroundColor: theme.colors.surfaceRaised,
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
     },
     rpBadgeText: {
-        color: theme.colors.onLight,
+        color: theme.colors.rp,
         fontSize: 14,
         fontWeight: '800',
     },
@@ -1363,7 +1363,12 @@ const styles = StyleSheet.create({
         minWidth: 140
     },
     upgradeBtnTextCompact: {
-        color: '#FFFFFF',
+        // WHERE THE RP COLOUR STOPS. This label is an RP cost, but it sits on
+        // the bright blue button fill, and white on that measures 2.65 -
+        // unreadable. Text on a light fill is black; that rule outranks the
+        // research colour, because a violet figure nobody can read says
+        // nothing at all. RP violet is for figures on the dark ground.
+        color: theme.colors.primaryText,
         fontWeight: '700',
         fontSize: 13,
         textAlign: 'center'

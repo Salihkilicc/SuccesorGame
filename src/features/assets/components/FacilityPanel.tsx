@@ -294,8 +294,12 @@ const FacilityPanel: React.FC = () => {
                         {Math.round(tier.retoolingRatio * 100)}% capacity while building
                     </Text>
 
+                    {/* The research requirement, in the research colour when
+                        it is met and grey when it is not - "nothing good is
+                        happening here" rather than the caution blue, which
+                        this shared with unrelated warnings. */}
                     {next.upgradeRP > 0 && (
-                        <Text style={totalRP >= next.upgradeRP ? styles.okLine : styles.warn}>
+                        <Text style={totalRP >= next.upgradeRP ? styles.rpLine : styles.rpLineShort}>
                             {t('fac.researchProgress', { v1: formatNumber(Math.floor(totalRP)), v2: formatNumber(next.upgradeRP) })}
                             {totalRP < next.upgradeRP
                                 ? ' — money alone will not build this. Fund the lab.'
@@ -485,6 +489,10 @@ const styles = StyleSheet.create({
 
     warn: { color: theme.colors.warning, fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     okLine: { color: '#FFFFFF', fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    /** Research cleared. */
+    rpLine: { color: theme.colors.rp, fontSize: 11.5, lineHeight: 16, marginTop: 4 },
+    /** Research short. */
+    rpLineShort: { color: theme.colors.down, fontSize: 11.5, lineHeight: 16, marginTop: 4 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginTop: 6 },
 
     utilBox: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)' },

@@ -959,7 +959,9 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCell}>
                   <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  <Text style={[styles.balanceValue, { color: '#FFFFFF' }]}>
+                  {/* White made this read as one more cash balance sitting
+                      beside two cash balances. It is not money. */}
+                  <Text style={[styles.balanceValue, { color: theme.colors.rp }]}>
                     {formatNumber(report.researchPoints)}
                   </Text>
                 </View>

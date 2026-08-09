@@ -327,7 +327,7 @@ const FinancialReportScreen = () => {
                     <Row label={t('company.personalCash')} amount={report.endingCash} />
                     <View style={styles.rowTop}>
                         <Text style={styles.label}>{t('company.researchPoints')}</Text>
-                        <Text style={[styles.value, { color: '#FFFFFF' }]}>
+                        <Text style={[styles.value, { color: theme.colors.rp }]}>
                             {formatNumber(report.researchPoints)}
                         </Text>
                     </View>

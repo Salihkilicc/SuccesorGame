@@ -187,8 +187,8 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                         <View style={styles.costRow}>
                             <View style={[styles.costBadge, totalRP < product.unlockRPCost && styles.costBadgeInsufficient]}>
                                 <Text style={styles.costLabel}>{t('product.researchPoints')}</Text>
-                                <Text style={styles.costValue}>{formatRP(product.unlockRPCost)}</Text>
-                                <Text style={styles.costAvailable}>{t('product.availableV1', { v1: formatRP(totalRP) })}</Text>
+                                <Text style={[styles.costValue, styles.rpFigure]}>{formatRP(product.unlockRPCost)}</Text>
+                                <Text style={[styles.costAvailable, styles.rpFigure]}>{t('product.availableV1', { v1: formatRP(totalRP) })}</Text>
                             </View>
                             <View style={[styles.costBadge, companyCapital < product.unlockCashCost && styles.costBadgeInsufficient]}>
                                 <Text style={styles.costLabel}>{t('product.capital')}</Text>
@@ -347,6 +347,10 @@ const styles = StyleSheet.create({
     costAvailable: {
         fontSize: 11,
         color: theme.colors.textSecondary,
+    },
+    /** Research points, in the research colour. See core/theme.ts. */
+    rpFigure: {
+        color: theme.colors.rp,
     },
     button: {
         width: '100%',

@@ -80,7 +80,7 @@ const TechTreeScreen = () => {
                 right={
                     /* The balance every price on this page is measured against. */
                     <View style={styles.balance}>
-                        <Text style={styles.balanceValue}>{formatNumber(totalRP)} RP</Text>
+                        <Text style={[styles.balanceValue, styles.rpFigure]}>{formatNumber(totalRP)} RP</Text>
                         <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
                     </View>
                 }
@@ -153,7 +153,7 @@ const TechTreeScreen = () => {
                                                     <Text
                                                         style={[
                                                             styles.costText,
-                                                            totalRP >= product.unlockRPCost && styles.costAffordable,
+                                                            totalRP >= product.unlockRPCost && styles.rpFigure,
                                                         ]}>
                                                         {formatRPShort(product.unlockRPCost)}
                                                     </Text>
@@ -336,6 +336,15 @@ const styles = StyleSheet.create({
     /** Within reach. Not green - affording something is not a profit. */
     costAffordable: {
         color: theme.colors.textPrimary,
+    },
+    /**
+     * Every RP figure in the app wears this. Research is the one resource
+     * that is neither money nor a rate, and it was being drawn in whatever
+     * colour the surrounding text happened to be - white here, muted there,
+     * and the profit green on the laboratory screen.
+     */
+    rpFigure: {
+        color: theme.colors.rp,
     },
     shortfall: {
         fontSize: 10,
