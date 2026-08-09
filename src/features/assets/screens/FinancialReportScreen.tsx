@@ -67,6 +67,7 @@ const FinancialReportScreen = () => {
     const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
     const companyCapital = useStatsStore(state => state.companyCapital);
     const money = useStatsStore(state => state.money);
+    const companyName = useStatsStore(state => state.companyName);
 
     // The period is the SUBTITLE, not part of the title: the title says where
     // you are and never changes, the subtitle says which quarter you are
@@ -76,7 +77,11 @@ const FinancialReportScreen = () => {
     const header = (
         <ScreenHeader
             title={t('company.financialReport')}
-            subtitle={report ? report.periodLabel : 'No data yet'}
+            subtitle={
+                report
+                    ? (companyName ? `${companyName} · ${report.periodLabel}` : report.periodLabel)
+                    : 'No data yet'
+            }
         />
     );
 

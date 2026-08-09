@@ -69,6 +69,7 @@ const MyCompanyScreen = () => {
 
   // Store Data
   const stats = useStatsStore();
+  const companyName = useStatsStore(st => st.companyName);
 
   // Equity Store - Dynamic Stock Price
   const stockPrice = useEquityStore((state) => state.stockPrice);
@@ -237,8 +238,12 @@ const MyCompanyScreen = () => {
               explained, so it is the one destination the card was always
               implying - and until now the only way there was the app grid on
               Home, two screens away from the figures it explains. */}
+          {/* The company's own card is the one place its name obviously
+              belongs. `companyName` is empty only before onboarding has run,
+              and the gate makes that unreachable - the fallback is there so a
+              half-migrated save shows a label rather than nothing. */}
           <DashboardCard
-            title={t('company.myCompany')}
+            title={companyName || t('company.myCompany')}
             onPress={() => navigation.navigate('FinancialReport')}
             rightContent={
               <View style={{ flexDirection: 'row', gap: 8 }}>

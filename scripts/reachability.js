@@ -144,11 +144,20 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
 //
 //  Missing either half is silent: the game opens, it runs, and only some
 //  numbers are wrong. That is how "my R&D points carried over" happens.
+//
+//  `@survives-new-game <reason>` is the way out, and it is a NARROW one: it
+//  skips this pass only. Settings used a blanket `@orphan-ok` for the same
+//  job, which also turned off the palette, frozen-text and dead-code checks
+//  on that file - a large hole to open for one small exemption. A store that
+//  outlives a run is a real category (the player's own name is not part of a
+//  save) but it has to be declared, because the default has to stay "a new
+//  game clears everything".
 {
     const ng = body.get(files.find(f => f.endsWith('core/newGame.ts'))) || '';
     for (const f of files.filter(f => /use\w+Store\.ts$/.test(f) && !optedOut(f))) {
         const t = read(f);
         if (!/persist\(/.test(t)) continue;
+        if (/@survives-new-game\s/.test(t)) continue;
         const key = [...t.matchAll(/name:\s*'([\w-]+)'/g)].pop()?.[1];
         const hook = t.match(/export const (use\w+Store)/)?.[1];
         if (!key || !hook) continue;

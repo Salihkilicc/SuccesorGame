@@ -102,6 +102,15 @@ export type StatsState = Record<StatKey, number> & {
   brandFloorByCategory?: Record<string, number>;
   /** The board's open demand this quarter, already formatted for display. */
   boardDemandNotice?: string;
+  /**
+   * WHAT THE PLAYER CALLED THE COMPANY.
+   *
+   * Here rather than in useIdentityStore because it belongs to the RUN: a new
+   * game is a new company, and the player asked to be prompted for it every
+   * time. The person starting it keeps their name; the company does not keep
+   * its own. Bkz. core/identity.ts
+   */
+  companyName: string;
   _hasHydrated: boolean;
   /** Gecen ceyregin kredi notu — not dususunu yakalamak icin */
   creditRatingPrev?: string;
@@ -269,6 +278,13 @@ export const initialStatsState: StatsState = {
   companyRevenueMonthly: 0,
   companyExpensesMonthly: 0,
   companyCapital: START_COMPANY_CAPITAL,
+  /**
+   * EMPTY MEANS "THIS RUN HAS NOT BEEN NAMED YET", and that is what the
+   * onboarding gate reads. A new game resets this to empty, so the next
+   * launch asks for a company name without needing a separate flag to
+   * remember that it should.
+   */
+  companyName: '',
 
   factoryCount: START_FACTORIES, // ESKI ALAN — tesis kademesi devraldi, taşıma icin duruyor
 
@@ -913,6 +929,7 @@ export const useStatsStore = create<StatsStore>()(
       name: 'succesor_stats_v1',
       storage: createJSONStorage(() => zustandStorage),
       partialize: state => ({
+        companyName: state.companyName,
         money: state.money,
         netWorth: state.netWorth,
         monthlyIncome: state.monthlyIncome,

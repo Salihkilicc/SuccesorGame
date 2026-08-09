@@ -471,6 +471,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   // Eski kayitlarda yeni alanlar olmayabilir — normalize et, yoksa render patlar.
   const rawReport = useGameStore(state => state.lastQuarterReport);
   const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
+  const companyName = useStatsStore(s => s.companyName);
 
   if (!report) {
     return (
@@ -514,7 +515,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
              ------------------------------------------------------------ */}
           <ScreenHeader
             title={t('company.quarterlyReport')}
-            subtitle={report.periodLabel}
+            subtitle={companyName ? `${companyName} · ${report.periodLabel}` : report.periodLabel}
             onBack={onClose}
             inset={false}
             category="finance"

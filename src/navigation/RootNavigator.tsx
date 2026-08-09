@@ -68,6 +68,9 @@ import {
   CapitalInjectionScreen, SharkDealScreen,
 } from '../features/assets/screens/CompanyScreens';
 import { theme } from '../core/theme';
+import OnboardingScreen from '../features/os/screens/OnboardingScreen';
+import { useIdentityStore } from '../core/store/useIdentityStore';
+import { useStatsStore } from '../core/store/useStatsStore';
 
 /**
  * Which swipe tab the bar should highlight for a given route.
@@ -348,6 +351,47 @@ const SwipeNavigator = () => (
 
 const RootNavigator = () => {
   const [currentRouteName, setCurrentRouteName] = React.useState<string | undefined>();
+
+  // ==========================================================================
+  //  THE ONBOARDING GATE
+  // ==========================================================================
+  //  Above the navigator rather than inside it as a route, deliberately: a
+  //  route brings the nav bar, a back gesture and a place in the history
+  //  stack, and none of those make sense for a question you must answer
+  //  before there is anything to navigate.
+  //
+  //  TWO STATES, READ FROM DATA RATHER THAN FROM A FLAG:
+  //
+  //    no identity          -> a new player. Ask everything.
+  //    identity, no company -> they have played before and this run is
+  //                            unnamed. Ask the company only.
+  //
+  //  `companyName` is emptied by the new-game wipe, and that is what makes
+  //  the second case work without anything having to remember that a new
+  //  game just happened. The state is the memory.
+  //
+  //  A save from before this feature has no identity, so those players see
+  //  the full form once. Correct rather than unfortunate: they were never
+  //  asked, and answering does not disturb the game in progress.
+  //
+  //  It waits for hydration. Without that an existing player would be shown
+  //  the form for a frame before their save landed - and the form WRITES, so
+  //  that flash would not be merely cosmetic.
+  // ==========================================================================
+  const identityHydrated = useIdentityStore(s => s._hasHydrated);
+  const identityCreated = useIdentityStore(s => s.created);
+  const companyName = useStatsStore(s => s.companyName);
+
+  if (identityHydrated && (!identityCreated || !companyName)) {
+    return (
+      <OnboardingScreen
+        mode={identityCreated ? 'company' : 'full'}
+        // Nothing to do on finish: the writes it makes are the same state
+        // this gate reads, so the app appears by itself.
+        onDone={() => { }}
+      />
+    );
+  }
 
   return (
     <NavigationContainer
