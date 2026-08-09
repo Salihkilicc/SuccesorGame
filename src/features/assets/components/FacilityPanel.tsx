@@ -71,6 +71,8 @@ const FacilityPanel: React.FC = () => {
     const isBuilding = !!facilityBuild;
 
     const [target, setTarget] = useState(targetHeadcount ?? employeeCount);
+    /** The stripe IS the facility header now - tapping it opens the details. */
+    const [facilityOpen, setFacilityOpen] = useState(false);
 
     const capacityNow = availableStandardUnits(employeeCount, tier.level, isBuilding);
     const staffing = staffingRatio(employeeCount, tier.level);
@@ -133,7 +135,15 @@ const FacilityPanel: React.FC = () => {
                 Panel cok yer kapliyordu. Ilk bakista sadece uc sey lazim:
                 hangi kademedeyim, ekip tam mi, hat ne kadar dolu.
                 Gerisi asagida katli duruyor. */}
-            <View style={styles.stripe}>
+            {/* ══ THE STRIPE IS THE HEADER ══
+                It used to sit above a separate "Facility" section that then
+                repeated its numbers. One thing now: the strip you always see
+                is the control that opens the detail behind it. */}
+            <Pressable
+                onPress={() => setFacilityOpen(o => !o)}
+                style={({ pressed }) => [styles.stripe, pressed && styles.stripePressed]}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: facilityOpen }}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.tierLabel}>
                         {t('fac.tierBadge', { v1: tier.level, v2: MAX_TIER_LEVEL })}{isBuilding ? `  ·  ${t('fac.retooling')}` : ''}
@@ -152,7 +162,8 @@ const FacilityPanel: React.FC = () => {
                         <Text style={styles.utilLabel}>{t('company.used')}</Text>
                     </View>
                 )}
-            </View>
+                <Text style={styles.stripeChevron}>{facilityOpen ? '⌃' : '⌄'}</Text>
+            </Pressable>
 
             {/* Ekip eksikse bu uyari KATLANMAZ — en ucuz uretim artisi budur */}
             {staffing < 1 && (
@@ -167,15 +178,18 @@ const FacilityPanel: React.FC = () => {
                 </Pressable>
             )}
 
-            {/* ══ KADEME DETAYI ══ */}
-            <CollapsibleSection
-                title={t('company.facility')}
-                note={t('company.whatThisTierGivesYou')}
-                info={t('company.yourProductionCapabilityItSets')}
-                infoDetail={t('fac.productionFormula')}
-                summary={tier.name}
-            >
-                <Text style={styles.tierDesc}>{tier.description}</Text>
+            {/* ══ KADEME DETAYI — opened by the stripe above ══ */}
+            {facilityOpen && (
+            <View style={styles.facilityBody}>
+                <View style={styles.facilityHead}>
+                    <Text style={styles.tierDesc}>{tier.description}</Text>
+                    <InfoDot
+                        title={t('company.facility')}
+                        text={t('company.yourProductionCapabilityItSets')}
+                        detail={t('fac.productionFormula')}
+                        small
+                    />
+                </View>
 
                 {/* Capacity and crew are NOT repeated here: the stripe above is
                     always visible and already carries them. What is left is
@@ -204,7 +218,8 @@ const FacilityPanel: React.FC = () => {
                         <Text style={styles.utilNote}>{UTILIZATION_NOTES[verdict]}</Text>
                     </View>
                 )}
-            </CollapsibleSection>
+            </View>
+            )}
 
             {/* ══ TAAHHUT KUYRUGU ══
                 Zaman bu oyunun ana mekaniklerinden biri. Neyin ne zaman
@@ -381,39 +396,11 @@ const FacilityPanel: React.FC = () => {
                     on. It belongs with the facility it describes, and it only
                     needs to show where you are and what is ahead - the rungs
                     you already climbed are history, not a decision. */}
-                {/* Only what NOTHING else on this panel covers. The current
-                    tier is this very section, and the one after it has its own
-                    "Next tier" block with the build button - listing them here
-                    too is where most of the repetition came from. */}
-                {FACILITY_TIERS.some(x => x.level > tier.level + 1) && (
-                <View style={styles.ladderBlock}>
-                    <Text style={styles.ladderHeading}>
-                        {t('company.laterTiers')} · {tier.level} / {MAX_TIER_LEVEL}
-                    </Text>
-                    {FACILITY_TIERS.filter(x => x.level > tier.level + 1).map(x => {
-                        const current = false;
-                        return (
-                            <View key={x.level} style={[styles.ladderRow, current && styles.ladderNow]}>
-                                <Text style={styles.ladderNum}>{x.level}</Text>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={[styles.ladderName, !current && styles.ladderDim]}>
-                                        {x.name}{current ? ` · ${t('company.used')}` : ''}
-                                    </Text>
-                                    <Text style={styles.ladderMeta}>
-                                        {formatNumber(x.capacity)} cap · crew {formatNumber(x.crew)} · cost ×
-                                        {x.unitCostMultiplier.toFixed(2)} · brand ≤{x.brandCeiling} · quality ≤
-                                        {x.qualityCeiling}
-                                        {x.upgradeRP > 0 ? ` · ${formatNumber(x.upgradeRP)} RP` : ''}
-                                    </Text>
-                                </View>
-                                <Text style={styles.ladderCost}>
-                                    {x.upgradeCost > 0 && !current ? formatMoney(x.upgradeCost) : '—'}
-                                </Text>
-                            </View>
-                        );
-                    })}
-                </View>
-                )}
+                {/* SHELVED: the tier ladder.
+                    It listed tiers you cannot act on - the current one IS this
+                    section and the next one has its own block with the build
+                    button. FACILITY_TIERS still holds the data if it comes
+                    back as something you can actually do. */}
             </CollapsibleSection>
 
         </View>
@@ -537,11 +524,29 @@ const styles = StyleSheet.create({
 
     primaryBtn: {
         marginTop: 12, paddingVertical: 13, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#CFD0D2',
+        // The token, not a raw hex - every other primary button in the app
+        // uses this, and the contrast pass cannot resolve a literal.
+        alignItems: 'center', backgroundColor: theme.colors.primary,
     },
     primaryBtnOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
     primaryBtnText: { color: theme.colors.onLight, fontSize: 13.5, fontWeight: '800' },
 
+    stripePressed: { opacity: 0.92 },
+    stripeChevron: {
+        color: theme.colors.textMuted,
+        fontSize: theme.typography.body,
+        marginLeft: theme.spacing.sm,
+        width: 12,
+        textAlign: 'center',
+    },
+    facilityBody: {
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.radius.md,
+        padding: theme.spacing.md,
+        marginTop: theme.spacing.xs,
+        gap: theme.spacing.sm,
+    },
+    facilityHead: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.sm },
     ladderBlock: {
         marginTop: theme.spacing.md,
         paddingTop: theme.spacing.sm,
