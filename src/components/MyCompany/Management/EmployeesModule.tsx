@@ -136,7 +136,12 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.label}>{t('ui.output')}</Text>
-                        <Text style={[styles.big, { color: efficiency >= 1 ? '#CFD0D2' : '#FF8A8A' }]}>
+                        {/* Below 1 the team is producing less than you are
+                            paying for, which is the loss red's widened case:
+                            it is costing you. At or above, blue. */}
+                        <Text style={[styles.big, {
+                            color: efficiency >= 1 ? theme.colors.up : theme.colors.negative,
+                        }]}>
                             ×{efficiency.toFixed(2)}
                         </Text>
                         <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
@@ -144,9 +149,16 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                 </View>
 
                 <View style={styles.moraleTrack}>
+                    {/* Three thresholds painted with two colours, and the two
+                        bad ones were the SAME hex - so 39 and 64 looked
+                        identical while meaning quite different things. Three
+                        steps now. Fills, so no signal tokens: see the note on
+                        the production bar in ProductModals. */}
                     <View style={[styles.moraleFill, {
                         width: `${morale}%`,
-                        backgroundColor: morale < 40 ? '#FF8A8A' : morale < 65 ? '#FF8A8A' : '#CFD0D2',
+                        backgroundColor: morale < 40 ? theme.colors.disabled
+                            : morale < 65 ? theme.colors.borderStrong
+                                : theme.colors.primary,
                     }]} />
                     {/* Maasin tasidigi seviye isareti */}
                     <View style={[styles.moraleMarker, { left: `${target}%` }]} />
@@ -160,7 +172,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     info={WORKFORCE_EXPLANATIONS.salaryRatio}
                     infoDetail={`Market rate for a ${tier.name} is ${formatMoney(market)} per person per quarter. You are paying ${formatMoney(perPerson)}.`}
                     summary={`${Math.round(salaryRatio * 100)}%`}
-                    summaryColor={salaryRatio < 0.95 ? '#FF8A8A' : '#CFD0D2'}
+                    summaryColor={salaryRatio < 0.95 ? theme.colors.down : theme.colors.up}
                     defaultOpen
                 >
                     <View style={styles.row}>
@@ -220,7 +232,13 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                                     <Text style={styles.eventDesc}>{ev.description}</Text>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={styles.eventCost}>{formatMoney(cost)}</Text>
+                                    {/* The row already dims when it is out of
+                                        reach; the price says which of the two
+                                        reasons it is - too expensive, or the
+                                        quarter's events already used up. */}
+                                    <Text style={[styles.eventCost, {
+                                        color: afford ? theme.colors.up : theme.colors.down,
+                                    }]}>{formatMoney(cost)}</Text>
                                     <Text style={styles.eventGain}>+{gain} morale</Text>
                                 </View>
                             </Pressable>
@@ -233,7 +251,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
                     summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
-                    summaryColor={canBonus ? '#CFD0D2' : 'rgba(255,255,255,0.48)'}
+                    summaryColor={canBonus ? theme.colors.up : theme.colors.down}
                 >
                     <Text style={styles.line}>
                         5% of last quarter's profit: {formatMoney(bonusCost)}
@@ -332,9 +350,14 @@ const styles = StyleSheet.create({
 
     primary: {
         marginTop: 10, paddingVertical: 12, borderRadius: 12,
-        alignItems: 'center', backgroundColor: '#CFD0D2',
+        alignItems: 'center', backgroundColor: theme.colors.primary,
     },
-    primaryOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
+    /**
+     * Disabled stays a LIGHT fill on purpose - the label does not change
+     * colour when a button greys out, so the off state has to stay on the
+     * same side of theme rule 1 as the on state.
+     */
+    primaryOff: { backgroundColor: theme.colors.disabled },
     primaryText: { color: theme.colors.onLight, fontSize: 13, fontWeight: '800' },
 
     overtimeBox: {
