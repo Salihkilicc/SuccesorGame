@@ -238,30 +238,22 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     )}
                 </View>
 
-            </ScrollView>
-
-            {/* ----------------------------------------------------------------
-                PINNED, not the last thing in the scroll body.
-                ----------------------------------------------------------------
-                As a scroll child it needed enough padding under it to clear the
-                floating nav bar, and on a short page that padding showed as a
-                dead gap beneath the button. Pinned, the gap is only what the
-                bar actually needs.
-               ---------------------------------------------------------------- */}
-            <View style={styles.footer}>
-                {totalDebt > 0 && (
+                <View style={styles.actions}>
+                    {totalDebt > 0 && (
+                        <Pressable
+                            onPress={onRepayDebt}
+                            style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
+                            <Text style={styles.btnSecondaryText}>{t('finance.repayDebt')}</Text>
+                        </Pressable>
+                    )}
                     <Pressable
-                        onPress={onRepayDebt}
-                        style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
-                        <Text style={styles.btnSecondaryText}>{t('finance.repayDebt')}</Text>
+                        onPress={onRequestLoan}
+                        style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}>
+                        <Text style={styles.btnPrimaryText}>{t('finance.requestNewLoan')}</Text>
                     </Pressable>
-                )}
-                <Pressable
-                    onPress={onRequestLoan}
-                    style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}>
-                    <Text style={styles.btnPrimaryText}>{t('finance.requestNewLoan')}</Text>
-                </Pressable>
-            </View>
+                </View>
+
+            </ScrollView>
 
             {/* Shark Deal Modal */}
             {sharkMember && (
@@ -285,7 +277,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 export default CorporateFinanceHubModal;
 
 const styles = StyleSheet.create({
-    body: { padding: theme.spacing.md, paddingBottom: theme.spacing.sm, gap: theme.spacing.md },
+    body: { padding: theme.spacing.md, paddingBottom: 100, gap: theme.spacing.md },
 
     // --- The one headline -------------------------------------------------
     hero: {
@@ -319,15 +311,6 @@ const styles = StyleSheet.create({
 
     // --- Actions ----------------------------------------------------------
     actions: { flexDirection: 'row', gap: theme.spacing.sm },
-    footer: {
-        flexDirection: 'row',
-        gap: theme.spacing.sm,
-        paddingHorizontal: theme.spacing.md,
-        paddingTop: theme.spacing.sm,
-        // The floating bar sits 36 from the bottom and is ~78 tall, so this is
-        // what it takes to sit just clear of it - and nothing more.
-        paddingBottom: 122,
-    },
     btn: {
         flex: 1,
         paddingVertical: theme.spacing.md,
