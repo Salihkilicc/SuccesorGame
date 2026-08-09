@@ -1,7 +1,7 @@
 // src/components/common/ConfirmPanel.tsx
 //
 // ============================================================================
-//  IN-PLACE CONFIRMATION
+//  THE CONFIRMATION DIALOG
 // ============================================================================
 //
 //  The company screens fired 61 Alert.alert calls, and the big ones were
@@ -16,16 +16,39 @@
 //  3) It takes the player out of the screen. You lose the context you were
 //     reading a moment ago, which for a numbers screen is the whole point.
 //
-//  This is the same decision rendered in place: a title, the figures as real
-//  rows, one line of consequence, and the two buttons. It draws inside the
-//  screen that raised it rather than over the app.
+//  So this is the same decision, themed, with the figures as real rows.
+//
+//  ---------------------------------------------------------------------------
+//  IT IS AN ACTUAL MODAL NOW, AND THAT WAS THE BUG
+//  ---------------------------------------------------------------------------
+//  It used to be a plain absolutely-positioned View, on the theory that a
+//  confirmation should stay inside the screen that raised it. That theory does
+//  not survive contact with the tree, because `absoluteFillObject` fills the
+//  PARENT, not the window:
+//
+//    - Raised from inside a card, the "full-screen" backdrop covered the card.
+//      The dim and the centring were relative to a box a third of the screen
+//      high, so the dialog sat wherever that box happened to be.
+//    - Any ancestor with `overflow: 'hidden'` CLIPPED it. The board room's
+//      container has one for its rounded corners; so does CollapsibleSection
+//      and the finance hub. A dialog can be cut in half by a border radius
+//      four levels above it, and nothing in the code says so.
+//    - It drew UNDER the hoisted nav bar, so a decision could be covered by
+//      navigation.
+//
+//  An RN Modal fills the window by definition and cannot be clipped by an
+//  ancestor. This is the one case where drawing above everything - the nav bar
+//  included - is the correct behaviour rather than the fault: you should not be
+//  able to navigate away from a question you have been asked. That is the
+//  opposite of a destination, which is why destinations became routes and this
+//  did not.
 //
 //  Alert is still right for genuinely unexpected failures - a rejected loan,
 //  a missing prerequisite - which is why this does not try to replace those.
 // ============================================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../core/theme';
 
 export type ConfirmLine = {
@@ -80,6 +103,12 @@ const ConfirmPanel = ({
     if (!visible) return null;
 
     return (
+        <Modal
+            visible
+            transparent
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={onCancel}>
         <View style={styles.overlay}>
             {/* Tapping outside cancels, matching what a system Alert would do. */}
             <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
@@ -154,6 +183,7 @@ const ConfirmPanel = ({
                 </View>
             </View>
         </View>
+        </Modal>
     );
 };
 
