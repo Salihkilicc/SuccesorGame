@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
 import LaboratoryScreen from './LaboratoryScreen';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 // Types
 type TabType = 'HUB' | 'LAB' | 'TREE';
@@ -80,18 +81,13 @@ const ResearchScreen = () => {
     };
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* HEADER - Only show for HUB and TREE */}
+        <View style={styles.container}>
+            {/* The lab draws its own header; the other tabs share this one. */}
             {activeTab !== 'LAB' && (
-                <View style={styles.header}>
-                    <Pressable onPress={handleBack} style={styles.backBtn}>
-                        <Text style={styles.backText}>←</Text>
-                    </Pressable>
-                    <Text style={styles.headerTitle}>
-                        {activeTab === 'HUB' ? 'Research Center' : 'Tech Tree'}
-                    </Text>
-                    <View style={{ width: 40 }} />
-                </View>
+                <ScreenHeader
+                    title={activeTab === 'HUB' ? 'Research Center' : 'Tech Tree'}
+                    onBack={handleBack}
+                />
             )}
 
             {/* CONTENT AREA */}

@@ -7,7 +7,6 @@ import {
     StyleSheet,
     FlatList,
     TouchableOpacity,
-    SafeAreaView
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';

@@ -9,7 +9,6 @@ import {
     ScrollView,
     Alert,
     TouchableOpacity,
-    SafeAreaView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
