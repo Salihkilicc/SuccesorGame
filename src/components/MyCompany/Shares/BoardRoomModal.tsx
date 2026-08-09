@@ -10,6 +10,7 @@ import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
@@ -154,11 +155,43 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                 <View style={[styles.container, asScreen && styles.containerScreen]}>
                     <ScreenHeader inset={!!asScreen} title={t('board.title')} onBack={onClose} />
 
+                    {/* ------------------------------------------------------
+                        WHY THIS WAS CRAMPED, AND IT WAS TWO THINGS
+
+                        1) NO SIDE PADDING. As a modal the card carried
+                           `padding: 20`; as a screen that had to go, because
+                           the header runs edge to edge - and nothing replaced
+                           it for the body. So every card below sat flush
+                           against both edges with the text touching the glass.
+                           The padding lives on the scroll content now, which
+                           is the only thing that wants it.
+
+                        2) HALF THE SCREEN WAS FIXED. The stake card, the open
+                           demands, the no-confidence warning and the tabs all
+                           sat ABOVE the ScrollView, and the list was
+                           `flexShrink: 1` underneath them. With a demand and a
+                           warning on screen the directors were squeezed into
+                           whatever was left - the more the board had to say,
+                           the less room there was to answer it. It all scrolls
+                           together now.
+                       ------------------------------------------------------ */}
+                    <ScrollView
+                        style={styles.body}
+                        contentContainerStyle={[
+                            styles.bodyContent,
+                            { paddingBottom: asScreen ? NAV_BAR_CLEARANCE : theme.spacing.lg },
+                        ]}>
+
                     {/* ---- KONTROL DURUMU: seyreltmenin bedeli burada gorunur ---- */}
                     <View style={styles.controlCard}>
                         <View style={styles.controlRow}>
                             <Text style={styles.controlLabel}>{t('board.yourStake')}</Text>
-                            <Text style={[styles.controlValue, { color: hasControl ? '#CFD0D2' : '#FF8A8A' }]}>
+                            {/* Above the threshold is blue. Below it the board
+                                can remove you, which ends the run - the widest
+                                case of "this is costing you", so it is red. */}
+                            <Text style={[styles.controlValue, {
+                                color: hasControl ? theme.colors.up : theme.colors.negative,
+                            }]}>
                                 {ownership.toFixed(1)}%
                             </Text>
                         </View>
@@ -232,15 +265,27 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                         ))}
                     </View>
 
-                    <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: 12 }}>
                         {tab === 'board' ? (
                             <>
                                 {members.map(m => {
                                     const weight = totalShares > 0 ? (m.shareCount / totalShares) * 100 : 0;
                                     const promised = promises.filter(p => p.memberId === m.id && !p.resolved);
                                     const alreadyLobbied = lobbied[m.id] !== undefined;
+                                    // Three tiers were painted with two colours,
+                                    // and the two bad ones were the SAME hex -
+                                    // so a director on 34 looked exactly like
+                                    // one on 59. Trust is also not money, so
+                                    // the loss red has no business here.
                                     const trustColor =
-                                        m.trust >= 60 ? '#CFD0D2' : m.trust >= 35 ? '#FF8A8A' : '#FF8A8A';
+                                        m.trust >= 60 ? theme.colors.up
+                                            : m.trust >= 35 ? theme.colors.textSecondary
+                                                : theme.colors.down;
+                                    // The BAR is a fill, so it cannot take the
+                                    // text tokens. Same three steps in fills.
+                                    const trustFill =
+                                        m.trust >= 60 ? theme.colors.primary
+                                            : m.trust >= 35 ? theme.colors.borderStrong
+                                                : theme.colors.disabled;
 
                                     return (
                                         <View key={m.id} style={styles.memberCard}>
@@ -268,7 +313,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                                 <View
                                                     style={[
                                                         styles.trustBarFill,
-                                                        { width: `${m.trust}%`, backgroundColor: trustColor },
+                                                        { width: `${m.trust}%`, backgroundColor: trustFill },
                                                     ]}
                                                 />
                                             </View>
@@ -329,7 +374,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                             <View key={v.memberId} style={styles.voteRow}>
                                                 <Text style={[
                                                     styles.voteMark,
-                                                    { color: v.vote === 'YES' ? '#CFD0D2' : '#FF8A8A' },
+                                                    { color: v.vote === 'YES' ? theme.colors.up : theme.colors.down },
                                                 ]}>
                                                     {v.vote === 'YES' ? '✓' : '✕'}
                                                 </Text>
@@ -390,7 +435,10 @@ const styles = StyleSheet.create({
     backdropScreen: { backgroundColor: theme.colors.background, padding: 0, justifyContent: 'flex-start' },
     container: {
         width: '100%', maxWidth: 460, maxHeight: '85%',
-        backgroundColor: theme.colors.background, borderRadius: 20, padding: 20,
+        backgroundColor: theme.colors.background, borderRadius: 20,
+        // No padding: the header must reach both edges. The scroll content
+        // below carries it instead - see bodyContent.
+        padding: 0, overflow: 'hidden',
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     },
     containerScreen: {
@@ -426,7 +474,12 @@ const styles = StyleSheet.create({
     tabText: { fontSize: 12, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
     tabTextActive: { color: theme.colors.onLight},
 
-    body: { flexGrow: 0, flexShrink: 1 },
+    /**
+     * The whole page scrolls, so the list gets the screen rather than the
+     * leftovers. `flexShrink: 1` under four fixed cards was the cramping.
+     */
+    body: { flex: 1 },
+    bodyContent: { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.md },
 
     memberCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 10 },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
