@@ -21,9 +21,9 @@
 //
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, LayoutAnimation } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -73,6 +73,11 @@ const FacilityPanel: React.FC = () => {
     const [target, setTarget] = useState(targetHeadcount ?? employeeCount);
     /** The stripe IS the facility header now - tapping it opens the details. */
     const [facilityOpen, setFacilityOpen] = useState(false);
+    const toggleFacility = useCallback(() => {
+        // Same easing CollapsibleSection uses, so the two open the same way.
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setFacilityOpen(o => !o);
+    }, []);
 
     const capacityNow = availableStandardUnits(employeeCount, tier.level, isBuilding);
     const staffing = staffingRatio(employeeCount, tier.level);
@@ -140,7 +145,7 @@ const FacilityPanel: React.FC = () => {
                 repeated its numbers. One thing now: the strip you always see
                 is the control that opens the detail behind it. */}
             <Pressable
-                onPress={() => setFacilityOpen(o => !o)}
+                onPress={toggleFacility}
                 style={({ pressed }) => [styles.stripe, pressed && styles.stripePressed]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: facilityOpen }}>
@@ -299,9 +304,10 @@ const FacilityPanel: React.FC = () => {
                     )}
 
                     <Pressable
-                        style={[
+                        style={({ pressed }) => [
                             styles.primaryBtn,
                             (isBuilding || companyCapital < next.upgradeCost) && styles.primaryBtnOff,
+                            pressed && !(isBuilding || companyCapital < next.upgradeCost) && styles.primaryBtnPressed,
                         ]}
                         disabled={
                             isBuilding ||
@@ -310,7 +316,10 @@ const FacilityPanel: React.FC = () => {
                         }
                         onPress={handleUpgrade}
                     >
-                        <Text style={styles.primaryBtnText}>
+                        <Text style={[
+                            styles.primaryBtnText,
+                            (isBuilding || companyCapital < next.upgradeCost) && styles.primaryBtnTextOff,
+                        ]}>
                             {isBuilding
                                 ? t('fac.buildInProgress')
                                 : companyCapital < next.upgradeCost
@@ -381,11 +390,15 @@ const FacilityPanel: React.FC = () => {
                 )}
 
                 <Pressable
-                    style={[styles.primaryBtn, delta === 0 && styles.primaryBtnOff]}
+                    style={({ pressed }) => [
+                        styles.primaryBtn,
+                        delta === 0 && styles.primaryBtnOff,
+                        pressed && delta !== 0 && styles.primaryBtnPressed,
+                    ]}
                     disabled={delta === 0}
                     onPress={applyTarget}
                 >
-                    <Text style={styles.primaryBtnText}>
+                    <Text style={[styles.primaryBtnText, delta === 0 && styles.primaryBtnTextOff]}>
                         {delta === 0 ? t('fac.noChange') : t('fac.confirmTarget')}
                     </Text>
                 </Pressable>
@@ -528,8 +541,12 @@ const styles = StyleSheet.create({
         // uses this, and the contrast pass cannot resolve a literal.
         alignItems: 'center', backgroundColor: theme.colors.primary,
     },
-    primaryBtnOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
+    primaryBtnOff: { backgroundColor: theme.colors.surfaceHigh },
+    primaryBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
     primaryBtnText: { color: theme.colors.onLight, fontSize: 13.5, fontWeight: '800' },
+    /* Disabled the fill goes DARK, so the label has to go light with it -
+       black on a dark disabled button measured 1.8 and could not be read. */
+    primaryBtnTextOff: { color: theme.colors.textMuted },
 
     stripePressed: { opacity: 0.92 },
     stripeChevron: {
