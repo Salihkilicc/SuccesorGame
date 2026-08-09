@@ -12,6 +12,17 @@ import { formatMoney } from '../../core/utils';
 
 const { width } = Dimensions.get('window');
 
+/**
+ * How much room the floating bar takes at the bottom of every screen.
+ *
+ * The bar sits `bottom: 36` on iOS and is roughly 78 tall (18 of padding top
+ * and bottom around a 26pt icon and its 12pt label). Screens that end in a
+ * button need to clear that, and every one of them was guessing a number -
+ * which is why the gap under Finance's buttons was wrong three times running.
+ * One constant, derived from the bar's own geometry.
+ */
+export const NAV_BAR_CLEARANCE = (Platform.OS === 'ios' ? 36 : 24) + 78 + 8;
+
 interface CrystalNavBarProps {
     activeTab: 'Life' | 'Home' | 'Company' | 'Love';
     variant: 'light' | 'dark';

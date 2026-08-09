@@ -11,6 +11,7 @@ import SharkDealModal from './SharkDealModal';
 import CapitalInjectionModal from './CapitalInjectionModal';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { StatRow, RowGroup, DetailLine, DetailNote } from '../../common/Disclosure';
 
 
@@ -277,10 +278,9 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 export default CorporateFinanceHubModal;
 
 const styles = StyleSheet.create({
-    // A small gap under the last button, as asked. The buttons scroll with
-    // the page rather than being pinned, so the floating nav bar can sit over
-    // them - scroll a little and they clear it.
-    body: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
+    // Exactly the bar's height, so scrolling to the bottom leaves the buttons
+    // sitting just clear of it. Taken from the bar itself rather than guessed.
+    body: { padding: theme.spacing.md, paddingBottom: NAV_BAR_CLEARANCE, gap: theme.spacing.md },
 
     // --- The one headline -------------------------------------------------
     hero: {
