@@ -177,19 +177,21 @@ const FacilityPanel: React.FC = () => {
             >
                 <Text style={styles.tierDesc}>{tier.description}</Text>
 
+                {/* Capacity and crew are NOT repeated here: the stripe above is
+                    always visible and already carries them. What is left is
+                    what the stripe cannot show - the limits this tier imposes. */}
                 <View style={styles.statRow}>
-                    <Stat label={t('company.capacityNow')} value={formatNumber(capacityNow)} />
-                    <Stat label={t('company.crew')} value={`${formatNumber(employeeCount)} / ${formatNumber(tier.crew)}`}
-                        tone={staffing < 1 ? 'warn' : 'ok'} />
                     <Stat label={t('company.unitCost')} value={`×${tier.unitCostMultiplier.toFixed(2)}`} />
+                    <Stat label={t('company.yield')} value={formatPercent(tier.yieldRate * 100)} />
                 </View>
 
                 <View style={styles.statRow}>
-                    <Stat label={t('company.yield')} value={formatPercent(tier.yieldRate * 100)} />
                     <Stat label={t('company.brandCeiling')} value={`${tier.brandCeiling}`} />
                     <Stat label={t('company.qualityCeiling')} value={`${tier.qualityCeiling}`} />
                 </View>
 
+                {/* The number lives in the stripe. This adds the shape and the
+                    reading of it, not the figure again. */}
                 {lastReport && (
                     <View style={styles.utilBox}>
                         <View style={styles.utilTrack}>
@@ -379,12 +381,17 @@ const FacilityPanel: React.FC = () => {
                     on. It belongs with the facility it describes, and it only
                     needs to show where you are and what is ahead - the rungs
                     you already climbed are history, not a decision. */}
+                {/* Only what NOTHING else on this panel covers. The current
+                    tier is this very section, and the one after it has its own
+                    "Next tier" block with the build button - listing them here
+                    too is where most of the repetition came from. */}
+                {FACILITY_TIERS.some(x => x.level > tier.level + 1) && (
                 <View style={styles.ladderBlock}>
                     <Text style={styles.ladderHeading}>
-                        {t('company.theLadder')} · {tier.level} / {MAX_TIER_LEVEL}
+                        {t('company.laterTiers')} · {tier.level} / {MAX_TIER_LEVEL}
                     </Text>
-                    {FACILITY_TIERS.filter(x => x.level >= tier.level).map(x => {
-                        const current = x.level === tier.level;
+                    {FACILITY_TIERS.filter(x => x.level > tier.level + 1).map(x => {
+                        const current = false;
                         return (
                             <View key={x.level} style={[styles.ladderRow, current && styles.ladderNow]}>
                                 <Text style={styles.ladderNum}>{x.level}</Text>
@@ -406,6 +413,7 @@ const FacilityPanel: React.FC = () => {
                         );
                     })}
                 </View>
+                )}
             </CollapsibleSection>
 
         </View>

@@ -350,6 +350,7 @@ export const en: Record<string, string> = {
     'company.storage': 'Storage',
     'company.strategicSense': 'Strategic Sense',
     'company.theLadder': 'THE LADDER',
+    'company.laterTiers': 'Later tiers',
     'company.todayAposSMarketEvent': 'Today&apos;s Market Event',
     'company.topTierReached': 'TOP TIER REACHED',
     'company.totalInvestments': 'Total Investments',

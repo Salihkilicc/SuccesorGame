@@ -351,6 +351,7 @@ export const tr: Record<string, string> = {
     'company.storage': 'Depolama',
     'company.strategicSense': 'Stratejik Sezgi',
     'company.theLadder': 'Merdiven',
+    'company.laterTiers': 'Sonraki kademeler',
     'company.todayAposSMarketEvent': 'Bugünün Piyasa Olayı',
     'company.topTierReached': 'En üst kademe',
     'company.totalInvestments': 'Toplam Yatırım',
