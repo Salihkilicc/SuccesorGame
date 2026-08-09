@@ -282,7 +282,7 @@ const HomeScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <MaterialCommunityIcons name={item.icon} size={32} color="#FFFFFF" style={styles.appIconVector} />
+        <MaterialCommunityIcons name={item.icon} size={34} color="#FFFFFF" style={styles.appIconVector} />
       </LinearGradient>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
@@ -829,11 +829,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     rowGap: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 0,
   },
   appCard: {
-    // 18% x 5 leaves room for the gaps, so the whole set is one row.
-    width: '18%',
+    // 19% x 5 = 95%, the remaining 5% spread as four gaps by space-between.
+    // As large as five-across allows without wrapping.
+    width: '19%',
     aspectRatio: 0.75, // Matching Apple ratio
     marginBottom: 8,
     alignItems: 'center',
@@ -864,7 +865,7 @@ const styles = StyleSheet.create({
   },
   appIconLabel: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '500',
     textAlign: 'center',
     letterSpacing: 0.3,
