@@ -9,6 +9,7 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
+import ScreenHeader from '../common/ScreenHeader';
 import { theme } from '../../core/theme';
 import { useMarketStore } from '../../core/store/useMarketStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
@@ -116,15 +117,13 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
       onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.title}>{t('market.myPortfolio')}</Text>
-              <Text style={styles.totalValue}>Total Value: {formatMoney(totalValue)}</Text>
-            </View>
-            <Pressable onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </Pressable>
-          </View>
+          <ScreenHeader
+            title={t('market.myPortfolio')}
+            subtitle={`Total Value: ${formatMoney(totalValue)}`}
+            onBack={onClose}
+            inset={false}
+            category="market"
+          />
 
           {portfolioList.length === 0 ? (
             <View style={styles.emptyState}>

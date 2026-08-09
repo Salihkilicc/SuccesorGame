@@ -6,6 +6,7 @@ import { useDividendLogic } from '../../../features/finance/hooks/useDividendLog
 import { formatMoney, formatPrice } from '../../../core/utils';
 import { DIVIDEND_TAX } from '../../../core/market/equity';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
+import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 
 interface Props {
@@ -70,15 +71,13 @@ const DividendModal = ({ visible, onClose }: Props) => {
                 <View style={styles.centeredView} pointerEvents="box-none">
                     <View style={styles.card}>
                         {/* Header */}
-                        <View style={styles.titleRow}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.title}>{t('dividend.title')}</Text>
-                                <Text style={styles.subtitle}>{t('dividend.subtitle')}</Text>
-                            </View>
-                            <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
-                                <Text style={styles.closeText}>✕</Text>
-                            </Pressable>
-                        </View>
+                        <ScreenHeader
+                            title={t('dividend.title')}
+                            subtitle={t('dividend.subtitle')}
+                            onBack={onClose}
+                            inset={false}
+                            category="market"
+                        />
 
                         <ScrollView
                             style={styles.body}

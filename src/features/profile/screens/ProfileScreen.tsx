@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 const ProfileScreen = () => {
     useLocale();
@@ -23,23 +24,12 @@ const ProfileScreen = () => {
             />
 
             <View style={[styles.safeArea]}>
-                {/* ── Header ── */}
-                <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-                    <Pressable
-                        onPress={() => navigation.goBack()}
-                        style={({ pressed }) => [
-                            styles.backBtn,
-                            pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
-                        ]}
-                    >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
-                    </Pressable>
-
-                    <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>{t('ui.profile')}</Text>
-                        <View style={styles.headerAccent} />
-                    </View>
-                </View>
+                {/* The back arrow here was painted #FF8A8A - the LOSS red,
+                    on a navigation control. Exactly the leak the colour rule
+                    exists to stop, and it survived because it was a JSX
+                    `color=` prop rather than a style, which the audit was
+                    only reading in styles. Both are checked now. */}
+                <ScreenHeader title={t('ui.profile')} />
 
                 {/* ── Main Content Area ── */}
                 <View style={styles.content}>

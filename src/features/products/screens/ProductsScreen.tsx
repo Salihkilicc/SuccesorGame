@@ -1,12 +1,13 @@
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, ScrollView, Pressable, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney } from '../../../core/utils';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 const ProductsScreen = () => {
     useLocale();
@@ -25,11 +26,8 @@ const ProductsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}><Text style={styles.backText}>←</Text></Pressable>
-        <Text style={styles.title}>{t('product.productLines')}</Text>
-      </View>
+    <View style={styles.container}>
+      <ScreenHeader title={t('product.productLines')} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -93,7 +91,7 @@ const ProductsScreen = () => {
         />
       )}
 
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -35,10 +35,16 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     const rawChance = 0.80 - (markup * 2.0);
     const successChance = Math.max(0, rawChance) * 100;
 
-    // Color Logic
-    let chanceColor = '#FF8A8A'; // Red (< 40%)
-    if (successChance >= 70) chanceColor = '#CFD0D2'; // Green
-    else if (successChance >= 40) chanceColor = '#FF8A8A'; // Yellow
+    // A LIKELIHOOD, NOT A RESULT. All three tiers used to be painted in
+    // the loss red (two of them literally the same hex, with comments
+    // claiming "Green" and "Yellow"), which said the sale had already gone
+    // wrong before it was attempted. A poor chance is not money leaving -
+    // it is simply nothing good, which is what grey means now.
+    // Typed wide on purpose: `theme` is `as const`, so inferring from the
+    // first assignment would pin this to that one literal hex.
+    let chanceColor: string = theme.colors.down;
+    if (successChance >= 70) chanceColor = theme.colors.up;
+    else if (successChance >= 40) chanceColor = theme.colors.textSecondary;
 
     const formatMoney = (amount: number) => {
         return formatMoneyExact(amount);

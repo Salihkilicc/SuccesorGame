@@ -75,7 +75,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [], exits: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -260,6 +260,81 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                 problems.palette.push(
                     `${rel(f)}:${i + 1}  ${m[1]} as raw hex - use colors.negative / colors.positive`);
             }
+            // The same signal spelled as a JSX PROP rather than a style. This
+            // is how the loss red survived every previous sweep as the BACK
+            // ARROW on Profile and Notes: `<Icon color="#FF8A8A" />` is not a
+            // style block, so nothing above was looking at it. A red arrow
+            // out of a screen says the way back is a loss.
+            //
+            // Gradient arrays too - Notes drew its "new note" button as a
+            // gradient from #FF8A8A to #FF8A8A, which is a fill wearing a
+            // gradient's clothes.
+            for (const m of line.matchAll(/(?:color|Color)\s*=\s*["'](#FF8A8A|#4ADE80)["']/g)) {
+                problems.palette.push(
+                    `${rel(f)}:${i + 1}  ${m[1]} as a JSX prop - a signal colour on a control`);
+            }
+            for (const m of line.matchAll(/colors=\{\[[^\]]*(#FF8A8A|#4ADE80)[^\]]*\]\}/g)) {
+                problems.palette.push(
+                    `${rel(f)}:${i + 1}  ${m[1]} in a gradient - a signal colour as a fill`);
+            }
+        });
+    }
+}
+
+// --- 0d5) A way out that is not THE way out ----------------------------------
+//  The app once had, at the same time: "← Close" as text, a bare "←", a "✕"
+//  in the top right, a "← Back", a full-width Close at the bottom, and screens
+//  with no way out at all. The player's note was that leaving should not
+//  depend on how a screen happened to be built.
+//
+//  So there is one header component, and this pass is what keeps it the only
+//  one. Any reachable file that draws an exit glyph without going through
+//  ScreenHeader is building a second way out.
+//
+//  The vote glyphs on the board screens are the same character as a close
+//  (`{v.vote === 'YES' ? '✓' : '✕'}`), which would be a false positive - but
+//  those files use ScreenHeader, so they are already exempt. That is the
+//  reason the test is "does this file use the header", not "does this line
+//  look like a close".
+{
+//  TWO REFINEMENTS, both paid for by a false positive:
+//
+//  - A GLYPH WITH WORDS BESIDE IT IS A LABEL, not an exit. "✖ Skip" on the
+//    match popup is a choice in a game, and reporting it taught me that the
+//    test has to be "is the glyph the whole button", not "does the glyph
+//    appear". Icon NAMES are exempt from that softening - nothing is called
+//    `arrow-left` by accident.
+//
+//  - `@exit-ok <reason>` on the line or just above it. The settings drawer on
+//    Home is shelved behind a flag that is off; its close button is code kept
+//    on purpose, and a whole-file opt-out there would blind the audit to the
+//    rest of the busiest screen in the app.
+    // Two regexes for one character class, and NOT an oversight: a /g regex
+    // keeps `lastIndex` between calls, so using the same object for `.test()`
+    // and `.replace()` makes the test alternate true/false down the file. It
+    // reported the pass as clean while four real cases sat in front of it.
+    const GLYPH = /[✕✖⨯←]/;
+    const GLYPH_ALL = /[✕✖⨯←]/g;
+    const ICON = /arrow-left|window-close|close-circle/;
+    for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+        const src = read(f);
+        if (/ScreenHeader/.test(src)) continue;
+        const lines = src.split('\n');
+        lines.forEach((line, i) => {
+            if (/^\s*(\/\/|\*)/.test(line)) return;
+            if (lines.slice(Math.max(0, i - 3), i + 1).some(l => /@exit-ok\s/.test(l))) return;
+
+            if (!ICON.test(line)) {
+                // The CAPTURE, not the match: `line.match(..., 'g')` returns
+                // the delimiters too, so the leftover after stripping the
+                // glyph was always "><" - non-empty, so every real case was
+                // dismissed as "a label". The pass reported clean twice.
+                const inner = [...line.matchAll(/>([^<>{}]*)</g)].map(m => m[1]).join(' ');
+                if (!GLYPH.test(inner)) return;
+                // Anything left once the glyph goes means it was a label.
+                if (inner.replace(GLYPH_ALL, '').trim()) return;
+            }
+            problems.exits.push(`${rel(f)}:${i + 1}  ${line.trim().slice(0, 68)}`);
         });
     }
 }
@@ -576,6 +651,8 @@ console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
 total += section('Text unreadable on the ground', problems.contrast,
     'Below 3:1 against the background. Fill tones are not text colours - use their light form.');
+total += section('A way out that is not the one way out', problems.exits,
+    'One header draws the back arrow. A second exit is how the app got six of them.');
 total += section('Colours outside the palette', problems.palette,
     'Consolidated to fifteen tokens. A new hex here is how the drift starts again.');
 total += section('Persisted stores a new game does not clear', problems.newGame,

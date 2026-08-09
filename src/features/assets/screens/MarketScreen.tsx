@@ -9,6 +9,7 @@ import { useUserStore } from '../../../core/store/useUserStore';
 import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { triggerEvent } from '../../../event/eventEngine';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
 
@@ -255,12 +256,13 @@ const PortfolioCard = ({
   </View>
 );
 
+// The bare arrow this screen drew for itself. The shared header carries the
+// title and the section colour with it, which the loose button could not.
 const BackButton = ({ navigation }: { navigation: any }) => (
-  <Pressable
-    onPress={() => navigation.canGoBack() && navigation.goBack()}
-    style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
-    <Text style={styles.backIcon}>←</Text>
-  </Pressable>
+  <ScreenHeader
+    title={t('company.market')}
+    onBack={() => navigation.canGoBack() && navigation.goBack()}
+  />
 );
 
 const MarketEventFooter = () => {

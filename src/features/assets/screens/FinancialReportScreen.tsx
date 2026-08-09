@@ -1,7 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
 import { t, useLocale } from '../../../core/i18n';
 import React from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import ScreenHeader from '../../../components/common/ScreenHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../core/theme';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -61,30 +62,33 @@ const Row = ({
 
 const FinancialReportScreen = () => {
     useLocale();
-    const navigation = useNavigation();
     // Eski kayitlarda yeni alanlar olmayabilir — normalize et.
     const rawReport = useGameStore(state => state.lastQuarterReport);
     const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
     const companyCapital = useStatsStore(state => state.companyCapital);
     const money = useStatsStore(state => state.money);
 
+    // The period is the SUBTITLE, not part of the title: the title says where
+    // you are and never changes, the subtitle says which quarter you are
+    // looking at. It read "Q2 · Year 1" almost permanently until the label
+    // itself was fixed - see useGameStore, the year was derived from a month
+    // counter that wraps every twelve months.
     const header = (
-        <View style={styles.header}>
-            <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-                <Text style={styles.backTxt}>←</Text>
-            </Pressable>
-            <View>
-                <Text style={styles.headerTitle}>{t('company.financialReport')}</Text>
-                <Text style={styles.headerSub}>{report ? report.periodLabel : 'No data yet'}</Text>
-            </View>
-        </View>
+        <ScreenHeader
+            title={t('company.financialReport')}
+            subtitle={report ? report.periodLabel : 'No data yet'}
+        />
     );
 
+    // The header sits OUTSIDE the ScrollView and pays its own status-bar
+    // inset. Inside a padded content container it would be indented from the
+    // edges and inset twice - the wide empty band that showed up above the
+    // product titles when this was got wrong there.
     if (!report) {
         return (
-            <SafeAreaView style={styles.safeArea}>
+            <View style={styles.safeArea}>
+                {header}
                 <ScrollView contentContainerStyle={styles.container}>
-                    {header}
                     <View style={styles.card}>
                         <Text style={styles.emptyText}>
                             No quarter has been completed yet. Advance time from the Home screen to generate your
@@ -97,16 +101,16 @@ const FinancialReportScreen = () => {
                         <Row label={t('company.personalCash')} amount={money || 0} />
                     </View>
                 </ScrollView>
-            </SafeAreaView>
+            </View>
         );
     }
 
     const e = report.expenses;
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
+            {header}
             <ScrollView contentContainerStyle={styles.container}>
-                {header}
 
                 {/* Ozet */}
                 <View style={[styles.heroCard, { borderColor: report.netProfit >= 0 ? theme.colors.positive : theme.colors.negative }]}>
@@ -329,9 +333,9 @@ const FinancialReportScreen = () => {
                     </View>
                 </CollapsibleSection>
 
-                <View style={{ height: 120 }} />
+                <View style={{ height: NAV_BAR_CLEARANCE }} />
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -341,23 +345,9 @@ const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: theme.colors.background },
     container: { padding: theme.spacing.md, paddingBottom: theme.spacing.xl },
 
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: theme.spacing.lg,
-        gap: theme.spacing.md,
-    },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: theme.colors.card,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    backTxt: { color: theme.colors.textPrimary, fontSize: 20 },
+    // SHELVED: this screen's own header. ScreenHeader draws it now, so these
+    // are kept only as the record of what the shared one replaced.
+    // header / backBtn / backTxt / headerTitle removed from use, not deleted:
     headerTitle: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: '700' },
     headerSub: { color: theme.colors.textSecondary, fontSize: 11, marginTop: 2 },
 

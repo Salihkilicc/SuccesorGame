@@ -15,6 +15,7 @@ import { useGameStore } from '../../../core/store/useGameStore';
 import { formatMoney, formatNumber, formatPercent, formatSignedMoney } from '../../../core/utils';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import InfoDot from '../../../components/common/InfoDot';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { EXPENSE_EXPLANATIONS, type QuarterReport, normalizeQuarterReport } from '../../../core/reportTypes';
 
@@ -480,19 +481,28 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
       <View style={styles.overlay}>
         <View style={styles.card}>
 
-          {/* Header */}
-          <View style={styles.customHeader}>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-            <View style={styles.headerCenter}>
-              <Text style={styles.headerTitle}>{t('company.quarterlyReport')}</Text>
-              <Text style={styles.headerSubtitle}>{t('company.incomeStatement')}</Text>
-            </View>
-            <View style={styles.periodBadge}>
-              <Text style={styles.periodText}>{report.periodLabel}</Text>
-            </View>
-          </View>
+          {/* ------------------------------------------------------------
+              The last ✕ in the app. Every other screen had already moved to
+              the arrow; this one kept its own close because it is a modal
+              rather than a route, and that is exactly the inconsistency the
+              player was pointing at - the way out should not depend on how
+              the screen was implemented.
+
+              `inset={false}`: this header is inside a card, and the page
+              behind it has already paid the status bar. Paying it twice is
+              what put an empty band above the title on the product screens.
+
+              The section colour is passed rather than resolved, because a
+              modal has no route of its own - the route underneath is
+              whatever screen raised it.
+             ------------------------------------------------------------ */}
+          <ScreenHeader
+            title={t('company.quarterlyReport')}
+            subtitle={report.periodLabel}
+            onBack={onClose}
+            inset={false}
+            category="finance"
+          />
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 

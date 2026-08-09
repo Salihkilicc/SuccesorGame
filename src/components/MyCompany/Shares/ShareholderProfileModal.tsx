@@ -17,6 +17,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import type { BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
+import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 
@@ -273,12 +274,17 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.container}>
-                    {/* Handle Bar */}
-                    <View style={styles.handleBarContainer}>
-                        <View style={styles.handleBar} />
-                    </View>
+                    <ScreenHeader
+                        title={member.name}
+                        subtitle={t('data.trait.' + member.trait)}
+                        onBack={onClose}
+                        inset={false}
+                        category="people"
+                    />
 
-                    {/* HEADER */}
+                    {/* The portrait block. It used to carry the name and the
+                        close button as well; both moved into the header, so
+                        what is left here is the picture. */}
                     <View style={styles.header}>
                         <View style={styles.avatarContainer}>
                             <View style={[styles.avatar, { backgroundColor: getTrustColor(member.trust) }]}>
@@ -320,10 +326,11 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             </View>
                         </View>
 
-                        {/* Close Button */}
-                        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                            <Text style={styles.closeButtonText}>✕</Text>
-                        </TouchableOpacity>
+                        {/* SHELVED: the ✕ that used to float over the portrait.
+                            A close in the top right of a card, when every
+                            other screen leaves by an arrow in the top left,
+                            is the inconsistency the player asked to end. The
+                            header above carries the way out now. */}
                     </View>
 
                     {/* TAB SWITCHER */}

@@ -42,7 +42,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <MaterialCommunityIcons name="flash" size={24} color="#FF8A8A" />
+                            <MaterialCommunityIcons name="flash" size={24} color={theme.colors.warning} />
                             <Text style={styles.title}>{t('ui.godMode')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -67,7 +67,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
                                 colors={['rgba(5,168,246,0.2)', 'rgba(5,168,246,0.05)']}
                                 style={StyleSheet.absoluteFill}
                             />
-                            <MaterialCommunityIcons name="skull" size={24} color="#FF8A8A" />
+                            <MaterialCommunityIcons name="skull" size={24} color={theme.colors.warning} />
                             <Text style={styles.actionTextReset}>{t('ui.resetGame')}</Text>
                         </TouchableOpacity>
                     </View>

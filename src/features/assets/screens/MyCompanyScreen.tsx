@@ -22,6 +22,7 @@ import { DashboardCard, StatColumn, VerticalDivider, SectionHeader } from '../co
 import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
@@ -202,24 +203,23 @@ const MyCompanyScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* FIXED HEADER */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => navigation.navigate('Home')}
-            style={({ pressed }) => [
-              styles.backBtn,
-              pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
-            ]}
-          >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={theme.colors.textPrimary} />
-          </Pressable>
+      <SafeAreaView style={styles.safeArea} edges={[]}>
+        {/* ----------------------------------------------------------------
+            THIS header used to be drawn here, by hand, and it is the one the
+            player picked as the standard - so it moved into ScreenHeader and
+            every other screen now wears it. What is left here is the one
+            thing that is genuinely local: back goes HOME rather than popping
+            the stack, because My Company is the section root and popping
+            would land wherever you happened to come from.
 
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{t('company.commandCenter')}</Text>
-            <View style={styles.headerAccent} />
-          </View>
-        </View>
+            `edges={[]}` because ScreenHeader pays the status-bar inset
+            itself. Letting SafeAreaView pay it too reserved the inset twice
+            and left an empty band above the title.
+           ---------------------------------------------------------------- */}
+        <ScreenHeader
+          title={t('company.commandCenter')}
+          onBack={() => navigation.navigate('Home')}
+        />
 
         <ScrollView
           contentContainerStyle={[styles.content, { paddingBottom: 120, paddingTop: 0 }]}>

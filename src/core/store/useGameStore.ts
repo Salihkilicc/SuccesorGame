@@ -1397,7 +1397,20 @@ export const useGameStore = create<GameStore>()(
         const ebit = grossProfit - operatingExpenses + dealEffect.netEbit;
 
         const totalAvailableGoods = totalBeginningStock + totalProduction;
-        const yearsElapsed = Math.floor((get().currentMonth - 1 + months) / 12);
+        // ------------------------------------------------------------------
+        //  THE PERIOD LABEL — it read "Q2 · Year 1" nearly forever
+        // ------------------------------------------------------------------
+        //  The year was derived from `currentMonth`, which WRAPS to 1-12 every
+        //  twelve months. So it could never exceed 1, and the `+ months` term
+        //  pushed month 10 over the boundary and printed Q4 as "Year 2" - the
+        //  only year it ever showed, one quarter early and then back to 1.
+        //
+        //  Elapsed years live in `age`, which is the field that actually
+        //  counts them. Read at this point in the tick it is still the age
+        //  DURING the quarter being reported, which is what the label wants.
+        //  The quarter index was right all along and is untouched.
+        // ------------------------------------------------------------------
+        const yearsElapsed = Math.max(0, get().age - initialGameState.age);
         const quarterIndex = Math.floor(((get().currentMonth - 1) % 12) / 3) + 1;
 
         const quarterReport: QuarterReport = {

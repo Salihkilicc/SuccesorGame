@@ -41,7 +41,7 @@ const SettingsRow = ({
     onPress,
     isFirst,
     isLast,
-    color = '#FF8A8A',
+    color = theme.colors.primary,
 }: SettingsRowProps) => {
     return (
         <TouchableOpacity
@@ -204,7 +204,7 @@ const SettingsScreen = () => {
                             label={t('os.notifications')}
                             value={isNotificationsEnabled}
                             onToggle={toggleNotifications}
-                            color="#FF8A8A"
+                            color={theme.colors.primary}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
@@ -213,7 +213,7 @@ const SettingsScreen = () => {
                             value={isHapticsEnabled}
                             onToggle={toggleHaptics}
                             isLast
-                            color="#FF8A8A"
+                            color={theme.colors.primary}
                         />
                     </View>
 

@@ -19,6 +19,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import LinearGradient from 'react-native-linear-gradient';
 import { useNotesStore, Note } from '../../../core/store/useNotesStore';
 import { theme } from '../../../core/theme';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
         >
             {/* Gold left accent bar */}
             <LinearGradient
-                colors={['#FF8A8A', '#FF8A8A']}
+                colors={[theme.colors.primary, theme.colors.secondary]}
                 style={styles.noteAccentBar}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
@@ -145,7 +146,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                     onPress={onCancel}
                     style={({ pressed }) => [styles.editorHeaderBtn, pressed && { opacity: 0.6 }]}
                 >
-                    <MaterialCommunityIcons name="arrow-left" size={22} color="#FF8A8A" />
+                    <MaterialCommunityIcons name="arrow-left" size={22} color={theme.colors.textPrimary} />
                     <Text style={styles.editorHeaderBtnText}>{t('os.notes')}</Text>
                 </Pressable>
 
@@ -157,7 +158,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                     ]}
                 >
                     <LinearGradient
-                        colors={['#FF8A8A', '#FF8A8A']}
+                        colors={[theme.colors.primary, theme.colors.secondary]}
                         style={StyleSheet.absoluteFillObject}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
@@ -180,7 +181,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 onSubmitEditing={() => contentRef.current?.focus()}
                 autoFocus={!note}
                 maxLength={120}
-                selectionColor="#FF8A8A"
+                selectionColor={theme.colors.primary}
             />
 
             {/* Divider */}
@@ -196,7 +197,7 @@ const EditorView = ({ note, onSave, onCancel }: EditorViewProps) => {
                 placeholderTextColor="#323A40"
                 multiline
                 textAlignVertical="top"
-                selectionColor="#FF8A8A"
+                selectionColor={theme.colors.primary}
             />
         </KeyboardAvoidingView>
     );
@@ -212,7 +213,7 @@ const EmptyState = ({ onNew }: { onNew: () => void }) => (
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
         >
-            <MaterialCommunityIcons name="note-text-outline" size={44} color="#FF8A8A" />
+            <MaterialCommunityIcons name="note-text-outline" size={44} color={theme.colors.primary} />
         </LinearGradient>
         <Text style={styles.emptyTitle}>{t('os.noNotesYet')}</Text>
         <Text style={styles.emptySubtitle}>
@@ -311,39 +312,25 @@ const NotesScreen = () => {
             />
 
             <View style={[styles.safeArea]}>
-                {/* ── Header ── */}
-                <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-                    <Pressable
-                        onPress={() => navigation.goBack()}
-                        style={({ pressed }) => [
-                            styles.backBtn,
-                            pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
-                        ]}
-                    >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
-                    </Pressable>
-
-                    <View style={styles.headerCenter}>
-                        <Text style={styles.headerTitle}>{t('os.notes2')}</Text>
-                        <View style={styles.headerAccent} />
-                    </View>
-
-                    <Pressable
-                        onPress={handleNewNote}
-                        style={({ pressed }) => [
-                            styles.addBtn,
-                            pressed && { opacity: 0.6, transform: [{ scale: 0.92 }] },
-                        ]}
-                    >
-                        <LinearGradient
-                            colors={['#FF8A8A', '#FF8A8A']}
-                            style={StyleSheet.absoluteFillObject}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                        />
-                        <MaterialCommunityIcons name="plus" size={22} color="#FFFFFF" />
-                    </Pressable>
-                </View>
+                {/* Two leaks of the loss red lived in this header: the back
+                    arrow, and the "new note" button which was a gradient of
+                    #FF8A8A to #FF8A8A - a gradient between a colour and
+                    itself, which is a fill wearing a gradient's clothes.
+                    Adding a note is not a loss. */}
+                <ScreenHeader
+                    title={t('os.notes2')}
+                    right={
+                        <Pressable
+                            onPress={handleNewNote}
+                            style={({ pressed }) => [
+                                styles.addBtnInline,
+                                pressed && { opacity: 0.6, transform: [{ scale: 0.92 }] },
+                            ]}
+                        >
+                            <MaterialCommunityIcons name="plus" size={22} color={theme.colors.primaryText} />
+                        </Pressable>
+                    }
+                />
 
                 {/* ── Notes count badge ── */}
                 {notes.length > 0 && (
@@ -441,6 +428,21 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
         elevation: 4,
     },
+    /**
+     * The same button, but positioned by the header's right slot rather than
+     * by itself. The old one was `position: absolute` against the screen; put
+     * inside the slot - which is also absolute - it would have been placed
+     * twice and landed off the bar.
+     */
+    addBtnInline: {
+        width: 38,
+        height: 38,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: theme.radius.md,
+        backgroundColor: theme.colors.primary,
+    },
+    // SHELVED: the screen-positioned original. Kept for reference.
     addBtn: {
         width: 38,
         height: 38,

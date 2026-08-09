@@ -4,6 +4,7 @@ import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'rea
 import { useNavigation } from '@react-navigation/native';
 import { useStatsStore, TechLevels } from '../../../core/store';
 import { checkAllAchievementsAfterStateChange } from '../../../achievements/checker';
+import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { formatMoney } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
@@ -187,12 +188,12 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{t('action.rDLabs')}</Text>
-            <Pressable onPress={onClose} hitSlop={10}>
-              <Text style={styles.closeIcon}>✕</Text>
-            </Pressable>
-          </View>
+          <ScreenHeader
+            title={t('action.rDLabs')}
+            onBack={onClose}
+            inset={false}
+            category="research"
+          />
           <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
           <Text style={styles.capitalText}>{t('action.availableCapitalV1', { v1: formatMoney(companyCapital) })}</Text>
 
@@ -372,12 +373,12 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
           {/* The Card */}
           <View style={styles.card}>
-            <View style={styles.header}>
-              <Text style={styles.title}>{t('action.rDLabs')}</Text>
-              <Pressable onPress={onClose} hitSlop={10}>
-                <Text style={styles.closeIcon}>✕</Text>
-              </Pressable>
-            </View>
+            <ScreenHeader
+              title={t('action.rDLabs')}
+              onBack={onClose}
+              inset={false}
+              category="research"
+            />
             <Text style={styles.subtitle}>{t('action.investInTechnologyToUnlock')}</Text>
             <Text style={styles.capitalText}>{t('action.availableCapitalV1', { v1: formatMoney(companyCapital) })}</Text>
 

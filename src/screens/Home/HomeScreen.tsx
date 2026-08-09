@@ -343,7 +343,7 @@ const HomeScreen = () => {
             <View style={styles.headerTopRow}>
               {/* Avatar */}
               <LinearGradient
-                colors={['#FF8A8A', '#FF8A8A', '#434B50']}
+                colors={[theme.colors.primary, theme.colors.secondary, theme.colors.surfaceRaised]}
                 style={styles.avatarCircle}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -385,7 +385,7 @@ const HomeScreen = () => {
               ]}
             >
               <LinearGradient
-                colors={['#FF8A8A', '#FF8A8A', '#434B50']}
+                colors={[theme.colors.primary, theme.colors.secondary, theme.colors.surfaceRaised]}
                 style={StyleSheet.absoluteFillObject}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -482,6 +482,8 @@ const HomeScreen = () => {
               <View style={styles.drawer}>
                 <View style={styles.drawerHeader}>
                   <Text style={styles.drawerTitle}>{t('home.settings')}</Text>
+                  {/* @exit-ok shelved drawer - SHOW_SETTINGS_DRAWER is false,
+                      so this close is unreachable code kept on purpose. */}
                   <Pressable onPress={() => setDrawerOpen(false)}>
                     <Text style={styles.drawerClose}>✕</Text>
                   </Pressable>

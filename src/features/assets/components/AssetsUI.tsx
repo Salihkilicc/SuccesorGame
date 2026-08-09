@@ -1,6 +1,7 @@
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { formatMoney } from '../../../core/utils';
 
@@ -13,13 +14,7 @@ export const StatPill = ({ label, value }: { label: string; value: string }) => 
 
 export const AssetsHeader = ({ onBack, risk, strategy }: any) => (
     <View style={styles.header}>
-        <View style={styles.headerRow}>
-            <Pressable onPress={onBack} style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
-                <Text style={styles.backIcon}>←</Text>
-            </Pressable>
-            <Text style={styles.title}>{t('company.assets2')}</Text>
-            <View style={{ width: 32 }} />
-        </View>
+        <ScreenHeader title={t('company.assets2')} onBack={onBack} />
         <View style={styles.riskRow}>
             <StatPill label={t('company.riskAppetite')} value={`${Math.round(risk)}%`} />
             <StatPill label={t('company.strategicSense')} value={`${Math.round(strategy)}%`} />
