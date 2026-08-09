@@ -158,7 +158,6 @@ const BorrowModal = ({ visible, onClose }: Props) => {
                 <View style={styles.centeredView} pointerEvents="box-none">
                     <View style={styles.container}>
                         <ScreenHeader
-                            inset={false}
                             title={t('bank.borrow.title')}
                             subtitle={`${assessment.rating} · ${assessment.leverage === Infinity ? '∞' : assessment.leverage.toFixed(1)}x leverage · ${borrowingCapacity > 0 ? `${formatMoney(borrowingCapacity)} available` : 'no capacity'}`}
                             onBack={onClose}
@@ -341,32 +340,30 @@ const styles = StyleSheet.create({
         fontVariant: ['tabular-nums'],
     },
 
+    // ----------------------------------------------------------------------
+    //  FULL-BLEED, like every other destination in the app.
+    //
+    //  This was a 420px card capped at 78% of the screen height, centred, with
+    //  24px of its own padding and an 80px margin under it. Six loan types, an
+    //  amount selector and a payment breakdown were being asked to live in a
+    //  box roughly half the screen - so it read as cramped no matter how the
+    //  contents were arranged. Choosing how to finance the company is a place
+    //  you go, not something you peek at.
+    // ----------------------------------------------------------------------
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(28,36,44,0.85)',
-        // No padding here
+        backgroundColor: theme.colors.background,
     },
-    dismissArea: { ...StyleSheet.absoluteFillObject },
+    dismissArea: { width: 0, height: 0 },
     centeredView: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
     },
     container: {
-        width: '100%',
-        maxWidth: 420,
-        // Ekranin en fazla %78'ini kaplasin; gerisi kaydirilir.
-        maxHeight: '78%',
-        backgroundColor: '#1C242C',
-        borderRadius: 20,
-        padding: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)',
-        marginBottom: 80, // Space for Bottom Bar
+        flex: 1,
+        backgroundColor: theme.colors.background,
     },
-    body: { flexGrow: 0, flexShrink: 1 },
-    bodyContent: { paddingBottom: 8 },
+    body: { flex: 1 },
+    bodyContent: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
     titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -489,6 +486,10 @@ const styles = StyleSheet.create({
     actions: {
         flexDirection: 'row',
         gap: 12,
+        padding: theme.spacing.md,
+        paddingBottom: 110, // clear of the nav bar
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: theme.colors.border,
     },
     cancelButton: {
         flex: 1,

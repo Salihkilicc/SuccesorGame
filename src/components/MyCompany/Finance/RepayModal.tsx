@@ -6,6 +6,7 @@ import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
+import ScreenHeader from '../../common/ScreenHeader';
 
 type Props = {
     visible: boolean;
@@ -56,7 +57,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
                 <View style={styles.backdrop}>
                     <View style={styles.centeredView}>
                         <View style={styles.container}>
-                            <Text style={styles.title}>{t('finance.debtFree')}</Text>
+                            <ScreenHeader title={t('finance.debtFree')} onBack={onClose} />
                             <Text style={styles.subtitle}>{t('finance.youHaveNoCorporateDebt')}</Text>
                             <Pressable onPress={onClose} style={styles.confirmButton}>
                                 <Text style={styles.confirmText}>{t('finance.great')}</Text>
@@ -73,12 +74,13 @@ const RepayModal = ({ visible, onClose }: Props) => {
             <View style={styles.backdrop}>
                 <View style={styles.centeredView}>
                     <View style={styles.container}>
-                        <Text style={styles.title}>{t('finance.repayDebt')}</Text>
-                        <Text style={styles.subtitle}>
-                            Total Debt: {formatMoney(totalDebt)} • Cash: {formatMoney(companyCapital)}
-                        </Text>
+                        <ScreenHeader
+                            title={t('finance.repayDebt')}
+                            subtitle={`${formatMoney(totalDebt)} owed · ${formatMoney(companyCapital)} cash`}
+                            onBack={onClose}
+                        />
 
-                        <ScrollView style={styles.loansScroll} showsVerticalScrollIndicator={false}>
+                        <ScrollView style={styles.loansScroll} contentContainerStyle={styles.loansContent} showsVerticalScrollIndicator={false}>
                             {loans.map((loan) => {
                                 const maxRepayable = Math.min(loan.balance, companyCapital);
 
@@ -172,9 +174,6 @@ const RepayModal = ({ visible, onClose }: Props) => {
                             })}
                         </ScrollView>
 
-                        <Pressable onPress={onClose} style={styles.closeButton}>
-                            <Text style={styles.closeText}>{t('finance.close')}</Text>
-                        </Pressable>
                     </View>
                 </View>
 
@@ -186,28 +185,11 @@ const RepayModal = ({ visible, onClose }: Props) => {
 export default RepayModal;
 
 const styles = StyleSheet.create({
-    backdrop: {
-        flex: 1,
-        backgroundColor: 'rgba(28,36,44,0.85)',
-        // No padding here
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    container: {
-        width: '100%',
-        maxWidth: 420,
-        maxHeight: '80%',
-        backgroundColor: '#1C242C',
-        borderRadius: 20,
-        padding: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-        marginBottom: 80, // Space for Bottom Bar
-    },
+    loansContent: { padding: theme.spacing.md, paddingBottom: 120, gap: theme.spacing.sm },
+    // Full-bleed, matching Borrow and every other destination.
+    backdrop: { flex: 1, backgroundColor: theme.colors.background },
+    centeredView: { flex: 1 },
+    container: { flex: 1, backgroundColor: theme.colors.background },
     title: {
         fontSize: 24,
         fontWeight: '800',
