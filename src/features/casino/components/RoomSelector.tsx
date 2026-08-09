@@ -28,10 +28,10 @@ const ROOMS: Array<{
   minCharisma?: number;
   flavor?: string;
 }> = [
-    { id: 'standard', label: t('ui.standardRoom'), minBet: '$1K', emoji: '🎰', flavor: 'Casual bets & chill vibe.' },
+    { id: 'standard', get label() { return t('ui.standardRoom'); }, minBet: '$1K', emoji: '🎰', flavor: 'Casual bets & chill vibe.' },
     {
       id: 'high',
-      label: t('ui.highRoller'),
+      get label() { return t('ui.highRoller'); },
       minBet: '$10K',
       emoji: '🔥',
       minNetWorth: MIN_HIGH_NET_WORTH,
@@ -40,7 +40,7 @@ const ROOMS: Array<{
     },
     {
       id: 'vip',
-      label: t('ui.vipRoom'),
+      get label() { return t('ui.vipRoom'); },
       minBet: '$50K — premium required',
       emoji: '💎',
       requiresPremium: true,
@@ -48,7 +48,7 @@ const ROOMS: Array<{
     },
     {
       id: 'ultra',
-      label: t('ui.ultraVip'),
+      get label() { return t('ui.ultraVip'); },
       minBet: '$250K — premium + $1M NW',
       emoji: '🃏',
       requiresPremium: true,

@@ -1164,6 +1164,8 @@ export const tr: Record<string, string> = {
     'home.investorsPunishGrowthWithoutFree': 'Yatırımcılar serbest nakit akışı olmayan büyümeyi cezalandırıyor.',
     'home.life': 'Hayat',
     'home.love': 'Aşk',
+    'home.messages': 'Mesajlar',
+    'home.casino': 'Kumarhane',
     'home.mail': 'Posta',
     'home.marketsRallyOnTechEarnings': 'Piyasalar teknoloji kârlarıyla yükseliyor.',
     'home.myCompany': 'Şirketim',

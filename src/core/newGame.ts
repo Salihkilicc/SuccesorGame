@@ -30,6 +30,7 @@ import { useLaboratoryStore } from './store/useLaboratoryStore';
 import { useEducationStore } from './store/useEducationStore';
 import { useMarketStore } from './store/useMarketStore';
 import { useAchievementStore } from './store/useAchievementStore';
+import { useMessageStore } from './store/useMessageStore';
 
 /**
  * EVERY game key in AsyncStorage.
@@ -49,6 +50,7 @@ export const PERSIST_KEYS: string[] = [
     'succesor_achievements_v1',
     'succesor_calendar_v2',
     'succesor_notes_v1',
+    'succesor_messages_v1',
 
     // Finans / piyasa
     'succesor_market_v6',
@@ -95,6 +97,8 @@ const resetInMemoryStores = () => {
     useEducationStore.getState().reset();
     useMarketStore.getState().reset();
     useAchievementStore.getState().resetAchievements();
+    // A new company gets a fresh inbox: the threads are story about THIS run.
+    useMessageStore.getState().reset();
 
     // ------------------------------------------------------------------
     //  `reset?.()` HID A MISSING METHOD

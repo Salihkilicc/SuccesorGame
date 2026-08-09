@@ -54,8 +54,19 @@ export const FEATURES = {
      *  NOTE: when it returns it will be reshaped as "stakeholder management"
      *  (board, investor relations, key hires). */
     love: false,
-    /** Kumarhane: slots, rulet, poker, blackjack */
-    casino: false,
+    /**
+     * Kumarhane: slots, rulet, poker, blackjack.
+     *
+     * BACK ON, as the home grid's fourth app. Switched on as-is and knowingly:
+     * these five screens predate the header standard and the palette, so they
+     * will look like a different app until they get their own pass. That was
+     * the call - having it playable now beats having it consistent later.
+     *
+     * They are also still inside the audit's `isDisabled` list, which means
+     * nothing in features/casino is being checked for palette, exits or dead
+     * code. That is the real debt here, and it is bigger than the styling.
+     */
+    casino: true,
     /** Underworld tab (black market + hookup + network hub) */
     underworld: false,
     /** Kara borsa ve polis takibi mini-oyunu */

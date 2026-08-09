@@ -1,3 +1,7 @@
+// @orphan-todo casino came off the shelf with this already unmounted. It is
+// leftover from the module's own history rather than new debt, and it is
+// listed here so the casino's clean-up pass has a worklist instead of a
+// memory. Kept, not deleted.
 // src/features/casino/components/CasinoUI.tsx
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';

@@ -82,6 +82,9 @@ const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hid
           <View style={styles.leftZone}>
             {onBack ? (
               <Pressable onPress={onBack} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.7 }]}>
+                {/* @exit-ok the casino predates ScreenHeader and was switched back on
+                    as-is, deliberately. It gets the header standard in its own pass;
+                    until then this is a known inconsistency rather than a stray. */}
                 <Text style={styles.navIcon}>←</Text>
               </Pressable>
             ) : (

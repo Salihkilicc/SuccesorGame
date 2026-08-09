@@ -58,6 +58,7 @@ import EducationScreen from '../features/life/screens/EducationScreen';
 import WeatherScreen from '../features/life/screens/WeatherScreen';
 import CalendarScreen from '../features/life/screens/CalendarScreen';
 import NotesScreen from '../features/os/screens/NotesScreen';
+import MessagesScreen from '../features/os/screens/MessagesScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import CrystalNavBar from './components/CrystalNavBar';
@@ -179,6 +180,7 @@ export type RootStackParamList = {
   Weather: undefined;
   Calendar: undefined;
   Notes: undefined;
+  Messages: undefined;
   Settings: undefined;
   Profile: undefined;
 };
@@ -484,6 +486,7 @@ const RootNavigator = () => {
           {/* --- AKTİF: OS kabuğu --- */}
           <RootStack.Screen name="Calendar" component={CalendarScreen} />
           <RootStack.Screen name="Notes" component={NotesScreen} />
+          <RootStack.Screen name="Messages" component={MessagesScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />
           <RootStack.Screen name="Profile" component={ProfileScreen} />
         </RootStack.Navigator>

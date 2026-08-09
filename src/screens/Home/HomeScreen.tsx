@@ -68,11 +68,23 @@ const HOMESCREEN_APPS: Array<{
     // SHELVED from the home grid. The route stays registered.
     // { key: 'calendar', get label() { return t('home.calendar'); }, icon: 'calendar', gradient: GRADIENTS.orangeYellow },
     { key: 'mail', get label() { return t('home.mail'); }, icon: 'email', gradient: GRADIENTS.blueSky },
-    { key: 'myCompany', get label() { return t('home.myCompany'); }, icon: 'office-building', gradient: GRADIENTS.networkBlue },
+    // ------------------------------------------------------------------
+    //  MESSAGES took My Company's place, and CASINO took Financials'.
+    //
+    //  Neither removal loses a destination, which is the only reason they
+    //  could go: My Company is the nav bar's Company tab, and the financial
+    //  report is what the company card on that screen opens. Both tiles were
+    //  a second door to a room that already had one - and the grid is small
+    //  enough that a duplicate costs a slot something new could use.
+    // ------------------------------------------------------------------
+    { key: 'messages', get label() { return t('home.messages'); }, icon: 'message-text', gradient: GRADIENTS.networkBlue },
     // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
     { key: 'education', get label() { return t('home.education'); }, icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
-    { key: 'financials', get label() { return t('home.financials'); }, icon: 'file-chart', gradient: GRADIENTS.bluePurple, feature: 'financialReport' },
+    { key: 'casino', get label() { return t('home.casino'); }, icon: 'cards-playing-outline', gradient: GRADIENTS.bluePurple, feature: 'casino' },
     { key: 'news', get label() { return t('home.news'); }, icon: 'newspaper', gradient: GRADIENTS.tealCyan },
+    // SHELVED from the grid, both still reachable - see the note above.
+    // { key: 'myCompany', ... icon: 'office-building' },
+    // { key: 'financials', ... icon: 'file-chart', feature: 'financialReport' },
     // SHELVED as a home-screen app: the gear in the header is the single way
     // in now. The route stays registered and `handleNavigateStack('Settings')`
     // still reaches it - only the duplicate icon is gone.
@@ -285,9 +297,13 @@ const HomeScreen = () => {
     switch (key) {
       case 'calendar': handleNavigateStack('Calendar'); break;
       case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
-      case 'myCompany': handleNavigateTabs('MyCompany'); break;
+      case 'messages': handleNavigateStack('Messages'); break;
       case 'education': handleNavigateStack('Education'); break;
-      case 'financials': handleNavigateStack('FinancialReport'); break;
+      // The casino is its own stack, so it opens at the lobby rather than at
+      // whichever screen that stack happens to list first.
+      case 'casino':
+        (navigation as any).navigate('Casino', { screen: 'CasinoLobby' });
+        break;
       case 'settings': handleNavigateStack('Settings'); break;
       case 'news': setShowNews(true); break;
     }

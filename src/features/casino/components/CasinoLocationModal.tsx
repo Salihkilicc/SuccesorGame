@@ -28,6 +28,9 @@ const CasinoLocationModal = ({ visible, onClose, currentLocationId, unlockedLoca
                     <View style={styles.header}>
                         <Text style={styles.title}>{t('ui.travelTo')}</Text>
                         <Pressable onPress={onClose} style={styles.closeBtn}>
+                            {/* @exit-ok the casino predates ScreenHeader and was switched back on
+                                as-is, deliberately. It gets the header standard in its own pass;
+                                until then this is a known inconsistency rather than a stray. */}
                             <Text style={styles.closeText}>✕</Text>
                         </Pressable>
                     </View>

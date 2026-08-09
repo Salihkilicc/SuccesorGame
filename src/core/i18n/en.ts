@@ -1163,6 +1163,8 @@ export const en: Record<string, string> = {
     'home.investorsPunishGrowthWithoutFree': 'Investors punish growth without free cash flow.',
     'home.life': 'Life',
     'home.love': 'Love',
+    'home.messages': 'Messages',
+    'home.casino': 'Casino',
     'home.mail': 'Mail',
     'home.marketsRallyOnTechEarnings': 'Markets rally on tech earnings.',
     'home.myCompany': 'My Company',

@@ -29,7 +29,32 @@ const files = [];
 const read = f => fs.readFileSync(f, 'utf8');
 const body = new Map(files.map(f => [f, read(f)]));
 const rel = f => path.relative(SRC, f);
-const isDisabled = f => /features\/(life|love|casino|shopping)\//.test(rel(f));
+// ---------------------------------------------------------------------------
+//  WHICH FEATURE FOLDERS ARE OFF - READ FROM THE FLAGS, NOT FROM A LIST
+// ---------------------------------------------------------------------------
+//  This was a hardcoded `(life|love|casino|shopping)`. The moment the casino
+//  flag was switched back ON, sixteen live files stayed excluded from every
+//  pass in this script - palette, exits, dead code, the lot - and the summary
+//  line at the bottom went on claiming they were "flagged off". An audit that
+//  disagrees with the app about what is shipping is worse than no audit,
+//  because it reports green while looking away.
+//
+//  Read the flags instead. Turning a module on now turns its checks on with
+//  it, which is the only arrangement where the green means anything.
+// ---------------------------------------------------------------------------
+const FEATURE_SRC = fs.readFileSync(path.join(SRC, 'core/featureFlags.ts'), 'utf8');
+const flagOff = name =>
+    new RegExp(`^\\s*${name}:\\s*false`, 'm').test(FEATURE_SRC);
+
+/** Folder in features/ -> the flag that gates it. */
+const GATED_FOLDERS = { life: 'life', love: 'love', casino: 'casino', shopping: 'shopping' };
+const OFF_FOLDERS = Object.entries(GATED_FOLDERS)
+    .filter(([, flag]) => flagOff(flag))
+    .map(([folder]) => folder);
+
+const isDisabled = f =>
+    OFF_FOLDERS.length > 0 &&
+    new RegExp(`features/(${OFF_FOLDERS.join('|')})/`).test(rel(f));
 
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -717,5 +742,7 @@ if (todos.length) {
 }
 
 console.log(`\n${total === 0 ? '\x1b[32mNothing orphaned.\x1b[0m' : `\x1b[33m${total} unreachable item(s).\x1b[0m`}`);
-console.log('(features/life, love, casino, shopping are flagged off and excluded.)\n');
+console.log(OFF_FOLDERS.length
+    ? `(features/${OFF_FOLDERS.join(', ')} are flagged off and excluded.)\n`
+    : '(every feature folder is switched on and checked.)\n');
 process.exit(0);
