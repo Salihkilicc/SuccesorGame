@@ -34,6 +34,8 @@ import { useShareholderStore } from '../../features/shareholders/stores/useShare
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGame } from '../../core/newGame';
+import { useIdentityStore } from '../../core/store/useIdentityStore';
+import { fullName } from '../../core/identity';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 
@@ -91,7 +93,24 @@ const NewsItem = ({ text }: { text: string }) => (
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeNavProp>();
-  const { name, bio, gender, hasPremium, partner } = useUserStore();
+  // ------------------------------------------------------------------
+  //  THE NAME COMES FROM THE IDENTITY STORE, NOT FROM HERE
+  // ------------------------------------------------------------------
+  //  This read `useUserStore().name`, which still holds the old default of
+  //  'John Rich' - so onboarding wrote a name into one store and the home
+  //  screen went on displaying another. Two places holding the same fact is
+  //  the bug; having asked the player for it and then ignored the answer is
+  //  just how it showed up.
+  //
+  //  useUserStore's `name` and `gender` are superseded (they are marked
+  //  there) but kept, because shelved modules still reference them. The
+  //  distinction that matters: useUserStore is wiped by a new game, and who
+  //  you are is not.
+  // ------------------------------------------------------------------
+  const { bio, hasPremium, partner } = useUserStore();
+  const firstName = useIdentityStore(s => s.firstName);
+  const lastName = useIdentityStore(s => s.lastName);
+  const gender = useIdentityStore(s => s.gender);
   const { age, currentMonth, advanceMonth, employeeMorale } = useGameStore();
   // Using useAssetsLogic for real-time financial data
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
@@ -216,7 +235,7 @@ const HomeScreen = () => {
     }
   };
 
-  const displayName = name || 'New Player';
+  const displayName = fullName(firstName, lastName) || 'New Player';
   const displayBio = bio || 'New to the rich life.';
   const genderSymbol = useMemo(() => {
     if (gender === 'male') return '♂';

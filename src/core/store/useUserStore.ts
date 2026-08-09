@@ -60,8 +60,19 @@ export interface UserJob {
 }
 
 export type UserState = {
+  /**
+   * SUPERSEDED by useIdentityStore. Do not read this for display.
+   *
+   * It still carries the old 'John Rich' default, and it is WIPED BY A NEW
+   * GAME - so it cannot hold the player's name, which outlives a run. The
+   * home screen kept reading it after onboarding started writing the real
+   * name elsewhere, and simply went on showing John Rich.
+   *
+   * Kept because shelved modules reference it, not because it is right.
+   */
   name: string;
   bio: string;
+  /** SUPERSEDED by useIdentityStore.gender. See the note on `name`. */
   gender?: 'male' | 'female' | 'other';
   profilePhoto?: string | null;
   hasPremium: boolean;

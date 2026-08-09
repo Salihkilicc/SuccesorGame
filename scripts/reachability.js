@@ -348,6 +348,36 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     }
 }
 
+// --- 0d6) The player's name, read from the store that does not own it -------
+//  Onboarding writes the name to useIdentityStore. useUserStore still has a
+//  `name` field holding the old 'John Rich' default, and the home screen went
+//  on reading THAT - so the player typed a name, the game saved it, and the
+//  first screen after onboarding greeted him as John Rich.
+//
+//  The two stores are not interchangeable and the difference is the whole
+//  point: useUserStore is wiped by a new game, and who you are is not. So
+//  destructuring `name` or `gender` off useUserStore is always the bug, and
+//  it is quiet - it compiles, it renders, it is just the wrong person.
+{
+    for (const f of files.filter(f => /\.tsx?$/.test(f) && !isDisabled(f) && !optedOut(f))) {
+        if (/useUserStore\.ts$/.test(f)) continue;   // the declaration itself
+        read(f).split('\n').forEach((line, i) => {
+            if (/^\s*(\/\/|\*)/.test(line)) return;
+            // `const { name, bio, gender } = useUserStore()` and the selector
+            // form `useUserStore(s => s.name)`.
+            const destructured = line.match(/const\s*\{([^}]*)\}\s*=\s*useUserStore\(/);
+            const selected = line.match(/useUserStore\(\s*\w+\s*=>\s*\w+\.(name|gender)\b/);
+            const hit = selected?.[1]
+                || (destructured && /(^|,)\s*(name|gender)\s*(,|$)/.test(destructured[1])
+                    ? (/(^|,)\s*name\s*(,|$)/.test(destructured[1]) ? 'name' : 'gender')
+                    : null);
+            if (!hit) return;
+            problems.palette.push(
+                `${rel(f)}:${i + 1}  useUserStore.${hit} - superseded by useIdentityStore, and wiped by a new game`);
+        });
+    }
+}
+
 // --- 0d3) `{someString && <JSX/>}` -------------------------------------------
 //  A guard on a STRING renders the string when it is empty: `'' && <Text/>`
 //  evaluates to `''`, and React Native refuses to draw a bare string with
