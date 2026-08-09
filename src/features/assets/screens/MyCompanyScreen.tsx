@@ -23,6 +23,7 @@ import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
@@ -221,8 +222,14 @@ const MyCompanyScreen = () => {
           onBack={() => navigation.navigate('Home')}
         />
 
+        {/* `paddingTop: 0` was correct when the header scrolled WITH the
+            content - it was the first thing in the list and brought its own
+            spacing. Now that the header is fixed above the ScrollView, zero
+            top padding puts the company card hard against the header's
+            bottom rule, and since the card became pressable its pressed fill
+            runs right into it. The content gets its top padding back. */}
         <ScrollView
-          contentContainerStyle={[styles.content, { paddingBottom: 120, paddingTop: 0 }]}>
+          contentContainerStyle={[styles.content, { paddingBottom: NAV_BAR_CLEARANCE }]}>
 
           {/* COMPANY STATS CARD
               Pressing it opens the financial report. The card is nine numbers
