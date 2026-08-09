@@ -173,6 +173,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const [panel, setPanel] = useState<null | {
         title: string; summary?: string; confirmLabel: string; tone?: 'default' | 'danger';
     }>(null);
+    /** Whether the collected warnings are showing. Closed by default. */
+    const [showAlerts, setShowAlerts] = useState(false);
     // ---- FASON URETIM (bkz. core/market/contract.ts) ----
     const [partnerId, setPartnerId] = useState<string>(product.contractPartnerId || '');
     const [contractUnits, setContractUnits] = useState(product.contractUnits || 0);
@@ -466,6 +468,49 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const projectedMargin =
         expectedSales * (effectivePrice - currentUnitCost) - marketing;
 
+    // ======================================================================
+    //  EVERY WARNING THIS SCREEN CAN RAISE, IN ONE LIST
+    // ======================================================================
+    //  They used to be scattered down the page as loose sentences: one under
+    //  the production slider, one under the capacity note, one after
+    //  retooling, one below the quality row, two under the marketing bar and
+    //  another two in the contract section. Eight places, all in the same
+    //  caution blue, none of them next to the control you would use to fix
+    //  it. The player's word was "karisik" and the reason is that a warning
+    //  every 40 pixels is not eight warnings, it is texture.
+    //
+    //  Collected here and shown behind one button. The list is built in the
+    //  order a problem actually bites: can you make it, can you sell it,
+    //  will anyone hear about it.
+    // ======================================================================
+    const alerts: string[] = [];
+    if (supplyGap < 0) {
+        alerts.push(t('product.underSupplying', { v1: formatNumber(Math.abs(supplyGap)) }));
+    } else if (supplyGap > expectedDemand * 0.2 && expectedDemand > 0) {
+        alerts.push(t('product.overBuilding', { v1: formatNumber(supplyGap) }));
+    }
+    if (maxUnits < expectedDemand) {
+        alerts.push(t('product.capacityCeiling', {
+            v1: formatNumber(maxUnits),
+            v2: tier.name,
+            v3: formatNumber(tier.capacity),
+            v4: formatNumber(tier.crew),
+        }));
+    }
+    if (isRetooling) alerts.push(t('product.retoolingWarn'));
+    if (qualityLevel > tier.qualityCeiling) {
+        alerts.push(t('product.qualityCappedByTier', {
+            v1: qualityLevel,
+            v2: tier.name,
+            v3: tier.qualityCeiling,
+        }));
+    }
+    if (marketing === 0) {
+        alerts.push(t('product.noMarketingWarn'));
+    } else if (marketing < maintenancePoint) {
+        alerts.push(t('product.belowMaintenance', { v1: formatMoney(maintenancePoint - marketing) }));
+    }
+
     // Now that every hook has run, it is safe to bail out.
     if (productMissing) return null;
 
@@ -613,7 +658,26 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         styles.capacityFill,
                                         {
                                             width: `${maxUnits > 0 ? Math.min(100, (willBuild / maxUnits) * 100) : 0}%`,
-                                            backgroundColor: supplyGap < 0 ? theme.colors.warning : theme.colors.primary,
+                                            // Blue when the plan matches the
+                                            // market, grey when it does not -
+                                            // and BOTH ways of not matching
+                                            // count. It used to go blue for
+                                            // anything that was not
+                                            // under-supply, so building three
+                                            // times what anyone wanted looked
+                                            // exactly like building the right
+                                            // amount.
+                                            // `primary`/`disabled` rather than
+                                            // `up`/`down`: those two are TEXT
+                                            // tokens - a verdict on a number -
+                                            // and the audit fails a fill using
+                                            // them. Same hexes, which is why
+                                            // they were made to share.
+                                            backgroundColor:
+                                                supplyGap < 0 ||
+                                                    (expectedDemand > 0 && supplyGap > expectedDemand * 0.2)
+                                                    ? theme.colors.disabled
+                                                    : theme.colors.primary,
                                         },
                                     ]}
                                 />
@@ -660,18 +724,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </View>
                             </View>
 
-                            {/* Teshis satiri */}
-                            {supplyGap < 0 ? (
-                                <Text style={styles.warnLine}>
-                                    {t('product.underSupplying', { v1: formatNumber(Math.abs(supplyGap)) })}
-                                </Text>
-                            ) : supplyGap > expectedDemand * 0.2 && expectedDemand > 0 ? (
-                                <Text style={styles.warnLine}>
-                                    {t('product.overBuilding', { v1: formatNumber(supplyGap) })}
-                                </Text>
-                            ) : (
-                                <Text style={styles.okLine}>{t('product.supplyIsCloseToDemand')}</Text>
-                            )}
+                            {/* MOVED TO ALERTS. "You will build X / Market wants
+                                Y" sits directly above this in two columns, so
+                                a sentence restating the gap was the third
+                                telling of the same fact. The bar's colour is
+                                the fourth, and that one is glanceable. */}
 
                             {/* Talebe esitle */}
                             {/* Stok zaten talebi karsiliyorsa dugme 0 gosteriyordu
@@ -696,7 +753,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             )}
                             {expectedDemand > 0 && neededUnits > 0 && maxUnits > 0 && (
                                 <Pressable
-                                    style={styles.matchBtn}
+                                    style={({ pressed }) => [styles.matchBtn, pressed && styles.matchBtnPressed]}
                                     onPress={() => setProductionUnits(Math.min(maxUnits, Math.ceil(neededUnits / effectiveYield)))}
                                 >
                                     <Text style={styles.matchBtnText}>
@@ -707,32 +764,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </Pressable>
                             )}
 
-                            {maxUnits < expectedDemand && (
-                                <Text style={styles.capLine}>
-                                    {t('product.capacityCeiling', {
-                                        v1: formatNumber(maxUnits),
-                                        v2: tier.name,
-                                        v3: formatNumber(tier.capacity),
-                                        v4: formatNumber(tier.crew),
-                                    })}
-                                </Text>
-                            )}
-
-                            {isRetooling && (
-                                <Text style={styles.warnLine}>
-                                    {t('product.retoolingWarn')}
-                                </Text>
-                            )}
-
-                            {qualityLevel > tier.qualityCeiling && (
-                                <Text style={styles.warnLine}>
-                                    {t('product.qualityCappedByTier', {
-                                        v1: qualityLevel,
-                                        v2: tier.name,
-                                        v3: tier.qualityCeiling,
-                                    })}
-                                </Text>
-                            )}
+                            {/* MOVED TO ALERTS: the capacity ceiling, the
+                                retooling notice and the quality cap. All
+                                three are standing conditions rather than
+                                feedback on the slider you are holding. */}
                         </View>
 
                         {/* ══ BU URUN NEDEN BU KADAR KAZANIYOR ══
@@ -977,9 +1012,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         styles.mktFill,
                                         {
                                             width: `${Math.min(100, (marketing / marketingMax) * 100)}%`,
+                                            // Below the maintenance mark the
+                                            // brand erodes - nothing good is
+                                            // happening, so grey. Above it,
+                                            // blue.
                                             backgroundColor:
                                                 marketing < maintenancePoint
-                                                    ? theme.colors.warning
+                                                    ? theme.colors.disabled
                                                     : theme.colors.primary,
                                         },
                                     ]}
@@ -1012,15 +1051,12 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 {t('product.shareOfVoice', { v1: formatPercent(sov * 100) })}
                             </Text>
 
-                            {marketing === 0 ? (
-                                <Text style={styles.warnLine}>
-                                    {t('product.noMarketingWarn')}
-                                </Text>
-                            ) : marketing < maintenancePoint ? (
-                                <Text style={styles.warnLine}>
-                                    {t('product.belowMaintenance', { v1: formatMoney(maintenancePoint - marketing) })}
-                                </Text>
-                            ) : isOverSaturated ? (
+                            {/* The two failing cases moved to Alerts; the bar
+                                below the maintenance marker already shows
+                                them in colour. What stays is the case where
+                                the budget is working, because nothing else on
+                                the screen says so. */}
+                            {marketing === 0 || marketing < maintenancePoint ? null : isOverSaturated ? (
                                 <Text style={styles.okLine}>
                                     {t('product.heavySpend')}
                                 </Text>
@@ -1095,6 +1131,41 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         <Pressable style={styles.btnDanger} onPress={() => onRetire(product.id)}>
                             <Text style={[styles.btnText, styles.btnTextOnDark]}>{t('product.retireProduct')}</Text>
                         </Pressable>
+
+                        {/* --------------------------------------------------
+                            ALERTS
+
+                            Half width and below the destructive action on
+                            purpose: this is the least urgent control on the
+                            screen precisely BECAUSE everything it holds used
+                            to be the most visible thing on it. A count on the
+                            face means you can ignore it honestly - you know
+                            how much you are ignoring.
+
+                            Disabled rather than hidden when the count is
+                            zero. A button that disappears takes the layout
+                            with it, and "no alerts" is information.
+                           -------------------------------------------------- */}
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.alertsBtn,
+                                !alerts.length && styles.alertsBtnEmpty,
+                                pressed && !!alerts.length && styles.alertsBtnPressed,
+                            ]}
+                            disabled={!alerts.length}
+                            onPress={() => setShowAlerts(v => !v)}>
+                            <Text style={[styles.alertsBtnText, !alerts.length && styles.alertsBtnTextEmpty]}>
+                                {alerts.length ? `Alerts · ${alerts.length}` : 'No alerts'}
+                            </Text>
+                        </Pressable>
+
+                        {showAlerts && !!alerts.length && (
+                            <View style={styles.alertsList}>
+                                {alerts.map((line, i) => (
+                                    <Text key={i} style={styles.alertsLine}>{`•  ${line}`}</Text>
+                                ))}
+                            </View>
+                        )}
                     </ScrollView>
                 </View>
             </View>
@@ -1149,21 +1220,28 @@ const styles = StyleSheet.create({
     compareLabel: { color: '#FFFFFF', fontSize: 9.5, letterSpacing: 0.5 },
     compareValue: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginTop: 2 },
 
+    // SHELVED: the loose warning sentences these drew now live behind the
+    // Alerts button. Kept for the contract section, which still uses one.
     warnLine: { color: theme.colors.warning, fontSize: 11, lineHeight: 16, marginTop: 10 },
     okLine: { color: '#FFFFFF', fontSize: 11, marginTop: 10 },
     capLine: { color: theme.colors.warning, fontSize: 10.5, lineHeight: 15, marginTop: 8 },
     costLine: { color: 'rgba(255,255,255,0.48)', fontSize: 10.5, marginTop: 10 },
 
+    /**
+     * BUILD TO CAPACITY / MATCH DEMAND. The one action in the production
+     * section, and it was a ghost outline over a 10% tint - the weakest
+     * thing on a panel full of sliders and steppers. Solid primary blue now,
+     * and therefore black text: rule 1.
+     */
     matchBtn: {
         marginTop: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(207,208,210,0.4)',
-        backgroundColor: 'rgba(207,208,210,0.1)',
+        backgroundColor: theme.colors.primary,
         borderRadius: 10,
-        paddingVertical: 10,
+        paddingVertical: 11,
         alignItems: 'center',
     },
-    matchBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
+    matchBtnPressed: { backgroundColor: theme.colors.highlight, transform: [{ scale: 0.99 }] },
+    matchBtnText: { color: theme.colors.primaryText, fontSize: 13, fontWeight: '800' },
 
     mktTrack: {
         height: 8,
@@ -1229,7 +1307,7 @@ const styles = StyleSheet.create({
     analysisBox: { backgroundColor: '#434B50', padding: 12, borderRadius: 8, marginBottom: 20 },
     sectionHeader: { color: '#FFFFFF', fontWeight: '700', marginBottom: 12 },
     barBg: { height: 6, backgroundColor: '#434B50', borderRadius: 3, marginBottom: 12 },
-    barFill: { height: '100%', backgroundColor: theme.colors.accent, borderRadius: 3 },
+    barFill: { height: '100%', backgroundColor: theme.colors.primary, borderRadius: 3 },
     blurBox: { height: 100, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderRadius: 8, marginBottom: 20, borderStyle: 'dashed', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     blurText: { color: '#FFFFFF', fontWeight: '700' },
     blurSubText: { color: 'rgba(255,255,255,0.48)', fontSize: 12 },
@@ -1237,6 +1315,34 @@ const styles = StyleSheet.create({
     btnPrimary: { backgroundColor: theme.colors.accent, padding: 14, borderRadius: 10, alignItems: 'center' },
     btnSuccess: { backgroundColor: theme.colors.accent, padding: 14, borderRadius: 10, alignItems: 'center' },
     btnDanger: { backgroundColor: theme.colors.destructive, padding: 14, borderRadius: 10, alignItems: 'center', marginTop: 20 },
+
+    /** Half width, as asked. Left-aligned so it reads as secondary to Retire. */
+    alertsBtn: {
+        width: '50%',
+        marginTop: 12,
+        paddingVertical: 11,
+        borderRadius: 10,
+        alignItems: 'center',
+        backgroundColor: theme.colors.surfaceRaised,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.borderStrong,
+    },
+    alertsBtnPressed: { backgroundColor: theme.colors.surfaceHigh },
+    alertsBtnEmpty: { opacity: 0.5 },
+    alertsBtnText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: 13 },
+    alertsBtnTextEmpty: { color: theme.colors.textMuted },
+    alertsList: {
+        marginTop: 10,
+        padding: theme.spacing.md,
+        borderRadius: 10,
+        backgroundColor: theme.colors.surface,
+        gap: 8,
+    },
+    alertsLine: {
+        color: theme.colors.textSecondary,
+        fontSize: 11.5,
+        lineHeight: 17,
+    },
     btnOutline: {
         backgroundColor: 'transparent',
         padding: 14,
