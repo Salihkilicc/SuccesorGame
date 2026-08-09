@@ -149,16 +149,32 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                 </View>
 
                 <View style={styles.moraleTrack}>
-                    {/* Three thresholds painted with two colours, and the two
-                        bad ones were the SAME hex - so 39 and 64 looked
-                        identical while meaning quite different things. Three
-                        steps now. Fills, so no signal tokens: see the note on
-                        the production bar in ProductModals. */}
+                    {/* --------------------------------------------------
+                        TWO STEPS, AT THE THRESHOLD THE ENGINE ACTUALLY USES
+
+                        This was three tiers - under 40, under 65, above -
+                        painted with two colours, and the two bad ones were
+                        the SAME hex. So 39 and 64 looked identical while
+                        meaning different things, and neither 40 nor 65
+                        corresponds to anything in the engine.
+
+                        FIFTY DOES. Below it attrition doubles
+                        (workforce.ts, attritionRate) and the quarter takes a
+                        production penalty (useGameStore). That is the line
+                        worth drawing, so it is the only one drawn.
+
+                        I tried a three-step ladder first and measured it:
+                        the only palette colour between the grey and the blue
+                        is blueDeep, which reads 1.74 against this track -
+                        invisible. The brighter alternatives are brighter
+                        than the healthy blue, which would invert the ladder.
+                        A middle you cannot see is worse than no middle.
+
+                        Fills, so no signal tokens - see the production bar.
+                       -------------------------------------------------- */}
                     <View style={[styles.moraleFill, {
                         width: `${morale}%`,
-                        backgroundColor: morale < 40 ? theme.colors.disabled
-                            : morale < 65 ? theme.colors.borderStrong
-                                : theme.colors.primary,
+                        backgroundColor: morale < 50 ? theme.colors.disabled : theme.colors.primary,
                     }]} />
                     {/* Maasin tasidigi seviye isareti */}
                     <View style={[styles.moraleMarker, { left: `${target}%` }]} />
