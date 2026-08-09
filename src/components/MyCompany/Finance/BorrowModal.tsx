@@ -18,6 +18,7 @@ import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
 import { StatRow, RowGroup, DetailLine, DetailRule, DetailNote } from '../../common/Disclosure';
+import ScreenHost from '../../common/ScreenHost';
 
 /**
  * The loan menu, in the order a company would actually work through it:
@@ -32,11 +33,13 @@ const LOAN_CHOICES: { kind: LoanKind; icon: string; label: () => string }[] = [
 ];
 
 type Props = {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
 };
 
-const BorrowModal = ({ visible, onClose }: Props) => {
+const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
     // Dil degisince yeniden ciz. Bu satir olmadan ekran eski dilde donar.
     useLocale();
     const navigation = useNavigation<any>();
@@ -142,7 +145,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
     const safeMax = Math.max(1_000_000, tierHeadroom);
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 {/* ------------------------------------------------------------
                     KAYDIRMA — bu ekran iki kredi katmani ve aciklamalarla
@@ -310,7 +313,7 @@ const BorrowModal = ({ visible, onClose }: Props) => {
 
                 {/* Persistent Bottom Bar */}
             </View>
-        </Modal>
+        </ScreenHost>
     );
 };
 

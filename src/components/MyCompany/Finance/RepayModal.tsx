@@ -7,13 +7,16 @@ import { useCorporateFinanceStore } from '../../../features/finance/stores/useCo
 import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
+import ScreenHost from '../../common/ScreenHost';
 
 type Props = {
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
 };
 
-const RepayModal = ({ visible, onClose }: Props) => {
+const RepayModal = ({ visible, onClose, asScreen }: Props) => {
     useLocale();
     const navigation = useNavigation<any>();
     const { companyCapital, update } = useStatsStore();
@@ -53,7 +56,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
     // If no debt, show simple message
     if (totalDebt <= 0) {
         return (
-            <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+            <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
                 <View style={styles.backdrop}>
                     <View style={styles.centeredView}>
                         <View style={styles.container}>
@@ -66,12 +69,12 @@ const RepayModal = ({ visible, onClose }: Props) => {
                     </View>
                     {/* Persistent Bottom Bar */}
                 </View>
-            </Modal>
+            </ScreenHost>
         );
     }
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 <View style={styles.centeredView}>
                     <View style={styles.container}>
@@ -180,7 +183,7 @@ const RepayModal = ({ visible, onClose }: Props) => {
 
                 {/* Persistent Bottom Bar */}
             </View>
-        </Modal>
+        </ScreenHost>
     );
 };
 

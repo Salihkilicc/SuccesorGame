@@ -59,21 +59,29 @@ export const TeamMoraleScreen = () => {
 
 export const FinanceScreen = () => {
     const close = useGoBack();
-    const [borrow, setBorrow] = useState(false);
-    const [repay, setRepay] = useState(false);
+    const navigation = useNavigation<any>();
+    // Borrowing and repaying are their OWN routes rather than modals raised
+    // here. As modals they drew above the nav bar, so the bar vanished on them
+    // - the same fault the company sections had before they became routes.
     return (
-        <>
-            <CorporateFinanceHubModal
-                asScreen
-                visible
-                onClose={close}
-                onRequestLoan={() => setBorrow(true)}
-                onRepayDebt={() => setRepay(true)}
-            />
-            <BorrowModal visible={borrow} onClose={() => setBorrow(false)} />
-            <RepayModal visible={repay} onClose={() => setRepay(false)} />
-        </>
+        <CorporateFinanceHubModal
+            asScreen
+            visible
+            onClose={close}
+            onRequestLoan={() => navigation.navigate('BorrowLoan')}
+            onRepayDebt={() => navigation.navigate('RepayDebt')}
+        />
     );
+};
+
+export const BorrowLoanScreen = () => {
+    const close = useGoBack();
+    return <BorrowModal asScreen visible onClose={close} />;
+};
+
+export const RepayDebtScreen = () => {
+    const close = useGoBack();
+    return <RepayModal asScreen visible onClose={close} />;
 };
 
 export const MyEmpireScreen = () => {

@@ -64,6 +64,7 @@ import CrystalNavBar from './components/CrystalNavBar';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
   MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
+  BorrowLoanScreen, RepayDebtScreen,
 } from '../features/assets/screens/CompanyScreens';
 import { theme } from '../core/theme';
 
@@ -76,6 +77,7 @@ import { theme } from '../core/theme';
 const COMPANY_ROUTES = new Set([
     'MyCompany', 'Products', 'Research', 'TechTree', 'Assets', 'FinancialReport',
     'BoardMembers', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
+    'BorrowLoan', 'RepayDebt',
 ]);
 
 const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
@@ -155,6 +157,8 @@ export type RootStackParamList = {
   MyEmpire: undefined;
   HostileTakeover: undefined;
   StockMarket: { onOpenIPO?: () => void } | undefined;
+  BorrowLoan: undefined;
+  RepayDebt: undefined;
   TechTree: undefined;
   FinancialReport: undefined;
   Assets: NavigatorScreenParams<AssetsStackParamList>;
@@ -392,6 +396,8 @@ const RootNavigator = () => {
           <RootStack.Screen name="MyEmpire" component={MyEmpireScreen} />
           <RootStack.Screen name="HostileTakeover" component={HostileTakeoverScreen} />
           <RootStack.Screen name="StockMarket" component={StockMarketScreen} />
+          <RootStack.Screen name="BorrowLoan" component={BorrowLoanScreen} />
+          <RootStack.Screen name="RepayDebt" component={RepayDebtScreen} />
           {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
           <RootStack.Screen name="Research" component={ResearchScreen} />
           <RootStack.Screen
