@@ -277,7 +277,10 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 export default CorporateFinanceHubModal;
 
 const styles = StyleSheet.create({
-    body: { padding: theme.spacing.md, paddingBottom: 100, gap: theme.spacing.md },
+    // A small gap under the last button, as asked. The buttons scroll with
+    // the page rather than being pinned, so the floating nav bar can sit over
+    // them - scroll a little and they clear it.
+    body: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
 
     // --- The one headline -------------------------------------------------
     hero: {
