@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -50,6 +51,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
 
     // Find Shark board members
     const sharkMember = members.find((m) => m.trait === 'Shark');
+    const navigation = useNavigation<any>();
 
     // Refresh credit score when modal opens
     React.useEffect(() => {
@@ -218,12 +220,29 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     )}
                 </RowGroup>
 
-                {/* Ways to raise money, in order of how much they cost you. */}
+                {/* ------------------------------------------------------------
+                    THE ROWS ARE THE BUTTONS NOW
+
+                    Ways to raise money, in order of how much they cost you -
+                    and until now, neither of them worked. They were drawn with
+                    a "›", which promises that pressing goes somewhere, but
+                    StatRow only reacted to a press when it had a detail block
+                    to open and these had none. The controls that DID work were
+                    two small buttons stacked above Request New Loan,
+                    duplicating the rows they sat below.
+
+                    So each option appeared twice: once as a door that was
+                    painted on, and once as a button that did not look like it
+                    belonged to it. Both go to a route now, for the same reason
+                    Borrow and Repay did - as modals they drew above the nav
+                    bar and it vanished on them.
+                   ------------------------------------------------------------ */}
                 <RowGroup title="Raise money">
                     <StatRow
                         label={`💸  ${t('finance.injection')}`}
                         value="›"
                         why={t('finance.personalInvestment')}
+                        onPress={() => navigation.navigate('CapitalInjection')}
                     />
                     {!!sharkMember && (
                         <StatRow
@@ -231,6 +250,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                             value="›"
                             why={`from ${sharkMember.name} — no credit check, secured on your own shares`}
                             valueColor={theme.colors.warning}
+                            onPress={() => navigation.navigate('SharkDeal')}
                         />
                     )}
                 </RowGroup>
@@ -286,20 +306,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     />
                 </RowGroup>
 
-                <View style={styles.actions}>
-                    <Pressable
-                        onPress={() => setShowInjection(true)}
-                        style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
-                        <Text style={styles.btnSecondaryText}>{t('finance.injection')}</Text>
-                    </Pressable>
-                    {!!sharkMember && (
-                        <Pressable
-                            onPress={() => setSharkDealModalVisible(true)}
-                            style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
-                            <Text style={styles.btnSecondaryText}>{sharkMember.name.split(' ')[0]}</Text>
-                        </Pressable>
-                    )}
-                </View>
+                {/* SHELVED: the Injection and shark buttons that used to sit
+                    here. They were the working half of a control whose visible
+                    half was the dead rows above, and having both meant the
+                    screen offered the same two options twice in two places.
+                    The rows carry it now; `setShowInjection` and
+                    `setSharkDealModalVisible` stay wired below so the modal
+                    path still exists for anything that raises this component
+                    outside a navigator. */}
 
                 <View style={styles.actions}>
                     {totalDebt > 0 && (

@@ -20,8 +20,8 @@
 //  jump. A disclosure that stutters reads as broken; an instant one does not.
 // ============================================================================
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { theme } from '../../core/theme';
 
 type StatRowProps = {
@@ -40,11 +40,49 @@ type StatRowProps = {
     detail?: React.ReactNode;
     /** Start open. For the one row on a screen that matters most. */
     startOpen?: boolean;
+    /**
+     * Make the row a WAY IN rather than a disclosure.
+     *
+     * The finance screen drew its two funding options as rows with a "›" on
+     * the right - a promise that pressing them goes somewhere - and a row
+     * without `detail` was not pressable at all. So the options were dead,
+     * and the controls that worked were two small buttons further down,
+     * duplicating them. A row that looks like a door has to be one.
+     *
+     * Mutually exclusive with `detail`: a row cannot both expand in place
+     * and leave the screen.
+     */
+    onPress?: () => void;
 };
 
-export const StatRow = ({ label, value, why, valueColor, detail, startOpen }: StatRowProps) => {
+export const StatRow = ({ label, value, why, valueColor, detail, startOpen, onPress }: StatRowProps) => {
     const [open, setOpen] = useState(!!startOpen);
-    const expandable = !!detail;
+    const expandable = !!detail && !onPress;
+
+    // ------------------------------------------------------------------
+    //  WHY THIS FADES RATHER THAN GROWS
+    // ------------------------------------------------------------------
+    //  The detail used to appear with no transition at all - the player's
+    //  words were that it opens "at the speed of light". The obvious fix is
+    //  LayoutAnimation, and that was tried: it animates every layout change
+    //  in the tree for that frame, so rows further down a ScrollView that
+    //  also holds modals visibly jumped.
+    //
+    //  So the LAYOUT still happens instantly - nothing jumps, nothing
+    //  reflows twice - and only the content fades and rises into the space.
+    //  It runs on the native driver, which is why it stays smooth on a long
+    //  screen. A reveal you can follow, without touching anyone else's
+    //  layout.
+    // ------------------------------------------------------------------
+    const reveal = useRef(new Animated.Value(startOpen ? 1 : 0)).current;
+    useEffect(() => {
+        Animated.timing(reveal, {
+            toValue: open ? 1 : 0,
+            duration: open ? 190 : 120,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    }, [open, reveal]);
 
     const body = (
         <>
@@ -58,9 +96,36 @@ export const StatRow = ({ label, value, why, valueColor, detail, startOpen }: St
                 </View>
             </View>
             {!!why && <Text style={styles.why} numberOfLines={open ? undefined : 1}>{why}</Text>}
-            {open && !!detail && <View style={styles.detail}>{detail}</View>}
+            {open && !!detail && (
+                <Animated.View
+                    style={[
+                        styles.detail,
+                        {
+                            opacity: reveal,
+                            transform: [{
+                                translateY: reveal.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [-6, 0],
+                                }),
+                            }],
+                        },
+                    ]}>
+                    {detail}
+                </Animated.View>
+            )}
         </>
     );
+
+    if (onPress) {
+        return (
+            <Pressable
+                onPress={onPress}
+                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                accessibilityRole="button">
+                {body}
+            </Pressable>
+        );
+    }
 
     if (!expandable) return <View style={styles.row}>{body}</View>;
 

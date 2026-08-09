@@ -39,6 +39,8 @@ const BY_ROUTE: Record<string, ScreenCategory> = {
     Finance: 'finance',
     BorrowLoan: 'finance',
     RepayDebt: 'finance',
+    CapitalInjection: 'finance',
+    SharkDeal: 'finance',
     FinancialReport: 'finance',
 
     // --- What you make

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import ScreenHeader from '../../common/ScreenHeader';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
@@ -16,7 +17,7 @@ type Props = {
     sharkMember: BoardMember;
 };
 
-const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
+const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { asScreen?: boolean }) => {
     const [panel, setPanel] = useState<null | {
         title: string;
         summary?: string;
@@ -104,13 +105,17 @@ const SharkDealModal = ({ visible, onClose, sharkMember }: Props) => {
     };
 
     return (
-        <GameModal visible={visible} onClose={onClose}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.warningIcon}>⚠️</Text>
-                <Text style={styles.headerTitle}>{t('finance.offerTerms')}</Text>
-                <Text style={styles.headerSubtitle}>{t('finance.privateEquityAgreement')}</Text>
-            </View>
+        <GameModal asScreen={asScreen} visible={visible} onClose={onClose}>
+            {/* The warning triangle stays - this really is the screen where
+                you pledge your own shares to a director - but it is a badge
+                beside the title now rather than a header of its own. */}
+            <ScreenHeader
+                title={`⚠️  ${t('finance.offerTerms')}`}
+                subtitle={t('finance.privateEquityAgreement')}
+                onBack={onClose}
+                inset={asScreen}
+                category="finance"
+            />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
                 {/* ----------------------------------------------------------

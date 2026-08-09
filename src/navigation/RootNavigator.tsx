@@ -65,6 +65,7 @@ import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
   MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
   BorrowLoanScreen, RepayDebtScreen,
+  CapitalInjectionScreen, SharkDealScreen,
 } from '../features/assets/screens/CompanyScreens';
 import { theme } from '../core/theme';
 
@@ -159,6 +160,8 @@ export type RootStackParamList = {
   StockMarket: { onOpenIPO?: () => void } | undefined;
   BorrowLoan: undefined;
   RepayDebt: undefined;
+  CapitalInjection: undefined;
+  SharkDeal: undefined;
   TechTree: undefined;
   FinancialReport: undefined;
   Assets: NavigatorScreenParams<AssetsStackParamList>;
@@ -398,6 +401,8 @@ const RootNavigator = () => {
           <RootStack.Screen name="StockMarket" component={StockMarketScreen} />
           <RootStack.Screen name="BorrowLoan" component={BorrowLoanScreen} />
           <RootStack.Screen name="RepayDebt" component={RepayDebtScreen} />
+          <RootStack.Screen name="CapitalInjection" component={CapitalInjectionScreen} />
+          <RootStack.Screen name="SharkDeal" component={SharkDealScreen} />
           {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
           <RootStack.Screen name="Research" component={ResearchScreen} />
           <RootStack.Screen

@@ -40,6 +40,9 @@ import DilutionModal from '../../../components/MyCompany/Shares/DilutionModal';
 import DividendModal from '../../../components/MyCompany/Shares/DividendModal';
 import { AcquisitionModal } from '../../../components/MyCompany/Actions/AcquisitionModal';
 import ExistingCompaniesModal from '../../../components/MyCompany/Finance/ExistingCompaniesModal';
+import CapitalInjectionModal from '../../../components/MyCompany/Finance/CapitalInjectionModal';
+import SharkDealModal from '../../../components/MyCompany/Finance/SharkDealModal';
+import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 
 /** Going back is what "close" means once these are screens. */
 const useGoBack = () => {
@@ -82,6 +85,33 @@ export const BorrowLoanScreen = () => {
 export const RepayDebtScreen = () => {
     const close = useGoBack();
     return <RepayModal asScreen visible onClose={close} />;
+};
+
+/**
+ * PUTTING YOUR OWN MONEY IN, and BORROWING FROM A DIRECTOR.
+ *
+ * Both were modals raised from two small buttons stacked above Request New
+ * Loan - buttons duplicating the two rows further up the screen, which were
+ * drawn with a "›" and did nothing at all. So the funding options looked
+ * like doors that were dead, and worked from controls that read as an
+ * afterthought. They are routes now, opened by the rows themselves.
+ */
+export const CapitalInjectionScreen = () => {
+    const close = useGoBack();
+    return <CapitalInjectionModal asScreen visible onClose={close} />;
+};
+
+export const SharkDealScreen = () => {
+    const close = useGoBack();
+    // The screen finds the lender itself rather than taking him as a route
+    // param: a param would go stale if the board changed underneath it.
+    const shark = useShareholderStore(s =>
+        s.members.find((m: any) => m.trait === 'Shark'));
+    // No shark on the board means no deal to offer. The row that opens this
+    // is already hidden in that case, but a route can be reached by other
+    // means and must not mount a screen with no lender.
+    if (!shark) return null;
+    return <SharkDealModal asScreen visible onClose={close} sharkMember={shark} />;
 };
 
 export const MyEmpireScreen = () => {
