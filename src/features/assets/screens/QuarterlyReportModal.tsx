@@ -16,6 +16,7 @@ import { formatMoney, formatNumber, formatPercent, formatSignedMoney } from '../
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import InfoDot from '../../../components/common/InfoDot';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { DetailLine, DetailRule } from '../../../components/common/Disclosure';
 import { theme } from '../../../core/theme';
 import { EXPENSE_EXPLANATIONS, type QuarterReport, normalizeQuarterReport } from '../../../core/reportTypes';
 
@@ -338,71 +339,75 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
         </View>
       </Pressable>
 
+      {/* ------------------------------------------------------------------
+          WHAT WAS WRONG IN HERE
+
+          Opening a product gave you five different SHAPES of information in
+          a row: a prose sentence about demand, a four-column grid with two
+          of its cells carrying extra sub-lines the other two did not have, a
+          progress bar, a caption, and then a dense run-on line of unit
+          economics separated by middots. Nothing lined up with anything, so
+          the eye had no column to travel down and every number had to be
+          hunted for individually. That is the "messy" - not the amount of
+          information, the number of layouts it arrived in.
+
+          It is one column of aligned label/value lines now, in the order the
+          questions actually get asked: what did the market want, what did I
+          make, what did I sell, what did it earn per unit. Same numbers,
+          nothing dropped - including scrap and the outsourcing split, which
+          were both hard-won additions and are now ordinary rows.
+         ------------------------------------------------------------------ */}
       {open && (
-        <>
+        <View style={styles.productDetail}>
           {p.marketDemandUnits !== undefined && (
-            <View style={styles.demandRow}>
-              <Text style={styles.demandText}>
-                Market wanted <Text style={styles.demandStrong}>{formatNumber(p.marketDemandUnits)}</Text>
-                {'  ·  '}{t('report.shareLabel')} <Text style={styles.demandStrong}>{(p.marketShare ?? 0).toFixed(3)}%</Text>
-              </Text>
+            <>
+              <DetailLine
+                label={t('report.marketWanted')}
+                value={formatNumber(p.marketDemandUnits)}
+              />
+              <DetailLine
+                label={t('report.shareLabel')}
+                value={`${(p.marketShare ?? 0).toFixed(3)}%`}
+              />
               {(p.unmetDemand ?? 0) > 0 && (
-                <Text style={styles.demandMiss}>
-                  {t('report.lostToRivalsV', { v1: formatNumber(p.unmetDemand ?? 0) })}
-                  {(p.contractUnits ?? 0) > 0
-                    ? ` — ${t('report.afterOutsourcing', { v1: formatNumber(p.contractUnits ?? 0) })}`
-                    : ''}
-                </Text>
+                <DetailLine
+                  label={t('report.lostToRivals')}
+                  value={formatNumber(p.unmetDemand ?? 0)}
+                  tone="down"
+                />
               )}
-            </View>
+              <DetailRule />
+            </>
           )}
 
-          <View style={styles.productStats}>
-            <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>{t('company.produced')}</Text>
-              <Text style={styles.productStatValue}>{formatNumber(p.produced)}</Text>
-              {/* --------------------------------------------------------
-                  Outsourced units used to vanish into this one number.
-                  A player who had ordered contract production saw a
-                  "lost to rivals" line and concluded those units had not
-                  been counted - the engine had counted them all along,
-                  they were simply never shown.
-                 -------------------------------------------------------- */}
-              {/* --------------------------------------------------------
-                  Scrap was computed, written to the report and never once
-                  shown. Units ordered but never made appeared nowhere: not
-                  in sold, not in stock. They simply went missing between
-                  the production order and the invoice.
-                 -------------------------------------------------------- */}
-              {(p.scrapped ?? 0) > 0 && (
-                <Text style={styles.scrapLine}>
-                  {t('report.scrappedLine', { v1: formatNumber(p.scrapped ?? 0) })}
-                </Text>
-              )}
-              {(p.contractUnits ?? 0) > 0 && (
-                <Text style={styles.productSplit}>
-                  {t('report.producedSplit', {
-                    v1: formatNumber(p.ownUnits ?? 0),
-                    v2: formatNumber(p.contractUnits ?? 0),
-                  })}
-                </Text>
-              )}
-            </View>
-            <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>{t('company.sold')}</Text>
-              <Text style={[styles.productStatValue, { color: '#FFFFFF' }]}>{formatNumber(p.sold)}</Text>
-            </View>
-            <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>{t('company.unsold')}</Text>
-              <Text style={[styles.productStatValue, { color: p.unsold > 0 ? theme.colors.warning : theme.colors.textMuted }]}>
-                {formatNumber(p.unsold)}
-              </Text>
-            </View>
-            <View style={styles.productStat}>
-              <Text style={styles.productStatLabel}>{t('company.stock')}</Text>
-              <Text style={styles.productStatValue}>{formatNumber(p.stock)}</Text>
-            </View>
-          </View>
+          <DetailLine label={t('company.produced')} value={formatNumber(p.produced)} />
+          {/* Outsourced units used to vanish into `produced`. A player who
+              had ordered contract production saw a "lost to rivals" line and
+              concluded those units had not been counted - the engine had
+              counted them all along, they were simply never shown. */}
+          {(p.contractUnits ?? 0) > 0 && (
+            <>
+              <DetailLine label="  own line" value={formatNumber(p.ownUnits ?? 0)} />
+              <DetailLine label="  outsourced" value={formatNumber(p.contractUnits ?? 0)} />
+            </>
+          )}
+          {/* Scrap was computed, written to the report and never once shown.
+              Units ordered but never made appeared nowhere: not in sold, not
+              in stock. They went missing between the order and the invoice. */}
+          {(p.scrapped ?? 0) > 0 && (
+            <DetailLine
+              label="  scrapped"
+              value={formatNumber(p.scrapped ?? 0)}
+              tone="down"
+            />
+          )}
+          <DetailLine label={t('company.sold')} value={formatNumber(p.sold)} tone="up" />
+          <DetailLine
+            label={t('company.unsold')}
+            value={formatNumber(p.unsold)}
+            tone={p.unsold > 0 ? 'down' : undefined}
+          />
+          <DetailLine label={t('company.stock')} value={formatNumber(p.stock)} />
 
           <View style={styles.sellThroughTrack}>
             <View
@@ -410,8 +415,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
                 styles.sellThroughFill,
                 {
                   width: `${Math.min(100, Math.max(0, p.sellThrough))}%`,
-                  backgroundColor:
-                    p.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning,
+                  backgroundColor: p.sellThrough >= 60 ? theme.colors.up : theme.colors.down,
                 },
               ]}
             />
@@ -420,14 +424,26 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             {formatPercent(p.sellThrough)} of available units sold
           </Text>
 
-          <Text style={styles.productEcon}>
-            Price {formatMoney(p.unitPrice)} · Cost {formatMoney(p.unitCost)} · Margin{' '}
-            {formatMoney(p.unitPrice - p.unitCost)}/unit
-            {(p.marketingBudget ?? 0) > 0
-              ? ` · Marketing ${formatMoney(p.marketingBudget ?? 0)}/quarter`
-              : ' · No marketing'}
-          </Text>
-        </>
+          <DetailRule />
+
+          <DetailLine label="Price" value={formatMoney(p.unitPrice)} />
+          <DetailLine label="Unit cost" value={formatMoney(p.unitCost)} />
+          <DetailLine
+            label="Margin per unit"
+            value={formatMoney(p.unitPrice - p.unitCost)}
+            strong
+            tone={p.unitPrice - p.unitCost >= 0 ? 'positive' : 'negative'}
+          />
+          <DetailLine
+            label="Marketing"
+            value={
+              (p.marketingBudget ?? 0) > 0
+                ? `${formatMoney(p.marketingBudget ?? 0)}/quarter`
+                : 'none'
+            }
+            tone={(p.marketingBudget ?? 0) > 0 ? undefined : 'down'}
+          />
+        </View>
       )}
     </View>
   );
@@ -735,7 +751,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
                   : 'fully served'
               }
-              summaryColor={report.totalUnmetDemand > 0 ? theme.colors.warning : theme.colors.textPrimary}
+              summaryColor={report.totalUnmetDemand > 0 ? theme.colors.down : theme.colors.up}
             >
               <View style={styles.opsGrid}>
                 <View style={styles.opsCell}>
@@ -744,7 +760,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.youSupplied")}</Text>
-                  <Text style={[styles.opsValue, { color: '#FFFFFF' }]}>
+                  <Text style={[styles.opsValue, { color: theme.colors.up }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -753,7 +769,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text
                     style={[
                       styles.opsValue,
-                      { color: report.totalUnmetDemand > 0 ? theme.colors.warning : theme.colors.textMuted },
+                      { color: report.totalUnmetDemand > 0 ? theme.colors.down : theme.colors.textMuted },
                     ]}
                   >
                     {formatNumber(report.totalUnmetDemand)}
@@ -761,12 +777,17 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t("report.brandValue")}</Text>
-                  <Text style={styles.opsValue}>
+                  {/* The FIGURE is always the brand orange - orange is what
+                      brand value looks like, whichever way it moved. The
+                      DELTA beside it is what carries the direction: blue up,
+                      grey down. Colouring the figure by direction would have
+                      meant brand value had no colour of its own. */}
+                  <Text style={[styles.opsValue, { color: theme.colors.brand }]}>
                     {(report.brandValue ?? 0).toFixed(1)}
                     <Text
                       style={{
                         fontSize: 11,
-                        color: report.brandChange >= 0 ? theme.colors.textPrimary : theme.colors.warning,
+                        color: report.brandChange >= 0 ? theme.colors.up : theme.colors.down,
                       }}
                     >
                       {'  '}
@@ -789,7 +810,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               info={t('company.sellThroughIsTheShare')}
               infoDetail={t('company.unsoldUnitsCarryIntoNext')} 
               summary={`${formatPercent(report.sellThrough)} sold`}
-              summaryColor={report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning}
+              summaryColor={report.sellThrough >= 60 ? theme.colors.up : theme.colors.down}
             >
               {/* Tesis durumu — kapasite kullanimi oyuncunun bakacagi tek sayi */}
               <View style={styles.facilityBar}>
@@ -863,7 +884,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
                 <View style={styles.opsCell}>
                   <Text style={styles.opsLabel}>{t('company.sold')}</Text>
-                  <Text style={[styles.opsValue, { color: '#FFFFFF' }]}>
+                  <Text style={[styles.opsValue, { color: theme.colors.up }]}>
                     {formatNumber(report.unitsSold)}
                   </Text>
                 </View>
@@ -946,26 +967,43 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               summary={formatMoney(report.endingCapital)}
               summaryColor="#FFFFFF"
             >
-              <View style={styles.balanceRow}>
-                <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>{t('company.companyCapital')}</Text>
-                  <Text style={styles.balanceValue}>{formatMoney(report.endingCapital)}</Text>
-                </View>
-                <View style={styles.balanceDivider} />
-                <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>{t('company.personalCash')}</Text>
-                  <Text style={styles.balanceValue}>{formatMoney(report.endingCash)}</Text>
-                </View>
-                <View style={styles.balanceDivider} />
-                <View style={styles.balanceCell}>
-                  <Text style={styles.balanceLabel}>{t('company.researchPoints')}</Text>
-                  {/* White made this read as one more cash balance sitting
-                      beside two cash balances. It is not money. */}
-                  <Text style={[styles.balanceValue, { color: theme.colors.rp }]}>
-                    {formatNumber(report.researchPoints)}
-                  </Text>
-                </View>
-              </View>
+              {/* ----------------------------------------------------------
+                  Three centred cells with 9.5pt labels and hairline dividers
+                  between them. Two of the three were money and one was not,
+                  but they were the same size, the same weight and the same
+                  colour, so the row read as one fact in three parts rather
+                  than three separate balances.
+
+                  The same aligned rows as everywhere else now, and the two
+                  money pools sit together with research below the rule -
+                  the grouping does the explaining that the tiny labels were
+                  failing to do. This is also the screen where "I am
+                  profitable but I have no money" gets answered, so the note
+                  spelling out which pool is which stays.
+                 ---------------------------------------------------------- */}
+              <DetailLine
+                label={t('company.companyCapital')}
+                value={formatMoney(report.endingCapital)}
+                strong
+              />
+              <DetailLine
+                label={t('company.personalCash')}
+                value={formatMoney(report.endingCash)}
+                strong
+              />
+              <DetailRule />
+              <DetailLine
+                label={t('company.researchPoints')}
+                value={formatNumber(report.researchPoints)}
+                tone="rp"
+              />
+              {report.researchGained > 0 && (
+                <DetailLine
+                  label="  earned this quarter"
+                  value={`+${formatNumber(report.researchGained)}`}
+                  tone="rp"
+                />
+              )}
             </CollapsibleSection>
 
           </ScrollView>
@@ -1138,6 +1176,8 @@ const styles = StyleSheet.create({
   noteDot: { width: 6, height: 6, borderRadius: 3, marginTop: 5, marginRight: 9 },
   noteText: { color: theme.colors.textSecondary, fontSize: 11.5, lineHeight: 17, flex: 1 },
 
+  /** The opened body of a product row. One column, one rhythm. */
+  productDetail: { gap: 3, paddingTop: 8 },
   productCard: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 14,
@@ -1201,12 +1241,23 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.07)',
   },
+  /**
+   * CONTINUE. The only action on the bill, and it was drawn in the raised
+   * surface colour - the same grey as the cards behind it, so the one thing
+   * you can do here looked like more of the page. It is the primary blue now,
+   * and therefore takes black text: see rule 1 in core/theme.ts.
+   */
   primaryButton: {
-    backgroundColor: '#434B50',
+    backgroundColor: theme.colors.primary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  primaryButtonPressed: { opacity: 0.8 },
-  primaryButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  primaryButtonPressed: { backgroundColor: theme.colors.highlight, transform: [{ scale: 0.99 }] },
+  primaryButtonText: {
+    color: theme.colors.primaryText,
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
 });

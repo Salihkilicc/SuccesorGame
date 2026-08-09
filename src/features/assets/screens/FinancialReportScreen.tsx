@@ -225,7 +225,7 @@ const FinancialReportScreen = () => {
                     note={t('company.howMuchYouBuiltAnd')}
                     info={t('company.sellThroughIsTheShare2')}
                     summary={`${formatPercent(report.sellThrough)} sold`}
-                    summaryColor={report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning}
+                    summaryColor={report.sellThrough >= 60 ? theme.colors.up : theme.colors.down}
                 >
                     <View style={styles.opsGrid}>
                         <View style={styles.opsCell}>
@@ -243,7 +243,7 @@ const FinancialReportScreen = () => {
                             <Text
                                 style={[
                                     styles.opsValue,
-                                    { color: report.sellThrough >= 60 ? theme.colors.textPrimary : theme.colors.warning },
+                                    { color: report.sellThrough >= 60 ? theme.colors.up : theme.colors.down },
                                 ]}
                             >
                                 {formatPercent(report.sellThrough)}
@@ -292,7 +292,7 @@ const FinancialReportScreen = () => {
                                     <Text style={[styles.cellText, styles.center, { color: theme.colors.success }]}>
                                         {formatNumber(p.sold)}
                                     </Text>
-                                    <Text style={[styles.cellText, styles.center, { color: theme.colors.warning }]}>
+                                    <Text style={[styles.cellText, styles.center, { color: theme.colors.down }]}>
                                         {formatNumber(p.stock)}
                                     </Text>
                                     <Text

@@ -76,6 +76,28 @@ export const StatRow = ({ label, value, why, valueColor, detail, startOpen }: St
 };
 
 /** A label/value pair for use INSIDE a StatRow's detail. */
+/**
+ * The tones a value can carry, and they are the theme's signal tokens by
+ * name. Naming them here rather than passing a colour is the whole point: a
+ * caller that could pass any colour would eventually pass the wrong one, and
+ * the rule that green means profit would live in thirty files instead of one.
+ *
+ * positive/negative are PROFIT AND LOSS. up/down are direction on anything
+ * else - a figure that rose, a price you can afford. They are separate
+ * because "this went up" and "you made money" are different sentences, and
+ * conflating them is what put the profit green on research output.
+ */
+export type ValueTone = 'positive' | 'negative' | 'up' | 'down' | 'brand' | 'rp';
+
+const TONE_COLOR: Record<ValueTone, string> = {
+    positive: theme.colors.positive,
+    negative: theme.colors.negative,
+    up: theme.colors.up,
+    down: theme.colors.down,
+    brand: theme.colors.brand,
+    rp: theme.colors.rp,
+};
+
 export const DetailLine = ({
     label,
     value,
@@ -85,7 +107,7 @@ export const DetailLine = ({
     label: string;
     value: string;
     strong?: boolean;
-    tone?: 'positive' | 'negative';
+    tone?: ValueTone;
 }) => (
     <View style={styles.detailRow}>
         <Text style={[styles.detailLabel, strong && styles.detailStrong]}>{label}</Text>
@@ -93,8 +115,7 @@ export const DetailLine = ({
             style={[
                 styles.detailValue,
                 strong && styles.detailStrong,
-                tone === 'positive' && { color: theme.colors.positive },
-                tone === 'negative' && { color: theme.colors.negative },
+                !!tone && { color: TONE_COLOR[tone] },
             ]}>
             {value}
         </Text>
