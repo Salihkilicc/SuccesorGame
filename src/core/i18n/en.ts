@@ -325,7 +325,7 @@ export const en: Record<string, string> = {
     'company.produced': 'Produced',
     'company.product': 'Product',
     'company.productPerformance': 'PRODUCT PERFORMANCE',
-    'company.products': 'PRODUCTS',
+    'company.products': 'Products',
     'company.profit': 'Profit',
     'company.qualityCeiling': 'Quality ceiling',
     'company.quarterlyEconomics': 'Quarterly Economics',
