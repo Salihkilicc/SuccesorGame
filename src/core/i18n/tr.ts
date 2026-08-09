@@ -280,6 +280,8 @@ export const tr: Record<string, string> = {
     'company.facility': 'Tesis',
     'company.factoryOverhead': 'Tesis Gideri',
     'company.finance': 'Finans',
+    'company.equity': 'Hisse & Sahiplik',
+    'company.financing': 'Finansman',
     'company.financialReport': 'Finansal Rapor',
     'company.fixedCosts': 'Sabit Giderler',
     'company.goodwillImpairment': 'Şerefiye Değer Düşüklüğü',

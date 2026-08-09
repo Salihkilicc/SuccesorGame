@@ -372,39 +372,42 @@ const FacilityPanel: React.FC = () => {
                         {delta === 0 ? t('fac.noChange') : t('fac.confirmTarget')}
                     </Text>
                 </Pressable>
-            </CollapsibleSection>
 
-            {/* ══ TUM MERDIVEN ══ */}
-            <CollapsibleSection
-                title={t('company.theLadder')}
-                note={t('company.everyTierAndWhatIt')}
-                summary={`${tier.level} / ${MAX_TIER_LEVEL}`}
-            >
-                {FACILITY_TIERS.map(t => {
-                    const state = t.level < tier.level ? 'past' : t.level === tier.level ? 'current' : 'future';
-                    return (
-                        <View key={t.level} style={[styles.ladderRow, state === 'current' && styles.ladderNow]}>
-                            <Text style={[styles.ladderNum, state === 'past' && styles.ladderDim]}>
-                                {t.level}
-                            </Text>
-                            <View style={{ flex: 1 }}>
-                                <Text style={[styles.ladderName, state === 'future' && styles.ladderDim]}>
-                                    {t.name}
-                                </Text>
-                                <Text style={styles.ladderMeta}>
-                                    {formatNumber(t.capacity)} cap · crew {formatNumber(t.crew)} · cost ×
-                                    {t.unitCostMultiplier.toFixed(2)} · brand ≤{t.brandCeiling} · quality ≤
-                                    {t.qualityCeiling}
-                                    {t.upgradeRP > 0 ? ` · ${formatNumber(t.upgradeRP)} RP` : ''}
+                {/* ══ WHAT COMES NEXT ══
+                    This was a separate "The Ladder" section listing all eight
+                    tiers, most of which were behind you and could not be acted
+                    on. It belongs with the facility it describes, and it only
+                    needs to show where you are and what is ahead - the rungs
+                    you already climbed are history, not a decision. */}
+                <View style={styles.ladderBlock}>
+                    <Text style={styles.ladderHeading}>
+                        {t('company.theLadder')} · {tier.level} / {MAX_TIER_LEVEL}
+                    </Text>
+                    {FACILITY_TIERS.filter(x => x.level >= tier.level).map(x => {
+                        const current = x.level === tier.level;
+                        return (
+                            <View key={x.level} style={[styles.ladderRow, current && styles.ladderNow]}>
+                                <Text style={styles.ladderNum}>{x.level}</Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[styles.ladderName, !current && styles.ladderDim]}>
+                                        {x.name}{current ? ` · ${t('company.used')}` : ''}
+                                    </Text>
+                                    <Text style={styles.ladderMeta}>
+                                        {formatNumber(x.capacity)} cap · crew {formatNumber(x.crew)} · cost ×
+                                        {x.unitCostMultiplier.toFixed(2)} · brand ≤{x.brandCeiling} · quality ≤
+                                        {x.qualityCeiling}
+                                        {x.upgradeRP > 0 ? ` · ${formatNumber(x.upgradeRP)} RP` : ''}
+                                    </Text>
+                                </View>
+                                <Text style={styles.ladderCost}>
+                                    {x.upgradeCost > 0 && !current ? formatMoney(x.upgradeCost) : '—'}
                                 </Text>
                             </View>
-                            <Text style={styles.ladderCost}>
-                                {t.upgradeCost > 0 ? formatMoney(t.upgradeCost) : '—'}
-                            </Text>
-                        </View>
-                    );
-                })}
+                        );
+                    })}
+                </View>
             </CollapsibleSection>
+
         </View>
     );
 };
@@ -531,6 +534,20 @@ const styles = StyleSheet.create({
     primaryBtnOff: { backgroundColor: 'rgba(255,255,255,0.07)' },
     primaryBtnText: { color: theme.colors.onLight, fontSize: 13.5, fontWeight: '800' },
 
+    ladderBlock: {
+        marginTop: theme.spacing.md,
+        paddingTop: theme.spacing.sm,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: theme.colors.border,
+    },
+    ladderHeading: {
+        color: theme.colors.textMuted,
+        fontSize: theme.typography.caption,
+        fontWeight: '700',
+        letterSpacing: 0.8,
+        textTransform: 'uppercase',
+        marginBottom: theme.spacing.xs,
+    },
     ladderRow: {
         flexDirection: 'row', alignItems: 'center', gap: 10,
         paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',

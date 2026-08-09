@@ -284,7 +284,7 @@ const MyCompanyScreen = () => {
           <View style={styles.grid}>
             <DepartmentCard
               icon="🏦"
-              title={t('company.finance')}
+              title={t('company.financing')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => navigation.navigate('Finance')}
             />
@@ -304,7 +304,7 @@ const MyCompanyScreen = () => {
             />
             <DepartmentCard
               icon="📈"
-              title={t('company.stockMarket')}
+              title={t('company.equity')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => navigation.navigate('StockMarket', { onOpenIPO: handleLaunchIPO })}
             />
