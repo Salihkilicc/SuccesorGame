@@ -19,6 +19,7 @@ import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
 import { StatRow, RowGroup, DetailLine, DetailRule, DetailNote } from '../../common/Disclosure';
 import ScreenHost from '../../common/ScreenHost';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 /**
  * The loan menu, in the order a company would actually work through it:
@@ -291,9 +292,7 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
 
                         {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-                        </ScrollView>
-
-                        {/* Actions — ScrollView DISINDA, her zaman gorunur */}
+                        {/* Scrolls with the page rather than pinned. */}
                         <View style={styles.actions}>
                             <Pressable onPress={onClose} style={styles.cancelButton}>
                                 <Text style={styles.cancelText}>{t('common.cancel')}</Text>
@@ -308,6 +307,8 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                 <Text style={styles.confirmText}>{t('bank.sign')}</Text>
                             </Pressable>
                         </View>
+
+                        </ScrollView>
                     </View>
                 </View>
 
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
     },
     body: { flex: 1 },
-    bodyContent: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg, gap: theme.spacing.md },
+    bodyContent: { padding: theme.spacing.md, paddingBottom: NAV_BAR_CLEARANCE, gap: theme.spacing.md },
     titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -490,10 +491,6 @@ const styles = StyleSheet.create({
     actions: {
         flexDirection: 'row',
         gap: 12,
-        padding: theme.spacing.md,
-        paddingBottom: 110, // clear of the nav bar
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: theme.colors.border,
     },
     cancelButton: {
         flex: 1,
