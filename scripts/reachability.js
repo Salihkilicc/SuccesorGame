@@ -176,6 +176,11 @@ const PALETTE = new Set([
     '#05A8F6', '#7DD3FC', '#0C6C9C',                          // the blues, as fills
     '#8C9494', '#CFD0D2',                                     // the greys
     '#4ADE80', '#FF8A8A',                                     // profit and loss ONLY
+    '#FFA94D', '#D6A96C',                                     // brand value, section headings
+    '#C4B5FD',                                                // research points
+    // The header rules. Wayfinding only - never text, never a fill of any
+    // size. Enforced below in 0d2.
+    '#EFC94C', '#3FC9C0', '#A78BFA', '#F09BD0', '#93A0F7',
 ]);
 //  Checked in rgba() form too. The last palette change only rewrote hex, so
 //  59 files quietly kept the previous theme's magenta as rgba(199,52,202,a) -
@@ -212,11 +217,31 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 //
 //  So: the signal tokens may be a text colour and nothing else. A fill or a
 //  border using them is the drift starting again.
+//
+//  The rule now covers seven tokens rather than five. `brand`, `brandMuted`
+//  and `rp` joined it the day they were created: a colour that says "this is
+//  brand value" stops saying it the moment a card is filled with it.
+//
+//  And the MIRROR: the category colours are the opposite case. They exist to
+//  be a line under a header, so a `color:` using one is the same mistake
+//  pointing the other way - wayfinding borrowed as meaning. They live in
+//  `theme.categories`, which makes both halves greppable.
 {
-    const SIGNAL = /(positive|negative|success|danger|error)\b/;
+    // Exact match, not a substring: `up` and `down` are short enough to hide
+    // inside other token names (a `dropdown` fill would have been reported as
+    // a signal). A `negativeSoft` tint is genuinely meant to be a fill, so
+    // anchoring loses nothing.
+    const SIGNAL = /^(positive|negative|success|danger|error|brand|brandMuted|rp|up|down)$/;
     for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
         read(f).split('\n').forEach((line, i) => {
             if (/^\s*(\/\/|\*)/.test(line)) return;
+
+            // A category colour used as TEXT. The header rule is the only
+            // thing these are for.
+            for (const m of line.matchAll(/\bcolor:\s*(?:theme\.)?categories\.(\w+)/g)) {
+                problems.palette.push(
+                    `${rel(f)}:${i + 1}  categories.${m[1]} used as text - it is a header rule, not a meaning`);
+            }
             // matchAll, not match: these styles are often written one per line
             // as `{ backgroundColor: x, borderColor: y }`, and stopping at the
             // first hit reported the fill while missing the border beside it.

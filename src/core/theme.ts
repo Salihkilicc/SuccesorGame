@@ -39,16 +39,67 @@
 //        surfaceRaised  #434B50   1.76                1.30
 //        surfaceHigh    #535B5F   2.26                1.28
 //
-//  3) GREEN AND RED MEAN PROFIT AND LOSS. Nothing else. They are the only
-//     two colours here that are not in the palette, and that is the point:
-//     they are a signal, not decoration. They are also the reason no button
-//     may be green - a green fill would make the signal ambiguous.
+//  3) A COLOUR THAT MEANS SOMETHING MEANS ONE THING, AND IT IS A SENTENCE.
+//     Not a category, not a mood - a sentence you could say out loud. If a
+//     colour needs two sentences it is two colours, and if two colours share
+//     a sentence one of them is decoration.
 //
-//     The obvious #22C55E / #EF4444 pair does not survive this ground. Red
-//     in particular fell to 2.36 on a raised card. These clear every rung:
+//        positive    #4ADE80   "you made money."
+//        negative    #FF8A8A   "this is costing you."
+//        brand       #FFA94D   "this is brand value."
+//        brandMuted  #D6A96C   "this is a section heading."
+//        rp          #C4B5FD   "this is research."
+//        up          #05A8F6   "this went the way you want."
+//        down        #8C9494   "nothing good is happening here."
 //
-//        positive  #4ADE80    9.01 / 6.64 / 5.10 / 3.98
-//        negative  #FF8A8A    6.92 / 5.10 / 3.92 / 3.05
+//     NEGATIVE WIDENED, AND ON PURPOSE. It used to mean strictly "loss". It
+//     now also covers a wall you have hit - 99% capacity, a breached
+//     covenant. That is not two meanings: a loss and a ceiling are the same
+//     sentence, "this is costing you". The old rule existed because red kept
+//     leaking in as DECORATION (the back arrow, six of seven credit grades,
+//     the share price). That ban is untouched: red is still never a fill and
+//     never a border.
+//
+//     Contrast against the four rungs of rule 2. The obvious #22C55E /
+//     #EF4444 pair does not survive this ground - red fell to 2.36 on a
+//     raised card - so these were solved for it instead:
+//
+//                     ground  surface  raised   high
+//        positive      9.01     6.64     5.10   3.98
+//        negative      6.92     5.10     3.92   3.05
+//        brand         8.25     6.08     4.67   3.64
+//        brandMuted    7.29     5.37     4.13   3.22
+//        rp            8.50     6.27     4.82   3.75
+//        up            5.93     4.37     3.36   2.62  <- see below
+//        down          5.07     3.74     2.87   2.24  <- see below
+//
+//     `up` and `down` are the only two that do not clear 3.0 on every rung,
+//     because they are the palette's own blue and grey rather than colours
+//     invented for the job. They are legible on the ground, on `surface` and
+//     on `surfaceRaised`; on `surfaceHigh` they are not. Audit pass 0f fails
+//     below 3.0, so this is caught rather than remembered.
+//
+//     WHY `up` IS THE BUTTON BLUE AND NOT THE LIGHT ONE: the light blue is
+//     already `warning`. A number that went the right way and a caution
+//     cannot be the same colour, so `up` takes the darker blue and pays for
+//     it with the surfaceHigh restriction above.
+//
+//  4) BRAND IS TWO TONES, AND THE DIFFERENCE IS SATURATION.
+//     Brand value is vivid orange; section headings are the same hue washed
+//     out to about half saturation. Same family, so the app looks composed;
+//     different saturation, so the eye does not read "Operations" as a
+//     figure. If they shared a tone, every heading would look like data.
+//
+//  5) CATEGORY COLOURS ARE NOT IN `colors`. They live in `theme.categories`
+//     and they are wayfinding, not meaning: the thin rule under a screen
+//     header, so you know which part of the app you are in before you read
+//     the title. Being a separate namespace is the guard - you cannot reach
+//     for one as a text colour by accident, and the audit enforces the
+//     mirror of rule 3: signal tokens are TEXT only, category tokens are
+//     LINE only.
+//
+//     Their hues avoid the profit green and the loss red entirely. A
+//     wayfinding colour that looks like a signal is worse than no colour.
 //
 //  RULE: components use tokens, never hex.
 //
@@ -61,6 +112,12 @@ export const palette = {
     grey: '#8C9494',
     greyLight: '#CFD0D2',
     ink: '#1C242C',
+
+    /** Brand value, and its washed-out form for section headings. */
+    orange: '#FFA94D',
+    orangeMuted: '#D6A96C',
+    /** Research points. */
+    violet: '#C4B5FD',
 } as const;
 
 export const theme = {
@@ -119,11 +176,55 @@ export const theme = {
          *  stay on the same side of rule 1 as the enabled one. */
         disabled: '#8C9494',
 
-        // ------------------------------------------------------------------
-        //  PROFIT / LOSS — and nothing else
-        // ------------------------------------------------------------------
+        // ==================================================================
+        //  THE SEVEN THAT MEAN SOMETHING
+        // ==================================================================
+        //  Each is one sentence (rule 3). All seven are TEXT colours: a fill
+        //  or a border using any of them is decoration wearing a signal's
+        //  clothes, and audit pass 0d2 fails on it.
+        // ==================================================================
+
+        /** "You made money." Profit, and nothing that merely feels good. */
         positive: '#4ADE80',
+        /**
+         * "This is costing you." A loss, or a ceiling you have hit - 99%
+         * capacity, a breached covenant. Deliberately wider than it was;
+         * see rule 3. Still never a fill and never a border.
+         */
         negative: '#FF8A8A',
+
+        /** "This is brand value." The figure itself, wherever it appears. */
+        brand: '#FFA94D',
+        /**
+         * "This is a section heading." Operations, Quick Actions, and their
+         * kind. The same hue as `brand` at roughly half the saturation, so
+         * headings sit in the family without reading as figures.
+         */
+        brandMuted: '#D6A96C',
+
+        /** "This is research." RP, the letters RP, research spend, upgrades. */
+        rp: '#C4B5FD',
+
+        /**
+         * "This went the way you want." A rising figure, an affordable
+         * price, demand fully served.
+         *
+         * The same hex as `primary`, and that is not an oversight: one is a
+         * button, one is a verdict on a number. Separate tokens because the
+         * job should be greppable, same hex because inventing a second blue
+         * is how a palette starts drifting.
+         *
+         * NOT legible on `surfaceHigh` (2.62). See rule 3.
+         */
+        up: '#05A8F6',
+        /**
+         * "Nothing good is happening here." A falling figure, a price you
+         * cannot afford, an inactive row. Shares its hex with `disabled`
+         * because it shares its sentence.
+         *
+         * NOT legible on `surfaceRaised` or above (2.87). See rule 3.
+         */
+        down: '#8C9494',
 
         // Legacy names, still in wide use. `success` and `danger` are now
         // strictly TEXT colours: they carry the profit/loss signal, so a
@@ -136,6 +237,51 @@ export const theme = {
         cardSoft: '#434B50',
         neutral: 'rgba(255,255,255,0.50)',
         lavender: '#CFD0D2',
+    },
+
+    // ======================================================================
+    //  CATEGORY COLOURS — wayfinding, not meaning
+    // ======================================================================
+    //  The thin rule under a screen header. Their whole job is "you are in a
+    //  different part of the app now", which is why they carry no valence:
+    //  there is no good or bad colour in this set, only a different one.
+    //
+    //  They sit in their own namespace so they cannot be picked up as a text
+    //  colour by accident, and so the audit can enforce the mirror of rule 3
+    //  - signal tokens are text only, these are line only.
+    //
+    //  HUES ARE SPACED, AND TWO ARE FORBIDDEN. Nothing here sits near the
+    //  profit green or the loss red; a wayfinding colour that reads as a
+    //  signal is worse than no colour at all. What is left, in order round
+    //  the wheel: 48 yellow, 176 teal, 199 blue, 230 indigo, 258 violet,
+    //  320 pink.
+    //
+    //  Contrast on the ground, where a header rule actually sits. WCAG asks
+    //  3.0 of a graphical object; the tightest here is research at 5.77.
+    //
+    //     company   #05A8F6  5.93     research  #A78BFA  5.77
+    //     finance   #EFC94C  9.81     people    #F09BD0  7.70
+    //     products  #3FC9C0  7.72     market    #93A0F7  6.44
+    //
+    //  RESEARCH IS THE RP VIOLET, one step more saturated. That repetition
+    //  is the only one in the set and it is deliberate: the research section
+    //  and the research figure should look related.
+    // ======================================================================
+    categories: {
+        /** My Company, My Empire. */
+        company: '#05A8F6',
+        /** Finance, Borrow, Repay, the financial report. */
+        finance: '#EFC94C',
+        /** Products and everything made in them. */
+        products: '#3FC9C0',
+        /** R&D, the laboratory, the tech tree. */
+        research: '#A78BFA',
+        /** The board, team morale - the screens that are about people. */
+        people: '#F09BD0',
+        /** The stock market, takeovers. */
+        market: '#93A0F7',
+        /** Home, settings, profile - anywhere with no section of its own. */
+        neutral: '#666E70',
     },
 
     elevation: {
