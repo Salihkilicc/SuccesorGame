@@ -130,7 +130,8 @@ const SanctuaryGroomingView = ({ visible, onClose, handleServicePurchase, getFre
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </View>
+            {/* Universal Crystal Navigation Bar */}
+        </View>
     );
 };
 

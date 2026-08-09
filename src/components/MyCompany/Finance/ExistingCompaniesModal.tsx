@@ -67,7 +67,8 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                         styles.listContent,
                         subsidiaries.length === 0 && styles.emptyList
                     ]}
-                />                {/* Detail Modal Integration */}
+                />
+                {/* Detail Modal Integration */}
                 {selectedCompanyId && (
                     <SubsidiaryDetailModal
                         visible={!!selectedCompanyId}

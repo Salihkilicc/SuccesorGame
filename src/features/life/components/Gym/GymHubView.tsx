@@ -154,7 +154,8 @@ const GymHubView = () => {
                 </View>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </View>
+            {/* Universal Crystal Navigation Bar */}
+        </View>
     );
 };
 

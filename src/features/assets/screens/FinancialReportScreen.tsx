@@ -96,7 +96,8 @@ const FinancialReportScreen = () => {
                         <Row label={t('company.companyCapital')} amount={companyCapital || 0} />
                         <Row label={t('company.personalCash')} amount={money || 0} />
                     </View>
-                </ScrollView>            </SafeAreaView>
+                </ScrollView>
+            </SafeAreaView>
         );
     }
 
@@ -304,7 +305,8 @@ const FinancialReportScreen = () => {
                 </CollapsibleSection>
 
                 <View style={{ height: 120 }} />
-            </ScrollView>        </SafeAreaView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

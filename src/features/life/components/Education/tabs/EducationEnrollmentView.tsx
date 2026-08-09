@@ -437,7 +437,8 @@ export const EducationEnrollmentView: React.FC<EducationEnrollmentViewProps> = (
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}        </View>
+            {/* Bottom Stats Bar */}
+        </View>
     );
 };
 

@@ -540,7 +540,8 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         )}
                     </ScrollView>
 
-                    {/* Persistent Bottom Bar */}                </View>
+                    {/* Persistent Bottom Bar */}
+                </View>
 
                 {/* ANIMATION OVERLAY */}
                 {animationState !== 'idle' && (

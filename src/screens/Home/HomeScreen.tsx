@@ -583,7 +583,8 @@ const HomeScreen = () => {
         {/* Education Exam Modal - Only show when report is closed */}
         {FEATURES.education && !reportVisible && <EducationExamModal />}
 
-        {/* Universal Crystal Navigation Bar (Dark Variant) */}      </SafeAreaView >
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}
+      </SafeAreaView >
     </View>
   );
 };

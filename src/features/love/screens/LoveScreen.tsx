@@ -848,7 +848,8 @@ const LoveScreen = () => {
           />
         )}
 
-        {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}        {/* BABY NAMING MODAL — extracted component */}
+        {/* Universal Crystal Navigation Bar (Active: Love, Dark Variant) */}
+        {/* BABY NAMING MODAL — extracted component */}
         <BabyNamingModal
           visible={isNamingChild}
           pendingChildGender={pendingChildGender}

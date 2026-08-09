@@ -95,7 +95,8 @@ const AssetsScreen = () => {
                         <BreakdownSection title={t('company.incomeSources')} items={report.incomeBreakdown} isIncome />
                         <BreakdownSection title={t('company.quarterlyExpenses')} items={report.expenseBreakdown} />
                     </View>
-                </ScrollView>            </SafeAreaView>
+                </ScrollView>
+            </SafeAreaView>
         </View>
     );
 };

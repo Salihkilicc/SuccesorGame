@@ -105,7 +105,8 @@ const SanctuaryMassageView = ({ visible, onClose, handleServicePurchase, isVIPMe
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </View>
+            {/* Universal Crystal Navigation Bar */}
+        </View>
     );
 };
 

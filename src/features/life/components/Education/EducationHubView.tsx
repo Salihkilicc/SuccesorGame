@@ -288,7 +288,8 @@ export const EducationHubView: React.FC<EducationHubViewProps> = ({ onNavigate, 
                 </SafeAreaView>
             </View>
 
-            {/* Bottom Stats Bar */}        </View>
+            {/* Bottom Stats Bar */}
+        </View>
     );
 };
 

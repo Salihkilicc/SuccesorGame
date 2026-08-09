@@ -260,7 +260,8 @@ const SettingsScreen = () => {
                     </View>
                 </ScrollView>
 
-                {/* Universal Crystal Navigation Bar */}            </View>
+                {/* Universal Crystal Navigation Bar */}
+            </View>
         </View>
     );
 };

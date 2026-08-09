@@ -64,7 +64,8 @@ const RepayModal = ({ visible, onClose }: Props) => {
                             </Pressable>
                         </View>
                     </View>
-                    {/* Persistent Bottom Bar */}                </View>
+                    {/* Persistent Bottom Bar */}
+                </View>
             </Modal>
         );
     }
@@ -177,7 +178,8 @@ const RepayModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}            </View>
+                {/* Persistent Bottom Bar */}
+            </View>
         </Modal>
     );
 };

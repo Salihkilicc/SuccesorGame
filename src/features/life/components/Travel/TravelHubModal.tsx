@@ -80,7 +80,8 @@ const TravelHubModal = ({
                     ))}
                 </ScrollView>
 
-            </SafeAreaView>        </View>
+            </SafeAreaView>
+        </View>
     );
 };
 

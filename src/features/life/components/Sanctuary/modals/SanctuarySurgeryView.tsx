@@ -233,7 +233,8 @@ const SanctuarySurgeryView = ({ visible, onClose, performSurgery, onGoHome }: Sa
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </View>
+            {/* Universal Crystal Navigation Bar */}
+        </View>
     );
 };
 

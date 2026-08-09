@@ -132,7 +132,8 @@ const UnderworldScreen = () => {
                         </View>
                     </View>
                     <View style={{ height: 100 }} />
-                </ScrollView>            </SafeAreaView>
+                </ScrollView>
+            </SafeAreaView>
 
             {/* --- MODALS --- */}
             <HookupModal

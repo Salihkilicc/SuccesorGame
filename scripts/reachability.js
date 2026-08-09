@@ -262,6 +262,49 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     }
 }
 
+// --- 0d4) Whitespace that survives as a text node -----------------------------
+//  JSX drops whitespace-only text that contains a NEWLINE. Whitespace on a
+//  SINGLE line between two tags is kept as a real text node - and React Native
+//  refuses to draw one outside <Text>:
+//
+//      {/* comment */}            </View>      <- a text node lives in there
+//      </ScrollView>            </SafeAreaView>
+//
+//  46 of these appeared at once when a regex removed a component and left the
+//  neighbouring tags sharing a line. They caused the console error that took
+//  four passes to find: the stack is React internals only - no file, no
+//  component - and nothing looks wrong on screen. A machine has to see it.
+//
+//  Parsed rather than matched. A regex cannot tell whether the whitespace sits
+//  inside a <Text>, where it is legal, and guessing produced both misses and
+//  false alarms.
+{
+    let ts = null;
+    try { ts = require(path.join(__dirname, '..', 'node_modules', 'typescript')); } catch { /* optional */ }
+    if (ts) {
+        for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
+            const src = read(f);
+            const sf = ts.createSourceFile(f, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+            const visit = node => {
+                if (ts.isJsxText(node)) {
+                    const raw = node.getFullText(sf);
+                    if (raw.length && raw.trim() === '' && !raw.includes('\n')) {
+                        const p = node.parent;
+                        const tag = ts.isJsxElement(p) ? p.openingElement.tagName.getText(sf) : '?';
+                        if (tag !== 'Text') {
+                            const ln = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+                            problems.stringGuards.push(
+                                `${rel(f)}:${ln}  whitespace between tags on one line renders as text inside <${tag}>`);
+                        }
+                    }
+                }
+                ts.forEachChild(node, visit);
+            };
+            visit(sf);
+        }
+    }
+}
+
 // --- 0e) Text that cannot be read on the ground -----------------------------
 //  Chained palette migrations quietly turned old `color: '#000'` into the
 //  BACKGROUND colour, so 89 labels became invisible - the player found it as
@@ -516,8 +559,8 @@ total += section('Translations frozen at module load', problems.frozenText,
     'Evaluated once on import, so they never follow a language change. Use a getter.');
 total += section('Hooks called after an early return', problems.hooks,
     'React will crash with "Rendered more hooks than during the previous render".');
-total += section('String used as a render guard', problems.stringGuards,
-    'An empty string renders as a bare text node: "Text strings must be rendered within a <Text>".');
+total += section('Renders as a bare text node', problems.stringGuards,
+    'React Native refuses these: "Text strings must be rendered within a <Text> component".');
 total += section('Components nothing renders', problems.components,
     'Written, compiles, and no screen mounts it.');
 total += section('Store actions nothing calls', problems.storeActions,

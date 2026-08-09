@@ -157,7 +157,8 @@ const NightOutSetupModal = ({
                 </View>
             </SafeAreaView>
 
-            {/* Bottom Stats Footer */}        </View>
+            {/* Bottom Stats Footer */}
+        </View>
     );
 };
 

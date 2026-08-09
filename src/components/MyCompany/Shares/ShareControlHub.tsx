@@ -439,7 +439,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         <View style={{ height: 40 }} />
                     </ScrollView>
 
-                    {/* Persistent Bottom Bar */}                    {/* Draws INSIDE this screen, over the content it refers to,
+                    {/* Persistent Bottom Bar */}
+                    {/* Draws INSIDE this screen, over the content it refers to,
                         rather than as a system dialog that replaces it. */}
                     <ConfirmPanel
                         visible={!!panel}

@@ -200,7 +200,8 @@ const ShoppingBrowseView = ({
                 <View style={{ height: 120 }} />
             </ScrollView>
 
-            {/* Bottom Stats Bar */}        </SafeAreaView>
+            {/* Bottom Stats Bar */}
+        </SafeAreaView>
     );
 };
 

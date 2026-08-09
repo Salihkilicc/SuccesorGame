@@ -211,7 +211,8 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
               
               Let's put it fixed at the bottom of the BACKDROP (screen).
           */}
-          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>          </View>
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+          </View>
 
         </View>
 
@@ -389,7 +390,8 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
 
         </View>
 
-        {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}      </View>
+        {/* Bottom Bar fixed at bottom of screen, outside backdrop padding/centering */}
+      </View>
     
             <ConfirmPanel
                 visible={!!panel}

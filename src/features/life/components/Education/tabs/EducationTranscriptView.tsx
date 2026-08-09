@@ -93,7 +93,8 @@ export const EducationTranscriptView: React.FC<EducationTranscriptViewProps> = (
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}        </View>
+            {/* Bottom Stats Bar */}
+        </View>
     );
 };
 

@@ -159,7 +159,8 @@ const TravelBookingModal = ({
                         <Text style={styles.closeText}>{t('life.cancelFlight')}</Text>
                     </Pressable>
                 </View>
-                {/* Universal Crystal Navigation Bar */}            </View>
+                {/* Universal Crystal Navigation Bar */}
+            </View>
         </Modal>
     );
 };

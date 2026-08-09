@@ -187,7 +187,8 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                     </View>
                 )}
 
-                {/* Info / Stats Bar */}            </SafeAreaView>
+                {/* Info / Stats Bar */}
+            </SafeAreaView>
         </Modal>
     );
 };

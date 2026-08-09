@@ -202,7 +202,8 @@ const LifeScreen = () => {
           <View style={{ height: 100 }} />
         </ScrollView>
 
-        {/* Universal Crystal Navigation Bar */}      </SafeAreaView>
+        {/* Universal Crystal Navigation Bar */}
+      </SafeAreaView>
 
       {/* --- MODALS --- */}
       < MatchPopup

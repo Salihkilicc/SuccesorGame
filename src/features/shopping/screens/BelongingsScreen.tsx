@@ -170,7 +170,8 @@ const BelongingsScreen = () => {
                     />
                 </SafeAreaView>
 
-                {/* 4. Footer Stats */}            </View>
+                {/* 4. Footer Stats */}
+            </View>
         </AppLaunchLoader>
     );
 };

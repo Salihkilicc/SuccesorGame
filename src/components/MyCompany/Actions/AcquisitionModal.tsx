@@ -358,7 +358,8 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
           }
         />
 
-        {/* Persistent Bottom Bar */}        {/* NEGOTIATION OVERLAY */}
+        {/* Persistent Bottom Bar */}
+        {/* NEGOTIATION OVERLAY */}
         {selectedTarget && (
           <View style={styles.overlayBackdrop}>
             <View style={styles.negotiationCard}>

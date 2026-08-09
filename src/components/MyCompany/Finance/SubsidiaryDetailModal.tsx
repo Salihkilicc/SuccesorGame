@@ -188,7 +188,8 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     </View>
                 </View>
 
-                {/* Bottom Bar */}                {/* Sell Modal */}
+                {/* Bottom Bar */}
+                {/* Sell Modal */}
                 {company && <SellCompanyModal
                     visible={isSellModalVisible}
                     companyId={company.id}

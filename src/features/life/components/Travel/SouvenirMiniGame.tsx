@@ -129,7 +129,8 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
                     )}
                 </View>
 
-                {/* Universal Crystal Navigation Bar */}            </View>
+                {/* Universal Crystal Navigation Bar */}
+            </View>
         </Modal>
     );
 };

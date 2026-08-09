@@ -208,7 +208,8 @@ const MarketScreen = () => {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />      </AppScreen>
+        <PortfolioModal visible={showPortfolio} onClose={() => setShowPortfolio(false)} />
+      </AppScreen>
     </AppLaunchLoader>
   );
 };

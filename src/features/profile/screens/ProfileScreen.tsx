@@ -55,7 +55,8 @@ const ProfileScreen = () => {
                     The navbar component expects: activeTab: 'Life' | 'Home' | 'Company' | 'Love';
                     I'll use 'Home' but visually activeTab highlights the specific icon.
                     Actually, let's just use 'Life' as it's a fallback.
-                */}            </View>
+                */}
+            </View>
         </View>
     );
 };

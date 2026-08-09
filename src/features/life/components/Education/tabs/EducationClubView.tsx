@@ -163,7 +163,8 @@ export const EducationClubView: React.FC<EducationClubViewProps> = ({ onBack }) 
                 </ScrollView>
             </SafeAreaView>
 
-            {/* Bottom Stats Bar */}        </View>
+            {/* Bottom Stats Bar */}
+        </View>
     );
 };
 

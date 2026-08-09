@@ -323,7 +323,8 @@ const ShoppingScreen = () => {
                     {currentView === 'SHOP_DETAIL' && renderShopDetail()}
                 </View>
 
-                {/* Footer */}                {/* Cart Modal */}
+                {/* Footer */}
+                {/* Cart Modal */}
                 <CartModal
                     visible={showCart}
                     onClose={() => setShowCart(false)}

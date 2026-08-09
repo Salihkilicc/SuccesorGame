@@ -68,7 +68,8 @@ const ProductsScreen = () => {
         {/* LOCKED PRODUCTS REMOVED AS REQUESTED */}
       </ScrollView>
 
-      {/* Persistent Bottom Bar */}      {/* MODALS */}
+      {/* Persistent Bottom Bar */}
+      {/* MODALS */}
       {selectedProduct?.status === 'locked' && (
         <ProductLaunchModal
           visible={!!selectedProduct}

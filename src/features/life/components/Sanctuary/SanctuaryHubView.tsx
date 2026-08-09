@@ -110,7 +110,8 @@ const SanctuaryHubView = ({ navigate, closeSanctuary, isVIPMember, buyMembership
 
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </View>
+            {/* Universal Crystal Navigation Bar */}
+        </View>
     );
 };
 

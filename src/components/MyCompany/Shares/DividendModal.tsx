@@ -255,7 +255,8 @@ const DividendModal = ({ visible, onClose }: Props) => {
                     </View>
                 </View>
 
-                {/* Persistent Bottom Bar */}            </View>
+                {/* Persistent Bottom Bar */}
+            </View>
         </Modal>
     );
 };

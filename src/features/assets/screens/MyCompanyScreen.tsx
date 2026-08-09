@@ -350,7 +350,8 @@ const MyCompanyScreen = () => {
           onCancel={() => setPanel(null)}
         />
 
-        {/* Universal Crystal Navigation Bar (Dark Variant) */}        {/* --- MODAL MANAGER --- */}
+        {/* Universal Crystal Navigation Bar (Dark Variant) */}
+        {/* --- MODAL MANAGER --- */}
         <CompanyModals
           modals={modals}
           toggleModal={toggleModal}

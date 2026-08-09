@@ -122,7 +122,8 @@ const SouvenirCollectionModal = ({
 
             </SafeAreaView>
 
-            {/* Universal Crystal Navigation Bar */}        </Modal>
+            {/* Universal Crystal Navigation Bar */}
+        </Modal>
     );
 };
 

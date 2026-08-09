@@ -250,7 +250,8 @@ const CalendarScreen = () => {
                     <View style={{ height: 140 }} />
                 </ScrollView>
 
-                {/* Universal Crystal Navigation Bar */}            </View>
+                {/* Universal Crystal Navigation Bar */}
+            </View>
 
             {/* ── Event Detail Modal ── */}
             <Modal

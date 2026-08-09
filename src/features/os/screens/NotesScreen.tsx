@@ -374,7 +374,8 @@ const NotesScreen = () => {
                     />
                 )}
 
-                {/* Universal Crystal Navigation Bar */}            </View>
+                {/* Universal Crystal Navigation Bar */}
+            </View>
         </View>
     );
 };
