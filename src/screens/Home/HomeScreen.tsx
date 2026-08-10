@@ -296,7 +296,7 @@ const HomeScreen = () => {
   const handleAppAction = (key: string) => {
     switch (key) {
       case 'calendar': handleNavigateStack('Calendar'); break;
-      case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
+      case 'mail': navigation.navigate('Mail'); break;
       case 'messages': handleNavigateStack('Messages'); break;
       case 'education': handleNavigateStack('Education'); break;
       // The casino is its own stack, so it opens at the lobby rather than at

@@ -58,6 +58,13 @@ const BY_ROUTE: Record<string, ScreenCategory> = {
     // --- What the market thinks
     StockMarket: 'market',
     HostileTakeover: 'market',
+
+    // --- OS Apps
+    Messages: 'company',
+    MessageThread: 'company',
+    Mail: 'products',
+    MailDetail: 'products',
+
     Market: 'market',
     StockDetail: 'market',
 

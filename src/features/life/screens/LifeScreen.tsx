@@ -120,7 +120,7 @@ const LifeScreen = () => {
       case 'appStore': Alert.alert('App Store', 'Coming Soon'); break;
       case 'calendar': Alert.alert('Calendar', 'Calendar app is coming soon!'); break;
       case 'notes': navigation.navigate('Notes' as never); break;
-      case 'mail': Alert.alert('Mail', 'Mail app is coming soon!'); break;
+      case 'mail': navigation.navigate('Mail'); break;
       case 'weather': Alert.alert('Weather', 'Weather app is coming soon!'); break;
 
       default: break;
