@@ -59,6 +59,7 @@ import WeatherScreen from '../features/life/screens/WeatherScreen';
 import CalendarScreen from '../features/life/screens/CalendarScreen';
 import NotesScreen from '../features/os/screens/NotesScreen';
 import MessagesScreen from '../features/os/screens/MessagesScreen';
+import MessageThreadScreen from '../features/os/screens/MessageThreadScreen';
 import MailScreen from '../features/os/screens/MailScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
@@ -182,6 +183,7 @@ export type RootStackParamList = {
   Calendar: undefined;
   Notes: undefined;
   Messages: undefined;
+  MessageThread: { threadId: string };
   Mail: undefined;
   Settings: undefined;
   Profile: undefined;
@@ -489,6 +491,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="Calendar" component={CalendarScreen} />
           <RootStack.Screen name="Notes" component={NotesScreen} />
           <RootStack.Screen name="Messages" component={MessagesScreen} />
+          <RootStack.Screen name="MessageThread" component={MessageThreadScreen} />
           <RootStack.Screen name="Mail" component={MailScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />
           <RootStack.Screen name="Profile" component={ProfileScreen} />
