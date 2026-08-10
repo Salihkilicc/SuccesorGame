@@ -14,6 +14,7 @@ import { CustomChipSelector } from '../components/CustomChipSelector';
 import { CASINO_LOCATIONS } from '../data/casinoData';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -105,9 +106,6 @@ const SlotsGameScreen = () => {
           <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
             {message.toUpperCase()}
           </Text>
-          <View style={styles.limitPill}>
-            <Text style={styles.limitText}>MAX BET: ${(currentLocation.maxBet).toLocaleString()}</Text>
-          </View>
         </View>
 
         {/* SLOT MACHINE CONTAINER */}
@@ -170,7 +168,7 @@ export default SlotsGameScreen;
 // STYLES
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 100 },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
 
   infoRow: {
     flexDirection: 'row',

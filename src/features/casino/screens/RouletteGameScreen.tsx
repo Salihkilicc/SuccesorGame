@@ -1,13 +1,16 @@
-import React from 'react';
+// src/features/casino/screens/RouletteGameScreen.tsx
+import React, { useEffect, useRef } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, Animated, Easing } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
-import { useRouletteLogic, BetType, ResultEntry } from '../logic/useRouletteLogic';
+import { useRouletteLogic, getNumberColor } from '../logic/useRouletteLogic';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
+import RouletteTable from '../components/RouletteTable';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 const RouletteGameScreen = () => {
     useLocale();
@@ -20,27 +23,66 @@ const RouletteGameScreen = () => {
 
   // Logic Hook
   const { state, actions } = useRouletteLogic(initialBet);
-  const { money, chip, selectedBet, lastResult, history, status, resultPopup, CHIP_VALUES } = state;
+  const {
+    money, selectedChip, bets, totalBetAmount,
+    lastResult, history, status, isSpinning,
+    spinResult, lastWinnings, resultPopup
+  } = state;
 
-  // Render Helpers
-  const renderBetButton = (type: BetType, label: string) => {
-    const active = selectedBet === type;
-    const color = active ? currentLocation.theme.primary : '#535B5F';
+  // Spin animation
+  const spinRotation = useRef(new Animated.Value(0)).current;
+  const resultScale = useRef(new Animated.Value(0)).current;
+  const resultOpacity = useRef(new Animated.Value(0)).current;
 
-    return (
-      <Pressable
-        onPress={() => actions.selectBet(type)}
-        style={({ pressed }) => [
-          styles.betButton,
-          { borderColor: active ? currentLocation.theme.primary : '#666E70', backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent' },
-          pressed && styles.betButtonPressed,
-        ]}>
-        <Text style={[styles.betButtonText, active && { color: currentLocation.theme.primary }]}>{label}</Text>
-      </Pressable>
-    );
-  };
+  useEffect(() => {
+    if (isSpinning) {
+      spinRotation.setValue(0);
+      Animated.loop(
+        Animated.timing(spinRotation, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      ).start();
+    } else {
+      spinRotation.stopAnimation();
+      spinRotation.setValue(0);
+    }
+  }, [isSpinning]);
 
-  const renderResultPill = (entry: ResultEntry, idx: number) => (
+  // Result number pop-in animation
+  useEffect(() => {
+    if (spinResult !== null && !isSpinning) {
+      resultScale.setValue(0);
+      resultOpacity.setValue(0);
+
+      Animated.parallel([
+        Animated.spring(resultScale, {
+          toValue: 1,
+          friction: 5,
+          tension: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(resultOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      resultScale.setValue(0);
+      resultOpacity.setValue(0);
+    }
+  }, [spinResult, isSpinning]);
+
+  const spinRotateInterp = spinRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  // Render history pills
+  const renderResultPill = (entry: { value: number; color: 'red' | 'black' | 'green' }, idx: number) => (
     <View
       key={`${entry.value}-${idx}`}
       style={[
@@ -49,7 +91,7 @@ const RouletteGameScreen = () => {
         entry.color === 'black' && styles.resultBlack,
         entry.color === 'green' && styles.resultGreen,
       ]}>
-      <Text style={styles.resultText}>{entry.value}</Text>
+      <Text style={styles.resultPillText}>{entry.value}</Text>
     </View>
   );
 
@@ -67,53 +109,119 @@ const RouletteGameScreen = () => {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-        {/* INFO */}
+        {/* STATUS + HISTORY */}
         <View style={styles.topRow}>
-          <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>{status.toUpperCase()}</Text>
-          <View style={styles.historyRow}>{history.map(renderResultPill)}</View>
+          <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
+            {status.toUpperCase()}
+          </Text>
         </View>
 
-        {/* BETTING TABLE */}
-        <View style={[styles.tableCard, { borderColor: currentLocation.theme.secondary }]}>
-          <Text style={styles.tableTitle}>{t('ui.placeYourBets')}</Text>
-          <View style={styles.betGrid}>
-            {renderBetButton('RED', 'RED')}
-            {renderBetButton('BLACK', 'BLACK')}
-            {renderBetButton('EVEN', 'EVEN')}
-            {renderBetButton('ODD', 'ODD')}
-            {renderBetButton('LOW', '1-18')}
-            {renderBetButton('HIGH', '19-36')}
+        {/* History Row */}
+        {history.length > 0 && (
+          <View style={styles.historyRow}>
+            <Text style={styles.historyLabel}>LAST:</Text>
+            {history.map(renderResultPill)}
           </View>
+        )}
+
+        {/* SPIN RESULT DISPLAY */}
+        {isSpinning && (
+          <View style={styles.spinningContainer}>
+            <Animated.View style={[styles.wheelIcon, { transform: [{ rotate: spinRotateInterp }] }]}>
+              <Text style={styles.wheelEmoji}>🎡</Text>
+            </Animated.View>
+            <Text style={styles.spinningText}>Spinning...</Text>
+          </View>
+        )}
+
+        {spinResult !== null && !isSpinning && (
+          <Animated.View
+            style={[
+              styles.resultContainer,
+              {
+                transform: [{ scale: resultScale }],
+                opacity: resultOpacity,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.resultCircle,
+                {
+                  backgroundColor:
+                    getNumberColor(spinResult) === 'red' ? '#C0392B'
+                    : getNumberColor(spinResult) === 'green' ? '#27AE60'
+                    : '#2C3E50',
+                },
+              ]}
+            >
+              <Text style={styles.resultNumber}>{spinResult}</Text>
+            </View>
+            {lastWinnings > 0 && (
+              <Text style={styles.winText}>+${lastWinnings.toLocaleString()}</Text>
+            )}
+          </Animated.View>
+        )}
+
+        {/* ROULETTE TABLE */}
+        <View style={[styles.tableContainer, { borderColor: currentLocation.theme.secondary }]}>
+          <RouletteTable
+            onPlaceBet={actions.placeBet}
+            getBetOnPosition={actions.getBetOnPosition}
+            gameTheme={currentLocation.theme}
+            disabled={isSpinning}
+          />
         </View>
 
         {/* CONTROLS */}
         <View style={styles.controlsSection}>
-
-          {/* CHIP SELECTOR (Uses internal game state 'chip' value via selectChip) */}
+          {/* CHIP SELECTOR */}
           <CustomChipSelector
-            chips={currentLocation.chips} // Or CHIP_VALUES if logic enforces specific ones. 
-            // Note: The logic hook uses 'chip' state to determine next bet amount.
-            selectedChip={chip}
-            onSelect={(val) => actions.selectChip(val)}
+            chips={currentLocation.chips}
+            selectedChip={selectedChip}
+            onSelect={actions.selectChip}
             gameTheme={currentLocation.theme}
           />
 
           <View style={styles.bottomControls}>
             <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>{t('ui.selectedChip')}</Text>
-              <Text style={styles.betValueText}>${chip.toLocaleString()}</Text>
+              <Text style={styles.betLabel}>TOTAL BET</Text>
+              <Text style={styles.betValueText}>${totalBetAmount.toLocaleString()}</Text>
+              {bets.length > 0 && (
+                <Text style={styles.betCount}>{bets.length} bet{bets.length > 1 ? 's' : ''}</Text>
+              )}
             </View>
 
-            {/* SPIN BTN */}
-            <Pressable
-              onPress={actions.handleSpin}
-              style={({ pressed }) => [
-                styles.spinButton,
-                { backgroundColor: currentLocation.theme.primary },
-                pressed && styles.spinButtonPressed
-              ]}>
-              <Text style={styles.spinText}>{t('ui.spinWheel')}</Text>
-            </Pressable>
+            <View style={styles.actionRow}>
+              {/* Clear Bets */}
+              {bets.length > 0 && !isSpinning && (
+                <Pressable
+                  onPress={actions.clearBets}
+                  style={({ pressed }) => [styles.clearBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.clearBtnText}>CLEAR</Text>
+                </Pressable>
+              )}
+
+              {/* SPIN BTN */}
+              <Pressable
+                onPress={actions.handleSpin}
+                disabled={isSpinning || bets.length === 0}
+                style={({ pressed }) => [
+                  styles.spinButton,
+                  {
+                    backgroundColor: isSpinning || bets.length === 0
+                      ? '#535B5F'
+                      : currentLocation.theme.primary,
+                  },
+                  pressed && styles.spinButtonPressed,
+                ]}
+              >
+                <Text style={styles.spinText}>
+                  {isSpinning ? '...' : t('ui.spinWheel')}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
 
@@ -126,33 +234,99 @@ export default RouletteGameScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
+  content: { padding: theme.spacing.md, gap: 12, paddingBottom: NAV_BAR_CLEARANCE },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },
-  historyRow: { flexDirection: 'row', gap: 4 },
 
-  tableCard: {
-    backgroundColor: '#434B50',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    gap: 16
-  },
-  tableTitle: { color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
-  betGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  betButton: {
-    flexBasis: '48%',
-    paddingVertical: 20,
-    borderRadius: 8,
-    borderWidth: 1,
+  historyRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    gap: 4,
   },
-  betButtonPressed: { opacity: 0.8 },
-  betButtonText: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1 },
+  historyLabel: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 10,
+    fontWeight: '700',
+    marginRight: 4,
+  },
+  resultPill: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  resultRed: { backgroundColor: '#C0392B' },
+  resultBlack: { backgroundColor: '#2C3E50' },
+  resultGreen: { backgroundColor: '#27AE60' },
+  resultPillText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
 
-  controlsSection: { marginTop: 'auto', gap: 20 },
+  // Spinning animation
+  spinningContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    gap: 8,
+  },
+  wheelIcon: {
+    width: 64,
+    height: 64,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wheelEmoji: { fontSize: 48 },
+  spinningText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+
+  // Result display
+  resultContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  resultCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  resultNumber: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: '900',
+  },
+  winText: {
+    color: '#4ADE80',
+    fontSize: 22,
+    fontWeight: '900',
+  },
+
+  // Table
+  tableContainer: {
+    backgroundColor: '#2C3E34',
+    borderRadius: 16,
+    padding: 10,
+    borderWidth: 1,
+  },
+
+  // Controls
+  controlsSection: { gap: 16 },
   bottomControls: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -161,29 +335,39 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)'
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   betDisplay: { gap: 2 },
   betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700' },
   betValueText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
+  betCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
+
+  actionRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  clearBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  clearBtnText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: '800',
+  },
 
   spinButton: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#1C242C',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 4
+    elevation: 4,
   },
   spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
   spinText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
-
-  resultPill: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  resultRed: { backgroundColor: '#434B50' },
-  resultBlack: { backgroundColor: '#434B50' },
-  resultGreen: { backgroundColor: '#CFD0D2' },
-  resultText: { color: theme.colors.onLight, fontSize: 10, fontWeight: '700' },
 });

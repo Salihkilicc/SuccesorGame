@@ -9,6 +9,8 @@ import { useBlackjackLogic, Card } from '../logic/useBlackjackLogic';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
+import AnimatedCard from '../components/AnimatedCard';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 const BlackjackGameScreen = () => {
     useLocale();
@@ -25,16 +27,6 @@ const BlackjackGameScreen = () => {
 
   // Krupiyenin kapalı kartı sadece oyuncu oynarken gizli
   const hideDealerHole = roundState === 'player';
-
-  // Kart Bileşeni (Render Helper)
-  const renderCard = (card: Card, idx: number) => (
-    <View key={`${card.rank}${card.suit}-${idx}`} style={styles.card}>
-      <Text style={styles.cardRank}>{card.rank}</Text>
-      <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#FF8A8A' : '#FFFFFF' }]}>
-        {card.suit}
-      </Text>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -56,25 +48,21 @@ const BlackjackGameScreen = () => {
           <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
             {status.toUpperCase()}
           </Text>
-          <View style={styles.limitPill}>
-            <Text style={styles.limitText}>MAX BET: ${(currentLocation.maxBet).toLocaleString()}</Text>
-          </View>
         </View>
 
         {/* DEALER HAND */}
         <View style={[styles.handCard, { borderColor: currentLocation.theme.secondary }]}>
           <Text style={styles.handLabel}>DEALER ({!hideDealerHole ? dealerTotal : '?'})</Text>
           <View style={styles.cardRow}>
-            {dealerCards.map((card, idx) => {
-              if (idx === 1 && hideDealerHole) {
-                return (
-                  <View key={`hidden-${idx}`} style={[styles.card, styles.hiddenCard]}>
-                    <Text style={styles.cardRank}>?</Text>
-                  </View>
-                );
-              }
-              return renderCard(card, idx);
-            })}
+            {dealerCards.map((card, idx) => (
+              <AnimatedCard
+                key={`dealer-${card.rank}${card.suit}-${idx}`}
+                card={card}
+                index={idx}
+                hidden={idx === 1 && hideDealerHole}
+                baseDelay={100}
+              />
+            ))}
           </View>
         </View>
 
@@ -86,15 +74,21 @@ const BlackjackGameScreen = () => {
         {/* PLAYER HAND */}
         <View style={[styles.handCard, { borderColor: currentLocation.theme.primary }]}>
           <Text style={styles.handLabel}>YOU ({playerTotal})</Text>
-          <View style={styles.cardRow}>{playerCards.map(renderCard)}</View>
+          <View style={styles.cardRow}>
+            {playerCards.map((card, idx) => (
+              <AnimatedCard
+                key={`player-${card.rank}${card.suit}-${idx}`}
+                card={card}
+                index={idx}
+                baseDelay={0}
+              />
+            ))}
+          </View>
         </View>
 
         {/* BET CONTROLS */}
         <View style={styles.controlsSection}>
 
-          {/* Only show chips if in betting phase (idle or dealing?) 
-               Actually for blackjack, we usually bet before deal. 
-               If roundState is 'player' or 'dealer', betting is locked. 
           {/* Only show chips if in betting phase */}
           <View style={{ opacity: roundState === 'player' ? 0.5 : 1 }}>
             <CustomChipSelector
@@ -158,12 +152,10 @@ export default BlackjackGameScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },
-  limitPill: { paddingHorizontal: 8, paddingVertical: 4, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12 },
-  limitText: { color: theme.colors.textSecondary, fontSize: 10, fontWeight: '600' },
 
   handCard: {
     backgroundColor: '#434B50',
@@ -175,22 +167,6 @@ const styles = StyleSheet.create({
   },
   handLabel: { color: 'rgba(255,255,255,0.48)', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
   cardRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  card: {
-    width: 64,
-    height: 90,
-    borderRadius: 6,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#1C242C',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  hiddenCard: { backgroundColor: '#434B50', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#FFFFFF' },
-  cardSuit: { fontSize: 20 },
 
   tableCenter: { alignItems: 'center', paddingVertical: 10 },
   tableLogo: { fontWeight: '900', fontSize: 14, letterSpacing: 2 },

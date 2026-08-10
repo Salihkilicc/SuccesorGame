@@ -187,6 +187,12 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
     let winAmount = 0;
     let resultType: 'win' | 'loss' = 'loss';
 
+    // Harcama bazlı reputation: her $100K bahis = +1 rep
+    const spendingRep = Math.floor(bet / 100000);
+    if (spendingRep > 0) {
+      reputationUp(spendingRep);
+    }
+
     if (outcome === 'JACKPOT') {
       winAmount = bet * 3;
       resultType = 'win';

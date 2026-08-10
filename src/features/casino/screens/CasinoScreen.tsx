@@ -11,6 +11,7 @@ import CasinoLocationModal from '../components/CasinoLocationModal';
 import { GameRoomCard } from '../components/GameRoomCard';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 const CasinoScreen = () => {
     useLocale();
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C242C'
   },
   content: {
-    paddingBottom: 40,
+    paddingBottom: NAV_BAR_CLEARANCE,
     paddingTop: 20
   },
 

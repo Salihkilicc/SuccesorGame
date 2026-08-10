@@ -127,6 +127,12 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       setField('money', money - baseBet);
       setCurrentBet(baseBet);
 
+      // Harcama bazlı reputation: her $100K bahis = +1 rep
+      const spendingRep = Math.floor(baseBet / 100000);
+      if (spendingRep > 0) {
+        reputationUp(spendingRep);
+      }
+
       const deck = createDeck();
       const nextPlayer = [deck.pop()!, deck.pop()!];
       const nextDealer = [deck.pop()!, deck.pop()!];
@@ -150,6 +156,10 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       setField('money', money - baseBet);
       setCurrentBet(currentBet + baseBet);
 
+      // Harcama bazlı reputation
+      const spendingRepFlop = Math.floor(baseBet / 100000);
+      if (spendingRepFlop > 0) reputationUp(spendingRepFlop);
+
       setRevealedBoard(4);
       setGamePhase('turn');
       setStatus('Turn revealed. Continue to triple bet.');
@@ -162,6 +172,10 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       }
       setField('money', money - baseBet);
       setCurrentBet(currentBet + baseBet);
+
+      // Harcama bazlı reputation
+      const spendingRepTurn = Math.floor(baseBet / 100000);
+      if (spendingRepTurn > 0) reputationUp(spendingRepTurn);
 
       setRevealedBoard(5);
       setGamePhase('river');

@@ -8,6 +8,8 @@ import { usePokerLogic, Card } from '../logic/usePokerLogic';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
+import AnimatedCard from '../components/AnimatedCard';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 const PokerGameScreen = () => {
     useLocale();
@@ -21,22 +23,6 @@ const PokerGameScreen = () => {
   // Logic Hook
   const { state, actions } = usePokerLogic(initialBet);
   const { playerHand, board, revealedBoard, status, resultPopup, gamePhase, currentBet, baseBet, money } = state;
-
-  // Render Helpers
-  const renderCard = (card: Card, idx: number, hidden: boolean = false) => (
-    <View key={`${card.rank}${card.suit}-${idx}`} style={[styles.card, hidden && styles.cardHidden]}>
-      {hidden ? (
-        <Text style={styles.cardBack}>🂠</Text>
-      ) : (
-        <>
-          <Text style={styles.cardRank}>{card.rank}</Text>
-          <Text style={[styles.cardSuit, { color: ['♥', '♦'].includes(card.suit) ? '#FF8A8A' : '#FFFFFF' }]}>
-            {card.suit}
-          </Text>
-        </>
-      )}
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -66,9 +52,16 @@ const PokerGameScreen = () => {
         <View style={[styles.boardCard, { borderColor: currentLocation.theme.secondary }]}>
           <Text style={styles.sectionLabel}>{t('ui.communityCards')}</Text>
           <View style={styles.cardRow}>
-            {board.slice(0, revealedBoard).map((card, idx) => renderCard(card, idx))}
+            {board.slice(0, revealedBoard).map((card, idx) => (
+              <AnimatedCard
+                key={`board-${card.rank}${card.suit}-${idx}`}
+                card={card}
+                index={idx}
+                baseDelay={200}
+              />
+            ))}
             {Array.from({ length: 5 - revealedBoard }).map((_, idx) => (
-              <View key={`placeholder-${idx}`} style={[styles.card, { opacity: 0.1, backgroundColor: '#434B50' }]} />
+              <View key={`placeholder-${idx}`} style={[styles.placeholderCard]} />
             ))}
           </View>
         </View>
@@ -76,7 +69,16 @@ const PokerGameScreen = () => {
         {/* PLAYER HAND */}
         <View style={[styles.tableCard, { borderColor: currentLocation.theme.primary }]}>
           <Text style={styles.sectionLabel}>{t('ui.yourHand')}</Text>
-          <View style={styles.cardRow}>{playerHand.map((card, idx) => renderCard(card, idx))}</View>
+          <View style={styles.cardRow}>
+            {playerHand.map((card, idx) => (
+              <AnimatedCard
+                key={`hand-${card.rank}${card.suit}-${idx}`}
+                card={card}
+                index={idx}
+                baseDelay={0}
+              />
+            ))}
+          </View>
         </View>
 
         {/* CONTROLS */}
@@ -139,7 +141,7 @@ export default PokerGameScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: 50 },
+  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },
@@ -167,22 +169,15 @@ const styles = StyleSheet.create({
   sectionLabel: { color: 'rgba(255,255,255,0.48)', fontWeight: '700', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
 
   cardRow: { flexDirection: 'row', gap: 8 },
-  card: {
-    width: 60,
-    height: 84,
-    borderRadius: 6,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#1C242C',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2
+  placeholderCard: {
+    width: 62,
+    height: 88,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    borderStyle: 'dashed',
   },
-  cardHidden: { backgroundColor: '#434B50', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  cardBack: { fontSize: 32 },
-  cardRank: { fontSize: 20, fontWeight: '900', color: '#FFFFFF' },
-  cardSuit: { fontSize: 20 },
 
   controlsSection: { marginTop: 'auto', gap: 16 },
   bottomControls: {
