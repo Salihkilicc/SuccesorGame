@@ -87,11 +87,9 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
     const resolveRound = (outcome: 'win' | 'lose' | 'push' | 'blackjack') => {
         let winnings = 0;
 
-        // Harcama bazlı reputation: her $100K bahis = +1 rep
-        const spendingRep = Math.floor(bet / 100000);
-        if (spendingRep > 0) {
-            reputationUp(spendingRep);
-        }
+        // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
+        const spendingRep = Math.max(1, Math.floor(bet / 10000));
+        reputationUp(spendingRep);
 
         if (outcome === 'win') {
             winnings = bet * 2;

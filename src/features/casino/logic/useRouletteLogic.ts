@@ -173,11 +173,9 @@ export const useRouletteLogic = (initialChip?: number) => {
         }
       }
 
-      // Harcama bazlı reputation gain
-      const spendingRep = Math.floor(totalBetAmount / 100000);
-      if (spendingRep > 0) {
-        reputationUp(spendingRep);
-      }
+      // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
+      const spendingRep = Math.max(1, Math.floor(totalBetAmount / 10000));
+      reputationUp(spendingRep);
 
       // Apply winnings
       if (totalWinnings > 0) {
