@@ -17,7 +17,7 @@ const recorder = () => {
         brand: a => log.push(`brand:${a}`),
         dial: (d, delta) => log.push(`dial:${d}:${delta}`),
         flag: f => log.push(`flag:${f}`),
-        message: (who, text) => log.push(`message:${who.id}:${text}`),
+        message: (who, text) => log.push(`message:${who}:${text}`),
         mail: m => log.push(`mail:${m.subject}`),
         news: h => log.push(`news:${h}`),
     };
@@ -67,8 +67,8 @@ describe('effects', () => {
             { kind: 'brand', amount: -3 },
             { kind: 'dial', dial: 'pearHostility', delta: 20 },
             { kind: 'flag', flag: 'fatherDead' },
-            { kind: 'message', who: { id: 'bro', name: 'B', role: 'Brother' }, text: 'hi' },
-            { kind: 'mail', fromName: 'Pear', fromEmail: 'a@b.c', subject: 'Offer', body: '...' },
+            { kind: 'message', who: 'bro', text: 'hi' },
+            { kind: 'mail', from: 'pear', subject: 'Offer', body: '...' },
             { kind: 'news', headline: 'Something happened' },
         ];
         applyEffects(all, sink);

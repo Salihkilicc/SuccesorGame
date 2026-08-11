@@ -429,29 +429,64 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     const ts = require('typescript');
     const dir = path.join(SRC, 'data/story');
 
-    /** Run one TS file as CommonJS and hand back its exports. */
+    /**
+     * Run one TS file as CommonJS and hand back its exports.
+     *
+     * It resolves relative imports, because graph.ts genuinely needs one -
+     * `canUseChannel` lives in cast.ts. But ONLY within core/story and
+     * data/story: anything reaching outside those is either a layering
+     * mistake or the start of dragging zustand and AsyncStorage into an audit
+     * script, and both are worth stopping at the door rather than debugging
+     * later.
+     */
+    const STORY_DIRS = [path.join(SRC, 'core/story'), path.join(SRC, 'data/story')];
+    const cache = new Map();
     const loadTs = (file) => {
-        const js = ts.transpileModule(read(file), {
+        const key = path.resolve(file);
+        if (cache.has(key)) return cache.get(key);
+        if (!STORY_DIRS.some(d => key.startsWith(d))) {
+            throw new Error(`story code may not reach outside core/story and data/story (${rel(file)})`);
+        }
+        const js = ts.transpileModule(read(key), {
             compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2019 },
         }).outputText;
         const module = { exports: {} };
-        // Data files import only types, which transpiling removes. Anything
-        // else asking for a require is a mistake worth surfacing loudly.
-        const req = (name) => { throw new Error(`story data must not import runtime code (${name})`); };
+        cache.set(key, module.exports);   // set first, so a cycle terminates
+        const req = (spec) => {
+            if (!spec.startsWith('.')) {
+                throw new Error(`story code may not import packages (${spec})`);
+            }
+            const base = path.resolve(path.dirname(key), spec);
+            const candidate = [base + '.ts', base + '.tsx', path.join(base, 'index.ts')]
+                .find(fs.existsSync);
+            if (!candidate) throw new Error(`cannot resolve ${spec} from ${rel(key)}`);
+            return loadTs(candidate);
+        };
         // eslint-disable-next-line no-new-func
         new Function('module', 'exports', 'require', js)(module, module.exports, req);
+        cache.set(key, module.exports);
         return module.exports;
     };
 
     if (fs.existsSync(dir)) {
         let validate = null;
+        let CAST = null;
         try {
             validate = loadTs(path.join(SRC, 'core/story/graph.ts')).validate;
         } catch (e) {
             problems.story.push(`core/story/graph.ts  validator would not load: ${e.message}`);
         }
+        // The cast, so the channel rule can be enforced rather than trusted.
+        // Pear writes letters; a scene that has him texting is a piece of
+        // characterisation quietly dying, and it reads perfectly well.
+        try {
+            CAST = loadTs(path.join(dir, 'cast.ts')).CAST;
+        } catch (e) {
+            problems.story.push(`data/story/cast.ts  could not be read: ${e.message}`);
+        }
 
-        const dataFiles = fs.readdirSync(dir).filter(f => /\.ts$/.test(f) && f !== 'index.ts');
+        const dataFiles = fs.readdirSync(dir)
+            .filter(f => /\.ts$/.test(f) && f !== 'index.ts' && f !== 'cast.ts');
         const index = fs.existsSync(path.join(dir, 'index.ts'))
             ? read(path.join(dir, 'index.ts')) : '';
 
@@ -474,7 +509,7 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 
             for (const c of conversations) {
                 if (validate) {
-                    for (const pr of validate(c)) {
+                    for (const pr of validate(c, CAST)) {
                         problems.story.push(
                             `data/story/${file}  ${pr.conversation}${pr.node ? '/' + pr.node : ''}  ${pr.kind}: ${pr.detail}`);
                     }

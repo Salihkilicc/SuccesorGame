@@ -37,6 +37,7 @@ import { applyEffects } from '../../core/story/effects';
 import { gameSink } from '../../core/story/gameSink';
 import { testAll } from '../../core/story/conditions';
 import { readWorld } from '../../core/story/world';
+import { CAST } from '../../data/story/cast';
 
 type Props = {
     conversation: Conversation;
@@ -115,7 +116,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                             ]}>
                             {variant === 'mail' && (
                                 <Text style={styles.letterFrom}>
-                                    {said.from === 'player' ? 'You replied' : conversation.from.name}
+                                    {said.from === 'player' ? 'You replied' : (CAST[conversation.from]?.name ?? conversation.from)}
                                 </Text>
                             )}
                             <Text style={[styles.said, said.from === 'player' && styles.saidMine]}>

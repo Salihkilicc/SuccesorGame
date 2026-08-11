@@ -38,8 +38,9 @@
 
 import type { Effect } from './effects';
 import type { Condition } from './conditions';
+import { canUseChannel, type Cast, type CastId, type Channel } from './cast';
 
-export type Channel = 'message' | 'mail';
+export type { Channel };
 
 export type Choice = {
     /** The button. Keep it short - it is a thing a person would actually say. */
@@ -73,7 +74,15 @@ export type Conversation = {
     id: string;
     /** Which app it arrives in. The runner is the same either way. */
     channel: Channel;
-    from: { id: string; name: string; role: string };
+    /**
+     * WHO IS WRITING - a cast id, not a name.
+     *
+     * An id rather than an inline name so the channel rule is checkable: the
+     * audit can look this person up and refuse a letter from someone who only
+     * texts. It also means a character's name lives in exactly one place, so
+     * renaming them is not a search-and-replace across every scene.
+     */
+    from: CastId;
     /** Mail has a subject line; a message does not. */
     subject?: string;
     /** When this may fire at all. */
@@ -96,7 +105,9 @@ export type GraphProblem = {
     | 'broken-link'
     | 'unreachable'
     | 'too-many-choices'
-    | 'all-choices-gated';
+    | 'all-choices-gated'
+    | 'unknown-speaker'
+    | 'wrong-channel';
     detail: string;
 };
 
@@ -107,10 +118,39 @@ export type GraphProblem = {
  * over a data file with no app running - which is the only way a check like
  * this actually gets run.
  */
-export const validate = (c: Conversation): GraphProblem[] => {
+export const validate = (c: Conversation, cast?: Cast): GraphProblem[] => {
     const problems: GraphProblem[] = [];
     const at = (kind: GraphProblem['kind'], detail: string, node?: string) =>
         problems.push({ conversation: c.id, node, kind, detail });
+
+    // --- WHO IS TALKING, AND ARE THEY ALLOWED TO
+    //  The cast is optional so the graph rules can be tested on their own,
+    //  but the audit always passes it - a scene that puts Pear on the
+    //  message channel is the failure this check exists for, and it would
+    //  be invisible otherwise because the scene reads perfectly well.
+    if (cast) {
+        const from = cast[c.from];
+        if (!from) {
+            at('unknown-speaker', `"${c.from}" is not in the cast`);
+        } else if (!canUseChannel(from, c.channel)) {
+            at('wrong-channel', `${from.name} does not use ${c.channel} (${from.channels} only)`);
+        }
+        for (const n of c.nodes) {
+            if (!cast[n.speaker]) {
+                at('unknown-speaker', `"${n.speaker}" is not in the cast`, n.id);
+            }
+            for (const ch of n.choices ?? []) {
+                for (const e of ch.effects ?? []) {
+                    if (e.kind === 'message' && !canUseChannel(cast[e.who], 'message')) {
+                        at('wrong-channel', `an effect has "${e.who}" sending a message`, n.id);
+                    }
+                    if (e.kind === 'mail' && !canUseChannel(cast[e.from], 'mail')) {
+                        at('wrong-channel', `an effect has "${e.from}" sending mail`, n.id);
+                    }
+                }
+            }
+        }
+    }
 
     // --- ids must be unique, or a link means two different things
     const seen = new Set<string>();
@@ -168,8 +208,8 @@ export const validate = (c: Conversation): GraphProblem[] => {
     return problems;
 };
 
-export const validateAll = (list: Conversation[]): GraphProblem[] => {
-    const problems = list.flatMap(validate);
+export const validateAll = (list: Conversation[], cast?: Cast): GraphProblem[] => {
+    const problems = list.flatMap(c => validate(c, cast));
     // Conversation ids are referenced from outside (a thread points at one),
     // so a duplicate there is worse than a duplicate node.
     const seen = new Set<string>();

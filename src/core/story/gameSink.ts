@@ -17,6 +17,8 @@ import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import type { EffectSink } from './effects';
+import { CAST } from '../../data/story/cast';
+import { emailOf } from './cast';
 
 /**
  * The real sink, wired to the game's stores.
@@ -40,14 +42,32 @@ export const gameSink = (): EffectSink => ({
     },
     dial: (dial, delta) => useStoryStore.getState().nudge(dial, delta),
     flag: (flag) => useStoryStore.getState().raise(flag),
-    message: (who, text) =>
-        useMessageStore.getState().sendFromCharacter(who, text, useGameStore.getState().currentMonth),
-    mail: (m) =>
+    // Cast ids are resolved here, at the last possible moment, so a scene
+    // never carries a copy of anybody's name. An id with no cast entry throws
+    // rather than delivering a message from "undefined" - the audit should
+    // have caught it, and if it did not, the loud failure is the next best
+    // thing to a silent one.
+    message: (who, text) => {
+        const m = CAST[who];
+        if (!m) throw new Error(`story: no cast member "${who}"`);
+        useMessageStore.getState().sendFromCharacter(
+            { id: m.id, name: m.name, role: m.role },
+            text,
+            useGameStore.getState().currentMonth,
+        );
+    },
+    mail: (m) => {
+        const from = CAST[m.from];
+        if (!from) throw new Error(`story: no cast member "${m.from}"`);
         useMailStore.getState().receiveMail({
-            ...m,
+            fromName: from.name,
+            fromEmail: emailOf(from) ?? '',
+            subject: m.subject,
+            body: m.body,
             atMonth: useGameStore.getState().currentMonth,
             category: 'Primary',
-        }),
+        });
+    },
     news: (headline) => {
         // The news system has no writer yet - applyCorporateShock exists and
         // is called from nowhere. Rather than invent half of it here, this

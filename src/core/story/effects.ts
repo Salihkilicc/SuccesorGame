@@ -49,20 +49,17 @@ export type Effect =
     | { kind: 'dial'; dial: Dial; delta: number }
     /** Record something that cannot unhappen. */
     | { kind: 'flag'; flag: StoryFlag }
-    /** A character writes to the player's phone. */
-    | {
-        kind: 'message';
-        who: { id: string; name: string; role: string };
-        text: string;
-    }
-    /** A character writes to the player's inbox. */
-    | {
-        kind: 'mail';
-        fromName: string;
-        fromEmail: string;
-        subject: string;
-        body: string;
-    }
+    /**
+     * A character writes to the player's phone.
+     *
+     * `who` is a CAST ID. The name and role are looked up when it is
+     * delivered, so a scene cannot invent a person, misspell an existing one,
+     * or put a mail-only character on the phone - the audit checks this id
+     * against the cast and its channel.
+     */
+    | { kind: 'message'; who: string; text: string }
+    /** A character writes to the player's inbox. Same rule for `from`. */
+    | { kind: 'mail'; from: string; subject: string; body: string }
     /** A line in the news. */
     | { kind: 'news'; headline: string };
 
@@ -78,8 +75,8 @@ export type EffectSink = {
     brand: (amount: number) => void;
     dial: (dial: Dial, delta: number) => void;
     flag: (flag: StoryFlag) => void;
-    message: (who: { id: string; name: string; role: string }, text: string) => void;
-    mail: (m: { fromName: string; fromEmail: string; subject: string; body: string }) => void;
+    message: (who: string, text: string) => void;
+    mail: (m: { from: string; subject: string; body: string }) => void;
     news: (headline: string) => void;
 };
 

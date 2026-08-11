@@ -6,13 +6,15 @@
 // this" into "the machine says it is fine".
 
 import { validate, validateAll, type Conversation } from './graph';
+import { canUseChannel, emailOf } from './cast';
+import { CAST } from '../../data/story/cast';
 import { cfoDividend } from '../../data/story/cfoDividend';
 import { CONVERSATIONS } from '../../data/story';
 
 const base = (nodes: Conversation['nodes'], start = 'a'): Conversation => ({
     id: 'test',
     channel: 'message',
-    from: { id: 'x', name: 'X', role: 'Y' },
+    from: 'cfo',
     start,
     nodes,
 });
@@ -22,21 +24,21 @@ const kinds = (c: Conversation) => validate(c).map(p => p.kind).sort();
 describe('validate', () => {
     it('passes a graph with nothing wrong with it', () => {
         expect(validate(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: 'on', next: 'b' }, { text: 'out' }] },
-            { id: 'b', speaker: 'x', text: 'b' },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: 'on', next: 'b' }, { text: 'out' }] },
+            { id: 'b', speaker: 'cfo', text: 'b' },
         ]))).toEqual([]);
     });
 
     it('catches a link to a card that does not exist', () => {
         expect(kinds(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: 'go', next: 'ghost' }] },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: 'go', next: 'ghost' }] },
         ]))).toEqual(['broken-link']);
     });
 
     it('catches a card nothing leads to', () => {
         expect(kinds(base([
-            { id: 'a', speaker: 'x', text: 'a' },
-            { id: 'lost', speaker: 'x', text: 'written, never seen' },
+            { id: 'a', speaker: 'cfo', text: 'a' },
+            { id: 'lost', speaker: 'cfo', text: 'written, never seen' },
         ]))).toEqual(['unreachable']);
     });
 
@@ -66,28 +68,28 @@ describe('validate', () => {
         // They had the last word. This is how most scenes should end, and
         // flagging it would make the check something people switch off.
         expect(validate(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: 'ok', next: 'b' }] },
-            { id: 'b', speaker: 'x', text: 'the last word' },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: 'ok', next: 'b' }] },
+            { id: 'b', speaker: 'cfo', text: 'the last word' },
         ]))).toEqual([]);
     });
 
     it('holds the two-answer limit', () => {
         expect(kinds(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: '1' }, { text: '2' }, { text: '3' }] },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: '1' }, { text: '2' }, { text: '3' }] },
         ]))).toEqual(['too-many-choices']);
     });
 
     it('catches a start that is not a card, and stops rather than piling on', () => {
         // Without the early return this also reports every node as unreachable,
         // which buries the one problem that actually matters.
-        expect(kinds(base([{ id: 'a', speaker: 'x', text: 'a' }], 'nowhere')))
+        expect(kinds(base([{ id: 'a', speaker: 'cfo', text: 'a' }], 'nowhere')))
             .toEqual(['missing-start']);
     });
 
     it('catches two cards sharing an id, because a link would be ambiguous', () => {
         expect(kinds(base([
-            { id: 'a', speaker: 'x', text: 'one', choices: [{ text: 'go', next: 'a' }] },
-            { id: 'a', speaker: 'x', text: 'two' },
+            { id: 'a', speaker: 'cfo', text: 'one', choices: [{ text: 'go', next: 'a' }] },
+            { id: 'a', speaker: 'cfo', text: 'two' },
         ]))).toContain('duplicate-node');
     });
 
@@ -95,31 +97,102 @@ describe('validate', () => {
         // A naive reachability check that only looks at the start node would
         // call c and d unreachable here.
         expect(validate(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: '>', next: 'b' }] },
-            { id: 'b', speaker: 'x', text: 'b', choices: [{ text: '>', next: 'c' }] },
-            { id: 'c', speaker: 'x', text: 'c', choices: [{ text: '>', next: 'd' }] },
-            { id: 'd', speaker: 'x', text: 'd' },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: '>', next: 'b' }] },
+            { id: 'b', speaker: 'cfo', text: 'b', choices: [{ text: '>', next: 'c' }] },
+            { id: 'c', speaker: 'cfo', text: 'c', choices: [{ text: '>', next: 'd' }] },
+            { id: 'd', speaker: 'cfo', text: 'd' },
         ]))).toEqual([]);
     });
 
     it('does not loop forever on a conversation that points back at itself', () => {
         expect(validate(base([
-            { id: 'a', speaker: 'x', text: 'a', choices: [{ text: 'round', next: 'b' }] },
-            { id: 'b', speaker: 'x', text: 'b', choices: [{ text: 'again', next: 'a' }, { text: 'out' }] },
+            { id: 'a', speaker: 'cfo', text: 'a', choices: [{ text: 'round', next: 'b' }] },
+            { id: 'b', speaker: 'cfo', text: 'b', choices: [{ text: 'again', next: 'a' }, { text: 'out' }] },
         ]))).toEqual([]);
     });
 });
 
 describe('validateAll', () => {
     it('catches two conversations sharing an id', () => {
-        const one = base([{ id: 'a', speaker: 'x', text: 'a' }]);
+        const one = base([{ id: 'a', speaker: 'cfo', text: 'a' }]);
         expect(validateAll([one, { ...one }]).map(p => p.kind)).toContain('duplicate-node');
     });
 });
 
+describe('the cast, and who may write how', () => {
+    it('Pear writes letters and cannot be made to text', () => {
+        // This is characterisation, not plumbing: he does not have your
+        // number and has never wanted it. A text from him would say the
+        // opposite without a line of dialogue.
+        expect(canUseChannel(CAST.pear, 'mail')).toBe(true);
+        expect(canUseChannel(CAST.pear, 'message')).toBe(false);
+    });
+
+    it('the brother and the friend only text', () => {
+        for (const id of ['brother', 'friend'] as const) {
+            expect(canUseChannel(CAST[id], 'message')).toBe(true);
+            expect(canUseChannel(CAST[id], 'mail')).toBe(false);
+        }
+    });
+
+    it('the people inside the company use both', () => {
+        // They file the report and then text you what it could not say.
+        for (const id of ['cfo', 'coo', 'cto'] as const) {
+            expect(canUseChannel(CAST[id], 'mail')).toBe(true);
+            expect(canUseChannel(CAST[id], 'message')).toBe(true);
+        }
+    });
+
+    it('everyone who can send mail has an address, and nobody else does', () => {
+        for (const m of Object.values(CAST)) {
+            const canMail = canUseChannel(m, 'mail');
+            expect(!!emailOf(m)).toBe(canMail);
+        }
+    });
+
+    it('every cast member has a stated voice', () => {
+        // A character with no tone gets written as whoever the author felt
+        // like that morning, and by the third scene he is four different men.
+        for (const m of Object.values(CAST)) {
+            expect(m.tone.length).toBeGreaterThan(40);
+        }
+    });
+
+    it('an id always matches its key, so a lookup cannot return someone else', () => {
+        for (const [key, m] of Object.entries(CAST)) expect(m.id).toBe(key);
+    });
+
+    it('rejects a conversation on a channel its sender does not use', () => {
+        const bad = base([{ id: 'a', speaker: 'pear', text: 'hi' }]);
+        bad.from = 'pear';
+        bad.channel = 'message';
+        expect(validate(bad, CAST).map(p => p.kind)).toContain('wrong-channel');
+    });
+
+    it('rejects a speaker who is not in the cast', () => {
+        expect(validate(base([{ id: 'a', speaker: 'nobody', text: 'hi' }]), CAST).map(p => p.kind))
+            .toContain('unknown-speaker');
+    });
+
+    it('rejects an EFFECT that puts someone on the wrong channel', () => {
+        // The subtle one: the conversation itself is fine, and a message
+        // effect inside it quietly hands Pear a phone.
+        const sneaky = base([{
+            id: 'a', speaker: 'cfo', text: 'hi',
+            choices: [{ text: 'ok', effects: [{ kind: 'message', who: 'pear', text: 'x' }] }],
+        }]);
+        expect(validate(sneaky, CAST).map(p => p.kind)).toContain('wrong-channel');
+    });
+
+    it('says nothing about channels when no cast is supplied', () => {
+        // The graph rules have to be testable on their own.
+        expect(validate(base([{ id: 'a', speaker: 'whoever', text: 'hi' }]))).toEqual([]);
+    });
+});
+
 describe('the story as it actually ships', () => {
-    it('every registered conversation is valid', () => {
-        expect(validateAll(CONVERSATIONS)).toEqual([]);
+    it('every registered conversation is valid, cast rules included', () => {
+        expect(validateAll(CONVERSATIONS, CAST)).toEqual([]);
     });
 
     it('the CFO scene reaches both of its endings', () => {

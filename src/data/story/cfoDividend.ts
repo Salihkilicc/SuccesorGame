@@ -27,7 +27,7 @@ const DIVIDEND = 2_000_000;
 export const cfoDividend: Conversation = {
     id: 'cfo-dividend',
     channel: 'message',
-    from: { id: 'cfo', name: 'Arthur Vance', role: 'Chief Financial Officer' },
+    from: 'cfo',
     // Only after the father is gone: while he was alive this was his fight.
     when: [{ kind: 'flag', flag: 'fatherDead' }],
     start: 'open',
@@ -100,7 +100,7 @@ export const cfoDividend: Conversation = {
                         { kind: 'dial', dial: 'cfoTrust', delta: 8 },
                         {
                             kind: 'message',
-                            who: { id: 'brother', name: 'Julian', role: 'Shareholder' },
+                            who: 'brother',
                             text: 'Heard you turned down the dividend. Bold. Dad used to say the same thing about money he did not have yet.',
                         },
                     ],
