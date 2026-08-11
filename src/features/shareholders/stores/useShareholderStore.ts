@@ -275,14 +275,30 @@ const toGov = (m: BoardMember): GovMember => ({
 const TOTAL_SHARES = 10_000_000; // 10 million shares total
 
 // ============================================================================
-// INITIAL NPC BOARD MEMBERS (3.5M shares = 35% Total)
+// INITIAL NPC BOARD MEMBERS (6.5M shares = 65% Total)
+// ============================================================================
+//
+//  THE PLAYER STARTS AS A MINORITY, AND THAT IS THE WHOLE GAME.
+//
+//  He used to hold 65%. At 65% the board is furniture: no vote can be lost,
+//  no-confidence can never trigger (it requires falling under 50% as one of
+//  its three conditions), and lobbying a director buys nothing you did not
+//  already have. Every governance system in this file was running, correctly,
+//  with no consequence attached.
+//
+//  35 / 15 / 50 instead. Your father sold the company down over twenty years
+//  to keep it alive - which is also why the man who did it is remembered as a
+//  giant and left you a minority holding.
+//
+//  To pass anything you need the brother's 15% or two of the directors. That
+//  makes the board a room you have to work rather than a screen you visit.
 // ============================================================================
 
 const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-marcus-wolf',
         name: "Marcus 'The Wolf'",
-        shareCount: 1_200_000, // 12% of company
+        shareCount: 1_700_000, // 17% of company
         trait: 'Shark',
         trust: 50,
         isHostile: false,
@@ -294,7 +310,7 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-elena-vance',
         name: 'Elena Vance',
-        shareCount: 1_000_000, // 10% of company
+        shareCount: 1_400_000, // 14% of company
         trait: 'Conservative',
         trust: 65,
         isHostile: false,
@@ -307,7 +323,7 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-victor-k',
         name: 'Victor K.',
-        shareCount: 800_000, // 8% of company
+        shareCount: 1_100_000, // 11% of company
         trait: 'Snake',
         trust: 40,
         isHostile: false,
@@ -316,9 +332,46 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         motivation: 'control',
     },
     {
+        // ------------------------------------------------------------------
+        //  YOUR BROTHER. 15%, and he was in the will.
+        // ------------------------------------------------------------------
+        //  A Snake because that is what the trait means here: `loyaltyOf`
+        //  INVERTS trust for a Snake, so a brother who is pleased with how
+        //  things are going is a brother who is not behind you. Being nice
+        //  to him does not buy his vote - it buys his comfort, and his
+        //  comfort is not on your side.
+        //
+        //  WHICH IS WHY HE STARTS AT 65 AND NOT AT 45. I set 45 first,
+        //  reading it as "lukewarm", and measured it: 100 - 45 gives him a
+        //  loyalty of 55, so the man who thinks he was robbed of the company
+        //  was counting as a supporter. 65 puts his loyalty at 35 - a real
+        //  drag on the board's average without being a crisis in year one.
+        //
+        //  READ THIS BEFORE WRITING A SCENE FOR HIM: raising his `trust`
+        //  makes him MORE dangerous, not less.
+        //
+        //  Vindication rather than control: he does not want the chair, he
+        //  wants it acknowledged that he should have had it. Victor wants
+        //  the chair. They will find each other.
+        //
+        //  His id is the cast id so the story and the cap table are the same
+        //  person - the man voting against you in the board room is the one
+        //  texting you at eleven at night.
+        // ------------------------------------------------------------------
+        id: 'brother',
+        name: 'Julian Hale',
+        shareCount: 1_500_000, // 15% of company
+        trait: 'Snake',
+        trust: 65,
+        isHostile: false,
+        origin: 'Founder',
+        motivation: 'vindication',
+        petIssue: 'dividend',
+    },
+    {
         id: 'npc-sarah-jen',
         name: 'Sarah Jen',
-        shareCount: 500_000, // 5% of company
+        shareCount: 800_000, // 8% of company
         trait: 'Aggressive',
         trust: 55,
         isHostile: false,
@@ -387,7 +440,7 @@ export const useShareholderStore = create<ShareholderState>()(
             // ========================================================================
             members: [] as BoardMember[],
             totalShares: TOTAL_SHARES,
-            playerShareCount: 6_500_000, // 65% of 10M
+            playerShareCount: 3_500_000, // 35% of 10M - a minority, on purpose
             boardMood: 'Conservative',
             boardStance: 'Neutral' as const,
             sharkLoans: [] as SharkLoan[], // No loans initially
@@ -398,7 +451,8 @@ export const useShareholderStore = create<ShareholderState>()(
 
             /**
              * Initialize the game with default board members and player shares.
-             * Player starts with 6.5M shares (65%), NPCs hold 3.5M (35%).
+             * Player starts with 3.5M shares (35%); the board and the brother
+             * hold 6.5M (65%). See the note above INITIAL_BOARD_MEMBERS.
              */
             promises: [] as BoardPromise[],
             lobbied: {} as Record<string, number>,

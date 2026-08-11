@@ -14,6 +14,7 @@ import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { IPO_MIN_VALUATION, quoteIpo } from '../../../core/market/equity';
+import { CONTROL_THRESHOLD } from '../../../core/market/governance';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
@@ -273,10 +274,15 @@ const MyCompanyScreen = () => {
               <StatColumn label={t('company.yourShares')} value={formatCompactNumber(playerShareCount || 0)} />
               <VerticalDivider />
               {/* Ownership % */}
+              {/* Green above the control threshold, red below it.
+                  The player now STARTS below it, so this reads red from the
+                  first screen - which is correct rather than alarming: being
+                  a minority holder is the situation, and the colour is the
+                  first thing that says so. */}
               <StatColumn
                 label={t('company.ownership')}
                 value={`${((playerShareCount || 0) / (totalShares || 10_000_000) * 100).toFixed(1)}%`}
-                colorType={stats.companyOwnership >= 51 ? 'success' : 'danger'}
+                colorType={stats.companyOwnership >= CONTROL_THRESHOLD ? 'success' : 'danger'}
               />
             </View>
 

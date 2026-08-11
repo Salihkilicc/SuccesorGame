@@ -224,7 +224,9 @@ const getShareholderState = (): { totalShares: number; playerShareCount: number 
     const st = mod.useShareholderStore.getState();
     return { totalShares: st.totalShares, playerShareCount: st.playerShareCount };
   } catch {
-    return { totalShares: 10_000_000, playerShareCount: 6_500_000 };
+    // Matches the shareholder store's opening cap table. A stale fallback
+    // here would report a majority the player does not have.
+    return { totalShares: 10_000_000, playerShareCount: 3_500_000 };
   }
 };
 
@@ -253,7 +255,8 @@ const START_FACTORIES = 1;
 // understaffed, running the plant at 91% before a single decision was made.
 export const START_EMPLOYEES = 22;
 /** Kurul üyelerinin toplam payı %35 → oyuncuya %65 kalıyor. */
-const START_PLAYER_OWNERSHIP = 65;
+/** A minority from day one. See useShareholderStore's cap table note. */
+const START_PLAYER_OWNERSHIP = 35;
 
 export const initialStatsState: StatsState = {
   _hasHydrated: false,
