@@ -36,6 +36,9 @@ import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFl
 import { startNewGame } from '../../core/newGame';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { fullName } from '../../core/identity';
+import UnreadBadge from '../../components/common/UnreadBadge';
+import { useMessageStore, unreadCount } from '../../core/store/useMessageStore';
+import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 
@@ -247,6 +250,9 @@ const HomeScreen = () => {
     }
   };
 
+  const unreadMessages = useMessageStore(st => unreadCount(st.threads));
+  const unreadMail = useMailStore(st => unreadMailCount(st.inbox));
+
   const displayName = fullName(firstName, lastName) || 'New Player';
   const displayBio = bio || 'New to the rich life.';
   const genderSymbol = useMemo(() => {
@@ -309,16 +315,25 @@ const HomeScreen = () => {
     }
   };
 
+  // Each channel badges its OWN tile. Mail is the corporate wall and Messages
+  // is your pocket; one merged number would say "four things" without saying
+  // whether they are four letters from the board or four texts at midnight.
+  const badgeFor = (key: string) =>
+    key === 'messages' ? unreadMessages : key === 'mail' ? unreadMail : 0;
+
   const renderAppIcon = (item: { key: string; label: string; icon: string; gradient: string[] }) => (
     <Pressable key={item.key} style={({ pressed }) => [styles.appCard, pressed && styles.appCardPressed]} onPress={() => handleAppAction(item.key)}>
-      <LinearGradient
-        colors={item.gradient}
-        style={styles.appCardInner}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <MaterialCommunityIcons name={item.icon} size={34} color="#FFFFFF" style={styles.appIconVector} />
-      </LinearGradient>
+      <View>
+        <LinearGradient
+          colors={item.gradient}
+          style={styles.appCardInner}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <MaterialCommunityIcons name={item.icon} size={34} color="#FFFFFF" style={styles.appIconVector} />
+        </LinearGradient>
+        <UnreadBadge count={badgeFor(item.key)} floating />
+      </View>
       <Text style={styles.appIconLabel} numberOfLines={1}>{item.label}</Text>
     </Pressable>
   );

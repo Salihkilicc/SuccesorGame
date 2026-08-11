@@ -215,6 +215,8 @@ const PALETTE = new Set([
     // The header rules. Wayfinding only - never text, never a fill of any
     // size. Enforced below in 0d2.
     '#EFC94C', '#3FC9C0', '#A78BFA', '#F09BD0', '#93A0F7',
+    // The unread badge. A fill, and the only red that is one - see theme.ts.
+    '#D32F2F',
 ]);
 //  Checked in rgba() form too. The last palette change only rewrote hex, so
 //  59 files quietly kept the previous theme's magenta as rgba(199,52,202,a) -
@@ -269,6 +271,14 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
         read(f).split('\n').forEach((line, i) => {
             if (/^\s*(\/\/|\*)/.test(line)) return;
+
+            // The badge red used as TEXT. The mirror of the signal rule: it
+            // is a fill and only a fill, which is what keeps it from becoming
+            // a second loss red.
+            for (const m of line.matchAll(/\bcolor:\s*(?:theme\.)?colors\.notification\b(?!Text)/g)) {
+                problems.palette.push(
+                    `${rel(f)}:${i + 1}  colors.notification used as text - it is a badge fill`);
+            }
 
             // A category colour used as TEXT. The header rule is the only
             // thing these are for.

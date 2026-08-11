@@ -8,6 +8,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme } from '../../core/theme';
 import { useStatsStore, usePlayerStore } from '../../core/store';
 import { FEATURES } from '../../core/featureFlags';
+import UnreadBadge from '../../components/common/UnreadBadge';
+import { useMessageStore, unreadCount } from '../../core/store/useMessageStore';
 import { formatMoney } from '../../core/utils';
 
 const { width } = Dimensions.get('window');
@@ -53,8 +55,23 @@ const NAV_ITEMS: Array<{
     feature?: keyof typeof FEATURES;
 }> = [
         { key: 'home', get label() { return t('nav.home'); }, icon: 'home-outline', target: 'Home', activeFor: 'Home' },
-        // target 'stats' özel: navigasyon yapmaz, stat modunu açar.
-        { key: 'stats', get label() { return t('nav.stats'); }, icon: 'chart-bar', target: 'stats', activeFor: '' },
+        // ------------------------------------------------------------------
+        //  MESSAGES TOOK THE STATS SLOT
+        // ------------------------------------------------------------------
+        //  Stats opened an inline strip showing cash, net worth and the share
+        //  price - three numbers that are already on My Company, one tap away,
+        //  with their context attached. A permanent slot for a duplicate is
+        //  the most expensive kind of duplicate, because the bar has four.
+        //
+        //  Messages earns the slot for the opposite reason: it is the only
+        //  thing in the app that can want you before you want it. A tab with
+        //  a badge is how you find out.
+        //
+        //  SHELVED, not deleted: the stats strip below is still built and
+        //  `setIsStatsMode` still works, so restoring it is one line here.
+        // ------------------------------------------------------------------
+        { key: 'messages', get label() { return t('nav.messages'); }, icon: 'message-text-outline', target: 'Messages', activeFor: 'Messages' },
+        // { key: 'stats', get label() { return t('nav.stats'); }, icon: 'chart-bar', target: 'stats', activeFor: '' },
         // Contacts (ilişkiler) rafa kaldırıldı; yerini şirket aldı.
         { key: 'contacts', get label() { return t('nav.contacts'); }, icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
         { key: 'company', get label() { return t('nav.company'); }, icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
@@ -66,6 +83,11 @@ const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]
 const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots }) => {
     const navigation = useNavigation<any>();
     const [isStatsMode, setIsStatsMode] = useState(false);
+
+    // Only the MESSAGE count. Mail has its own badge on its own tile - see
+    // the note on UnreadBadge: merging them would report "four things"
+    // without saying which room they are in.
+    const unreadMessages = useMessageStore(s => unreadCount(s.threads));
 
     // Stores
     const userMoney = useStatsStore(state => state.money);
@@ -160,7 +182,13 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                                         style={styles.bottomTab}
                                         onPress={() => (item.target === 'stats' ? setIsStatsMode(true) : navigateTo(item.target))}
                                     >
-                                        <MaterialCommunityIcons name={item.icon} style={getIconStyle(item.activeFor)} />
+                                        {/* The badge floats over the icon, so
+                                            it needs a box that does not stretch
+                                            the tab. */}
+                                        <View>
+                                            <MaterialCommunityIcons name={item.icon} style={getIconStyle(item.activeFor)} />
+                                            {item.key === 'messages' && <UnreadBadge count={unreadMessages} floating />}
+                                        </View>
                                         <Text style={getLabelStyle(item.activeFor)}>{item.label}</Text>
                                     </Pressable>
                                 ))}

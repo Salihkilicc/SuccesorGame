@@ -1338,6 +1338,7 @@ export const en: Record<string, string> = {
     'nav.assetPortfolio': 'Asset Portfolio',
     'nav.company': 'Company',
     'nav.contacts': 'Contacts',
+    'nav.messages': 'Messages',
     'nav.home': 'Home',
     'nav.innovationTechTree': 'Innovation Tech Tree',
     'nav.profile': 'Profile',

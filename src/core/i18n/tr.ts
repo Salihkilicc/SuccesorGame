@@ -1339,6 +1339,7 @@ export const tr: Record<string, string> = {
     'nav.assetPortfolio': 'Varlık Portföyü',
     'nav.company': 'Şirket',
     'nav.contacts': 'Kişiler',
+    'nav.messages': 'Mesajlar',
     'nav.home': 'Ana Sayfa',
     'nav.innovationTechTree': 'İnovasyon Teknoloji Ağacı',
     'nav.profile': 'Profile',

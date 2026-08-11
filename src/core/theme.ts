@@ -226,6 +226,35 @@ export const theme = {
          */
         down: '#8C9494',
 
+        // ==================================================================
+        //  THE ONE RED THAT IS A FILL
+        // ==================================================================
+        //  An unread badge. It breaks the shape of rule 3 - red is a text
+        //  colour and never a fill - so it needs an argument rather than an
+        //  exception.
+        //
+        //  THE ARGUMENT: a notification badge is not this game's red saying
+        //  something. It is a convention the player already knows from every
+        //  phone they have ever held, and it is the only place in the app
+        //  where a colour is doing a job the player learned somewhere else.
+        //  Painting it blue would be internally consistent and would read as
+        //  decoration.
+        //
+        //  WHY IT IS NOT `negative`. Two different reds doing two different
+        //  jobs is the drift this palette was built to stop, so these are kept
+        //  apart deliberately: `negative` is a soft pink-red chosen to be
+        //  READ on a dark ground and is never a fill; this is a saturated red
+        //  chosen to be a fill and is never text. They never appear in the
+        //  same role, so neither can be mistaken for the other.
+        //
+        //  #D32F2F is measured, not picked. White digits on it read 4.98, and
+        //  the badge itself reads 3.15 against the ground - the only rung
+        //  that clears both. #FF3B30 (iOS) gives white 3.55, too low for
+        //  10pt digits; anything darker than this disappears into the bar.
+        // ==================================================================
+        notification: '#D32F2F',
+        notificationText: '#FFFFFF',
+
         // Legacy names, still in wide use. `success` and `danger` are now
         // strictly TEXT colours: they carry the profit/loss signal, so a
         // fill may never use them.
