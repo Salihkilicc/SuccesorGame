@@ -215,30 +215,70 @@ export const initialGameState: GameState = {
   lastQuarterReport: null,
 };
 
-/**
- * SATIN ALMA BUFF'LARI — artik gercekten okunuyor.
- *
- * `getAcquisitionBuffs` bir ekran hook'unda duruyordu ve MOTOR HIC
- * OKUMUYORDU. Yani "Ar-Ge Hizi +%15", "Uretim Maliyeti -%10" gibi
- * satin alma odulleri oyunda hicbir sey yapmiyordu.
- */
-const subsidiaryBuffs = (): {
-  rndSpeed: number; productionCost: number; marketingBoost: number; loanInterest: number;
-} => {
-  const acc = { rndSpeed: 0, productionCost: 0, marketingBoost: 0, loanInterest: 0 };
-  try {
-    const subs = require('../store/useUserStore').useUserStore.getState().subsidiaries || [];
-    subs.forEach((sub: any) => {
-      const b = sub?.acquisitionBuff;
-      if (!b) return;
-      if (b.type === 'R_AND_D_SPEED') acc.rndSpeed += b.value;
-      else if (b.type === 'PRODUCTION_COST') acc.productionCost += b.value;
-      else if (b.type === 'MARKETING_BOOST') acc.marketingBoost += b.value;
-      else if (b.type === 'LOAN_INTEREST') acc.loanInterest += b.value;
-    });
-  } catch { /* buff okunamadi */ }
-  return acc;
-};
+// ============================================================================
+//  SHELVED — ACQUISITION BUFFS ARE NO LONGER READ BY THE ENGINE
+// ============================================================================
+//
+//  An acquisition is a financial investment. It buys revenue, profit and
+//  company value, and nothing else. What it does NOT buy is a permanent
+//  multiplier on your own operations.
+//
+//  WHAT THIS USED TO DO. `subsidiaryBuffs()` summed a hidden `acquisitionBuff`
+//  off every owned company and the quarterly tick read it in three places:
+//  research output, unit cost, and marketing reach. Buying a components maker
+//  made YOUR factory cheaper. Buying a media firm made YOUR adverts carry
+//  further. Neither had any balance-sheet existence - no cost, no accounting,
+//  no way to lose it. They were magic items with an M&A skin.
+//
+//  WHY THAT WAS WORSE THAN IT SOUNDS. It gave two systems a claim on the same
+//  decision and they disagreed about what a good deal was. The financial model
+//  in core/market/mergers.ts prices a target on its earnings: pay too much and
+//  the goodwill impairs. The buff priced nothing at all, so the strongest play
+//  was to buy the cheapest company carrying the biggest percentage - and the
+//  entire earnings model, the premium, the payback period, the impairment
+//  test, all of it was noise you could ignore. One of the two systems had to
+//  go, and it was never going to be the one with the arithmetic.
+//
+//  A SECOND LIST. The buffs were read off `useUserStore.subsidiaries` while
+//  the money was read off `useCorporateFinanceStore.subsidiaries` - two lists
+//  for the same acquisitions, written at different points, neither aware of
+//  the other. Selling a company removed it from one of them. Whether the buff
+//  survived the sale depended on which list you asked.
+//
+//  KEPT, NOT DELETED. The `acquisitionBuff` field still exists on the market
+//  data and the shape is preserved here, because prompt 24 wants sector fit to
+//  matter again - as a factor in the PRICE and the earnings, which is where a
+//  real synergy shows up, rather than as a stat bonus. When that arrives it
+//  should read this comment first.
+//
+//  Shelved rather than removed so the three call sites below stay readable:
+//  each one says what it no longer does.
+// ============================================================================
+//
+// const subsidiaryBuffs = (): {
+//   rndSpeed: number; productionCost: number; marketingBoost: number; loanInterest: number;
+// } => {
+//   const acc = { rndSpeed: 0, productionCost: 0, marketingBoost: 0, loanInterest: 0 };
+//   try {
+//     const subs = require('../store/useUserStore').useUserStore.getState().subsidiaries || [];
+//     subs.forEach((sub: any) => {
+//       const b = sub?.acquisitionBuff;
+//       if (!b) return;
+//       if (b.type === 'R_AND_D_SPEED') acc.rndSpeed += b.value;
+//       else if (b.type === 'PRODUCTION_COST') acc.productionCost += b.value;
+//       else if (b.type === 'MARKETING_BOOST') acc.marketingBoost += b.value;
+//       else if (b.type === 'LOAN_INTEREST') acc.loanInterest += b.value;
+//     });
+//   } catch { /* buff okunamadi */ }
+//   return acc;
+// };
+//
+//  FOURTH BUFF, NEVER READ AT ALL: `loanInterest` was accumulated above and
+//  then read by nobody. Every LOAN_INTEREST target in marketData.ts - and
+//  there are eleven - advertised a rate cut the engine never applied. It is
+//  worth knowing that a buff can sit in a shipped game doing nothing while
+//  the screen promises it, because that is what the other three were doing
+//  until recently too.
 
 export const useGameStore = create<GameStore>()(
   persist(
@@ -337,7 +377,9 @@ export const useGameStore = create<GameStore>()(
         //  kurali kendiliginden isler.
         // ==================================================================
         const brandValueRaw = stats.brandValue ?? 0;
-        const marketingBuffPre = Math.min(1, Math.max(0, subsidiaryBuffs().marketingBoost));
+        // Marketing reach used to be multiplied by a subsidiary buff here.
+        // Owning a media company does not make your adverts louder; buying
+        // more advertising does. See the shelved block at the top of the file.
         const isBuilding = !!stats.facilityBuild;
         const tier = getTier(stats.facilityTier);
         const salaryRatio = stats.salaryRatio ?? 1;
@@ -499,8 +541,9 @@ export const useGameStore = create<GameStore>()(
                 sellingPrice: p.sellingPrice || p.suggestedPrice,
                 suggestedPrice: p.suggestedPrice,
                 // Pazarlama artik CEYREKLIK BUTCE (birim basina degil).
-                // Satin alma buff'i butceyi daha etkili kilar (MARKETING_BOOST).
-                marketingBudget: (p.marketingBudget || 0) * (1 + marketingBuffPre),
+                // The budget is now the whole of it: what you spend is what
+                // the market hears.
+                marketingBudget: p.marketingBudget || 0,
                 benchmark: benchmarks[i],
                 // KALITE TAVANI: Ar-Ge'de seviye 9'u kesfetmis olabilirsin
                 // ama atolyede uretemezsin. Tesis kademesi tavani koyar.
@@ -616,10 +659,10 @@ export const useGameStore = create<GameStore>()(
         /** Fasondan gelen toplam saglam adet — raporda gostermek icin */
         let contractUnitsTotal = 0;
 
-        // Satin alma buff'lari — uretim maliyetini dusurur (PRODUCTION_COST).
-        // Bu buff'lar bugune kadar bir ekran hook'unda duruyor ve motor
-        // tarafindan HIC OKUNMUYORDU.
-        const costBuff = Math.min(0.5, Math.max(0, subsidiaryBuffs().productionCost));
+        // Unit cost used to be cut by a PRODUCTION_COST subsidiary buff here,
+        // by up to half. Your cost per unit now comes only from things you can
+        // point at: the product, the facility tier, and the contract partner.
+        // See the shelved block at the top of the file.
 
         // Loop through each active product and calculate financials
         const updatedProducts: any[] = [];
@@ -666,7 +709,7 @@ export const useGameStore = create<GameStore>()(
               ? quoteContractOrder(
                   partner,
                   (product.contractUnits || 0) * Math.max(1, quarters),
-                  unitCost * (1 - costBuff),
+                  unitCost,
                   product.complexity,
                 )
               : null;
@@ -741,9 +784,8 @@ export const useGameStore = create<GameStore>()(
             const productRevenue = sellingPrice * quarterlySales;
             // COGS DENENEN adet uzerinden — fireye giden urunun maliyeti de
             // sana ait. Kademe carpani olcek ekonomisini yansitir.
-            // Satin alma buff'i birim maliyeti dusurur (PRODUCTION_COST).
             const productCOGS =
-              unitCost * attemptedUnits * tier.unitCostMultiplier * (1 - costBuff);
+              unitCost * attemptedUnits * tier.unitCostMultiplier;
 
             totalRevenue += productRevenue;
             totalCOGS += productCOGS;
@@ -862,8 +904,9 @@ export const useGameStore = create<GameStore>()(
         if (quarters > 0) {
           for (let i = 0; i < quarters; i++) {
             const { rpAwarded } = useLaboratoryStore.getState().processQuarter(() => { });
-            // Satin alma buff'i arastirmayi hizlandirir (R_AND_D_SPEED).
-            rndRPGenerated += Math.round(rpAwarded * (1 + subsidiaryBuffs().rndSpeed));
+            // Research output used to be multiplied by an R_AND_D_SPEED buff
+            // here. It now comes only from the people you hired into the lab.
+            rndRPGenerated += rpAwarded;
           }
 
         }
@@ -1054,7 +1097,33 @@ export const useGameStore = create<GameStore>()(
         //  ileriye tasinip sonraki karli ceyreklerde dusuluyor.
         //  Bkz. core/market/credit.ts -> applyTax
         // ==================================================================
-        const pretaxProfit = totalRevenue - totalExpenses;
+        // ==================================================================
+        //  WHAT THE SUBSIDIARIES EARNED — and it has to land HERE
+        // ==================================================================
+        //  BUG FOUND WHILE REMOVING THE BUFFS. This effect was computed two
+        //  hundred lines below, added to the report's `ebit` field, and then
+        //  never touched anything else: not `netProfit`, not company capital,
+        //  not the tax, not the CEO bonus base. The quarterly report showed
+        //  "Acquisitions +$409,500" while the bank balance moved by zero.
+        //
+        //  It went unnoticed because the buffs were covering for it. An
+        //  acquisition felt like it paid because your own factory got cheaper
+        //  and your own lab got faster - the earnings line was decoration on
+        //  top of the thing that was actually doing the work. Take the buffs
+        //  away and a subsidiary contributes NOTHING, which is the opposite of
+        //  what this change is for.
+        //
+        //  Read-only here. The deals are advanced once, later, at report time.
+        // ==================================================================
+        const dealEffect = useCorporateFinanceStore
+          .getState()
+          .acquisitionsQuarterEffect(Math.max(1, quarters));
+
+        // Their profit is profit, so it is taxed with the rest of it. The
+        // integration bill and any goodwill written off are inside netEbit
+        // and reduce the base, which is also correct: a deal that is going
+        // badly should shelter the tax, not be quietly ignored.
+        const pretaxProfit = totalRevenue - totalExpenses + dealEffect.netEbit;
         const taxResult = applyTax(
           pretaxProfit + interestExpense + penaltyInterest, // EBIT tabani
           interestExpense + penaltyInterest,
@@ -1390,9 +1459,11 @@ export const useGameStore = create<GameStore>()(
         //  ve hisse fiyatina. Ayri bir "hisse etkisi" formulu YOK.
         //  Bkz. core/market/mergers.ts
         // ==================================================================
-        const dealEffect = useCorporateFinanceStore
+        // The one place the deals actually move on. `dealEffect` was read
+        // before tax, far above; this only advances the clock.
+        useCorporateFinanceStore
           .getState()
-          .processAcquisitionsQuarter(Math.max(1, quarters));
+          .advanceAcquisitionsQuarter(Math.max(1, quarters));
 
         const ebit = grossProfit - operatingExpenses + dealEffect.netEbit;
 

@@ -137,7 +137,7 @@ const NegotiationModal = ({ visible, onClose, company, onSuccess }: Props) => {
                                 marketCap: company.marketCap,
                                 risk: company.risk,
                                 category: company.category,
-                                acquisitionBuff: company.acquisitionBuff,
+                                // acquisitionBuff no longer passed - nothing reads it.
                             },
                             hostile: false,
                             financing: 'cash',

@@ -24,6 +24,7 @@ import {
   FinancingMethod,
   FinancingQuote,
   TargetRisk,
+  estimateTargetEbit,
   quoteAcquisition,
   quoteFinancing,
 } from '../../../core/market/mergers';
@@ -223,8 +224,8 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
       confirmLabel: hostile ? t('acq.launchHostile') : t('acq.signDeal'),
       onConfirm: () => {
           {
-            // TEK KAPI — finansman, anlasma kaydi, buff ve piyasa tepkisi
-            // hepsi orada. Bkz. useCorporateFinanceStore.executeAcquisition
+            // TEK KAPI — finansman, anlasma kaydi ve piyasa tepkisi hepsi
+            // orada. Bkz. useCorporateFinanceStore.executeAcquisition
             const result = executeAcquisition({
               target: {
                 id: selectedTarget.id || selectedTarget.symbol,
@@ -232,7 +233,7 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
                 marketCap: currentValuationOf(selectedTarget),
                 risk: selectedTarget.risk,
                 category: selectedTarget.category,
-                acquisitionBuff: selectedTarget.acquisitionBuff,
+                // acquisitionBuff no longer passed - nothing reads it.
               },
               hostile,
               financing: fin.method,
@@ -397,10 +398,37 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
                   );
                 })()}
 
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>{t('action.synergyBuff')}</Text>
-                  <Text style={styles.buffValue}>{selectedTarget.acquisitionBuff?.label || t('common.none')}</Text>
-                </View>
+                {/* ----------------------------------------------------------
+                    WHAT YOU ARE ACTUALLY BUYING
+
+                    This row used to read "R&D Speed +15%" off the target's
+                    `acquisitionBuff`. The engine no longer applies those, so
+                    the row was a promise nothing kept - the worst kind of
+                    stale UI, because it reads as a reason to sign.
+
+                    Their annual profit replaces it: the number the price, the
+                    payback and the impairment test are all derived from, and
+                    the one an actual buyer asks for first.
+                ---------------------------------------------------------- */}
+                {(() => {
+                  const ebit = estimateTargetEbit(
+                    selectedTarget.currentValuation,
+                    selectedTarget.risk as TargetRisk,
+                  );
+                  return (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>{t('acq.theirAnnualProfit')}</Text>
+                      <Text style={[
+                        styles.infoValue,
+                        // Sign only. A target that loses money should look
+                        // like one before you have opened the deal sheet.
+                        { color: ebit >= 0 ? theme.colors.positive : theme.colors.negative },
+                      ]}>
+                        {formatMoney(ebit)}
+                      </Text>
+                    </View>
+                  );
+                })()}
               </View>
 
               <View style={styles.negActions}>
@@ -665,10 +693,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
   },
-  buffValue: {
-    color: theme.colors.success,
-    fontWeight: '600',
-  },
+  // SHELVED with the buff row above - the only thing styled green here was
+  // the stat bonus the engine no longer applies.
+  // buffValue: {
+  //   color: theme.colors.success,
+  //   fontWeight: '600',
+  // },
   negActions: {
     gap: 12,
   },

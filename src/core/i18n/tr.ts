@@ -1739,6 +1739,7 @@ export const tr: Record<string, string> = {
     'acq.accretive': 'kâra katkı',
     'acq.dilutive': 'SEYRELTİCİ',
     'acq.paybackYears': '{v1} yıl',
+    'acq.theirAnnualProfit': 'Yıllık kârları',
     'acq.neverAtThisPrice': 'bu fiyata asla',
     'acq.paidInShares': 'HİSSEYLE ÖDENDİ: {v1} yeni hisse onların sahiplerine gidiyor. Payın %{v2} seviyesine iniyor.\n\n',
     'acq.paidWithDebt': 'BORÇLA ÖDENDİ: her yıl {v1} faiz, ve borç kapanana kadar değerlemenin karşısında duruyor.\n\n',

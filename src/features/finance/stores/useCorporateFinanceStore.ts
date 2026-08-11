@@ -194,14 +194,22 @@ export interface CorporateFinanceState {
         /** Pazarlikla belirlenen fiyat — verilmezse standart prim uygulanir */
         negotiatedPrice?: number;
     }) => { success: boolean; message: string; announcementImpact: number };
-    /** Tum devralmalarin bu ceyrekki toplam EBIT etkisi. Motor cagirir. */
-    processAcquisitionsQuarter: (quarters: number) => {
+    /**
+     * Tum devralmalarin bu ceyrekki toplam EBIT etkisi. Motor cagirir.
+     *
+     * Read-only, so the tick can ask before tax and again at report time
+     * without paying the earnings twice. `advanceAcquisitionsQuarter` is what
+     * actually moves the deals on.
+     */
+    acquisitionsQuarterEffect: (quarters: number) => {
         netEbit: number;
         integrationCost: number;
         synergy: number;
         earnings: number;
         impairment: number;
     };
+    /** Her anlasmayi bir ceyrek ilerlet. Ceyrekte TAM BIR KEZ cagrilir. */
+    advanceAcquisitionsQuarter: (quarters: number) => void;
     sellSubsidiary: (id: string) => void;
     updateSubsidiaryStrategy: (id: string, newStrategy: SubsidiaryStrategy) => void;
     evaluateSubsidiaries: () => void;
@@ -324,6 +332,47 @@ export const boardGate = (
         console.warn('[boardGate] vote failed, allowing', err);
         return { needed: false, passed: true, reason: '' };
     }
+};
+
+// ============================================================================
+//  THE QUARTER'S ACQUISITION ARITHMETIC — ONE IMPLEMENTATION, TWO USES
+// ============================================================================
+//
+//  The tick needs this answer at two different moments: once BEFORE tax, so
+//  the subsidiaries' profit is taxed along with everything else, and once at
+//  report time to advance every deal one quarter on.
+//
+//  Those two moments are two hundred lines apart, and the obvious way to get
+//  the number twice is to call the same mutating function twice - which would
+//  advance every deal twice and pay you their earnings twice. So the sum and
+//  the advance are separated here, and both go through this one function so
+//  they can never drift apart.
+//
+//  Pure: takes the list, returns the totals and the new list, touches nothing.
+// ============================================================================
+const runAcquisitionsQuarter = (subsidiaries: Subsidiary[], quarters: number) => {
+    let netEbit = 0, integrationCost = 0, synergy = 0, earnings = 0, impairment = 0;
+
+    const updated = subsidiaries.map(sub => {
+        if (!sub.deal) return sub;
+        const q = Math.max(1, quarters);
+        let deal = sub.deal;
+        // Quarter by quarter rather than in one jump: the capture ratio, the
+        // synergy ramp and the integration bill all depend on WHERE in its
+        // life the deal is, so skipping the middle would misprice it.
+        for (let i = 0; i < q; i++) {
+            const eff = dealQuarterEffect(deal);
+            netEbit += eff.netEbit;
+            integrationCost += eff.integrationCost;
+            synergy += eff.synergy;
+            earnings += eff.earningsContribution;
+            impairment += eff.impairment;
+            deal = advanceDeal(deal, 1);
+        }
+        return { ...sub, deal };
+    });
+
+    return { effect: { netEbit, integrationCost, synergy, earnings, impairment }, updated };
 };
 
 export const useCorporateFinanceStore = create<CorporateFinanceState>()(
@@ -714,28 +763,27 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
              *   - sinerji en yavas gelen (6 ceyrek)
              *   - hedef hala kazandirmiyorsa 8. ceyrekte serefiye silinir
              */
-            processAcquisitionsQuarter: (quarters) => {
-                const { subsidiaries } = get();
-                let netEbit = 0, integrationCost = 0, synergy = 0, earnings = 0, impairment = 0;
+            // SHELVED — replaced by the read/advance pair below.
+            //
+            //  It did both jobs in one call, which was fine while the engine
+            //  only wanted the number at report time. Once the subsidiaries'
+            //  profit had to be TAXED, the number was needed earlier as well,
+            //  and a function that advances every deal as a side effect of
+            //  being asked a question cannot be asked twice.
+            //
+            // processAcquisitionsQuarter: (quarters) => {
+            //     const { subsidiaries } = get();
+            //     ... accumulate dealQuarterEffect, advance, set() ...
+            //     return { netEbit, integrationCost, synergy, earnings, impairment };
+            // },
 
-                const updated = subsidiaries.map(sub => {
-                    if (!sub.deal) return sub;
-                    const q = Math.max(1, quarters);
-                    let deal = sub.deal;
-                    for (let i = 0; i < q; i++) {
-                        const eff = dealQuarterEffect(deal);
-                        netEbit += eff.netEbit;
-                        integrationCost += eff.integrationCost;
-                        synergy += eff.synergy;
-                        earnings += eff.earningsContribution;
-                        impairment += eff.impairment;
-                        deal = advanceDeal(deal, 1);
-                    }
-                    return { ...sub, deal };
-                });
+            /** Read-only. What the deals are worth this quarter. Taxable. */
+            acquisitionsQuarterEffect: (quarters) =>
+                runAcquisitionsQuarter(get().subsidiaries, quarters).effect,
 
-                set({ subsidiaries: updated });
-                return { netEbit, integrationCost, synergy, earnings, impairment };
+            /** Mutation only. Move every deal one quarter further along. */
+            advanceAcquisitionsQuarter: (quarters) => {
+                set({ subsidiaries: runAcquisitionsQuarter(get().subsidiaries, quarters).updated });
             },
 
             /**
@@ -892,22 +940,27 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     }],
                 }));
 
-                // 5) BUFF'LARI YAZ.
-                //    Buff'lar useUserStore.subsidiaries'ten okunuyor ve oraya
-                //    yalnizca hic cagrilmayan bir yol yaziyordu; yani satin
-                //    alma buff'lari bugune kadar HIC CALISMADI.
-                if (target.acquisitionBuff) {
-                    try {
-                        require('../../../core/store/useUserStore').useUserStore
-                            .getState()
-                            .addSubsidiary({
-                                id: target.id,
-                                name: target.name,
-                                category: target.category,
-                                acquisitionBuff: target.acquisitionBuff,
-                            });
-                    } catch { /* buff yazilamadi, islem yine de gecerli */ }
-                }
+                // 5) SHELVED — the buff mirror.
+                //    This wrote a SECOND copy of the acquisition into
+                //    useUserStore purely so the engine could read a stat bonus
+                //    off it. The engine no longer reads it, and keeping the
+                //    write would leave a list that only ever grows: sales
+                //    remove the company from `subsidiaries` above and never
+                //    from this one. The deal record created in step 4 is now
+                //    the only place an acquisition exists.
+                //
+                // if (target.acquisitionBuff) {
+                //     try {
+                //         require('../../../core/store/useUserStore').useUserStore
+                //             .getState()
+                //             .addSubsidiary({
+                //                 id: target.id,
+                //                 name: target.name,
+                //                 category: target.category,
+                //                 acquisitionBuff: target.acquisitionBuff,
+                //             });
+                //     } catch { /* buff yazilamadi, islem yine de gecerli */ }
+                // }
 
                 // 6) Duyuru tepkisi
                 const impact = announcementImpact(

@@ -1737,6 +1737,7 @@ export const en: Record<string, string> = {
     'acq.accretive': 'accretive',
     'acq.dilutive': 'DILUTIVE',
     'acq.paybackYears': '{v1} years',
+    'acq.theirAnnualProfit': 'Their annual profit',
     'acq.neverAtThisPrice': 'never at this price',
     'acq.paidInShares': 'PAID IN SHARES: {v1} new shares go to their owners. Your ownership falls to {v2}%.\n\n',
     'acq.paidWithDebt': 'PAID WITH DEBT: {v1} of interest every year, and the debt sits against your valuation until it is repaid.\n\n',

@@ -29,6 +29,39 @@ const files = [];
 const read = f => fs.readFileSync(f, 'utf8');
 const body = new Map(files.map(f => [f, read(f)]));
 const rel = f => path.relative(SRC, f);
+
+// ---------------------------------------------------------------------------
+//  A COMMENTED-OUT CALL IS NOT A CALL
+// ---------------------------------------------------------------------------
+//  This project never deletes code. Anything retired gets commented out with
+//  a note explaining what it did and why it went - which means shelved code
+//  keeps its full text, including every call it used to make.
+//
+//  Every reachability pass below was matching on raw file text, so those
+//  ghost references counted. Shelving the only caller of a function therefore
+//  made that function look ALIVE to the audit, permanently. The two house
+//  rules were quietly cancelling each other out: "never delete" was blinding
+//  "find what nothing calls", and it got a little worse with every shelved
+//  block.
+//
+//  Found by shelving useUserStore.addSubsidiary's only caller and watching
+//  the audit report clean.
+//
+//  Comments are STRIPPED HERE ONLY, for the passes that ask "does anything
+//  reference this". The passes that read markers out of comments -
+//  @orphan-ok, @orphan-todo, @exit-ok - keep reading `body`, because for them
+//  the comments are the data.
+//
+//  Not a parser. It does not know a `//` inside a string literal from a real
+//  comment, and it does not need to: a false "this is a comment" can only
+//  ever LOSE a reference, and losing one turns into a reported finding for a
+//  human to look at rather than into silence.
+// ---------------------------------------------------------------------------
+const stripComments = s => s
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, '$1');
+
+const code = new Map(files.map(f => [f, stripComments(body.get(f))]));
 // ---------------------------------------------------------------------------
 //  WHICH FEATURE FOLDERS ARE OFF - READ FROM THE FLAGS, NOT FROM A LIST
 // ---------------------------------------------------------------------------
@@ -62,7 +95,7 @@ const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const refs = (name, self) => {
     let n = 0;
     const re = new RegExp(`\\b${esc(name)}\\b`);
-    for (const [f, t] of body) if (f !== self && re.test(t)) n++;
+    for (const [f, t] of code) if (f !== self && re.test(t)) n++;
     return n;
 };
 
@@ -75,7 +108,7 @@ const refs = (name, self) => {
  * healthy code is worse than no audit - it gets ignored.
  */
 const usedInternally = (name, self) =>
-    (body.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
+    (code.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
 
 /** A file may opt out with `// @orphan-ok <reason>` - legacy kept on purpose. */
 const optedOut = f => /@orphan-ok\s/.test(body.get(f));
@@ -839,7 +872,7 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
     if (optedOut(f)) continue;
     const base = path.basename(f).replace(/\.tsx$/, '');
-    const imported = [...body].some(([g, t]) =>
+    const imported = [...code].some(([g, t]) =>
         g !== f && new RegExp(`from\\s+['"][^'"]*\\b${esc(base)}['"]`).test(t));
     if (imported) continue;
     const m = read(f).match(/export default (?:function )?(\w+)|export const (\w+)\s*[:=]/);
@@ -862,7 +895,7 @@ for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
         const a = line.match(/^\s{4}(\w+):\s*\(/);           // action signature
         if (!a) continue;
         let used = 0;
-        for (const [g, gt] of body) {
+        for (const [g, gt] of code) {
             if (g === f) continue;
             if (isDisabled(g)) continue;
             if (new RegExp(`\\b${a[1]}\\b`).test(gt)) used++;
@@ -874,7 +907,7 @@ for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
 // --- 3) Engine exports the game never consumes ------------------------------
 for (const f of files.filter(f => /core\/market\/\w+\.ts$/.test(f))) {
     if (optedOut(f)) continue;
-    for (const m of read(f).matchAll(/export const (\w+)\s*=\s*\(/g)) {
+    for (const m of code.get(f).matchAll(/export const (\w+)\s*=\s*\(/g)) {
         // Only flag it if nothing anywhere uses it - including its own file.
         if (refs(m[1], f) === 0 && !usedInternally(m[1], f) && !symbolOptedOut(m[1], f)) {
             problems.engineExports.push(`${m[1]}()  (${rel(f)})`);
@@ -891,9 +924,9 @@ if (statsFile) {
         for (const line of iface[1].split('\n')) {
             const m = line.match(/^\s{2}(\w+)\??:/);
             if (!m || /^(set|update|reset)/.test(m[1])) continue;
-            const written = [...body].some(([g, t]) =>
+            const written = [...code].some(([g, t]) =>
                 g !== statsFile && new RegExp(`\\b${m[1]}\\s*:`).test(t));
-            const shown = tsx.some(g => new RegExp(`\\b${m[1]}\\b`).test(body.get(g)));
+            const shown = tsx.some(g => new RegExp(`\\b${m[1]}\\b`).test(code.get(g)));
             if (written && !shown) problems.statsFields.push(m[1]);
         }
     }
