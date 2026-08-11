@@ -546,6 +546,60 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     }
 }
 
+// --- 0d8) Teaching locks that could trap the player ----------------------
+//  A lock dims the screen and lights one control. If that control cannot be
+//  used, the game is not lost - it is STUCK, and the player cannot tell the
+//  difference until it is too late.
+//
+//  The shape this catches: a lock cleared by SPENDING with nothing stopping
+//  it engaging when there is no money. That is the bonus trap, and it is
+//  visible in the data. The ones that are not visible are why the overlay's
+//  timed skip exists and is not optional.
+{
+    const ts = require('typescript');
+    const seqFile = path.join(SRC, 'data/tutorial/sequence.ts');
+    const coreFile = path.join(SRC, 'core/tutorial/locks.ts');
+
+    if (fs.existsSync(seqFile) && fs.existsSync(coreFile)) {
+        const runTs = (file) => {
+            const js = ts.transpileModule(read(file), {
+                compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2019 },
+            }).outputText;
+            const module = { exports: {} };
+            const req = (spec) => {
+                const base = path.resolve(path.dirname(file), spec);
+                const found = [base + '.ts', path.join(base, 'index.ts')].find(fs.existsSync);
+                if (!found) throw new Error(`cannot resolve ${spec}`);
+                return runTs(found);
+            };
+            // eslint-disable-next-line no-new-func
+            new Function('module', 'exports', 'require', js)(module, module.exports, req);
+            return module.exports;
+        };
+        try {
+            const { validateLocks } = runTs(coreFile);
+            const { TUTORIAL_SEQUENCE } = runTs(seqFile);
+            for (const pr of validateLocks(TUTORIAL_SEQUENCE)) {
+                problems.story.push(`data/tutorial/sequence.ts  ${pr.lock}  ${pr.kind}: ${pr.detail}`);
+            }
+            // A lock pointing at a key no screen registers dims the screen and
+            // lights nothing - which reads as a freeze even though it is not.
+            const registered = new Set();
+            for (const f of files) {
+                for (const m of read(f).matchAll(/tutorialKey=["']([\w-]+)["']/g)) registered.add(m[1]);
+            }
+            for (const l of TUTORIAL_SEQUENCE) {
+                if (!registered.has(l.highlight)) {
+                    problems.story.push(
+                        `data/tutorial/sequence.ts  ${l.id}  highlights "${l.highlight}", which no screen registers`);
+                }
+            }
+        } catch (e) {
+            problems.story.push(`data/tutorial  could not be checked: ${e.message}`);
+        }
+    }
+}
+
 // --- 0d3) `{someString && <JSX/>}` -------------------------------------------
 //  A guard on a STRING renders the string when it is empty: `'' && <Text/>`
 //  evaluates to `''`, and React Native refuses to draw a bare string with

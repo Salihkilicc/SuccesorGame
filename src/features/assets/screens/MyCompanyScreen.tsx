@@ -28,6 +28,7 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
+import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 
 // Helper Component
 //
@@ -313,12 +314,17 @@ const MyCompanyScreen = () => {
               onPress={() => navigation.navigate('Finance')}
             />
 
-            <DepartmentCard
-              icon="🏭"
-              title={t('company.products')}
-              subtitle={`${activeProductsCount} Active`}
-              onPress={() => navigation.navigate('Products')}
-            />
+            {/* Registered so the first year can point at it. The key is the
+                only thing the tutorial knows about this card; the card knows
+                nothing about the tutorial. */}
+            <TutorialTarget tutorialKey="products" style={styles.deptTargetWrap}>
+              <DepartmentCard
+                icon="🏭"
+                title={t('company.products')}
+                subtitle={`${activeProductsCount} Active`}
+                onPress={() => navigation.navigate('Products')}
+              />
+            </TutorialTarget>
 
             <DepartmentCard
               icon="📊"
@@ -342,13 +348,13 @@ const MyCompanyScreen = () => {
           <SectionHeader title={t('company.operations')} />
           <FacilityPanel />
 
-          <View style={{ marginTop: 12 }}>
+          <TutorialTarget tutorialKey="teamMorale" style={{ marginTop: 12 }}>
             <SectionCard
               title={`🎉 ${t('company.teamMorale')}`}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
               onPress={() => navigation.navigate('TeamMorale')}
             />
-          </View>
+          </TutorialTarget>
 
           {/* QUICK ACTIONS */}
           <SectionHeader title={t('company.quickActions')} />
@@ -483,6 +489,8 @@ const styles = StyleSheet.create({
   },
   subtitle: { color: 'rgba(255,255,255,0.48)', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  /** The target wrapper must not change the grid: same width as a card. */
+  deptTargetWrap: { width: '48%' },
   deptCard: {
     // Dolgu, cerceve degil: bu kart eskiden saydamdi ve yalnizca ince bir
     // kenarlikla duruyordu, o yuzden zeminin uzerinde "yokmus gibi" goruntu

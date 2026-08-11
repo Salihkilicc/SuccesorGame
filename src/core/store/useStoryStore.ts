@@ -31,6 +31,7 @@ import {
     type StoryFlag,
 } from '../story/state';
 import { nextPriority, type Pending } from '../story/inbox';
+import { emptyLockState, type LockState } from '../tutorial/locks';
 
 export type StoryState = {
     dials: Dials;
@@ -44,6 +45,12 @@ export type StoryState = {
      * feel big is also the one that quietly forgets.
      */
     pending: Pending[];
+    /**
+     * Which teaching locks are done with. Per RUN, because the first year
+     * happens again in a new company - the memory of having seen it is a
+     * different thing and lives on the player (useIdentityStore).
+     */
+    locks: LockState;
     _hasHydrated: boolean;
 };
 
@@ -80,6 +87,13 @@ type StoryStore = StoryState & {
     /** Replace the queue. The tick calls this with what drain kept. */
     setPending: (pending: Pending[]) => void;
 
+    /** A lock cleared by doing the thing. */
+    completeLock: (id: string) => void;
+    /** A lock the player walked away from. Recorded apart, so it is visible. */
+    skipLock: (id: string) => void;
+    /** Turn the whole thing off. */
+    disableTutorial: () => void;
+
     reset: () => void;
 };
 
@@ -87,6 +101,7 @@ export const initialStoryState: StoryState = {
     dials: { ...INITIAL_DIALS },
     flags: {},
     pending: [],
+    locks: emptyLockState(),
     _hasHydrated: false,
 };
 
@@ -120,17 +135,30 @@ export const useStoryStore = create<StoryStore>()(
 
             setPending: (pending) => set({ pending }),
 
+            completeLock: (id) =>
+                set(state => (state.locks.completed.includes(id) ? state : {
+                    locks: { ...state.locks, completed: [...state.locks.completed, id] },
+                })),
+
+            skipLock: (id) =>
+                set(state => (state.locks.skipped.includes(id) ? state : {
+                    locks: { ...state.locks, skipped: [...state.locks.skipped, id] },
+                })),
+
+            disableTutorial: () => set(state => ({ locks: { ...state.locks, disabled: true } })),
+
             reset: () => set({
                 dials: { ...INITIAL_DIALS },
                 flags: {},
                 pending: [],
+                locks: emptyLockState(),
                 _hasHydrated: true,
             }),
         }),
         {
             name: 'succesor_story_v1',
             storage: createJSONStorage(() => zustandStorage),
-            partialize: state => ({ dials: state.dials, flags: state.flags, pending: state.pending }),
+            partialize: state => ({ dials: state.dials, flags: state.flags, pending: state.pending, locks: state.locks }),
             /**
              * A save made before a dial existed has no value for it, and
              * `undefined + 5` is NaN - which would spread silently through
@@ -144,6 +172,7 @@ export const useStoryStore = create<StoryStore>()(
                     dials: { ...INITIAL_DIALS, ...(p.dials ?? {}) },
                     flags: { ...(p.flags ?? {}) },
                     pending: p.pending ?? [],
+                    locks: p.locks ?? emptyLockState(),
                 };
             },
             onRehydrateStorage: () => (state) => {

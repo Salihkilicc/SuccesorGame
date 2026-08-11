@@ -2180,6 +2180,12 @@ export const useGameStore = create<GameStore>()(
         update({ companyCapital: companyCapital - bonusAmount });
         set({ employeeMorale: Math.min(100, employeeMorale + 15), bonusDistributedThisQuarter: true });
 
+        // The teaching lock clears on the ACTION, not on the screen opening.
+        // Raised here, at the point the money actually leaves, so it cannot
+        // be satisfied by looking at the page.
+        try {
+          require('./useStoryStore').useStoryStore.getState().raise('tutorialBonusPaid');
+        } catch { /* story store not ready */ }
       },
 
       /**

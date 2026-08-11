@@ -117,12 +117,22 @@ export const useProductStore = create<ProductState & ProductActions>()(
                     ),
                 })),
 
-            updateProduct: (id, updates) =>
+            updateProduct: (id, updates) => {
+                // The first year's opening lock clears when a production
+                // target is actually SET - not when the screen is opened, and
+                // not when the tick writes results back. `productionLevel`
+                // arriving in an update is the player having moved the slider.
+                if (updates.productionLevel !== undefined) {
+                    try {
+                        require('./useStoryStore').useStoryStore.getState().raise('tutorialProductionSet');
+                    } catch { /* story store not ready */ }
+                }
                 set((state) => ({
                     products: state.products.map((p) =>
                         p.id === id ? { ...p, ...updates } : p
                     ),
-                })),
+                }));
+            },
             retireProduct: (id) =>
                 set((state) => ({
                     products: state.products.map((p) =>

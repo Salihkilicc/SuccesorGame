@@ -35,6 +35,15 @@ export type IdentityState = {
     gender: Gender;
     /** Has the player been through onboarding at least once? */
     created: boolean;
+    /**
+     * Has the first year been finished once, on any run?
+     *
+     * Here rather than in the story store because it is a fact about the
+     * PERSON, not the company: someone who has been taught does not need
+     * teaching again in their second company. It is what puts a "skip the
+     * tutorial" offer on the second playthrough and not the first.
+     */
+    tutorialCompleted: boolean;
     _hasHydrated: boolean;
 };
 
@@ -47,6 +56,8 @@ type IdentityStore = IdentityState & {
      */
     setIdentity: (v: { firstName: string; lastName: string; gender: Gender }) =>
         { ok: true } | { ok: false; reason: string };
+    /** Called when the last lock clears. Never unset. */
+    markTutorialCompleted: () => void;
 };
 
 export const initialIdentityState: IdentityState = {
@@ -54,6 +65,7 @@ export const initialIdentityState: IdentityState = {
     lastName: '',
     gender: 'male',
     created: false,
+    tutorialCompleted: false,
     _hasHydrated: false,
 };
 
@@ -76,6 +88,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 });
                 return { ok: true };
             },
+            markTutorialCompleted: () => set({ tutorialCompleted: true }),
         }),
         {
             name: 'succesor_identity_v1',
@@ -85,6 +98,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 lastName: state.lastName,
                 gender: state.gender,
                 created: state.created,
+                tutorialCompleted: state.tutorialCompleted,
             }),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);

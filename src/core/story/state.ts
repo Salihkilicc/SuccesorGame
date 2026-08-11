@@ -93,6 +93,10 @@ export type StoryFlag =
     // --- Unlocks
     | 'moleUnlocked'
     | 'brotherPlottedOpenly'
+    // --- Teaching. Raised by the screens the first year points at, so a
+    //     lock clears on the ACTION rather than on a screen being opened.
+    | 'tutorialProductionSet'
+    | 'tutorialBonusPaid'
     // --- Verdicts
     | 'fbiCleared'
     | 'fbiGuilty'

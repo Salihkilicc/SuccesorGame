@@ -75,6 +75,7 @@ import { theme } from '../core/theme';
 import OnboardingScreen from '../features/os/screens/OnboardingScreen';
 import { useIdentityStore } from '../core/store/useIdentityStore';
 import { useStatsStore } from '../core/store/useStatsStore';
+import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
 /**
  * Which swipe tab the bar should highlight for a given route.
@@ -516,6 +517,16 @@ const RootNavigator = () => {
             screen remembering to place it correctly.
            -------------------------------------------------------------- */}
         <CrystalNavBar activeTab={navTabFor(currentRouteName)} variant="dark" />
+
+        {/* ----------------------------------------------------------------
+            THE TEACHING LAYER, ABOVE EVERYTHING INCLUDING THE NAV BAR.
+            A lock that pointed at a control while the bar floated over it
+            would be telling the player to press something they can also
+            navigate away from mid-instruction. It sits below the onboarding
+            gate, which returns before this - there is nothing to teach until
+            there is a company.
+           ---------------------------------------------------------------- */}
+        <TutorialOverlay />
       </View>
     </NavigationContainer>
   );
