@@ -1,0 +1,111 @@
+// src/core/story/conditions.ts
+//
+// ============================================================================
+//  WHAT A SCENE IS ALLOWED TO ASK
+// ============================================================================
+//
+//  The mirror of effects.ts. A closed list of questions, described as data,
+//  with no predicate a scene can supply.
+//
+//  Same reasoning, and one more: a condition written as a function cannot be
+//  INSPECTED. The audit pass in prompt 2 has to be able to read a scene and
+//  answer "can this ever open?" - which is possible when a condition is
+//  `{ kind: 'flag', flag: 'fatherDead' }` and impossible when it is
+//  `() => somethingComplicated()`.
+//
+//  A story that can be read by a machine can be checked by one. That is worth
+//  more than the flexibility being given up.
+//
+//  ---------------------------------------------------------------------------
+//  BANDS, NOT NUMBERS
+//  ---------------------------------------------------------------------------
+//  Dial conditions ask for a BAND - none / low / high / extreme - rather than
+//  a threshold. `pearHostility >= 73` means nothing to whoever reads it next,
+//  and if every scene picks its own number the dial has no shared meaning at
+//  all. The bands are defined once in state.ts, and rebalancing them moves
+//  every scene together rather than none of them.
+// ============================================================================
+
+import { band, type Band, type Dial, type Dials, type StoryFlag } from './state';
+
+export type Condition =
+    /** This has happened. */
+    | { kind: 'flag'; flag: StoryFlag }
+    /** This has NOT happened. */
+    | { kind: 'noFlag'; flag: StoryFlag }
+    /** A relationship is at least this warm/hostile. */
+    | { kind: 'dialAtLeast'; dial: Dial; band: Band }
+    /** A relationship is at most this warm/hostile. */
+    | { kind: 'dialAtMost'; dial: Dial; band: Band }
+    /** The game has reached a quarter. */
+    | { kind: 'quarterAtLeast'; quarter: number }
+    /** The company can afford something. */
+    | { kind: 'capitalAtLeast'; amount: number }
+    /** The player personally can. */
+    | { kind: 'cashAtLeast'; amount: number }
+    /** Every one of these holds. */
+    | { kind: 'all'; of: Condition[] }
+    /** At least one of these holds. */
+    | { kind: 'any'; of: Condition[] }
+    /** This does not hold. */
+    | { kind: 'not'; of: Condition };
+
+/** Everything a condition needs to know, handed in so it can be tested. */
+export type World = {
+    dials: Dials;
+    flags: Partial<Record<StoryFlag, true>>;
+    /** Quarters elapsed since the game began, 1-based. */
+    quarter: number;
+    capital: number;
+    cash: number;
+};
+
+const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
+const rank = (b: Band): number => ORDER.indexOf(b);
+
+export const test = (c: Condition, w: World): boolean => {
+    switch (c.kind) {
+        case 'flag': return !!w.flags[c.flag];
+        case 'noFlag': return !w.flags[c.flag];
+        case 'dialAtLeast': return rank(band(w.dials[c.dial])) >= rank(c.band);
+        case 'dialAtMost': return rank(band(w.dials[c.dial])) <= rank(c.band);
+        case 'quarterAtLeast': return w.quarter >= c.quarter;
+        case 'capitalAtLeast': return w.capital >= c.amount;
+        case 'cashAtLeast': return w.cash >= c.amount;
+        case 'all': return c.of.every(x => test(x, w));
+        case 'any': return c.of.some(x => test(x, w));
+        case 'not': return !test(c.of, w);
+    }
+    const never: never = c;
+    throw new Error(`Unhandled condition: ${JSON.stringify(never)}`);
+};
+
+/**
+ * No condition at all means "always". Written out rather than left implicit
+ * because most scenes have no gate, and `test(undefined)` is the call every
+ * caller would otherwise have to remember to guard.
+ */
+export const testAll = (conditions: Condition[] | undefined, w: World): boolean =>
+    (conditions ?? []).every(c => test(c, w));
+
+/**
+ * Which flags a condition mentions.
+ *
+ * For the audit in prompt 2: a scene gated on a flag nothing ever raises can
+ * never open, and that is invisible by reading - the scene looks finished.
+ * This walks the tree so the check can be mechanical.
+ */
+export const flagsMentioned = (c: Condition): StoryFlag[] => {
+    switch (c.kind) {
+        case 'flag':
+        case 'noFlag':
+            return [c.flag];
+        case 'all':
+        case 'any':
+            return c.of.flatMap(flagsMentioned);
+        case 'not':
+            return flagsMentioned(c.of);
+        default:
+            return [];
+    }
+};
