@@ -17,6 +17,8 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
 import { useGameStore } from '../../../core/store/useGameStore';
+import ConversationRunner from '../../../components/story/ConversationRunner';
+import { conversationById } from '../../../data/story';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -43,6 +45,31 @@ const MessageThreadScreen = () => {
     }, [thread?.messages.length]);
 
     if (!thread) return null;
+
+    // ------------------------------------------------------------------
+    //  A THREAD WITH A CONVERSATION IS PLAYED, NOT TYPED INTO
+    // ------------------------------------------------------------------
+    //  Same runner the mail screen uses. The reply box below is for the
+    //  plain threads that have no branching attached - a scene supplies its
+    //  own answers, and a free-text box beside two written choices would
+    //  suggest the game reads what you type.
+    // ------------------------------------------------------------------
+    const conversation = thread.conversationId
+        ? conversationById(thread.conversationId)
+        : undefined;
+
+    if (conversation) {
+        return (
+            <View style={styles.root}>
+                <ScreenHeader title={thread.name} subtitle={thread.role} onBack={() => navigation.goBack()} />
+                <ConversationRunner
+                    conversation={conversation}
+                    variant="message"
+                    onFinished={() => navigation.goBack()}
+                />
+            </View>
+        );
+    }
 
     const send = () => {
         const text = draft.trim();

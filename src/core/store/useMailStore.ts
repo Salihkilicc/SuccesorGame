@@ -14,6 +14,8 @@ export type Mail = {
     atMonth: number;
     isRead: boolean;
     category: MailCategory;
+    /** A branching conversation instead of a plain letter. See Thread. */
+    conversationId?: string;
 };
 
 export type MailState = {

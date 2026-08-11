@@ -54,6 +54,13 @@ export type Thread = {
     messages: Message[];
     /** Messages from them that the player has not opened. */
     unread: number;
+    /**
+     * A branching conversation instead of a plain thread.
+     *
+     * Optional on purpose: every thread that exists today has none and keeps
+     * behaving exactly as it did. A thread with one opens in the runner.
+     */
+    conversationId?: string;
 };
 
 export type MessageState = {

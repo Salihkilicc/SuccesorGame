@@ -100,7 +100,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [], exits: [] };
+const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [], exits: [], story: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -400,6 +400,93 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             problems.palette.push(
                 `${rel(f)}:${i + 1}  useUserStore.${hit} - superseded by useIdentityStore, and wiped by a new game`);
         });
+    }
+}
+
+
+// --- 0d7) Conversation graphs -----------------------------------------------
+//  A story told as a graph has three failures that are invisible by reading
+//  and obvious by walking:
+//
+//    a link to a card that does not exist   - the branch just stops
+//    a card nothing leads to                - written, never seen
+//    a card whose every answer is gated     - can offer nothing at all
+//
+//  All three look FINISHED in the data file, which is exactly why a person
+//  cannot be the check.
+//
+//  IT RUNS THE APP'S OWN VALIDATOR. core/story/graph.ts is transpiled and
+//  called directly, so the audit and the runner cannot drift into disagreeing
+//  about what a valid graph is - there is one definition of "valid" and both
+//  of them use it.
+//
+//  Transpiled with the TypeScript compiler rather than stripped with regexes.
+//  I tried the regex first and it fell over on `export type Channel = ...` -
+//  which is the honest outcome, because a regex that understands TypeScript
+//  types is just a worse compiler. `transpileModule` also drops `import type`
+//  lines for free, so a data file's type imports never need resolving.
+{
+    const ts = require('typescript');
+    const dir = path.join(SRC, 'data/story');
+
+    /** Run one TS file as CommonJS and hand back its exports. */
+    const loadTs = (file) => {
+        const js = ts.transpileModule(read(file), {
+            compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2019 },
+        }).outputText;
+        const module = { exports: {} };
+        // Data files import only types, which transpiling removes. Anything
+        // else asking for a require is a mistake worth surfacing loudly.
+        const req = (name) => { throw new Error(`story data must not import runtime code (${name})`); };
+        // eslint-disable-next-line no-new-func
+        new Function('module', 'exports', 'require', js)(module, module.exports, req);
+        return module.exports;
+    };
+
+    if (fs.existsSync(dir)) {
+        let validate = null;
+        try {
+            validate = loadTs(path.join(SRC, 'core/story/graph.ts')).validate;
+        } catch (e) {
+            problems.story.push(`core/story/graph.ts  validator would not load: ${e.message}`);
+        }
+
+        const dataFiles = fs.readdirSync(dir).filter(f => /\.ts$/.test(f) && f !== 'index.ts');
+        const index = fs.existsSync(path.join(dir, 'index.ts'))
+            ? read(path.join(dir, 'index.ts')) : '';
+
+        for (const file of dataFiles) {
+            let exported;
+            try {
+                exported = loadTs(path.join(dir, file));
+            } catch (e) {
+                problems.story.push(`data/story/${file}  could not be read: ${e.message}`);
+                continue;
+            }
+
+            const conversations = Object.values(exported)
+                .filter(v => v && typeof v === 'object' && v.id && Array.isArray(v.nodes));
+
+            if (conversations.length === 0) {
+                problems.story.push(`data/story/${file}  exports no conversation`);
+                continue;
+            }
+
+            for (const c of conversations) {
+                if (validate) {
+                    for (const pr of validate(c)) {
+                        problems.story.push(
+                            `data/story/${file}  ${pr.conversation}${pr.node ? '/' + pr.node : ''}  ${pr.kind}: ${pr.detail}`);
+                    }
+                }
+                // Written but not registered is not in the game - and, worse,
+                // nothing above would have checked it either.
+                if (!index.includes(file.replace(/\.ts$/, ''))) {
+                    problems.story.push(
+                        `data/story/${file}  ${c.id} is not in data/story/index.ts, so it is not in the game`);
+                }
+            }
+        }
     }
 }
 
@@ -715,6 +802,8 @@ console.log('\nREACHABILITY AUDIT — can the player actually get here?\n');
 let total = 0;
 total += section('Text unreadable on the ground', problems.contrast,
     'Below 3:1 against the background. Fill tones are not text colours - use their light form.');
+total += section('Conversations that cannot be played', problems.story,
+    'Broken links, cards nothing leads to, and cards that can offer no answer.');
 total += section('A way out that is not the one way out', problems.exits,
     'One header draws the back arrow. A second exit is how the app got six of them.');
 total += section('Colours outside the palette', problems.palette,

@@ -14,6 +14,8 @@ import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
+import ConversationRunner from '../../../components/story/ConversationRunner';
+import { conversationById } from '../../../data/story';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -43,6 +45,25 @@ const MailDetailScreen = () => {
     const insets = useSafeAreaInsets();
 
     if (!mail) return null;
+
+    // A letter that branches plays in the same runner as a message; only the
+    // presentation differs. See components/story/ConversationRunner.
+    const conversation = mail.conversationId
+        ? conversationById(mail.conversationId)
+        : undefined;
+
+    if (conversation) {
+        return (
+            <View style={styles.root}>
+                <ScreenHeader title={mail.fromName} subtitle={mail.subject} onBack={() => navigation.goBack()} />
+                <ConversationRunner
+                    conversation={conversation}
+                    variant="mail"
+                    onFinished={() => navigation.goBack()}
+                />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.root}>
