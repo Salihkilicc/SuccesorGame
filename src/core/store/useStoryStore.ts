@@ -30,11 +30,20 @@ import {
     type Dials,
     type StoryFlag,
 } from '../story/state';
+import { nextPriority, type Pending } from '../story/inbox';
 
 export type StoryState = {
     dials: Dials;
     /** Set membership, stored as a map because JSON has no Set. */
     flags: Partial<Record<StoryFlag, true>>;
+    /**
+     * Conversations waiting to arrive.
+     *
+     * Persisted, because a reply promised for next quarter has to survive the
+     * app being closed - otherwise the one mechanic that makes a big company
+     * feel big is also the one that quietly forgets.
+     */
+    pending: Pending[];
     _hasHydrated: boolean;
 };
 
@@ -54,12 +63,30 @@ type StoryStore = StoryState & {
     raise: (flag: StoryFlag) => void;
     has: (flag: StoryFlag) => boolean;
 
+    /**
+     * Queue a conversation for a later quarter.
+     *
+     * Priority is assigned here rather than by the caller, from the order
+     * things were scheduled. That is what makes a wave arrive in the order it
+     * was written instead of whatever order the effects happened to run in.
+     */
+    schedule: (item: {
+        conversationId: string;
+        dueQuarter: number;
+        urgent?: boolean;
+        expiresAfter?: number;
+        queuedAtQuarter: number;
+    }) => void;
+    /** Replace the queue. The tick calls this with what drain kept. */
+    setPending: (pending: Pending[]) => void;
+
     reset: () => void;
 };
 
 export const initialStoryState: StoryState = {
     dials: { ...INITIAL_DIALS },
     flags: {},
+    pending: [],
     _hasHydrated: false,
 };
 
@@ -79,16 +106,31 @@ export const useStoryStore = create<StoryStore>()(
 
             has: (flag) => !!get().flags[flag],
 
+            schedule: (item) =>
+                set(state => ({
+                    pending: [
+                        ...state.pending,
+                        {
+                            ...item,
+                            id: `${item.conversationId}@${item.dueQuarter}#${state.pending.length}`,
+                            priority: nextPriority(state.pending, item.dueQuarter),
+                        },
+                    ],
+                })),
+
+            setPending: (pending) => set({ pending }),
+
             reset: () => set({
                 dials: { ...INITIAL_DIALS },
                 flags: {},
+                pending: [],
                 _hasHydrated: true,
             }),
         }),
         {
             name: 'succesor_story_v1',
             storage: createJSONStorage(() => zustandStorage),
-            partialize: state => ({ dials: state.dials, flags: state.flags }),
+            partialize: state => ({ dials: state.dials, flags: state.flags, pending: state.pending }),
             /**
              * A save made before a dial existed has no value for it, and
              * `undefined + 5` is NaN - which would spread silently through
@@ -101,6 +143,7 @@ export const useStoryStore = create<StoryStore>()(
                     ...p,
                     dials: { ...INITIAL_DIALS, ...(p.dials ?? {}) },
                     flags: { ...(p.flags ?? {}) },
+                    pending: p.pending ?? [],
                 };
             },
             onRehydrateStorage: () => (state) => {

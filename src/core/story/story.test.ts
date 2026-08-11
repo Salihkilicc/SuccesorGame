@@ -20,6 +20,7 @@ const recorder = () => {
         message: (who, text) => log.push(`message:${who}:${text}`),
         mail: m => log.push(`mail:${m.subject}`),
         news: h => log.push(`news:${h}`),
+        schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };
     return { log, sink };
 };
@@ -70,6 +71,7 @@ describe('effects', () => {
             { kind: 'message', who: 'bro', text: 'hi' },
             { kind: 'mail', from: 'pear', subject: 'Offer', body: '...' },
             { kind: 'news', headline: 'Something happened' },
+            { kind: 'schedule', conversation: 'pear-reply', afterQuarters: 1 },
         ];
         applyEffects(all, sink);
         expect(log).toEqual([
@@ -81,6 +83,7 @@ describe('effects', () => {
             'message:bro:hi',
             'mail:Offer',
             'news:Something happened',
+            'schedule:pear-reply:+1',
         ]);
     });
 

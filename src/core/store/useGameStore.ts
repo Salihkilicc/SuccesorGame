@@ -1554,6 +1554,25 @@ export const useGameStore = create<GameStore>()(
         // 4. Aylık Flagleri Sıfırla
         get().resetMonthlyState();
 
+        // ------------------------------------------------------------------
+        //  THE INBOX QUEUE
+        // ------------------------------------------------------------------
+        //  Run AFTER the date advances, so a conversation scheduled "next
+        //  quarter" is measured against the quarter the player has just
+        //  arrived in rather than the one they left. Before the advance it
+        //  would land a quarter early, which is exactly the wait that makes a
+        //  large company feel large.
+        //
+        //  Lazy require: core/story/deliver imports the message and mail
+        //  stores, and a static import here would close a cycle back into
+        //  this file.
+        // ------------------------------------------------------------------
+        try {
+            require('../story/deliver').runInbox();
+        } catch (e) {
+            console.warn('[story] inbox could not run', e);
+        }
+
         // 5. Store'ları Güncelle (Yeni verileri kaydet)
         // CRITICAL FIX: Use update() instead of setState() to preserve other fields
         // ==================================================================

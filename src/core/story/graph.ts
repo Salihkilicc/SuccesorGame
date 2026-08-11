@@ -107,7 +107,8 @@ export type GraphProblem = {
     | 'too-many-choices'
     | 'all-choices-gated'
     | 'unknown-speaker'
-    | 'wrong-channel';
+    | 'wrong-channel'
+    | 'unknown-schedule';
     detail: string;
 };
 
@@ -118,7 +119,18 @@ export type GraphProblem = {
  * over a data file with no app running - which is the only way a check like
  * this actually gets run.
  */
-export const validate = (c: Conversation, cast?: Cast): GraphProblem[] => {
+export const validate = (
+    c: Conversation,
+    cast?: Cast,
+    /**
+     * Every conversation id in the game.
+     *
+     * For `schedule` effects: a scene promising a reply that does not exist
+     * fails exactly like a broken link, except later and more confusingly -
+     * the player waits a quarter for nothing, and there is no error anywhere.
+     */
+    known?: Set<string>,
+): GraphProblem[] => {
     const problems: GraphProblem[] = [];
     const at = (kind: GraphProblem['kind'], detail: string, node?: string) =>
         problems.push({ conversation: c.id, node, kind, detail });
@@ -146,6 +158,19 @@ export const validate = (c: Conversation, cast?: Cast): GraphProblem[] => {
                     }
                     if (e.kind === 'mail' && !canUseChannel(cast[e.from], 'mail')) {
                         at('wrong-channel', `an effect has "${e.from}" sending mail`, n.id);
+                    }
+                }
+            }
+        }
+    }
+
+    // --- a promised reply must be a conversation that exists
+    if (known) {
+        for (const n of c.nodes) {
+            for (const ch of n.choices ?? []) {
+                for (const e of ch.effects ?? []) {
+                    if (e.kind === 'schedule' && !known.has(e.conversation)) {
+                        at('unknown-schedule', `schedules "${e.conversation}", which is not a conversation`, n.id);
                     }
                 }
             }
@@ -209,7 +234,8 @@ export const validate = (c: Conversation, cast?: Cast): GraphProblem[] => {
 };
 
 export const validateAll = (list: Conversation[], cast?: Cast): GraphProblem[] => {
-    const problems = list.flatMap(c => validate(c, cast));
+    const known = new Set(list.map(c => c.id));
+    const problems = list.flatMap(c => validate(c, cast, known));
     // Conversation ids are referenced from outside (a thread points at one),
     // so a duplicate there is worse than a duplicate node.
     const seen = new Set<string>();

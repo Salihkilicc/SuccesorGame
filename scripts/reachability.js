@@ -487,6 +487,17 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 
         const dataFiles = fs.readdirSync(dir)
             .filter(f => /\.ts$/.test(f) && f !== 'index.ts' && f !== 'cast.ts');
+
+        // Every conversation id in the game, gathered before validating any of
+        // them - a scene can schedule a reply that lives in another file.
+        const known = new Set();
+        for (const file of dataFiles) {
+            try {
+                for (const v of Object.values(loadTs(path.join(dir, file)))) {
+                    if (v && typeof v === 'object' && v.id && Array.isArray(v.nodes)) known.add(v.id);
+                }
+            } catch { /* reported below when it is loaded for real */ }
+        }
         const index = fs.existsSync(path.join(dir, 'index.ts'))
             ? read(path.join(dir, 'index.ts')) : '';
 
@@ -509,7 +520,7 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 
             for (const c of conversations) {
                 if (validate) {
-                    for (const pr of validate(c, CAST)) {
+                    for (const pr of validate(c, CAST, known)) {
                         problems.story.push(
                             `data/story/${file}  ${pr.conversation}${pr.node ? '/' + pr.node : ''}  ${pr.kind}: ${pr.detail}`);
                     }

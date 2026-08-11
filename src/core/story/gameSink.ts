@@ -18,6 +18,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
+import { currentQuarter } from './world';
 import { emailOf } from './cast';
 
 /**
@@ -66,6 +67,20 @@ export const gameSink = (): EffectSink => ({
             body: m.body,
             atMonth: useGameStore.getState().currentMonth,
             category: 'Primary',
+        });
+    },
+    // Scheduling writes to the queue; nothing is delivered here. A scene
+    // asks for a reply "next quarter" and the tick decides when that
+    // actually lands, which is the only place the per-quarter allowance can
+    // be honoured.
+    schedule: ({ conversation, afterQuarters, urgent, expiresAfter }) => {
+        const now = currentQuarter();
+        useStoryStore.getState().schedule({
+            conversationId: conversation,
+            dueQuarter: now + Math.max(0, Math.floor(afterQuarters)),
+            urgent,
+            expiresAfter,
+            queuedAtQuarter: now,
         });
     },
     news: (headline) => {

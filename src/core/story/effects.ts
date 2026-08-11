@@ -61,7 +61,26 @@ export type Effect =
     /** A character writes to the player's inbox. Same rule for `from`. */
     | { kind: 'mail'; from: string; subject: string; body: string }
     /** A line in the news. */
-    | { kind: 'news'; headline: string };
+    | { kind: 'news'; headline: string }
+    /**
+     * A conversation that arrives LATER.
+     *
+     * This is how a scene promises a reply. You write to Pear and the answer
+     * comes next quarter; the waiting is the characterisation, and it is a
+     * one-line effect rather than a mechanism each scene reinvents.
+     *
+     * `afterQuarters: 0` means "as soon as the next tick allows", which still
+     * goes through the queue and its allowance.
+     */
+    | {
+        kind: 'schedule';
+        conversation: string;
+        afterQuarters: number;
+        /** Ignore the per-quarter allowance. See inbox.ts - meant to be rare. */
+        urgent?: boolean;
+        /** Give up if still undeliverable this many quarters later. */
+        expiresAfter?: number;
+    };
 
 /**
  * Everything an effect needed but could not know for itself.
@@ -78,6 +97,12 @@ export type EffectSink = {
     message: (who: string, text: string) => void;
     mail: (m: { from: string; subject: string; body: string }) => void;
     news: (headline: string) => void;
+    schedule: (item: {
+        conversation: string;
+        afterQuarters: number;
+        urgent?: boolean;
+        expiresAfter?: number;
+    }) => void;
 };
 
 /**
@@ -97,6 +122,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'message': sink.message(effect.who, effect.text); return;
         case 'mail': sink.mail(effect); return;
         case 'news': sink.news(effect.headline); return;
+        case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added
     // without a case, TypeScript fails here rather than at runtime.
