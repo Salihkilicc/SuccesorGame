@@ -1568,6 +1568,15 @@ export const useGameStore = create<GameStore>()(
         //  this file.
         // ------------------------------------------------------------------
         try {
+            // Gifts, lobbying and quarter events all move the brother's trust
+            // on the BOARD. This copies the result back into the story's
+            // number so a scene next quarter reads what actually happened.
+            require('../story/brother').syncBrotherDial();
+        } catch (e) {
+            console.warn('[story] brother sync failed', e);
+        }
+
+        try {
             require('../story/deliver').runInbox();
         } catch (e) {
             console.warn('[story] inbox could not run', e);

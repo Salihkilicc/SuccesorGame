@@ -18,6 +18,7 @@ import { useStoryStore } from '../store/useStoryStore';
 import { useGameStore } from '../store/useGameStore';
 import { initialGameState } from '../store/useGameStore';
 import type { World } from './conditions';
+import { brotherLoyalty } from './brother';
 
 /**
  * Quarters elapsed since the game began, 1-based.
@@ -38,7 +39,12 @@ export const readWorld = (): World => {
     const stats = useStatsStore.getState();
     const story = useStoryStore.getState();
     return {
-        dials: story.dials,
+        // The brother's number is READ FROM THE CAP TABLE, not from the stored
+        // dial. He is one person in two systems and the board is the one that
+        // stores him; see core/story/brother.ts. Reading the stored copy would
+        // let a condition test a value a gift or a lobbying result had already
+        // changed.
+        dials: { ...story.dials, brotherTrust: brotherLoyalty() },
         flags: story.flags,
         quarter: currentQuarter(),
         capital: stats.companyCapital || 0,

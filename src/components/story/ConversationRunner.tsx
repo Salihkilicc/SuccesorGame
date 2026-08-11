@@ -114,8 +114,12 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                                 variant === 'mail' ? styles.letter : styles.bubble,
                                 said.from === 'player' && styles.mine,
                             ]}>
+                            {/* The player's own letter takes the light fill, so
+                                this label has to go black with it. The muted
+                                orange measures 1.29 there - caught by the
+                                audit, not by looking. */}
                             {variant === 'mail' && (
-                                <Text style={styles.letterFrom}>
+                                <Text style={[styles.letterFrom, said.from === 'player' && styles.letterFromMine]}>
                                     {said.from === 'player' ? 'You replied' : (CAST[conversation.from]?.name ?? conversation.from)}
                                 </Text>
                             )}
@@ -199,6 +203,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         marginBottom: 6,
     },
+    letterFromMine: { color: theme.colors.highlightText },
 
     said: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, lineHeight: 21 },
     saidMine: { color: theme.colors.highlightText },

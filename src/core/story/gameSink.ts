@@ -19,6 +19,7 @@ import { useGameStore } from '../store/useGameStore';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
 import { currentQuarter } from './world';
+import { BROTHER_ID, nudgeBrotherLoyalty, syncBrotherDial } from './brother';
 import { emailOf } from './cast';
 
 /**
@@ -41,7 +42,17 @@ export const gameSink = (): EffectSink => ({
         const s = useStatsStore.getState();
         s.update({ brandValue: Math.max(0, (s.brandValue || 0) + amount) });
     },
-    dial: (dial, delta) => useStoryStore.getState().nudge(dial, delta),
+    dial: (dial, delta) => {
+        // The brother lives on the cap table. Writing the story's copy would
+        // leave the board holding the old number - and for a Snake, holding
+        // it in the opposite direction.
+        if (dial === 'brotherTrust') {
+            nudgeBrotherLoyalty(delta);
+            syncBrotherDial();
+            return;
+        }
+        useStoryStore.getState().nudge(dial, delta);
+    },
     flag: (flag) => useStoryStore.getState().raise(flag),
     // Cast ids are resolved here, at the last possible moment, so a scene
     // never carries a copy of anybody's name. An id with no cast entry throws

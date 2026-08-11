@@ -59,13 +59,8 @@ import { t } from '../i18n';
 //
 // ============================================================================
 
-export type TraitType =
-    | 'Shark'
-    | 'Loyalist'
-    | 'Conservative'
-    | 'Visionary'
-    | 'Aggressive'
-    | 'Snake';
+export type { TraitType } from './governanceTypes';
+import type { TraitType } from './governanceTypes';
 
 export interface GovMember {
     id: string;
@@ -808,8 +803,21 @@ export const NO_CONFIDENCE_TRUST = 35;
  * situation", when what we need is "is this member behind ME". For a Snake
  * those two are INVERSELY related. Hence loyalty is computed separately.
  */
-export const loyaltyOf = (m: GovMember): number =>
-    m.trait === 'Snake' ? 100 - m.trust : m.trust;
+export { loyaltyOf, trustForLoyalty } from './loyalty';
+import { loyaltyOf } from './loyalty';
+
+/**
+ * The inverse: what `trust` must be for a member of this trait to have this
+ * loyalty.
+ *
+ * Exists so the story can talk about the brother in the only terms that make
+ * sense to a writer - "is he behind me" - while the board keeps storing the
+ * field it has always stored. Without this the two numbers drift, and they
+ * drift in OPPOSITE DIRECTIONS for a Snake, which is the worst version: a
+ * scene warms him up and the cap table reads it as a threat.
+ *
+ * `trustForLoyalty(trait, loyaltyOf(m)) === m.trust` for every trait.
+ */
 
 export const checkNoConfidence = (
     members: GovMember[],

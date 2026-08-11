@@ -23,13 +23,14 @@ import {
     resolvePromise,
     trustDelta,
     voteNoConfidence, giftEffect, RELATIONSHIP_NEUTRAL, type Motivation,
-    detectDemand, evaluateDemand, decayRelationship,
+    detectDemand, evaluateDemand, decayRelationship, trustForLoyalty,
     DEMAND_COOLDOWN_MET, DEMAND_COOLDOWN_FAILED, DEMAND_QUIET,
     NO_CONFIDENCE_COOLDOWN, FATIGUE_CAP, FATIGUE_RECOVERY,
     DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
     type BoardDemand, type DemandContext, type DemandKind, type PetIssue,
 }from '../../../core/market/governance';
 import { formatMoney, formatNumber } from '../../../core/utils';
+import { INITIAL_DIALS } from '../../../core/story/state';
 
 
 
@@ -362,7 +363,11 @@ const INITIAL_BOARD_MEMBERS: BoardMember[] = [
         name: 'Julian Hale',
         shareCount: 1_500_000, // 15% of company
         trait: 'Snake',
-        trust: 65,
+        // DERIVED, not typed in. `brotherTrust` starts at 40 in the story's
+        // dials; a Snake's stored trust is the inverse, so this is 60. Writing
+        // 60 by hand is how the two numbers would disagree the first time
+        // either was rebalanced.
+        trust: trustForLoyalty('Snake', INITIAL_DIALS.brotherTrust),
         isHostile: false,
         origin: 'Founder',
         motivation: 'vindication',
