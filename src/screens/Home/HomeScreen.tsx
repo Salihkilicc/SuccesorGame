@@ -41,6 +41,7 @@ import { useMessageStore, unreadCount } from '../../core/store/useMessageStore';
 import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
+import { useNewsStore } from '../../core/store/useNewsStore';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -147,6 +148,9 @@ const HomeScreen = () => {
   // kayboluyordu. Artik tek kaynak: core/i18n.
   const locale = useLocale();
   const [showNews, setShowNews] = useState(false);
+  // Subscribed rather than read once: a headline published while the player
+  // is standing on the home screen should appear without a navigation.
+  const newsItems = useNewsStore(state => state.items);
 
   // --- Quarterly Report State ---
   const [reportVisible, setReportVisible] = useState(false);
@@ -602,7 +606,23 @@ const HomeScreen = () => {
                   <Text style={styles.newsClose}>{t('home.close')}</Text>
                 </TouchableOpacity>
               </View>
+              {/* ------------------------------------------------------
+                  REAL HEADLINES FIRST, WALLPAPER UNDERNEATH
+
+                  These four lines were the entire News app: hardcoded into
+                  the JSX, identical in every game and every quarter. The
+                  wire now carries what actually happened - divestitures,
+                  board arrivals, and anything a story scene publishes.
+
+                  The static four are kept as the tail rather than deleted.
+                  An empty news app on a quiet quarter reads as broken, and
+                  a market that never mentions anything but you is a small
+                  world.
+              ------------------------------------------------------ */}
               <ScrollView showsVerticalScrollIndicator={false}>
+                {newsItems.map(item => (
+                  <NewsItem key={item.id} text={item.headline} />
+                ))}
                 <NewsItem text={t('home.marketsRallyOnTechEarnings')} />
                 <NewsItem text={t('home.supplierCostsClimbAsInput')} />
                 <NewsItem text={t('home.investorsPunishGrowthWithoutFree')} />

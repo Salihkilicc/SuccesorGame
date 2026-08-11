@@ -105,6 +105,78 @@ export const INITIAL_STOCKS: StockItem[] = [
     marketCap: 3_100_000_000
   },
 
+  // ==========================================================================
+  //  THE THREE WITH NAMES ON THE DOOR
+  // ==========================================================================
+  //  These existed in data/AcquisitionData.ts, a file whose DATA is imported
+  //  by nothing - only its type is. The acquisition screen has always listed
+  //  INITIAL_MARKET_ITEMS, so SkyNet, VoltMotors and Streamify have never
+  //  been buyable in a shipped build. They were three companies written down
+  //  and then never wired to anything.
+  //
+  //  Each comes with a real person who takes a board seat - see
+  //  data/market/founders.ts. That is what makes them worth listing
+  //  separately rather than being three more rows: buying one of these is a
+  //  decision about who you will be arguing with for the rest of the game.
+  //
+  //  SIZED TO THE GAME, NOT TO THE OLD FILE. AcquisitionData priced them at
+  //  $2.5B / $40B / $120B, which is unreachable for most of a campaign. They
+  //  are placed here at three different rungs so that one is an early
+  //  temptation, one a mid-game decision and one a late statement.
+  // ==========================================================================
+  {
+    id: 'tech_streamify',
+    symbol: 'STFY',
+    name: 'Streamify',
+    price: 62.0,
+    change: 2.4,
+    category: 'Technology',
+    // Profitable but thin-margined, and he sold at the top. The risk rating
+    // no longer picks his temperament - the founder file does - but it still
+    // decides the earnings the deal model pays you.
+    risk: 'Medium',
+    description: 'Music streaming. Everyone uses it, nobody pays much for it.',
+    acquisitionCost: 1_240_000_000,
+    acquisitionBuff: { type: 'MARKETING_BOOST', value: 0.10, label: 'Marketing +10%' },
+    isAcquired: false,
+    marketCap: 1_240_000_000,
+  },
+  {
+    id: 'ind_voltmotors',
+    symbol: 'VOLT',
+    name: 'VoltMotors',
+    price: 175.0,
+    change: 0.6,
+    category: 'Industrial',
+    // Dull and reliable, which is the whole character. Low risk here means a
+    // high, steady earnings yield in mergers.ts - this is the one that pays
+    // for itself.
+    risk: 'Low',
+    description: 'Batteries. Twenty years, no bad quarters, no surprises.',
+    acquisitionCost: 9_800_000_000,
+    acquisitionBuff: { type: 'PRODUCTION_COST', value: 0.08, label: 'Cost -8%' },
+    isAcquired: false,
+    marketCap: 9_800_000_000,
+  },
+  {
+    id: 'tech_skynet',
+    symbol: 'SKNT',
+    name: 'SkyNet AI',
+    price: 1_250.0,
+    change: 11.5,
+    category: 'Technology',
+    // Extreme, and it means something now: mergers.ts gives a burning
+    // company little or no EBIT, so synergy is near zero and the goodwill
+    // impairs on schedule unless it grows into the price. Buying this is
+    // buying a belief.
+    risk: 'Extreme',
+    description: 'Research lab with no product and a conviction about the future.',
+    acquisitionCost: 44_000_000_000,
+    acquisitionBuff: { type: 'R_AND_D_SPEED', value: 0.30, label: 'R&D Speed +30%' },
+    isAcquired: false,
+    marketCap: 44_000_000_000,
+  },
+
   // HEALTH (Defensive, Steady)
   {
     id: 'health_pfiz',

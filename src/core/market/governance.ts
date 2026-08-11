@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { founderOf } from '../../data/market/founders';
 // src/core/market/governance.ts
 //
 // ============================================================================
@@ -1154,6 +1155,11 @@ export interface IncomingDirector {
     /** Kendisine ihrac edilecek hisse adedi */
     shareCount: number;
     note: string;
+    /** Set for the named founders - decides what they are fixated on. */
+    motivation?: Motivation;
+    petIssue?: PetIssue;
+    /** True when he is here because he lost. Seats him as a standing threat. */
+    resentful?: boolean;
 }
 
 /**
@@ -1180,19 +1186,53 @@ export const directorFromAcquisition = (
     totalShares: number,
     risk: string,
     hostile: boolean,
+    /** Market id. Named founders are looked up on it; unknown ids stay generic. */
+    targetId?: string,
 ): IncomingDirector | null => {
-    // Dusmanca devralmada hedefin yonetimi kalmaz. Odedigin yuksek prim
-    // zaten bunun bedelidir.
-    if (hostile) return null;
+    const named = targetId ? founderOf(targetId) : undefined;
+
+    // ------------------------------------------------------------------
+    //  HOSTILE
+    // ------------------------------------------------------------------
+    //  A generic target's management does not stay. You paid a 35% premium
+    //  precisely so you would not have to negotiate with them, and that
+    //  remains the deal.
+    //
+    //  A NAMED founder does stay, and this is a deliberate exception. The
+    //  point of these three is that they are people rather than rows, and a
+    //  man who lost his company and now has to sit at your table every
+    //  quarter is worth more to the game than a tidy board. He arrives near
+    //  hostile - see `hostileTrust` in data/market/founders.ts - which means
+    //  he is a standing problem, not a mood that passes.
+    // ------------------------------------------------------------------
+    if (hostile && !named) return null;
 
     const val = Math.max(1, acquirerValuation || 1);
     const ratio = Math.max(0, dealPrice || 0) / val;
+
+    // The size floor applies to everyone, named or not. Buying a company
+    // worth 2% of yours does not hand anyone a board seat, and exempting the
+    // named three would have made a token purchase the cheapest way to put a
+    // Shark on your own board.
     if (ratio < SEAT_MIN_DEAL_RATIO) return null;
 
     // The stake scales with deal size, but within a narrow band. Even buying
     // a company larger than yours, no single person takes half the board.
     const stake = Math.max(SEAT_MIN_STAKE, Math.min(SEAT_MAX_STAKE, ratio * 0.35));
     const shareCount = Math.round((totalShares || 10_000_000) * stake);
+
+    if (named) {
+        return {
+            name: named.name,
+            trait: named.trait,
+            trust: hostile ? named.hostileTrust : named.trust,
+            shareCount,
+            note: hostile ? named.hostileLine : named.line,
+            motivation: named.motivation,
+            petIssue: named.petIssue,
+            resentful: hostile,
+        };
+    }
 
     return {
         get name() { return t('gov.founderOf', { v1: targetName }); },

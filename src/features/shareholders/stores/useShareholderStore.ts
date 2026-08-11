@@ -75,6 +75,15 @@ export interface BoardMember {
     isHostile: boolean; // True if trust < 20
     origin: 'Founder' | 'Investor' | 'Network' | 'DebtShark';
     networkId?: string; // If they came from the "Love/Friends" module
+    /**
+     * The subsidiary id that brought this person onto the board.
+     *
+     * Set for directors who arrived with an acquisition, so that selling the
+     * company also removes them. Without it the seat had no link back to the
+     * deal, and a founder stayed on your board voting on your future long
+     * after you had sold the business he came with.
+     */
+    acquiredWith?: string;
 }
 
 /** Bir jestin sonucu — ekranda gerekcesiyle gostermek icin. */

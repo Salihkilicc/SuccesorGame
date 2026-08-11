@@ -65,7 +65,26 @@ interface MarketState {
      * Bkz. core/market/competitors.ts
      */
     competitorShares: Record<string, number>;
+    /**
+     * A company's OWN fundamental value, overriding the one it shipped with.
+     *
+     * Mean reversion needs something to revert TO, and until now that was
+     * always the price in marketData.ts - the value the company had on the
+     * day the game was written. So a company you bought, ran for five years
+     * and sold at four times what you paid was written back to the market at
+     * your exit price and then dragged, quarter by quarter, back down to its
+     * original listing. You could sell it and buy it back cheaper.
+     *
+     * Fixing the live price alone could never work: the price was never the
+     * problem, the ANCHOR was. Whatever a company is fundamentally worth now
+     * lives here, and the shipped price is only the starting value.
+     *
+     * See useCorporateFinanceStore.sellSubsidiary.
+     */
+    valueAnchors: Record<string, number>;
     // Actions
+    /** Rewrite what a company is fundamentally worth. Persists. */
+    setValueAnchor: (id: string, price: number) => void;
     buyAsset: (symbol: string, price: number, quantity: number, type: 'stock' | 'crypto' | 'bond' | 'fund') => void;
     sellAsset: (symbol: string, quantity: number, currentPrice: number) => void;
     reset: () => void;
@@ -81,6 +100,7 @@ export const initialMarketState = {
     holdings: [],
     competitorShares: {} as Record<string, number>,
     marketPrices: {},
+    valueAnchors: {} as Record<string, number>,
     marketTrend: 'FLAT' as const,
     priceHistory: {},
     currentQuarter: 0,
@@ -93,6 +113,7 @@ export const useMarketStore = create<MarketState>()(
             // Rakiplerin canli pazar paylari — bkz. core/market/competitors.ts
             competitorShares: {} as Record<string, number>,
             marketPrices: {},
+            valueAnchors: {} as Record<string, number>,
             marketTrend: 'FLAT' as const,
             priceHistory: {},
             currentQuarter: 0,
@@ -266,7 +287,16 @@ export const useMarketStore = create<MarketState>()(
                 }
             },
 
-            reset: () => set({ holdings: [], marketPrices: {}, competitorShares: {} }),
+            // `valueAnchors` is cleared with the rest: the companies you
+            // reshaped in the last run are strangers to the next one.
+            reset: () => set({
+                holdings: [], marketPrices: {}, competitorShares: {}, valueAnchors: {},
+            }),
+
+            setValueAnchor: (id, price) => {
+                if (!(price > 0)) return;   // NaN and 0 would erase the company
+                set(state => ({ valueAnchors: { ...state.valueAnchors, [id]: price } }));
+            },
 
             liquidatePortfolio: () => {
                 const state = get();
@@ -437,7 +467,14 @@ export const useMarketStore = create<MarketState>()(
                     //  buyur ama kacmaz. Oyuncunun karliligi ceyrekte bunun
                     //  cok ustunde artabilir — yani YETISEBILIR.
                     // ==========================================================
-                    const basePrice = ('price' in item ? (item as any).price : 0) || currentPrice;
+                    // The anchor is what the company is worth NOW, which is
+                    // not always what it shipped worth. A company you grew and
+                    // sold carries your exit value; everything else falls back
+                    // to its listing price.
+                    const basePrice =
+                        get().valueAnchors[item.id]
+                        || ('price' in item ? (item as any).price : 0)
+                        || currentPrice;
                     // ==========================================================
                     //  PAZAR PAYI DEGERLEMEYI SURUKLER
                     // ==========================================================
@@ -523,6 +560,10 @@ export const useMarketStore = create<MarketState>()(
                 // uygulama her acildiginda pazar baslangica doner ve
                 // oyuncunun yillarca surdurdugu rekabet silinir.
                 competitorShares: state.competitorShares,
+                // Same reasoning as competitorShares, and a stronger case:
+                // this is what the player DID to a company. Dropping it on
+                // restart would undo the sale price they negotiated.
+                valueAnchors: state.valueAnchors,
             }),
             // ==============================================================
             //  ONE-TIME CLAMP FOR PRE-REVERSION SAVES
@@ -544,7 +585,15 @@ export const useMarketStore = create<MarketState>()(
                 const updates = Math.floor((state.currentQuarter || 0) / 2);
                 let clamped = 0;
                 INITIAL_MARKET_ITEMS.forEach(item => {
-                    const base = ('price' in item ? (item as any).price : 0) || 0;
+                    // Same override as the tick. Without it this clamp was the
+                    // second thing dragging a sold company back to default,
+                    // and the crueller one: it fired on APP LAUNCH, so the
+                    // company you sold at 4x was back to its shipped price the
+                    // next time the player opened the game.
+                    const base =
+                        state.valueAnchors?.[item.id]
+                        || ('price' in item ? (item as any).price : 0)
+                        || 0;
                     if (!base) return;
                     const price = state.marketPrices[item.id];
                     if (!price) return;

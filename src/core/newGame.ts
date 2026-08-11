@@ -33,6 +33,7 @@ import { useAchievementStore } from './store/useAchievementStore';
 import { useMessageStore } from './store/useMessageStore';
 import { useStoryStore } from './store/useStoryStore';
 import { useMailStore } from './store/useMailStore';
+import { useNewsStore } from './store/useNewsStore';
 
 /**
  * EVERY game key in AsyncStorage.
@@ -55,6 +56,7 @@ export const PERSIST_KEYS: string[] = [
     'succesor_messages_v1',
     'succesor_mail_v1',
     'succesor_story_v1',
+    'succesor_news_v1',
 
     // Finans / piyasa
     'succesor_market_v6',
@@ -107,6 +109,8 @@ const resetInMemoryStores = () => {
     useStoryStore.getState().reset();
     // Same reason as the inbox: the mail is story about THIS run.
     useMailStore.getState().reset();
+    // The wire carries what happened in the last run. It did not happen here.
+    useNewsStore.getState().reset();
 
     // ------------------------------------------------------------------
     //  `reset?.()` HID A MISSING METHOD
@@ -321,6 +325,12 @@ export const verifyNewGame = (): string[] => {
 
         const sub = require('../features/finance/stores/useCorporateFinanceStore').useCorporateFinanceStore.getState();
         check('subsidiary', 'owned', (sub.subsidiaries ?? []).length, 0);
+
+        check('news', 'items', useNewsStore.getState().items.length, 0);
+        // The value you left a company at is a fact about the LAST run. If it
+        // survives, the next player starts in a market someone else reshaped.
+        const mk = useMarketStore.getState() as any;
+        check('market', 'valueAnchors', mk.valueAnchors ?? {}, {});
     } catch (e) {
         problems.push(`denetim calistirilamadi: ${String(e)}`);
     }

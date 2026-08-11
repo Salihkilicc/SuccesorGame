@@ -16,6 +16,7 @@ import { useStoryStore } from '../store/useStoryStore';
 import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
+import { useNewsStore } from '../store/useNewsStore';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
 import { currentQuarter } from './world';
@@ -94,12 +95,12 @@ export const gameSink = (): EffectSink => ({
             queuedAtQuarter: now,
         });
     },
+    // It has a home now - see core/store/useNewsStore.ts. This used to
+    // console.log with a note saying so, which meant a scene could use the
+    // effect, look wired, and reach nobody.
     news: (headline) => {
-        // The news system has no writer yet - applyCorporateShock exists and
-        // is called from nowhere. Rather than invent half of it here, this
-        // records the intent and prompt 10 gives it a home. Silently dropping
-        // it would be the worse failure: a scene would look wired and not be.
-        // eslint-disable-next-line no-console
-        console.log('[story] news pending a home:', headline);
+        useNewsStore.getState().publish(
+            headline, 'story', useGameStore.getState().currentMonth,
+        );
     },
 });

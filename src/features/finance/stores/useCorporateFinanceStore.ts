@@ -892,9 +892,14 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 //  buyurse bir gun %50'nin altina dusersin ve kurul sistemi
                 //  tam orada devreye girer: BUYUMENIN KENDISI bir risk.
                 // ------------------------------------------------------------
+                //  NAMED FOUNDERS. Three companies come with a person rather
+                //  than a generated placeholder, and one of them will sit
+                //  down even after a hostile bid - see data/market/founders.ts
+                //  for who they are and why that exception exists.
                 const incoming = directorFromAcquisition(
                     target.name, price, acquirerValuation,
                     shStore.getState().totalShares, risk, hostile,
+                    target.id,
                 );
                 if (incoming) {
                     shStore.setState((st: any) => ({
@@ -905,11 +910,29 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                             shareCount: incoming.shareCount,
                             trait: incoming.trait,
                             trust: incoming.trust,
-                            isHostile: false,
+                            motivation: incoming.motivation,
+                            petIssue: incoming.petIssue,
+                            // A man seated by a hostile takeover is hostile.
+                            // Hardcoding false meant a director could arrive
+                            // at trust 15 and still be read as a supporter.
+                            isHostile: !!incoming.resentful,
                             origin: 'Investor' as const,
+                            // The link back to the deal, so that selling the
+                            // company also clears the seat.
+                            acquiredWith: target.id,
                         }],
                     }));
                     shStore.getState().recalculateBoardMood();
+
+                    try {
+                        const { useNewsStore } = require('../../../core/store/useNewsStore');
+                        const { useGameStore } = require('../../../core/store/useGameStore');
+                        useNewsStore.getState().publish(
+                            `${incoming.name} joins the board with ${target.name}. "${incoming.note}"`,
+                            'deal',
+                            useGameStore.getState().currentMonth,
+                        );
+                    } catch { /* haber deposu yoksa sessizce gec */ }
                 }
 
                 // 4) Istirak kaydi + M&A anlasmasi
@@ -1008,21 +1031,77 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 //  Artik cikis degerlemesi ima edilen hisse fiyatina
                 //  cevrilip piyasaya yaziliyor. Sirket rafa senin biraktigin
                 //  degerle donuyor.
+                //
+                //  ...AND THEN DRIFTED STRAIGHT BACK. Writing the price was
+                //  only half of it, and the half that does not last. Mean
+                //  reversion pulls every price towards an ANCHOR, and the
+                //  anchor was the value in marketData.ts - the day the game
+                //  was written. So the exit price held for one quarter and
+                //  was then dragged, 15% of the gap at a time, back to the
+                //  shipped number. Worse, the rehydrate clamp snapped
+                //  anything above 3x its anchor back on APP LAUNCH.
+                //
+                //  A company you doubled and sold could be bought back
+                //  cheaper, and reliably so. The price was never the problem.
+                //  The anchor is now written too, so the company keeps the
+                //  value you built and drifts on its own from there.
                 // ----------------------------------------------------------
+                const exitValuation = subsidiary.valuation || 0;
                 try {
                     const { INITIAL_MARKET_ITEMS } = require('../../assets/data/marketData');
                     const base: any = (INITIAL_MARKET_ITEMS as any[]).find(x => x.id === id);
-                    const exitValuation = subsidiary.valuation || 0;
                     if (base && exitValuation > 0 && (base.marketCap || 0) > 0) {
                         const basePrice = base.price || 100;
                         const impliedPrice = basePrice * (exitValuation / base.marketCap);
-                        require('../../../core/store/useMarketStore').useMarketStore.setState(
-                            (st: any) => ({
-                                marketPrices: { ...st.marketPrices, [id]: impliedPrice },
-                            }),
-                        );
+                        const market = require('../../../core/store/useMarketStore').useMarketStore;
+                        market.setState((st: any) => ({
+                            marketPrices: { ...st.marketPrices, [id]: impliedPrice },
+                        }));
+                        // What it is worth, not just what it costs today.
+                        market.getState().setValueAnchor(id, impliedPrice);
                     }
                 } catch { /* piyasa deposu yoksa sessizce gec */ }
+
+                // ----------------------------------------------------------
+                //  HIS SEAT GOES WITH THE COMPANY
+                // ----------------------------------------------------------
+                //  The founder took a board seat when you bought his company.
+                //  Nothing removed it when you sold, so he stayed on your
+                //  board - voting on your future, holding shares you issued
+                //  him - as the director of a company that was no longer
+                //  anything to do with you. Sell three and the board fills
+                //  with strangers you cannot get rid of.
+                //
+                //  The shares are retired with him, which is the point: the
+                //  dilution you accepted to buy the company is undone when
+                //  the company goes.
+                // ----------------------------------------------------------
+                try {
+                    const sh = require('../../shareholders/stores/useShareholderStore').useShareholderStore;
+                    const leaving = sh.getState().members.filter(
+                        (m: any) => m.acquiredWith === id,
+                    );
+                    if (leaving.length > 0) {
+                        const retired = leaving.reduce((n: number, m: any) => n + (m.shareCount || 0), 0);
+                        sh.setState((st: any) => ({
+                            members: st.members.filter((m: any) => m.acquiredWith !== id),
+                            totalShares: Math.max(1, st.totalShares - retired),
+                        }));
+                        sh.getState().recalculateBoardMood();
+                    }
+                } catch { /* kurul deposu yoksa sessizce gec */ }
+
+                // The market hears about it. Divestitures are public.
+                try {
+                    const { useNewsStore } = require('../../../core/store/useNewsStore');
+                    const { useGameStore } = require('../../../core/store/useGameStore');
+                    const { companyName } = useStatsStore.getState();
+                    useNewsStore.getState().publish(
+                        `${companyName || 'The group'} sells ${subsidiary.name} for ${formatMoney(proceeds)}.`,
+                        'deal',
+                        useGameStore.getState().currentMonth,
+                    );
+                } catch { /* haber deposu yoksa sessizce gec */ }
 
                 set(state => ({
                     subsidiaries: state.subsidiaries.filter(s => s.id !== id),
