@@ -2068,6 +2068,16 @@ export const useGameStore = create<GameStore>()(
             console.warn('[events] roll failed', e);
           }
 
+          // Beats whose moment has come - the father's death is the first.
+          // Before the tutorial check, because a beat can lift every lock and
+          // there is no sense queueing an explanation for one that is about
+          // to stop existing.
+          try {
+            require('../story/deliver').runStoryBeats();
+          } catch (e) {
+            console.warn('[story] beat could not be queued', e);
+          }
+
           try {
             require('../story/deliver').runTutorialScenes();
           } catch (e) {

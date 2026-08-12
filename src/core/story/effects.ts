@@ -72,6 +72,19 @@ export type Effect =
      * `afterQuarters: 0` means "as soon as the next tick allows", which still
      * goes through the queue and its allowance.
      */
+    /**
+     * The game stops here.
+     *
+     * `ending` is an id from data/story/endings.ts, not the text - so the
+     * audit can check the id exists, the same way it checks a scheduled
+     * conversation does. A scene offering an ending that is not there would
+     * take the player's decision and then do nothing with it, which is the
+     * worst available failure at the exact moment it matters most.
+     *
+     * Deliberately terminal and deliberately rare. Anything reversible is a
+     * flag, not an ending.
+     */
+    | { kind: 'ending'; ending: string }
     | {
         kind: 'schedule';
         conversation: string;
@@ -97,6 +110,7 @@ export type EffectSink = {
     message: (who: string, text: string) => void;
     mail: (m: { from: string; subject: string; body: string }) => void;
     news: (headline: string) => void;
+    ending: (id: string) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -122,6 +136,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'message': sink.message(effect.who, effect.text); return;
         case 'mail': sink.mail(effect); return;
         case 'news': sink.news(effect.headline); return;
+        case 'ending': sink.ending(effect.ending); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

@@ -26,7 +26,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { CAST } from '../../data/story/cast';
-import { conversationById, OPENING_CONVERSATIONS } from '../../data/story';
+import { conversationById, OPENING_CONVERSATIONS, STORY_BEATS } from '../../data/story';
 import { emailOf } from './cast';
 import { drain, type Pending } from './inbox';
 import { testAll } from './conditions';
@@ -108,6 +108,36 @@ export const seedOpening = (): void => {
     // advances; arriving after it would be advice about a quarter that is
     // already over.
     runInbox();
+};
+
+/**
+ * Queue any story beat whose moment has arrived.
+ *
+ * The scene's own `when` is the trigger, so there is no second place to state
+ * it and the condition that fires a beat cannot drift from the condition that
+ * lets it be delivered. Once each, guarded by `seenScenes`.
+ */
+export const runStoryBeats = (): void => {
+    const world = readWorld();
+    const now = currentQuarter();
+
+    for (const id of STORY_BEATS) {
+        const story = useStoryStore.getState();
+        if (story.seenScenes.includes(id)) continue;
+        if (story.pending.some(p => p.conversationId === id)) continue;
+
+        const c = conversationById(id);
+        if (!c || !testAll(c.when, world)) continue;
+
+        useStoryStore.getState().schedule({
+            conversationId: id,
+            dueQuarter: now,
+            queuedAtQuarter: now,
+            // The spine does not wait behind a recall notice.
+            urgent: true,
+        });
+        useStoryStore.getState().markSceneSeen(id);
+    }
 };
 
 /**

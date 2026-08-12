@@ -73,6 +73,13 @@ export type StoryState = {
      * delivered there is nothing left in the queue to say it ever happened.
      */
     seenScenes: string[];
+    /**
+     * The ending that has been reached, if any. An id from data/story/endings.
+     *
+     * Persisted: a player who closes the app on the last screen should not
+     * come back to a running company they no longer own.
+     */
+    ending: string | null;
     _hasHydrated: boolean;
 };
 
@@ -115,6 +122,9 @@ type StoryStore = StoryState & {
     /** Remember that a scene has been shown, so it is not shown twice. */
     markSceneSeen: (conversationId: string) => void;
 
+    /** Stop the game. See data/story/endings.ts for the ids. */
+    endGame: (endingId: string) => void;
+
     /** A lock cleared by doing the thing. */
     completeLock: (id: string) => void;
     /** A lock the player walked away from. Recorded apart, so it is visible. */
@@ -132,6 +142,7 @@ export const initialStoryState: StoryState = {
     locks: emptyLockState(),
     eventHistory: emptyHistory(),
     seenScenes: [],
+    ending: null,
     _hasHydrated: false,
 };
 
@@ -167,6 +178,8 @@ export const useStoryStore = create<StoryStore>()(
 
             setEventHistory: (eventHistory) => set({ eventHistory }),
 
+            endGame: (endingId) => set({ ending: endingId }),
+
             markSceneSeen: (id) =>
                 set(state => (state.seenScenes.includes(id) ? state : {
                     seenScenes: [...state.seenScenes, id],
@@ -193,6 +206,7 @@ export const useStoryStore = create<StoryStore>()(
                 // from the first, and a new company would have a quiet decade.
                 eventHistory: emptyHistory(),
                 seenScenes: [],
+                ending: null,
                 _hasHydrated: true,
             }),
         }),
@@ -202,7 +216,7 @@ export const useStoryStore = create<StoryStore>()(
             partialize: state => ({
                 dials: state.dials, flags: state.flags, pending: state.pending,
                 locks: state.locks, eventHistory: state.eventHistory,
-                seenScenes: state.seenScenes,
+                seenScenes: state.seenScenes, ending: state.ending,
             }),
             /**
              * A save made before a dial existed has no value for it, and
@@ -223,6 +237,7 @@ export const useStoryStore = create<StoryStore>()(
                     // on the first tick after an update.
                     eventHistory: p.eventHistory ?? emptyHistory(),
                     seenScenes: p.seenScenes ?? [],
+                    ending: p.ending ?? null,
                 };
             },
             onRehydrateStorage: () => (state) => {

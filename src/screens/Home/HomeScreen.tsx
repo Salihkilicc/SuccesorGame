@@ -42,6 +42,8 @@ import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 import { useNewsStore } from '../../core/store/useNewsStore';
+import { useStoryStore } from '../../core/store/useStoryStore';
+import { endingById } from '../../data/story/endings';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -151,6 +153,21 @@ const HomeScreen = () => {
   // Subscribed rather than read once: a headline published while the player
   // is standing on the home screen should appear without a navigation.
   const newsItems = useNewsStore(state => state.items);
+  // ------------------------------------------------------------------
+  //  A STORY ENDING IS A GAME OVER TOO
+  // ------------------------------------------------------------------
+  //  The two that existed - bankrupt and removed - are decided inside the
+  //  quarterly tick and arrive as a status on its result. An ending chosen
+  //  in a CONVERSATION cannot travel that way: the decision happens four
+  //  screens from here, between ticks, and this component's local state
+  //  knows nothing about it.
+  //
+  //  So it goes through the story store, which is also what makes it
+  //  survive a reload. A player who closes the app on the last screen
+  //  should not come back to a company they no longer own.
+  // ------------------------------------------------------------------
+  const storyEnding = useStoryStore(state => state.ending);
+  const ending = storyEnding ? endingById(storyEnding) : undefined;
 
   // --- Quarterly Report State ---
   const [reportVisible, setReportVisible] = useState(false);
@@ -162,7 +179,7 @@ const HomeScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (isGameOver) {
+    if (isGameOver || !!ending) {
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 2000, // 2 saniye fade-in
@@ -171,7 +188,7 @@ const HomeScreen = () => {
     } else {
       fadeAnim.setValue(0);
     }
-  }, [isGameOver]);
+  }, [isGameOver, ending]);
 
   /**
    * Temiz yeni oyun.
@@ -634,15 +651,19 @@ const HomeScreen = () => {
 
         {/* --- GAME OVER OVERLAY --- */}
         {
-          isGameOver && (
+          (isGameOver || !!ending) && (
             <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
               <Text style={styles.gameOverText}>
-                {gameOverReason === 'removed' ? t('gameover.removed') : t('gameover.bankrupt')}
+                {ending
+                  ? ending.title
+                  : gameOverReason === 'removed' ? t('gameover.removed') : t('gameover.bankrupt')}
               </Text>
               <Text style={styles.gameOverSubText}>
-                {gameOverReason === 'removed'
-                  ? t('gameover.removedBody')
-                  : t('gameover.bankruptBody')}
+                {ending
+                  ? ending.body
+                  : gameOverReason === 'removed'
+                    ? t('gameover.removedBody')
+                    : t('gameover.bankruptBody')}
               </Text>
 
               <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>

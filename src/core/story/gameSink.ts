@@ -134,6 +134,13 @@ export const gameSink = (): EffectSink => ({
             queuedAtQuarter: now,
         });
     },
+    // The one effect that stops the game. Written to the story store rather
+    // than to a screen's local state, because the decision happens inside a
+    // conversation and the overlay lives four screens away - and because an
+    // ending the app forgets on a reload is not an ending.
+    ending: (id) => {
+        useStoryStore.getState().endGame(id);
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

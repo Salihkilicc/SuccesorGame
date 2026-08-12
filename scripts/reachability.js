@@ -781,7 +781,7 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
         // "exports no conversation" against a test that was never meant to.
         const isSceneFile = f =>
             /\.ts$/.test(f) && !/\.test\.ts$/.test(f)
-            && f !== 'index.ts' && f !== 'cast.ts';
+            && f !== 'index.ts' && f !== 'cast.ts' && f !== 'endings.ts';
 
         const dataFiles = fs.readdirSync(dir).filter(isSceneFile);
 
@@ -841,6 +841,47 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                         `data/events/${file}  ${c.id} is not in data/story/index.ts, so the inbox cannot deliver it`);
                 }
             }
+        }
+
+        // ------------------------------------------------------------------
+        //  AN ENDING THAT DOES NOT EXIST
+        // ------------------------------------------------------------------
+        //  The same failure as a broken link, at the worst possible moment:
+        //  the player makes the biggest decision in the game, presses the
+        //  button, and nothing happens. `ending` effects name an id in
+        //  data/story/endings.ts and this checks they are all real.
+        // ------------------------------------------------------------------
+        try {
+            const { ENDINGS } = loadTs(path.join(dir, 'endings.ts'));
+            const known = new Set(Object.keys(ENDINGS));
+            const walk = (c, file) => {
+                for (const node of c.nodes || []) {
+                    for (const choice of node.choices || []) {
+                        for (const e of choice.effects || []) {
+                            if (e.kind === 'ending' && !known.has(e.ending)) {
+                                problems.story.push(
+                                    `${file}  ${c.id}/${node.id}  unknown-ending: "${e.ending}" is not in data/story/endings.ts`);
+                            }
+                        }
+                    }
+                }
+            };
+            for (const file of dataFiles) {
+                for (const v of Object.values(loadTs(path.join(dir, file)))) {
+                    if (v && typeof v === 'object' && v.id && Array.isArray(v.nodes)) {
+                        walk(v, `data/story/${file}`);
+                    }
+                }
+            }
+            for (const file of eventFiles) {
+                for (const v of Object.values(loadTs(path.join(eventDir, file)))) {
+                    if (v && typeof v === 'object' && v.id && Array.isArray(v.nodes)) {
+                        walk(v, `data/events/${file}`);
+                    }
+                }
+            }
+        } catch (e) {
+            problems.story.push(`data/story/endings.ts  could not be checked: ${e.message}`);
         }
 
         // ------------------------------------------------------------------
