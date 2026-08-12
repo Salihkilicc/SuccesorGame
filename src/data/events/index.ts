@@ -29,6 +29,10 @@ import {
     friendGossipSmallEvent, friendGossipRealEvent,
     friendPearWeaknessEvent, friendOffersPlanoraEvent,
 } from './friendGossip';
+import {
+    moleNumberEvent, moleFirstContactEvent, moleOfferEvent,
+    fbiFirstContactEvent, fbiFirstContactRepeatEvent,
+} from './mole';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -52,6 +56,14 @@ export const EVENTS: GameEvent[] = [
     friendGossipRealEvent,
     friendPearWeaknessEvent,
     friendOffersPlanoraEvent,
+    // The hidden arc, and the only one a whole campaign can miss entirely.
+    // The two FBI entries are the same letter at two probabilities - see the
+    // note in mole.ts about why the escalation is a chance rather than a gate.
+    moleNumberEvent,
+    moleFirstContactEvent,
+    moleOfferEvent,
+    fbiFirstContactEvent,
+    fbiFirstContactRepeatEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

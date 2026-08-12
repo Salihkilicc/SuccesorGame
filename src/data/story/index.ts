@@ -46,6 +46,9 @@ import {
 import {
     friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
 } from '../events/friendGossip';
+import {
+    moleNumber, moleFirstContact, moleOffer, fbiFirstContact,
+} from '../events/mole';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -69,6 +72,7 @@ export const CONVERSATIONS: Conversation[] = [
     brotherVote, cfoWarnsAboutBrother, brotherCaught, brotherMeetsPearQuietly,
     friendAsks, friendGrows,
     friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
+    moleNumber, moleFirstContact, moleOffer, fbiFirstContact,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

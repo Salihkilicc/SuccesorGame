@@ -149,6 +149,17 @@ export type StoryFlag =
     | 'knowsPearWeakness'
     /** Planora is on the market at a price only you were offered. */
     | 'planoraOffered'
+    // --- The mole.
+    //
+    //     `moleUnlocked` already existed and was raised in two places without
+    //     ever being read. It is the door: the friend has given you a number.
+    //     Walking through it is `moleEngaged`, and that is a different fact -
+    //     the player who keeps the number and never uses it has done nothing.
+    | 'moleEngaged'
+    /** Used more than once. The FBI's odds change on this, not on the first. */
+    | 'moleRepeated'
+    /** Somebody federal has been in touch. Once is a courtesy; twice is not. */
+    | 'fbiContacted'
     // --- Teaching. Raised by the screens the first year points at, so a
     //     lock clears on the ACTION rather than on a screen being opened.
     | 'tutorialProductionSet'

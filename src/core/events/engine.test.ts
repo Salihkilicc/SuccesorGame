@@ -231,6 +231,27 @@ describe('the events that actually ship', () => {
                 flags: { fatherDead: true, friendHelped: true },
                 dials: { ...INITIAL_DIALS, friendLoyalty: 60, pearHostility: 60 },
             }],
+            ['at war with Pear, and took the number', {
+                capital: 80_000_000,
+                flags: { fatherDead: true, friendHelped: true, moleUnlocked: true },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 80 },
+            }],
+            ['...and used it once', {
+                capital: 80_000_000,
+                flags: {
+                    fatherDead: true, friendHelped: true,
+                    moleUnlocked: true, moleEngaged: true,
+                },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 80 },
+            }],
+            ['...and kept using it', {
+                capital: 80_000_000,
+                flags: {
+                    fatherDead: true, friendHelped: true,
+                    moleUnlocked: true, moleEngaged: true, moleRepeated: true,
+                },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 80 },
+            }],
         ];
 
         const seen = new Set<string>();
