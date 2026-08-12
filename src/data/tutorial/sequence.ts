@@ -100,4 +100,38 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
             { kind: 'moraleAtMost', value: MORALE_EVENT_THRESHOLD },
         ],
     },
+
+    {
+        // ------------------------------------------------------------------
+        //  Q3 — BEING HEARD
+        // ------------------------------------------------------------------
+        //  Time-based rather than triggered by a share number, and that is
+        //  deliberate after the morale threshold: a condition on share would
+        //  need share to actually fall, and a player doing well would never
+        //  see the lesson. Competitors ARE taking share in the third quarter
+        //  of every game - that is what a market with a 31% incumbent does.
+        //
+        //  The scene is where the father is out of date for the first time.
+        //  See data/story/fatherMarketing.ts.
+        // ------------------------------------------------------------------
+        id: 'q3-marketing',
+        highlight: 'products',
+        // Products again, on purpose: the marketing budget lives INSIDE a
+        // product, and a lock cannot light a control that is behind a closed
+        // modal - the overlay would dim the screen and point at nothing. The
+        // instruction carries the second step.
+        instruction: 'Open a product and put money behind it. A budget of zero is a product nobody has heard of.',
+        conversation: 'father-marketing',
+        satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
+        canEngage: [
+            { kind: 'noFlag', flag: 'fatherDead' },
+            { kind: 'quarterAtLeast', quarter: 3 },
+            // THE ESCAPE, and the audit could not have demanded it. Its
+            // no-escape rule looks for money in `satisfied`, and `satisfied`
+            // here is a FLAG - which happens to be raised by spending. The
+            // cost is real and completely invisible to the check. See the
+            // note in core/tutorial/locks.ts validateLocks.
+            { kind: 'capitalAtLeast', amount: 500_000 },
+        ],
+    },
 ];

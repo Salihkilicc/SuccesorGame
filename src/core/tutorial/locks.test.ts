@@ -175,10 +175,23 @@ describe('validateLocks finds the shapes that trap people', () => {
         expect(validateLocks([lock(), lock()]).map(p => p.kind)).toContain('duplicate');
     });
 
-    it('does not complain about a flag-cleared lock with no gate', () => {
-        // Raising a flag costs nothing, so there is nothing to be unable to
-        // afford. Flagging these would make the check noise.
-        expect(validateLocks([lock()])).toEqual([]);
+    it('now demands a gate even on a flag-cleared lock', () => {
+        // THIS TEST USED TO ASSERT THE OPPOSITE, on the reasoning that
+        // "raising a flag costs nothing, so there is nothing to be unable to
+        // afford". The marketing lock disproved it: its satisfying condition
+        // is a flag, and the flag is raised by SPENDING on a marketing
+        // budget. A flag can be raised by anything, including something the
+        // player cannot afford, so the cost is invisible to any check that
+        // reads the condition shape.
+        expect(validateLocks([lock()]).map(p => p.kind)).toEqual(['no-escape']);
+    });
+
+    it('and one line satisfies it', () => {
+        // The cost of the rule to an honest lock. It is not asking for a
+        // proof, it is asking the author to say when this is fair.
+        expect(validateLocks([lock({
+            canEngage: [{ kind: 'noFlag', flag: 'fatherDead' }],
+        })])).toEqual([]);
     });
 });
 

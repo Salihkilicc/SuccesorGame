@@ -127,6 +127,14 @@ export const useProductStore = create<ProductState & ProductActions>()(
                         require('./useStoryStore').useStoryStore.getState().raise('tutorialProductionSet');
                     } catch { /* story store not ready */ }
                 }
+                // Same rule for the marketing lock: it clears on money being
+                // committed, not on the field being looked at. Zero does not
+                // count - "I set it to nothing" is not the lesson.
+                if (typeof updates.marketingBudget === 'number' && updates.marketingBudget > 0) {
+                    try {
+                        require('./useStoryStore').useStoryStore.getState().raise('tutorialMarketingSet');
+                    } catch { /* story store not ready */ }
+                }
                 set((state) => ({
                     products: state.products.map((p) =>
                         p.id === id ? { ...p, ...updates } : p

@@ -107,6 +107,7 @@ export type StoryFlag =
     //     lock clears on the ACTION rather than on a screen being opened.
     | 'tutorialProductionSet'
     | 'tutorialBonusPaid'
+    | 'tutorialMarketingSet'
     // --- Verdicts
     | 'fbiCleared'
     | 'fbiGuilty'

@@ -91,7 +91,12 @@ describe('the lock', () => {
         // It had NO morale condition at all before this - it would have
         // engaged in quarter one, on a workforce at 75, telling the player to
         // fix something that was not wrong.
-        expect(activeLock(TUTORIAL_SEQUENCE, state(), world({ morale: 75 }))).toBeUndefined();
+        //
+        // Asserted as "not this lock" rather than "no lock at all": the Q3
+        // marketing lock sits behind it in the sequence and legitimately
+        // takes over, which is the step-over behaviour working.
+        expect(activeLock(TUTORIAL_SEQUENCE, state(), world({ morale: 75 }))?.id)
+            .not.toBe('morale-bonus');
     });
 
     it('engages once morale has settled', () => {

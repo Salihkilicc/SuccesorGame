@@ -196,11 +196,30 @@ export const validateLocks = (sequence: TutorialLock[]): LockProblem[] => {
             });
         }
 
-        if (lock.satisfied.some(needsResources) && !(lock.canEngage ?? []).length) {
+        // ------------------------------------------------------------------
+        //  EVERY LOCK DECLARES WHEN IT MAY ENGAGE. NO EXCEPTIONS.
+        // ------------------------------------------------------------------
+        //  This used to fire only when `satisfied` mentioned money, which
+        //  reads well and has a hole you can drive the marketing lock through:
+        //  its satisfying condition is a FLAG, and the flag happens to be
+        //  raised by spending. The cost is entirely real and entirely
+        //  invisible to any check that looks at the condition shape - a flag
+        //  can be raised by anything, including something the player cannot
+        //  afford.
+        //
+        //  So the requirement is now unconditional. It costs an honest lock
+        //  one line - `canEngage: [{ kind: 'noFlag', flag: 'fatherDead' }]`
+        //  is a perfectly good answer - and it makes the author state, every
+        //  time, the circumstances in which this is a fair thing to demand.
+        //  That question is the whole point of the file.
+        // ------------------------------------------------------------------
+        if (!(lock.canEngage ?? []).length) {
             problems.push({
                 lock: lock.id,
                 kind: 'no-escape',
-                detail: 'clearing it costs money but nothing stops it engaging when there is none',
+                detail: lock.satisfied.some(needsResources)
+                    ? 'clearing it costs money but nothing stops it engaging when there is none'
+                    : 'no canEngage: say when this is a fair thing to demand, even if the answer is "always in year one"',
             });
         }
     }
