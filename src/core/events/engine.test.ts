@@ -25,6 +25,9 @@ const world = (over: Partial<World> = {}): World => ({
     researchers: 0,
     // Owns nothing. These tests are not about the portfolio.
     subsidiaries: [],
+    // Never at a table, and the name has never been on anything.
+    casinoStreak: 0,
+    quartersWithoutSponsor: 0,
     ...over,
 });
 
@@ -392,6 +395,14 @@ describe('the events that actually ship', () => {
                 capital: 60_000_000,
                 flags: { fatherDead: true },
                 dials: { ...INITIAL_DIALS, brotherTrust: 15 },
+            }],
+            // ------------------------------------------------------------------
+            //  AND THE ONE WHO KEEPS GOING BACK
+            // ------------------------------------------------------------------
+            ['who has been at a table three quarters running', {
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                casinoStreak: 3,
             }],
             ['...and big enough at home that Pear has noticed', {
                 // NOT the same as 'beating him' above: that archetype carries

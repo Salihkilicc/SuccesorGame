@@ -51,6 +51,20 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   }, [maxBetLimit]);
 
   const reputationUp = (delta: number) => {
+    // ------------------------------------------------------------------
+    //  THE ONLY PLACE THE COMPANY FINDS OUT YOU WERE HERE
+    // ------------------------------------------------------------------
+    //  The casino has been in this game since before any of the story and it
+    //  has never cost the chief executive anything except money - a player
+    //  could be at a table every week for nine years and nothing in the
+    //  company would know. This marks the quarter. See
+    //  core/store/useCasinoRiskStore.ts for why it is a boolean rather than a
+    //  tally, and data/events/casino.ts for what three in a row does.
+    // ------------------------------------------------------------------
+    try {
+        require('../../../core/store/useCasinoRiskStore')
+            .useCasinoRiskStore.getState().recordVisit();
+    } catch { /* risk store not ready */ }
     updateReputation('casino', clamp(Math.round(casinoReputation + delta), 0, 1000));
   };
   const reputationDownSmall = () => {

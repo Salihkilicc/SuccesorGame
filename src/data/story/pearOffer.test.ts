@@ -47,6 +47,9 @@ const world = (over: Partial<World> = {}): World => ({
     researchers: 0,
     // Owns nothing. These tests are not about the portfolio.
     subsidiaries: [],
+    // Never at a table, and the name has never been on anything.
+    casinoStreak: 0,
+    quartersWithoutSponsor: 0,
     ...over,
 });
 

@@ -49,6 +49,9 @@ const world = (over: { cfoTrust?: number; cfoResigned?: boolean } = {}): World =
     researchers: 0,
     // Owns nothing. These tests are not about the portfolio.
     subsidiaries: [],
+    // Never at a table, and the name has never been on anything.
+    casinoStreak: 0,
+    quartersWithoutSponsor: 0,
 });
 
 describe('all of it is in the game', () => {

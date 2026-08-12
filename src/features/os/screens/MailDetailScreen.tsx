@@ -21,6 +21,9 @@ import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { hostilePremiumFor } from '../../../core/market/negotiation';
+import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
+import { offerById } from '../../../core/market/sponsorship';
+import { formatMoney } from '../../../core/utils';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -57,6 +60,13 @@ const MailDetailScreen = () => {
     const negotiation = offers.find(
         o => o.id === mail?.negotiationId && o.status === 'open',
     );
+    const signSponsor = useSponsorshipStore(s => s.sign);
+    const activeSponsor = useSponsorshipStore(s => s.active);
+    // Only live while nothing is signed: a company sponsors one thing, and an
+    // old letter in the inbox must not become a second one.
+    const sponsorOffer = !activeSponsor && mail?.sponsorOfferId
+        ? offerById(mail.sponsorOfferId)
+        : undefined;
 
     if (!mail) return null;
 
@@ -229,6 +239,28 @@ const MailDetailScreen = () => {
                                 </Pressable>
                             </>
                         )}
+                    </View>
+                )}
+
+                {/* The sponsorship letter's two answers. Signing replaces
+                    nothing, because there is nothing signed - the offer is
+                    only live while the company's name is on nothing. */}
+                {sponsorOffer && (
+                    <View style={styles.negotiationBox}>
+                        <Text style={styles.negotiationLabel}>THEY ARE WAITING ON YOU</Text>
+                        <Pressable
+                            style={styles.optionPrimary}
+                            onPress={() => {
+                                signSponsor(sponsorOffer.id);
+                                navigation.goBack();
+                            }}>
+                            <Text style={styles.optionPrimaryText}>
+                                Sign it — {formatMoney(sponsorOffer.quarterlyCost)} a quarter
+                            </Text>
+                        </Pressable>
+                        <Pressable style={styles.option} onPress={() => navigation.goBack()}>
+                            <Text style={styles.optionText}>Not this one.</Text>
+                        </Pressable>
                     </View>
                 )}
 

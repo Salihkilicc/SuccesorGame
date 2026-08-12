@@ -1247,12 +1247,23 @@ export const useGameStore = create<GameStore>()(
           // public. Read here rather than applied as a one-off subtraction:
           // brand mean-reverts, so a drain on the value is erased within two
           // or three quarters and measured at almost exactly nothing.
+          // TWO CEILING PENALTIES, ADDED. A conviction and a drought are
+          // different failures and a company can have both - and both had to
+          // be ceilings rather than drains for the same measured reason: the
+          // brand mean-reverts, so a subtraction from the VALUE is pulled
+          // straight back out within two or three quarters.
           ceilingPenalty: (() => {
+            let penalty = 0;
             try {
               const { useStoryStore: st } = require('./useStoryStore');
               const { CONVICTION_CEILING_PENALTY } = require('../story/state');
-              return st.getState().flags?.fbiGuilty ? CONVICTION_CEILING_PENALTY : 0;
-            } catch { return 0; }
+              if (st.getState().flags?.fbiGuilty) penalty += CONVICTION_CEILING_PENALTY;
+            } catch { /* story store not ready */ }
+            try {
+              penalty += require('./useSponsorshipStore')
+                .useSponsorshipStore.getState().penalty();
+            } catch { /* sponsorship store not ready */ }
+            return penalty;
           })(),
         });
 
@@ -2149,6 +2160,35 @@ export const useGameStore = create<GameStore>()(
           //  called above. Durable by construction: the company can still
           //  climb and can never climb as high as it would have.
           // ==============================================================
+          // ==============================================================
+          //  TWO COUNTERS AND ONE BILL
+          // ==============================================================
+          //  Before the roll, because the casino streak this closes is the
+          //  gate on the scandal that the roll may fire in the same quarter.
+          //  The other order costs the player a quarter for nothing and looks
+          //  exactly like the event being slow.
+          // ==============================================================
+          try {
+            require('./useCasinoRiskStore').useCasinoRiskStore
+              .getState().closeQuarter(Math.max(1, quarters));
+          } catch (e) {
+            console.warn('[casino] quarter could not be closed', e);
+          }
+
+          try {
+            const sponsorship = require('./useSponsorshipStore').useSponsorshipStore;
+            const due = sponsorship.getState().advance(Math.max(1, quarters));
+            if (due.cost > 0) {
+              const st = useStatsStore.getState();
+              st.update({ companyCapital: (st.companyCapital || 0) - due.cost });
+            }
+            if (due.brand > 0) {
+              require('../story/gameSink').gameSink().brand(due.brand);
+            }
+          } catch (e) {
+            console.warn('[sponsorship] quarter could not be advanced', e);
+          }
+
           try {
             require('../events/runQuarter').runEvents();
           } catch (e) {
@@ -2191,6 +2231,13 @@ export const useGameStore = create<GameStore>()(
             require('../market/postNegotiationReplies').postDueReplies();
           } catch (e) {
             console.warn('[negotiation] replies could not be posted', e);
+          }
+
+          try {
+            require('../market/postSponsorOffer')
+              .postSponsorOffer(require('../story/world').currentQuarter());
+          } catch (e) {
+            console.warn('[sponsorship] offer could not be posted', e);
           }
 
           try {

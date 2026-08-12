@@ -49,6 +49,9 @@ const world = (over: Partial<World> = {}): World => ({
     staffing: 100,
     researchers: 0,
     subsidiaries: [],
+    // Never at a table, and the name has never been on anything.
+    casinoStreak: 0,
+    quartersWithoutSponsor: 0,
     ...over,
 });
 

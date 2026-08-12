@@ -34,6 +34,8 @@ import { useMessageStore } from './store/useMessageStore';
 import { useStoryStore } from './store/useStoryStore';
 import { useNegotiationStore } from './store/useNegotiationStore';
 import { useTerritoryStore } from './store/useTerritoryStore';
+import { useSponsorshipStore } from './store/useSponsorshipStore';
+import { useCasinoRiskStore } from './store/useCasinoRiskStore';
 import { useMailStore } from './store/useMailStore';
 import { useNewsStore } from './store/useNewsStore';
 
@@ -63,6 +65,10 @@ export const PERSIST_KEYS: string[] = [
     // Royalties are forever, which is the whole point of them - and forever
     // has to mean this run rather than this device.
     'succesor_territory_v1',
+    // Whose name is on what, and how many quarters in a row somebody was at a
+    // table. Both are facts about a person who is no longer the CEO.
+    'succesor_sponsorship_v1',
+    'succesor_casino_risk_v1',
     'succesor_story_v1',
     'succesor_news_v1',
 
@@ -124,6 +130,8 @@ const resetInMemoryStores = () => {
     // who is no longer the CEO.
     useNegotiationStore.getState().reset();
     useTerritoryStore.getState().reset();
+    useSponsorshipStore.getState().reset();
+    useCasinoRiskStore.getState().reset();
 
     // ------------------------------------------------------------------
     //  `reset?.()` HID A MISSING METHOD

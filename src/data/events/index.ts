@@ -67,6 +67,7 @@ import {
 } from './labPressure';
 import { espionageKestrelEvent, espionageBrokerEvent, espionageOracleEvent } from './espionage';
 import { fbiFinancialEvent, fbiInsiderEvent, fbiEspionageEvent } from './fbi';
+import { casinoScandalEvent } from './casino';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -166,6 +167,9 @@ export const EVENTS: GameEvent[] = [
     fbiFinancialEvent,
     fbiInsiderEvent,
     fbiEspionageEvent,
+    // The counter this prompt added. Rolled again every quarter the streak
+    // survives, because each quarter is a fresh choice to keep going.
+    casinoScandalEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

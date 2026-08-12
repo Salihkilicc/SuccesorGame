@@ -113,6 +113,16 @@ export type Condition =
      * company the player sold two years ago is the failure mode.
      */
     | { kind: 'owns'; company: string }
+    /**
+     * Consecutive quarters with at least one night at a table.
+     *
+     * A streak rather than a count, because a scandal is about a PATTERN. One
+     * heavy weekend is a story nobody writes; three quarters in a row is a
+     * thing a journalist can print. See core/store/useCasinoRiskStore.ts.
+     */
+    | { kind: 'casinoStreakAtLeast'; quarters: number }
+    /** Quarters with the company's name on nothing. */
+    | { kind: 'withoutSponsorAtLeast'; quarters: number }
     /** Every one of these holds. */
     | { kind: 'all'; of: Condition[] }
     /** At least one of these holds. */
@@ -164,6 +174,10 @@ export type World = {
      * cannot answer this one.
      */
     subsidiaries: string[];
+    /** Consecutive quarters with at least one casino visit. */
+    casinoStreak: number;
+    /** Quarters since the company's name was last on anything. */
+    quartersWithoutSponsor: number;
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -185,6 +199,8 @@ export const test = (c: Condition, w: World): boolean => {
         case 'staffingAtMost': return w.staffing <= c.percent;
         case 'researchersAtMost': return w.researchers <= c.count;
         case 'owns': return (w.subsidiaries ?? []).includes(c.company);
+        case 'casinoStreakAtLeast': return (w.casinoStreak ?? 0) >= c.quarters;
+        case 'withoutSponsorAtLeast': return (w.quartersWithoutSponsor ?? 0) >= c.quarters;
         case 'all': return c.of.every(x => test(x, w));
         case 'any': return c.of.some(x => test(x, w));
         case 'not': return !test(c.of, w);

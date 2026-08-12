@@ -91,6 +91,7 @@ import {
     espionageOracleBetrayal,
 } from '../events/espionage';
 import { fbiFinancial, fbiInsider, fbiEspionage } from '../events/fbi';
+import { casinoScandalScene } from '../events/casino';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -158,6 +159,8 @@ export const CONVERSATIONS: Conversation[] = [
     // Three interviews. The trap in each is the graph shape rather than a
     // die - see the note at the top of data/events/fbi.ts.
     fbiFinancial, fbiInsider, fbiEspionage,
+    // Three quarters in a row.
+    casinoScandalScene,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

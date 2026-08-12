@@ -26,6 +26,14 @@ export type Mail = {
      * screen guessing which kind it had.
      */
     negotiationId?: string;
+    /**
+     * A sponsorship offer waiting to be signed or declined.
+     *
+     * A third kind rather than reusing either of the other two, and for the
+     * same reason they are separate from each other: they are answered by
+     * different machines and the detail screen would otherwise be guessing.
+     */
+    sponsorOfferId?: string;
 };
 
 export type MailState = {

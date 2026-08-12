@@ -97,5 +97,20 @@ export const readWorld = (): World => {
                 return [];
             }
         })(),
+        casinoStreak: (() => {
+            try {
+                return require('../store/useCasinoRiskStore')
+                    .useCasinoRiskStore.getState().streak ?? 0;
+            } catch { return 0; }
+        })(),
+        quartersWithoutSponsor: (() => {
+            try {
+                const s = require('../store/useSponsorshipStore').useSponsorshipStore.getState();
+                // A live deal means the name is on something TODAY, whatever
+                // the counter last read. Without this, the quarter a deal is
+                // signed would still look like a drought to every condition.
+                return s.active ? 0 : (s.quartersWithout ?? 0);
+            } catch { return 0; }
+        })(),
     };
 };
