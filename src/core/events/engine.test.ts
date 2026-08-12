@@ -16,6 +16,7 @@ const world = (over: Partial<World> = {}): World => ({
     quarter: 20,
     capital: 100_000_000,
     cash: 5_000_000,
+    morale: 75,
     ...over,
 });
 

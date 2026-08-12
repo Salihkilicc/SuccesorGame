@@ -16,6 +16,7 @@ import type { Conversation } from '../../core/story/graph';
 import { cfoDividend } from './cfoDividend';
 import { fatherQ1 } from './fatherQ1';
 import { fatherQ1Invoice } from './fatherQ1Invoice';
+import { fatherMorale } from './fatherMorale';
 // Event scenes live next to their trigger in data/events, because a scene and
 // the condition that fires it are one thing and splitting them across two
 // folders is how they drift. They register HERE all the same: the inbox
@@ -27,6 +28,7 @@ import { shortSellerConversation } from '../events/shortSeller';
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
     fatherQ1Invoice,
+    fatherMorale,
     cfoDividend,
     recallConversation,
     poachConversation,

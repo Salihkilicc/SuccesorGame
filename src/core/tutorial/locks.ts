@@ -76,6 +76,18 @@ export type TutorialLock = {
      * `canEngage`, because that is the shape of the bonus trap.
      */
     canEngage?: Condition[];
+    /**
+     * The scene that explains it.
+     *
+     * A conversation id. When the lock first becomes engageable it is queued,
+     * so the father's words and the dimmed screen arrive together.
+     *
+     * They were unrelated before this. The overlay said "Pay a bonus before
+     * the line starts costing you" and nothing anywhere said WHY, which left
+     * the teaching layer sounding like a tooltip rather than a person - and
+     * left the two halves free to drift into saying different things.
+     */
+    conversation?: string;
 };
 
 export type LockState = {

@@ -20,6 +20,33 @@
 
 import type { TutorialLock } from '../../core/tutorial/locks';
 
+// ============================================================================
+//  WHY THE MORALE THRESHOLD IS NOT 70
+// ============================================================================
+//
+//  It was specified as 70, on the reasoning that 70 is MORALE_ANCHOR - where
+//  market pay parks morale - so nearly every player would see the event. The
+//  reasoning is right and the number does not work, and it is worth writing
+//  down why rather than quietly using a different one.
+//
+//  MORALE NEVER GOES BELOW 70. It approaches it. The workforce starts at 75
+//  and closes 30% of the remaining gap to its wage target each quarter, so on
+//  market pay it runs 73.5, 72.5, 71.8, 71.3, 70.9, 70.6, 70.4, 70.3 - an
+//  asymptote. Measured over eight quarters in the real tick, not reasoned
+//  about. `moraleAtMost: 70` would fire for nobody, ever, which is the exact
+//  opposite of the intent.
+//
+//  72 is the smallest round number that delivers what was actually asked for:
+//  it is crossed in the second or third quarter of ordinary play, so the
+//  event lands inside the tutorial year for anyone paying the market rate,
+//  and it does NOT fire for a player who has already pushed morale up - which
+//  is the one group who has earned skipping the lesson.
+//
+//  Kept as a named constant so the number is in one place and moving it is a
+//  decision rather than a search.
+// ============================================================================
+export const MORALE_EVENT_THRESHOLD = 72;
+
 export const TUTORIAL_SEQUENCE: TutorialLock[] = [
     {
         // ------------------------------------------------------------------
@@ -58,12 +85,19 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // ------------------------------------------------------------------
         id: 'morale-bonus',
         highlight: 'teamMorale',
-        instruction: 'Morale is slipping. Pay a bonus before the line starts costing you.',
+        // Not "morale is slipping" any more - it is not slipping, it has
+        // settled, and telling the player otherwise would be the game
+        // describing something they can go and see is untrue.
+        instruction: 'Morale has settled at the market rate. A bonus is how you buy back a quarter of it.',
+        conversation: 'father-morale',
         satisfied: [{ kind: 'flag', flag: 'tutorialBonusPaid' }],
         canEngage: [
             { kind: 'noFlag', flag: 'fatherDead' },
             // THE ESCAPE. Cannot demand what cannot be paid.
             { kind: 'capitalAtLeast', amount: 250_000 },
+            // The trigger itself, which this lock did not have at all - it
+            // would have engaged on quarter one regardless of morale.
+            { kind: 'moraleAtMost', value: MORALE_EVENT_THRESHOLD },
         ],
     },
 ];

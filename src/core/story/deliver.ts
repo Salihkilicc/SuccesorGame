@@ -31,6 +31,8 @@ import { emailOf } from './cast';
 import { drain, type Pending } from './inbox';
 import { testAll } from './conditions';
 import { readWorld, currentQuarter } from './world';
+import { activeLock } from '../tutorial/locks';
+import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 
 /** Put one conversation in front of the player. */
 export const deliver = (conversationId: string): boolean => {
@@ -106,6 +108,40 @@ export const seedOpening = (): void => {
     // advances; arriving after it would be advice about a quarter that is
     // already over.
     runInbox();
+};
+
+/**
+ * Queue the scene belonging to whichever lock is now live.
+ *
+ * The overlay dims the screen and lights one control; the conversation says
+ * why. Before this they were unrelated - the lock had an `instruction` string
+ * and nothing anywhere explained it, so the teaching layer sounded like a
+ * tooltip rather than a person.
+ *
+ * Called each quarter. Idempotent per lock: the conversation is queued once,
+ * recorded in the same flag set as everything else.
+ */
+export const runTutorialScenes = (): void => {
+    const world = readWorld();
+    const story = useStoryStore.getState();
+    const lock = activeLock(TUTORIAL_SEQUENCE, story.locks, world);
+    if (!lock?.conversation) return;
+
+    const already = story.pending.some(p => p.conversationId === lock.conversation)
+        || story.seenScenes.includes(lock.conversation);
+    if (already) return;
+
+    const now = currentQuarter();
+    useStoryStore.getState().schedule({
+        conversationId: lock.conversation,
+        dueQuarter: now,
+        queuedAtQuarter: now,
+        // The lock is already on screen. Its explanation does not queue behind
+        // a random event, or the player stares at a dimmed screen being told
+        // to do something by nobody.
+        urgent: true,
+    });
+    useStoryStore.getState().markSceneSeen(lock.conversation);
 };
 
 /**

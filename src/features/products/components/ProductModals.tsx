@@ -11,6 +11,7 @@ import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinan
 import { brandIndex, BRAND_INDEX_SCALE } from '../../../core/market/brand';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useGameStore } from '../../../core/store/useGameStore';
 import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
 import {
     computeAttraction,
@@ -321,7 +322,20 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     //  after scrap it always came up short by the scrap rate. The order now
     //  grosses up for yield, and the screen states both numbers.
     // ----------------------------------------------------------------------
-    const employeeMorale = useStatsStore(state => state.employeeMorale ?? 70);
+    // ------------------------------------------------------------------
+    //  READ THE MORALE THE ENGINE ACTUALLY USES
+    // ------------------------------------------------------------------
+    //  This read useStatsStore.employeeMorale, which is initialised to 75
+    //  with a comment saying it must match the game store's - and is then
+    //  never written again. Measured over eight quarters: the game store
+    //  walked 73.5 -> 70.3 while this copy sat at 75 the whole time.
+    //
+    //  So the scrap preview on this screen was computed from a morale the
+    //  tick does not use, and it under-estimated waste by more every quarter
+    //  the game went on. On the one screen whose entire job is telling the
+    //  player how much they are about to throw away.
+    // ------------------------------------------------------------------
+    const employeeMorale = useGameStore(state => state.employeeMorale ?? 70);
     const effectiveYield = Math.max(
         0.5,
         1 - (1 - tier.yieldRate) * scrapMultiplier(employeeMorale),

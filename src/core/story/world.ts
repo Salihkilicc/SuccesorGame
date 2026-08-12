@@ -49,5 +49,18 @@ export const readWorld = (): World => {
         quarter: currentQuarter(),
         capital: stats.companyCapital || 0,
         cash: stats.money || 0,
+        // ------------------------------------------------------------------
+        //  MORALE IS IN TWO STORES AND ONLY ONE OF THEM MOVES
+        // ------------------------------------------------------------------
+        //  `useStatsStore.employeeMorale` is initialised to 75 with a comment
+        //  saying it must match the game store's - and then nothing ever
+        //  writes it again. Measured over eight quarters: the game store
+        //  walked 73.5 -> 70.3 while the stats copy sat at 75 the whole time.
+        //
+        //  The tick reads and writes the GAME store, so that is the real one
+        //  and this reads it. See the note in ProductModals.tsx for the screen
+        //  that was reading the frozen copy.
+        // ------------------------------------------------------------------
+        morale: useGameStore.getState().employeeMorale ?? 75,
     };
 };

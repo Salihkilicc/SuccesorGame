@@ -61,6 +61,18 @@ export type StoryState = {
      * notice the repetition.
      */
     eventHistory: EventHistory;
+    /**
+     * Conversation ids that have already been put in front of the player once.
+     *
+     * A list rather than a StoryFlag per scene: flags are a closed union and
+     * naming irreversible FACTS, and "scene 14 has been shown" is neither
+     * interesting enough to be a fact nor something the union should grow by
+     * one for every scene written.
+     *
+     * Distinct from `pending`, which is drained - by the time a scene has been
+     * delivered there is nothing left in the queue to say it ever happened.
+     */
+    seenScenes: string[];
     _hasHydrated: boolean;
 };
 
@@ -100,6 +112,9 @@ type StoryStore = StoryState & {
     /** Record which events fired this quarter. See core/events/runQuarter.ts */
     setEventHistory: (history: EventHistory) => void;
 
+    /** Remember that a scene has been shown, so it is not shown twice. */
+    markSceneSeen: (conversationId: string) => void;
+
     /** A lock cleared by doing the thing. */
     completeLock: (id: string) => void;
     /** A lock the player walked away from. Recorded apart, so it is visible. */
@@ -116,6 +131,7 @@ export const initialStoryState: StoryState = {
     pending: [],
     locks: emptyLockState(),
     eventHistory: emptyHistory(),
+    seenScenes: [],
     _hasHydrated: false,
 };
 
@@ -151,6 +167,11 @@ export const useStoryStore = create<StoryStore>()(
 
             setEventHistory: (eventHistory) => set({ eventHistory }),
 
+            markSceneSeen: (id) =>
+                set(state => (state.seenScenes.includes(id) ? state : {
+                    seenScenes: [...state.seenScenes, id],
+                })),
+
             completeLock: (id) =>
                 set(state => (state.locks.completed.includes(id) ? state : {
                     locks: { ...state.locks, completed: [...state.locks.completed, id] },
@@ -171,6 +192,7 @@ export const useStoryStore = create<StoryStore>()(
                 // Otherwise the second run starts with every event on cooldown
                 // from the first, and a new company would have a quiet decade.
                 eventHistory: emptyHistory(),
+                seenScenes: [],
                 _hasHydrated: true,
             }),
         }),
@@ -180,6 +202,7 @@ export const useStoryStore = create<StoryStore>()(
             partialize: state => ({
                 dials: state.dials, flags: state.flags, pending: state.pending,
                 locks: state.locks, eventHistory: state.eventHistory,
+                seenScenes: state.seenScenes,
             }),
             /**
              * A save made before a dial existed has no value for it, and
@@ -199,6 +222,7 @@ export const useStoryStore = create<StoryStore>()(
                     // undefined here would make `history.lastFired[id]` throw
                     // on the first tick after an update.
                     eventHistory: p.eventHistory ?? emptyHistory(),
+                    seenScenes: p.seenScenes ?? [],
                 };
             },
             onRehydrateStorage: () => (state) => {

@@ -1650,31 +1650,8 @@ export const useGameStore = create<GameStore>()(
             console.warn('[story] brother sync failed', e);
         }
 
-        // ------------------------------------------------------------------
-        //  RANDOM EVENTS — rolled BEFORE the inbox drains
-        // ------------------------------------------------------------------
-        //  So an event that fires can be delivered in the same quarter if
-        //  there is room. It queues rather than pushing in: the two-a-quarter
-        //  allowance belongs to the story, and a dice roll must not be able to
-        //  displace a beat somebody wrote.
-        //
-        //  The headline goes out either way, immediately. That is the point of
-        //  news - the world hears on its own schedule, and reading about your
-        //  own recall before your COO reaches you is the right way round.
-        //
-        //  See core/events/runQuarter.ts.
-        // ------------------------------------------------------------------
-        try {
-            require('../events/runQuarter').runEvents();
-        } catch (e) {
-            console.warn('[events] roll failed', e);
-        }
-
-        try {
-            require('../story/deliver').runInbox();
-        } catch (e) {
-            console.warn('[story] inbox could not run', e);
-        }
+        // The story block used to sit here. It has moved to the END of the
+        // tick - see "THE STORY READS A FINISHED QUARTER" below for why.
 
         // 5. Store'ları Güncelle (Yeni verileri kaydet)
         // CRITICAL FIX: Use update() instead of setState() to preserve other fields
@@ -2054,6 +2031,54 @@ export const useGameStore = create<GameStore>()(
             lastQuarterProfit: netProfit,
             bonusDistributedThisQuarter: false,
           }));
+
+          // ==============================================================
+          //  THE STORY READS A FINISHED QUARTER
+          // ==============================================================
+          //  This block used to run four hundred lines earlier, straight
+          //  after the date advanced. The date was right and NOTHING ELSE
+          //  WAS: company capital is written at the stats update below it,
+          //  morale on the line above this comment. So every condition a
+          //  scene asked about money or morale was answered with LAST
+          //  quarter's figure while `quarter` said this one.
+          //
+          //  Found by the morale beat arriving a quarter late. Morale
+          //  crossed the threshold in Q3 and the father turned up in Q4,
+          //  because in Q3 the story was still looking at Q2's number. A
+          //  one-quarter lag on everything, and nothing would ever have
+          //  reported it - the scenes all still fire, just late.
+          //
+          //  Now it runs last. The quarter is fully resolved - money moved,
+          //  morale settled, valuation written - and the story reacts to
+          //  the world the player is about to see rather than the one they
+          //  have just left.
+          //
+          //  ORDER WITHIN THE BLOCK MATTERS TOO:
+          //    events        - roll, publish the headline, queue the scene
+          //    tutorial      - queue the scene belonging to the live lock
+          //    inbox         - drain the queue, honouring the allowance
+          //  so anything queued above can be delivered in the same quarter
+          //  if there is room for it. Events queue rather than push in: the
+          //  allowance belongs to the story and a dice roll must not
+          //  displace a beat somebody wrote.
+          // ==============================================================
+          try {
+            require('../events/runQuarter').runEvents();
+          } catch (e) {
+            console.warn('[events] roll failed', e);
+          }
+
+          try {
+            require('../story/deliver').runTutorialScenes();
+          } catch (e) {
+            console.warn('[tutorial] scene could not be queued', e);
+          }
+
+          try {
+            require('../story/deliver').runInbox();
+          } catch (e) {
+            console.warn('[story] inbox could not run', e);
+          }
 
           // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
           if (FEATURES.love) {

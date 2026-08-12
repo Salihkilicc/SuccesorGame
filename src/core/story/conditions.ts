@@ -43,6 +43,15 @@ export type Condition =
     | { kind: 'capitalAtLeast'; amount: number }
     /** The player personally can. */
     | { kind: 'cashAtLeast'; amount: number }
+    /**
+     * The workforce has stopped being happy.
+     *
+     * A raw number rather than a band, unlike the dials, and that is on
+     * purpose: morale is not a relationship the story owns, it is an engine
+     * figure with its own physics in core/market/workforce.ts. Inventing
+     * story bands over it would give the same number two vocabularies.
+     */
+    | { kind: 'moraleAtMost'; value: number }
     /** Every one of these holds. */
     | { kind: 'all'; of: Condition[] }
     /** At least one of these holds. */
@@ -58,6 +67,14 @@ export type World = {
     quarter: number;
     capital: number;
     cash: number;
+    /**
+     * Employee morale, 0-100.
+     *
+     * READ FROM useGameStore, which is the one the engine actually advances.
+     * useStatsStore carries a field of the same name that nothing updates -
+     * see the note in core/story/world.ts.
+     */
+    morale: number;
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -72,6 +89,7 @@ export const test = (c: Condition, w: World): boolean => {
         case 'quarterAtLeast': return w.quarter >= c.quarter;
         case 'capitalAtLeast': return w.capital >= c.amount;
         case 'cashAtLeast': return w.cash >= c.amount;
+        case 'moraleAtMost': return w.morale <= c.value;
         case 'all': return c.of.every(x => test(x, w));
         case 'any': return c.of.some(x => test(x, w));
         case 'not': return !test(c.of, w);
