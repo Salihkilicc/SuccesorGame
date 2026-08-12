@@ -61,6 +61,10 @@ import {
 import {
     territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
 } from '../events/territory';
+import {
+    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleBiogen, rippleSkynet, ripplePlanora,
+} from '../events/ripple';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -96,6 +100,10 @@ export const CONVERSATIONS: Conversation[] = [
     // out in data/events/index.ts: the audit reads these modules statically
     // and a spread of an imported array stops it reading them at all.
     territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
+    // And the six people who wanted the company you just bought. Listed for
+    // the same reason - a spread stops the audit reading this module at all.
+    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleBiogen, rippleSkynet, ripplePlanora,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

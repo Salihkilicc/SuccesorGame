@@ -62,6 +62,8 @@ const playable = () => {
         ending: () => { }, schedule: () => { }, reprice: () => { },
     royalty: () => { },
     siege: () => { },
+    raid: () => { },
+    retention: () => { },
     };
     return { w, sink };
 };

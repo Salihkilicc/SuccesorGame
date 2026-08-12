@@ -325,6 +325,23 @@ describe('the events that actually ship', () => {
                     enteredBioTech: true,
                 },
             }],
+            // ------------------------------------------------------------------
+            //  AND THE PLAYER WHO HAS BEEN BUYING
+            // ------------------------------------------------------------------
+            //  One archetype for all six ripples rather than six, for the same
+            //  reason as the territory entries: a company can hold all six at
+            //  once, and splitting them would be six ways of describing one
+            //  acquisitive CEO.
+            // ------------------------------------------------------------------
+            ['has been buying, and other people had folders too', {
+                capital: 400_000_000,
+                flags: {
+                    fatherDead: true,
+                    boughtVoltmotors: true, boughtStreamify: true,
+                    boughtNovidia: true, boughtBiogen: true,
+                    boughtSkynet: true, boughtPlanora: true,
+                },
+            }],
             ['...and big enough at home that Pear has noticed', {
                 // NOT the same as 'beating him' above: that archetype carries
                 // pearHostility 85, and this letter requires that the war has

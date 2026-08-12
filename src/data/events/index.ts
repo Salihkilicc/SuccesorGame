@@ -42,6 +42,10 @@ import {
     territoryBioTechEvent, territoryConsumerEvent,
 } from './territory';
 import {
+    rippleVoltmotorsEvent, rippleStreamifyEvent, rippleNovidiaEvent,
+    rippleBiogenEvent, rippleSkynetEvent, ripplePlanoraEvent,
+} from './ripple';
+import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
 
@@ -105,6 +109,14 @@ export const EVENTS: GameEvent[] = [
     territoryDeepTechEvent,
     territoryBioTechEvent,
     territoryConsumerEvent,
+    // Buying a company is not a private transaction. Four rivals who wanted
+    // the same business and one fund that wanted two of them cheap.
+    rippleVoltmotorsEvent,
+    rippleStreamifyEvent,
+    rippleNovidiaEvent,
+    rippleBiogenEvent,
+    rippleSkynetEvent,
+    ripplePlanoraEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

@@ -67,6 +67,18 @@ export interface AcquisitionDeal {
     impaired: boolean;
     /** Dusmanca miydi — entegrasyon daha zor gecer */
     hostile: boolean;
+    /**
+     * How much of the synergy this deal will ever realise, 0-1.
+     *
+     * Undefined means "whatever the hostile flag implies", which is what every
+     * deal did before and still does. It exists so that somebody ELSE can
+     * damage a deal after it closes - a rival who wanted the same company and
+     * hires its people out from under you. See core/market/ripple.ts.
+     *
+     * PERMANENT AND NOT A TIMER, deliberately. A siege ends; people who have
+     * left do not come back, and the thing you actually bought was them.
+     */
+    synergyRealization?: number;
 }
 
 // ============================================================================
@@ -254,7 +266,11 @@ export const dealQuarterEffect = (deal: AcquisitionDeal): DealQuarterEffect => {
 
     // 3) Sinerji — yavas gelir, dusmanca devralmada eksik gerceklesir.
     const synergyRatio = rampRatio(q, SYNERGY_RAMP_QUARTERS);
-    const realization = deal.hostile ? HOSTILE_SYNERGY_REALIZATION : 1;
+    // A raid overrides the hostile default rather than multiplying it: a deal
+    // can only be damaged to a level, not repeatedly, so two rivals cannot
+    // stack their way to zero.
+    const realization = deal.synergyRealization
+        ?? (deal.hostile ? HOSTILE_SYNERGY_REALIZATION : 1);
     // TABAN: hedefin KENDI kari. Kar etmeyen sirkette kirpacak gider
     // yoktur — sinerji sifirdir. Once `deal.price` uzerinden hesaplaniyordu
     // ve para yakan bir hedefi bile karli gosteriyordu.

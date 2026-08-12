@@ -180,6 +180,58 @@ export const gameSink = (): EffectSink => ({
             );
         } catch { /* territory store not ready */ }
     },
+    // Writes onto the DEAL rather than anywhere global, so the damage is to
+    // the acquisition it was aimed at and nothing else the player owns.
+    raid: (company) => {
+        try {
+            const { rippleFor, realizationAfter } = require('../market/ripple');
+            const ripple = rippleFor(company);
+            if (!ripple) return;
+            const realization = realizationAfter(ripple.kind);
+            const finance = require('../../features/finance/stores/useCorporateFinanceStore')
+                .useCorporateFinanceStore;
+            // ONTO `sub.deal`, NOT ONTO THE SUBSIDIARY. A subsidiary is the
+            // holding record - name, sector, valuation, a strategy the player
+            // sets - and the deal nested inside it is the M&A model that
+            // `dealQuarterEffect` actually reads every quarter. The first
+            // version wrote the field on the wrapper, where it was perfectly
+            // stored and read by nothing.
+            finance.setState((st: any) => ({
+                subsidiaries: (st.subsidiaries ?? []).map((sub: any) =>
+                    sub.id === company && sub.deal
+                        ? {
+                            ...sub,
+                            deal: {
+                                ...sub.deal,
+                                // Math.min, so two raids on one deal cannot
+                                // stack their way to zero - the worst stands.
+                                synergyRealization: Math.min(
+                                    sub.deal.synergyRealization ?? 1, realization,
+                                ),
+                            },
+                        }
+                        : sub),
+            }));
+        } catch { /* finance store not ready */ }
+    },
+    // Priced off the DEAL, which is the only place the target's earnings are
+    // recorded. A scene has no way of knowing that number and should not
+    // pretend to - the first draft hardcoded six figures per letter.
+    retention: (company) => {
+        try {
+            const { defenceCost } = require('../market/ripple');
+            const finance = require('../../features/finance/stores/useCorporateFinanceStore')
+                .useCorporateFinanceStore;
+            const sub = (finance.getState().subsidiaries ?? [])
+                .find((d: any) => d.id === company);
+            if (!sub?.deal) return;
+            const cost = defenceCost(sub.deal.targetAnnualEbit);
+            // Through the same door as every other money movement in this
+            // file, rather than a second way of writing capital.
+            const stats = useStatsStore.getState();
+            stats.update({ companyCapital: (stats.companyCapital || 0) - cost });
+        } catch { /* finance store not ready */ }
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

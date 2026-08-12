@@ -117,6 +117,37 @@ export type Effect =
      * it makes everything else look better than it did. Ends on a timer.
      */
     | { kind: 'siege'; category: string; quarters: number; pressure: number }
+    /**
+     * Somebody hires the company you just bought out from under you.
+     *
+     * Writes the deal's `synergyRealization` - the fraction of the synergy it
+     * will ever deliver - and it is PERMANENT, unlike a siege. A besieger stops
+     * paying and goes away; a team that has resigned does not reassemble.
+     *
+     * It lands on exactly the thing that was bought. A share penalty would
+     * punish the whole company for one deal; this leaves you owning the
+     * business, still earning, with the reason you paid a premium for it gone.
+     */
+    /**
+     * NO NUMBER ON IT, and that is the second draft.
+     *
+     * The first version carried `realization`, so the scene stated how much
+     * damage it did - and the audit reported two dead helpers in ripple.ts,
+     * which was the correct diagnosis of a real fault: the scenes were also
+     * carrying hardcoded retention costs they had no way of computing. A scene
+     * knows WHO is angry. It cannot know what the target earns.
+     *
+     * So both of these name a company and nothing else, and the engine looks
+     * up what that means. See core/market/ripple.ts.
+     */
+    | { kind: 'raid'; company: string }
+    /**
+     * Pay to keep the team, priced off the target's own annual earnings.
+     *
+     * A flat sum in the scene would be unaffordable early and free late, so
+     * the choice would only be a choice in a narrow band of the campaign.
+     */
+    | { kind: 'retention'; company: string }
     | {
         kind: 'schedule';
         conversation: string;
@@ -146,6 +177,8 @@ export type EffectSink = {
     reprice: (company: string, multiplier: number) => void;
     royalty: (category: string, rate: number) => void;
     siege: (category: string, quarters: number, pressure: number) => void;
+    raid: (company: string) => void;
+    retention: (company: string) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -175,6 +208,8 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'reprice': sink.reprice(effect.company, effect.multiplier); return;
         case 'royalty': sink.royalty(effect.category, effect.rate); return;
         case 'siege': sink.siege(effect.category, effect.quarters, effect.pressure); return;
+        case 'raid': sink.raid(effect.company); return;
+        case 'retention': sink.retention(effect.company); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

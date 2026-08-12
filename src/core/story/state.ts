@@ -203,6 +203,22 @@ export type StoryFlag =
     //     later scenes read it.
     | 'kneltToAGiant'
     | 'declaredWarOnAGiant'
+    // --- Somebody else wanted it too.
+    //
+    //     Six flags rather than one, because the letter that arrives has to
+    //     name the company - a conversation is static data and cannot say
+    //     "your recent acquisition". Raised by executeAcquisition through
+    //     `rippleFlagFor`, so the mapping lives in one place and a seventh
+    //     company is a line of data rather than a change here and a change
+    //     there. See core/market/ripple.ts.
+    | 'boughtVoltmotors'
+    | 'boughtStreamify'
+    | 'boughtNovidia'
+    | 'boughtBiogen'
+    | 'boughtSkynet'
+    | 'boughtPlanora'
+    /** You paid to keep the team. A fact about you, not about a company. */
+    | 'paidToKeepThem'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'

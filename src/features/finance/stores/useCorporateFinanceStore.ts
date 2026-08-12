@@ -994,6 +994,23 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     } catch { /* story store not ready */ }
                 }
 
+                // ----------------------------------------------------------
+                //  AND SO DOES WHOEVER ELSE WANTED IT
+                // ----------------------------------------------------------
+                //  Six companies have somebody who minds - a rival who wanted
+                //  the same business, or a fund that was waiting for it to
+                //  fall over. The mapping is data (core/market/ripple.ts), so
+                //  adding a seventh is a line there rather than a branch here.
+                // ----------------------------------------------------------
+                try {
+                    const flag = require('../../../core/market/ripple')
+                        .rippleFlagFor(target.id);
+                    if (flag) {
+                        require('../../../core/store/useStoryStore').useStoryStore
+                            .getState().raise(flag);
+                    }
+                } catch { /* story store not ready */ }
+
                 // 6) Duyuru tepkisi
                 const impact = announcementImpact(
                     premium, acquirerValuation,
