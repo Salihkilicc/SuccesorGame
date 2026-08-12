@@ -18,6 +18,11 @@ const world = (over: Partial<World> = {}): World => ({
     cash: 5_000_000,
     morale: 75,
     marketShare: 4,
+    // A fully crewed plant and an empty lab: the state every one of these
+    // tests was implicitly assuming before the COO and the CTO could read
+    // either number. Neither arc is what this file is about.
+    staffing: 100,
+    researchers: 0,
     ...over,
 });
 
@@ -267,6 +272,42 @@ describe('the events that actually ship', () => {
                     moleUnlocked: true, moleEngaged: true, moleRepeated: true,
                 },
                 dials: { ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 80 },
+            }],
+            // ------------------------------------------------------------------
+            //  THE TWO INSIDE THE BUILDING
+            // ------------------------------------------------------------------
+            //  A fourth dimension the loop never had, and the reason the
+            //  archetype form keeps paying for itself: the COO and the CTO read
+            //  NUMBERS rather than dials or flags, so no combination of the
+            //  eleven ways of playing above could reach four of their six
+            //  events. Written out, each one is a legible sentence about a
+            //  company somebody could actually be running.
+            // ------------------------------------------------------------------
+            ['halfway through an expansion', {
+                // The state a tier upgrade leaves you in: a bigger plant and
+                // last quarter's crew. Measured at ~67%.
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                staffing: 67,
+            }],
+            ['paying the floor as little as it will take', {
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                morale: 44,
+            }],
+            ['has a lab, and is losing anyway', {
+                // The only archetype with researchers in it. Without this one
+                // the CTO's alarm is unreachable and her "too late" twin is the
+                // only version of that morning anybody ever sees.
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                researchers: 15,
+                marketShare: 3,
+            }],
+            ['said yes to the lab and never did it', {
+                capital: 60_000_000,
+                flags: { fatherDead: true, labBacked: true },
+                researchers: 0,
             }],
         ];
 

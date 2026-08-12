@@ -17,6 +17,7 @@ import { useStatsStore } from '../store/useStatsStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useGameStore } from '../store/useGameStore';
 import { initialGameState } from '../store/useGameStore';
+import { useLaboratoryStore } from '../store/useLaboratoryStore';
 import type { World } from './conditions';
 import { brotherLoyalty } from './brother';
 
@@ -38,6 +39,17 @@ export const currentQuarter = (): number => {
 export const readWorld = (): World => {
     const stats = useStatsStore.getState();
     const story = useStoryStore.getState();
+    const report = useGameStore.getState().lastQuarterReport as any;
+    // ----------------------------------------------------------------------
+    //  STAFFING, BEFORE THE FIRST QUARTER HAS CLOSED
+    // ----------------------------------------------------------------------
+    //  `crewRequired` is 0 in the blank report, and 0/0 is NaN - which passes
+    //  no comparison and fails every one, so the COO would simply never speak
+    //  and nothing would say why. 100 is the honest reading of "we have not
+    //  run a quarter yet": nobody is short of anything.
+    // ----------------------------------------------------------------------
+    const crew = report?.crewRequired ?? 0;
+    const staffing = crew > 0 ? ((report?.headcount ?? 0) / crew) * 100 : 100;
     return {
         // The brother's number is READ FROM THE CAP TABLE, not from the stored
         // dial. He is one person in two systems and the board is the one that
@@ -66,6 +78,11 @@ export const readWorld = (): World => {
         // tick works it out (`totalPlayerShare`) and puts it here; asking the
         // market stores again would be a second implementation of the one
         // number the competitive game is about.
-        marketShare: (useGameStore.getState().lastQuarterReport as any)?.marketShare ?? 0,
+        marketShare: report?.marketShare ?? 0,
+        staffing,
+        // The one figure here that is NOT from the report, because the report
+        // has no reason to carry it - the lab is its own store and the number
+        // is authoritative there. Zero at the start of every game.
+        researchers: useLaboratoryStore.getState().researcherCount ?? 0,
     };
 };

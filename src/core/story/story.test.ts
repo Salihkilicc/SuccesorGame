@@ -35,6 +35,11 @@ const world = (over: Partial<World> = {}): World => ({
     cash: 100_000,
     morale: 75,
     marketShare: 4,
+    // A fully crewed plant and an empty lab: the state every one of these
+    // tests was implicitly assuming before the COO and the CTO could read
+    // either number. Neither arc is what this file is about.
+    staffing: 100,
+    researchers: 0,
     ...over,
 });
 

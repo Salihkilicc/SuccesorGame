@@ -69,6 +69,40 @@ export type Condition =
      * It is what "you took the category off him" actually means.
      */
     | { kind: 'marketShareAtLeast'; percent: number }
+    /**
+     * ...and the mirror, which is the half that matters more often.
+     *
+     * Added for the same reason `capitalAtMost` was: the vocabulary keeps
+     * growing a way to ask whether the player has ENOUGH of something and then
+     * has no way to ask the opposite. Losing is the more common state and the
+     * one more scenes are about - the CTO's alarm is not "we are winning", it
+     * is "they shipped it and we are not in the room".
+     */
+    | { kind: 'marketShareAtMost'; percent: number }
+    /**
+     * The line is short of the crew the plant needs, as a percent.
+     *
+     * 100 means fully staffed. Below that, `staffingRatio` in market/capacity.ts
+     * scales production down by exactly this figure - so this is not a mood, it
+     * is the multiplier on everything the company makes.
+     *
+     * NOT CAPPED AT 100, unlike the engine's own ratio. Overstaffing does not
+     * raise output (the engine clamps it, deliberately: "fazla calisan uretimi
+     * ARTIRMAZ - maasini odersin, hicbir sey uretmez") but it is a real and
+     * expensive mistake, and a story that could only read the clamped figure
+     * could not see it.
+     */
+    | { kind: 'staffingAtMost'; percent: number }
+    /**
+     * The lab is this small, or this empty.
+     *
+     * A count rather than a band because the number that matters is ZERO, and
+     * zero is where the company starts: `useLaboratoryStore` initialises
+     * `researcherCount: 0`. The founder ran this company for thirty years with
+     * no research at all, and that is a fact about him sitting in a store
+     * default rather than in any scene. It is the CTO's entire opening.
+     */
+    | { kind: 'researchersAtMost'; count: number }
     /** Every one of these holds. */
     | { kind: 'all'; of: Condition[] }
     /** At least one of these holds. */
@@ -100,6 +134,17 @@ export type World = {
      * whole competitive game is about.
      */
     marketShare: number;
+    /**
+     * Headcount as a percent of the crew the current facility requires.
+     *
+     * From the last closed quarter's report (`headcount` / `crewRequired`),
+     * which is where the tick already puts both halves. Deriving it here from
+     * the facility tier and the staff store would be a second implementation
+     * of a number the report has computed correctly all along.
+     */
+    staffing: number;
+    /** How many people are in the lab. Zero at the start of every game. */
+    researchers: number;
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -117,6 +162,9 @@ export const test = (c: Condition, w: World): boolean => {
         case 'cashAtLeast': return w.cash >= c.amount;
         case 'moraleAtMost': return w.morale <= c.value;
         case 'marketShareAtLeast': return w.marketShare >= c.percent;
+        case 'marketShareAtMost': return w.marketShare <= c.percent;
+        case 'staffingAtMost': return w.staffing <= c.percent;
+        case 'researchersAtMost': return w.researchers <= c.count;
         case 'all': return c.of.every(x => test(x, w));
         case 'any': return c.of.some(x => test(x, w));
         case 'not': return !test(c.of, w);

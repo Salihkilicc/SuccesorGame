@@ -28,6 +28,10 @@ import { useMessageStore } from '../store/useMessageStore';
 import { gameSink } from '../story/gameSink';
 import { runEvents } from './runQuarter';
 import { EVENTS } from '../../data/events';
+import { readWorld } from '../story/world';
+import { testAll } from '../story/conditions';
+import { useLaboratoryStore } from '../store/useLaboratoryStore';
+import { cooLineShortEvent } from '../../data/events/plantFloor';
 
 const seeded = (seed: number) => {
     let s = seed >>> 0;
@@ -138,6 +142,68 @@ describe('an event that fires reaches the player', () => {
 
         expect(useNewsStore.getState().items).toEqual([]);
         expect(useStoryStore.getState().pending).toEqual([]);
+    });
+});
+
+describe('the two numbers the COO and the CTO were given', () => {
+    // ----------------------------------------------------------------------
+    //  THE FAILURE THIS EXISTS FOR
+    // ----------------------------------------------------------------------
+    //  `staffing` is derived in readWorld from the last closed quarter's
+    //  report. If those fields are not there, or not there yet, the divide
+    //  falls back to 100 and the COO simply never speaks - a silent, total
+    //  failure of an entire arc with no error anywhere. Exactly the shape of
+    //  the buffs the engine never read and the news that logged to a console.
+    //
+    //  So this advances a REAL quarter with a deliberately under-crewed plant
+    //  and reads the world the way a condition would.
+    // ----------------------------------------------------------------------
+    it('a plant running under crew is visible to the story', async () => {
+        grownCompany();
+        // Tier 4 needs 72. Give it 30 and freeze the target there, which is
+        // what a player who upgraded and never reopened the staff screen has.
+        useStatsStore.setState({
+            facilityTier: 4, employeeCount: 30, targetHeadcount: 30, incomingHires: 0,
+        } as any);
+
+        await useGameStore.getState().advanceMonth(3);
+
+        const w = readWorld();
+        expect(w.staffing).toBeGreaterThan(0);
+        expect(w.staffing).toBeLessThan(50);
+        expect(testAll(cooLineShortEvent.when, { ...w, flags: { fatherDead: true } }))
+            .toBe(true);
+    });
+
+    it('and a fully crewed one is not', async () => {
+        grownCompany();
+        useStatsStore.setState({
+            facilityTier: 4, employeeCount: 90, targetHeadcount: 90, incomingHires: 0,
+        } as any);
+
+        await useGameStore.getState().advanceMonth(3);
+
+        const w = readWorld();
+        expect(w.staffing).toBeGreaterThanOrEqual(100);
+        expect(testAll(cooLineShortEvent.when, { ...w, flags: { fatherDead: true } }))
+            .toBe(false);
+    });
+
+    it('before any quarter has closed, nobody is short of anything', () => {
+        // crewRequired is 0 in the blank report and 0/0 is NaN, which passes no
+        // comparison and fails every one - so the arc would be dead on a fresh
+        // save and would look like a design decision.
+        grownCompany();
+        expect(Number.isNaN(readWorld().staffing)).toBe(false);
+        expect(readWorld().staffing).toBe(100);
+    });
+
+    it('and the lab count reaches the story from the store that owns it', () => {
+        grownCompany();
+        expect(readWorld().researchers).toBe(0);
+        useLaboratoryStore.setState({ researcherCount: 15 } as any);
+        expect(readWorld().researchers).toBe(15);
+        useLaboratoryStore.setState({ researcherCount: 0 } as any);
     });
 });
 

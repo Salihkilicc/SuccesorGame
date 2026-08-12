@@ -36,6 +36,10 @@ import {
 import {
     pearPatentEvent, pearSuppliersEvent, pearPriceWarEvent, pearMidnightEvent,
 } from './pearEscalation';
+import { cooLineShortEvent, cooWalkoutEvent } from './plantFloor';
+import {
+    ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
+} from './labPressure';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -72,6 +76,18 @@ export const EVENTS: GameEvent[] = [
     pearSuppliersEvent,
     pearPriceWarEvent,
     pearMidnightEvent,
+    // The floor. Neither of these is about a relationship - both read numbers
+    // the player is already managing on a screen, which is why the COO and
+    // the CTO have flags and no dial.
+    cooLineShortEvent,
+    cooWalkoutEvent,
+    // The lab. `cto-alarm` and `cto-too-late` are the same morning at two
+    // companies and their gates are exclusive: one needs a lab, the other
+    // needs the absence of one.
+    ctoDarkLabEvent,
+    ctoAlarmEvent,
+    ctoTooLateEvent,
+    ctoStillEmptyEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

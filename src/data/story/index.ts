@@ -52,6 +52,12 @@ import {
 import {
     pearPatent, pearSuppliers, pearPriceWar, pearMidnight,
 } from '../events/pearEscalation';
+import {
+    cooLineShort, cooWalkout, cooOpsNote, cooOpsNoteCc,
+} from '../events/plantFloor';
+import {
+    ctoDarkLab, ctoAlarm, ctoTooLate, ctoBudgetMemo, ctoStillEmpty,
+} from '../events/labPressure';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -77,6 +83,12 @@ export const CONVERSATIONS: Conversation[] = [
     friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
     moleNumber, moleFirstContact, moleOffer, fbiFirstContact,
     pearPatent, pearSuppliers, pearPriceWar, pearMidnight,
+    // The two people inside the building. Their quarterly letters are here
+    // and NOT in the event list, because nothing rolls for them - they are
+    // scheduled by the message that came first, which is the whole shape of
+    // the pair: the emergency arrives on the phone, the record arrives later.
+    cooLineShort, cooWalkout, cooOpsNote, cooOpsNoteCc,
+    ctoDarkLab, ctoAlarm, ctoTooLate, ctoBudgetMemo, ctoStillEmpty,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

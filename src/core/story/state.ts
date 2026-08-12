@@ -160,6 +160,31 @@ export type StoryFlag =
     | 'moleRepeated'
     /** Somebody federal has been in touch. Once is a courtesy; twice is not. */
     | 'fbiContacted'
+    // --- The floor and the lab.
+    //
+    //     The COO and the CTO get FLAGS AND NO DIAL, and that is the design
+    //     rather than a shortcut. Five dials is a stated ceiling ("the cost of
+    //     one more is paid in every scene forever") and these two do not need
+    //     a sixth, because they already have one each and the engine owns it:
+    //     Dana's standing with you is employee morale, Priya's is the size of
+    //     the lab. Both are numbers the player is already managing on a screen,
+    //     which means neither of them can be repaired by picking the nice
+    //     dialogue option - the only way to be on good terms with your COO is
+    //     to pay the floor properly.
+    /** She told you the line was short and you left it short. */
+    | 'cooOverruled'
+    /** The floor stopped. Not a metaphor - staffing and morale both gave way. */
+    | 'plantWalkout'
+    /**
+     * You told the CTO yes.
+     *
+     * NAMED FOR WHAT IT ACTUALLY KNOWS. The obvious name was `labFunded`, and
+     * it would have been a lie: no effect in the vocabulary can hire a
+     * researcher, so a scene can only ever record that the player SAID yes.
+     * Whether anybody was hired is a live number (`researchers`), and asking
+     * both at once - backed it, still empty - is a scene she gets to have.
+     */
+    | 'labBacked'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'

@@ -46,6 +46,11 @@ const world = (brotherTrust: number): World => ({
     cash: 200_000,
     morale: 71,
     marketShare: 4,
+    // A fully crewed plant and an empty lab: the state every one of these
+    // tests was implicitly assuming before the COO and the CTO could read
+    // either number. Neither arc is what this file is about.
+    staffing: 100,
+    researchers: 0,
 });
 
 describe('all three are in the game', () => {
