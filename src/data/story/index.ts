@@ -82,6 +82,14 @@ import {
     crisisOutage,
     crisisAllocation,
 } from '../events/crises';
+import {
+    espionageKestrel,
+    espionageKestrelBetrayal,
+    espionageBroker,
+    espionageBrokerBetrayal,
+    espionageOracle,
+    espionageOracleBetrayal,
+} from '../events/espionage';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -137,6 +145,15 @@ export const CONVERSATIONS: Conversation[] = [
     crisisInquiry,
     crisisOutage,
     crisisAllocation,
+    // Three ransoms and three betrayals. The betrayals are registered here
+    // but are NOT in the event pool - they arrive because a coin came up
+    // wrong, not because a die was rolled at them every quarter.
+    espionageKestrel,
+    espionageKestrelBetrayal,
+    espionageBroker,
+    espionageBrokerBetrayal,
+    espionageOracle,
+    espionageOracleBetrayal,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

@@ -177,6 +177,33 @@ export type Effect =
      * does not become the new normal unless the player lets it.
      */
     | { kind: 'morale'; amount: number }
+    /**
+     * THE ONE PLACE A DIE IS ALLOWED INSIDE A CHOICE.
+     *
+     * Everything else in this vocabulary is deterministic, on purpose: the
+     * shelved NegotiationModal decided with `Math.random()` behind a spinner
+     * and offered a button that re-rolled it, and the whole story system was
+     * built against that. A percentage attached to an answer is normally a
+     * slot machine with prose on it.
+     *
+     * Paying criminals is the exception, and it is the exception because the
+     * uncertainty IS the content. You are not buying an outcome, you are
+     * buying a promise from somebody whose business model is promises.
+     *
+     * TWO THINGS KEEP IT HONEST. The roll happens ONCE, at the moment the
+     * player decides, and it cannot be re-pulled - unlike an event chance,
+     * which rolls every quarter and therefore converges on certainty. And the
+     * failure is a SCENE rather than a number, so the player finds out what
+     * happened from a person rather than from a balance sheet.
+     */
+    | {
+        kind: 'risk';
+        /** Probability the promise is kept, 0-1. */
+        chance: number;
+        /** The conversation that arrives if it is not. */
+        onBetrayal: string;
+        afterQuarters: number;
+    }
     | {
         kind: 'schedule';
         conversation: string;
@@ -210,6 +237,7 @@ export type EffectSink = {
     retention: (company: string) => void;
     divest: (company: string, priceMultiple: number) => void;
     morale: (amount: number) => void;
+    risk: (chance: number, onBetrayal: string, afterQuarters: number) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -243,6 +271,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'retention': sink.retention(effect.company); return;
         case 'divest': sink.divest(effect.company, effect.priceMultiple); return;
         case 'morale': sink.morale(effect.amount); return;
+        case 'risk': sink.risk(effect.chance, effect.onBetrayal, effect.afterQuarters); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

@@ -65,6 +65,7 @@ import {
 import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
+import { espionageKestrelEvent, espionageBrokerEvent, espionageOracleEvent } from './espionage';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -154,6 +155,11 @@ export const EVENTS: GameEvent[] = [
     crisisInquiryEvent,
     crisisOutageEvent,
     crisisAllocationEvent,
+    // The three openings. Their betrayals are not here on purpose - see the
+    // note at the bottom of data/events/espionage.ts.
+    espionageKestrelEvent,
+    espionageBrokerEvent,
+    espionageOracleEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

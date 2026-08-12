@@ -252,6 +252,22 @@ export const gameSink = (): EffectSink => ({
         const next = Math.max(0, Math.min(100, (g.employeeMorale ?? 75) + amount));
         useGameStore.setState({ employeeMorale: next } as any);
     },
+    // Rolled HERE and once, rather than by the event engine - an event's
+    // chance is rolled every quarter and a 30% event therefore happens to
+    // everybody eventually. This is a single coin, flipped at the moment the
+    // player decides, and the answer is fixed from then on.
+    risk: (chance, onBetrayal, afterQuarters) => {
+        if (Math.random() < chance) return;      // the promise was kept
+        useStoryStore.getState().schedule({
+            conversationId: onBetrayal,
+            dueQuarter: currentQuarter() + Math.max(0, afterQuarters),
+            queuedAtQuarter: currentQuarter(),
+            // Urgent: it is the payoff of a decision the player made with
+            // money, and holding it behind two condolence letters would be
+            // the wrong quarter to find out in.
+            urgent: true,
+        });
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

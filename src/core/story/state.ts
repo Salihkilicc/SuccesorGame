@@ -249,6 +249,16 @@ export type StoryFlag =
     | 'plantAccident'
     /** You kept an executive the papers had. */
     | 'keptTheScandal'
+    /** You paid, and the coin came up wrong. */
+    | 'betrayedAfterPaying'
+    /**
+     * You found out who was behind it, and it was him.
+     *
+     * The mole arc from the other end: it can only be reached by a player who
+     * hired somebody to get inside Pear first, and it is the same thing coming
+     * back. See data/events/espionage.ts.
+     */
+    | 'pearHiredThem'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'
