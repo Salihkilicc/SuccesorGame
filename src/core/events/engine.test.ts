@@ -23,6 +23,8 @@ const world = (over: Partial<World> = {}): World => ({
     // either number. Neither arc is what this file is about.
     staffing: 100,
     researchers: 0,
+    // Owns nothing. These tests are not about the portfolio.
+    subsidiaries: [],
     ...over,
 });
 
@@ -341,6 +343,26 @@ describe('the events that actually ship', () => {
                     boughtNovidia: true, boughtBiogen: true,
                     boughtSkynet: true, boughtPlanora: true,
                 },
+            }],
+            // ------------------------------------------------------------------
+            //  THE PLAYER WHO HAS TO SELL SOMETHING
+            // ------------------------------------------------------------------
+            //  Two of the three portfolio letters can only reach a company that
+            //  is SHORT, which is the whole design of them - a fund that turns
+            //  up when you are comfortable is making an offer, and one that
+            //  turns up when you have a quarter of cash left is doing something
+            //  else. So this archetype is deliberately broke AND holding
+            //  things, which no earlier one is.
+            // ------------------------------------------------------------------
+            ['holding assets, and one quarter from empty', {
+                capital: 900_000,
+                flags: { fatherDead: true },
+                subsidiaries: ['tech_streamify', 'tech_skynet', 'tech_planora'],
+            }],
+            ['...and comfortable, so only the one who is not squeezing writes', {
+                capital: 400_000_000,
+                flags: { fatherDead: true },
+                subsidiaries: ['tech_streamify'],
             }],
             ['...and big enough at home that Pear has noticed', {
                 // NOT the same as 'beating him' above: that archetype carries

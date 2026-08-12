@@ -51,6 +51,8 @@ const world = (brotherTrust: number): World => ({
     // either number. Neither arc is what this file is about.
     staffing: 100,
     researchers: 0,
+    // Owns nothing. These tests are not about the portfolio.
+    subsidiaries: [],
 });
 
 describe('all three are in the game', () => {

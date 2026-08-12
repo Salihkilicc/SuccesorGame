@@ -26,6 +26,7 @@ const recorder = () => {
         siege: (c, q, p) => log.push(`siege:${c}:${q}:${p}`),
         raid: c => log.push(`raid:${c}`),
         retention: c => log.push(`retention:${c}`),
+        divest: (c, m) => log.push(`divest:${c}:${m}`),
         schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };
     return { log, sink };
@@ -44,6 +45,8 @@ const world = (over: Partial<World> = {}): World => ({
     // either number. Neither arc is what this file is about.
     staffing: 100,
     researchers: 0,
+    // Owns nothing. These tests are not about the portfolio.
+    subsidiaries: [],
     ...over,
 });
 

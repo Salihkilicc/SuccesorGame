@@ -65,6 +65,9 @@ import {
     rippleVoltmotors, rippleStreamify, rippleNovidia,
     rippleBiogen, rippleSkynet, ripplePlanora,
 } from '../events/ripple';
+import {
+    portfolioPear, portfolioVulture, portfolioFriend,
+} from '../events/portfolio';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -104,6 +107,8 @@ export const CONVERSATIONS: Conversation[] = [
     // the same reason - a spread stops the audit reading this module at all.
     rippleVoltmotors, rippleStreamify, rippleNovidia,
     rippleBiogen, rippleSkynet, ripplePlanora,
+    // And the three who would like to buy something back off you.
+    portfolioPear, portfolioVulture, portfolioFriend,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

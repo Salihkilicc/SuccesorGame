@@ -148,6 +148,21 @@ export type Effect =
      * the choice would only be a choice in a narrow band of the campaign.
      */
     | { kind: 'retention'; company: string }
+    /**
+     * Somebody takes a subsidiary off your hands at a stated price.
+     *
+     * `priceMultiple` is against the deal's CURRENT FAIR VALUE, not against
+     * what you paid - which is the figure `quoteDivestiture` already computes
+     * from the target's own earnings. So 0.85 is the ordinary market exit, and
+     * the whole point of the three scenes that use this is that none of them
+     * is 0.85: an incumbent buying you out of his category pays over the odds,
+     * and a fund that knows you are short of cash does not.
+     *
+     * The multiple is on the EFFECT rather than in the engine because it is
+     * the term of a specific offer from a specific person. There is no general
+     * rule to keep it consistent with.
+     */
+    | { kind: 'divest'; company: string; priceMultiple: number }
     | {
         kind: 'schedule';
         conversation: string;
@@ -179,6 +194,7 @@ export type EffectSink = {
     siege: (category: string, quarters: number, pressure: number) => void;
     raid: (company: string) => void;
     retention: (company: string) => void;
+    divest: (company: string, priceMultiple: number) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -210,6 +226,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'siege': sink.siege(effect.category, effect.quarters, effect.pressure); return;
         case 'raid': sink.raid(effect.company); return;
         case 'retention': sink.retention(effect.company); return;
+        case 'divest': sink.divest(effect.company, effect.priceMultiple); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

@@ -47,6 +47,8 @@ const world = (over: { cfoTrust?: number; cfoResigned?: boolean } = {}): World =
     // either number. Neither arc is what this file is about.
     staffing: 100,
     researchers: 0,
+    // Owns nothing. These tests are not about the portfolio.
+    subsidiaries: [],
 });
 
 describe('all of it is in the game', () => {

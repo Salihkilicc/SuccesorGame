@@ -84,5 +84,18 @@ export const readWorld = (): World => {
         // has no reason to carry it - the lab is its own store and the number
         // is authoritative there. Zero at the start of every game.
         researchers: useLaboratoryStore.getState().researcherCount ?? 0,
+        // Lazily required, like the rest of the finance store's callers: this
+        // module is imported by the audit and by tests, and pulling the
+        // corporate finance store in at module load drags four more stores
+        // and AsyncStorage behind it.
+        subsidiaries: (() => {
+            try {
+                return (require('../../features/finance/stores/useCorporateFinanceStore')
+                    .useCorporateFinanceStore.getState().subsidiaries ?? [])
+                    .map((s: any) => s.id);
+            } catch {
+                return [];
+            }
+        })(),
     };
 };

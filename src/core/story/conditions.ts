@@ -103,6 +103,16 @@ export type Condition =
      * default rather than in any scene. It is the CTO's entire opening.
      */
     | { kind: 'researchersAtMost'; count: number }
+    /**
+     * The player owns this company RIGHT NOW.
+     *
+     * A condition rather than a flag, and the distinction is the whole reason
+     * it exists. `boughtSkynet` says you bought it once and cannot unsay it;
+     * this says you still have it. Every scene that reads it is somebody
+     * offering to take a subsidiary off your hands, and writing to offer for a
+     * company the player sold two years ago is the failure mode.
+     */
+    | { kind: 'owns'; company: string }
     /** Every one of these holds. */
     | { kind: 'all'; of: Condition[] }
     /** At least one of these holds. */
@@ -145,6 +155,15 @@ export type World = {
     staffing: number;
     /** How many people are in the lab. Zero at the start of every game. */
     researchers: number;
+    /**
+     * Market ids of the companies the player currently holds.
+     *
+     * CURRENTLY, not ever. Read from `useCorporateFinanceStore.subsidiaries`,
+     * which is the list a divestiture removes from - see the note in
+     * sellSubsidiary. The `bought*` flags answer a different question and
+     * cannot answer this one.
+     */
+    subsidiaries: string[];
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -165,6 +184,7 @@ export const test = (c: Condition, w: World): boolean => {
         case 'marketShareAtMost': return w.marketShare <= c.percent;
         case 'staffingAtMost': return w.staffing <= c.percent;
         case 'researchersAtMost': return w.researchers <= c.count;
+        case 'owns': return (w.subsidiaries ?? []).includes(c.company);
         case 'all': return c.of.every(x => test(x, w));
         case 'any': return c.of.some(x => test(x, w));
         case 'not': return !test(c.of, w);

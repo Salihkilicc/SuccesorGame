@@ -46,6 +46,9 @@ import {
     rippleBiogenEvent, rippleSkynetEvent, ripplePlanoraEvent,
 } from './ripple';
 import {
+    portfolioPearEvent, portfolioVultureEvent, portfolioFriendEvent,
+} from './portfolio';
+import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
 
@@ -117,6 +120,12 @@ export const EVENTS: GameEvent[] = [
     rippleBiogenEvent,
     rippleSkynetEvent,
     ripplePlanoraEvent,
+    // Selling, and the three prices. Halberd's is the only one in the pool
+    // gated on the player being SHORT - he cannot reach a comfortable
+    // company, which is what makes 55% a decision instead of an insult.
+    portfolioPearEvent,
+    portfolioVultureEvent,
+    portfolioFriendEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

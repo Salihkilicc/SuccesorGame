@@ -210,7 +210,7 @@ export interface CorporateFinanceState {
     };
     /** Her anlasmayi bir ceyrek ilerlet. Ceyrekte TAM BIR KEZ cagrilir. */
     advanceAcquisitionsQuarter: (quarters: number) => void;
-    sellSubsidiary: (id: string) => void;
+    sellSubsidiary: (id: string, priceMultiple?: number) => void;
     updateSubsidiaryStrategy: (id: string, newStrategy: SubsidiaryStrategy) => void;
     evaluateSubsidiaries: () => void;
 
@@ -1031,15 +1031,22 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 };
             },
 
-            sellSubsidiary: (id) => {
+            /**
+             * @param priceMultiple Against the deal's CURRENT FAIR VALUE, for
+             * a named buyer's offer. Omitted, the ordinary market exit applies
+             * and every existing caller is unchanged - see DIVESTITURE_DISCOUNT
+             * and the note above it about why selling costs you a discount.
+             */
+            sellSubsidiary: (id, priceMultiple) => {
                 const { subsidiaries } = get();
                 const subsidiary = subsidiaries.find(s => s.id === id);
                 if (!subsidiary) return;
 
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
-                const proceeds = subsidiary.deal
-                    ? quoteDivestiture(subsidiary.deal).proceeds
-                    : subsidiary.valuation * 0.85;
+                const quote = subsidiary.deal ? quoteDivestiture(subsidiary.deal) : undefined;
+                const proceeds = priceMultiple !== undefined
+                    ? (quote ? quote.currentFairValue : subsidiary.valuation) * priceMultiple
+                    : (quote ? quote.proceeds : subsidiary.valuation * 0.85);
 
                 setCompanyCapital(companyCapital + proceeds);
 

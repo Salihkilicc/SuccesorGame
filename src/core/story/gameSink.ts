@@ -232,6 +232,18 @@ export const gameSink = (): EffectSink => ({
             stats.update({ companyCapital: (stats.companyCapital || 0) - cost });
         } catch { /* finance store not ready */ }
     },
+    // Through `sellSubsidiary`, which is the one door: it credits the money,
+    // removes the holding, and - importantly - writes the exit valuation AND
+    // its anchor back to the market, so the company returns to the shelf at
+    // the value you built rather than the one it shipped with. A scene doing
+    // its own arithmetic here would skip all of that.
+    divest: (company, priceMultiple) => {
+        try {
+            require('../../features/finance/stores/useCorporateFinanceStore')
+                .useCorporateFinanceStore.getState()
+                .sellSubsidiary(company, priceMultiple);
+        } catch { /* finance store not ready */ }
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

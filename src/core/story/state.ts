@@ -219,6 +219,18 @@ export type StoryFlag =
     | 'boughtPlanora'
     /** You paid to keep the team. A fact about you, not about a company. */
     | 'paidToKeepThem'
+    // --- What you sold, and to whom, and in what state.
+    //
+    //     Three facts about the player rather than three about a company. The
+    //     portfolio scenes are all about the same act - letting a subsidiary
+    //     go - and what separates them is who was on the other end and how
+    //     badly you needed it.
+    /** You took Pear's over-the-odds price and he stopped writing letters. */
+    | 'soldToPearTactically'
+    /** You sold at a fund's number because you had one quarter of cash left. */
+    | 'soldUnderPressure'
+    /** You let your friend buy his company back, under the market. */
+    | 'gavePlanoraBack'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'

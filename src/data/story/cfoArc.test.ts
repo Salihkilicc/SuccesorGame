@@ -43,6 +43,8 @@ const world = (over: Partial<World> = {}): World => ({
     // either number. Neither arc is what this file is about.
     staffing: 100,
     researchers: 0,
+    // Owns nothing. These tests are not about the portfolio.
+    subsidiaries: [],
     ...over,
 });
 
@@ -64,6 +66,7 @@ const playable = () => {
     siege: () => { },
     raid: () => { },
     retention: () => { },
+    divest: () => { },
     };
     return { w, sink };
 };
