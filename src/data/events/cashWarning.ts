@@ -124,6 +124,9 @@ export const cashWarningEvent: GameEvent = {
     cooldown: 6,
     conversation: cashWarningConversation,
     headline: 'Analysts note a tightening cash position at Hale.',
-    // Above the recall and the poach: a solvency warning outranks a bad batch.
-    priority: 3,
+    // The highest priority in the pool, and the ordering is by how much the
+    // player must act THIS quarter rather than by how important the news is.
+    // Your brother having lunch with the buyer matters more in the long run
+    // and can wait a quarter; being three quarters from empty cannot.
+    priority: 5,
 };

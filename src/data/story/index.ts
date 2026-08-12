@@ -40,6 +40,9 @@ import { cashWarningConversation } from '../events/cashWarning';
 import {
     brotherDividendCold, brotherDividendWarm, brotherDividendClose,
 } from '../events/brotherDividend';
+import {
+    brotherVote, cfoWarnsAboutBrother, brotherCaught, brotherMeetsPearQuietly,
+} from '../events/brotherPlot';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
@@ -59,6 +62,7 @@ export const CONVERSATIONS: Conversation[] = [
     cashWarningConversation,
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
     brotherDividendCold, brotherDividendWarm, brotherDividendClose,
+    brotherVote, cfoWarnsAboutBrother, brotherCaught, brotherMeetsPearQuietly,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

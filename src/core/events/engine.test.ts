@@ -182,17 +182,22 @@ describe('the events that actually ship', () => {
         // that would ship a scene nobody can ever see.
         const money = [1_000_000, 500_000_000];
         const brother = [10, 60, 90];
+        // Sampled too, because two events are now mirrored on it: one fires
+        // when the CFO will still bring you things and one when he will not.
+        const cfo = [10, 70];
         const seen = new Set<string>();
 
         for (const capital of money) {
             for (const brotherTrust of brother) {
-                const w = world({
-                    quarter: 40, capital,
-                    flags: { fatherDead: true },
-                    dials: { ...INITIAL_DIALS, pearHostility: 60, brotherTrust },
-                });
-                rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
-                    .eligible.forEach(e => seen.add(e.id));
+                for (const cfoTrust of cfo) {
+                    const w = world({
+                        quarter: 40, capital,
+                        flags: { fatherDead: true },
+                        dials: { ...INITIAL_DIALS, pearHostility: 60, brotherTrust, cfoTrust },
+                    });
+                    rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
+                        .eligible.forEach(e => seen.add(e.id));
+                }
             }
         }
 

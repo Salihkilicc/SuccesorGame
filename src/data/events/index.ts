@@ -22,6 +22,9 @@ import { cashWarningEvent } from './cashWarning';
 import {
     brotherDividendColdEvent, brotherDividendWarmEvent, brotherDividendCloseEvent,
 } from './brotherDividend';
+import {
+    brotherVoteEvent, cfoWarnsAboutBrotherEvent, brotherMeetsPearQuietlyEvent,
+} from './brotherPlot';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -33,6 +36,12 @@ export const EVENTS: GameEvent[] = [
     brotherDividendColdEvent,
     brotherDividendWarmEvent,
     brotherDividendCloseEvent,
+    // What he does once he has stopped asking. The warning and the silence
+    // are mirrors: one needs the CFO, the other fires when there is no CFO
+    // left to bring it.
+    brotherVoteEvent,
+    cfoWarnsAboutBrotherEvent,
+    brotherMeetsPearQuietlyEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

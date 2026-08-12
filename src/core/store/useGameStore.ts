@@ -2256,7 +2256,24 @@ export const useGameStore = create<GameStore>()(
             try {
               const removed = require('../../features/shareholders/stores/useShareholderStore')
                 .useShareholderStore.getState().ceoRemoved;
-              if (removed) return 'removed' as const;
+              if (removed) {
+                // ------------------------------------------------------
+                //  THE VERDICT IS NOT THE LAST THING THE PLAYER READS
+                // ------------------------------------------------------
+                //  Routed through the endings system so the removal screen
+                //  carries the brother's message rather than a line from the
+                //  translation file. It had to go in the ENDING rather than
+                //  into Messages: the overlay covers the app the moment this
+                //  tick finishes, so a delivered message would be found
+                //  afterwards, as an artefact, instead of read first.
+                //
+                //  See data/story/endings.ts - and note the timestamps.
+                // ------------------------------------------------------
+                try {
+                  require('./useStoryStore').useStoryStore.getState().endGame('removedByBoard');
+                } catch { /* story store not ready - the screen still ends it */ }
+                return 'removed' as const;
+              }
             } catch { /* kurul durumu okunamadi */ }
             return newCompanyCapital < 0 ? 'bankrupt' as const : 'active' as const;
           })(),
