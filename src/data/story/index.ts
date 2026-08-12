@@ -37,6 +37,9 @@ import { recallConversation } from '../events/recall';
 import { poachConversation } from '../events/poach';
 import { shortSellerConversation } from '../events/shortSeller';
 import { cashWarningConversation } from '../events/cashWarning';
+import {
+    brotherDividendCold, brotherDividendWarm, brotherDividendClose,
+} from '../events/brotherDividend';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
@@ -55,6 +58,7 @@ export const CONVERSATIONS: Conversation[] = [
     shortSellerConversation,
     cashWarningConversation,
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
+    brotherDividendCold, brotherDividendWarm, brotherDividendClose,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

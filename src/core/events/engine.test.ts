@@ -171,25 +171,33 @@ describe('the events that actually ship', () => {
     });
 
     it('and every event is reachable by SOME company', () => {
-        // This used to assert that one large, old, hostile company could see
-        // all of them at once, which was true until an event was written whose
-        // trigger is being POOR. Events can have opposite conditions; what
-        // matters is that none of them is unreachable by everybody.
-        const rich = world({
-            quarter: 40, capital: 500_000_000,
-            flags: { fatherDead: true },
-            dials: { ...INITIAL_DIALS, pearHostility: 60 },
-        });
-        const broke = world({
-            quarter: 40, capital: 1_000_000,
-            flags: { fatherDead: true },
-            dials: { ...INITIAL_DIALS, pearHostility: 60 },
-        });
-        const seen = new Set([
-            ...rollQuarter(EVENTS, rich, emptyHistory(), 40, () => 1).eligible.map(e => e.id),
-            ...rollQuarter(EVENTS, broke, emptyHistory(), 40, () => 1).eligible.map(e => e.id),
-        ]);
-        expect(seen.size).toBe(EVENTS.length);
+        // THIS TEST HAS BEEN WRONG TWICE, in the same way both times: it
+        // assumed one company could see everything. First an event was written
+        // whose trigger is being POOR, then three whose triggers are mutually
+        // exclusive bands of the same dial. Events are supposed to disagree
+        // about what kind of company they happen to.
+        //
+        // So it samples the space instead. What must hold is that no event is
+        // unreachable by EVERYBODY - which is the real failure, and the one
+        // that would ship a scene nobody can ever see.
+        const money = [1_000_000, 500_000_000];
+        const brother = [10, 60, 90];
+        const seen = new Set<string>();
+
+        for (const capital of money) {
+            for (const brotherTrust of brother) {
+                const w = world({
+                    quarter: 40, capital,
+                    flags: { fatherDead: true },
+                    dials: { ...INITIAL_DIALS, pearHostility: 60, brotherTrust },
+                });
+                rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
+                    .eligible.forEach(e => seen.add(e.id));
+            }
+        }
+
+        const unreachable = EVENTS.filter(e => !seen.has(e.id)).map(e => e.id);
+        expect(unreachable).toEqual([]);
     });
 
     it('a common event must be a REACTION, not weather', () => {

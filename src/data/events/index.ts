@@ -19,12 +19,20 @@ import { recallEvent } from './recall';
 import { poachEvent } from './poach';
 import { shortSellerEvent } from './shortSeller';
 import { cashWarningEvent } from './cashWarning';
+import {
+    brotherDividendColdEvent, brotherDividendWarmEvent, brotherDividendCloseEvent,
+} from './brotherDividend';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
     poachEvent,
     shortSellerEvent,
     cashWarningEvent,
+    // Three temperatures of one demand. The band gates are mutually
+    // exclusive, so exactly one of them can be eligible in any quarter.
+    brotherDividendColdEvent,
+    brotherDividendWarmEvent,
+    brotherDividendCloseEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>
