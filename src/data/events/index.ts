@@ -66,6 +66,7 @@ import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
 import { espionageKestrelEvent, espionageBrokerEvent, espionageOracleEvent } from './espionage';
+import { fbiFinancialEvent, fbiInsiderEvent, fbiEspionageEvent } from './fbi';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -160,6 +161,11 @@ export const EVENTS: GameEvent[] = [
     espionageKestrelEvent,
     espionageBrokerEvent,
     espionageOracleEvent,
+    // The three cases. Each needs a specific thing to have happened, and no
+    // campaign can see more than one verdict.
+    fbiFinancialEvent,
+    fbiInsiderEvent,
+    fbiEspionageEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

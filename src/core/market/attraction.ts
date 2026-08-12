@@ -454,6 +454,20 @@ export interface BrandUpdateInput {
     brandCeiling?: number;
     /** Tesis kademesinin marka tabani */
     brandFloor?: number;
+    /**
+     * Points taken off the ceiling for something that will not wear off.
+     *
+     * A CEILING PENALTY RATHER THAN A SUBTRACTION, and the difference is the
+     * whole reason this parameter exists. Brand mean-reverts towards a target
+     * every quarter, so subtracting from the VALUE is erased within two or
+     * three ticks - measured: a conviction draining 1.5 a quarter produced a
+     * brand of 21.5 against a clean company's 21.3, which is nothing. It is
+     * the same mistake as writing a divestiture price without an anchor.
+     *
+     * Lowering the ceiling is durable by construction: the company can still
+     * climb, and it can never climb as high as it would have.
+     */
+    ceilingPenalty?: number;
 }
 
 export interface BrandUpdateResult {
@@ -506,6 +520,7 @@ const DEFAULT_BRAND_FLOOR = 5;
  */
 export const updateBrand = (input: BrandUpdateInput): BrandUpdateResult => {
     const reasons: string[] = [];
+    const penalty = Math.max(0, input.ceilingPenalty || 0);
 
     const maintenance = Math.max(0, input.marketingBenchmarkTotal) * BRAND_MAINTENANCE_RATIO;
     const spend = Math.max(0, input.marketingSpend);
@@ -553,11 +568,17 @@ export const updateBrand = (input: BrandUpdateInput): BrandUpdateResult => {
     const floor = input.brandFloor ?? DEFAULT_BRAND_FLOOR;
     // TAVAN: atolyede premium marka olamazsin. Ne kadar pazarlama
     // yaparsan yap, uretim kabiliyetin itibarinin tavanini belirler.
-    const ceiling = Math.min(100, input.brandCeiling ?? 100);
+    // The penalty comes off the ceiling and the FLOOR follows it down, so a
+    // conviction cannot be parked under the tier's floor and ignored.
+    const ceiling = Math.max(0, Math.min(100, input.brandCeiling ?? 100) - penalty);
 
     // Taban yalnizca ASAGI yonlu koruma; zaten tavanin ustundeysen
     // (kademe dusurulduyse) yukselmene de izin verilmez.
-    const floored = clampedDelta < 0 ? Math.max(floor, raw) : raw;
+    // The floor cannot rescue a conviction: it comes down with the ceiling,
+    // or a convicted company would simply sit on its tier's floor and the
+    // penalty would be invisible at every level except the very top.
+    const effectiveFloor = Math.max(0, floor - penalty);
+    const floored = clampedDelta < 0 ? Math.max(effectiveFloor, raw) : raw;
     const newBrand = Math.max(0, Math.min(ceiling, floored));
 
     return {

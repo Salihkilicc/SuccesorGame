@@ -145,6 +145,21 @@ export const SUBJECT_SHIFT: Record<Subject, number> = {
  */
 export const SECOND_APPROACH_PENALTY = 0.12;
 
+/**
+ * What a conviction adds to every board's resistance, forever.
+ *
+ * The second half of `fbiGuilty` being a poison rather than a label. A board
+ * with a fiduciary duty does not recommend a sale to a chief executive who
+ * has been found to have obstructed a federal investigation - not out of
+ * distaste, but because their own shareholders will ask.
+ *
+ * 0.30 is enough to close the ordinary target: a mid-sized company at a
+ * comfortable 0.35 lands at 0.65, past the refusal threshold. Everything is
+ * still buyable hostile, at a price that has also gone up, because the same
+ * number feeds `hostilePremiumFor`.
+ */
+export const CONVICTION_RESISTANCE = 0.30;
+
 export interface ResistanceInput {
     targetMarketCap: number;
     acquirerValuation: number;
@@ -156,6 +171,8 @@ export interface ResistanceInput {
     personalityShift: number;
     /** How many times this target has already been approached and refused. */
     priorRefusals: number;
+    /** The player has been found guilty. See CONVICTION_RESISTANCE. */
+    convicted?: boolean;
 }
 
 export const resistance = (i: ResistanceInput): number => {
@@ -167,7 +184,8 @@ export const resistance = (i: ResistanceInput): number => {
         base
         + SUBJECT_SHIFT[i.subject]
         + i.personalityShift
-        + Math.max(0, i.priorRefusals) * SECOND_APPROACH_PENALTY,
+        + Math.max(0, i.priorRefusals) * SECOND_APPROACH_PENALTY
+        + (i.convicted ? CONVICTION_RESISTANCE : 0),
     );
 };
 

@@ -274,6 +274,37 @@ export type StoryFlag =
     | 'fbiGuilty'
     | 'casinoScandal';
 
+/**
+ * What a conviction goes on costing, every quarter, forever.
+ *
+ * `fbiGuilty` would otherwise be a label - raised once, read by a few gates,
+ * and free after the quarter it happened in. The verdict itself takes 25
+ * points of brand; this is the part that keeps taking them.
+ *
+ * 1.5 a quarter, and the size is the design: it is under what a funded
+ * marketing budget adds, so a convicted chief executive can still climb - just
+ * never as fast as they would have, and never without carrying it. A larger
+ * number would be a slow game over, which is a different and worse thing than
+ * a permanent handicap.
+ */
+export const CONVICTION_BRAND_DRAIN = 1.5;
+
+/**
+ * How many points a conviction takes off the brand CEILING, forever.
+ *
+ * The one above is shelved and this is what replaced it. A per-quarter drain
+ * on the brand VALUE measured at almost exactly nothing - 21.5 against a clean
+ * company's 21.3 over four quarters - because brand mean-reverts towards a
+ * target every tick and a subtraction is pulled straight back out.
+ *
+ * 18 points off the ceiling and off the floor beneath it. A convicted chief
+ * executive can still build a brand; they can never build the brand they would
+ * have had, at any facility tier, for the rest of the campaign. That is a
+ * permanent handicap rather than a slow game over, which is the distinction
+ * worth getting right.
+ */
+export const CONVICTION_CEILING_PENALTY = 18;
+
 export const clampDial = (v: number): number => Math.max(0, Math.min(100, Math.round(v)));
 
 /**

@@ -31,6 +31,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useStoryStore } from '../../../core/store/useStoryStore';
 import { currentQuarter } from '../../../core/story/world';
 import { SUBJECTS, type Subject } from '../../../core/market/negotiation';
 import { INITIAL_MARKET_ITEMS } from '../../assets/data/marketData';
@@ -86,6 +87,10 @@ const ComposeOfferScreen = () => {
             risk: target.risk ?? 'Medium',
             acquirerValuation: valuation,
             quarter: currentQuarter(),
+            // A board with a fiduciary duty does not recommend a sale to a
+            // chief executive who has been found guilty. See
+            // CONVICTION_RESISTANCE in core/market/negotiation.ts.
+            convicted: !!useStoryStore.getState().flags.fbiGuilty,
         });
         if (!result.ok) {
             Alert.alert('Not sent', result.reason);

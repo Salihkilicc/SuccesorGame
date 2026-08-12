@@ -376,6 +376,23 @@ describe('the events that actually ship', () => {
                 capital: 60_000_000,
                 flags: { fatherDead: true, buriedTheRecall: true },
             }],
+            // ------------------------------------------------------------------
+            //  THE THREE PEOPLE WHO GET A LETTER FROM THE GOVERNMENT
+            // ------------------------------------------------------------------
+            //  Each case needs a specific thing to have happened, and they are
+            //  three different specific things - so this is the one place three
+            //  archetypes are genuinely three people rather than one described
+            //  three ways.
+            // ------------------------------------------------------------------
+            ['who kept paying the beneficiary after he was told', {
+                capital: 60_000_000,
+                flags: { fatherDead: true, bragaKeptPaying: true },
+            }],
+            ['whose brother has an account', {
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, brotherTrust: 15 },
+            }],
             ['...and big enough at home that Pear has noticed', {
                 // NOT the same as 'beating him' above: that archetype carries
                 // pearHostility 85, and this letter requires that the war has

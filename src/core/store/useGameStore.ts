@@ -1243,6 +1243,17 @@ export const useGameStore = create<GameStore>()(
           // kademeden gelir ki buyurken kendi basarin seni cezalandirmasin.
           brandCeiling: tier.brandCeiling,
           brandFloor: tier.brandFloor,
+          // A conviction lowers what this company can ever be worth to the
+          // public. Read here rather than applied as a one-off subtraction:
+          // brand mean-reverts, so a drain on the value is erased within two
+          // or three quarters and measured at almost exactly nothing.
+          ceilingPenalty: (() => {
+            try {
+              const { useStoryStore: st } = require('./useStoryStore');
+              const { CONVICTION_CEILING_PENALTY } = require('../story/state');
+              return st.getState().flags?.fbiGuilty ? CONVICTION_CEILING_PENALTY : 0;
+            } catch { return 0; }
+          })(),
         });
 
         // ==================================================================
@@ -2124,6 +2135,20 @@ export const useGameStore = create<GameStore>()(
             console.warn('[territory] entry check failed', e);
           }
 
+          // ==============================================================
+          //  A CONVICTION DOES NOT WEAR OFF
+          // ==============================================================
+          //  SHELVED: a per-quarter brand drain used to live here and it did
+          //  nothing. Measured over four quarters, a convicted company came
+          //  out at 21.5 against a clean company's 21.3 - brand mean-reverts
+          //  towards a target every tick, so subtracting from the VALUE is
+          //  erased within two or three quarters. Same mistake as writing a
+          //  divestiture price without an anchor.
+          //
+          //  The penalty is now on the CEILING, applied where updateBrand is
+          //  called above. Durable by construction: the company can still
+          //  climb and can never climb as high as it would have.
+          // ==============================================================
           try {
             require('../events/runQuarter').runEvents();
           } catch (e) {
