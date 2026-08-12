@@ -31,6 +31,7 @@ import {
     type StoryFlag,
 } from '../story/state';
 import { nextPriority, type Pending } from '../story/inbox';
+import { emptyHistory, type EventHistory } from '../events/types';
 import { emptyLockState, type LockState } from '../tutorial/locks';
 
 export type StoryState = {
@@ -51,6 +52,15 @@ export type StoryState = {
      * different thing and lives on the player (useIdentityStore).
      */
     locks: LockState;
+    /**
+     * When each random event last fired.
+     *
+     * Persisted with the rest of the story, because a cooldown that resets on
+     * app launch is not a cooldown - the same event would arrive every time
+     * the player came back to the game, which is precisely when they would
+     * notice the repetition.
+     */
+    eventHistory: EventHistory;
     _hasHydrated: boolean;
 };
 
@@ -87,6 +97,9 @@ type StoryStore = StoryState & {
     /** Replace the queue. The tick calls this with what drain kept. */
     setPending: (pending: Pending[]) => void;
 
+    /** Record which events fired this quarter. See core/events/runQuarter.ts */
+    setEventHistory: (history: EventHistory) => void;
+
     /** A lock cleared by doing the thing. */
     completeLock: (id: string) => void;
     /** A lock the player walked away from. Recorded apart, so it is visible. */
@@ -102,6 +115,7 @@ export const initialStoryState: StoryState = {
     flags: {},
     pending: [],
     locks: emptyLockState(),
+    eventHistory: emptyHistory(),
     _hasHydrated: false,
 };
 
@@ -135,6 +149,8 @@ export const useStoryStore = create<StoryStore>()(
 
             setPending: (pending) => set({ pending }),
 
+            setEventHistory: (eventHistory) => set({ eventHistory }),
+
             completeLock: (id) =>
                 set(state => (state.locks.completed.includes(id) ? state : {
                     locks: { ...state.locks, completed: [...state.locks.completed, id] },
@@ -152,13 +168,19 @@ export const useStoryStore = create<StoryStore>()(
                 flags: {},
                 pending: [],
                 locks: emptyLockState(),
+                // Otherwise the second run starts with every event on cooldown
+                // from the first, and a new company would have a quiet decade.
+                eventHistory: emptyHistory(),
                 _hasHydrated: true,
             }),
         }),
         {
             name: 'succesor_story_v1',
             storage: createJSONStorage(() => zustandStorage),
-            partialize: state => ({ dials: state.dials, flags: state.flags, pending: state.pending, locks: state.locks }),
+            partialize: state => ({
+                dials: state.dials, flags: state.flags, pending: state.pending,
+                locks: state.locks, eventHistory: state.eventHistory,
+            }),
             /**
              * A save made before a dial existed has no value for it, and
              * `undefined + 5` is NaN - which would spread silently through
@@ -173,6 +195,10 @@ export const useStoryStore = create<StoryStore>()(
                     flags: { ...(p.flags ?? {}) },
                     pending: p.pending ?? [],
                     locks: p.locks ?? emptyLockState(),
+                    // Saves made before events existed have no history. An
+                    // undefined here would make `history.lastFired[id]` throw
+                    // on the first tick after an update.
+                    eventHistory: p.eventHistory ?? emptyHistory(),
                 };
             },
             onRehydrateStorage: () => (state) => {

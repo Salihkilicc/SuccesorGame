@@ -10,7 +10,10 @@ import { getMarket, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
-  advanceCategoryBrand, corporateBrandFrom, applyCorporateShock, brandIndex, earnedFloor,
+  // applyCorporateShock was imported here and never called - see the note in
+  // core/story/gameSink.ts, which is now its caller. The unused import is why
+  // the audit called it reachable for weeks.
+  advanceCategoryBrand, corporateBrandFrom, brandIndex, earnedFloor,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import {
@@ -1645,6 +1648,26 @@ export const useGameStore = create<GameStore>()(
             require('../story/brother').syncBrotherDial();
         } catch (e) {
             console.warn('[story] brother sync failed', e);
+        }
+
+        // ------------------------------------------------------------------
+        //  RANDOM EVENTS — rolled BEFORE the inbox drains
+        // ------------------------------------------------------------------
+        //  So an event that fires can be delivered in the same quarter if
+        //  there is room. It queues rather than pushing in: the two-a-quarter
+        //  allowance belongs to the story, and a dice roll must not be able to
+        //  displace a beat somebody wrote.
+        //
+        //  The headline goes out either way, immediately. That is the point of
+        //  news - the world hears on its own schedule, and reading about your
+        //  own recall before your COO reaches you is the right way round.
+        //
+        //  See core/events/runQuarter.ts.
+        // ------------------------------------------------------------------
+        try {
+            require('../events/runQuarter').runEvents();
+        } catch (e) {
+            console.warn('[events] roll failed', e);
         }
 
         try {

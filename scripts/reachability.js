@@ -62,6 +62,28 @@ const stripComments = s => s
     .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, '$1');
 
 const code = new Map(files.map(f => [f, stripComments(body.get(f))]));
+
+// ---------------------------------------------------------------------------
+//  AN IMPORT IS NOT A USE
+// ---------------------------------------------------------------------------
+//  Same family of mistake as the commented-out call, and it hid a bigger fish.
+//  `applyCorporateShock` was written, tested, and called from nowhere for
+//  weeks - while useGameStore.ts IMPORTED it and never invoked it. One import
+//  line was enough to make the audit report it as reached, so the check that
+//  exists to find exactly this was the reason nobody found it.
+//
+//  Imports are stripped for the passes that ask "does anything CALL this".
+//  The component pass still reads `code`, because there the import path is
+//  precisely the evidence it wants.
+//
+//  Multi-line imports included - the shock was inside a six-name braced list
+//  spanning two lines, which a single-line pattern would have walked past.
+// ---------------------------------------------------------------------------
+const stripImports = s => s
+    .replace(/^\s*import\s[\s\S]*?from\s*['"][^'"]*['"];?/gm, ' ')
+    .replace(/^\s*import\s*['"][^'"]*['"];?/gm, ' ');
+
+const calls = new Map(files.map(f => [f, stripImports(code.get(f))]));
 // ---------------------------------------------------------------------------
 //  WHICH FEATURE FOLDERS ARE OFF - READ FROM THE FLAGS, NOT FROM A LIST
 // ---------------------------------------------------------------------------
@@ -95,7 +117,7 @@ const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const refs = (name, self) => {
     let n = 0;
     const re = new RegExp(`\\b${esc(name)}\\b`);
-    for (const [f, t] of code) if (f !== self && re.test(t)) n++;
+    for (const [f, t] of calls) if (f !== self && re.test(t)) n++;
     return n;
 };
 
@@ -108,7 +130,7 @@ const refs = (name, self) => {
  * healthy code is worse than no audit - it gets ignored.
  */
 const usedInternally = (name, self) =>
-    (code.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
+    (calls.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
 
 /** A file may opt out with `// @orphan-ok <reason>` - legacy kept on purpose. */
 const optedOut = f => /@orphan-ok\s/.test(body.get(f));
@@ -482,7 +504,14 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
      * script, and both are worth stopping at the door rather than debugging
      * later.
      */
-    const STORY_DIRS = [path.join(SRC, 'core/story'), path.join(SRC, 'data/story')];
+    //  core/events and data/events joined the list when events became data.
+    //  They only reach INTO core/story - conditions, graph - never the other
+    //  way, so the layering the guard exists to protect is intact and the
+    //  event pool can be validated by the same loader.
+    const STORY_DIRS = [
+        path.join(SRC, 'core/story'), path.join(SRC, 'data/story'),
+        path.join(SRC, 'core/events'), path.join(SRC, 'data/events'),
+    ];
     const cache = new Map();
     const loadTs = (file) => {
         const key = path.resolve(file);
@@ -531,18 +560,93 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
         const dataFiles = fs.readdirSync(dir)
             .filter(f => /\.ts$/.test(f) && f !== 'index.ts' && f !== 'cast.ts');
 
+        // Event scenes live in data/events and are registered in the story
+        // index, so they count as known ids and are validated like any other.
+        const eventDir = path.join(SRC, 'data/events');
+        const eventFiles = fs.existsSync(eventDir)
+            ? fs.readdirSync(eventDir).filter(f => /\.ts$/.test(f) && f !== 'index.ts')
+            : [];
+
         // Every conversation id in the game, gathered before validating any of
         // them - a scene can schedule a reply that lives in another file.
         const known = new Set();
-        for (const file of dataFiles) {
-            try {
-                for (const v of Object.values(loadTs(path.join(dir, file)))) {
-                    if (v && typeof v === 'object' && v.id && Array.isArray(v.nodes)) known.add(v.id);
-                }
-            } catch { /* reported below when it is loaded for real */ }
-        }
+        const collect = (base, files) => {
+            for (const file of files) {
+                try {
+                    for (const v of Object.values(loadTs(path.join(base, file)))) {
+                        if (v && typeof v === 'object' && v.id && Array.isArray(v.nodes)) known.add(v.id);
+                    }
+                } catch { /* reported below when it is loaded for real */ }
+            }
+        };
+        collect(dir, dataFiles);
+        collect(eventDir, eventFiles);
+
         const index = fs.existsSync(path.join(dir, 'index.ts'))
             ? read(path.join(dir, 'index.ts')) : '';
+
+        // ------------------------------------------------------------------
+        //  EVENT SCENES, THROUGH THE SAME VALIDATOR
+        // ------------------------------------------------------------------
+        //  They are conversations. Giving them a second, gentler check because
+        //  they happen to live in another folder is how two definitions of
+        //  "valid" get started.
+        // ------------------------------------------------------------------
+        for (const file of eventFiles) {
+            let exported;
+            try {
+                exported = loadTs(path.join(eventDir, file));
+            } catch (e) {
+                problems.story.push(`data/events/${file}  could not be read: ${e.message}`);
+                continue;
+            }
+            for (const c of Object.values(exported)) {
+                if (!(c && typeof c === 'object' && c.id && Array.isArray(c.nodes))) continue;
+                if (validate) {
+                    for (const pr of validate(c, CAST, known)) {
+                        problems.story.push(
+                            `data/events/${file}  ${pr.conversation}${pr.node ? '/' + pr.node : ''}  ${pr.kind}: ${pr.detail}`);
+                    }
+                }
+                // The headline appears and the message never does. That is
+                // what an unregistered event scene looks like from the
+                // player's side, and nothing else would report it.
+                if (!index.includes(file.replace(/\.ts$/, ''))) {
+                    problems.story.push(
+                        `data/events/${file}  ${c.id} is not in data/story/index.ts, so the inbox cannot deliver it`);
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------
+        //  THE TRIGGERS THEMSELVES
+        // ------------------------------------------------------------------
+        //  A random event's characteristic bug is not a crash. It is firing
+        //  the wrong thing at the wrong time and looking fine. Because the
+        //  triggers are data, the app's own validator can read them.
+        // ------------------------------------------------------------------
+        try {
+            const { validateEvents } = loadTs(path.join(SRC, 'core/events/engine.ts'));
+            const { EVENTS } = loadTs(path.join(eventDir, 'index.ts'));
+            for (const pr of validateEvents(EVENTS, known)) {
+                problems.story.push(`data/events  ${pr.event}  ${pr.kind}: ${pr.detail}`);
+            }
+            // Registered in the pool, or it never rolls. Same failure as an
+            // unregistered conversation, one level up.
+            for (const file of eventFiles) {
+                const exported = loadTs(path.join(eventDir, file));
+                for (const [name, v] of Object.entries(exported)) {
+                    const isEvent = v && typeof v === 'object'
+                        && typeof v.chance === 'number' && v.conversation;
+                    if (isEvent && !EVENTS.some(e => e.id === v.id)) {
+                        problems.story.push(
+                            `data/events/${file}  ${name} is not in data/events/index.ts, so it can never fire`);
+                    }
+                }
+            }
+        } catch (e) {
+            problems.story.push(`data/events  could not be checked: ${e.message}`);
+        }
 
         for (const file of dataFiles) {
             let exported;
@@ -895,7 +999,7 @@ for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
         const a = line.match(/^\s{4}(\w+):\s*\(/);           // action signature
         if (!a) continue;
         let used = 0;
-        for (const [g, gt] of code) {
+        for (const [g, gt] of calls) {
             if (g === f) continue;
             if (isDisabled(g)) continue;
             if (new RegExp(`\\b${a[1]}\\b`).test(gt)) used++;

@@ -17,6 +17,7 @@ import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useNewsStore } from '../store/useNewsStore';
+import { applyCorporateShock, corporateBrandFrom } from '../market/brand';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
 import { currentQuarter } from './world';
@@ -39,9 +40,47 @@ export const gameSink = (): EffectSink => ({
         const s = useStatsStore.getState();
         s.update({ money: (s.money || 0) + amount });
     },
+    // ------------------------------------------------------------------
+    //  A HIT TO YOUR REPUTATION HAS TO LAND WHERE REPUTATION IS KEPT
+    // ------------------------------------------------------------------
+    //  This used to write `stats.brandValue` directly, and the quarterly tick
+    //  DERIVES that field from `brandByCategory` every time it runs. So a
+    //  scandal knocked 25 points off, the player saw it, and the next tick
+    //  recomputed the number from categories the scandal never touched and
+    //  put it back. Measured: 40 -> 15 -> 33.4 one quarter later.
+    //
+    //  Nothing failed. The effect ran, the store changed, the screen updated.
+    //  It just did not survive the night.
+    //
+    //  `applyCorporateShock` is the function written for exactly this - a
+    //  company-wide hit travelling DOWN into each category in proportion to
+    //  its weight, with the normaliser that makes a -25 to q land as exactly
+    //  -25. It has existed, tested, called from nowhere, for weeks. This is
+    //  its caller.
+    //
+    //  Works in both directions: the slicing is sign-agnostic, so a scene that
+    //  repairs your reputation uses the same effect with a positive amount.
+    // ------------------------------------------------------------------
     brand: (amount) => {
         const s = useStatsStore.getState();
-        s.update({ brandValue: Math.max(0, (s.brandValue || 0) + amount) });
+        const byCategory = { ...(s.brandByCategory || {}) };
+        const active = Object.keys(byCategory);
+
+        // Before the first quarter closes there are no categories yet, and
+        // spreading a shock over nothing would silently drop it. Fall back to
+        // the flat field so an early scene is not quietly ignored.
+        if (active.length === 0) {
+            s.update({ brandValue: Math.max(0, (s.brandValue || 0) + amount) });
+            return;
+        }
+
+        const next = applyCorporateShock(byCategory, amount, active);
+        s.update({
+            brandByCategory: next,
+            // Recomputed rather than adjusted, so q stays DERIVED. Storing it
+            // twice is how the two halves drifted apart in the first place.
+            brandValue: corporateBrandFrom(next, active),
+        });
     },
     dial: (dial, delta) => {
         // The brother lives on the cap table. Writing the story's copy would
