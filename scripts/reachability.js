@@ -1120,25 +1120,106 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                 : /(?:^|\n)\s*color: *(?:theme\.)?colors\.(\w+)/;
             return (b.match(re) || [])[1] || null;
         };
+        // ------------------------------------------------------------------
+        //  A STYLE ARRAY IS NOT A LIST, IT IS A SET OF POSSIBLE SCREENS
+        // ------------------------------------------------------------------
+        //  `[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleThem]`
+        //  does not resolve to one style. It resolves to one of two, and which
+        //  one decides what the text sitting inside it should be.
+        //
+        //  Reading it as "last entry wins" paired the MINE text colour with
+        //  the THEM background - two branches that can never both be on - and
+        //  reported the message thread as unreadable. It is not. That screen
+        //  is where every story scene is read, so a false alarm there is
+        //  exactly the one that gets a rule quietly dropped instead of obeyed.
+        //
+        //  So each entry carries the condition that switches it on, and the
+        //  check enumerates the real combinations. Two entries guarded by the
+        //  SAME condition text can never be on at once, which is the whole
+        //  fix - the container and the label are usually guarded by the same
+        //  `isMine`, and that is what ties them together.
+        // ------------------------------------------------------------------
+
+        /**
+         * Ordered style entries in one open tag, each with the guard that
+         * enables it. `cond ? A : B` becomes A-if-cond and B-if-not-cond;
+         * `cond && A` becomes A-if-cond; a bare entry has no guard.
+         */
+        const entriesIn = (slice) => {
+            const out = [];
+            // Ternary first, so its two branches are not also read as bare.
+            const claimed = new Set();
+            for (const m of slice.matchAll(
+                /([A-Za-z_$][\w$.]*)\s*\?\s*styles\.(\w+)\s*:\s*styles\.(\w+)/g)) {
+                out.push({ name: m[2], guard: m[1], on: true, at: m.index });
+                out.push({ name: m[3], guard: m[1], on: false, at: m.index + 1 });
+                claimed.add(m[2]); claimed.add(m[3]);
+            }
+            for (const m of slice.matchAll(
+                /([A-Za-z_$][\w$.]*)\s*&&\s*styles\.(\w+)/g)) {
+                out.push({ name: m[2], guard: m[1], on: true, at: m.index });
+                claimed.add(m[2]);
+            }
+            for (const m of slice.matchAll(/styles\.(\w+)/g)) {
+                if (!claimed.has(m[1])) out.push({ name: m[1], guard: null, on: true, at: m.index });
+            }
+            return out.sort((a, b) => a.at - b.at);
+        };
+
+        /** The entry that actually applies, given a truth value per guard. */
+        const resolve = (entries, prop, world) => {
+            let token = null, from = null;
+            for (const e of entries) {
+                if (e.guard && (world[e.guard] ?? true) !== e.on) continue;
+                const t = tokenOf(e.name, prop);
+                if (t) { token = t; from = e.name; }
+            }
+            return { token, from };
+        };
+
+        /** Every consistent combination of the guards involved. Capped. */
+        const worlds = (guards) => {
+            const g = [...new Set(guards.filter(Boolean))].slice(0, 6);
+            const out = [];
+            for (let mask = 0; mask < (1 << g.length); mask++) {
+                const w = {};
+                g.forEach((name, i) => { w[name] = !!(mask & (1 << i)); });
+                out.push(w);
+            }
+            return out;
+        };
+
         // Collect every container that paints a background, with its span.
         const spans = [];
         for (const tag of TAGS) {
             for (const m of src.matchAll(new RegExp(`<${esc(tag)}\\b`, 'g'))) {
                 const j = endOpen(src, m.index);
                 if (j < 0 || src[j - 1] === '/') continue;
-                // In a style ARRAY the last entry wins, so resolve to the last
-                // style that sets the property - not the first. Reading the
-                // first made `[tabText, active && activeTabText]` look broken
-                // when the override right after it was the fix.
-                let fill = null;
-                for (const s of src.slice(m.index, j).matchAll(/styles\.(\w+)/g)) {
-                    const t = tokenOf(s[1], 'bg');
-                    if (t) fill = t;
-                }
-                const inline = src.slice(m.index, j)
+                const slice = src.slice(m.index, j);
+                const entries = entriesIn(slice);
+                const inline = slice
                     .match(/backgroundColor: *(?:theme\.)?colors\.(\w+)(?! *\+)/);
-                if (inline) fill = inline[1];
-                if (!fill || !TOKENS.has(fill)) continue;
+                // ----------------------------------------------------------
+                //  A FILL THIS SCRIPT CANNOT READ IS STILL A FILL
+                // ----------------------------------------------------------
+                //  `backgroundColor: avatarTintFor(name)` paints the box, and
+                //  the audit has no idea with what. Treating it as "does not
+                //  paint" made the label inside get checked against the ROW
+                //  behind it instead - so black initials on a light avatar
+                //  were reported as black on the dark ground, 1.34.
+                //
+                //  Marked unknown instead. Anything sitting on it is skipped,
+                //  because the honest answer here is "cannot tell", and a
+                //  confident wrong answer is what makes people stop reading
+                //  the output. The tints themselves are measured where they
+                //  are declared, in theme.ts.
+                // ----------------------------------------------------------
+                const paintsUnknown = !inline
+                    && /backgroundColor:/.test(slice)
+                    && !entries.some(e => tokenOf(e.name, 'bg'));
+                const paints = inline || paintsUnknown
+                    || entries.some(e => tokenOf(e.name, 'bg'));
+                if (!paints) continue;
                 const re = new RegExp(`<(/?)${esc(tag)}\\b`, 'g');
                 re.lastIndex = j + 1;
                 let depth = 1, end = src.length, hit;
@@ -1146,7 +1227,11 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                     depth += hit[1] === '/' ? -1 : 1;
                     if (depth === 0) end = hit.index;
                 }
-                spans.push({ start: m.index, end, fill });
+                spans.push({
+                    start: m.index, end, entries,
+                    inlineFill: inline && inline[1],
+                    unknown: paintsUnknown,
+                });
             }
         }
 
@@ -1154,15 +1239,10 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
         for (const tm of src.matchAll(/<Text\b/g)) {
             const te = endOpen(src, tm.index);
             if (te < 0) continue;
-            let tok = null, styleName = null;
-            for (const s of src.slice(tm.index, te).matchAll(/styles\.(\w+)/g)) {
-                const t = tokenOf(s[1], 'color');
-                if (t) { tok = t; styleName = s[1]; }
-            }
-            const inline = src.slice(tm.index, te)
-                .match(/\bcolor: *(?:theme\.)?colors\.(\w+)/);
-            if (inline) { tok = inline[1]; styleName = styleName || 'inline'; }
-            if (!tok || !TOKENS.has(tok)) continue;
+            const slice = src.slice(tm.index, te);
+            const textEntries = entriesIn(slice);
+            const inlineText = slice.match(/\bcolor: *(?:theme\.)?colors\.(\w+)/);
+            if (!inlineText && !textEntries.some(e => tokenOf(e.name, 'color'))) continue;
 
             // The label sits on its INNERMOST painted ancestor, not on every
             // ancestor. A cyan button inside a dark card was being checked
@@ -1173,15 +1253,29 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
                 if (s.start >= tm.index || s.end <= tm.index) continue;
                 if (!inner || s.start > inner.start) inner = s;
             }
-            if (!inner) continue;
+            // Its nearest background is one this script cannot resolve, so
+            // there is nothing honest to compare against.
+            if (!inner || inner.unknown) continue;
 
-            const r = ratio(hx(TOKENS.get(tok)), hx(TOKENS.get(inner.fill)));
-            const key = `${styleName}|${inner.fill}`;
-            if (r < 3 && !seen.has(key)) {
-                seen.add(key);
-                const ln = src.slice(0, tm.index).split('\n').length;
-                problems.contrast.push(
-                    `${rel(f)}:${ln}  ${tok} on ${inner.fill} fill = ${r.toFixed(2)}`);
+            // Guards from BOTH the label and its background, evaluated
+            // together - that shared `isMine` is the whole point.
+            const allGuards = [...inner.entries, ...textEntries].map(e => e.guard);
+            for (const world of worlds(allGuards)) {
+                const fill = inner.inlineFill
+                    || resolve(inner.entries, 'bg', world).token;
+                const text = inlineText
+                    ? inlineText[1]
+                    : resolve(textEntries, 'color', world).token;
+                if (!fill || !text || !TOKENS.has(fill) || !TOKENS.has(text)) continue;
+
+                const r = ratio(hx(TOKENS.get(text)), hx(TOKENS.get(fill)));
+                const key = `${text}|${fill}`;
+                if (r < 3 && !seen.has(key)) {
+                    seen.add(key);
+                    const ln = src.slice(0, tm.index).split('\n').length;
+                    problems.contrast.push(
+                        `${rel(f)}:${ln}  ${text} on ${fill} fill = ${r.toFixed(2)}`);
+                }
             }
         }
     }

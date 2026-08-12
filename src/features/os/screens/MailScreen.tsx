@@ -10,7 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { theme } from '../../../core/theme';
+import { theme, avatarTintFor } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
@@ -20,14 +20,11 @@ const formatMonth = (m: number) => `M${m}`;
 const getInitials = (name: string): string =>
     name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
-const avatarColors = ['#E27D60', '#E8A87C', '#C38D9E', '#41B3A3', '#85DCB', '#EFC94C', '#3FC9C0', '#A78BFA'];
-const getAvatarColor = (name: string) => {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return avatarColors[Math.abs(hash) % avatarColors.length];
-};
+// The palette and the hash moved to core/theme.ts. MailDetailScreen carried a
+// SECOND copy of both, so the same sender could be drawn in one colour in the
+// list and another in the detail view. One of the eight, '#85DCB', was five
+// digits - not a colour - so one sender in eight got whatever React Native
+// does with a malformed hex.
 
 const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
     const isUnread = !mail.isRead;
@@ -38,7 +35,7 @@ const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
             
             <View style={styles.avatarWrap}>
-                <View style={[styles.avatar, { backgroundColor: getAvatarColor(mail.fromName) }]}>
+                <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
                     <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
                 </View>
                 {isUnread && (
@@ -207,8 +204,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    avatarText: { color: '#FFFFFF', fontWeight: '600', fontSize: 16 },
+    // Black. Every avatar tint is a light fill and prefers it by at
+    // least 10:1; white on them measured 1.45 to 2.03 - the whole avatar
+    // column was below the floor and nothing reported it, because the fill
+    // comes out of a function and the audit can only read tokens.
+    avatarText: { color: theme.colors.onLight, fontWeight: '600', fontSize: 16 },
     
+    // The same badge as MessagesScreen, and it had the same fault: `brand` as
+    // a fill with white on it, 1.90. `notification` is the one red the palette
+    // allows as a background, and an unread dot is what it is for.
     unreadIndicatorRow: {
         position: 'absolute',
         top: 0,
@@ -216,14 +220,14 @@ const styles = StyleSheet.create({
         width: 16,
         height: 16,
         borderRadius: 8,
-        backgroundColor: theme.colors.brand,
+        backgroundColor: theme.colors.notification,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
         borderColor: theme.colors.background,
     },
     unreadIndicatorRowText: {
-        color: theme.colors.textPrimary,
+        color: theme.colors.notificationText,
         fontSize: 10,
         fontWeight: '900',
     },

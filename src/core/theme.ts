@@ -255,6 +255,40 @@ export const theme = {
         notification: '#D32F2F',
         notificationText: '#FFFFFF',
 
+        // ==================================================================
+        //  AVATAR TINTS — identity, and nothing else
+        // ==================================================================
+        //  Eight light fills whose only job is telling one sender from
+        //  another at a glance. They carry NO meaning: a green avatar is not
+        //  a good sender, which is exactly why the signal seven may not be
+        //  used here. Reusing `rp` violet for an avatar would quietly teach
+        //  the player that violet sometimes means research and sometimes
+        //  means Marisol.
+        //
+        //  WHY THEY LIVE HERE. There was a hardcoded array of eight hexes
+        //  in MailScreen.tsx and a second copy of the same array in
+        //  MailDetailScreen.tsx, so the same person could be drawn in two
+        //  colours depending on which screen you were on. One of the eight,
+        //  '#85DCB', is FIVE digits - not a colour at all - so one sender in
+        //  eight got whatever React Native does with a malformed hex.
+        //
+        //  ALL EIGHT TAKE BLACK. Measured, lowest is 10.34:1; white on them
+        //  ranges 1.45 to 2.03, and white is what both screens were using.
+        //  Every avatar in the mail app was below the contrast floor and
+        //  nothing reported it, because the fill comes out of a function and
+        //  the audit can only read tokens.
+        // ==================================================================
+        avatarTints: [
+            '#F0A48A', // coral    10.38 on black
+            '#F2C89B', // sand     13.51
+            '#D9A9BB', // rose     10.34
+            '#7DD3C8', // teal     12.02
+            '#F2D479', // wheat    14.47
+            '#9DC4F0', // sky      11.59
+            '#C9B8F5', // lilac    11.66
+            '#A8D8A0', // sage     12.99
+        ] as string[],
+
         // Legacy names, still in wide use. `success` and `danger` are now
         // strictly TEXT colours: they carry the profit/loss signal, so a
         // fill may never use them.
@@ -324,3 +358,23 @@ export const theme = {
     spacing: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 },
     typography: { display: 34, title: 28, subtitle: 16, body: 14, caption: 12, micro: 10 },
 } as const;
+
+/**
+ * Which tint a sender gets. Stable for a given name.
+ *
+ * ONE implementation, because there were two: MailScreen and MailDetailScreen
+ * each carried their own copy of the palette and the hash, so opening a mail
+ * could redraw the sender in a different colour than the list had just shown.
+ * The same person, two identities, one tap apart.
+ *
+ * The initials on top are `colors.onLight` - every tint is a light fill and
+ * all eight prefer black by at least 10:1. Both screens were writing white.
+ */
+export const avatarTintFor = (name: string): string => {
+    const tints = theme.colors.avatarTints;
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return tints[Math.abs(hash) % tints.length];
+};

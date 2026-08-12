@@ -10,7 +10,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { theme } from '../../../core/theme';
+import { theme, avatarTintFor } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
@@ -22,16 +22,9 @@ const formatMonth = (m: number) => `M${m}`;
 const getInitials = (name: string): string =>
     name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
-// We can still use varied colors for avatars to keep the Gmail feel, 
-// but muted slightly to fit the dark theme.
-const avatarColors = ['#E27D60', '#E8A87C', '#C38D9E', '#41B3A3', '#85DCB', '#EFC94C', '#3FC9C0', '#A78BFA'];
-const getAvatarColor = (name: string) => {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return avatarColors[Math.abs(hash) % avatarColors.length];
-};
+// The tints and the hash live in core/theme.ts. This file used to carry its
+// own copy of both, so a sender drawn one colour in the list could be drawn
+// another the moment you opened the mail.
 
 const MailDetailScreen = () => {
     const navigation = useNavigation<any>();
@@ -84,7 +77,7 @@ const MailDetailScreen = () => {
 
                 {/* Sender Info */}
                 <View style={styles.senderSection}>
-                    <View style={[styles.avatar, { backgroundColor: getAvatarColor(mail.fromName) }]}>
+                    <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
                         <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
                     </View>
                     <View style={styles.senderInfo}>
@@ -141,7 +134,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    avatarText: { color: '#FFFFFF', fontWeight: '600', fontSize: 16 },
+    // Black - every tint is a light fill. See MailScreen for the numbers.
+    avatarText: { color: theme.colors.onLight, fontWeight: '600', fontSize: 16 },
     senderInfo: { flex: 1, marginLeft: 12, justifyContent: 'center' },
     senderNameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     detailFromName: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700' },

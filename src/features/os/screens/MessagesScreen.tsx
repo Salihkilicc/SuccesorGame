@@ -107,6 +107,15 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceHigh,
     },
     avatarText: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 18 },
+    // ------------------------------------------------------------------
+    //  THE UNREAD DOT
+    // ------------------------------------------------------------------
+    //  Was `brand` orange with white on it: 1.90, and `brand` is a TEXT
+    //  colour meaning "this is brand value" - painting with it says nothing
+    //  and reads as nothing. `notification` is the one red the palette
+    //  allows as a fill, and it exists for exactly this: a badge borrowing
+    //  a convention the player already knows from every phone they own.
+    // ------------------------------------------------------------------
     unreadIndicatorRow: {
         position: 'absolute',
         top: -2,
@@ -114,14 +123,14 @@ const styles = StyleSheet.create({
         width: 18,
         height: 18,
         borderRadius: 9,
-        backgroundColor: theme.colors.brand,
+        backgroundColor: theme.colors.notification,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
         borderColor: theme.colors.surface,
     },
     unreadIndicatorRowText: {
-        color: theme.colors.textPrimary,
+        color: theme.colors.notificationText,
         fontSize: 10,
         fontWeight: '900',
     },

@@ -86,6 +86,14 @@ export interface EquityState {
     reset: () => void;
 }
 
+/**
+ * The most of itself a company may sell in one placement.
+ *
+ * Half. Beyond that you are not raising money, you are handing over control,
+ * and that should be a different screen with the board's name on it.
+ */
+export const MAX_DILUTION_RATIO = 0.5;
+
 const updatePriceHistory = (history: number[], newPrice: number): number[] => {
     const updated = [...history, newPrice];
     if (updated.length > 12) updated.shift();
@@ -232,7 +240,28 @@ export const useEquityStore = create<EquityState>()(
             //  yani "istedigin an degerlemenden nakit basmak" gibiydi.
             executeDilution: (percentToSell, valuation, addCashFn) => {
                 const cap = readCapTable();
-                const decimal = Math.max(0, Math.min(0.5, percentToSell / 100));
+                // ----------------------------------------------------------
+                //  ASKING FOR TOO MUCH USED TO QUIETLY SELL HALF
+                // ----------------------------------------------------------
+                //  This was `Math.max(0, Math.min(0.5, percentToSell / 100))`,
+                //  so `executeDilution(150)` clamped to 0.5 and sold FIFTY
+                //  PERCENT OF THE COMPANY without complaint - it even
+                //  reported success. A slipped decimal or a bad field on the
+                //  dilution screen would hand away half the cap table and the
+                //  only sign would be the ownership number afterwards.
+                //
+                //  A clamp is the right instinct for a slider and the wrong
+                //  one for a transaction. Out of range now changes nothing
+                //  and says so.
+                // ----------------------------------------------------------
+                const decimal = percentToSell / 100;
+                if (!(decimal > 0) || decimal > MAX_DILUTION_RATIO) {
+                    return {
+                        newShares: 0,
+                        capitalRaised: 0,
+                        newOwnershipPercent: get().getPlayerOwnership(),
+                    };
+                }
                 const price = useStatsStore.getState().companySharePrice
                     || sharePrice(valuation, cap.totalShares);
 
@@ -309,6 +338,25 @@ export const useEquityStore = create<EquityState>()(
 
             distributeDividend: (amountPerShare, spendCashFn) => {
                 const cap = readCapTable();
+                // ----------------------------------------------------------
+                //  A NEGATIVE DIVIDEND WAS A MONEY PRINTER
+                // ----------------------------------------------------------
+                //  Nothing checked the sign. `distributeDividend(-1)` gave a
+                //  totalCost of -10,000,000, and `spendCashFn` of a negative
+                //  number ADDS it - so the company paid itself ten million
+                //  and the player's personal cash went down by their share.
+                //  Free money, in the one function whose entire job is moving
+                //  money out of the company.
+                //
+                //  Zero is refused too. It costs nothing, pays nobody, and
+                //  still collects the sentiment boost below.
+                // ----------------------------------------------------------
+                if (!(amountPerShare > 0)) {
+                    return {
+                        totalRequired: 0, playerPortion: 0, playerGross: 0,
+                        tax: 0, isAffordable: true,
+                    };
+                }
                 const totalCost = amountPerShare * cap.totalShares;
                 const playerGross = amountPerShare * cap.playerShares;
 
