@@ -26,7 +26,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { CAST } from '../../data/story/cast';
-import { conversationById } from '../../data/story';
+import { conversationById, OPENING_CONVERSATIONS } from '../../data/story';
 import { emailOf } from './cast';
 import { drain, type Pending } from './inbox';
 import { testAll } from './conditions';
@@ -72,6 +72,40 @@ export const deliver = (conversationId: string): boolean => {
             t.id === from.id ? { ...t, conversationId: c.id } : t),
     }));
     return true;
+};
+
+/**
+ * Put the opening scene in the queue.
+ *
+ * Called once, when the company is named - that is the moment the game
+ * actually begins, and the father should already be waiting when the player
+ * reaches the home screen for the first time.
+ *
+ * Idempotent via a flag rather than by inspecting the queue: the queue gets
+ * drained, so by the second quarter there would be nothing left to tell us it
+ * had ever been there, and re-entering onboarding would seed it again.
+ */
+export const seedOpening = (): void => {
+    const story = useStoryStore.getState();
+    if (story.flags.openingQueued) return;
+
+    const now = currentQuarter();
+    OPENING_CONVERSATIONS.forEach(id => {
+        useStoryStore.getState().schedule({
+            conversationId: id,
+            dueQuarter: now,
+            queuedAtQuarter: now,
+            // The first thing anybody says. It does not wait behind anything.
+            urgent: true,
+        });
+    });
+    useStoryStore.getState().raise('openingQueued');
+
+    // Delivered immediately rather than at the next tick. The father is
+    // telling the player to go and set a production target BEFORE the quarter
+    // advances; arriving after it would be advice about a quarter that is
+    // already over.
+    runInbox();
 };
 
 /**

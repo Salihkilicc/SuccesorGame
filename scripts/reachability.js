@@ -776,14 +776,20 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             problems.story.push(`data/story/cast.ts  could not be read: ${e.message}`);
         }
 
-        const dataFiles = fs.readdirSync(dir)
-            .filter(f => /\.ts$/.test(f) && f !== 'index.ts' && f !== 'cast.ts');
+        // A scene file, its own tests, and the two support files are three
+        // different things. Without the .test exclusion the pass reported
+        // "exports no conversation" against a test that was never meant to.
+        const isSceneFile = f =>
+            /\.ts$/.test(f) && !/\.test\.ts$/.test(f)
+            && f !== 'index.ts' && f !== 'cast.ts';
+
+        const dataFiles = fs.readdirSync(dir).filter(isSceneFile);
 
         // Event scenes live in data/events and are registered in the story
         // index, so they count as known ids and are validated like any other.
         const eventDir = path.join(SRC, 'data/events');
         const eventFiles = fs.existsSync(eventDir)
-            ? fs.readdirSync(eventDir).filter(f => /\.ts$/.test(f) && f !== 'index.ts')
+            ? fs.readdirSync(eventDir).filter(isSceneFile)
             : [];
 
         // Every conversation id in the game, gathered before validating any of

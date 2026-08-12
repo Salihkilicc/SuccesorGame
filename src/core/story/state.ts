@@ -87,6 +87,16 @@ export const INITIAL_DIALS: Dials = {
  * something IRREVERSIBLE. If it can become false again, it is a dial.
  */
 export type StoryFlag =
+    // --- Bookkeeping
+    /**
+     * The opening scene has been put in the queue.
+     *
+     * A flag rather than a check on `pending`, because pending is DRAINED -
+     * once the father's first message has been delivered there is nothing
+     * left to look at, and the seeding would run again every time the player
+     * passed through onboarding.
+     */
+    | 'openingQueued'
     // --- Year one
     | 'fatherDead'
     | 'soldToPear'

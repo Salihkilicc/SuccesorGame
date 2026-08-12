@@ -153,6 +153,18 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
         }
 
         update({ companyName: tidy(company) });
+
+        // The company has a name, so the game has begun. Put the father in
+        // the inbox now rather than at the first tick - he is telling the
+        // player to set a production target BEFORE the quarter advances, and
+        // arriving afterwards would make it advice about a quarter that is
+        // already over. Idempotent; see core/story/deliver.ts.
+        try {
+            require('../../../core/story/deliver').seedOpening();
+        } catch (e) {
+            console.warn('[story] opening could not be seeded', e);
+        }
+
         onDone();
     };
 
