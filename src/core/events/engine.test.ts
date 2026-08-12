@@ -17,6 +17,7 @@ const world = (over: Partial<World> = {}): World => ({
     capital: 100_000_000,
     cash: 5_000_000,
     morale: 75,
+    marketShare: 4,
     ...over,
 });
 
@@ -230,6 +231,21 @@ describe('the events that actually ship', () => {
                 capital: 60_000_000,
                 flags: { fatherDead: true, friendHelped: true },
                 dials: { ...INITIAL_DIALS, friendLoyalty: 60, pearHostility: 60 },
+            }],
+            ['at war with Pear, and losing', {
+                // The archetypes above all skip `refusedPear`, which is the
+                // gate on Pear's entire escalation - so until this was written
+                // out, four letters were unreachable by everybody.
+                capital: 80_000_000,
+                flags: { fatherDead: true, refusedPear: true },
+                dials: { ...INITIAL_DIALS, pearHostility: 85 },
+                marketShare: 3,
+            }],
+            ['...and beating him', {
+                capital: 200_000_000,
+                flags: { fatherDead: true, refusedPear: true },
+                dials: { ...INITIAL_DIALS, pearHostility: 85 },
+                marketShare: 14,
             }],
             ['at war with Pear, and took the number', {
                 capital: 80_000_000,

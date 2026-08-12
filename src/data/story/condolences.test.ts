@@ -41,6 +41,7 @@ const world = (flags: Partial<Record<string, true>>): World => ({
     capital: 5_000_000,
     cash: 100_000,
     morale: 71,
+    marketShare: 4,
 });
 
 describe('all of it is in the game', () => {

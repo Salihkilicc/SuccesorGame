@@ -41,6 +41,7 @@ const world = (over: { cfoTrust?: number; cfoResigned?: boolean } = {}): World =
     capital: 30_000_000,
     cash: 200_000,
     morale: 71,
+    marketShare: 4,
 });
 
 describe('all of it is in the game', () => {

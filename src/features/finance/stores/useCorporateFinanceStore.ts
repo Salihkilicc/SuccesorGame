@@ -985,6 +985,15 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 //     } catch { /* buff yazilamadi, islem yine de gecerli */ }
                 // }
 
+                // Moving on Pear is a story event as well as a transaction.
+                // He notices, and the midnight message reads this.
+                if (target.id === 'tech_pear') {
+                    try {
+                        require('../../../core/store/useStoryStore').useStoryStore
+                            .getState().raise('movedOnPear');
+                    } catch { /* story store not ready */ }
+                }
+
                 // 6) Duyuru tepkisi
                 const impact = announcementImpact(
                     premium, acquirerValuation,

@@ -45,6 +45,7 @@ const world = (brotherTrust: number): World => ({
     capital: 20_000_000,
     cash: 200_000,
     morale: 71,
+    marketShare: 4,
 });
 
 describe('all three are in the game', () => {

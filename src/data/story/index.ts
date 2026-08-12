@@ -49,6 +49,9 @@ import {
 import {
     moleNumber, moleFirstContact, moleOffer, fbiFirstContact,
 } from '../events/mole';
+import {
+    pearPatent, pearSuppliers, pearPriceWar, pearMidnight,
+} from '../events/pearEscalation';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -73,6 +76,7 @@ export const CONVERSATIONS: Conversation[] = [
     friendAsks, friendGrows,
     friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
     moleNumber, moleFirstContact, moleOffer, fbiFirstContact,
+    pearPatent, pearSuppliers, pearPriceWar, pearMidnight,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

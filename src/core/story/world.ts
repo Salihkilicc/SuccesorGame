@@ -62,5 +62,10 @@ export const readWorld = (): World => {
         //  that was reading the frozen copy.
         // ------------------------------------------------------------------
         morale: useGameStore.getState().employeeMorale ?? 75,
+        // From the last closed quarter's report rather than recomputed. The
+        // tick works it out (`totalPlayerShare`) and puts it here; asking the
+        // market stores again would be a second implementation of the one
+        // number the competitive game is about.
+        marketShare: (useGameStore.getState().lastQuarterReport as any)?.marketShare ?? 0,
     };
 };

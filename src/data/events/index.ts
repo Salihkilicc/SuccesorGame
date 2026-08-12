@@ -33,6 +33,9 @@ import {
     moleNumberEvent, moleFirstContactEvent, moleOfferEvent,
     fbiFirstContactEvent, fbiFirstContactRepeatEvent,
 } from './mole';
+import {
+    pearPatentEvent, pearSuppliersEvent, pearPriceWarEvent, pearMidnightEvent,
+} from './pearEscalation';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -64,6 +67,11 @@ export const EVENTS: GameEvent[] = [
     moleOfferEvent,
     fbiFirstContactEvent,
     fbiFirstContactRepeatEvent,
+    // Pear, getting louder - and then the one time he is not.
+    pearPatentEvent,
+    pearSuppliersEvent,
+    pearPriceWarEvent,
+    pearMidnightEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

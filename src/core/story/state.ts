@@ -160,6 +160,11 @@ export type StoryFlag =
     | 'moleRepeated'
     /** Somebody federal has been in touch. Once is a courtesy; twice is not. */
     | 'fbiContacted'
+    // --- Pear.
+    /** You bid for Pear itself, hostile or otherwise. He noticed. */
+    | 'movedOnPear'
+    /** The night he texted. Once, ever. */
+    | 'droveHimToIt'
     // --- Teaching. Raised by the screens the first year points at, so a
     //     lock clears on the ACTION rather than on a screen being opened.
     | 'tutorialProductionSet'

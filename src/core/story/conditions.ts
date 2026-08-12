@@ -61,6 +61,14 @@ export type Condition =
      * story bands over it would give the same number two vocabularies.
      */
     | { kind: 'moraleAtMost'; value: number }
+    /**
+     * The player holds at least this much of the markets they compete in.
+     *
+     * A percent rather than a band, for the same reason as morale: share is an
+     * engine figure with its own physics, not a relationship the story owns.
+     * It is what "you took the category off him" actually means.
+     */
+    | { kind: 'marketShareAtLeast'; percent: number }
     /** Every one of these holds. */
     | { kind: 'all'; of: Condition[] }
     /** At least one of these holds. */
@@ -84,6 +92,14 @@ export type World = {
      * see the note in core/story/world.ts.
      */
     morale: number;
+    /**
+     * The player's realised market share across every category, as a percent.
+     *
+     * The tick already computes this - `totalPlayerShare` - and it was not
+     * being handed to the story, so no scene could react to the one number the
+     * whole competitive game is about.
+     */
+    marketShare: number;
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -100,6 +116,7 @@ export const test = (c: Condition, w: World): boolean => {
         case 'capitalAtMost': return w.capital <= c.amount;
         case 'cashAtLeast': return w.cash >= c.amount;
         case 'moraleAtMost': return w.morale <= c.value;
+        case 'marketShareAtLeast': return w.marketShare >= c.percent;
         case 'all': return c.of.every(x => test(x, w));
         case 'any': return c.of.some(x => test(x, w));
         case 'not': return !test(c.of, w);

@@ -87,6 +87,25 @@ export type Conversation = {
     subject?: string;
     /** When this may fire at all. */
     when?: Condition[];
+    /**
+     * A stated reason for using a channel this character does not use.
+     *
+     * THE RULE THIS BREAKS. Pear is mail-only, and the cast file says why:
+     * "he does not have your number and has never wanted it. If he ever texts
+     * you, something has broken in him - which is a scene worth saving for."
+     * That was written before the scene existed. This is the scene.
+     *
+     * The exception is a FIELD rather than a loosened rule because the two
+     * alternatives are both worse. Changing his `channels` to 'both' would let
+     * him text from quarter one and throw away the meaning the restriction was
+     * accumulating for twenty prompts. Letting the validator shrug would make
+     * every future break silent and accidental.
+     *
+     * As a declared string, breaking the rule costs a sentence explaining
+     * yourself, and the audit prints it - so the next person reads the reason
+     * rather than discovering the inconsistency.
+     */
+    channelBreak?: string;
     /** The first card. */
     start: string;
     nodes: StoryNode[];
@@ -144,7 +163,7 @@ export const validate = (
         const from = cast[c.from];
         if (!from) {
             at('unknown-speaker', `"${c.from}" is not in the cast`);
-        } else if (!canUseChannel(from, c.channel)) {
+        } else if (!canUseChannel(from, c.channel) && !c.channelBreak) {
             at('wrong-channel', `${from.name} does not use ${c.channel} (${from.channels} only)`);
         }
         for (const n of c.nodes) {
