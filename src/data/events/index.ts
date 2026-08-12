@@ -25,6 +25,10 @@ import {
 import {
     brotherVoteEvent, cfoWarnsAboutBrotherEvent, brotherMeetsPearQuietlyEvent,
 } from './brotherPlot';
+import {
+    friendGossipSmallEvent, friendGossipRealEvent,
+    friendPearWeaknessEvent, friendOffersPlanoraEvent,
+} from './friendGossip';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -42,6 +46,12 @@ export const EVENTS: GameEvent[] = [
     brotherVoteEvent,
     cfoWarnsAboutBrotherEvent,
     brotherMeetsPearQuietlyEvent,
+    // The channel. Every one of these requires that the player did not refuse
+    // him - and a player who did will never see any of them, or be told why.
+    friendGossipSmallEvent,
+    friendGossipRealEvent,
+    friendPearWeaknessEvent,
+    friendOffersPlanoraEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

@@ -136,6 +136,19 @@ export type StoryFlag =
     /** The player stopped it. */
     | 'bragaStopped'
     | 'brotherPlottedOpenly'
+    // --- The friend's arc.
+    //
+    //     `friendRefused` is the one that matters and it is the reason this
+    //     arc needs flags at all. Every later friend scene requires its
+    //     absence, so refusing him does not produce a scene, a warning or a
+    //     closing door - it produces nothing, forever. See data/story/friend.
+    | 'friendHelped'
+    | 'friendRefused'
+    | 'friendGrewUp'
+    /** He told you where Pear is soft. Once. */
+    | 'knowsPearWeakness'
+    /** Planora is on the market at a price only you were offered. */
+    | 'planoraOffered'
     // --- Teaching. Raised by the screens the first year points at, so a
     //     lock clears on the ACTION rather than on a screen being opened.
     | 'tutorialProductionSet'

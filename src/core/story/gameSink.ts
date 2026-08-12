@@ -141,6 +141,22 @@ export const gameSink = (): EffectSink => ({
     ending: (id) => {
         useStoryStore.getState().endGame(id);
     },
+    // Writes the ANCHOR, not the price. A price alone drifts back to the
+    // shipped value within a few quarters - that was the divestiture bug, and
+    // a story reward that expires quietly is worse than no reward.
+    reprice: (company, multiplier) => {
+        try {
+            const { INITIAL_MARKET_ITEMS } = require('../../features/assets/data/marketData');
+            const base: any = (INITIAL_MARKET_ITEMS as any[]).find(x => x.id === company);
+            if (!base?.price) return;
+            const market = require('../store/useMarketStore').useMarketStore;
+            const next = base.price * multiplier;
+            market.setState((st: any) => ({
+                marketPrices: { ...st.marketPrices, [company]: next },
+            }));
+            market.getState().setValueAnchor(company, next);
+        } catch { /* market store not ready */ }
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

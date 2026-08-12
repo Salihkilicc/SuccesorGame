@@ -43,6 +43,10 @@ import {
 import {
     brotherVote, cfoWarnsAboutBrother, brotherCaught, brotherMeetsPearQuietly,
 } from '../events/brotherPlot';
+import {
+    friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
+} from '../events/friendGossip';
+import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
@@ -63,6 +67,8 @@ export const CONVERSATIONS: Conversation[] = [
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
     brotherDividendCold, brotherDividendWarm, brotherDividendClose,
     brotherVote, cfoWarnsAboutBrother, brotherCaught, brotherMeetsPearQuietly,
+    friendAsks, friendGrows,
+    friendGossipSmall, friendGossipReal, friendPearWeakness, friendOffersPlanora,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>
@@ -163,4 +169,17 @@ STORY_BEATS.push(
     { conversation: cfoBoardRoom.id },
     { conversation: cfoBragaName.id },
     { conversation: cfoResignation.id },
+);
+
+// ----------------------------------------------------------------------------
+//  THE FRIEND'S ARC
+// ----------------------------------------------------------------------------
+//  Two beats; the rest of him is events. Neither is urgent - he is the one
+//  person in the cast who never needs an answer this quarter, and making him
+//  jump the queue would be the wrong note in the only relationship that is not
+//  transactional.
+// ----------------------------------------------------------------------------
+STORY_BEATS.push(
+    { conversation: friendAsks.id },
+    { conversation: friendGrows.id },
 );

@@ -177,6 +177,33 @@ export const INITIAL_STOCKS: StockItem[] = [
     marketCap: 44_000_000_000,
   },
 
+  // ==========================================================================
+  //  PLANORA — the friend's company
+  // ==========================================================================
+  //  Listed because a story reward has to be a real one. "He will sell it to
+  //  you cheap" is worth nothing if the acquisition screen has never heard of
+  //  the company, and the player would rightly read the offer as flavour.
+  //
+  //  Small, unprofitable and growing fast: the shape of a company run by
+  //  somebody who is good at the product and learning the rest in public. It
+  //  is buyable by anybody at the listed price - the friendship only changes
+  //  what it costs, through the anchor. See the `reprice` effect.
+  // ==========================================================================
+  {
+    id: 'tech_planora',
+    symbol: 'PLNR',
+    name: 'Planora',
+    price: 46.0,
+    change: 4.1,
+    category: 'Technology',
+    risk: 'High',
+    description: 'Scheduling software people are unreasonably fond of.',
+    acquisitionCost: 640_000_000,
+    acquisitionBuff: { type: 'R_AND_D_SPEED', value: 0.10, label: 'R&D Speed +10%' },
+    isAcquired: false,
+    marketCap: 640_000_000,
+  },
+
   // HEALTH (Defensive, Steady)
   {
     id: 'health_pfiz',

@@ -171,34 +171,73 @@ describe('the events that actually ship', () => {
     });
 
     it('and every event is reachable by SOME company', () => {
-        // THIS TEST HAS BEEN WRONG TWICE, in the same way both times: it
-        // assumed one company could see everything. First an event was written
-        // whose trigger is being POOR, then three whose triggers are mutually
-        // exclusive bands of the same dial. Events are supposed to disagree
-        // about what kind of company they happen to.
+        // ------------------------------------------------------------------
+        //  WRITTEN AS PEOPLE, NOT AS A NESTED LOOP
+        // ------------------------------------------------------------------
+        //  This test has been wrong three times, always the same way: it
+        //  assumed one company could see everything, and each new arc added a
+        //  dimension the loop did not have. First an event whose trigger is
+        //  being POOR, then three on exclusive bands of one dial, then a whole
+        //  arc gated on flags.
         //
-        // So it samples the space instead. What must hold is that no event is
-        // unreachable by EVERYBODY - which is the real failure, and the one
-        // that would ship a scene nobody can ever see.
-        const money = [1_000_000, 500_000_000];
-        const brother = [10, 60, 90];
-        // Sampled too, because two events are now mirrored on it: one fires
-        // when the CFO will still bring you things and one when he will not.
-        const cfo = [10, 70];
-        const seen = new Set<string>();
+        //  A loop over every dial and flag is 2^n and grows with the story.
+        //  These are five ways of playing instead - and the reason that is
+        //  better than more nesting is that it fails LEGIBLY: an unreachable
+        //  event now means "nobody who plays like this would ever see it",
+        //  which is the actual question.
+        // ------------------------------------------------------------------
+        const archetypes: Array<[string, Partial<World>]> = [
+            ['broke and alone', {
+                capital: 1_000_000,
+                flags: { fatherDead: true, cfoResigned: true },
+                dials: { ...INITIAL_DIALS, brotherTrust: 15, pearHostility: 60 },
+            }],
+            ['broke, but the CFO is still here', {
+                // Added because the first pass had no archetype that was both
+                // short of money and still had a finance director - which is
+                // the single most ordinary bad quarter in the game, and the
+                // only state the cash warning can fire in.
+                capital: 1_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, cfoTrust: 70, pearHostility: 60 },
+            }],
+            ['rich and hated', {
+                capital: 500_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, brotherTrust: 15, cfoTrust: 70, pearHostility: 60 },
+            }],
+            ['rich and reconciled', {
+                capital: 500_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, brotherTrust: 90, cfoTrust: 70, pearHostility: 60 },
+            }],
+            ['keeping everyone at arm\'s length', {
+                capital: 60_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, brotherTrust: 60, cfoTrust: 40, pearHostility: 60 },
+            }],
+            ['the one who helped his friend', {
+                capital: 60_000_000,
+                flags: {
+                    fatherDead: true, friendHelped: true, friendGrewUp: true,
+                },
+                dials: {
+                    ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 60,
+                    brotherTrust: 60, cfoTrust: 70,
+                },
+            }],
+            ['...who is only ordinarily fond of him', {
+                capital: 60_000_000,
+                flags: { fatherDead: true, friendHelped: true },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 60, pearHostility: 60 },
+            }],
+        ];
 
-        for (const capital of money) {
-            for (const brotherTrust of brother) {
-                for (const cfoTrust of cfo) {
-                    const w = world({
-                        quarter: 40, capital,
-                        flags: { fatherDead: true },
-                        dials: { ...INITIAL_DIALS, pearHostility: 60, brotherTrust, cfoTrust },
-                    });
-                    rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
-                        .eligible.forEach(e => seen.add(e.id));
-                }
-            }
+        const seen = new Set<string>();
+        for (const [, over] of archetypes) {
+            const w = world({ quarter: 40, ...over });
+            rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
+                .eligible.forEach(e => seen.add(e.id));
         }
 
         const unreachable = EVENTS.filter(e => !seen.has(e.id)).map(e => e.id);

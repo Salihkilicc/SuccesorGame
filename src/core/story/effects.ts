@@ -85,6 +85,19 @@ export type Effect =
      * flag, not an ending.
      */
     | { kind: 'ending'; ending: string }
+    /**
+     * Move what a company is fundamentally worth.
+     *
+     * `multiplier` against its listed value: 0.45 means somebody is willing to
+     * let it go at under half. This writes the ANCHOR rather than the price
+     * (see useMarketStore.valueAnchors) because a price alone decays back
+     * within a few quarters - the whole reason divestitures needed anchors.
+     *
+     * It exists so a story reward can be a real one. "He will sell you his
+     * company cheap" is worth nothing if the acquisition screen has never
+     * heard of it.
+     */
+    | { kind: 'reprice'; company: string; multiplier: number }
     | {
         kind: 'schedule';
         conversation: string;
@@ -111,6 +124,7 @@ export type EffectSink = {
     mail: (m: { from: string; subject: string; body: string }) => void;
     news: (headline: string) => void;
     ending: (id: string) => void;
+    reprice: (company: string, multiplier: number) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -137,6 +151,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'mail': sink.mail(effect); return;
         case 'news': sink.news(effect.headline); return;
         case 'ending': sink.ending(effect.ending); return;
+        case 'reprice': sink.reprice(effect.company, effect.multiplier); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added
