@@ -11,6 +11,37 @@
  *  tsc cannot catch this: unreachable code is still valid code. So this script
  *  asks the question tsc does not - can the player actually get here?
  *
+ *  ---------------------------------------------------------------------------
+ *  IT READS THE CODE. IT DOES NOT MATCH THE TEXT.
+ *  ---------------------------------------------------------------------------
+ *  For most of its life this script answered "is anything using X?" by looking
+ *  for the string X in the other files. That is wrong in four ways and all
+ *  four bit, one per session, each one found only by accident:
+ *
+ *      a commented-out call          - and this repo never deletes code
+ *      an import with no call        - hid applyCorporateShock for weeks
+ *      a name inside a string        - hid enroll() behind an i18n key
+ *      two things sharing a name     - two dead acquireCompany()s, each the
+ *                                      reason nobody found the other
+ *
+ *  Patching them one at a time was the wrong instinct and I did it twice
+ *  before admitting it. Every patch was a narrower regex, and the next
+ *  blindness was always whatever that regex still could not see. A regex
+ *  cannot tell a call from a word, because it has no idea what a call is.
+ *
+ *  The program is now type-checked and every identifier is resolved to the
+ *  declaration it points at. Comments are not nodes, string contents are not
+ *  identifiers, an import specifier is its own kind of node, and two
+ *  same-named members of different types are two different symbols. All four
+ *  blindnesses stop being cases to handle and become things that cannot arise.
+ *
+ *  WHERE IT IS STILL APPROXIMATE, and it says so at the point it happens: the
+ *  codebase uses `require()` deliberately to break import cycles, and the
+ *  checker types that as `any`. Along those paths the index falls back to
+ *  matching the name. Precision holds wherever the types do.
+ *
+ *  Costs about three seconds. Cheaper than one of the four bugs above.
+ *
  *  Run before calling anything finished:   node scripts/reachability.js
  * ========================================================================== */
 const fs = require('fs');
@@ -30,60 +61,250 @@ const read = f => fs.readFileSync(f, 'utf8');
 const body = new Map(files.map(f => [f, read(f)]));
 const rel = f => path.relative(SRC, f);
 
-// ---------------------------------------------------------------------------
-//  A COMMENTED-OUT CALL IS NOT A CALL
-// ---------------------------------------------------------------------------
-//  This project never deletes code. Anything retired gets commented out with
-//  a note explaining what it did and why it went - which means shelved code
-//  keeps its full text, including every call it used to make.
+// ===========================================================================
+//  THE REFERENCE INDEX — READ THE CODE, DO NOT MATCH THE TEXT
+// ===========================================================================
 //
-//  Every reachability pass below was matching on raw file text, so those
-//  ghost references counted. Shelving the only caller of a function therefore
-//  made that function look ALIVE to the audit, permanently. The two house
-//  rules were quietly cancelling each other out: "never delete" was blinding
-//  "find what nothing calls", and it got a little worse with every shelved
-//  block.
+//  Every reachability pass here used to ask a regex whether a name appeared
+//  in a file. Three separate blindnesses came out of that in three
+//  consecutive sessions, and they were all the same mistake wearing different
+//  clothes:
 //
-//  Found by shelving useUserStore.addSubsidiary's only caller and watching
-//  the audit report clean.
+//    1. A COMMENTED-OUT CALL COUNTED AS A CALL. This project never deletes
+//       code - retired things get commented out with a note - so shelving the
+//       last caller of a function made that function look permanently alive.
+//       The two house rules were cancelling each other out, a little more
+//       with every shelved block. Found by shelving addSubsidiary's only
+//       caller and watching the audit report clean.
 //
-//  Comments are STRIPPED HERE ONLY, for the passes that ask "does anything
-//  reference this". The passes that read markers out of comments -
-//  @orphan-ok, @orphan-todo, @exit-ok - keep reading `body`, because for them
-//  the comments are the data.
+//    2. AN IMPORT COUNTED AS A CALL. `applyCorporateShock` sat written and
+//       tested and uncalled for weeks while useGameStore.ts imported it and
+//       never invoked it. One import line was enough. The check that exists
+//       to find dead code was the reason nobody found that dead code.
 //
-//  Not a parser. It does not know a `//` inside a string literal from a real
-//  comment, and it does not need to: a false "this is a comment" can only
-//  ever LOSE a reference, and losing one turns into a reported finding for a
-//  human to look at rather than into silence.
-// ---------------------------------------------------------------------------
-const stripComments = s => s
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, '$1');
+//    3. A NAME IN A COMMENT ANYWHERE COUNTED. The store-action pass looked
+//       for the bare word in any file, so `recent()` was invisible because
+//       the word "recent" appears in a comment in equity.ts. Any action named
+//       with a common English word was unauditable.
+//
+//  Patching each one in turn was the wrong instinct, and I did it twice
+//  before seeing that. Each patch was a narrower regex, and the next
+//  blindness was always going to be whatever that regex still could not see.
+//  A regex cannot tell a call from a word, because it does not know what a
+//  call is.
+//
+//  So the file is PARSED. TypeScript is already a dependency and the story
+//  pass already transpiles with it. `ts.createSourceFile` gives a syntax tree
+//  in which comments are not nodes, string contents are not identifiers, and
+//  an import specifier is a different kind of node from a reference. All
+//  three blindnesses stop being special cases and become things the parser
+//  never had.
+//
+//  ---------------------------------------------------------------------------
+//  WHAT COUNTS AS A USE
+//  ---------------------------------------------------------------------------
+//  An identifier in REFERENCE position: read it, call it, pass it, render it,
+//  reach it through a dot. Explicitly NOT:
+//
+//    - the name being declared (`const foo`, `function foo`, `foo: string`)
+//    - an import or re-export specifier - naming something is not using it
+//    - a key in an object literal (`{ foo: 1 }`), which is recorded
+//      separately, because "written" and "read" are different questions and
+//      the stats pass needs both
+//
+//  Type positions count. A type-only reference is still a reason the symbol
+//  exists, and reporting it as dead would be a false alarm - which is the one
+//  failure mode that gets an audit switched off.
+//
+//  ---------------------------------------------------------------------------
+//  AND IT IS INDEXED BY SYMBOL, NOT BY NAME
+//  ---------------------------------------------------------------------------
+//  A syntax tree alone fixes comments, strings and imports, and it still gets
+//  the fourth case wrong - because a name is not a thing. Two different stores
+//  each declaring a dead method called `acquireCompany` made EACH OTHER look
+//  alive: the audit found the name in the other file and stopped asking. Both
+//  had been dead for as long as they had both existed, and the second one was
+//  what hid the first.
+//
+//  So the whole program is type-checked and every identifier is resolved to
+//  the declaration it actually points at. `enroll` on one store and `enroll`
+//  on another are then two symbols that happen to be spelled the same, which
+//  is what they always were.
+//
+//  Destructuring needed saying out loud: in `const { foo } = useStore()`, the
+//  identifier is BOTH a new local and a read of the property. It is the way
+//  most screens in this codebase call a store, so treating it as a pure
+//  declaration - which is what it looks like structurally - would have made
+//  most of the app's real calls invisible. That mistake was in the first
+//  version of this index and it reported a live action as dead.
+//
+//  Costs about a second for 414 files.
+// ===========================================================================
+const ts = require('typescript');
 
-const code = new Map(files.map(f => [f, stripComments(body.get(f))]));
+const REFERENCE_INDEX = (() => {
+    const cfgPath = path.join(__dirname, '..', 'tsconfig.srccheck.json');
+    const cfg = ts.readConfigFile(cfgPath, ts.sys.readFile);
+    const parsed = ts.parseJsonConfigFileContent(
+        cfg.config, ts.sys, path.join(__dirname, '..'));
+    const program = ts.createProgram(parsed.fileNames, { ...parsed.options, noEmit: true });
+    const checker = program.getTypeChecker();
 
-// ---------------------------------------------------------------------------
-//  AN IMPORT IS NOT A USE
-// ---------------------------------------------------------------------------
-//  Same family of mistake as the commented-out call, and it hid a bigger fish.
-//  `applyCorporateShock` was written, tested, and called from nowhere for
-//  weeks - while useGameStore.ts IMPORTED it and never invoked it. One import
-//  line was enough to make the audit report it as reached, so the check that
-//  exists to find exactly this was the reason nobody found it.
-//
-//  Imports are stripped for the passes that ask "does anything CALL this".
-//  The component pass still reads `code`, because there the import path is
-//  precisely the evidence it wants.
-//
-//  Multi-line imports included - the shock was inside a six-name braced list
-//  spanning two lines, which a single-line pattern would have walked past.
-// ---------------------------------------------------------------------------
-const stripImports = s => s
-    .replace(/^\s*import\s[\s\S]*?from\s*['"][^'"]*['"];?/gm, ' ')
-    .replace(/^\s*import\s*['"][^'"]*['"];?/gm, ' ');
+    /** A declaration's identity: where it is written. */
+    const keyOf = node => `${node.getSourceFile().fileName}:${node.getStart()}`;
 
-const calls = new Map(files.map(f => [f, stripImports(code.get(f))]));
+    /** declaration key -> the files that reference it. */
+    const byDecl = new Map();
+    /** file -> module specifiers it imports. */
+    const importsOf = new Map();
+    /** file -> names it uses as an object-literal KEY, which is a write. */
+    const writesOf = new Map();
+    // ----------------------------------------------------------------------
+    //  WHERE THE TYPES RUN OUT
+    // ----------------------------------------------------------------------
+    //  This codebase reaches for `require('...')` on purpose, in about a dozen
+    //  places, to break import cycles between the stores and the engine. The
+    //  checker types that as `any`, so `require(x).useShareholderStore
+    //  .getState().holdVote()` resolves to no symbol at all.
+    //
+    //  The first symbol-only version of this index reported twenty-two dead
+    //  store actions. Most of them were live and called exactly that way -
+    //  including `setValueAnchor`, which I had wired myself an hour earlier.
+    //  An audit that cries wolf twenty-two times is an audit nobody reads
+    //  again, and it would have been worse than the text matching it replaced.
+    //
+    //  So: symbol where there is one, NAME where there is not. Precision holds
+    //  everywhere the types do, and degrades only along the `any` paths -
+    //  which is the best any tool can do without types, and is honest about
+    //  which half of the answer it is giving.
+    // ----------------------------------------------------------------------
+    /** file -> names referenced through an expression the checker cannot type. */
+    const untypedUsesOf = new Map();
+
+    const record = (symbol, file) => {
+        if (!symbol) return;
+        let s = symbol;
+        // An imported name is an alias for the real thing; follow it, or every
+        // reference would be attributed to the import statement.
+        if (s.flags & ts.SymbolFlags.Alias) {
+            try { s = checker.getAliasedSymbol(s); } catch { /* not an alias after all */ }
+        }
+        for (const d of s.declarations || []) {
+            const k = keyOf(d);
+            if (!byDecl.has(k)) byDecl.set(k, new Set());
+            byDecl.get(k).add(file);
+        }
+    };
+
+    for (const sf of program.getSourceFiles()) {
+        if (sf.isDeclarationFile) continue;
+        const file = path.resolve(sf.fileName);
+        const imps = new Set();
+        const writes = new Set();
+        const untyped = new Set();
+        importsOf.set(file, imps);
+        writesOf.set(file, writes);
+        untypedUsesOf.set(file, untyped);
+
+        const isDeclarationName = (node) => {
+            const p = node.parent;
+            if (!p) return false;
+            // `{ foo }` in an object literal is shorthand for `{ foo: foo }`.
+            if (ts.isShorthandPropertyAssignment(p)) return false;
+            return p.name === node && (
+                ts.isVariableDeclaration(p) || ts.isFunctionDeclaration(p)
+                || ts.isClassDeclaration(p) || ts.isInterfaceDeclaration(p)
+                || ts.isTypeAliasDeclaration(p) || ts.isEnumDeclaration(p)
+                || ts.isEnumMember(p) || ts.isParameter(p)
+                || ts.isPropertyDeclaration(p) || ts.isPropertySignature(p)
+                || ts.isMethodDeclaration(p) || ts.isMethodSignature(p)
+                || ts.isPropertyAssignment(p) || ts.isModuleDeclaration(p)
+                || ts.isTypeParameterDeclaration(p)
+            );
+        };
+
+        const visit = (node) => {
+            // Naming something in an import is not using it. This is the line
+            // that would have caught applyCorporateShock weeks earlier.
+            if (ts.isImportDeclaration(node)) {
+                if (ts.isStringLiteral(node.moduleSpecifier)) imps.add(node.moduleSpecifier.text);
+                return;
+            }
+            if (ts.isExportDeclaration(node) && node.moduleSpecifier) {
+                if (ts.isStringLiteral(node.moduleSpecifier)) imps.add(node.moduleSpecifier.text);
+                return;
+            }
+            // `require('./x')` is used deliberately here to break import
+            // cycles, so it is a real edge and has to be recorded as one.
+            if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)
+                && node.expression.text === 'require'
+                && node.arguments.length === 1 && ts.isStringLiteral(node.arguments[0])) {
+                imps.add(node.arguments[0].text);
+            }
+
+            if (ts.isIdentifier(node)) {
+                const p = node.parent;
+
+                // A key in an object literal is a WRITE, not a read. The stats
+                // pass needs the two apart: a field the engine writes and no
+                // screen shows is the exact thing it is looking for.
+                if (p && ts.isPropertyAssignment(p) && p.name === node) {
+                    writes.add(node.text);
+                } else if (p && ts.isBindingElement(p) && p.name === node && !p.propertyName) {
+                    // `const { foo } = store` - a local AND a read of `foo`.
+                    // Resolve through the pattern's type to get the PROPERTY
+                    // rather than the local we are declaring.
+                    const pattern = p.parent;
+                    const prop = ts.isObjectBindingPattern(pattern)
+                        ? checker.getTypeAtLocation(pattern).getProperty(node.text)
+                        : undefined;
+                    if (prop) record(prop, file);
+                    else untyped.add(node.text);
+                } else if (!isDeclarationName(node)) {
+                    const sym = checker.getSymbolAtLocation(node);
+                    if (sym) record(sym, file);
+                    // Only a property reach - `x.foo` - is worth remembering
+                    // when it does not resolve. A bare unresolved identifier
+                    // is usually a global or a type parameter, and recording
+                    // those would make the fallback match everything.
+                    else if (p && ts.isPropertyAccessExpression(p) && p.name === node) {
+                        untyped.add(node.text);
+                    }
+                }
+            }
+            ts.forEachChild(node, visit);
+        };
+        visit(sf);
+    }
+
+    return {
+        /**
+         * Files other than `self` that reference this declaration node.
+         *
+         * `name` is optional and turns on the untyped fallback: pass it when
+         * the thing being looked for can be reached through a `require`, which
+         * for a store action it always can.
+         */
+        referencingFiles(decl, self, name) {
+            const set = new Set(byDecl.get(keyOf(decl)) || []);
+            if (name) {
+                for (const [f, names] of untypedUsesOf) if (names.has(name)) set.add(f);
+            }
+            return [...set].filter(f => path.resolve(f) !== path.resolve(self));
+        },
+        /** Does the declaring file use it itself, beyond declaring it? */
+        usedInOwnFile(decl) {
+            const set = byDecl.get(keyOf(decl)) || new Set();
+            return set.has(path.resolve(decl.getSourceFile().fileName));
+        },
+        importsOf,
+        writesOf,
+        /** Parsed source, so passes can read declarations out of the tree. */
+        sourceOf(f) {
+            return program.getSourceFile(f) || program.getSourceFile(path.resolve(f));
+        },
+    };
+})();
 // ---------------------------------------------------------------------------
 //  WHICH FEATURE FOLDERS ARE OFF - READ FROM THE FLAGS, NOT FROM A LIST
 // ---------------------------------------------------------------------------
@@ -113,13 +334,9 @@ const isDisabled = f =>
 
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** How many files other than `self` mention `name` as a whole word. */
-const refs = (name, self) => {
-    let n = 0;
-    const re = new RegExp(`\\b${esc(name)}\\b`);
-    for (const [f, t] of calls) if (f !== self && re.test(t)) n++;
-    return n;
-};
+/** How many files other than `self` reference this declaration. */
+const refs = (decl, self, name) =>
+    REFERENCE_INDEX.referencingFiles(decl, self, name).length;
 
 /**
  * Is it used inside its own file, beyond the declaration itself?
@@ -129,8 +346,10 @@ const refs = (name, self) => {
  * internally, and they were being reported as dead. An audit that reports
  * healthy code is worse than no audit - it gets ignored.
  */
-const usedInternally = (name, self) =>
-    (calls.get(self).match(new RegExp(`\\b${esc(name)}\\b`, 'g')) || []).length > 1;
+//
+// The checker distinguishes the declaration from a reference, so this is a
+// plain lookup rather than "appears more than once".
+const usedInternally = (decl) => REFERENCE_INDEX.usedInOwnFile(decl);
 
 /** A file may opt out with `// @orphan-ok <reason>` - legacy kept on purpose. */
 const optedOut = f => /@orphan-ok\s/.test(body.get(f));
@@ -973,11 +1192,16 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 //  gave false positives: RAndDModal.tsx exports `RAndDModalRevised` as a const
 //  and the real component as the default, so the audit hunted for a name
 //  nobody imports while the file itself was rendered every game.
+//
+//  The path now comes from the parsed import declaration rather than from a
+//  regex, so a filename mentioned in a comment - or in a commented-out import,
+//  which is exactly what shelving one produces - no longer counts as rendering
+//  the screen.
 for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
     if (optedOut(f)) continue;
     const base = path.basename(f).replace(/\.tsx$/, '');
-    const imported = [...code].some(([g, t]) =>
-        g !== f && new RegExp(`from\\s+['"][^'"]*\\b${esc(base)}['"]`).test(t));
+    const imported = [...REFERENCE_INDEX.importsOf].some(([g, specs]) =>
+        path.resolve(g) !== path.resolve(f) && [...specs].some(s => path.basename(s) === base));
     if (imported) continue;
     const m = read(f).match(/export default (?:function )?(\w+)|export const (\w+)\s*[:=]/);
     const label = `${(m && (m[1] || m[2])) || base}  (${rel(f)})`;
@@ -989,50 +1213,101 @@ for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
     }
 }
 
+// ---------------------------------------------------------------------------
+//  READING A DECLARATION OUT OF THE TREE RATHER THAN OFF THE PAGE
+// ---------------------------------------------------------------------------
+//  The two passes below used to find their subjects with `^\s{4}(\w+):\s*\(`
+//  and `^\s{2}(\w+)\??:` - four spaces meant "an action", two meant "a stats
+//  field". Reformatting a file, or nesting an interface one level deeper,
+//  silently emptied the check and it would have reported a clean pass while
+//  looking at nothing. Indentation is not a language feature here.
+// ---------------------------------------------------------------------------
+/** Members of every interface whose name matches, as declaration NODES. */
+const interfaceMembers = (f, matches) => {
+    const out = [];
+    const sf = REFERENCE_INDEX.sourceOf(f);
+    if (!sf) return out;
+    ts.forEachChild(sf, (node) => {
+        if (!ts.isInterfaceDeclaration(node) || !matches(node.name.text)) return;
+        for (const m of node.members) {
+            if (!m.name || !ts.isIdentifier(m.name)) continue;
+            const type = m.type;
+            out.push({
+                name: m.name.text,
+                decl: m,
+                // A function-typed property is an action; anything else is data.
+                isFunction: !!type && (ts.isFunctionTypeNode(type)
+                    || (ts.isUnionTypeNode(type) && type.types.some(ts.isFunctionTypeNode))),
+            });
+        }
+    });
+    return out;
+};
+
 // --- 2) Store actions no component calls ------------------------------------
 for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
     if (isDisabled(f) || optedOut(f)) continue;   // shelved modules are not a finding
-    const t = read(f);
-    const iface = t.match(/interface \w*State \{([\s\S]*?)\n\}/);
-    if (!iface) continue;
-    for (const line of iface[1].split('\n')) {
-        const a = line.match(/^\s{4}(\w+):\s*\(/);           // action signature
-        if (!a) continue;
-        let used = 0;
-        for (const [g, gt] of calls) {
-            if (g === f) continue;
-            if (isDisabled(g)) continue;
-            if (new RegExp(`\\b${a[1]}\\b`).test(gt)) used++;
+    for (const member of interfaceMembers(f, n => /State$/.test(n))) {
+        if (!member.isFunction) continue;
+        // Files that reference THIS action, resolved by symbol - so an
+        // identically named action on another store is not mistaken for a
+        // caller, which is how two dead `acquireCompany`s kept each other
+        // alive for months.
+        const callers = REFERENCE_INDEX.referencingFiles(member.decl, f, member.name)
+            .filter(g => !isDisabled(g));
+        if (callers.length === 0 && !symbolOptedOut(member.name, f)) {
+            problems.storeActions.push(`${member.name}()  (${rel(f)})`);
         }
-        if (used === 0 && !symbolOptedOut(a[1], f)) problems.storeActions.push(`${a[1]}()  (${rel(f)})`);
     }
 }
 
 // --- 3) Engine exports the game never consumes ------------------------------
 for (const f of files.filter(f => /core\/market\/\w+\.ts$/.test(f))) {
     if (optedOut(f)) continue;
-    for (const m of code.get(f).matchAll(/export const (\w+)\s*=\s*\(/g)) {
-        // Only flag it if nothing anywhere uses it - including its own file.
-        if (refs(m[1], f) === 0 && !usedInternally(m[1], f) && !symbolOptedOut(m[1], f)) {
-            problems.engineExports.push(`${m[1]}()  (${rel(f)})`);
+    const sf = REFERENCE_INDEX.sourceOf(f);
+    if (!sf) continue;
+    ts.forEachChild(sf, (node) => {
+        if (!ts.isVariableStatement(node)) return;
+        const exported = (node.modifiers || []).some(mo => mo.kind === ts.SyntaxKind.ExportKeyword);
+        if (!exported) return;
+        for (const d of node.declarationList.declarations) {
+            if (!ts.isIdentifier(d.name)) continue;
+            const init = d.initializer;
+            // Only functions. An exported constant is data and is reached by
+            // being read, which this pass would report as dead.
+            if (!init || !(ts.isArrowFunction(init) || ts.isFunctionExpression(init))) continue;
+            const name = d.name.text;
+            // Only flag it if nothing anywhere uses it - including its own
+            // file. The name is passed so a `require('./brand').thing()` call
+            // counts; the engine is reached that way from the quarter tick.
+            if (refs(d, f, name) === 0 && !usedInternally(d) && !symbolOptedOut(name, f)) {
+                problems.engineExports.push(`${name}()  (${rel(f)})`);
+            }
         }
-    }
+    });
 }
 
 // --- 4) Stats fields written by the engine and read by no screen ------------
 const statsFile = files.find(f => f.endsWith('useStatsStore.ts'));
 if (statsFile) {
-    const iface = read(statsFile).match(/interface StatsState \{([\s\S]*?)\n\}/);
     const tsx = files.filter(f => f.endsWith('.tsx') && !isDisabled(f));
-    if (iface) {
-        for (const line of iface[1].split('\n')) {
-            const m = line.match(/^\s{2}(\w+)\??:/);
-            if (!m || /^(set|update|reset)/.test(m[1])) continue;
-            const written = [...code].some(([g, t]) =>
-                g !== statsFile && new RegExp(`\\b${m[1]}\\s*:`).test(t));
-            const shown = tsx.some(g => new RegExp(`\\b${m[1]}\\b`).test(code.get(g)));
-            if (written && !shown) problems.statsFields.push(m[1]);
-        }
+    for (const member of interfaceMembers(statsFile, n => n === 'StatsState')) {
+        if (member.isFunction || /^(set|update|reset)/.test(member.name)) continue;
+        // WRITTEN: it appears as an object key somewhere else - which is what
+        // `{ brandValue: 12 }` is, and the only shape the engine writes stats in.
+        //
+        // By NAME rather than by symbol, deliberately: an engine write is a
+        // bare object literal handed to update(), and its keys often resolve
+        // to nothing at all. The looser test is the right one here because the
+        // consequence of a false "written" is only that the second half of the
+        // question gets asked.
+        const written = [...REFERENCE_INDEX.writesOf].some(([g, set]) =>
+            path.resolve(g) !== path.resolve(statsFile) && set.has(member.name));
+        // SHOWN: a screen references THIS field. By symbol, so a same-named
+        // field on some other object cannot stand in for it.
+        const shown = REFERENCE_INDEX.referencingFiles(member.decl, statsFile)
+            .some(g => tsx.some(t => path.resolve(t) === path.resolve(g)));
+        if (written && !shown) problems.statsFields.push(member.name);
     }
 }
 
