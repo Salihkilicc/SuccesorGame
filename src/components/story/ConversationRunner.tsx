@@ -32,6 +32,8 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
+import { useLocale } from '../../core/i18n';
+import { line, nodeKey, choiceKey, subjectKey } from '../../data/i18n/storyText';
 import { nodeById, type Conversation, type Choice } from '../../core/story/graph';
 import { applyEffects } from '../../core/story/effects';
 import { gameSink } from '../../core/story/gameSink';
@@ -52,9 +54,35 @@ type Said = { from: 'them' | 'player'; text: string };
 
 const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     const [nodeId, setNodeId] = useState<string | null>(conversation.start);
+    // ------------------------------------------------------------------
+    //  EVERY LINE GOES THROUGH THE DICTIONARY
+    // ------------------------------------------------------------------
+    //  `line()` falls back to the English in the scene file when there is no
+    //  translation, so a half-finished language is playable and a missing key
+    //  is a stray English sentence rather than a crash in the middle of the
+    //  father's death. See src/data/i18n/storyText.ts.
+    //
+    //  Choices are keyed by INDEX, not by their own text - the button text is
+    //  what identifies the choice, so keying a translation on it would be
+    //  circular.
+    //
+    //  `useLocale()` subscribes this component to the app's language, which is
+    //  also the story's language - there is no second setting. Note that what
+    //  is ALREADY in `history` stays in the language it was read in: those
+    //  strings were resolved when the card arrived. Changing language during a
+    //  conversation therefore leaves the sentences above the fold as they were
+    //  and applies from the next card, which is both cheaper and closer to
+    //  right than retranslating a thing the player has already read.
+    // ------------------------------------------------------------------
+    useLocale();
+    const say = (nodeIdent: string, text: string) =>
+        line(nodeKey(conversation.id, nodeIdent), text);
+    const answer = (nodeIdent: string, index: number, text: string) =>
+        line(choiceKey(conversation.id, nodeIdent, index), text);
+
     const [history, setHistory] = useState<Said[]>(() => {
         const first = nodeById(conversation, conversation.start);
-        return first ? [{ from: 'them', text: first.text }] : [];
+        return first ? [{ from: 'them', text: say(first.id, first.text) }] : [];
     });
 
     const node = nodeId ? nodeById(conversation, nodeId) : undefined;
@@ -64,8 +92,20 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     // card is about to test.
     const world = readWorld();
 
-    const available: Choice[] = useMemo(
-        () => (node?.choices ?? []).filter(ch => testAll(ch.when, world)),
+    // ------------------------------------------------------------------
+    //  THE ORIGINAL INDEX IS CARRIED, NOT RECOMPUTED
+    // ------------------------------------------------------------------
+    //  Translation keys are `scene/card#n` where n is the choice's position
+    //  in the DATA. This list is filtered by `when`, so its own index is not
+    //  that number - a card whose first answer is gated off would look up the
+    //  translation of the answer above the one being shown, and only for
+    //  players who failed the gate. Silent, conditional, and impossible to
+    //  reproduce on purpose.
+    // ------------------------------------------------------------------
+    const available: { choice: Choice; index: number }[] = useMemo(
+        () => (node?.choices ?? [])
+            .map((choice, index) => ({ choice, index }))
+            .filter(({ choice }) => testAll(choice.when, world)),
         [node, world],
     );
 
@@ -74,15 +114,18 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         onFinished?.();
     };
 
-    const pick = (choice: Choice) => {
+    const pick = (choice: Choice, index: number) => {
         // Effects first, then move. A choice that pays for something and then
         // opens a card mentioning the payment has to happen in that order.
         applyEffects(choice.effects, gameSink());
 
         setHistory(h => {
-            const next = [...h, { from: 'player' as const, text: choice.text }];
+            const next = [...h, {
+                from: 'player' as const,
+                text: node ? answer(node.id, index, choice.text) : choice.text,
+            }];
             const target = choice.next ? nodeById(conversation, choice.next) : undefined;
-            if (target) next.push({ from: 'them', text: target.text });
+            if (target) next.push({ from: 'them', text: say(target.id, target.text) });
             return next;
         });
 
@@ -99,7 +142,9 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         <View style={styles.root}>
             <ScrollView contentContainerStyle={styles.body}>
                 {variant === 'mail' && !!conversation.subject && (
-                    <Text style={styles.subject}>{conversation.subject}</Text>
+                    <Text style={styles.subject}>
+                        {line(subjectKey(conversation.id), conversation.subject)}
+                    </Text>
                 )}
 
                 {history.map((said, i) => (
@@ -148,12 +193,14 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                         <Text style={styles.answerText}>Close</Text>
                     </Pressable>
                 ) : (
-                    available.map((ch, i) => (
+                    available.map(({ choice, index }) => (
                         <Pressable
-                            key={i}
-                            onPress={() => pick(ch)}
+                            key={index}
+                            onPress={() => pick(choice, index)}
                             style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                            <Text style={styles.answerText}>{ch.text}</Text>
+                            <Text style={styles.answerText}>
+                                {node ? answer(node.id, index, choice.text) : choice.text}
+                            </Text>
                         </Pressable>
                     ))
                 )}

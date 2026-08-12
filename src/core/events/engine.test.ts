@@ -399,6 +399,16 @@ describe('the events that actually ship', () => {
             // ------------------------------------------------------------------
             //  AND THE ONE WHO KEEPS GOING BACK
             // ------------------------------------------------------------------
+            ['who kept his friend, bought his company, and stayed decent', {
+                capital: 200_000_000,
+                quarter: 44,
+                flags: {
+                    fatherDead: true, friendHelped: true, friendGrewUp: true,
+                    planoraOffered: true,
+                },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 95 },
+                subsidiaries: ['tech_planora'],
+            }],
             ['who has been at a table three quarters running', {
                 capital: 60_000_000,
                 flags: { fatherDead: true },

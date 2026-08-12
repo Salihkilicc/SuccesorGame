@@ -28,6 +28,7 @@ const recorder = () => {
         retention: c => log.push(`retention:${c}`),
         divest: (c, m) => log.push(`divest:${c}:${m}`),
         morale: a => log.push(`morale:${a}`),
+        boardSeat: (p, st) => log.push(`boardSeat:${p}:${st}`),
         risk: (c, o, q) => log.push(`risk:${c}:${o}:+${q}`),
         schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };

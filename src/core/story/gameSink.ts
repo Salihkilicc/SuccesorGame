@@ -268,6 +268,49 @@ export const gameSink = (): EffectSink => ({
             urgent: true,
         });
     },
+    // Through the same door an acquisition seat uses: new shares issued, the
+    // member appended, the board mood recalculated. A second way of seating
+    // somebody would be a second way of getting the cap table wrong.
+    boardSeat: (person, stake) => {
+        try {
+            const { founderOf } = require('../../data/market/founders');
+            const { SEAT_MIN_STAKE, SEAT_MAX_STAKE } = require('../market/governance');
+            const named = founderOf(person);
+            if (!named) return;
+
+            const shStore = require('../../features/shareholders/stores/useShareholderStore')
+                .useShareholderStore;
+            const state = shStore.getState();
+            // Already at the table - a gesture cannot be made twice, and
+            // stacking two seats on one person would double his vote.
+            if ((state.members ?? []).some((m: any) => m.name === named.name)) return;
+
+            const clamped = Math.max(SEAT_MIN_STAKE, Math.min(SEAT_MAX_STAKE, stake));
+            const shareCount = Math.round((state.totalShares || 10_000_000) * clamped);
+
+            shStore.setState((st: any) => ({
+                totalShares: st.totalShares + shareCount,
+                members: [...st.members, {
+                    id: `DIR_${person}_${Date.now()}`,
+                    name: named.name,
+                    shareCount,
+                    trait: named.trait,
+                    trust: named.trust,
+                    motivation: named.motivation,
+                    petIssue: named.petIssue,
+                    isHostile: false,
+                    origin: 'Investor' as const,
+                }],
+            }));
+            shStore.getState().recalculateBoardMood();
+
+            useNewsStore.getState().publish(
+                `${named.name} joins the Hale board.`,
+                'deal',
+                useGameStore.getState().currentMonth,
+            );
+        } catch { /* shareholder store not ready */ }
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

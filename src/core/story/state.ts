@@ -217,6 +217,14 @@ export type StoryFlag =
     | 'boughtBiogen'
     | 'boughtSkynet'
     | 'boughtPlanora'
+    /**
+     * Marco is at your table.
+     *
+     * The last thing in the friend's arc and the only warm one in the game's
+     * endgame. Irreversible: the seat is issued shares, and you cannot unsay
+     * having asked.
+     */
+    | 'friendOnBoard'
     /** You paid to keep the team. A fact about you, not about a company. */
     | 'paidToKeepThem'
     // --- What you sold, and to whom, and in what state.

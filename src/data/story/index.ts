@@ -93,6 +93,7 @@ import {
 import { fbiFinancial, fbiInsider, fbiEspionage } from '../events/fbi';
 import { casinoScandalScene } from '../events/casino';
 import { friendAsks, friendGrows } from './friendArc';
+import { friendBoardSeat } from './friendBoard';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
@@ -161,6 +162,8 @@ export const CONVERSATIONS: Conversation[] = [
     fbiFinancial, fbiInsider, fbiEspionage,
     // Three quarters in a row.
     casinoScandalScene,
+    // And the last thing in the friend's arc.
+    friendBoardSeat,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

@@ -71,6 +71,7 @@ const playable = () => {
     retention: () => { },
     divest: () => { },
     morale: () => { },
+    boardSeat: () => { },
     risk: () => { },
     };
     return { w, sink };

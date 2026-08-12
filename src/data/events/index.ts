@@ -68,6 +68,7 @@ import {
 import { espionageKestrelEvent, espionageBrokerEvent, espionageOracleEvent } from './espionage';
 import { fbiFinancialEvent, fbiInsiderEvent, fbiEspionageEvent } from './fbi';
 import { casinoScandalEvent } from './casino';
+import { friendBoardSeatEvent } from '../story/friendBoard';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -170,6 +171,8 @@ export const EVENTS: GameEvent[] = [
     // The counter this prompt added. Rolled again every quarter the streak
     // survives, because each quarter is a fresh choice to keep going.
     casinoScandalEvent,
+    // Ten years of being decent, and one per cent.
+    friendBoardSeatEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

@@ -131,6 +131,39 @@ export const FOUNDER_BY_COMPANY: Record<string, NamedFounder> = {
         line: 'Good price. Congratulations to us both — one of us more than the other.',
         hostileLine: 'You overpaid to humiliate me. I can work with a man who does that.',
     },
+
+    // ------------------------------------------------------------------
+    //  PLANORA — the friend
+    // ------------------------------------------------------------------
+    //  He is here for a narrow reason. `directorFromAcquisition` seats a
+    //  GENERIC "Founder of Planora" when the deal is at least 3% of the
+    //  buyer's value - which happens if the player buys him early, while
+    //  they are still small. Without an entry here, the one person in the
+    //  cast the player has a history with would arrive at their own board
+    //  as a placeholder with a generated name.
+    //
+    //  Most players will not trigger that path: by the time Planora is
+    //  affordable it is usually under 3% of the company, and he gets no
+    //  automatic seat at all. That gap is deliberate and it is what
+    //  `friendBoardSeat` in data/story/friendBoard.ts is for.
+    //
+    //  NO HOSTILE LINE THAT MEANS ANYTHING. You cannot take Planora
+    //  hostile in practice - he sells to you at eighty per cent and asks
+    //  first - but the field is required, so it says the only thing he
+    //  would say.
+    // ------------------------------------------------------------------
+    tech_planora: {
+        name: 'Marco Alvarez',
+        trait: 'Visionary',
+        // The highest trust of anybody who joins this board, and the only
+        // one whose number is about the person rather than the deal.
+        trust: 88,
+        hostileTrust: 40,
+        motivation: 'legacy',
+        petIssue: 'rnd',
+        line: 'ok so do i have to wear a suit to these',
+        hostileLine: 'i didnt think you would do it like that. thats all',
+    },
 };
 
 export const founderOf = (companyId: string): NamedFounder | undefined =>

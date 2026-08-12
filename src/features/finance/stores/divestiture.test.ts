@@ -207,8 +207,21 @@ describe('the three who come with a name', () => {
         expect(seat('tech_skynet', false)!.name).toBe(FOUNDER_BY_COMPANY.tech_skynet.name);
     });
 
+    /**
+     * The three who were TAKEN.
+     *
+     * Marco Alvarez is in FOUNDER_BY_COMPANY as well now, and he is
+     * deliberately outside the claims below. Those three lost a company to a
+     * hostile bid and sit at the table as standing threats. He is somebody who
+     * offered you his company at eighty per cent and asked first - if you took
+     * it over his head anyway he would be hurt rather than dangerous, and
+     * seating him at 18 trust would make him a schemer, which is the one thing
+     * that character is not.
+     */
+    const TAKEN = ['tech_skynet', 'ind_voltmotors', 'tech_streamify'];
+
     it('a hostile bid seats him anyway, and he is not pleased', () => {
-        for (const id of Object.keys(FOUNDER_BY_COMPANY)) {
+        for (const id of TAKEN) {
             const friendly = seat(id, false)!;
             const taken = seat(id, true)!;
             expect(taken).not.toBeNull();
@@ -218,6 +231,13 @@ describe('the three who come with a name', () => {
             // than someone having a bad quarter.
             expect(taken.trust).toBeLessThan(25);
         }
+    });
+
+    it('and the friend is the exception, because he is not a schemer', () => {
+        const taken = seat('tech_planora', true)!;
+        // Still hurt - well below his friendly number - and still not hostile.
+        expect(taken.trust).toBeLessThan(seat('tech_planora', false)!.trust);
+        expect(taken.trust).toBeGreaterThan(25);
     });
 
     it('the man who did not want to sell is the sorest of the three', () => {

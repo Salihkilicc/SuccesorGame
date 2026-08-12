@@ -196,6 +196,16 @@ export type Effect =
      * failure is a SCENE rather than a number, so the player finds out what
      * happened from a person rather than from a balance sheet.
      */
+    /**
+     * Somebody takes a seat at your table.
+     *
+     * Named rather than generated, and it issues new shares exactly the way an
+     * acquisition seat does - see `directorFromAcquisition`. The stake is on
+     * the effect because it is a term of a specific offer: a seat handed to
+     * somebody as a gesture is not the same size as one that came attached to
+     * a company.
+     */
+    | { kind: 'boardSeat'; person: string; stake: number }
     | {
         kind: 'risk';
         /** Probability the promise is kept, 0-1. */
@@ -237,6 +247,7 @@ export type EffectSink = {
     retention: (company: string) => void;
     divest: (company: string, priceMultiple: number) => void;
     morale: (amount: number) => void;
+    boardSeat: (person: string, stake: number) => void;
     risk: (chance: number, onBetrayal: string, afterQuarters: number) => void;
     schedule: (item: {
         conversation: string;
@@ -271,6 +282,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'retention': sink.retention(effect.company); return;
         case 'divest': sink.divest(effect.company, effect.priceMultiple); return;
         case 'morale': sink.morale(effect.amount); return;
+        case 'boardSeat': sink.boardSeat(effect.person, effect.stake); return;
         case 'risk': sink.risk(effect.chance, effect.onBetrayal, effect.afterQuarters); return;
         case 'schedule': sink.schedule(effect); return;
     }
