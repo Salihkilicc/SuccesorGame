@@ -302,6 +302,18 @@ export const computeShares = (
     market: ProductMarket,
     /** Satin alinan rakipler havuzdan cikar, paylari sana gecer. */
     acquiredStockIds: string[] = [],
+    /**
+     * An incumbent spending against you in this category.
+     *
+     * Multiplies the competitor pool K and nothing else, which is the honest
+     * model of what a siege is: your product is unchanged and unharmed, and
+     * everything it stands next to has become more attractive than it was.
+     * See core/market/territory.ts for where the number comes from and why it
+     * expires.
+     *
+     * Defaults to 1, so every existing caller is untouched.
+     */
+    competitorPressure: number = 1,
 ): { shares: number[]; totalShare: number } => {
     const { perCompetitor, remainingTotal } = competitorAttractionMap(market, acquiredStockIds);
 
@@ -312,7 +324,7 @@ export const computeShares = (
         0,
     );
 
-    const K = remainingTotal;
+    const K = remainingTotal * Math.max(1, competitorPressure || 1);
     const sumPlayer = attractions.reduce((sum, a) => sum + Math.max(0, a), 0) + inherited;
     const denominator = sumPlayer + K;
 

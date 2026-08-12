@@ -98,6 +98,25 @@ export type Effect =
      * heard of it.
      */
     | { kind: 'reprice'; company: string; multiplier: number }
+    /**
+     * A standing cut of one category's revenue, forever.
+     *
+     * The price of not fighting an incumbent - see core/market/territory.ts.
+     * A NEW KIND rather than a `capital` effect with a number in it, because
+     * the whole character of this cost is that it is not a payment: it is a
+     * percentage that costs nothing on the day it is signed and grows with
+     * every quarter the player succeeds. Expressing it as capital would mean
+     * the scene inventing a figure it cannot know.
+     */
+    | { kind: 'royalty'; category: string; rate: number }
+    /**
+     * An incumbent spends against you in one category for a while.
+     *
+     * Multiplies the competitor pool in `computeShares`, which is what an
+     * incumbent actually does to an entrant - it does not remove your product,
+     * it makes everything else look better than it did. Ends on a timer.
+     */
+    | { kind: 'siege'; category: string; quarters: number; pressure: number }
     | {
         kind: 'schedule';
         conversation: string;
@@ -125,6 +144,8 @@ export type EffectSink = {
     news: (headline: string) => void;
     ending: (id: string) => void;
     reprice: (company: string, multiplier: number) => void;
+    royalty: (category: string, rate: number) => void;
+    siege: (category: string, quarters: number, pressure: number) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -152,6 +173,8 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'news': sink.news(effect.headline); return;
         case 'ending': sink.ending(effect.ending); return;
         case 'reprice': sink.reprice(effect.company, effect.multiplier); return;
+        case 'royalty': sink.royalty(effect.category, effect.rate); return;
+        case 'siege': sink.siege(effect.category, effect.quarters, effect.pressure); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

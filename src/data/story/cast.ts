@@ -118,6 +118,54 @@ export const CAST: Cast = {
     },
 
     // ------------------------------------------------------------------
+    //  THE ONES WHO WERE THERE FIRST
+    // ------------------------------------------------------------------
+    //  The largest company in each of the three markets you can walk INTO.
+    //  Consumer's incumbent is Pear, who is already above - the player has
+    //  been in his market since the first quarter, so his version of this
+    //  letter is about share rather than entry.
+    //
+    //  ALL THREE ARE MAIL ONLY, and by the rule this file already states:
+    //  mail is distance, and everyone who uses only mail is somebody who does
+    //  not consider you a peer. That is exactly what an incumbent writing to
+    //  a new entrant is. None of them should ever text you, and if the game
+    //  ever wants one of them to, it will cost a `channelBreak` and a
+    //  sentence explaining itself - the same as it cost Vogel.
+    // ------------------------------------------------------------------
+    edison: {
+        id: 'edison',
+        name: 'Hal Brennerman',
+        role: 'Chief Executive, Edison Motors',
+        channels: 'mail',
+        email: 'h.brennerman@edisonmotors.com',
+        tone: 'Thirty-one years in a business of dealers and service bays, and he talks like it: parts, counties, contract terms, people who answer phones at two in the morning. Never threatens - describes an arrangement that already exists and lets you work out that you are outside it. Agrees with your accusations, which is worse than denying them.',
+    },
+
+    // The Deep Tech incumbent, and she is at OpenAI-ish rather than Novidia
+    // because the giant of a market is whoever holds the most of it and the
+    // data says 29 against 26. A first draft had this letter coming from the
+    // chip company and threatening allocation, which read well and was about
+    // the wrong company - caught by the test that checks the four letters
+    // against PRODUCT_MARKETS rather than against the author's memory.
+    openai: {
+        id: 'openai',
+        name: 'Wen Zhao-Lindqvist',
+        role: 'Head of Research Operations, OpenAI-ish',
+        channels: 'mail',
+        email: 'research-ops@openaiish.com',
+        tone: 'Writes an HR email about an existential threat and does not appear to notice the difference. Short paragraphs, scheduling language, no adjectives. Sincere congratulations followed immediately by terms. Never says the word "poach" and never needs to.',
+    },
+
+    swanson: {
+        id: 'swanson',
+        name: 'Dr. Eleanor Ratliff',
+        role: 'Chair, Category Standards Committee',
+        channels: 'mail',
+        email: 'chair@devicestandards.org',
+        tone: 'Never threatens anything, because she does not have to - she describes a process, and every sentence of it is true, procedural and entirely outside your control. Scrupulously fair and aware of how that reads. The only antagonist in the game with nobody in her to argue with.',
+    },
+
+    // ------------------------------------------------------------------
     //  THE ONES YOU DO NOT WANT
     // ------------------------------------------------------------------
     unknown: {

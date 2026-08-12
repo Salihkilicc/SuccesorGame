@@ -22,6 +22,8 @@ const recorder = () => {
         news: h => log.push(`news:${h}`),
         ending: id => log.push(`ending:${id}`),
         reprice: (c, m) => log.push(`reprice:${c}:${m}`),
+        royalty: (c, r) => log.push(`royalty:${c}:${r}`),
+        siege: (c, q, p) => log.push(`siege:${c}:${q}:${p}`),
         schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };
     return { log, sink };

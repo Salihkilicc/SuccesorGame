@@ -60,6 +60,8 @@ const playable = () => {
         flag: f => { (w.flags as any)[f] = true; },
         message: () => { }, mail: () => { }, news: () => { },
         ending: () => { }, schedule: () => { }, reprice: () => { },
+    royalty: () => { },
+    siege: () => { },
     };
     return { w, sink };
 };

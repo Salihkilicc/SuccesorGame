@@ -58,6 +58,9 @@ import {
 import {
     ctoDarkLab, ctoAlarm, ctoTooLate, ctoBudgetMemo, ctoStillEmpty,
 } from '../events/labPressure';
+import {
+    territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
+} from '../events/territory';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -89,6 +92,10 @@ export const CONVERSATIONS: Conversation[] = [
     // the pair: the emergency arrives on the phone, the record arrives later.
     cooLineShort, cooWalkout, cooOpsNote, cooOpsNoteCc,
     ctoDarkLab, ctoAlarm, ctoTooLate, ctoBudgetMemo, ctoStillEmpty,
+    // The four incumbents. Listed rather than spread for the reason written
+    // out in data/events/index.ts: the audit reads these modules statically
+    // and a spread of an imported array stops it reading them at all.
+    territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

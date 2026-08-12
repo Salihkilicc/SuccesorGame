@@ -309,6 +309,31 @@ describe('the events that actually ship', () => {
                 flags: { fatherDead: true, labBacked: true },
                 researchers: 0,
             }],
+            // ------------------------------------------------------------------
+            //  THE THREE MARKETS YOU CAN WALK INTO
+            // ------------------------------------------------------------------
+            //  One archetype rather than three, deliberately: a company can be
+            //  in all three at once and frequently is, so splitting them would
+            //  be three ways of describing the same player.
+            // ------------------------------------------------------------------
+            ['selling outside the category he inherited', {
+                capital: 120_000_000,
+                flags: {
+                    fatherDead: true,
+                    enteredRobotics: true,
+                    enteredDeepTech: true,
+                    enteredBioTech: true,
+                },
+            }],
+            ['...and big enough at home that Pear has noticed', {
+                // NOT the same as 'beating him' above: that archetype carries
+                // pearHostility 85, and this letter requires that the war has
+                // not started. It is the one he sends BEFORE the escalation.
+                capital: 120_000_000,
+                flags: { fatherDead: true },
+                dials: { ...INITIAL_DIALS, pearHostility: 20 },
+                marketShare: 11,
+            }],
         ];
 
         const seen = new Set<string>();
@@ -337,8 +362,22 @@ describe('the events that actually ship', () => {
             e.when.some(c => c.kind !== 'quarterAtLeast'
                 && c.kind !== 'flag' && c.kind !== 'noFlag');
 
+        // ------------------------------------------------------------------
+        //  AND AN EVENT THAT CAN ONLY HAPPEN ONCE IS NOT WEATHER
+        // ------------------------------------------------------------------
+        //  Added for the territory letters, and it is an amendment rather than
+        //  an exemption. `cooldown: undefined` means once per game, ever - see
+        //  core/events/types.ts, where the difference between undefined and 0
+        //  is load-bearing. Weather means RECURRING; something that fires at
+        //  most once in a campaign cannot be it, whatever gates it.
+        //
+        //  The rule's real target is untouched: an event that repeats, is
+        //  common, and is gated only on time passing. Those still fail.
+        // ------------------------------------------------------------------
+        const oncePerGame = (e: (typeof EVENTS)[number]) => e.cooldown === undefined;
+
         for (const e of EVENTS) {
-            if (e.chance > 0.33) {
+            if (e.chance > 0.33 && !oncePerGame(e)) {
                 expect({ id: e.id, narrowed: narrowing(e) })
                     .toEqual({ id: e.id, narrowed: true });
             }

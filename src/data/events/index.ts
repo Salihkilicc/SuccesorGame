@@ -38,6 +38,10 @@ import {
 } from './pearEscalation';
 import { cooLineShortEvent, cooWalkoutEvent } from './plantFloor';
 import {
+    territoryRoboticsEvent, territoryDeepTechEvent,
+    territoryBioTechEvent, territoryConsumerEvent,
+} from './territory';
+import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
 
@@ -88,6 +92,19 @@ export const EVENTS: GameEvent[] = [
     ctoAlarmEvent,
     ctoTooLateEvent,
     ctoStillEmptyEvent,
+    // Walking into somebody else's market. Three fire on entry; Pear's fires
+    // on share, because the player has been in his category since Q1.
+    //
+    // LISTED RATHER THAN SPREAD, and the first version did spread a
+    // TERRITORY_EVENTS array from the scene file. The audit reads this module
+    // statically and reported `TERRITORY_EVENTS is not iterable`, which means
+    // it stopped checking data/events ENTIRELY - four unvalidated scenes and a
+    // whole category of check silently switched off. Four repeated names is a
+    // smaller cost than an audit that cannot see them.
+    territoryRoboticsEvent,
+    territoryDeepTechEvent,
+    territoryBioTechEvent,
+    territoryConsumerEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

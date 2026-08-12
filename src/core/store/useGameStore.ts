@@ -582,6 +582,8 @@ export const useGameStore = create<GameStore>()(
             breakdowns.map((b, i) => b.total * (group[i].reachIndex ?? 1)),
             market,
             acquiredStockIds,
+            // The incumbent you told to go away, if you told one. 1 otherwise.
+            require('./useTerritoryStore').useTerritoryStore.getState().pressureIn(category),
           );
 
           // ==============================================================
@@ -1074,8 +1076,36 @@ export const useGameStore = create<GameStore>()(
 
         }
 
+        // ==================================================================
+        //  WHAT YOU AGREED TO PAY SOMEBODY ELSE'S SHAREHOLDERS
+        // ==================================================================
+        //  A standing cut of one category's revenue, taken because the player
+        //  chose not to fight an incumbent. See core/market/territory.ts.
+        //
+        //  CHARGED ON REVENUE, NOT PROFIT, and it sits in the expense block
+        //  with everything else rather than being netted off revenue quietly -
+        //  a cost the player agreed to should appear as a cost. Computed from
+        //  productBreakdownList, which is built above and carries the category
+        //  on each line; `revenueByCategory` further down is the same figure
+        //  and arrives four hundred lines too late to be charged for.
+        // ==================================================================
+        let territoryRoyalty = 0;
+        try {
+          const revenueForRoyalty: Record<string, number> = {};
+          productBreakdownList.forEach(pb => {
+            const c = pb.category || 'Consumer';
+            revenueForRoyalty[c] = (revenueForRoyalty[c] || 0) + (pb.revenue || 0);
+          });
+          territoryRoyalty =
+            require('./useTerritoryStore').useTerritoryStore
+              .getState().royaltyFor(revenueForRoyalty) * Math.max(1, quarters);
+        } catch (e) {
+          console.warn('[territory] royalty could not be charged', e);
+        }
+
         // 5. CALCULATE NET PROFIT/LOSS
         const totalExpenses =
+          territoryRoyalty +
           totalCOGS +
           contractSpend +
           totalMarketingCost +
@@ -1433,6 +1463,7 @@ export const useGameStore = create<GameStore>()(
 
         const grossProfit = totalRevenue - totalCOGS;
         const operatingExpenses =
+          territoryRoyalty +
           contractSpend +
           totalMarketingCost +
           totalStorageCost +
@@ -2062,6 +2093,37 @@ export const useGameStore = create<GameStore>()(
           //  allowance belongs to the story and a dice roll must not
           //  displace a beat somebody wrote.
           // ==============================================================
+          // ==============================================================
+          //  WHO YOU WERE SEEN SELLING TO
+          // ==============================================================
+          //  Before the roll, because the entry flag it raises is the gate
+          //  on the letter that the roll may fire in this same quarter. The
+          //  other order costs the player a quarter for nothing and would
+          //  look exactly like the events being slow.
+          //
+          //  Off UNITS SOLD, not off owning a product: a design nobody has
+          //  shipped is not a territorial fact and the incumbent has no way
+          //  of knowing about it. `soldByCategory` is built above from the
+          //  quarter's real deliveries.
+          //
+          //  Sieges tick down here too, in the same block, because both are
+          //  the same subject and splitting them is how one of them ends up
+          //  running in a branch the other does not.
+          // ==============================================================
+          try {
+            const territory = require('../market/territory');
+            const story = require('./useStoryStore').useStoryStore.getState();
+            const entered = territory.entriesThisQuarter(
+              soldByCategory,
+              (flag: string) => !!story.flags[flag],
+            );
+            entered.forEach((flag: string) => story.raise(flag));
+            require('./useTerritoryStore').useTerritoryStore
+              .getState().advance(Math.max(1, quarters));
+          } catch (e) {
+            console.warn('[territory] entry check failed', e);
+          }
+
           try {
             require('../events/runQuarter').runEvents();
           } catch (e) {

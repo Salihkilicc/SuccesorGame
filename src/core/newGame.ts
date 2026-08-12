@@ -33,6 +33,7 @@ import { useAchievementStore } from './store/useAchievementStore';
 import { useMessageStore } from './store/useMessageStore';
 import { useStoryStore } from './store/useStoryStore';
 import { useNegotiationStore } from './store/useNegotiationStore';
+import { useTerritoryStore } from './store/useTerritoryStore';
 import { useMailStore } from './store/useMailStore';
 import { useNewsStore } from './store/useNewsStore';
 
@@ -59,6 +60,9 @@ export const PERSIST_KEYS: string[] = [
     // Letters in the post. An offer written by the last CEO to a company the
     // new one has never approached would be answered in his second quarter.
     'succesor_negotiation_v1',
+    // Royalties are forever, which is the whole point of them - and forever
+    // has to mean this run rather than this device.
+    'succesor_territory_v1',
     'succesor_story_v1',
     'succesor_news_v1',
 
@@ -119,6 +123,7 @@ const resetInMemoryStores = () => {
     // which one asked you never to write again. All of that is about a person
     // who is no longer the CEO.
     useNegotiationStore.getState().reset();
+    useTerritoryStore.getState().reset();
 
     // ------------------------------------------------------------------
     //  `reset?.()` HID A MISSING METHOD

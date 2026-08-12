@@ -157,6 +157,29 @@ export const gameSink = (): EffectSink => ({
             market.getState().setValueAnchor(company, next);
         } catch { /* market store not ready */ }
     },
+    // Both halves of the territory dilemma. Deliberately thin: the store
+    // owns the rules (one royalty per category, a siege replaces rather than
+    // stacks) so that a scene cannot sign the same category twice by having
+    // two choices that both do it.
+    royalty: (category, rate) => {
+        try {
+            const { useTerritoryStore } = require('../store/useTerritoryStore');
+            const { currentQuarter } = require('./world');
+            const { giantOf } = require('../market/territory');
+            useTerritoryStore.getState().agreeRoyalty(
+                category, rate, currentQuarter(), giantOf(category)?.name ?? category,
+            );
+        } catch { /* territory store not ready */ }
+    },
+    siege: (category, quarters, pressure) => {
+        try {
+            const { useTerritoryStore } = require('../store/useTerritoryStore');
+            const { giantOf } = require('../market/territory');
+            useTerritoryStore.getState().beginSiege(
+                category, quarters, pressure, giantOf(category)?.name ?? category,
+            );
+        } catch { /* territory store not ready */ }
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

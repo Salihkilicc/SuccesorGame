@@ -185,6 +185,24 @@ export type StoryFlag =
      * both at once - backed it, still empty - is a scene she gets to have.
      */
     | 'labBacked'
+    // --- Walking into somebody else's market.
+    //
+    //     THE ENTRY FLAGS ARE RAISED BY THE TICK, off units actually sold -
+    //     not off owning a product. A design nobody has shipped is not a
+    //     territorial fact and the incumbent has no way of knowing about it.
+    //
+    //     Consumer has no entry flag on purpose: the starter product is a
+    //     phone, so the player has been in that market since the first
+    //     quarter. Its incumbent is triggered by SHARE instead.
+    | 'enteredRobotics'
+    | 'enteredDeepTech'
+    | 'enteredBioTech'
+    //     And the two facts about the PLAYER rather than about a category.
+    //     Which market you knelt in is bookkeeping and lives in
+    //     useTerritoryStore; that you are somebody who knelt is a fact, and
+    //     later scenes read it.
+    | 'kneltToAGiant'
+    | 'declaredWarOnAGiant'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'
