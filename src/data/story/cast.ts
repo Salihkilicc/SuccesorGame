@@ -185,6 +185,17 @@ export const CAST: Cast = {
         tone: 'Bored professionalism, like a courier reading out a delivery slot. Deadlines stated as facts. Occasional flashes of something almost friendly, which is the most frightening part.',
     },
 
+    regulator: {
+        id: 'regulator',
+        name: 'Consumer Safety Directorate',
+        role: 'Compliance Division',
+        // Mail only, and for the same reason as the FBI: everything they send
+        // is written to be read aloud somewhere else later.
+        channels: 'mail',
+        email: 'notices@csd.gov',
+        tone: 'Neither hostile nor sympathetic - a process with letterhead. Cites the section before the finding. Deadlines are stated as dates, never as warnings, and the absence of any threat is the most alarming thing about it. Never uses the word "you" where "the undertaking" will do.',
+    },
+
     fbi: {
         id: 'fbi',
         name: 'Field Office',

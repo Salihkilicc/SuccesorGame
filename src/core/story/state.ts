@@ -231,6 +231,24 @@ export type StoryFlag =
     | 'soldUnderPressure'
     /** You let your friend buy his company back, under the market. */
     | 'gavePlanoraBack'
+    // --- Crises. Facts a later crisis can find you by.
+    /**
+     * You knew about the defect and shipped anyway.
+     *
+     * The recall event has had a "bury it" branch since it was written and it
+     * carried no effects at all - the COO says it is the expensive option and
+     * that you will find out why in two months, and then nothing ever arrived.
+     * This is what makes his sentence true.
+     */
+    | 'buriedTheRecall'
+    /** You paid people who had encrypted your systems. */
+    | 'paidTheRansom'
+    /** Customers found out about the leak from somebody else. */
+    | 'concealedTheLeak'
+    /** Somebody was hurt on your line and the report says what it says. */
+    | 'plantAccident'
+    /** You kept an executive the papers had. */
+    | 'keptTheScandal'
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'

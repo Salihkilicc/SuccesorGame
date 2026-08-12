@@ -244,6 +244,14 @@ export const gameSink = (): EffectSink => ({
                 .sellSubsidiary(company, priceMultiple);
         } catch { /* finance store not ready */ }
     },
+    // Onto useGameStore, which is the copy the tick advances. useStatsStore
+    // carries a field of the same name that nothing has written since the game
+    // was built - see the note in core/story/world.ts.
+    morale: (amount) => {
+        const g = useGameStore.getState();
+        const next = Math.max(0, Math.min(100, (g.employeeMorale ?? 75) + amount));
+        useGameStore.setState({ employeeMorale: next } as any);
+    },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the
     // effect, look wired, and reach nobody.

@@ -27,6 +27,7 @@ const recorder = () => {
         raid: c => log.push(`raid:${c}`),
         retention: c => log.push(`retention:${c}`),
         divest: (c, m) => log.push(`divest:${c}:${m}`),
+        morale: a => log.push(`morale:${a}`),
         schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };
     return { log, sink };

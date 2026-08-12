@@ -49,6 +49,20 @@ import {
     portfolioPearEvent, portfolioVultureEvent, portfolioFriendEvent,
 } from './portfolio';
 import {
+    crisisRansomwareEvent,
+    crisisLeakEvent,
+    crisisForcedRecallEvent,
+    crisisSupplierEvent,
+    crisisUnionEvent,
+    crisisExecutiveEvent,
+    crisisPatentEvent,
+    crisisAccidentEvent,
+    crisisCounterfeitEvent,
+    crisisInquiryEvent,
+    crisisOutageEvent,
+    crisisAllocationEvent,
+} from './crises';
+import {
     ctoDarkLabEvent, ctoAlarmEvent, ctoTooLateEvent, ctoStillEmptyEvent,
 } from './labPressure';
 
@@ -126,6 +140,20 @@ export const EVENTS: GameEvent[] = [
     portfolioPearEvent,
     portfolioVultureEvent,
     portfolioFriendEvent,
+    // The crisis pack. Twelve, all gated on a grown company and a dead
+    // father, all of them costing something whichever answer is given.
+    crisisRansomwareEvent,
+    crisisLeakEvent,
+    crisisForcedRecallEvent,
+    crisisSupplierEvent,
+    crisisUnionEvent,
+    crisisExecutiveEvent,
+    crisisPatentEvent,
+    crisisAccidentEvent,
+    crisisCounterfeitEvent,
+    crisisInquiryEvent,
+    crisisOutageEvent,
+    crisisAllocationEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

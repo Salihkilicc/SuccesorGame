@@ -68,6 +68,20 @@ import {
 import {
     portfolioPear, portfolioVulture, portfolioFriend,
 } from '../events/portfolio';
+import {
+    crisisRansomware,
+    crisisLeak,
+    crisisForcedRecall,
+    crisisSupplier,
+    crisisUnion,
+    crisisExecutive,
+    crisisPatent,
+    crisisAccident,
+    crisisCounterfeit,
+    crisisInquiry,
+    crisisOutage,
+    crisisAllocation,
+} from '../events/crises';
 import { friendAsks, friendGrows } from './friendArc';
 
 export const CONVERSATIONS: Conversation[] = [
@@ -109,6 +123,20 @@ export const CONVERSATIONS: Conversation[] = [
     rippleBiogen, rippleSkynet, ripplePlanora,
     // And the three who would like to buy something back off you.
     portfolioPear, portfolioVulture, portfolioFriend,
+    // Twelve things you get out of rather than things you beat. No answer in
+    // any of them is free - see the note at the top of data/events/crises.ts.
+    crisisRansomware,
+    crisisLeak,
+    crisisForcedRecall,
+    crisisSupplier,
+    crisisUnion,
+    crisisExecutive,
+    crisisPatent,
+    crisisAccident,
+    crisisCounterfeit,
+    crisisInquiry,
+    crisisOutage,
+    crisisAllocation,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

@@ -163,6 +163,20 @@ export type Effect =
      * rule to keep it consistent with.
      */
     | { kind: 'divest'; company: string; priceMultiple: number }
+    /**
+     * Something happened to the people who work here.
+     *
+     * FOR EVENTS IN THE WORLD, NEVER FOR A CHARACTER'S OPINION OF YOU. The COO
+     * has no dial precisely because morale is the engine's number and cannot
+     * be repaired by picking the warm answer (see core/story/state.ts), and
+     * this effect must not become a way around that. A fire on the line moves
+     * it. A well-chosen sentence does not.
+     *
+     * Applied as a one-off adjustment, so the wage model pulls it back towards
+     * its own target over the following quarters - the shock is real and it
+     * does not become the new normal unless the player lets it.
+     */
+    | { kind: 'morale'; amount: number }
     | {
         kind: 'schedule';
         conversation: string;
@@ -195,6 +209,7 @@ export type EffectSink = {
     raid: (company: string) => void;
     retention: (company: string) => void;
     divest: (company: string, priceMultiple: number) => void;
+    morale: (amount: number) => void;
     schedule: (item: {
         conversation: string;
         afterQuarters: number;
@@ -227,6 +242,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'raid': sink.raid(effect.company); return;
         case 'retention': sink.retention(effect.company); return;
         case 'divest': sink.divest(effect.company, effect.priceMultiple); return;
+        case 'morale': sink.morale(effect.amount); return;
         case 'schedule': sink.schedule(effect); return;
     }
     // Unreachable while the switch is exhaustive. If a new variant is added

@@ -67,6 +67,7 @@ const playable = () => {
     raid: () => { },
     retention: () => { },
     divest: () => { },
+    morale: () => { },
     };
     return { w, sink };
 };

@@ -93,8 +93,20 @@ export const recallConversation: Conversation = {
         {
             id: 'buried',
             speaker: 'coo',
-            // No choices. He has said what he is going to say.
+            // ONE CHOICE, WHERE THERE WERE NONE. This card used to have no
+            // choices and no effects at all, which meant burying a known
+            // defect cost exactly nothing, forever - he says "this is the
+            // expensive option and we will not find out why for about two
+            // months", and then nothing ever arrived. The flag is what makes
+            // the sentence true: it is the only way the regulator's forced
+            // recall in data/events/crises.ts can find you.
             text: 'Understood. For the record, I think this is the expensive option and we will not find out why for about two months.',
+            choices: [
+                {
+                    text: '(say nothing)',
+                    effects: [{ kind: 'flag', flag: 'buriedTheRecall' }],
+                },
+            ],
         },
     ],
 };

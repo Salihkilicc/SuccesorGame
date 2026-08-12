@@ -364,6 +364,18 @@ describe('the events that actually ship', () => {
                 flags: { fatherDead: true },
                 subsidiaries: ['tech_streamify'],
             }],
+            // ------------------------------------------------------------------
+            //  THE ONE WHO BURIED IT
+            // ------------------------------------------------------------------
+            //  Eleven of the twelve crises reach any grown company. The twelfth
+            //  is the regulator's forced recall, which can only find a player
+            //  who took a specific branch of a specific earlier scene - and
+            //  that is the whole point of it, so it needs its own line here.
+            // ------------------------------------------------------------------
+            ['and once shipped a batch he knew about', {
+                capital: 60_000_000,
+                flags: { fatherDead: true, buriedTheRecall: true },
+            }],
             ['...and big enough at home that Pear has noticed', {
                 // NOT the same as 'beating him' above: that archetype carries
                 // pearHostility 85, and this letter requires that the war has
