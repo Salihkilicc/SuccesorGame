@@ -62,6 +62,7 @@ import MessagesScreen from '../features/os/screens/MessagesScreen';
 import MessageThreadScreen from '../features/os/screens/MessageThreadScreen';
 import MailScreen from '../features/os/screens/MailScreen';
 import MailDetailScreen from '../features/os/screens/MailDetailScreen';
+import ComposeOfferScreen from '../features/os/screens/ComposeOfferScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import CrystalNavBar from './components/CrystalNavBar';
@@ -188,6 +189,7 @@ export type RootStackParamList = {
   MessageThread: { threadId: string };
   Mail: undefined;
   MailDetail: { mailId: string };
+  ComposeOffer: undefined;
   Settings: undefined;
   Profile: undefined;
 };
@@ -497,6 +499,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="MessageThread" component={MessageThreadScreen} />
           <RootStack.Screen name="Mail" component={MailScreen} />
           <RootStack.Screen name="MailDetail" component={MailDetailScreen} />
+          <RootStack.Screen name="ComposeOffer" component={ComposeOfferScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />
           <RootStack.Screen name="Profile" component={ProfileScreen} />
         </RootStack.Navigator>

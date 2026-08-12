@@ -2084,6 +2084,28 @@ export const useGameStore = create<GameStore>()(
             console.warn('[tutorial] scene could not be queued', e);
           }
 
+          // ==============================================================
+          //  THE POST ARRIVES
+          // ==============================================================
+          //  Before runInbox and after everything else, and both halves of
+          //  that placement are deliberate.
+          //
+          //  AFTER the quarter's maths, because a reply is decided by a
+          //  resistance score frozen when the letter was SENT - but the
+          //  premium the player will be quoted if they go hostile reads the
+          //  valuation this tick just wrote.
+          //
+          //  BEFORE runInbox only because it posts mail directly rather than
+          //  through the story queue, so it cannot take an allowance slot
+          //  from a beat. A reply the player has been waiting a whole
+          //  quarter for should not be held back by two condolence letters.
+          // ==============================================================
+          try {
+            require('../market/postNegotiationReplies').postDueReplies();
+          } catch (e) {
+            console.warn('[negotiation] replies could not be posted', e);
+          }
+
           try {
             require('../story/deliver').runInbox();
           } catch (e) {

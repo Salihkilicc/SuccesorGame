@@ -5,6 +5,7 @@ import {
     StyleSheet,
     Pressable,
     ScrollView,
+    Alert,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +17,10 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
 import ConversationRunner from '../../../components/story/ConversationRunner';
 import { conversationById } from '../../../data/story';
+import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
+import { useStoryStore } from '../../../core/store/useStoryStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { hostilePremiumFor } from '../../../core/market/negotiation';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -37,7 +42,100 @@ const MailDetailScreen = () => {
 
     const insets = useSafeAreaInsets();
 
+    // ------------------------------------------------------------------
+    //  HOOKS BEFORE THE EARLY RETURN
+    // ------------------------------------------------------------------
+    //  `if (!mail) return null` sits below, and the audit has a check named
+    //  "Hooks called after an early return" for exactly this. Everything
+    //  stateful has to be declared above it, even though the values are only
+    //  used further down.
+    // ------------------------------------------------------------------
+    const [stage, setStage] = React.useState<'first' | 'second'>('first');
+    const offers = useNegotiationStore(s => s.offers);
+    const answerOffer = useNegotiationStore(s => s.answer);
+    const withdrawOffer = useNegotiationStore(s => s.withdraw);
+    const negotiation = offers.find(
+        o => o.id === mail?.negotiationId && o.status === 'open',
+    );
+
     if (!mail) return null;
+
+    const demand = negotiation?.reply?.kind === 'demand'
+        ? negotiation.reply.demand
+        : undefined;
+
+    // The button says what it costs. "Accept" would be a word; this is a
+    // number the player can weigh against the one in the letter.
+    const meetLabel =
+        !demand ? 'Agree.'
+            : demand.kind === 'price'
+                ? `Pay it — ${Math.round(demand.extraPremium * 100)}% over the usual premium.`
+                : demand.kind === 'seat' ? 'Give them the seat.'
+                    : demand.kind === 'reputation' ? 'Accept the condition.'
+                        : 'Agree.';
+
+    const hostileLabel = negotiation
+        ? `${Math.round(hostilePremiumFor(negotiation.score) * 100)}% over market`
+        : '';
+
+    const onMeet = () => {
+        if (!negotiation) return;
+        const result = answerOffer(negotiation.id, true, {
+            publicReputation: useStoryStore.getState().dials.publicReputation,
+            capital: useStatsStore.getState().companyCapital ?? 0,
+            price: 0,
+        });
+        if (!result.ok) {
+            // The reputation floor, almost always. They have not gone away -
+            // the letter stays open and the player can come back once their
+            // standing is where the board asked for it.
+            Alert.alert('Not yet', result.reason ?? 'You cannot meet that today.');
+            return;
+        }
+        if (result.counter) {
+            // Their one comeback. Okonjo raising the number because you said
+            // yes too fast, or Køhl splitting the difference because you said
+            // no. Back to the first pair of buttons, once.
+            setStage('first');
+            Alert.alert('They have come back to you', 'The terms have changed. Read it again.');
+            return;
+        }
+        navigation.goBack();
+    };
+
+    const onWithdraw = () => {
+        if (!negotiation) return;
+        answerOffer(negotiation.id, false, {
+            publicReputation: useStoryStore.getState().dials.publicReputation,
+            capital: useStatsStore.getState().companyCapital ?? 0,
+            price: 0,
+        });
+        withdrawOffer(negotiation.id);
+        navigation.goBack();
+    };
+
+    const onHostile = () => {
+        if (!negotiation) return;
+        Alert.alert(
+            'Tender to their shareholders',
+            `You would go over the board's head at ${hostileLabel}. Their people stay, and they will remember which of you they work for.`,
+            [
+                { text: 'Not yet', style: 'cancel' },
+                {
+                    text: 'Do it',
+                    onPress: () => {
+                        withdrawOffer(negotiation.id);
+                        // The bid itself is placed on the acquisition screen,
+                        // which owns financing, the cash check and the board
+                        // vote. Two doors into executeAcquisition is how the
+                        // last negotiation screen ended up moving money the
+                        // engine never saw - see the note in NegotiationModal.
+                        navigation.navigate('Assets', { hostileFor: negotiation.targetId });
+                    },
+                },
+            ],
+        );
+    };
 
     // A letter that branches plays in the same runner as a message; only the
     // presentation differs. See components/story/ConversationRunner.
@@ -94,6 +192,46 @@ const MailDetailScreen = () => {
                     <Text style={styles.bodyText}>{mail.body}</Text>
                 </View>
                 
+                {/* ==========================================================
+                    THE TWO OPTIONS
+                    ==========================================================
+                    Exactly two, and the second one always leads to a second
+                    pair rather than doing anything - the same discipline the
+                    story graph enforces on every card in the game (see the
+                    two-choice limit in core/story/graph.ts). A negotiation
+                    screen with five buttons is a menu; two is a decision.
+
+                    They appear only on a letter that is genuinely waiting on
+                    an answer. A refusal arrives closed, so it has no buttons -
+                    which is how the player learns that "no" was not an opening
+                    position. */}
+                {negotiation && (
+                    <View style={styles.negotiationBox}>
+                        <Text style={styles.negotiationLabel}>THEY ARE WAITING ON YOU</Text>
+                        {stage === 'first' ? (
+                            <>
+                                <Pressable style={styles.optionPrimary} onPress={onMeet}>
+                                    <Text style={styles.optionPrimaryText}>{meetLabel}</Text>
+                                </Pressable>
+                                <Pressable style={styles.option} onPress={() => setStage('second')}>
+                                    <Text style={styles.optionText}>No.</Text>
+                                </Pressable>
+                            </>
+                        ) : (
+                            <>
+                                <Pressable style={styles.option} onPress={onWithdraw}>
+                                    <Text style={styles.optionText}>Withdraw the offer.</Text>
+                                </Pressable>
+                                <Pressable style={styles.optionDanger} onPress={onHostile}>
+                                    <Text style={styles.optionDangerText}>
+                                        Go to their shareholders — {hostileLabel}
+                                    </Text>
+                                </Pressable>
+                            </>
+                        )}
+                    </View>
+                )}
+
                 {/* Reply Actions */}
                 <View style={styles.replyActionRow}>
                     <View style={styles.replyBtn}>
@@ -157,5 +295,52 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: theme.colors.border,
     },
-    replyBtnText: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '600' }
+    replyBtnText: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '600' },
+
+    negotiationBox: {
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 14,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        gap: 10,
+    },
+    negotiationLabel: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        fontWeight: '700',
+        letterSpacing: 1,
+    },
+    option: {
+        backgroundColor: theme.colors.surfaceRaised,
+        borderRadius: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    optionText: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '600' },
+    optionPrimary: {
+        // `primary`, not `brand`. See the note in ComposeOfferScreen: brand is
+        // a text-only signal token meaning "this figure is brand value".
+        backgroundColor: theme.colors.primary,
+        borderRadius: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+    },
+    // Dark text on the light primary fill, never the reverse.
+    optionPrimaryText: { color: theme.colors.onLight, fontSize: 14, fontWeight: '700' },
+    optionDanger: {
+        backgroundColor: theme.colors.surfaceRaised,
+        borderRadius: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    // TEXT-ONLY signal. Danger is a colour on the words here and never a red
+    // fill: red and green are reserved for profit and loss, and a red button
+    // would read as a number going the wrong way.
+    optionDangerText: { color: theme.colors.danger, fontSize: 14, fontWeight: '700' },
 });

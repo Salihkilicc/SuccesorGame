@@ -32,6 +32,7 @@ import { useMarketStore } from './store/useMarketStore';
 import { useAchievementStore } from './store/useAchievementStore';
 import { useMessageStore } from './store/useMessageStore';
 import { useStoryStore } from './store/useStoryStore';
+import { useNegotiationStore } from './store/useNegotiationStore';
 import { useMailStore } from './store/useMailStore';
 import { useNewsStore } from './store/useNewsStore';
 
@@ -55,6 +56,9 @@ export const PERSIST_KEYS: string[] = [
     'succesor_notes_v1',
     'succesor_messages_v1',
     'succesor_mail_v1',
+    // Letters in the post. An offer written by the last CEO to a company the
+    // new one has never approached would be answered in his second quarter.
+    'succesor_negotiation_v1',
     'succesor_story_v1',
     'succesor_news_v1',
 
@@ -111,6 +115,10 @@ const resetInMemoryStores = () => {
     useMailStore.getState().reset();
     // The wire carries what happened in the last run. It did not happen here.
     useNewsStore.getState().reset();
+    // Offers in flight, and - more importantly - which boards refused you and
+    // which one asked you never to write again. All of that is about a person
+    // who is no longer the CEO.
+    useNegotiationStore.getState().reset();
 
     // ------------------------------------------------------------------
     //  `reset?.()` HID A MISSING METHOD

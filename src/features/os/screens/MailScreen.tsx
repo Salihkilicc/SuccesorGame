@@ -116,8 +116,13 @@ const MailScreen = () => {
                 )}
             </ScrollView>
             
-            {/* Compose FAB (Grey background with Orange icon to match user request) */}
-            <Pressable style={styles.fab} onPress={() => {}}>
+            {/* The Compose FAB. It has been on this screen since before the
+                mail app did anything, wired to an empty arrow function - a
+                control that is drawn, styled, labelled and connected to
+                nothing. It opens the offer composer now. */}
+            <Pressable
+                style={styles.fab}
+                onPress={() => navigation.navigate('ComposeOffer')}>
                 <View style={styles.fabIconWrap}>
                     <MaterialCommunityIcons name="pencil" size={22} color={theme.colors.brand} />
                 </View>

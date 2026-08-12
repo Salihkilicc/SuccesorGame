@@ -127,7 +127,19 @@ export const estimateTargetEbit = (marketCap: number, risk: TargetRisk = 'Medium
 
 /** Dostane devralmada odenen tipik prim. */
 export const FRIENDLY_PREMIUM = 0.15;
-/** Dusmanca devralmada — yonetimi ikna edemedigin icin daha pahali. */
+/**
+ * SHELVED — a flat hostile premium, replaced by a floor plus resistance.
+ *
+ * Kept as the DEFAULT for any caller that has no resistance score to hand, so
+ * nothing silently prices a hostile deal at the friendly rate. The live number
+ * is `hostilePremiumFor(score)` in core/market/negotiation.ts, which is where
+ * the measurement and the argument for the change are written down.
+ *
+ * The short version: 0.35 was flat, so overrunning a board that barely refused
+ * you cost exactly what overrunning one that would fight to the last share
+ * cost - and `boardWillSell` was already computing the difference and throwing
+ * it away. It now runs 0.45 to 0.75 on that score.
+ */
 export const HOSTILE_PREMIUM = 0.35;
 
 /** Entegrasyon maliyeti islem bedelinin bu orani kadardir. */
@@ -352,9 +364,23 @@ export const quoteAcquisition = (
     risk: TargetRisk,
     hostile: boolean,
     acquirerValuation: number,
+    /**
+     * The premium actually being paid, when the caller knows it.
+     *
+     * A hostile bid's price now depends on how hard the board resists
+     * (`hostilePremiumFor` in negotiation.ts), and a friendly one can carry a
+     * premium the target negotiated for. Passed IN rather than computed here
+     * because this module must not import the negotiation module - that module
+     * imports this one, and the cycle would be real.
+     *
+     * Omitted, it falls back to the flat rates, so an old caller prices a
+     * hostile deal at the shelved 0.35 rather than at the friendly rate. Wrong
+     * by a known amount beats wrong by a silent one.
+     */
+    premiumOverride?: number,
 ): AcquisitionQuote => {
     const fairValue = Math.max(0, marketCap || 0);
-    const premiumRatio = hostile ? HOSTILE_PREMIUM : FRIENDLY_PREMIUM;
+    const premiumRatio = premiumOverride ?? (hostile ? HOSTILE_PREMIUM : FRIENDLY_PREMIUM);
     const price = fairValue * (1 + premiumRatio);
     const premium = price - fairValue;
     const targetAnnualEbit = estimateTargetEbit(fairValue, risk);

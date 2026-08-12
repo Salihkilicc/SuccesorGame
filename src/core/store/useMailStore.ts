@@ -16,6 +16,16 @@ export type Mail = {
     category: MailCategory;
     /** A branching conversation instead of a plain letter. See Thread. */
     conversationId?: string;
+    /**
+     * A live negotiation waiting on an answer.
+     *
+     * Separate from `conversationId` rather than reusing it, because they are
+     * answered by different machines: a conversation is static graph data the
+     * audit can walk, and a negotiation is a generated letter whose two options
+     * come from a store. Folding them together would mean the mail detail
+     * screen guessing which kind it had.
+     */
+    negotiationId?: string;
 };
 
 export type MailState = {
