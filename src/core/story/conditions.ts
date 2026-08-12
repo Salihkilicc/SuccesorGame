@@ -41,6 +41,15 @@ export type Condition =
     | { kind: 'quarterAtLeast'; quarter: number }
     /** The company can afford something. */
     | { kind: 'capitalAtLeast'; amount: number }
+    /**
+     * The company is running out.
+     *
+     * The mirror of the above, and it did not exist - every condition in the
+     * vocabulary asked whether the player had ENOUGH of something. A story
+     * about a company cannot only be able to ask that: half its scenes are
+     * about the quarter where the answer is no.
+     */
+    | { kind: 'capitalAtMost'; amount: number }
     /** The player personally can. */
     | { kind: 'cashAtLeast'; amount: number }
     /**
@@ -88,6 +97,7 @@ export const test = (c: Condition, w: World): boolean => {
         case 'dialAtMost': return rank(band(w.dials[c.dial])) <= rank(c.band);
         case 'quarterAtLeast': return w.quarter >= c.quarter;
         case 'capitalAtLeast': return w.capital >= c.amount;
+        case 'capitalAtMost': return w.capital <= c.amount;
         case 'cashAtLeast': return w.cash >= c.amount;
         case 'moraleAtMost': return w.morale <= c.value;
         case 'all': return c.of.every(x => test(x, w));

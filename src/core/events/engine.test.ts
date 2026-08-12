@@ -170,19 +170,48 @@ describe('the events that actually ship', () => {
         expect(rollQuarter(EVENTS, newborn, emptyHistory(), 1, () => 0).fired).toEqual([]);
     });
 
-    it('and a large old company can see all of them', () => {
-        const grown = world({
-            quarter: 40,
-            capital: 500_000_000,
+    it('and every event is reachable by SOME company', () => {
+        // This used to assert that one large, old, hostile company could see
+        // all of them at once, which was true until an event was written whose
+        // trigger is being POOR. Events can have opposite conditions; what
+        // matters is that none of them is unreachable by everybody.
+        const rich = world({
+            quarter: 40, capital: 500_000_000,
+            flags: { fatherDead: true },
             dials: { ...INITIAL_DIALS, pearHostility: 60 },
         });
-        const eligible = rollQuarter(EVENTS, grown, emptyHistory(), 40, () => 1).eligible;
-        expect(eligible).toHaveLength(EVENTS.length);
+        const broke = world({
+            quarter: 40, capital: 1_000_000,
+            flags: { fatherDead: true },
+            dials: { ...INITIAL_DIALS, pearHostility: 60 },
+        });
+        const seen = new Set([
+            ...rollQuarter(EVENTS, rich, emptyHistory(), 40, () => 1).eligible.map(e => e.id),
+            ...rollQuarter(EVENTS, broke, emptyHistory(), 40, () => 1).eligible.map(e => e.id),
+        ]);
+        expect(seen.size).toBe(EVENTS.length);
     });
 
-    it('every one of them is rare enough to be an event', () => {
-        // A per-quarter chance above a third is not a random event, it is a
-        // recurring cost with a cutscene.
-        for (const e of EVENTS) expect(e.chance).toBeLessThanOrEqual(0.33);
+    it('a common event must be a REACTION, not weather', () => {
+        // THE RULE THIS REPLACED said flatly that any chance above a third was
+        // "a recurring cost with a cutscene". That is right about weather and
+        // wrong about a reaction: when the company is three quarters from
+        // empty, the finance director noticing is not a 12% event, and making
+        // it one would mean the warning that arrives is luck rather than the
+        // state of the balance sheet.
+        //
+        // So the test is now about what makes it common. An event may be
+        // near-certain if it is gated on a specific situation - and must be
+        // rare if the only thing gating it is time passing.
+        const narrowing = (e: (typeof EVENTS)[number]) =>
+            e.when.some(c => c.kind !== 'quarterAtLeast'
+                && c.kind !== 'flag' && c.kind !== 'noFlag');
+
+        for (const e of EVENTS) {
+            if (e.chance > 0.33) {
+                expect({ id: e.id, narrowed: narrowing(e) })
+                    .toEqual({ id: e.id, narrowed: true });
+            }
+        }
     });
 });

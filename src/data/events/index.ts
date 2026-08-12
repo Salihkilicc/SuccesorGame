@@ -18,11 +18,13 @@ import type { GameEvent } from '../../core/events/types';
 import { recallEvent } from './recall';
 import { poachEvent } from './poach';
 import { shortSellerEvent } from './shortSeller';
+import { cashWarningEvent } from './cashWarning';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
     poachEvent,
     shortSellerEvent,
+    cashWarningEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

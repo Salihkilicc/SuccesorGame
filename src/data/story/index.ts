@@ -21,6 +21,9 @@ import { fatherMarketing } from './fatherMarketing';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
 import {
+    cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
+} from './cfoArc';
+import {
     friendCondolence, friendCondolencePublic,
     cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,
     brotherCondolence, brotherCondolencePublic,
@@ -33,6 +36,7 @@ import {
 import { recallConversation } from '../events/recall';
 import { poachConversation } from '../events/poach';
 import { shortSellerConversation } from '../events/shortSeller';
+import { cashWarningConversation } from '../events/cashWarning';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherQ1,
@@ -49,6 +53,8 @@ export const CONVERSATIONS: Conversation[] = [
     recallConversation,
     poachConversation,
     shortSellerConversation,
+    cashWarningConversation,
+    cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>
@@ -135,4 +141,18 @@ STORY_BEATS.push(
     { conversation: boardCondolence.id },
     { conversation: boardCondolencePublic.id },
     { conversation: cfoCondolencePublic.id },
+);
+
+// ----------------------------------------------------------------------------
+//  THE CFO'S ARC
+// ----------------------------------------------------------------------------
+//  Each of these carries its own `when`, and between them they read cfoTrust
+//  at both ends: the board-room trade and the Braga thread need him to be
+//  being listened to, and the resignation needs him to have given up. None of
+//  them is urgent - he is not the spine, he is the person standing next to it.
+// ----------------------------------------------------------------------------
+STORY_BEATS.push(
+    { conversation: cfoBoardRoom.id },
+    { conversation: cfoBragaName.id },
+    { conversation: cfoResignation.id },
 );

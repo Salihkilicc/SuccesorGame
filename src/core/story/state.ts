@@ -122,6 +122,19 @@ export type StoryFlag =
     | 'refusedPearPublicly'
     // --- Unlocks
     | 'moleUnlocked'
+    // --- The CFO's arc. Staged with flags rather than finer dial bands:
+    //     cfoTrust starts at 50, which is already the 'high' band, so the only
+    //     dial gates that mean anything are the two ENDS. The dial decides
+    //     whether he opens up at all and whether he leaves; the flags decide
+    //     how far along the telling has got.
+    | 'cfoToldBoardRoom'
+    | 'cfoToldBragaName'
+    | 'cfoToldBragaTruth'
+    | 'cfoResigned'
+    /** The player kept paying Braga after learning what it was. */
+    | 'bragaKeptPaying'
+    /** The player stopped it. */
+    | 'bragaStopped'
     | 'brotherPlottedOpenly'
     // --- Teaching. Raised by the screens the first year points at, so a
     //     lock clears on the ACTION rather than on a screen being opened.
