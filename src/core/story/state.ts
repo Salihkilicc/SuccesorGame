@@ -100,6 +100,26 @@ export type StoryFlag =
     // --- Year one
     | 'fatherDead'
     | 'soldToPear'
+    /**
+     * The refusal was public - it went in the news with the words in it.
+     *
+     * The quiet refusal and the loud one are the same decision and a
+     * completely different fact about the player, and everybody who writes to
+     * them afterwards knows which one happened. Without this the condolence
+     * wave has to guess, and four characters guessing the same way is how a
+     * cast starts sounding like one person.
+     */
+    /**
+     * Pear was told no, either way.
+     *
+     * Separate from `refusedPearPublicly` because it answers a different
+     * question. This one is "has the player replied at all" - and the
+     * condolence wave waits on it, because every one of those four letters is
+     * written by somebody who already knows the answer. Queued before the
+     * player has given one, they would be guessing.
+     */
+    | 'refusedPear'
+    | 'refusedPearPublicly'
     // --- Unlocks
     | 'moleUnlocked'
     | 'brotherPlottedOpenly'

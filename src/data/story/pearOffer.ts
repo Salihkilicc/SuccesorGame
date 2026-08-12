@@ -153,6 +153,7 @@ export const pearOffer: Conversation = {
                     text: '(close)',
                     effects: [
                         { kind: 'dial', dial: 'pearHostility', delta: 15 },
+                        { kind: 'flag', flag: 'refusedPear' },
                         {
                             kind: 'news',
                             headline: 'Hale rejects an approach from Pear. The company declined to comment on the price.',
@@ -165,7 +166,10 @@ export const pearOffer: Conversation = {
                         // Saying it out loud costs more than silence. He now
                         // knows it is personal, and he files that.
                         { kind: 'dial', dial: 'pearHostility', delta: 22 },
+                        { kind: 'flag', flag: 'refusedPear' },
                         { kind: 'dial', dial: 'publicReputation', delta: 3 },
+                        // Everyone who writes to you next quarter read this.
+                        { kind: 'flag', flag: 'refusedPearPublicly' },
                         {
                             kind: 'news',
                             headline: 'Hale rejects Pear approach publicly. "Not for sale" — the new chief executive.',

@@ -101,7 +101,12 @@ export const drain = (
     pending: Pending[],
     quarter: number,
     canDeliver: (p: Pending) => boolean,
-    budget: number = DELIVERIES_PER_QUARTER,
+    budget: number | undefined = DELIVERIES_PER_QUARTER,
+    /**
+     * Who is sending it, if the caller knows. Enables the one-per-sender rule
+     * below; omitted, the rule simply does not apply.
+     */
+    senderOf: (p: Pending) => string | undefined = () => undefined,
 ): DrainResult => {
     const deliver: Pending[] = [];
     const keep: Pending[] = [];
@@ -112,6 +117,29 @@ export const drain = (
     // quarter's arrivals, however important they think they are.
     const ordered = [...pending].sort((a, b) =>
         a.dueQuarter - b.dueQuarter || a.priority - b.priority);
+
+    // ------------------------------------------------------------------
+    //  ONE CONVERSATION PER PERSON PER QUARTER
+    // ------------------------------------------------------------------
+    //  FOUND BY PLAYING THE CONDOLENCE WAVE. A message thread holds ONE
+    //  conversation id - `deliver()` creates or reuses the thread for a
+    //  character and attaches the id to it. So when the brother's condolence
+    //  and his follow-up about the seven point two million both came due in
+    //  the same quarter, the second overwrote the first and the player never
+    //  saw it. No error, no warning: one of the two best-written messages in
+    //  the wave simply did not exist.
+    //
+    //  Capping the thread was the alternative and it is worse - it would let
+    //  a character send two playable conversations at once, which nobody
+    //  does. Holding the second back a quarter is both the fix and the right
+    //  pacing: he sends the difficult one the next morning.
+    //
+    //  Urgent still bypasses this, deliberately. Two urgent scenes from the
+    //  same person in one quarter would be a collision, but urgent is the
+    //  spine and the spine is allowed to be loud - and there is exactly one
+    //  urgent sender at a time by construction.
+    // ------------------------------------------------------------------
+    const spoken = new Set<string>();
 
     let spent = 0;
     for (const p of ordered) {
@@ -125,7 +153,16 @@ export const drain = (
         }
 
         if (p.urgent) { deliver.push(p); continue; }
-        if (spent < budget) { deliver.push(p); spent += 1; continue; }
+
+        const from = senderOf(p);
+        if (from !== undefined && spoken.has(from)) { keep.push(p); continue; }
+
+        if (spent < (budget ?? DELIVERIES_PER_QUARTER)) {
+            deliver.push(p);
+            spent += 1;
+            if (from !== undefined) spoken.add(from);
+            continue;
+        }
 
         // Over the allowance. It keeps its due quarter, so next quarter it
         // sorts ahead of anything newer - the queue is fair, not a stack.

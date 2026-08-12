@@ -49,7 +49,10 @@ const effectsOf = (conversationId: string): Effect[] => {
 
 describe('the father dies at the end of the first year', () => {
     it('is a beat that fires on its own, not one another scene has to remember', () => {
-        expect(STORY_BEATS).toContain(fatherDeath.id);
+        expect(STORY_BEATS.map(b => b.conversation)).toContain(fatherDeath.id);
+        // And it is the one that bypasses the allowance. The offer that
+        // follows it decides whether there is a game after this quarter.
+        expect(STORY_BEATS.find(b => b.conversation === fatherDeath.id)!.urgent).toBe(true);
         expect(validate(fatherDeath, CAST, known)).toEqual([]);
     });
 

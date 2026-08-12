@@ -20,6 +20,12 @@ import { fatherMorale } from './fatherMorale';
 import { fatherMarketing } from './fatherMarketing';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
+import {
+    friendCondolence, friendCondolencePublic,
+    cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,
+    brotherCondolence, brotherCondolencePublic,
+    boardCondolence, boardCondolencePublic,
+} from './condolences';
 // Event scenes live next to their trigger in data/events, because a scene and
 // the condition that fires it are one thing and splitting them across two
 // folders is how they drift. They register HERE all the same: the inbox
@@ -35,6 +41,10 @@ export const CONVERSATIONS: Conversation[] = [
     fatherMarketing,
     fatherDeath,
     pearOffer,
+    friendCondolence, friendCondolencePublic,
+    cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,
+    brotherCondolence, brotherCondolencePublic,
+    boardCondolence, boardCondolencePublic,
     cfoDividend,
     recallConversation,
     poachConversation,
@@ -82,6 +92,47 @@ export const OPENING_CONVERSATIONS: string[] = [
 //  it, so the condition that fires a scene and the condition that lets it be
 //  delivered cannot disagree.
 // ============================================================================
-export const STORY_BEATS: string[] = [
-    fatherDeath.id,
+export interface StoryBeat {
+    conversation: string;
+    /**
+     * Bypass the two-a-quarter allowance.
+     *
+     * True only for the spine. The condolence wave is deliberately NOT urgent:
+     * its whole shape is four people arriving over two quarters, and marking
+     * them urgent would dump all four in one and turn a sequence into a pile.
+     */
+    urgent?: boolean;
+}
+
+export const STORY_BEATS: StoryBeat[] = [
+    { conversation: fatherDeath.id, urgent: true },
 ];
+
+// ============================================================================
+//  THE CONDOLENCE WAVE
+// ============================================================================
+//
+//  Scheduled together the moment the player refuses Pear, and delivered two a
+//  quarter in this order by the inbox queue (core/story/inbox.ts). NOT urgent:
+//  the whole point is that they arrive over two quarters rather than as a pile
+//  of four, and marking them urgent would bypass the allowance that produces
+//  the pacing.
+//
+//  The order is the writing. The friend goes first because he is the only one
+//  who wants nothing, and after him nobody in this game writes for free. The
+//  board goes last because a demand reads differently once you have already
+//  been reminded three times that everyone wants something.
+//
+//  The `-public` variants are queued alongside and simply do not pass their
+//  own `when` on the quiet branch, so the inbox drops them.
+// ============================================================================
+STORY_BEATS.push(
+    { conversation: friendCondolence.id },
+    { conversation: friendCondolencePublic.id },
+    { conversation: cfoCondolenceMail.id },
+    { conversation: brotherCondolence.id },
+    { conversation: brotherCondolencePublic.id },
+    { conversation: boardCondolence.id },
+    { conversation: boardCondolencePublic.id },
+    { conversation: cfoCondolencePublic.id },
+);

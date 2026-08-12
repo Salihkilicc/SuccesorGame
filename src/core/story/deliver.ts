@@ -121,7 +121,8 @@ export const runStoryBeats = (): void => {
     const world = readWorld();
     const now = currentQuarter();
 
-    for (const id of STORY_BEATS) {
+    for (const beat of STORY_BEATS) {
+        const id = beat.conversation;
         const story = useStoryStore.getState();
         if (story.seenScenes.includes(id)) continue;
         if (story.pending.some(p => p.conversationId === id)) continue;
@@ -133,8 +134,9 @@ export const runStoryBeats = (): void => {
             conversationId: id,
             dueQuarter: now,
             queuedAtQuarter: now,
-            // The spine does not wait behind a recall notice.
-            urgent: true,
+            // Only the spine bypasses the allowance. Everything else queues,
+            // which is what turns a set of scenes into a sequence.
+            urgent: beat.urgent,
         });
         useStoryStore.getState().markSceneSeen(id);
     }
@@ -193,7 +195,13 @@ export const runInbox = (): void => {
         return testAll(c.when, world);
     };
 
-    const { deliver: due, keep, expired } = drain(story.pending, quarter, canDeliver);
+    // The sender, so two conversations from the same person cannot land in one
+    // quarter and overwrite each other on the thread. See inbox.ts.
+    const senderOf = (p: Pending): string | undefined =>
+        conversationById(p.conversationId)?.from;
+
+    const { deliver: due, keep, expired } =
+        drain(story.pending, quarter, canDeliver, undefined, senderOf);
 
     due.forEach(p => deliver(p.conversationId));
     story.setPending(keep);
