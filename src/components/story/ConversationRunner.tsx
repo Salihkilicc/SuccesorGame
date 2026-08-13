@@ -35,6 +35,7 @@ import { theme } from '../../core/theme';
 import { useLocale } from '../../core/i18n';
 import { line, nodeKey, choiceKey, subjectKey } from '../../data/i18n/storyText';
 import { MAX_ANSWER_BLOCK, MAX_FONT_MULTIPLIER } from './answerFit';
+import { NAV_BAR_CLEARANCE } from '../../navigation/components/CrystalNavBar';
 import { nodeById, type Conversation, type Choice } from '../../core/story/graph';
 import { applyEffects } from '../../core/story/effects';
 import { gameSink } from '../../core/story/gameSink';
@@ -139,6 +140,65 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
 
     const done = !node;
 
+    // ------------------------------------------------------------------
+    //  THE ANSWERS, WHICH BELONG IN TWO DIFFERENT PLACES
+    // ------------------------------------------------------------------
+    //  On a MESSAGE they are a keyboard: pinned to the bottom, where a reply
+    //  field lives, with the conversation scrolling above them.
+    //
+    //  On a LETTER they are not. You answer a letter underneath it. Pinned to
+    //  the bottom they covered the last paragraph of the thing being replied
+    //  to, and on the mail screen - which has the nav bar floating over it -
+    //  the bottom row sat partly under the bar. The answers were hardest to
+    //  reach on exactly the screens with the most text above them.
+    //
+    //  So for mail they go inside the scroll, directly under the last card,
+    //  drawn as the player's own bubbles rather than a rack of buttons. Which
+    //  is what they are: the thing you are about to say.
+    // ------------------------------------------------------------------
+    const closeButton = (onPress: () => void) => (
+        <Pressable
+            onPress={onPress}
+            style={({ pressed }) => [
+                styles.answer,
+                variant === 'mail' && styles.answerBubble,
+                pressed && styles.answerPressed,
+            ]}>
+            <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
+                Close
+            </Text>
+        </Pressable>
+    );
+
+    const answers = done
+        ? closeButton(() => onFinished?.())
+        // Either the card is terminal - they had the last word - or every
+        // answer was gated out. Both end the same way for the player; only
+        // the audit tells them apart.
+        : available.length === 0
+            ? closeButton(finish)
+            : available.map(({ choice, index }) => (
+                <Pressable
+                    key={index}
+                    onPress={() => pick(choice, index)}
+                    style={({ pressed }) => [
+                        styles.answer,
+                        variant === 'mail' && styles.answerBubble,
+                        pressed && styles.answerPressed,
+                    ]}>
+                    <Text
+                        style={styles.answerText}
+                        // Honoured up to AX1 and then held. Past that the
+                        // block is taller than the phone - and the container
+                        // gives way rather than the text shrinking, which
+                        // would answer a player who cannot read small text by
+                        // making it smaller. See answerFit.ts.
+                        maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
+                        {node ? answer(node.id, index, choice.text) : choice.text}
+                    </Text>
+                </Pressable>
+            ));
+
     return (
         <View style={styles.root}>
             <ScrollView contentContainerStyle={styles.body}>
@@ -175,63 +235,36 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                         </View>
                     </View>
                 ))}
+
+                {/* A letter is answered underneath it - see the note on
+                    `answers` above. Inside the scroll, so the last paragraph
+                    of what is being replied to stays readable. */}
+                {variant === 'mail' && (
+                    <View style={styles.mailAnswers}>{answers}</View>
+                )}
             </ScrollView>
 
             {/* ------------------------------------------------------------
-                THE ANSWERS SCROLL RATHER THAN RUNNING OFF THE SCREEN
+                THE MESSAGE VARIANT KEEPS ITS BOTTOM RACK
 
-                It was a plain View, and at the largest accessibility text
-                size two cards in the game put the second answer below the
-                bottom of an iPhone SE - with nothing to scroll, so the
-                conversation simply could not be finished. That does not read
-                as a layout bug to the player.
-
-                `maxHeight` rather than a fixed one, so the block still hugs
-                its content on every card that fits, which is all of them at
-                normal sizes. See answerFit.ts for the measurements.
+                It scrolls rather than running off the screen: it was a plain
+                View, and at the largest accessibility text size two cards in
+                the game put the second answer below the bottom of an iPhone
+                SE with nothing to scroll, so the conversation could not be
+                finished. `maxHeight` rather than a fixed one, so the block
+                still hugs its content on every card that fits - which is all
+                of them at normal sizes. See answerFit.ts.
                ------------------------------------------------------------ */}
-            <ScrollView
-                style={styles.answersScroll}
-                contentContainerStyle={styles.answers}
-                // The answers are the point of the screen; if they are tall
-                // enough to scroll, start at the top of them.
-                bounces={false}>
-                {done ? (
-                    <Pressable
-                        onPress={() => onFinished?.()}
-                        style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                        <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>Close</Text>
-                    </Pressable>
-                ) : available.length === 0 ? (
-                    // Either the card is terminal - they had the last word - or
-                    // every answer was gated out. Both end the same way for the
-                    // player; only the audit tells them apart.
-                    <Pressable
-                        onPress={finish}
-                        style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                        <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>Close</Text>
-                    </Pressable>
-                ) : (
-                    available.map(({ choice, index }) => (
-                        <Pressable
-                            key={index}
-                            onPress={() => pick(choice, index)}
-                            style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                            <Text
-                                style={styles.answerText}
-                                // Honoured up to AX1 and then held. Past that
-                                // the block is taller than the phone - and
-                                // the container gives way rather than the
-                                // text shrinking, which would answer a player
-                                // who cannot read small text by making it
-                                // smaller. See answerFit.ts.
-                                maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
-                                {node ? answer(node.id, index, choice.text) : choice.text}
-                            </Text>
-                        </Pressable>
-                    ))
-                )}
-            </ScrollView>
+            {variant === 'message' && (
+                <ScrollView
+                    style={styles.answersScroll}
+                    contentContainerStyle={styles.answers}
+                    // The answers are the point of the screen; if they are
+                    // tall enough to scroll, start at the top of them.
+                    bounces={false}>
+                    {answers}
+                </ScrollView>
+            )}
         </View>
     );
 };
@@ -240,7 +273,19 @@ export default ConversationRunner;
 
 const styles = StyleSheet.create({
     root: { flex: 1 },
-    body: { padding: theme.spacing.md, gap: theme.spacing.sm },
+    body: {
+        padding: theme.spacing.md,
+        gap: theme.spacing.sm,
+        // ------------------------------------------------------------------
+        //  ROOM UNDER THE LAST THING ON THE PAGE
+        // ------------------------------------------------------------------
+        //  The nav bar floats over this screen. With the answers pinned to the
+        //  bottom it was their problem; now that a letter is answered inside
+        //  the scroll, the last bubble was the thing sitting under the bar -
+        //  which is to say the button the player was trying to press.
+        // ------------------------------------------------------------------
+        paddingBottom: NAV_BAR_CLEARANCE + theme.spacing.lg,
+    },
 
     subject: {
         color: theme.colors.textPrimary,
@@ -263,6 +308,17 @@ const styles = StyleSheet.create({
     mine: { backgroundColor: theme.colors.highlight },
 
     // --- Mail: stacked letters
+    /**
+     * The reply block, under the letter rather than pinned below it.
+     *
+     * Right-aligned because these are the player's own words and every other
+     * thing they say in this app sits on the right.
+     */
+    mailAnswers: {
+        gap: theme.spacing.sm,
+        marginTop: theme.spacing.md,
+        alignItems: 'flex-end',
+    },
     letterWrap: {},
     letter: {
         backgroundColor: theme.colors.surface,
@@ -298,6 +354,19 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.borderStrong,
+    },
+    /**
+     * The same answer, as a bubble.
+     *
+     * Hugs its text instead of filling the row, and takes the corner
+     * treatment the player's own message bubbles use - one square corner on
+     * the side it is spoken from.
+     */
+    answerBubble: {
+        maxWidth: '85%',
+        alignSelf: 'flex-end',
+        borderTopRightRadius: theme.radius.md,
+        borderBottomRightRadius: 4,
     },
     answerPressed: { backgroundColor: theme.colors.surfaceHigh },
     answerText: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, fontWeight: '600' },
