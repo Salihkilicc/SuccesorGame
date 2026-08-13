@@ -215,9 +215,20 @@ const styles = StyleSheet.create({
     // comes out of a function and the audit can only read tokens.
     avatarText: { color: theme.colors.onLight, fontWeight: '600', fontSize: 16 },
     
-    // The same badge as MessagesScreen, and it had the same fault: `brand` as
-    // a fill with white on it, 1.90. `notification` is the one red the palette
-    // allows as a background, and an unread dot is what it is for.
+    // ------------------------------------------------------------------
+    //  THE UNREAD BADGE IS TOBACCO, NOT RED
+    // ------------------------------------------------------------------
+    //  Red on a badge is the convention every phone uses, and it is the
+    //  wrong convention here: this game keeps red for one sentence, "this is
+    //  costing you", and a message you have not opened is not costing you
+    //  anything. It was the last red in the app doing a job that was not
+    //  that.
+    //
+    //  LIGHT tobacco with dark text. The dark tobacco was the obvious pick
+    //  and does not survive measurement - 1.61 from the surface it sits on,
+    //  so the badge would be a slightly warmer patch of the same darkness.
+    //  A badge nobody notices is not a badge. See `unread` in core/theme.ts.
+    // ------------------------------------------------------------------
     unreadIndicatorRow: {
         position: 'absolute',
         top: 0,
@@ -225,14 +236,14 @@ const styles = StyleSheet.create({
         width: 16,
         height: 16,
         borderRadius: 8,
-        backgroundColor: theme.colors.notification,
+        backgroundColor: theme.colors.unread,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
         borderColor: theme.colors.background,
     },
     unreadIndicatorRowText: {
-        color: theme.colors.notificationText,
+        color: theme.colors.onLight,
         fontSize: 10,
         fontWeight: '900',
     },

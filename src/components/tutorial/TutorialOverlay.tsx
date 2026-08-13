@@ -294,7 +294,8 @@ const styles = StyleSheet.create({
         right: theme.spacing.lg,
         // Not surfaceRaised. An instruction from a person used to look like
         // every other card in the app - same grey, on a dimmed screen, with
-        // nothing to say it was not part of the game. See `guidance` in
+        // nothing to say it was not part of the game. Violet, which is also
+        // research's hue and for a related reason. See `guidance` in
         // core/theme.ts for the measurements.
         backgroundColor: theme.colors.guidance,
         borderRadius: theme.radius.lg,

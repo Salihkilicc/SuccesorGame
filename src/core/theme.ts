@@ -217,13 +217,47 @@ export const theme = {
          * stays composed, and the speaker's name on that card is already
          * brandMuted, so the label and its ground are one family.
          *
+         * VIOLET RATHER THAN THE TOBACCO IT WAS FOR AN HOUR. The tobacco
+         * was the right family for a heading and the wrong one for this: it
+         * is now doing a different job (see `unread` below), and one hue
+         * cannot carry two sentences - which is rule 3, and the rule this
+         * file was written around.
+         *
+         * Violet is also already research's hue, and the relation is not an
+         * accident: `rp` means "this is a thing you invest in and get back
+         * later", and so does a lesson.
+         *
          * Dark rather than light because it is a FILL and this app's fills
-         * carry white text. brandMuted itself measures 1.99:1 against white
-         * and is unusable as a ground; this measures 6.66:1, and 2.18 from
-         * the ground, which separates the card better than surfaceRaised's
-         * 1.76 ever did.
+         * carry white text. `rp` itself measures 1.85:1 against white and is
+         * unusable as a ground; this measures 7.65, and 2.05 from the
+         * ground, which separates the card better than surfaceRaised's 1.76
+         * ever did.
          */
-        guidance: '#6B5335',
+        guidance: '#584A87',
+        /**
+         * "there is something here you have not read."
+         *
+         * The unread badge on Messages and Mail, which was `notification`
+         * red. Red on a badge is the convention every phone uses and it is
+         * the wrong convention HERE: this game keeps red for one sentence,
+         * "this is costing you", and a message you have not opened is not
+         * costing you anything.
+         *
+         * Tobacco, and LIGHT tobacco with dark text on it. The dark tobacco
+         * was asked for and does not survive measurement as a badge - it
+         * separates from the surface it sits on by 1.61, so the badge would
+         * be a slightly warmer patch of the same darkness and nobody would
+         * see it. A badge that is not noticed is not a badge.
+         *
+         *      #6B5335  dark    1.61 from surface   - invisible
+         *      #A8834F          3.32
+         *      #D6A96C  light   5.37               - chosen, 7.29 dark text
+         *
+         * Same value as brandMuted on purpose: this is a fill and that is a
+         * text colour, so they never appear in the same role, and the app
+         * gets one tobacco rather than two that nearly match.
+         */
+        unread: '#D6A96C',
 
         /** "This is research." RP, the letters RP, research spend, upgrades. */
         rp: '#C4B5FD',
