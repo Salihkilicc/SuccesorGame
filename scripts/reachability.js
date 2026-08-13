@@ -781,12 +781,20 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             problems.story.push(`data/story/cast.ts  could not be read: ${e.message}`);
         }
 
-        // A scene file, its own tests, and the two support files are three
-        // different things. Without the .test exclusion the pass reported
-        // "exports no conversation" against a test that was never meant to.
+        // A scene file, its own tests, and the support files are different
+        // things. Without the .test exclusion the pass reported "exports no
+        // conversation" against a test that was never meant to.
+        //
+        // `openingAct.ts` joined the support list rather than moving out of
+        // this directory: it is a MANIFEST of scenes - which of them make up
+        // the first year, so a returning player can be offered a run without
+        // it - and it belongs beside the scenes it names. A list of scene ids
+        // living in core/ would be one rename away from being wrong with
+        // nothing to notice.
         const isSceneFile = f =>
             /\.ts$/.test(f) && !/\.test\.ts$/.test(f)
-            && f !== 'index.ts' && f !== 'cast.ts' && f !== 'endings.ts';
+            && f !== 'index.ts' && f !== 'cast.ts' && f !== 'endings.ts'
+            && f !== 'openingAct.ts';
 
         const dataFiles = fs.readdirSync(dir).filter(isSceneFile);
 
