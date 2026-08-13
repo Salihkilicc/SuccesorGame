@@ -28,6 +28,9 @@
 
 import { useNegotiationStore, initialNegotiationState } from '../store/useNegotiationStore';
 import { friendlyLock, isOutOfReach, FRIENDLY_LOCK_MARKET_CAP } from './reach';
+import {
+    priceFor, resistance, SECOND_APPROACH_PENALTY, GOODWILL_FLOOR,
+} from './negotiation';
 import { FRIENDLY_PREMIUM, HOSTILE_MULTIPLE, quoteAcquisition } from './mergers';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 
@@ -157,5 +160,152 @@ describe('the hostile price', () => {
         const f = quoteAcquisition(cap, 'Medium', false, 1e9);
         const h = quoteAcquisition(cap, 'Medium', true, 1e9);
         expect(h.price / f.price).toBeGreaterThan(2);
+    });
+});
+
+// ============================================================================
+//  "IS THE REST OF COMPOSE WORKING?" — TWO OF THE FOUR WERE NOT
+// ============================================================================
+//  `canAccept` has said since it was written that only a PURCHASE or a MERGER
+//  can end in ownership: a partnership and a notice of intent always come back
+//  with a condition and never with a plain yes. Nothing enforced it on the
+//  answering side, so meeting the condition produced terms, the screen carried
+//  the terms to the acquisition page, and writing to a company about a
+//  COMMERCIAL PARTNERSHIP bought it at the friendly premium.
+//
+//  What those two letters actually buy is standing: `refusalsByTarget` goes
+//  DOWN by one, which is what lowers resistance the next time you write about
+//  buying them. That was always the point of the slow route.
+// ============================================================================
+
+const answering = (subject: string, reply: any, over: any = {}) => {
+    fresh();
+    useNegotiationStore.setState({
+        offers: [{
+            id: 'offer-y', targetId: 'medidevice', targetName: 'MediDevice',
+            subject, sentQuarter: 1, status: 'open',
+            score: 0.1, risk: 'Medium', marketCap: 1_000_000_000, reply, ...over,
+        } as any],
+    });
+    return 'offer-y';
+};
+
+describe('the four subject lines', () => {
+    it.each(['purchase', 'merger'])('%s can end in owning them', (subject) => {
+        const id = answering(subject, { kind: 'demand', demand: { kind: 'seat' } });
+        expect(useNegotiationStore.getState().answer(id, true, world).agreed).toBeDefined();
+    });
+
+    it.each(['partnership', 'notice'])('%s never does, whatever is agreed', (subject) => {
+        const id = answering(subject, { kind: 'demand', demand: { kind: 'none' } });
+        const r = useNegotiationStore.getState().answer(id, true, world);
+        expect(r.ok).toBe(true);
+        expect(r.closed).toBe(true);
+        expect(r.agreed).toBeUndefined();
+    });
+
+    it('and what a partnership buys instead is a warmer desk', () => {
+        // The mechanic that was already there, had nothing pointing at it,
+        // and was clamped to zero anyway - see the goodwill block below.
+        const id = answering('partnership', { kind: 'demand', demand: { kind: 'none' } });
+        useNegotiationStore.getState().answer(id, true, world);
+        expect(useNegotiationStore.getState().refusalsByTarget.medidevice).toBeLessThan(0);
+    });
+});
+
+// ============================================================================
+//  AND THE MONEY CHECK, WHICH HAD NOTHING TO CHECK AGAINST
+// ============================================================================
+//  `canMeet` prices a price demand at `capital >= price * (1 + extra)`, and
+//  the screen passed `price: 0` - so it read `capital >= 0` and every premium
+//  in the game was affordable. The player agreed to a number they could not
+//  fund and was bounced by the financing screen one tap later, with nothing
+//  connecting the two refusals.
+// ============================================================================
+describe('agreeing to a price you cannot raise', () => {
+    const demand = { kind: 'demand', demand: { kind: 'price', extraPremium: 0.10 } };
+    const poor = { publicReputation: 100, capital: 50_000_000, price: 0 };
+
+    it('is refused, and refused before the financing screen', () => {
+        const id = answering('purchase', demand);
+        const r = useNegotiationStore.getState().answer(id, true, poor);
+        expect(r.ok).toBe(false);
+        expect(r.reason).toMatch(/cannot raise/i);
+    });
+
+    it('and they have not gone away — the letter stays open', () => {
+        // The same shape as the reputation floor: short of something, not
+        // rejected. Closing it would punish a player for reading their post.
+        const id = answering('purchase', demand);
+        useNegotiationStore.getState().answer(id, true, poor);
+        expect(useNegotiationStore.getState().offers[0].status).toBe('open');
+    });
+
+    it('while a company that can afford it goes through', () => {
+        const id = answering('purchase', demand);
+        // 1B market cap at the friendly premium plus ten points = 1.25B.
+        const rich = { publicReputation: 100, capital: 2_000_000_000, price: 0 };
+        expect(useNegotiationStore.getState().answer(id, true, rich).ok).toBe(true);
+    });
+
+    it('and the price it checks is the one the acquisition screen will charge', () => {
+        // Same premium `termsFor` produces and `quoteAcquisition` applies, so
+        // the letter, the button and the till agree.
+        const offer = { marketCap: 1_000_000_000 } as any;
+        expect(priceFor(offer, 0.10)).toBeCloseTo(1_000_000_000 * (1 + FRIENDLY_PREMIUM + 0.10), 0);
+    });
+
+    it('and a save written before the price was frozen is not treated as free', () => {
+        // No market cap on the offer: `priceFor` says it does not know, and
+        // the world's own figure stands rather than zero standing in for it.
+        expect(priceFor({} as any, 0.1)).toBeUndefined();
+    });
+});
+
+// ============================================================================
+//  AND THE GOODWILL ITSELF, WHICH TWO CLAMPS HAD SWITCHED OFF
+// ============================================================================
+//  `Math.max(0, ...)` in the store and `Math.max(0, priorRefusals)` in
+//  `resistance`. Between them, meeting a board's condition could never put you
+//  in credit - and since a partnership is signed BEFORE anybody has refused
+//  you, the normal case scored exactly zero. DEMAND_MET_RELIEF and the comment
+//  about an honestly-handled board being cheaper to overrun were both
+//  describing a mechanic that arithmetic had turned off.
+// ============================================================================
+describe('goodwill', () => {
+    const base = {
+        targetMarketCap: 1e9, acquirerValuation: 5e9, risk: 'Medium' as const,
+        subject: 'purchase' as const, personalityShift: 0,
+    };
+
+    it('makes the next letter easier, which it did not', () => {
+        expect(resistance({ ...base, priorRefusals: -1 }))
+            .toBeLessThan(resistance({ ...base, priorRefusals: 0 }));
+    });
+
+    it('by exactly what a refusal costs, in the other direction', () => {
+        const neutral = resistance({ ...base, priorRefusals: 0 });
+        expect(resistance({ ...base, priorRefusals: -1 }))
+            .toBeCloseTo(neutral - SECOND_APPROACH_PENALTY, 6);
+        expect(resistance({ ...base, priorRefusals: 1 }))
+            .toBeCloseTo(neutral + SECOND_APPROACH_PENALTY, 6);
+    });
+
+    it('and it cannot be farmed', () => {
+        // One good turn is remembered. Four is a routine - and four signed
+        // partnerships walking you into anybody is not a negotiation system.
+        expect(resistance({ ...base, priorRefusals: -4 }))
+            .toBe(resistance({ ...base, priorRefusals: GOODWILL_FLOOR }));
+    });
+
+    it('and the store will not bank more than one either', () => {
+        const id = answering('partnership', { kind: 'demand', demand: { kind: 'none' } });
+        for (let i = 0; i < 4; i++) {
+            useNegotiationStore.setState({
+                offers: [{ ...useNegotiationStore.getState().offers[0], status: 'open' } as any],
+            });
+            useNegotiationStore.getState().answer(id, true, world);
+        }
+        expect(useNegotiationStore.getState().refusalsByTarget.medidevice).toBe(GOODWILL_FLOOR);
     });
 });

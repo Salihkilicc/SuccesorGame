@@ -21,6 +21,7 @@ import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { HOSTILE_MULTIPLE } from '../../../core/market/mergers';
+import { canAccept, priceFor } from '../../../core/market/negotiation';
 import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
 import { offerById } from '../../../core/market/sponsorship';
 import { formatMoney } from '../../../core/utils';
@@ -74,15 +75,29 @@ const MailDetailScreen = () => {
         ? negotiation.reply.demand
         : undefined;
 
-    // The button says what it costs. "Accept" would be a word; this is a
-    // number the player can weigh against the one in the letter.
+    // ------------------------------------------------------------------
+    //  THE BUTTON SAYS WHAT IT COSTS, AND WHAT IT IS
+    // ------------------------------------------------------------------
+    //  "Accept" would be a word; a price demand shows the money. And a
+    //  PARTNERSHIP is not a purchase - `canAccept` has said so since it was
+    //  written, but the button said "Agree." for all four subjects, so a
+    //  player who wrote about a commercial partnership and pressed it had no
+    //  way to know they were not buying the company. (They were, until this
+    //  commit. See the note in useNegotiationStore.answer.)
+    // ------------------------------------------------------------------
+    const owning = negotiation ? canAccept(negotiation.subject) : true;
+    const price = negotiation && demand?.kind === 'price'
+        ? priceFor(negotiation, demand.extraPremium) : undefined;
+
     const meetLabel =
         !demand ? 'Agree.'
             : demand.kind === 'price'
-                ? `Pay it — ${Math.round(demand.extraPremium * 100)}% over the usual premium.`
+                ? (price
+                    ? `Pay it — ${formatMoney(price)}.`
+                    : `Pay it — ${Math.round(demand.extraPremium * 100)}% over the usual premium.`)
                 : demand.kind === 'seat' ? 'Give them the seat.'
                     : demand.kind === 'reputation' ? 'Accept the condition.'
-                        : 'Agree.';
+                        : owning ? 'Agree.' : 'Sign it.';
 
     // Flat, and the same figure the acquisition screen prints and the engine
     // charges. The resistance curve is shelved - see HOSTILE_MULTIPLE in
@@ -97,10 +112,13 @@ const MailDetailScreen = () => {
             price: 0,
         });
         if (!result.ok) {
-            // The reputation floor, almost always. They have not gone away -
-            // the letter stays open and the player can come back once their
-            // standing is where the board asked for it.
-            Alert.alert('Not yet', result.reason ?? 'You cannot meet that today.');
+            // The reputation floor or the money. They have not gone away -
+            // the letter stays open and the player can come back once the
+            // thing they are short of has changed.
+            Alert.alert(
+                negotiation.targetName,
+                result.reason ?? 'You cannot meet that today.',
+            );
             return;
         }
         if (result.counter) {
@@ -126,6 +144,21 @@ const MailDetailScreen = () => {
         //  which is how the shelved NegotiationModal ended up moving money the
         //  engine never saw.
         // ------------------------------------------------------------------
+        // A partnership or a notice of intent buys standing rather than a
+        // company - `refusalsByTarget` goes down by one, which is what makes
+        // the purchase letter easier next time. Said out loud, because an
+        // unexplained return to the inbox reads as nothing having happened.
+        if (!result.agreed && result.closed) {
+            Alert.alert(
+                negotiation.targetName,
+                owning
+                    ? 'Closed.'
+                    : 'Signed. You are not buying them today, but the next letter you write to this board will land on a warmer desk.',
+                [{ text: 'OK', onPress: () => navigation.goBack() }],
+            );
+            return;
+        }
+
         if (result.agreed) {
             navigation.navigate('HostileTakeover', {
                 acquire: {

@@ -31,6 +31,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useNegotiationStore } from '../store/useNegotiationStore';
 import { postDueReplies, bodyFor, demandLine } from './postNegotiationReplies';
 import { currentQuarter } from '../story/world';
+import { HOSTILE_MULTIPLE } from './mergers';
 import { hostilePremiumFor } from './negotiation';
 
 const grownCompany = () => {
@@ -121,9 +122,21 @@ describe('the reply is a letter the player can find', () => {
         sendTo('tech_pear', 'Pear Inc.', {
             quarter: currentQuarter() - 1, marketCap: 3_000_000_000_000,
         });
+        // ------------------------------------------------------------------
+        //  AND IT QUOTES THE PRICE THE ENGINE CHARGES
+        // ------------------------------------------------------------------
+        //  This asserted `hostilePremiumFor(offer.score)`, which the engine
+        //  stopped charging when the hostile route became a flat 2.5x - so
+        //  the refusal letter was the THIRD place in the game printing a
+        //  hostile price that was not the hostile price, after the button and
+        //  its own label.
+        //
+        //  Pinned to the constant rather than to a function, because the
+        //  whole point of the change is that there is one number.
+        // ------------------------------------------------------------------
         const [offer] = postDueReplies();
         const body = bodyFor(offer);
-        expect(body).toContain(`${Math.round(hostilePremiumFor(offer.score) * 100)}%`);
+        expect(body).toContain(`${HOSTILE_MULTIPLE}x market`);
         expect(body).toContain('directly to their shareholders');
     });
 

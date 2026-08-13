@@ -146,6 +146,26 @@ export const SUBJECT_SHIFT: Record<Subject, number> = {
 export const SECOND_APPROACH_PENALTY = 0.12;
 
 /**
+ * HOW MUCH GOODWILL YOU CAN BANK, AND WHY IT IS ONLY ONE.
+ *
+ * `priorRefusals` runs negative when the player has met a board's condition -
+ * a partnership signed, a seat given - and a negative one is a DISCOUNT on the
+ * next approach at the same rate a refusal is a penalty. That is the entire
+ * reason the partnership and notice routes exist: they cannot end in
+ * ownership, so what they buy is a warmer desk next time.
+ *
+ * It was written and it could not fire. Two clamps, in two files, both reading
+ * `Math.max(0, ...)`: the store refused to record a credit and `resistance`
+ * refused to honour one. So `DEMAND_MET_RELIEF`, the comment above it about a
+ * board you dealt with honestly being cheaper to overrun, and the whole slow
+ * route were describing a mechanic that arithmetic had switched off.
+ *
+ * Floored at one because otherwise it is farmable: sign four partnerships and
+ * walk into anybody. One good turn is remembered. Four is a routine.
+ */
+export const GOODWILL_FLOOR = -1;
+
+/**
  * What a conviction adds to every board's resistance, forever.
  *
  * The second half of `fbiGuilty` being a poison rather than a label. A board
@@ -184,7 +204,8 @@ export const resistance = (i: ResistanceInput): number => {
         base
         + SUBJECT_SHIFT[i.subject]
         + i.personalityShift
-        + Math.max(0, i.priorRefusals) * SECOND_APPROACH_PENALTY
+        // Negative is a credit, not a no-op. See GOODWILL_FLOOR.
+        + Math.max(GOODWILL_FLOOR, i.priorRefusals) * SECOND_APPROACH_PENALTY
         + (i.convicted ? CONVICTION_RESISTANCE : 0),
     );
 };
@@ -308,6 +329,18 @@ export const termsFor = (demand: Demand, met: boolean): OfferTerms => {
     throw new Error(`Unhandled demand: ${JSON.stringify(never)}`);
 };
 
+/**
+ * What the player would actually pay, if the board's terms were accepted.
+ *
+ * The FRIENDLY premium plus whatever they asked on top - which is exactly what
+ * `termsFor` produces and `quoteAcquisition` charges, so this is the same
+ * number the acquisition screen will print rather than a second estimate.
+ */
+export const priceFor = (offer: Offer, extraPremium: number): number | undefined => {
+    if (!(offer.marketCap && offer.marketCap > 0)) return undefined;
+    return offer.marketCap * (1 + FRIENDLY_PREMIUM + extraPremium);
+};
+
 /** Can the player meet this demand right now? */
 export const canMeet = (
     demand: Demand,
@@ -349,6 +382,19 @@ export interface Offer {
     status: OfferStatus;
     /** Resistance at the moment of sending. Frozen - the reply cannot re-roll. */
     score: number;
+    /**
+     * What they were worth when the letter went. Frozen with everything else.
+     *
+     * IT IS HERE SO THE MONEY CHECK CAN RUN. `canMeet` needs a price for a
+     * price demand, and the screen was passing zero - so `capital >= 0` was
+     * always true and a player could agree to a premium they could not fund,
+     * then be bounced by the financing screen a tap later with no explanation
+     * connecting the two.
+     *
+     * Optional because saves written before this exists have no value for it;
+     * `priceFor` treats a missing one as unknown rather than as free.
+     */
+    marketCap?: number;
     /**
      * The target's risk rating, frozen with the letter for the same reason.
      *

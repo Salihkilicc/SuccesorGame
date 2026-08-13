@@ -23,7 +23,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
 import {
     isDue, replyFor, counterFor, resistance, hostilePremiumFor, termsFor,
-    canMeet, DEMAND_MET_RELIEF,
+    canMeet, canAccept, priceFor, DEMAND_MET_RELIEF, GOODWILL_FLOOR,
     type Offer, type Subject, type Demand, type Reply,
 } from '../market/negotiation';
 import { negotiatorFor, shiftFor } from '../../data/market/negotiators';
@@ -168,6 +168,9 @@ export const useNegotiationStore = create<Store>()(
                     // already decided by the letter you actually sent.
                     score,
                     risk: input.risk,
+                    // Same reason, and it is what the money check prices
+                    // against - see `priceFor`.
+                    marketCap: input.marketCap,
                 };
                 set(s => ({ offers: [offer, ...s.offers] }));
                 return { ok: true, offer };
@@ -253,11 +256,36 @@ export const useNegotiationStore = create<Store>()(
                 }
                 const demand = offer.reply.demand;
 
-                if (met && !canMeet(demand, world)) {
-                    // The reputation floor is the only demand that can be
-                    // refused BY THE WORLD rather than by the player, and the
-                    // offer stays open - they are waiting, not gone.
-                    return { ok: false, reason: 'You cannot meet that today.' };
+                // ------------------------------------------------------
+                //  THE MONEY CHECK, WHICH HAD NO PRICE TO CHECK AGAINST
+                // ------------------------------------------------------
+                //  `canMeet` prices a `price` demand at `capital >= price *
+                //  (1 + extra)` and the screen was passing `price: 0`, so it
+                //  read `capital >= 0` and every premium in the game was
+                //  affordable. A player could agree to a number they could
+                //  not fund and be bounced by the financing screen one tap
+                //  later, with nothing connecting the two refusals.
+                //
+                //  The price comes off the offer now, frozen with the letter.
+                //  A save from before that has no market cap, so `priceFor`
+                //  returns undefined and the world's own figure stands -
+                //  unknown rather than free.
+                // ------------------------------------------------------
+                const price = demand.kind === 'price'
+                    ? priceFor(offer, demand.extraPremium) ?? world.price
+                    : world.price;
+
+                if (met && !canMeet(demand, { ...world, price })) {
+                    // The reputation floor and the money are the two demands
+                    // that can be refused BY THE WORLD rather than by the
+                    // player, and the offer stays open in both cases - they
+                    // are waiting, not gone.
+                    return {
+                        ok: false,
+                        reason: demand.kind === 'price'
+                            ? 'You cannot raise what they are asking. They have not withdrawn — the letter stays open until you can.'
+                            : 'You cannot meet that today.',
+                    };
                 }
 
                 const negotiator = negotiatorFor(offer.targetId, offer.risk);
@@ -289,8 +317,13 @@ export const useNegotiationStore = create<Store>()(
                             // you dealt with honestly is cheaper to overrun
                             // later than one you never spoke to.
                             ...s.refusalsByTarget,
+                            // FLOORED AT -1, NOT AT 0. It was 0, which meant a
+                            // board that had never refused you could not be
+                            // put in credit - and since you sign a partnership
+                            // BEFORE being refused, that is the normal case.
+                            // See GOODWILL_FLOOR.
                             [offer.targetId]: Math.max(
-                                0, (s.refusalsByTarget[offer.targetId] ?? 0) - 1,
+                                GOODWILL_FLOOR, (s.refusalsByTarget[offer.targetId] ?? 0) - 1,
                             ),
                         }
                         : { ...s.refusalsByTarget, [offer.targetId]: (s.refusalsByTarget[offer.targetId] ?? 0) + 1 },
@@ -311,11 +344,29 @@ export const useNegotiationStore = create<Store>()(
                 //  The terms come from `termsFor`, which already knew what a
                 //  met demand was worth and had nobody to tell.
                 // ------------------------------------------------------
+                // ------------------------------------------------------
+                //  AND A PARTNERSHIP IS NOT A PURCHASE
+                // ------------------------------------------------------
+                //  `canAccept` has said since it was written that only a
+                //  purchase or a merger can end in ownership - a partnership
+                //  and a notice of intent always come back with a condition
+                //  and never with a plain yes.
+                //
+                //  Nothing enforced it on this side. Meeting the condition
+                //  produced terms, the screen took the terms to the
+                //  acquisition page, and writing to a company about a
+                //  COMMERCIAL PARTNERSHIP bought it at the friendly premium.
+                //
+                //  What those two letters actually buy is the standing above:
+                //  `refusalsByTarget` goes DOWN by one, which is what lowers
+                //  resistance the next time you write about buying them. The
+                //  slow route was always the point of them.
+                // ------------------------------------------------------
                 const terms = termsFor(demand, met);
                 return {
                     ok: true,
                     closed: true,
-                    agreed: met
+                    agreed: met && canAccept(offer.subject)
                         ? {
                             targetId: offer.targetId,
                             targetName: offer.targetName,

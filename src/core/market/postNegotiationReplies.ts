@@ -27,7 +27,8 @@ import { useNegotiationStore } from '../store/useNegotiationStore';
 import { useGameStore } from '../store/useGameStore';
 import { currentQuarter } from '../story/world';
 import { negotiatorFor } from '../../data/market/negotiators';
-import { hostilePremiumFor, type Offer, type Demand } from './negotiation';
+import { type Offer, type Demand } from './negotiation';
+import { HOSTILE_MULTIPLE } from './mergers';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 
 const pct = (r: number) => `${Math.round(r * 100)}%`;
@@ -64,15 +65,18 @@ export const bodyFor = (offer: Offer): string => {
     if (!offer.reply) return '';
 
     if (offer.reply.kind === 'refuse') {
-        const hostile = hostilePremiumFor(offer.score);
         return [
             n.lines.refuseLine,
             '',
             // ALWAYS TOLD, EVEN IN THE REFUSAL. The rude route being open is
-            // not a secret, and its price is the whole point of the redesign -
-            // hiding it would leave the player unable to tell a board that
-            // barely refused from one that would fight.
-            `— A tender directly to their shareholders would clear at about ${pct(hostile)} over market.`,
+            // not a secret, and stating its price here is what lets a refusal
+            // be weighed rather than merely suffered.
+            //
+            // IT USED TO QUOTE `hostilePremiumFor(offer.score)`, which the
+            // engine no longer charges - so the letter was the third place
+            // this game printed a hostile price that was not the hostile
+            // price. One number, everywhere. See HOSTILE_MULTIPLE.
+            `— A tender directly to their shareholders would clear at ${HOSTILE_MULTIPLE}x market.`,
         ].join('\n');
     }
 
