@@ -5,8 +5,9 @@
 // ============================================================================
 //
 //  Run:  node tools/exportStoryText.js
-//  Out:  build/story-en.json   — what to translate
-//        build/story-report.txt — how much there is, per character
+//  Out:  build/story-en.json          — everything, one file
+//        build/batches/batch-NN.json  — the same thing in askable pieces
+//        build/story-report.txt       — how much there is, per character
 //
 //  The JSON is grouped by conversation and carries the SPEAKER on every line,
 //  because that is the single most useful thing a translator can be told
@@ -99,5 +100,45 @@ const report = [
 ].join('\n');
 
 fs.writeFileSync(path.join(OUT, 'story-report.txt'), report);
-console.log(report);
-console.log(`\nwritten: build/story-en.json`);
+
+// ============================================================================
+//  BATCHES, SPLIT ON SCENE BOUNDARIES
+// ============================================================================
+//
+//  Eleven hundred lines in one request comes back worse than eleven hundred
+//  lines in ten: models drift on voice somewhere past the four hundredth line,
+//  and the drift is toward flat, neutral, correct prose - which is exactly the
+//  thing this cast is not.
+//
+//  A scene is NEVER split across two batches. Half the translation problem
+//  here is that an answer has to sound like a reply to the card above it, and
+//  a translator holding only the second half of a conversation cannot do that.
+//  So the size below is a ceiling, not a target - a batch runs over rather
+//  than cutting a scene in two.
+// ============================================================================
+const BATCH_LINES = 120;
+const batchDir = path.join(OUT, 'batches');
+fs.rmSync(batchDir, { recursive: true, force: true });
+fs.mkdirSync(batchDir, { recursive: true });
+
+let batch = {};
+let held = 0;
+let index = 1;
+const flush = () => {
+    if (!held) return;
+    const name = `batch-${String(index).padStart(2, '0')}.json`;
+    fs.writeFileSync(path.join(batchDir, name), JSON.stringify(batch, null, 2));
+    console.log(`  ${name}  ${String(held).padStart(4)} lines  ${Object.keys(batch).length} scenes`);
+    batch = {}; held = 0; index += 1;
+};
+
+console.log('\nbatches:');
+for (const [id, conv] of Object.entries(out)) {
+    if (held && held + conv.lines.length > BATCH_LINES) flush();
+    batch[id] = conv;
+    held += conv.lines.length;
+}
+flush();
+
+console.log(`\nwritten: build/story-en.json and ${index - 1} batches`);
+console.log('next:    docs/translation/GEMINI_PROMPT.md');
