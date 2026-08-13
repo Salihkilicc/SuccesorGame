@@ -14,6 +14,8 @@ import {
     validateLocks,
     type LockState,
     type TutorialLock,
+    DIM_DEFAULT,
+    DIM_HEAVY,
 } from './locks';
 import { CAST } from '../../data/story/cast';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
@@ -327,5 +329,43 @@ describe('a lock points at a control that exists', () => {
         // they would spend in has been opened.
         expect(TUTORIAL_SEQUENCE.indexOf(open))
             .toBeLessThan(TUTORIAL_SEQUENCE.indexOf(spend));
+    });
+});
+
+// ============================================================================
+//  HOW DARK, AND WHY IT IS NOT ONE NUMBER
+// ============================================================================
+//  It was 0.82 everywhere, which is nearly opaque. Halving it fixed the
+//  product and laboratory sheets - where the dim was covering the very
+//  figures the decision is made from - and made the morale step too faint,
+//  because that one points at a department tile with nothing behind it worth
+//  reading.
+//
+//  There is no third value that is right for both, so it moved onto the lock.
+// ============================================================================
+describe('the dim', () => {
+    it('is light by default, because most locks sit on figures', () => {
+        expect(DIM_DEFAULT).toBeLessThan(0.5);
+        for (const id of ['q1-marketing', 'rnd-hire']) {
+            const lock = TUTORIAL_SEQUENCE.find(l => l.id === id)!;
+            expect(lock.dim ?? DIM_DEFAULT).toBe(DIM_DEFAULT);
+        }
+    });
+
+    it('is heavier where there is nothing to read behind it', () => {
+        const morale = TUTORIAL_SEQUENCE.find(l => l.id === 'morale-bonus')!;
+        expect(morale.dim).toBe(DIM_HEAVY);
+        expect(DIM_HEAVY).toBeGreaterThan(DIM_DEFAULT);
+    });
+
+    it('and never opaque, whichever a lock asks for', () => {
+        // A dim that hides the screen completely is a modal wearing a
+        // tutorial's clothes, and the player cannot see what they are being
+        // asked to decide about.
+        for (const lock of TUTORIAL_SEQUENCE) {
+            const value = lock.dim ?? DIM_DEFAULT;
+            expect(value).toBeGreaterThan(0);
+            expect(value).toBeLessThanOrEqual(0.7);
+        }
     });
 });

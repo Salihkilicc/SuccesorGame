@@ -57,6 +57,18 @@ import type { World } from '../story/conditions';
  */
 export const ESCAPE_AFTER_MS = 12_000;
 
+/**
+ * The default dim, and the light one.
+ *
+ * It was 0.82 for everything, which is nearly opaque - the screen went black
+ * and the lit control read as the only thing that existed. Right for a modal
+ * asking a question, much too heavy for a hint about a number.
+ */
+export const DIM_DEFAULT = 0.41;
+
+/** For a lock pointing at a control with nothing worth reading behind it. */
+export const DIM_HEAVY = 0.62;
+
 export type TutorialLock = {
     id: string;
     /**
@@ -76,6 +88,24 @@ export type TutorialLock = {
      * in the conversation that arrives with it; the card should be him.
      */
     instruction: string;
+    /**
+     * How dark the rest of the screen goes, 0 to 1.
+     *
+     * PER LOCK, because one number was wrong for both cases and there is no
+     * third value that is right for either.
+     *
+     * A lesson about a slider on a sheet full of figures needs a LIGHT dim:
+     * salary against output, budget against benchmark - the numbers being
+     * blacked out are the ones the player is being asked to weigh, and hiding
+     * the arithmetic before asking for a decision about it is worse than not
+     * focusing their attention at all.
+     *
+     * A lesson that just says "this button, over here" can be heavier,
+     * because there is nothing behind the paint worth reading.
+     *
+     * Defaults to the light value. A lock that wants weight asks for it.
+     */
+    dim?: number;
     /**
      * Who is saying it. Defaults to the father, who teaches the first year.
      *

@@ -29,7 +29,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
 
 import { theme } from '../../core/theme';
-import { ESCAPE_AFTER_MS, activeLock, isSatisfied, mustRelease, isComplete } from '../../core/tutorial/locks';
+import { ESCAPE_AFTER_MS, DIM_DEFAULT, activeLock, isSatisfied, mustRelease, isComplete } from '../../core/tutorial/locks';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
@@ -164,6 +164,11 @@ const TutorialOverlay = () => {
 
     const { width: W, height: H } = Dimensions.get('window');
 
+    // Per lock. See the note on `dim` in core/tutorial/locks.ts: one value
+    // was wrong for a sheet full of figures and wrong for a bare button, in
+    // opposite directions.
+    const shade = { backgroundColor: `rgba(28,36,44,${lock.dim ?? DIM_DEFAULT})` };
+
     // Unconditional now: the null case returned above, so there is always a
     // control to cut a hole around.
     const hole = {
@@ -274,20 +279,9 @@ const TutorialOverlay = () => {
 export default TutorialOverlay;
 
 const styles = StyleSheet.create({
-    // ------------------------------------------------------------------
-    //  HALF AS DARK AS IT WAS
-    // ------------------------------------------------------------------
-    //  It was 0.82, which is nearly opaque - the rest of the screen went
-    //  black and the lit control read as the only thing that existed. That
-    //  is the right weight for a modal asking a question and much too heavy
-    //  for a hint about a slider, especially on the laboratory and product
-    //  sheets where the numbers the player is being asked to weigh are the
-    //  ones being blacked out.
-    //
-    //  0.41 still reads unmistakably as "not this part", and the figures
-    //  behind it stay legible enough to think with.
-    // ------------------------------------------------------------------
-    dim: { position: 'absolute', backgroundColor: 'rgba(28,36,44,0.41)' },
+    // The colour comes from the lock, not from here - see `shade` above and
+    // the note on `dim` in core/tutorial/locks.ts.
+    dim: { position: 'absolute' },
     ring: {
         position: 'absolute',
         borderRadius: theme.radius.md,

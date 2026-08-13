@@ -18,7 +18,7 @@
 //  screen that dims and points at a button for no stated reason.
 // ============================================================================
 
-import type { TutorialLock } from '../../core/tutorial/locks';
+import { DIM_HEAVY, type TutorialLock } from '../../core/tutorial/locks';
 
 // ============================================================================
 //  WHY THE MORALE THRESHOLD IS NOT 70
@@ -214,6 +214,11 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         //  That makes it a guaranteed teaching beat rather than a discovery.
         // ------------------------------------------------------------------
         id: 'morale-bonus',
+        // Heavier than the default. This one points at a department tile on
+        // a plain screen - there is nothing behind the paint the player needs
+        // to read, unlike the product and laboratory sheets where the dim was
+        // covering the very figures the decision is made from.
+        dim: DIM_HEAVY,
         highlight: 'teamMorale',
         // Not "morale is slipping" any more - it is not slipping, it has
         // settled, and telling the player otherwise would be the game
