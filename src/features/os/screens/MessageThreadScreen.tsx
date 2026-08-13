@@ -66,7 +66,23 @@ const MessageThreadScreen = () => {
                 <ConversationRunner
                     conversation={conversation}
                     variant="message"
-                    onFinished={() => navigation.goBack()}
+                    onFinished={() => {
+                        // ------------------------------------------------------
+                        //  PLAYED IS NOT THE SAME AS DELIVERED
+                        // ------------------------------------------------------
+                        //  A thread holds one conversation id and nothing ever
+                        //  cleared it, so re-opening the thread replayed the
+                        //  scene from the top - and the runner applies effects
+                        //  as answers are picked, so dials moved twice and a
+                        //  schedule fired twice.
+                        //
+                        //  It also made the thread look permanently busy, which
+                        //  is what stops the next scene being delivered - see
+                        //  the note in core/story/deliver.ts.
+                        // ------------------------------------------------------
+                        useMessageStore.getState().clearConversation(thread.id);
+                        navigation.goBack();
+                    }}
                 />
             </View>
         );

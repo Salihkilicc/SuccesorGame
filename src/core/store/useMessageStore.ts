@@ -73,6 +73,24 @@ type MessageStore = MessageState & {
     /** Mark a thread read. Called when it is opened, not when it is listed. */
     markRead: (threadId: string) => void;
     /**
+     * The conversation on this thread has been played to the end.
+     *
+     * Nothing did this, and a thread holds exactly ONE conversation id, so
+     * two things went wrong at once:
+     *
+     *   - Opening the thread again replayed the whole scene, and the runner
+     *     applies effects as answers are picked. Dials moved twice. Money
+     *     moved twice. A `schedule` fired twice.
+     *   - The only thing that ever changed the id was the NEXT conversation
+     *     from the same person overwriting it, so a scene the player had not
+     *     got round to was deleted by the one behind it.
+     *
+     * Clearing it on finish fixes the first and makes the second detectable:
+     * a thread that still carries an id is a scene nobody has answered, and
+     * `deliver` now holds the next one back rather than writing over it.
+     */
+    clearConversation: (threadId: string) => void;
+    /**
      * The player's reply.
      *
      * @orphan-ok-symbol sendFromPlayer
@@ -144,6 +162,12 @@ export const useMessageStore = create<MessageStore>()(
         (set) => ({
             ...initialMessageState,
             setHasHydrated: (v) => set({ _hasHydrated: v }),
+
+            clearConversation: (threadId) =>
+                set(state => ({
+                    threads: state.threads.map(t =>
+                        t.id === threadId ? { ...t, conversationId: undefined } : t),
+                })),
 
             markRead: (threadId) =>
                 set(state => ({

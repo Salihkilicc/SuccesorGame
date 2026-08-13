@@ -32,6 +32,8 @@ const fresh = () => {
     useStoryStore.setState({ ...initialStoryState, flags: { fatherDead: true } });
     useMailStore.setState({ ...initialMailState });
     useMessageStore.setState({ ...initialMessageState });
+    // currentQuarter counts years from `age`, so this is quarter one.
+    useGameStore.setState({ age: 25, currentMonth: 1 } as never);
 };
 
 const inbox = () => useMailStore.getState().inbox;
@@ -215,5 +217,76 @@ describe('who a letter says it is from', () => {
         const letter = inbox().find(m => m.conversationId === 'pear-offer');
         expect(letter).toBeDefined();
         expect(letter!.fromName).toContain('Pear');
+    });
+});
+
+// ============================================================================
+//  A THREAD HOLDS ONE SCENE, AND NOTHING WAS PROTECTING IT
+// ============================================================================
+//  This is where the second act actually went, and it is not the scheduler.
+//
+//  Message threads carry exactly one conversation id. Nothing ever cleared it
+//  and nothing held the next scene back, so:
+//
+//    - re-opening a played thread replayed the whole scene, and the runner
+//      applies effects as answers are picked: dials moved twice, a schedule
+//      fired twice;
+//    - the next conversation from that person overwrote one the player had
+//      not got round to, however many quarters later, silently.
+//
+//  The father's death lands on the CFO's thread and PEAR'S LETTER IS
+//  SCHEDULED BY AN EFFECT INSIDE IT. A player who had not opened that thread
+//  had not answered the CFO, so nothing was ever scheduled - and the next
+//  beat from the CFO would have deleted the death itself.
+// ============================================================================
+describe('a thread with an unanswered scene on it', () => {
+    const threads = () => useMessageStore.getState().threads;
+    const threadFor = (id: string) => threads().find(t => t.id === id);
+
+    it('holds the next one back rather than overwriting it', () => {
+        useStoryStore.setState({ ...initialStoryState, flags: {} });
+        // Two scenes from the same person, both due.
+        gameSink().schedule({ conversation: 'father-inheritance', afterQuarters: 0, urgent: true });
+        expect(threadFor('father')?.conversationId).toBe('father-inheritance');
+
+        gameSink().schedule({ conversation: 'father-q1', afterQuarters: 0, urgent: true });
+
+        // THE ASSERTION. The first is still there, and the second is waiting.
+        expect(threadFor('father')?.conversationId).toBe('father-inheritance');
+        expect(useStoryStore.getState().pending
+            .some(p => p.conversationId === 'father-q1')).toBe(true);
+    });
+
+    it('and lets it through once the first has been played', () => {
+        useStoryStore.setState({ ...initialStoryState, flags: {} });
+        gameSink().schedule({ conversation: 'father-inheritance', afterQuarters: 0, urgent: true });
+        gameSink().schedule({ conversation: 'father-q1', afterQuarters: 0, urgent: true });
+
+        // What MessageThreadScreen does when the runner finishes.
+        useMessageStore.getState().clearConversation('father');
+        runInbox();
+
+        expect(threadFor('father')?.conversationId).toBe('father-q1');
+    });
+
+    it('and a different person is not blocked by it', () => {
+        useStoryStore.setState({ ...initialStoryState, flags: {} });
+        // The death's own gate is quarter five. currentQuarter counts years
+        // from `age`, so a year on is a quarter five.
+        useGameStore.setState({ age: 26, currentMonth: 1 } as never);
+        gameSink().schedule({ conversation: 'father-inheritance', afterQuarters: 0, urgent: true });
+        gameSink().schedule({ conversation: 'father-death', afterQuarters: 0, urgent: true });
+        // The death is the CFO's, so it lands beside the father's, not behind.
+        expect(threadFor('father')?.conversationId).toBe('father-inheritance');
+        expect(threadFor('cfo')?.conversationId).toBe('father-death');
+    });
+
+    it('and playing one clears it, so it cannot be replayed for its effects', () => {
+        useStoryStore.setState({ ...initialStoryState, flags: {} });
+        useGameStore.setState({ age: 26, currentMonth: 1 } as never);
+        gameSink().schedule({ conversation: 'father-death', afterQuarters: 0, urgent: true });
+        expect(threadFor('cfo')?.conversationId).toBe('father-death');
+        useMessageStore.getState().clearConversation('cfo');
+        expect(threadFor('cfo')?.conversationId).toBeUndefined();
     });
 });

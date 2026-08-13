@@ -247,6 +247,36 @@ export const runInbox = (): void => {
     const senderOf = (p: Pending): string | undefined =>
         conversationById(p.conversationId)?.from;
 
+    // ------------------------------------------------------------------
+    //  A THREAD WITH AN UNANSWERED SCENE ON IT IS BUSY
+    // ------------------------------------------------------------------
+    //  inbox.ts holds back a second conversation from the same person in the
+    //  same QUARTER, and that was only half of it. A thread holds exactly one
+    //  conversation id, so the scene the player has not got round to is
+    //  deleted by the next one from that person however many quarters later
+    //  it arrives - silently, with no error and nothing in the inbox to say a
+    //  scene ever existed.
+    //
+    //  Which is where the second act went. The father's death lands on the
+    //  CFO's thread, and PEAR'S LETTER IS SCHEDULED BY AN EFFECT INSIDE IT -
+    //  so a player who had not opened that thread had not answered the CFO,
+    //  and nothing was ever scheduled. The next beat from the CFO would then
+    //  have overwritten the death itself, taking the whole act with it.
+    //
+    //  Busy means "has an id". Playing a conversation clears it - see
+    //  clearConversation - so this holds the queue rather than blocking it.
+    // ------------------------------------------------------------------
+    const busyThreads = new Set(
+        useMessageStore.getState().threads
+            .filter(t => !!t.conversationId)
+            .map(t => t.id),
+    );
+    const threadIsBusy = (p: Pending): boolean => {
+        const c = conversationById(p.conversationId);
+        if (!c || c.channel !== 'message') return false;
+        return busyThreads.has(c.from);
+    };
+
     const { deliver: due, keep, expired } =
         drain(story.pending, quarter, canDeliver, undefined, senderOf);
 
@@ -264,12 +294,18 @@ export const runInbox = (): void => {
     //  quarter is a different thing and still works.
     // ------------------------------------------------------------------
     const sent = new Set<string>();
+    const held: Pending[] = [];
     due.forEach(p => {
         if (sent.has(p.conversationId)) return;
+        // Its thread still has a scene nobody has answered. Wait rather than
+        // write over it.
+        if (threadIsBusy(p)) { held.push(p); return; }
         sent.add(p.conversationId);
         deliver(p.conversationId);
+        const c = conversationById(p.conversationId);
+        if (c?.channel === 'message') busyThreads.add(c.from);
     });
-    story.setPending(keep);
+    story.setPending([...keep, ...held]);
 
     if (__DEV__ && expired.length) {
         // Quiet in a shipped build, loud while writing: a scene that expired
