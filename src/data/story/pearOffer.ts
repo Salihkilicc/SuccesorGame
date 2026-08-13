@@ -50,36 +50,30 @@ import type { Condition } from '../../core/story/conditions';
 const OFFER = 48_000_000;
 
 // ---------------------------------------------------------------------------
-//  IT HAS A GATE AS WELL AS A SENDER, AND THE GATE IS A BACKSTOP
+//  IT ARRIVES IN THE SIXTH QUARTER. THAT IS THE ONLY CONDITION.
 // ---------------------------------------------------------------------------
-//  This letter is scheduled by an EFFECT inside the father's death scene, and
-//  that was the only way it could ever arrive. One effect, firing once, and
-//  the entire second act behind it: the condolence wave is gated on the
-//  player having answered Pear, so a schedule that goes missing does not
-//  delay the story, it ends it.
+//  This letter used to be scheduled by an effect inside the father's death
+//  scene, and then additionally gated on `fatherDead`, on the player not
+//  having already refused, and on the player not having already sold.
 //
-//  And it can go missing. A save carried across a build where the scheduler
-//  changed, a queue entry dropped, a scene played in a version that wrote the
-//  schedule differently - the effect has already run, it will never run
-//  again, and nothing anywhere notices. That is exactly what happened to a
-//  save I spent five commits chasing through the scheduler.
+//  Every one of those is a cause-and-effect condition on something that is
+//  not a consequence. THE OPENING ACT IS A SCRIPT. The father dies in the
+//  fifth quarter because that is when the story says he does; Pear writes in
+//  the sixth for the same reason. Nobody chose either of them, so nothing the
+//  player did should be able to stop them happening.
 //
-//  So the letter now also has its own `when`, and it is registered as a story
-//  beat. Normally the schedule wins - it is queued in the quarter of the
-//  death and this gate does not open until the one after - and the beat is
-//  skipped, because runStoryBeats will not queue something already pending.
-//  If the schedule was lost, the beat delivers it anyway.
+//  Written as a chain, it broke four different ways in one week - a schedule
+//  that fired once and was lost, a flag raised by a scene in another app, a
+//  thread that overwrote the scene before it could be played. Each fix was
+//  correct and none of them was the problem, because the problem was that a
+//  fixed beat had been given four ways to not happen.
 //
-//  A single point of failure in front of the most important letter in the
-//  game was not worth keeping for tidiness.
+//  A quarter number cannot go missing. It is also the honest description of
+//  what this is: the second act starts here whatever the player has been
+//  doing, which is exactly how it feels to be him.
 // ---------------------------------------------------------------------------
 const WHEN: Condition[] = [
-    { kind: 'flag', flag: 'fatherDead' },
-    // The quarter after the death, matching what the scene schedules.
     { kind: 'quarterAtLeast', quarter: 6 },
-    // And not if the question has already been answered, either way.
-    { kind: 'noFlag', flag: 'refusedPear' },
-    { kind: 'noFlag', flag: 'soldToPear' },
 ];
 
 export const pearOffer: Conversation = {

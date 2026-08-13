@@ -52,7 +52,27 @@ import type { Conversation } from '../../core/story/graph';
  * Without it the wave could queue before the offer was opened and four people
  * would be reacting to a decision that had not been made.
  */
-const AFTER_THE_ANSWER = [{ kind: 'flag' as const, flag: 'refusedPear' as const }];
+// ---------------------------------------------------------------------------
+//  THE SEVENTH QUARTER. NOT "ONCE THE PLAYER HAS ANSWERED PEAR".
+// ---------------------------------------------------------------------------
+//  This was `refusedPear`, and the reasoning read well: four people reacting
+//  to a decision should not arrive before the decision.
+//
+//  It is the wrong reasoning about the wrong thing. THEY ARE NOT REACTING TO
+//  THE DECISION - they are reacting to a death, and the death happened
+//  whatever the player did about the letter. The friend does not mention the
+//  company once. The flag was there to order two events, and a quarter number
+//  orders them without making one hostage to the other.
+//
+//  What it cost: Pear's letter is the only thing that raises that flag, and
+//  the letter had four ways to go missing. When it did, four written scenes
+//  went with it and nothing anywhere said so. One condition, one act.
+//
+//  The `-public` variants below keep their flag, and that is a real branch:
+//  refusing him in public IS a choice, and what people say about it is a
+//  consequence. That is what a flag is for.
+// ---------------------------------------------------------------------------
+const AFTER_THE_ANSWER = [{ kind: 'quarterAtLeast' as const, quarter: 7 }];
 
 // ============================================================================
 //  1. THE FRIEND — bad at this, and the only one who is not after anything

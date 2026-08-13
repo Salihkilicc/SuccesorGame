@@ -90,27 +90,33 @@ describe('the father dies at the end of the first year', () => {
         expect(node.text).toContain('He was right');
     });
 
-    it('asking for a day does not buy one', () => {
-        // Both answers schedule the offer for the SAME quarter as each other,
-        // which is the assertion - the first thing the new job teaches,
-        // taught without a line of dialogue. Which quarter that is belongs to
-        // the scene and not to this test.
+    it('and asking for a day does not buy one', () => {
+        // ------------------------------------------------------------------
+        //  THE SCHEDULE IS GONE FROM THIS SCENE ENTIRELY
+        // ------------------------------------------------------------------
+        //  Both answers used to schedule Pear's letter, identically, so that
+        //  asking for a day bought nothing. The lesson is intact and it is
+        //  now free: the letter is a beat with a quarter number on it, so
+        //  neither answer affects when it lands because neither answer is
+        //  connected to it at all.
         //
-        // It was 0 and is now 1, and the reason is written out in
-        // data/story/fatherDeath.ts: the inbox is drained by the tick, so a
-        // zero scheduled from inside a conversation meant "whenever the
-        // player next advances time" - the same delay wearing immediacy's
-        // clothes. One says it honestly.
+        //  Which is the honest version. He wrote in the sixth quarter
+        //  because the story says he does - see the note at the top of
+        //  pearOffer.ts - and making that depend on a scene being reached,
+        //  delivered, opened and answered gave a fixed beat four ways not to
+        //  happen. All four happened.
+        // ------------------------------------------------------------------
         const close = fatherDeath.nodes.find(n => n.id === 'tellThem')!;
-        const scheduled = close.choices!.map(choice =>
-            (choice.effects ?? []).find(e => e.kind === 'schedule') as any);
-
-        expect(scheduled.length).toBe(2);
-        for (const s of scheduled) {
-            expect(s.conversation).toBe(pearOffer.id);
-            expect(s.urgent).toBe(true);
+        for (const choice of close.choices!) {
+            expect((choice.effects ?? []).filter(e => e.kind === 'schedule'))
+                .toEqual([]);
         }
-        expect(scheduled[0].afterQuarters).toBe(scheduled[1].afterQuarters);
+        // And what the scene DOES do, on both answers, is the one thing only
+        // it can: establish that he is dead.
+        for (const choice of close.choices!) {
+            expect((choice.effects ?? []).some((e: any) =>
+                e.kind === 'flag' && e.flag === 'fatherDead')).toBe(true);
+        }
     });
 });
 

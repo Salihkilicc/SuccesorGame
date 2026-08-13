@@ -34,10 +34,10 @@ const WAVE = [
 ];
 const textOf = (c: typeof friendCondolence) => c.nodes.map(n => n.text).join(' ');
 
-const world = (flags: Partial<Record<string, true>>): World => ({
+const world = (flags: Partial<Record<string, true>>, quarter = 5): World => ({
     dials: { ...INITIAL_DIALS },
     flags: flags as any,
-    quarter: 5,
+    quarter,
     capital: 5_000_000,
     cash: 100_000,
     morale: 71,
@@ -78,27 +78,52 @@ describe('all of it is in the game', () => {
     });
 });
 
-describe('nobody writes until there is an answer to know about', () => {
-    it('the whole wave waits on the refusal', () => {
-        const before = world({ fatherDead: true });
+describe('the wave is on a quarter, not on Pear being answered', () => {
+    // ------------------------------------------------------------------
+    //  IT WAS `refusedPear`, AND THE REASONING READ WELL
+    // ------------------------------------------------------------------
+    //  Four people reacting to a decision should not arrive before the
+    //  decision. True, and about the wrong thing: they are not reacting to
+    //  the decision, they are reacting to a DEATH - which happened whatever
+    //  the player did about the letter. The friend does not mention the
+    //  company once.
+    //
+    //  What the flag cost: Pear's letter is the only thing that raises it,
+    //  and that letter had four ways to go missing. When it did, four
+    //  written scenes went with it and nothing said so.
+    // ------------------------------------------------------------------
+    it('does not arrive in the quarter of the death itself', () => {
+        const q5 = world({ fatherDead: true }, 5);
         for (const c of WAVE) {
             if (c.id === cfoCondolenceMessage.id) continue;  // scheduled by the mail
-            expect(testAll(c.when, before)).toBe(false);
+            expect(testAll(c.when, q5)).toBe(false);
         }
     });
 
-    it('and arrives once it exists', () => {
-        const after = world({ fatherDead: true, refusedPear: true });
-        expect(testAll(friendCondolence.when, after)).toBe(true);
-        expect(testAll(cfoCondolenceMail.when, after)).toBe(true);
-        expect(testAll(brotherCondolence.when, after)).toBe(true);
-        expect(testAll(boardCondolence.when, after)).toBe(true);
+    it('and arrives the quarter after Pear writes, answered or not', () => {
+        const q7 = world({ fatherDead: true }, 7);
+        expect(testAll(friendCondolence.when, q7)).toBe(true);
+        expect(testAll(cfoCondolenceMail.when, q7)).toBe(true);
+        expect(testAll(brotherCondolence.when, q7)).toBe(true);
+        expect(testAll(boardCondolence.when, q7)).toBe(true);
+    });
+
+    it('and none of the four still names that flag', () => {
+        for (const c of [friendCondolence, cfoCondolenceMail,
+            brotherCondolence, boardCondolence]) {
+            expect(JSON.stringify(c.when ?? [])).not.toContain('refusedPear');
+        }
     });
 });
 
 describe('they know HOW you refused', () => {
-    const quiet = world({ fatherDead: true, refusedPear: true });
-    const loud = world({ fatherDead: true, refusedPear: true, refusedPearPublicly: true });
+    // The public variants KEEP their flag, and that is the distinction the
+    // change above rests on: refusing him in public is a choice, and what
+    // people say about it is a consequence. That is what a flag is for.
+    const quiet = world({ fatherDead: true, refusedPear: true }, 7);
+    const loud = world(
+        { fatherDead: true, refusedPear: true, refusedPearPublicly: true }, 7,
+    );
 
     it('the public follow-ups are dropped on the quiet branch', () => {
         for (const c of [friendCondolencePublic, cfoCondolencePublic,

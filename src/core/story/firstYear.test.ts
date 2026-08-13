@@ -82,11 +82,14 @@ describe('what the Mail app actually holds in the first year', () => {
         expect(notRandom.length).toBeLessThan(10);
     });
 
-    it('and nothing in it can start the story', () => {
-        // pear-offer is the earliest, and it cannot arrive until the father
-        // is dead - which is a flag raised by playing a MESSAGE.
+    it('and the first thing that does arrive is on a quarter, not a flag', () => {
+        // pear-offer is the earliest, and it used to be gated on the father
+        // being dead - a flag raised by playing a MESSAGE, in the app the
+        // player was not looking at. The opening act is a script: he writes
+        // in the sixth quarter because the story says so.
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
-        expect(JSON.stringify(pear.when)).toContain('fatherDead');
+        expect(JSON.stringify(pear.when)).toContain('quarterAtLeast');
+        expect(JSON.stringify(pear.when)).not.toContain('fatherDead');
     });
 });
 

@@ -104,20 +104,29 @@ describe('so the act after the death can actually start', () => {
         expect(letter!.isRead).toBe(false);
     });
 
-    it('and the condolences are still gated on him being answered', () => {
-        // Not changed by any of this, and worth pinning: the wave reacts to a
-        // decision, so it must not be able to arrive before the decision.
+    it('and the condolences are on a quarter, not on Pear being answered', () => {
+        // They were gated on `refusedPear`, and the reasoning read well:
+        // four people reacting to a decision should not arrive before it.
         //
-        // condolence-cfo-message is the exception and not an oversight - it
-        // has no gate because it is not a beat. The CFO's LETTER schedules
-        // it an hour later, so its timing is the letter's timing and giving
-        // it a second gate would be a second source for one fact.
-        const wave = CONVERSATIONS.filter(
-            c => c.id.startsWith('condolence-') && c.id !== 'condolence-cfo-message',
-        );
-        expect(wave.length).toBeGreaterThan(3);
-        for (const c of wave) {
-            expect(JSON.stringify(c.when ?? [])).toMatch(/refusedPear/);
+        // They are not reacting to the decision. They are reacting to a
+        // death, which happened whatever the player did about the letter -
+        // and the flag made four written scenes hostage to one letter that
+        // had four ways to go missing.
+        const base = ['condolence-friend', 'condolence-cfo-mail',
+            'condolence-brother', 'condolence-board'];
+        for (const id of base) {
+            const c = CONVERSATIONS.find(x => x.id === id)!;
+            expect(JSON.stringify(c.when ?? [])).toContain('quarterAtLeast');
+            expect(JSON.stringify(c.when ?? [])).not.toContain('refusedPear');
+        }
+    });
+
+    it('while the public variants keep their flag, because that IS a choice', () => {
+        // Refusing him in public is a decision, and what people say about it
+        // is a consequence. That is what a flag is for.
+        for (const id of ['condolence-friend-public', 'condolence-board-public']) {
+            const c = CONVERSATIONS.find(x => x.id === id)!;
+            expect(JSON.stringify(c.when ?? [])).toContain('refusedPearPublicly');
         }
     });
 });
@@ -133,26 +142,27 @@ describe('so the act after the death can actually start', () => {
 //  One quarter is the honest statement of the same thing, and it does not
 //  depend on a side effect of the scheduler to be true.
 // ============================================================================
-describe("the letter the father's death sends", () => {
-    const deathEffects = () => {
+describe("the letter the father's death does NOT send", () => {
+    it('because a fixed beat should not depend on a scene being played', () => {
+        // It was scheduled from both answers of the death, and that made the
+        // second act depend on this conversation being reached, delivered,
+        // opened and answered. Four ways not to start, all of which happened.
         const death = CONVERSATIONS.find(c => c.id === 'father-death')!;
-        return death.nodes
+        const scheduled = death.nodes
             .flatMap(n => n.choices?.flatMap(c => c.effects ?? []) ?? [])
-            .filter((e: any) => e.kind === 'schedule' && e.conversation === 'pear-offer') as any[];
-    };
-
-    it('is scheduled from both answers, identically', () => {
-        const scheduled = deathEffects();
-        expect(scheduled.length).toBe(2);
-        // Asking for a day does not buy one, and the two answers must not
-        // differ on when it lands or the choice becomes a delay tactic.
-        expect(scheduled[0].afterQuarters).toBe(scheduled[1].afterQuarters);
+            .filter((e: any) => e.kind === 'schedule');
+        expect(scheduled).toEqual([]);
     });
 
-    it('for the quarter after, and it jumps the queue when it comes', () => {
-        for (const e of deathEffects()) {
-            expect(e.afterQuarters).toBe(1);
-            expect(e.urgent).toBe(true);
+    it('and the death still does the one thing only it can do', () => {
+        // Raise the flag. Everything downstream is on a quarter now, but the
+        // father being dead is a fact this scene establishes and nothing
+        // else does.
+        const death = CONVERSATIONS.find(c => c.id === 'father-death')!;
+        const last = death.nodes.find(n => n.id === 'tellThem')!;
+        for (const choice of last.choices!) {
+            expect((choice.effects ?? []).some((e: any) =>
+                e.kind === 'flag' && e.flag === 'fatherDead')).toBe(true);
         }
     });
 });
@@ -318,10 +328,7 @@ describe('Pear cannot be lost', () => {
         expect(STORY_BEATS.map((b: any) => b.conversation)).toContain('pear-offer');
     });
 
-    it('whose gate opens the quarter AFTER the death, so the schedule wins', () => {
-        // Normally the effect delivers it and this never fires: the schedule
-        // is queued in the quarter of the death, and runStoryBeats skips
-        // anything already pending.
+    it('whose only condition is the quarter', () => {
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
         const w = (q: number) => ({
             dials: {} as never, flags: { fatherDead: true }, quarter: q,
@@ -332,19 +339,20 @@ describe('Pear cannot be lost', () => {
         const { testAll } = require('./conditions');
         expect(testAll(pear.when, w(5))).toBe(false);
         expect(testAll(pear.when, w(6))).toBe(true);
+        // And nothing else. A quarter number cannot go missing; a flag
+        // raised by a scene in another app can, and did, four times.
+        expect(pear.when).toHaveLength(1);
     });
 
-    it('and closes once the question has been answered either way', () => {
+    it('so it arrives even for a player who never opened the death', () => {
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
         const { testAll } = require('./conditions');
         const w = (flags: Record<string, true>) => ({
-            dials: {} as never, flags, quarter: 9,
+            dials: {} as never, flags, quarter: 6,
             capital: 1, cash: 1, morale: 70, marketShare: 1, staffing: 100,
             researchers: 0, subsidiaries: [], casinoStreak: 0,
             quartersWithoutSponsor: 0,
         } as never);
-        expect(testAll(pear.when, w({ fatherDead: true }))).toBe(true);
-        expect(testAll(pear.when, w({ fatherDead: true, refusedPear: true }))).toBe(false);
-        expect(testAll(pear.when, w({ fatherDead: true, soldToPear: true }))).toBe(false);
+        expect(testAll(pear.when, w({}))).toBe(true);
     });
 });
