@@ -28,6 +28,7 @@ import { useGameStore, initialGameState } from '../store/useGameStore';
 import { useStatsStore, initialStatsState } from '../store/useStatsStore';
 import { useStoryStore, initialStoryState } from '../store/useStoryStore';
 import { useTerritoryStore } from '../store/useTerritoryStore';
+import { useProductStore } from '../store/useProductStore';
 import { gameSink } from '../story/gameSink';
 import { ROYALTY_RATE, SIEGE_QUARTERS, SIEGE_PRESSURE } from './territory';
 
@@ -80,6 +81,20 @@ describe('the tick charges what was agreed', () => {
         // cannot be anything except the royalty.
         const runQuarter = async (withRoyalty: boolean) => {
             fresh();
+            // ------------------------------------------------------------------
+            //  THE TARGET IS SET HERE, BECAUSE A NEW COMPANY BUILDS NOTHING
+            // ------------------------------------------------------------------
+            //  This used to rely on the seed product carrying a production
+            //  level, and the comment below said "which it does". It did, by
+            //  accident: the seed held the OLD percentage field with no units
+            //  beside it, so the migration path in production.ts read a new
+            //  game as an old save and started the line at half capacity.
+            //
+            //  The seed is honest now - the line really is cold until somebody
+            //  decides otherwise - so this test has to do what a player does
+            //  before it can measure a royalty on revenue.
+            // ------------------------------------------------------------------
+            useProductStore.getState().updateProduct('smart_phone', { productionUnits: 400 });
             if (withRoyalty) gameSink().royalty('Consumer', ROYALTY_RATE);
             await useGameStore.getState().advanceMonth(3);
             return useGameStore.getState().lastQuarterReport as any;
@@ -92,7 +107,8 @@ describe('the tick charges what was agreed', () => {
             .filter((p: any) => (p.category ?? 'Consumer') === 'Consumer')
             .reduce((s: number, p: any) => s + (p.revenue ?? 0), 0);
 
-        // Only meaningful if the starter company sold something, which it does.
+        // Only meaningful if the company sold something, which it now does
+        // because the target above was set.
         expect(revenue).toBeGreaterThan(0);
         expect(taxed.totalExpenses - clean.totalExpenses)
             .toBeCloseTo(revenue * ROYALTY_RATE, 0);

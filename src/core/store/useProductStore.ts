@@ -80,9 +80,30 @@ export const initialProductState: ProductState = {
             unitCost: 250,
             suggestedPrice: 600,
 
-            // Active Config
+            // ------------------------------------------------------------------
+            //  THE LINE REALLY IS COLD, WHICH IT WAS NOT
+            // ------------------------------------------------------------------
+            //  This read `productionLevel: 50` - the OLD percentage field, with
+            //  no `productionUnits` beside it. resolveTargetUnits() treats that
+            //  shape as a legacy save and migrates it, so a NEW GAME started at
+            //  half of capacity, producing and selling, with nobody having
+            //  decided anything.
+            //
+            //  Which made the first two things the game says untrue. The father
+            //  opens with "the line is cold. Three days you have had the chair
+            //  and the line is cold", and the tutorial card asks for a target -
+            //  both describing a state the game was not in, and both therefore
+            //  reading as the game not knowing what it had. A player who looks
+            //  and sees the phone already running concludes the tutorial has
+            //  lost track of its own world, and they are right.
+            //
+            //  `productionUnits: 0` says the same thing in the data. Nothing is
+            //  being built until the player builds it, the man is telling the
+            //  truth, and the first instruction asks for something that is
+            //  genuinely undone.
+            // ------------------------------------------------------------------
             sellingPrice: 600,
-            productionLevel: 50, // Started at 50%
+            productionUnits: 0,
             marketingBudget: 0,
             inventory: 0,
             revenue: 0,
@@ -118,11 +139,26 @@ export const useProductStore = create<ProductState & ProductActions>()(
                 })),
 
             updateProduct: (id, updates) => {
-                // The first year's opening lock clears when a production
-                // target is actually SET - not when the screen is opened, and
-                // not when the tick writes results back. `productionLevel`
-                // arriving in an update is the player having moved the slider.
-                if (updates.productionLevel !== undefined) {
+                // ------------------------------------------------------------------
+                //  IT WATCHED THE WRONG FIELD, AND THE STEP COULD NOT BE CLEARED
+                // ------------------------------------------------------------------
+                //  The first year's opening lock clears when a production target is
+                //  actually SET - not when the screen is opened, and not when the
+                //  tick writes results back.
+                //
+                //  It only ever watched `productionLevel`, which is the OLD
+                //  percentage field. The detail modal has written `productionUnits`
+                //  since production moved to absolute units, so a player who opened
+                //  the phone, set the number and saved raised nothing. The lock
+                //  stayed up, the screen stayed dim, and the only way out was the
+                //  twelve-second skip - which reads as the tutorial being broken,
+                //  because it was.
+                //
+                //  Both are accepted. `productionLevel` stays for the migration
+                //  path in core/market/production.ts, which still carries old saves.
+                // ------------------------------------------------------------------
+                if (updates.productionUnits !== undefined
+                    || updates.productionLevel !== undefined) {
                     try {
                         require('./useStoryStore').useStoryStore.getState().raise('tutorialProductionSet');
                     } catch { /* story store not ready */ }
