@@ -217,3 +217,69 @@ describe('when somebody stops writing to you', () => {
         }
     });
 });
+
+// ============================================================================
+//  AND THE OPENING LINE WAS ALWAYS SAID TWICE
+// ============================================================================
+//  `deliver` puts the first card into the thread as a real message and THEN
+//  attaches the conversation - that message is what raises the badge and what
+//  the list shows as the preview, so a thread reads as a thread before the
+//  player has opened anything.
+//
+//  The runner's transcript starts with the same card. Appending all of it
+//  wrote the opening a second time, so every finished scene ended with the
+//  other person having said their first line twice.
+// ============================================================================
+
+describe('the line the thread already had', () => {
+    const delivered = (text: string) => {
+        useMessageStore.setState({
+            threads: [{
+                id: 'father', name: 'Your Father', role: 'Chairman', initials: 'YF',
+                unread: 1, conversationId: 'father-q1',
+                messages: [{ id: 'father-1', from: 'them', text, atMonth: 1 }],
+            }],
+        });
+    };
+    const texts = () => useMessageStore.getState().threads[0].messages.map(m => m.text);
+
+    it('is not written again when the scene is filed', () => {
+        delivered('It has been a year.');
+        useMessageStore.getState().appendTranscript('father', [
+            { from: 'them', text: 'It has been a year.' },
+            { from: 'player', text: 'Then what are you asking?' },
+        ], 2);
+        expect(texts()).toEqual([
+            'It has been a year.',
+            'Then what are you asking?',
+        ]);
+    });
+
+    it('and a scene whose opening is genuinely new is kept whole', () => {
+        // The guard matches on the TEXT, so it cannot swallow a real line.
+        delivered('Something else entirely.');
+        useMessageStore.getState().appendTranscript('father', [
+            { from: 'them', text: 'It has been a year.' },
+            { from: 'player', text: 'Then what are you asking?' },
+        ], 2);
+        expect(texts()).toHaveLength(3);
+    });
+
+    it('and a transcript that is only its opening adds nothing at all', () => {
+        delivered('It has been a year.');
+        useMessageStore.getState().appendTranscript('father', [
+            { from: 'them', text: 'It has been a year.' },
+        ], 2);
+        expect(texts()).toHaveLength(1);
+    });
+
+    it('while the player saying the same words is still recorded', () => {
+        // Only a `them` line can duplicate a `them` delivery. An answer that
+        // happens to echo the question is an answer.
+        delivered('Noted.');
+        useMessageStore.getState().appendTranscript('father', [
+            { from: 'player', text: 'Noted.' },
+        ], 2);
+        expect(texts()).toEqual(['Noted.', 'Noted.']);
+    });
+});

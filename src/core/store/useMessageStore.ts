@@ -198,12 +198,42 @@ export const useMessageStore = create<MessageStore>()(
                 set(state => ({
                     threads: state.threads.map(t => {
                         if (t.id !== threadId || lines.length === 0) return t;
+
+                        // ------------------------------------------------------
+                        //  THE OPENING LINE IS ALREADY IN THE THREAD
+                        // ------------------------------------------------------
+                        //  `deliver` puts the first card in as a real message
+                        //  and THEN attaches the conversation - that message is
+                        //  what raises the badge and what the list shows as the
+                        //  preview, so the thread reads as a thread before the
+                        //  player has opened anything.
+                        //
+                        //  The runner's transcript starts with the same card,
+                        //  so appending the whole of it wrote the first line a
+                        //  second time. Every finished scene ended with the
+                        //  other person having said their opening twice.
+                        //
+                        //  Matched on the text rather than assumed by position,
+                        //  because a scene the player left and came back to has
+                        //  a resumed transcript and the delivery may be several
+                        //  messages back.
+                        // ------------------------------------------------------
+                        const last = t.messages[t.messages.length - 1];
+                        const [first] = lines;
+                        const toAdd = last && first
+                            && first.from === 'them'
+                            && last.from === 'them'
+                            && last.text === first.text
+                            ? lines.slice(1)
+                            : lines;
+                        if (toAdd.length === 0) return t;
+
                         const base = t.messages.length;
                         return {
                             ...t,
                             messages: [
                                 ...t.messages,
-                                ...lines.map((l, i) => ({
+                                ...toAdd.map((l, i) => ({
                                     // Offset by what is already there, so ids
                                     // stay unique and stable as keys.
                                     id: `${threadId}-${base + i + 1}`,

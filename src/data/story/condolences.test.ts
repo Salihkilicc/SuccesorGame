@@ -101,11 +101,13 @@ describe('the wave is on a quarter, not on Pear being answered', () => {
     });
 
     it('and arrives the quarter after Pear writes, answered or not', () => {
-        const q7 = world({ fatherDead: true }, 7);
-        expect(testAll(friendCondolence.when, q7)).toBe(true);
-        expect(testAll(cfoCondolenceMail.when, q7)).toBe(true);
-        expect(testAll(brotherCondolence.when, q7)).toBe(true);
-        expect(testAll(boardCondolence.when, q7)).toBe(true);
+        // EIGHT, not seven. The whole act moved a quarter later when the
+        // death did - see the note in data/story/fatherDeath.ts.
+        const q8 = world({ fatherDead: true }, 8);
+        expect(testAll(friendCondolence.when, q8)).toBe(true);
+        expect(testAll(cfoCondolenceMail.when, q8)).toBe(true);
+        expect(testAll(brotherCondolence.when, q8)).toBe(true);
+        expect(testAll(boardCondolence.when, q8)).toBe(true);
     });
 
     it('and none of the four still names that flag', () => {
@@ -120,9 +122,9 @@ describe('they know HOW you refused', () => {
     // The public variants KEEP their flag, and that is the distinction the
     // change above rests on: refusing him in public is a choice, and what
     // people say about it is a consequence. That is what a flag is for.
-    const quiet = world({ fatherDead: true, refusedPear: true }, 7);
+    const quiet = world({ fatherDead: true, refusedPear: true }, 8);
     const loud = world(
-        { fatherDead: true, refusedPear: true, refusedPearPublicly: true }, 7,
+        { fatherDead: true, refusedPear: true, refusedPearPublicly: true }, 8,
     );
 
     it('the public follow-ups are dropped on the quiet branch', () => {

@@ -35,7 +35,20 @@ export const fatherDeath: Conversation = {
     // The end of the fourth quarter, once. `currentQuarter` counts from one,
     // so the tick in which the first year closes is the fifth.
     when: [
-        { kind: 'quarterAtLeast', quarter: 5 },
+        // ------------------------------------------------------------------
+        //  THE SIXTH QUARTER, BECAUSE THE FIFTH WAS ALREADY HIS
+        // ------------------------------------------------------------------
+        //  It was five, and five is where the father's own queue was still
+        //  draining. A message thread carries ONE conversation at a time and
+        //  he has six for the first year, so a player who took a quarter or
+        //  two to read them was getting the morale lesson and the phone call
+        //  in the same tick: a man teaching you about your workforce, and the
+        //  news that he is dead, in one sitting.
+        //
+        //  Everything behind it moved with it - Pear to seven, the condolence
+        //  wave to eight. The act keeps its shape; it starts a quarter later.
+        // ------------------------------------------------------------------
+        { kind: 'quarterAtLeast', quarter: 6 },
         { kind: 'noFlag', flag: 'fatherDead' },
     ],
     start: 'open',

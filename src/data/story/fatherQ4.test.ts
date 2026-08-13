@@ -52,7 +52,7 @@ describe('when it arrives', () => {
 describe('it cannot share an inbox with the news', () => {
     it('the death waits for the quarter after his', () => {
         expect(due(fatherDeath as never, world({ quarter: 4 }))).toBe(false);
-        expect(due(fatherDeath as never, world({ quarter: 5 }))).toBe(true);
+        expect(due(fatherDeath as never, world({ quarter: 6 }))).toBe(true);
     });
 
     it('so there is no quarter in which both are due', () => {

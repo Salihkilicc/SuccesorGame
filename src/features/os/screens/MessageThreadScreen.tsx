@@ -39,6 +39,24 @@ const MessageThreadScreen = () => {
     // const [draft, setDraft] = useState('');
     const scrollViewRef = useRef<ScrollView>(null);
 
+    // ------------------------------------------------------------------
+    //  THE SCENE IS DECIDED ONCE, ON ARRIVAL
+    // ------------------------------------------------------------------
+    //  Finishing a conversation clears the thread's `conversationId`, and
+    //  this screen is subscribed to the threads - so for one frame between
+    //  the clear and `goBack()` it re-rendered as a PLAIN thread: a different
+    //  scroll view, a composer, a keyboard-avoiding wrapper, all mounting and
+    //  unmounting inside a single transition. That is the white flash at the
+    //  end of every scene.
+    //
+    //  Read on mount and held. The player cannot be handed a different scene
+    //  while they are inside one, so there is nothing to react to.
+    // ------------------------------------------------------------------
+    const [playing] = useState(() => {
+        const t = useMessageStore.getState().threads.find(x => x.id === threadId);
+        return t?.conversationId ? conversationById(t.conversationId) : undefined;
+    });
+
     // Auto scroll to bottom
     useEffect(() => {
         if (!thread) return;
@@ -57,9 +75,7 @@ const MessageThreadScreen = () => {
     //  own answers, and a free-text box beside two written choices would
     //  suggest the game reads what you type.
     // ------------------------------------------------------------------
-    const conversation = thread.conversationId
-        ? conversationById(thread.conversationId)
-        : undefined;
+    const conversation = playing;
 
     if (conversation) {
         return (

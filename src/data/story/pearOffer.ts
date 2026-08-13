@@ -73,7 +73,9 @@ const OFFER = 48_000_000;
 //  doing, which is exactly how it feels to be him.
 // ---------------------------------------------------------------------------
 const WHEN: Condition[] = [
-    { kind: 'quarterAtLeast', quarter: 6 },
+    // Seven, moved with the death - see the note in fatherDeath.ts. The
+    // quarter after the funeral, which is the whole point of the timing.
+    { kind: 'quarterAtLeast', quarter: 7 },
 ];
 
 export const pearOffer: Conversation = {

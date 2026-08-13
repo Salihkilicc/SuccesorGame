@@ -33,7 +33,7 @@ const fresh = () => {
     useMailStore.setState({ ...initialMailState });
     useMessageStore.setState({ ...initialMessageState });
     // ------------------------------------------------------------------
-    //  QUARTER SIX, BECAUSE THAT IS WHEN PEAR IS ALLOWED TO EXIST
+    //  QUARTER SEVEN, BECAUSE THAT IS WHEN PEAR IS ALLOWED TO EXIST
     // ------------------------------------------------------------------
     //  These tests used pear-offer as a convenient stand-in for "any
     //  conversation" while it had no gate of its own. It has one now - the
@@ -41,9 +41,14 @@ const fresh = () => {
     //  letter could arrive in, or they are testing the gate rather than the
     //  scheduler.
     //
-    //  currentQuarter counts years from `age`: 26 and month four is Q6.
+    //  It was six. The whole act moved a quarter later when the death did -
+    //  the fifth quarter was still draining the father's own queue, so the
+    //  morale lesson and the phone call were arriving together. See the note
+    //  in data/story/fatherDeath.ts.
+    //
+    //  currentQuarter counts years from `age`: 26 and month seven is Q7.
     // ------------------------------------------------------------------
-    useGameStore.setState({ age: 26, currentMonth: 4 } as never);
+    useGameStore.setState({ age: 26, currentMonth: 7 } as never);
 };
 
 const inbox = () => useMailStore.getState().inbox;
@@ -85,7 +90,7 @@ describe('a scene that schedules for this quarter', () => {
         gameSink().schedule({ conversation: 'pear-offer', afterQuarters: 1 });
         expect(useStoryStore.getState().pending.length).toBe(2);
 
-        useGameStore.setState({ currentMonth: 7 } as never);
+        useGameStore.setState({ currentMonth: 10 } as never);
         runInbox();
 
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
@@ -337,8 +342,8 @@ describe('Pear cannot be lost', () => {
             quartersWithoutSponsor: 0,
         } as never);
         const { testAll } = require('./conditions');
-        expect(testAll(pear.when, w(5))).toBe(false);
-        expect(testAll(pear.when, w(6))).toBe(true);
+        expect(testAll(pear.when, w(6))).toBe(false);
+        expect(testAll(pear.when, w(7))).toBe(true);
         // And nothing else. A quarter number cannot go missing; a flag
         // raised by a scene in another app can, and did, four times.
         expect(pear.when).toHaveLength(1);
@@ -348,7 +353,7 @@ describe('Pear cannot be lost', () => {
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
         const { testAll } = require('./conditions');
         const w = (flags: Record<string, true>) => ({
-            dials: {} as never, flags, quarter: 6,
+            dials: {} as never, flags, quarter: 7,
             capital: 1, cash: 1, morale: 70, marketShare: 1, staffing: 100,
             researchers: 0, subsidiaries: [], casinoStreak: 0,
             quartersWithoutSponsor: 0,
