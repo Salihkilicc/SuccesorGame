@@ -52,16 +52,21 @@ const WHEN: Condition[] = [
     //  Almost every beat in this game opens and stays open - a letter that
     //  becomes possible in year three should not expire because the player
     //  was slow. This one closes, because the quarter after it is the
-    //  quarter he dies.
+    //  quarter he dies, and "are you sleeping" arriving beside "your father
+    //  died this morning" reads as the writing not knowing what it is doing.
     //
-    //  Without the bound, `quarter >= 4` and the death's `quarter >= 5`
-    //  both hold from the fifth quarter on, and a player who had not yet
-    //  been given this would get a message from him and the call saying he
-    //  died that morning in the same inbox. Beat order makes that unlikely.
-    //  Unlikely is not good enough here.
+    //  IT ALSO NEARLY DELETED THE SCENE, and the fix was not here. The
+    //  father had six conversations for the first four quarters and a
+    //  message thread carries one at a time, so this was still queued behind
+    //  the others when its one quarter passed. I widened the window, which
+    //  brought the collision straight back, then measured instead: shelving
+    //  father-q1-invoice frees the quarter and this arrives on time with the
+    //  bound untouched.
     //
-    //  Paired with `urgent` below: the window is one quarter wide, so the
-    //  scene must not be able to lose its place in it to a random event.
+    //      Q1 inheritance   Q3 marketing   Q5 death
+    //      Q2 q1            Q4 THIS        Q6 pear
+    //
+    //  The queue was the problem. The window was doing its job.
     // ------------------------------------------------------------------
     { kind: 'quarterAtMost', quarter: 4 },
     { kind: 'noFlag', flag: 'fatherDead' },

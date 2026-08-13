@@ -183,32 +183,50 @@ export const fatherQ1: Conversation = {
                 {
                     text: 'I will.',
                     effects: [
-                        {
-                            kind: 'schedule',
-                            conversation: 'father-q1-invoice',
-                            afterQuarters: 1,
-                            // Urgent: this is the tutorial's second beat and
-                            // it must not queue behind a random event. The
-                            // first year is the one place the spine outranks
-                            // the allowance.
-                            urgent: true,
-                        },
+                        // ------------------------------------------------
+                        //  SHELVED: THE INVOICE SCENE
+                        // ------------------------------------------------
+                        //  The father had SIX conversations in the first four
+                        //  quarters and a message thread carries one at a
+                        //  time. They queued behind each other and the last
+                        //  one - father-q4, the only scene of his that
+                        //  teaches nothing - never arrived at all.
+                        //
+                        //  This is the one that went, and it is the right
+                        //  one: its lesson (open the breakdown, do not read
+                        //  the total) is no longer carried by any lock, and
+                        //  at 27 cards it is the longest thing he says. What
+                        //  it costs is the Zeidler story, which is the best
+                        //  three cards in it - see the note in
+                        //  data/story/fatherQ1Invoice.ts, which is kept whole
+                        //  so it can be folded into another scene later.
+                        //
+                        //  {
+                        //      kind: 'schedule',
+                        //      conversation: 'father-q1-invoice',
+                        //      afterQuarters: 1,
+                        //      urgent: true,
+                        //  },
                     ],
                 },
                 {
                     text: 'That is a strange thing to ask.',
                     effects: [
-                        // He does not answer this. The scene ends on it, and
-                        // the conversation still comes back next quarter -
-                        // the schedule is on both answers on purpose, because
-                        // the player's scepticism should not cost them the
-                        // tutorial.
-                        {
-                            kind: 'schedule',
-                            conversation: 'father-q1-invoice',
-                            afterQuarters: 1,
-                            urgent: true,
-                        },
+                        // He does not answer this, and the scene ends on it.
+                        //
+                        // SHELVED with the other answer's copy - see the note
+                        // above. The schedule was on BOTH answers on purpose,
+                        // so that the player's scepticism did not cost them
+                        // the next scene; shelving one and not the other
+                        // would have reintroduced exactly that, quietly, on
+                        // the branch nobody tests.
+                        //
+                        //  {
+                        //      kind: 'schedule',
+                        //      conversation: 'father-q1-invoice',
+                        //      afterQuarters: 1,
+                        //      urgent: true,
+                        //  },
                     ],
                 },
             ],

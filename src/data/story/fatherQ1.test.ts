@@ -19,7 +19,7 @@
 
 import { fatherQ1 } from './fatherQ1';
 import { fatherQ1Invoice } from './fatherQ1Invoice';
-import { CONVERSATIONS, OPENING_CONVERSATIONS } from './index';
+import { STORY_BEATS, CONVERSATIONS, OPENING_CONVERSATIONS } from './index';
 import { validate } from '../../core/story/graph';
 import { CAST } from './cast';
 import { TUTORIAL_SEQUENCE } from '../tutorial/sequence';
@@ -68,22 +68,41 @@ describe('being rude to him costs you nothing you need', () => {
         }
     });
 
-    it('and every answer at the end brings him back next quarter', () => {
+    it('and no longer schedules a follow-up, because that scene is shelved', () => {
+        // ------------------------------------------------------------------
+        //  SIX SCENES, ONE THREAD
+        // ------------------------------------------------------------------
+        //  He had six conversations across the first four quarters, and a
+        //  message thread carries one at a time. They queued behind each
+        //  other and father-q4 - the only scene of his that teaches nothing,
+        //  and the last thing he says before he dies - never arrived at all.
+        //
+        //  father-q1-invoice is the one that went. Its lesson is carried by
+        //  no lock any more and at 27 cards it is the longest thing he says.
+        //  The file is kept whole so the Zeidler story can be folded into
+        //  another scene; only the schedule that delivered it is shelved.
+        //
+        //  Measured after: Q1 inheritance, Q2 this, Q3 marketing, Q4 q4,
+        //  Q5 the death, Q6 Pear. Nothing queued behind anything.
+        // ------------------------------------------------------------------
         const close = nodeOf(fatherQ1, 'close');
         expect(close.choices!.length).toBeGreaterThan(0);
         for (const choice of close.choices!) {
-            const schedules = (choice.effects ?? []).filter(e => e.kind === 'schedule');
-            expect(schedules).toHaveLength(1);
-            expect((schedules[0] as any).conversation).toBe(fatherQ1Invoice.id);
+            expect((choice.effects ?? []).filter(e => e.kind === 'schedule'))
+                .toHaveLength(0);
         }
     });
 
-    it('the follow-up is urgent, so a dice roll cannot take its slot', () => {
-        for (const choice of nodeOf(fatherQ1, 'close').choices!) {
-            const s = (choice.effects ?? []).find(e => e.kind === 'schedule') as any;
-            expect(s.urgent).toBe(true);
-        }
+    it('and the shelved scene is not reachable by any other route', () => {
+        // Shelved means unreachable, not deleted. If something else starts
+        // scheduling it the queue problem comes back and this says so.
+        const all = CONVERSATIONS.flatMap(c =>
+            c.nodes.flatMap(n => n.choices?.flatMap(ch => ch.effects ?? []) ?? []));
+        expect(all.filter((e: any) =>
+            e.kind === 'schedule' && e.conversation === fatherQ1Invoice.id)).toEqual([]);
+        expect(STORY_BEATS.map(b => b.conversation)).not.toContain(fatherQ1Invoice.id);
     });
+
 });
 
 describe('he teaches the mechanics that actually exist', () => {
