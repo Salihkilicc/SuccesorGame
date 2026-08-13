@@ -18,6 +18,20 @@
 //  Renders NOTHING at zero. A badge showing 0 is not information, it is
 //  furniture, and it trains the eye to stop looking at the corner where the
 //  real ones appear.
+//
+//  ---------------------------------------------------------------------------
+//  AND IT DID NOT MANAGE TO BE THE ONLY ONE
+//  ---------------------------------------------------------------------------
+//  This covers the nav bar and the home tiles. MessagesScreen and MailScreen
+//  each grew their OWN `unreadIndicatorRow` styles instead of using it, which
+//  is precisely the drift the file was opened to prevent - three badges, two
+//  of them copies.
+//
+//  They are not folded in here yet because the ring colour genuinely differs:
+//  the row badges sit on `surface`, this one on `background`, and merging
+//  them needs a prop rather than a find-and-replace. Recorded rather than
+//  quietly tolerated, so the next person sees a decision instead of an
+//  oversight.
 // ============================================================================
 
 import React from 'react';
@@ -52,10 +66,24 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        // The one red in the palette that is a fill. See core/theme.ts - it is
-        // #D32F2F rather than the iOS #FF3B30 because white digits on that
-        // measure 3.55, which is too low for text this small.
-        backgroundColor: theme.colors.notification,
+        // ------------------------------------------------------------------
+        //  TOBACCO, NOT RED
+        // ------------------------------------------------------------------
+        //  It was `notification` #D32F2F - the one red in the palette that is
+        //  a fill - and it was the last red in this app doing a job that is
+        //  not red's job. Red here means one sentence, "this is costing you",
+        //  and a message you have not opened is not costing you anything.
+        //
+        //  It measures better as well, which was not the reason and is worth
+        //  writing down anyway. On the app's own ground:
+        //
+        //      #D32F2F   3.15 from the ground, white digits 4.98
+        //      #D6A96C   7.29 from the ground, dark digits  7.29
+        //
+        //  The floating badge sits on that ground with a ring cut in it, so
+        //  separation is the number that decides whether it is seen at all.
+        // ------------------------------------------------------------------
+        backgroundColor: theme.colors.unread,
     },
     floating: {
         position: 'absolute',
@@ -71,10 +99,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     text: {
-        color: theme.colors.notificationText,
+        // Dark on a light fill, which is this app's rule for every light
+        // fill and the reason the light tobacco was picked over the dark one.
+        color: theme.colors.onLight,
         fontSize: 11,
         fontWeight: '800',
-        // Digits are why this red was chosen: white on it reads 4.98.
         lineHeight: 14,
     },
 });
