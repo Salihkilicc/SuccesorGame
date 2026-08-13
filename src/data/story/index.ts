@@ -19,6 +19,7 @@ import { fatherQ1 } from './fatherQ1';
 import { fatherQ1Invoice } from './fatherQ1Invoice';
 import { fatherMorale } from './fatherMorale';
 import { fatherMarketing } from './fatherMarketing';
+import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
 import {
@@ -102,6 +103,7 @@ export const CONVERSATIONS: Conversation[] = [
     fatherQ1Invoice,
     fatherMorale,
     fatherMarketing,
+    fatherQ4,
     fatherDeath,
     pearOffer,
     friendCondolence, friendCondolencePublic,
@@ -230,6 +232,21 @@ export interface StoryBeat {
 }
 
 export const STORY_BEATS: StoryBeat[] = [
+    // ------------------------------------------------------------------
+    //  THE LAST QUARTER OF HIM, AND THEN THE PHONE CALL
+    // ------------------------------------------------------------------
+    //  Q4 before Q5, and they cannot meet: father-q4 carries `noFlag
+    //  fatherDead` and the death carries `quarterAtLeast 5`, so the only
+    //  way they could share an inbox is a player who arrives at quarter
+    //  four late. The order in this list settles that - a beat is queued
+    //  the first quarter its `when` holds, and this one is checked first.
+    //
+    //  URGENT, and it is the only beat that teaches nothing which is. Its
+    //  window is exactly one quarter wide - see the `quarterAtMost` on it -
+    //  so waiting behind two random events would not delay it, it would
+    //  delete it.
+    // ------------------------------------------------------------------
+    { conversation: fatherQ4.id, urgent: true },
     { conversation: fatherDeath.id, urgent: true },
 ];
 

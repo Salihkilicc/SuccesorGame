@@ -131,13 +131,44 @@ describe('the crack he does not notice', () => {
     });
 });
 
-describe('it lines up with the lock that dims the screen', () => {
-    it('the Q1 lock points at the screen he is sending the player to', () => {
+describe('it does NOT repeat the lock that dims the screen', () => {
+    // ------------------------------------------------------------------
+    //  THE SPLIT, AND IT USED TO BE THE OPPOSITE ASSERTION
+    // ------------------------------------------------------------------
+    //  This test used to require that he say "Products" too, so that the
+    //  message and the overlay agreed. They agreed by saying the same thing,
+    //  and the player read one instruction twice - once on a card with his
+    //  name on it and once in a conversation with him.
+    //
+    //  The division now is: the CARD says what to do, and he says why it
+    //  ever mattered to him. Nothing is lost - a player who reads only the
+    //  card still knows where to go - and what he says stops being a manual
+    //  the player has already been handed.
+    // ------------------------------------------------------------------
+    const spoken = () => fatherQ1.nodes.map(n => n.text).join(' ');
+
+    it('leaves the where to the overlay', () => {
         const q1 = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-production')!;
         expect(q1.highlight).toBe('products');
-        // He says "go to Products", and the overlay lights up Products. If
-        // those two ever disagree the player is told two different things at
-        // once by the same game.
-        expect(fatherQ1.nodes.map(n => n.text).join(' ')).toContain('Products');
+        // He never sends them to a screen by name. That is the card's job
+        // and it is doing it three centimetres away.
+        expect(spoken()).not.toMatch(/go to Products|open Products/i);
+    });
+
+    it('and does not restate the card word for word', () => {
+        const q1 = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-production')!;
+        // The card reads "Set a target. In units." He may still be about
+        // targets - he is standing in front of a cold line - but the
+        // imperative belongs to one of them, not both.
+        expect(spoken()).not.toContain(q1.instruction);
+        expect(spoken()).not.toMatch(/\bSet a target\b/);
+    });
+
+    it('what he says instead is about him', () => {
+        // The replacement is not silence. Each removed directive left a gap
+        // and something of his life went into it - his wife on the factory
+        // floor on Saturdays, the year he stopped saying the honest thing.
+        expect(spoken()).toContain('Saturdays');
+        expect(spoken()).toContain('I do not recommend the trade');
     });
 });

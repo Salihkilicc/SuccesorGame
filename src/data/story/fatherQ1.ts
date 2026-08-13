@@ -55,7 +55,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'open',
             speaker: 'father',
-            text: 'The line is cold. Three days you have had the chair and the line is cold.\n\nYour grandfather ran it hot through a war. I ran it hot through two recessions, a bank that changed its mind on a Friday, and a man in California who decided we were a rounding error. Three days.\n\nGo to Products and set a target. Not today — now, while I am telling you.',
+            text: 'The line is cold. Three days you have had the chair and the line is cold.\n\nYour grandfather ran it hot through a war. I ran it hot through two recessions, a bank that changed its mind on a Friday, and a man in California who decided we were a rounding error.\n\nThree days. I am not going to tell you how to start it — somebody will show you where the buttons are. I want to tell you why I could never leave it cold.',
             choices: [
                 { text: 'How much should I make?', next: 'howMuch' },
                 { text: 'Good morning to you too.', next: 'goodMorning' },
@@ -68,7 +68,19 @@ export const fatherQ1: Conversation = {
             // The warmth arrives sideways and is withdrawn before it can be
             // answered. This is the only affection in the scene and it is
             // buried in the middle of an instruction, where he can deny it.
-            text: 'Your mother taught you that. It is a good habit and it will not help you here.\n\nGood morning. Set a target.',
+            text: 'Your mother taught you that. It is a good habit and it will not help you here.\n\nGood morning. She used to say it to the machines as well, on the Saturdays she came in with me. To the machines. Out loud.',
+            choices: [
+                { text: 'She came in on Saturdays?', next: 'saturdays' },
+                { text: 'How much should I make?', next: 'howMuch' },
+            ],
+        },
+
+        {
+            id: 'saturdays',
+            speaker: 'father',
+            // Him, sideways. He is answering a question about her and the
+            // answer is entirely about what he did with the time.
+            text: 'For eleven years. She read, mostly. She said the building was quieter than the house and I never worked out whether that was a joke.\n\nI took it as one at the time. I have had a while to think about it since.',
             choices: [
                 { text: 'How much should I make?', next: 'howMuch' },
             ],
@@ -79,7 +91,7 @@ export const fatherQ1: Conversation = {
             speaker: 'father',
             // Every fact here is true of the engine: absolute units, not a
             // percentage. See core/market/production.ts -> resolveTargetUnits.
-            text: 'A number. Units. Not a percentage — I never want to see a percentage from you.\n\nA percentage is what a man says when he does not want to be held to a figure. Ask a supplier for "about eighty percent" and see what arrives.',
+            text: 'Whatever the number is, it is a number. Units. Not a percentage — I never want to hear a percentage out of you.\n\nA percentage is what a man says when he does not want to be held to a figure. Ask a supplier for "about eighty percent" and see what arrives.',
             choices: [
                 { text: 'What limits the number?', next: 'capacity' },
                 { text: 'Suppliers have been fine so far.', next: 'soFar' },
@@ -121,7 +133,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'under',
             speaker: 'father',
-            text: 'Aim under it and you will never learn where it is. Aim at it and it will teach you in one quarter what a consultant would take a year and forty thousand to explain badly.\n\nSet the number. I will look at the invoice with you when it comes.',
+            text: 'Aim under it and you will never learn where it is. Aim at it and it will teach you in one quarter what a consultant would take a year and forty thousand to explain badly.\n\nI will look at the invoice with you when it comes. I would like that, actually. I have not read one with anybody in a long time.',
             choices: [
                 { text: 'The invoice?', next: 'invoice' },
                 { text: 'Fine.', next: 'close' },
@@ -145,7 +157,7 @@ export const fatherQ1: Conversation = {
             id: 'form',
             speaker: 'father',
             // He does not defend himself. He agrees, and it lands worse.
-            text: 'Probably. That is the honest answer and I would like you to keep giving it, right up until the quarter it turns out to be the other one.\n\nSet the target.',
+            text: 'Probably. That is the honest answer and I would like you to keep giving it, right up until the quarter it turns out to be the other one.\n\nI stopped giving it somewhere around fifty. I do not recommend the trade.',
             choices: [
                 { text: 'Setting it now.', next: 'close' },
             ],

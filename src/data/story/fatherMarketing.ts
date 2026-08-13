@@ -108,7 +108,7 @@ export const fatherMarketing: Conversation = {
             // SEAM 1. The number is his and it is fixed, and that is the
             // point: he is quoting an absolute from a company that was not
             // growing, to a company that is.
-            text: 'You put money into marketing on the product, in Products, and you leave it there. Not one quarter — every quarter.\n\nFour hundred thousand held our line for nine years. I never once raised it and I never once had to.',
+            text: 'You put money behind it and you leave it there. Not one quarter — every quarter. That part somebody will show you.\n\nFour hundred thousand held our line for nine years. I never once raised it and I never once had to.',
             choices: [
                 { text: 'Nine years at the same number?', next: 'nineYears' },
                 { text: 'And that builds the brand?', next: 'brand' },

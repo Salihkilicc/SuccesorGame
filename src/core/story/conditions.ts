@@ -39,6 +39,23 @@ export type Condition =
     | { kind: 'dialAtMost'; dial: Dial; band: Band }
     /** The game has reached a quarter. */
     | { kind: 'quarterAtLeast'; quarter: number }
+    /**
+     * A window that CLOSES.
+     *
+     * Every time-gated beat until now opened and stayed open, which is right
+     * for almost all of them - a letter that becomes possible in year three
+     * should not expire because the player was slow.
+     *
+     * It is wrong for a beat that has to happen BEFORE another one. The
+     * father's last conversation and the news of his death were gated
+     * `quarter >= 4` and `quarter >= 5`, and from the fifth quarter onwards
+     * both held at once: a player who had not yet been given the first would
+     * receive a message from him and the call telling them he had died in the
+     * same inbox. Ordering the beat list makes that unlikely and not
+     * impossible, and unlikely is not a thing to ship in the scene the whole
+     * first act is built towards.
+     */
+    | { kind: 'quarterAtMost'; quarter: number }
     /** The company can afford something. */
     | { kind: 'capitalAtLeast'; amount: number }
     /**
@@ -190,6 +207,7 @@ export const test = (c: Condition, w: World): boolean => {
         case 'dialAtLeast': return rank(band(w.dials[c.dial])) >= rank(c.band);
         case 'dialAtMost': return rank(band(w.dials[c.dial])) <= rank(c.band);
         case 'quarterAtLeast': return w.quarter >= c.quarter;
+        case 'quarterAtMost': return w.quarter <= c.quarter;
         case 'capitalAtLeast': return w.capital >= c.amount;
         case 'capitalAtMost': return w.capital <= c.amount;
         case 'cashAtLeast': return w.cash >= c.amount;
