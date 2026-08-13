@@ -21,7 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // --- Store'lar ---
 import { useGameStore, initialGameState } from './store/useGameStore';
-import { useStatsStore } from './store/useStatsStore';
+import { useStatsStore, initialStatsState } from './store/useStatsStore';
 import { useProductStore } from './store/useProductStore';
 import { useUserStore } from './store/useUserStore';
 import { usePlayerStore } from './store/usePlayerStore';
@@ -317,30 +317,55 @@ export const verifyNewGame = (): string[] => {
         }
     };
 
+    // ------------------------------------------------------------------
+    //  THE EXPECTED VALUES ARE READ, NOT RETYPED
+    // ------------------------------------------------------------------
+    //  They used to be literals: `check('stats', 'employeeCount', ..., 20)`.
+    //  START_EMPLOYEES is 22 and has been for a while, so this audit reported
+    //  "data carried over from the previous game" on EVERY new game, for two
+    //  fields, forever - a dev-build alert that interrupted every reset and
+    //  was wrong every time.
+    //
+    //  Which is worse than not having the check. An alarm that always fires
+    //  is an alarm nobody reads, and the day something really did survive a
+    //  reset it would have arrived as the same box people had learned to
+    //  dismiss.
+    //
+    //  A check must not hold its own copy of the fact it is checking. That is
+    //  the whole failure mode this file was written to catch, and it was
+    //  sitting inside the file.
+    // ------------------------------------------------------------------
     try {
         const st = useStatsStore.getState() as any;
+        const s0 = initialStatsState as any;
         // Personel — oyuncunun ilk fark ettigi sey bu.
-        check('stats', 'employeeCount', st.employeeCount, 20);
-        check('stats', 'targetHeadcount', st.targetHeadcount, 20);
-        check('stats', 'incomingHires', st.incomingHires, 0);
-        check('stats', 'employeeMorale', st.employeeMorale, 75);
-        check('stats', 'facilityTier', st.facilityTier, 1);
-        check('stats', 'companyDebtTotal', st.companyDebtTotal, 0);
-        check('stats', 'lossStreak', st.lossStreak ?? 0, 0);
-        check('stats', 'brandByCategory', st.brandByCategory ?? {}, {});
+        check('stats', 'employeeCount', st.employeeCount, s0.employeeCount);
+        check('stats', 'targetHeadcount', st.targetHeadcount, s0.targetHeadcount);
+        check('stats', 'incomingHires', st.incomingHires, s0.incomingHires ?? 0);
+        check('stats', 'employeeMorale', st.employeeMorale, s0.employeeMorale);
+        check('stats', 'facilityTier', st.facilityTier, s0.facilityTier);
+        check('stats', 'companyDebtTotal', st.companyDebtTotal, s0.companyDebtTotal);
+        check('stats', 'lossStreak', st.lossStreak ?? 0, s0.lossStreak ?? 0);
+        check('stats', 'brandByCategory', st.brandByCategory ?? {}, s0.brandByCategory ?? {});
 
         const g = useGameStore.getState() as any;
-        check('game', 'currentMonth', g.currentMonth, 1);
-        check('game', 'age', g.age, 25);
-        check('game', 'lastQuarterReport', g.lastQuarterReport, null);
+        const g0 = initialGameState as any;
+        check('game', 'currentMonth', g.currentMonth, g0.currentMonth);
+        check('game', 'age', g.age, g0.age);
+        check('game', 'lastQuarterReport', g.lastQuarterReport, g0.lastQuarterReport ?? null);
 
         const lab = useLaboratoryStore.getState() as any;
         check('laboratory', 'researcherCount', lab.researcherCount, 0);
         check('laboratory', 'totalRP', lab.totalRP, 0);
 
-        const sh = require('../features/shareholders/stores/useShareholderStore').useShareholderStore.getState();
+        const shModule = require('../features/shareholders/stores/useShareholderStore');
+        const sh = shModule.useShareholderStore.getState();
         check('shareholder', 'ceoRemoved', sh.ceoRemoved, false);
-        check('shareholder', 'memberCount', sh.members.length, 4);
+        // Read, not retyped - same reason as the headcount above. Seating a
+        // fifth director at the start would otherwise make this audit lie
+        // about a game that was perfectly fine.
+        check('shareholder', 'memberCount', sh.members.length,
+            shModule.INITIAL_BOARD_MEMBERS.length);
         check('shareholder', 'boardDemands', sh.boardDemands.length, 0);
         check('shareholder', 'promises', sh.promises.length, 0);
 

@@ -713,6 +713,21 @@ const styles = StyleSheet.create({
     // Clear of the nav bar. The old 160 was there so a scrolling page could
     // reach its end; nothing scrolls now.
     paddingBottom: 110,
+    // ------------------------------------------------------------------
+    //  THE WHOLE PAGE, A FEW POINTS HIGHER
+    // ------------------------------------------------------------------
+    //  The wordmark, the gear and the player card sat a touch low against
+    //  the status bar. A translate rather than trimming the brand's own
+    //  marginTop: this container centres its children, so taking eight
+    //  points off the first child's margin moves the group up by four and
+    //  changes the gap under the wordmark as a side effect. A transform
+    //  moves everything by exactly the number written here and leaves every
+    //  spacing relationship inside the page alone.
+    //
+    //  Six points. Enough to read as deliberate, small enough that nobody
+    //  who has not been told will notice.
+    // ------------------------------------------------------------------
+    transform: [{ translateY: -6 }],
   },
   // ── Premium Header Card ──
   headerCard: {

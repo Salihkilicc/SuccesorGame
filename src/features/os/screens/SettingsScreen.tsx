@@ -16,7 +16,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import { startNewGame } from '../../../core/newGame';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
-import { START_EMPLOYEES } from '../../../core/store/useStatsStore';
+// START_EMPLOYEES was only read by the confirmation box removed below.
 import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 
@@ -116,10 +116,23 @@ const SettingsScreen = () => {
                         try {
                             await startNewGame();
                             navigation.goBack();
-                            Alert.alert(
-                                'New Game',
-                                t('newgame.freshStartBody', { v1: String(START_EMPLOYEES) }),
-                            );
+                            // ------------------------------------------------------
+                            //  NO SECOND BOX
+                            // ------------------------------------------------------
+                            //  There was a confirmation here - "a fresh run has
+                            //  been set up, you have N employees" - dismissed
+                            //  immediately after the player had already confirmed
+                            //  the destructive one. Two taps to be told a thing
+                            //  the screen behind the box is already showing.
+                            //
+                            //  The player is now looking at a company with 22
+                            //  people and a cold line, which says it better than
+                            //  a modal does.
+                            //
+                            //  `newgame.freshStartBody` stays in the catalogue; if
+                            //  a first-run welcome is ever wanted it belongs on the
+                            //  home screen and not on top of it.
+                            // ------------------------------------------------------
                         } catch (e) {
                             console.error('[Settings] Yeni oyun baslatilamadi', e);
                             Alert.alert('Error', 'Could not start a new game. Check the console.');
