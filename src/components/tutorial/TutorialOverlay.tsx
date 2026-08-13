@@ -97,6 +97,37 @@ const TutorialOverlay = () => {
         if (!seenBefore && isComplete(TUTORIAL_SEQUENCE, locks)) markDone();
     }, [locks, seenBefore]);
 
+    // ------------------------------------------------------------------
+    //  WHY IS NOTHING ON SCREEN
+    // ------------------------------------------------------------------
+    //  The overlay is correctly silent in three completely different
+    //  situations - the tutorial is finished, the lock is waiting for a
+    //  screen the player is not on, or the lock was skipped - and they look
+    //  identical, which is to say they look broken. That ambiguity cost an
+    //  evening: the highlight was working and the question "is it even
+    //  coming?" could not be answered by looking at the phone.
+    //
+    //  So in development it says which. Once per change of reason, not per
+    //  render, or it drowns the Metro log the moment anybody scrolls.
+    // ------------------------------------------------------------------
+    const reason = !lock
+        ? (locks.disabled ? 'tutorial disabled'
+            : isComplete(TUTORIAL_SEQUENCE, locks) ? 'all steps done'
+                : 'no step engageable right now (check canEngage)')
+        : rects[lock.highlight]
+            ? undefined
+            : `waiting for "${lock.highlight}" - not on this screen`;
+
+    useEffect(() => {
+        if (__DEV__ && reason) {
+            console.log(
+                `[tutorial] silent: ${reason}`,
+                `| done: [${locks.completed.join(', ')}]`,
+                `| skipped: [${locks.skipped.join(', ')}]`,
+            );
+        }
+    }, [reason]);
+
     if (!lock) return null;
 
     const rect = rects[lock.highlight];
