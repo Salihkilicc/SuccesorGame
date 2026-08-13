@@ -32,8 +32,18 @@ const fresh = () => {
     useStoryStore.setState({ ...initialStoryState, flags: { fatherDead: true } });
     useMailStore.setState({ ...initialMailState });
     useMessageStore.setState({ ...initialMessageState });
-    // currentQuarter counts years from `age`, so this is quarter one.
-    useGameStore.setState({ age: 25, currentMonth: 1 } as never);
+    // ------------------------------------------------------------------
+    //  QUARTER SIX, BECAUSE THAT IS WHEN PEAR IS ALLOWED TO EXIST
+    // ------------------------------------------------------------------
+    //  These tests used pear-offer as a convenient stand-in for "any
+    //  conversation" while it had no gate of its own. It has one now - the
+    //  backstop below - so the world they run in has to be a world the
+    //  letter could arrive in, or they are testing the gate rather than the
+    //  scheduler.
+    //
+    //  currentQuarter counts years from `age`: 26 and month four is Q6.
+    // ------------------------------------------------------------------
+    useGameStore.setState({ age: 26, currentMonth: 4 } as never);
 };
 
 const inbox = () => useMailStore.getState().inbox;
@@ -75,7 +85,7 @@ describe('a scene that schedules for this quarter', () => {
         gameSink().schedule({ conversation: 'pear-offer', afterQuarters: 1 });
         expect(useStoryStore.getState().pending.length).toBe(2);
 
-        useGameStore.setState({ currentMonth: 4 } as never);
+        useGameStore.setState({ currentMonth: 7 } as never);
         runInbox();
 
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
@@ -273,7 +283,6 @@ describe('a thread with an unanswered scene on it', () => {
         useStoryStore.setState({ ...initialStoryState, flags: {} });
         // The death's own gate is quarter five. currentQuarter counts years
         // from `age`, so a year on is a quarter five.
-        useGameStore.setState({ age: 26, currentMonth: 1 } as never);
         gameSink().schedule({ conversation: 'father-inheritance', afterQuarters: 0, urgent: true });
         gameSink().schedule({ conversation: 'father-death', afterQuarters: 0, urgent: true });
         // The death is the CFO's, so it lands beside the father's, not behind.
@@ -283,10 +292,59 @@ describe('a thread with an unanswered scene on it', () => {
 
     it('and playing one clears it, so it cannot be replayed for its effects', () => {
         useStoryStore.setState({ ...initialStoryState, flags: {} });
-        useGameStore.setState({ age: 26, currentMonth: 1 } as never);
         gameSink().schedule({ conversation: 'father-death', afterQuarters: 0, urgent: true });
         expect(threadFor('cfo')?.conversationId).toBe('father-death');
         useMessageStore.getState().clearConversation('cfo');
         expect(threadFor('cfo')?.conversationId).toBeUndefined();
+    });
+});
+
+// ============================================================================
+//  THE LETTER HAS TWO WAYS TO ARRIVE, AND ONE OF THEM IS A BACKSTOP
+// ============================================================================
+//  It was scheduled by an effect inside the father's death scene and by
+//  nothing else. One effect, firing once, with the entire second act behind
+//  it - the condolence wave cannot start until Pear has been answered - so a
+//  schedule that goes missing does not delay the story, it ends it.
+//
+//  And it can go missing: a save carried across a build where the scheduler
+//  changed, a queue entry dropped, a scene played in a version that wrote the
+//  schedule differently. The effect has already run, it will never run again,
+//  and nothing anywhere notices.
+// ============================================================================
+describe('Pear cannot be lost', () => {
+    it('is a story beat as well as a scheduled effect', () => {
+        const { STORY_BEATS } = require('../../data/story');
+        expect(STORY_BEATS.map((b: any) => b.conversation)).toContain('pear-offer');
+    });
+
+    it('whose gate opens the quarter AFTER the death, so the schedule wins', () => {
+        // Normally the effect delivers it and this never fires: the schedule
+        // is queued in the quarter of the death, and runStoryBeats skips
+        // anything already pending.
+        const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
+        const w = (q: number) => ({
+            dials: {} as never, flags: { fatherDead: true }, quarter: q,
+            capital: 1, cash: 1, morale: 70, marketShare: 1, staffing: 100,
+            researchers: 0, subsidiaries: [], casinoStreak: 0,
+            quartersWithoutSponsor: 0,
+        } as never);
+        const { testAll } = require('./conditions');
+        expect(testAll(pear.when, w(5))).toBe(false);
+        expect(testAll(pear.when, w(6))).toBe(true);
+    });
+
+    it('and closes once the question has been answered either way', () => {
+        const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
+        const { testAll } = require('./conditions');
+        const w = (flags: Record<string, true>) => ({
+            dials: {} as never, flags, quarter: 9,
+            capital: 1, cash: 1, morale: 70, marketShare: 1, staffing: 100,
+            researchers: 0, subsidiaries: [], casinoStreak: 0,
+            quartersWithoutSponsor: 0,
+        } as never);
+        expect(testAll(pear.when, w({ fatherDead: true }))).toBe(true);
+        expect(testAll(pear.when, w({ fatherDead: true, refusedPear: true }))).toBe(false);
+        expect(testAll(pear.when, w({ fatherDead: true, soldToPear: true }))).toBe(false);
     });
 });

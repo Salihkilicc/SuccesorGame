@@ -238,6 +238,19 @@ export interface StoryBeat {
 
 export const STORY_BEATS: StoryBeat[] = [
     // ------------------------------------------------------------------
+    //  PEAR, AS A BACKSTOP RATHER THAN AS THE ROUTE
+    // ------------------------------------------------------------------
+    //  The death scene schedules this letter, and normally that is what
+    //  delivers it - the schedule is queued in the quarter of the death and
+    //  the conversation's own gate does not open until the one after, so
+    //  runStoryBeats finds it already pending and skips.
+    //
+    //  This exists for the save where the schedule was lost. One effect,
+    //  firing once, with the whole second act behind it was a single point
+    //  of failure in front of the most important letter in the game.
+    // ------------------------------------------------------------------
+    { conversation: pearOffer.id, urgent: true },
+    // ------------------------------------------------------------------
     //  THE LAST QUARTER OF HIM, AND THEN THE PHONE CALL
     // ------------------------------------------------------------------
     //  Q4 before Q5, and they cannot meet: father-q4 carries `noFlag

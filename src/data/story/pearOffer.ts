@@ -44,14 +44,49 @@
 // ============================================================================
 
 import type { Conversation } from '../../core/story/graph';
+import type { Condition } from '../../core/story/conditions';
 
 /** Roughly a year of the company's revenue. Fair. That is the trap. */
 const OFFER = 48_000_000;
+
+// ---------------------------------------------------------------------------
+//  IT HAS A GATE AS WELL AS A SENDER, AND THE GATE IS A BACKSTOP
+// ---------------------------------------------------------------------------
+//  This letter is scheduled by an EFFECT inside the father's death scene, and
+//  that was the only way it could ever arrive. One effect, firing once, and
+//  the entire second act behind it: the condolence wave is gated on the
+//  player having answered Pear, so a schedule that goes missing does not
+//  delay the story, it ends it.
+//
+//  And it can go missing. A save carried across a build where the scheduler
+//  changed, a queue entry dropped, a scene played in a version that wrote the
+//  schedule differently - the effect has already run, it will never run
+//  again, and nothing anywhere notices. That is exactly what happened to a
+//  save I spent five commits chasing through the scheduler.
+//
+//  So the letter now also has its own `when`, and it is registered as a story
+//  beat. Normally the schedule wins - it is queued in the quarter of the
+//  death and this gate does not open until the one after - and the beat is
+//  skipped, because runStoryBeats will not queue something already pending.
+//  If the schedule was lost, the beat delivers it anyway.
+//
+//  A single point of failure in front of the most important letter in the
+//  game was not worth keeping for tidiness.
+// ---------------------------------------------------------------------------
+const WHEN: Condition[] = [
+    { kind: 'flag', flag: 'fatherDead' },
+    // The quarter after the death, matching what the scene schedules.
+    { kind: 'quarterAtLeast', quarter: 6 },
+    // And not if the question has already been answered, either way.
+    { kind: 'noFlag', flag: 'refusedPear' },
+    { kind: 'noFlag', flag: 'soldToPear' },
+];
 
 export const pearOffer: Conversation = {
     id: 'pear-offer',
     channel: 'mail',
     from: 'pear',
+    when: WHEN,
     // The subject is an internal workflow with the player's family in it.
     subject: 'HALE / condolence + preliminary approach — ref 4471-C',
     start: 'open',
