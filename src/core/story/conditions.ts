@@ -232,6 +232,18 @@ export const test = (c: Condition, w: World): boolean => {
  * because most scenes have no gate, and `test(undefined)` is the call every
  * caller would otherwise have to remember to guard.
  */
+/**
+ * The FIRST condition that does not hold, or undefined if they all do.
+ *
+ * For asking a gate why it is shut. `testAll` answers yes or no, and when the
+ * answer is no on a device it is the least useful word in the language - the
+ * question is always which one, and reading the data file to guess is how
+ * four days went into a letter that was arriving correctly the whole time.
+ */
+export const firstFailing = (
+    conditions: Condition[] | undefined, w: World,
+): Condition | undefined => (conditions ?? []).find(c => !test(c, w));
+
 export const testAll = (conditions: Condition[] | undefined, w: World): boolean =>
     (conditions ?? []).every(c => test(c, w));
 

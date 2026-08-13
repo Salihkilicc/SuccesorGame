@@ -29,7 +29,7 @@ import { CAST } from '../../data/story/cast';
 import { conversationById, OPENING_CONVERSATIONS, STORY_BEATS } from '../../data/story';
 import { emailOf } from './cast';
 import { drain, type Pending } from './inbox';
-import { testAll } from './conditions';
+import { testAll, firstFailing } from './conditions';
 import { readWorld, currentQuarter } from './world';
 import { activeLock } from '../tutorial/locks';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
@@ -171,11 +171,31 @@ export const runStoryBeats = (): void => {
     for (const beat of STORY_BEATS) {
         const id = beat.conversation;
         const story = useStoryStore.getState();
-        if (story.seenScenes.includes(id)) continue;
-        if (story.pending.some(p => p.conversationId === id)) continue;
+        // ------------------------------------------------------------------
+        //  AND IN DEVELOPMENT IT SAYS WHY NOT
+        // ------------------------------------------------------------------
+        //  A beat that does not arrive is silent in every direction: no
+        //  error, nothing in the inbox, and the only way to find out which
+        //  of its conditions is shut is to read the data file and guess.
+        //
+        //  Four days went into a letter that turned out to be arriving
+        //  correctly the whole time, and then into a save whose flags had
+        //  already closed the gate. Both would have been one line of log.
+        // ------------------------------------------------------------------
+        const explain = (why: string) => {
+            if (__DEV__) console.log(`[story] beat "${id}" not queued: ${why}`);
+        };
+
+        if (story.seenScenes.includes(id)) { explain('already delivered once'); continue; }
+        if (story.pending.some(p => p.conversationId === id)) { explain('already in the queue'); continue; }
 
         const c = conversationById(id);
-        if (!c || !testAll(c.when, world)) continue;
+        if (!c) { explain('no conversation with that id'); continue; }
+        const shut = firstFailing(c.when, world);
+        if (shut) {
+            explain(`gate ${JSON.stringify(shut)} (quarter ${world.quarter})`);
+            continue;
+        }
 
         useStoryStore.getState().schedule({
             conversationId: id,
