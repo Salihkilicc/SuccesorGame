@@ -76,7 +76,24 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         speaker: 'cto',
         instruction: 'Open the laboratory.',
         conversation: 'cto-research',
-        satisfied: [{ kind: 'flag', flag: 'rndLabOpened' }],
+        // ------------------------------------------------------------------
+        //  HIRING ENDS THE WHOLE LESSON, NOT JUST THE STEP AFTER IT
+        // ------------------------------------------------------------------
+        //  `rndHired` appears in BOTH steps' conditions on purpose. Without
+        //  it here, a player who hired somebody and later came back to the
+        //  laboratory would be told to open the laboratory - which they are
+        //  looking at - because this step had never been marked done.
+        //
+        //  A lesson ends when the thing it was teaching has been done, not
+        //  when its last card happened to be dismissed.
+        // ------------------------------------------------------------------
+        satisfied: [{
+            kind: 'any',
+            of: [
+                { kind: 'flag', flag: 'rndLabOpened' },
+                { kind: 'flag', flag: 'rndHired' },
+            ],
+        }],
         canEngage: [
             // The trigger. Until the player has opened research at all, this
             // lock does not exist as far as the overlay is concerned.

@@ -274,7 +274,20 @@ const TutorialOverlay = () => {
 export default TutorialOverlay;
 
 const styles = StyleSheet.create({
-    dim: { position: 'absolute', backgroundColor: 'rgba(28,36,44,0.82)' },
+    // ------------------------------------------------------------------
+    //  HALF AS DARK AS IT WAS
+    // ------------------------------------------------------------------
+    //  It was 0.82, which is nearly opaque - the rest of the screen went
+    //  black and the lit control read as the only thing that existed. That
+    //  is the right weight for a modal asking a question and much too heavy
+    //  for a hint about a slider, especially on the laboratory and product
+    //  sheets where the numbers the player is being asked to weigh are the
+    //  ones being blacked out.
+    //
+    //  0.41 still reads unmistakably as "not this part", and the figures
+    //  behind it stay legible enough to think with.
+    // ------------------------------------------------------------------
+    dim: { position: 'absolute', backgroundColor: 'rgba(28,36,44,0.41)' },
     ring: {
         position: 'absolute',
         borderRadius: theme.radius.md,

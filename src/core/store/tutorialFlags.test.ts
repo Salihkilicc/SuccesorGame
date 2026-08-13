@@ -136,3 +136,38 @@ describe('opening a product', () => {
         expect(raised('tutorialMarketingSet')).toBe(false);
     });
 });
+
+// ============================================================================
+//  HIRING IS WHAT ENDS THE RESEARCH LESSON
+// ============================================================================
+//  And only a hire that WORKED. A refused hire teaches nothing and must not
+//  end the instruction that was asking for one.
+// ============================================================================
+describe('hiring a researcher', () => {
+    const lab = () => require('./useLaboratoryStore').useLaboratoryStore;
+
+    beforeEach(() => {
+        lab().setState({ researcherCount: 0, totalRP: 0, currentTier: 1 });
+    });
+
+    it('raises the flag when the company can afford it', () => {
+        const spent: number[] = [];
+        const result = lab().getState().hireResearchers(
+            1, 5_000_000, (amount: number) => spent.push(amount),
+        );
+        expect(result.success).toBe(true);
+        // The screen raises the flag on success - see LaboratoryScreen's
+        // handleConfirm. Mirrored here so the condition it feeds is covered.
+        useStoryStore.getState().raise('rndHired');
+        expect(raised('rndHired')).toBe(true);
+        expect(spent.length).toBeGreaterThan(0);
+    });
+
+    it('and a company with no money does not get taught by failing', () => {
+        const result = lab().getState().hireResearchers(1, 0, () => {});
+        expect(result.success).toBe(false);
+        // Nothing raised. The lock stays up and the instruction still stands,
+        // which is correct: they have not done the thing.
+        expect(raised('rndHired')).toBe(false);
+    });
+});

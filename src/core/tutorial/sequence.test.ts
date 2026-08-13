@@ -61,7 +61,26 @@ describe('research, which the player asks for', () => {
         }))).toBe('rnd-hire');
     });
 
-    it('and hands back to the first year once somebody is hired', () => {
+    it('and is finished the moment somebody is hired', () => {
+        // Neither research step comes back. `rndHired` satisfies both, so a
+        // player who returns to the laboratory later is not told to open the
+        // laboratory they are looking at.
+        for (const flags of [
+            { rndOpened: true, rndLabOpened: true, rndHired: true },
+            // And for the one who hired without the lesson having reached
+            // its second step - a save from before this existed, or a fast
+            // player who was already in there.
+            { rndOpened: true, rndHired: true },
+        ] as const) {
+            const id = showing(opening({ flags }));
+            expect(id).not.toBe('rnd-lab');
+            expect(id).not.toBe('rnd-hire');
+        }
+    });
+
+    it('and once it is over the first year picks up where it left off', () => {
+        // Interrupted, not cancelled. The marketing lesson was mid-flight
+        // when the player wandered into research.
         expect(showing(opening({
             flags: { rndOpened: true, rndLabOpened: true, rndHired: true },
         }))).toBe('q1-open-product');
