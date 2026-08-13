@@ -13,7 +13,8 @@
 // ============================================================================
 
 import { CONVERSATIONS } from '../story';
-import { nodeKey, choiceKey, subjectKey } from './storyText';
+import { TUTORIAL_SEQUENCE } from '../tutorial/sequence';
+import { nodeKey, choiceKey, subjectKey, lockKey } from './storyText';
 
 export interface StoryLine {
     key: string;
@@ -22,7 +23,7 @@ export interface StoryLine {
     conversation: string;
     /** Who is speaking, so a translator can hear the voice. */
     speaker: string;
-    kind: 'body' | 'choice' | 'subject';
+    kind: 'body' | 'choice' | 'subject' | 'lock';
 }
 
 export const allStoryLines = (): StoryLine[] => {
@@ -50,6 +51,26 @@ export const allStoryLines = (): StoryLine[] => {
             });
         }
     }
+
+    // ------------------------------------------------------------------
+    //  THE TUTORIAL LINES ARE DIALOGUE TOO
+    // ------------------------------------------------------------------
+    //  The father says these over a dimmed screen. They were the last of
+    //  his words sitting outside the dictionary, which would have shipped
+    //  a Turkish game whose first hour is in English.
+    //
+    //  `conversation` points at the scene the lock carries, so a translator
+    //  reading the export sees the lock line next to the conversation it
+    //  arrives with and can match the register.
+    // ------------------------------------------------------------------
+    for (const lock of TUTORIAL_SEQUENCE) {
+        out.push({
+            key: lockKey(lock.id), english: lock.instruction,
+            conversation: lock.conversation ?? `@lock/${lock.id}`,
+            speaker: lock.speaker ?? 'father', kind: 'lock',
+        });
+    }
+
     return out;
 };
 

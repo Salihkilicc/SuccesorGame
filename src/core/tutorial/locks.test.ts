@@ -15,6 +15,7 @@ import {
     type LockState,
     type TutorialLock,
 } from './locks';
+import { CAST } from '../../data/story/cast';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 import { INITIAL_DIALS } from '../story/state';
 import type { World } from '../story/conditions';
@@ -210,5 +211,52 @@ describe('isSatisfied', () => {
     it('reads the condition rather than a stored answer', () => {
         expect(isSatisfied(lock(), world())).toBe(false);
         expect(isSatisfied(lock(), world({ flags: { tutorialProductionSet: true } }))).toBe(true);
+    });
+});
+
+// ============================================================================
+//  A DIMMED SCREEN INSTRUCTED BY NOBODY
+// ============================================================================
+//  The overlay used to render a bare sentence with no name on it, so the
+//  first hour of the game read as manual copy - which is exactly the hour
+//  the father is standing next to the player in the conversation the lock
+//  carries. These pin the fix.
+// ============================================================================
+describe('somebody is saying it', () => {
+    it('every lock names a speaker the cast knows', () => {
+        for (const lock of TUTORIAL_SEQUENCE) {
+            const who = lock.speaker ?? 'father';
+            expect(CAST[who]).toBeDefined();
+        }
+    });
+
+    it('the first year is taught by the father, not by the game', () => {
+        expect(TUTORIAL_SEQUENCE.every(l => (l.speaker ?? 'father') === 'father'))
+            .toBe(true);
+    });
+
+    it('and every lock carries the scene that argues for it, bar the first', () => {
+        // The card is one line. The reason lives in the conversation, and a
+        // lock without one is a screen that dims and points at a button for
+        // no stated reason.
+        //
+        // q1-production is the exception and it is not an oversight: its
+        // scene is father-q1, which arrives through OPENING_CONVERSATIONS
+        // because it is the opening. Naming it here as well would give one
+        // conversation two delivery routes - deliver.ts would dedupe it, but
+        // relying on a dedupe to cover a design with two sources is how the
+        // second source eventually wins.
+        expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
+            .toEqual(['q1-production']);
+    });
+
+    it('the instruction stays short enough to sit on a dimmed screen', () => {
+        // Not a layout limit - the overlay wraps. A limit on how much can be
+        // said in a place the player cannot leave, which is a different and
+        // stricter thing.
+        const long = TUTORIAL_SEQUENCE
+            .filter(l => l.instruction.length > 110)
+            .map(l => `${l.id}: ${l.instruction.length}ch`);
+        expect(long).toEqual([]);
     });
 });

@@ -46,6 +46,15 @@ export const choiceKey = (
     conversationId: string, nodeId: string, index: number,
 ): string => `${conversationId}/${nodeId}#${index}`;
 
+/**
+ * A tutorial lock's instruction.
+ *
+ * These are dialogue - the father says them over a dimmed screen - so they
+ * belong in the same dictionary as everything else he says, rather than in
+ * the UI catalogue with the button labels.
+ */
+export const lockKey = (lockId: string): string => `@lock/${lockId}`;
+
 /** The subject line of a letter. */
 export const subjectKey = (conversationId: string): string =>
     `${conversationId}/@subject`;

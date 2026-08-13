@@ -54,6 +54,7 @@ const load = (file) => {
 
 const { CONVERSATIONS } = load(path.join(SRC, 'data/story/index.ts'));
 const { CAST } = load(path.join(SRC, 'data/story/cast.ts'));
+const { TUTORIAL_SEQUENCE } = load(path.join(SRC, 'data/tutorial/sequence.ts'));
 
 const out = {};
 const counts = {};
@@ -89,6 +90,41 @@ for (const c of CONVERSATIONS) {
         from: c.from,
         speakerName: CAST[c.from] ? CAST[c.from].name : c.from,
         tone: CAST[c.from] ? CAST[c.from].tone : undefined,
+        lines: entries,
+    };
+}
+
+// ---------------------------------------------------------------------------
+//  THE TUTORIAL LINES GO OUT WITH THE REST
+// ---------------------------------------------------------------------------
+//  The father says these over a dimmed screen in the first year. They are
+//  dialogue, not interface copy, and a translator needs them next to the
+//  scenes they arrive with rather than in a separate file nobody remembers.
+// ---------------------------------------------------------------------------
+if (TUTORIAL_SEQUENCE && TUTORIAL_SEQUENCE.length) {
+    const entries = TUTORIAL_SEQUENCE.map(l => {
+        lines += 1;
+        words += l.instruction.split(/\s+/).filter(Boolean).length;
+        const who = l.speaker || 'father';
+        counts[who] = (counts[who] || 0) + 1;
+        return {
+            key: `@lock/${l.id}`,
+            speaker: who,
+            kind: 'lock',
+            // Said over a dimmed screen with one control lit, so it has to
+            // stay short - it is an instruction in a voice, not a speech.
+            maxChars: 110,
+            note: l.conversation
+                ? `arrives with the scene "${l.conversation}" - match its register`
+                : undefined,
+            en: l.instruction,
+        };
+    });
+    out['@tutorial'] = {
+        channel: 'overlay',
+        from: 'father',
+        speakerName: CAST.father ? CAST.father.name : 'father',
+        tone: CAST.father ? CAST.father.tone : undefined,
         lines: entries,
     };
 }

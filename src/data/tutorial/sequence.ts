@@ -58,7 +58,10 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // ------------------------------------------------------------------
         id: 'q1-production',
         highlight: 'products',
-        instruction: 'Set a production target. Nothing else happens until something is being built.',
+        // His voice, not the manual's. Short because it sits on a dimmed screen
+        // for as long as it takes - the argument is in the conversation.
+        speaker: 'father',
+        instruction: 'Set a target. In units. Nothing in this company is real until something is being built.',
         satisfied: [{ kind: 'flag', flag: 'tutorialProductionSet' }],
         // Only in the first year. After that he is either dead or has stopped
         // explaining, and a tutorial that reappears in year three is a bug.
@@ -88,7 +91,11 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // Not "morale is slipping" any more - it is not slipping, it has
         // settled, and telling the player otherwise would be the game
         // describing something they can go and see is untrue.
-        instruction: 'Morale has settled at the market rate. A bonus is how you buy back a quarter of it.',
+        speaker: 'father',
+        // Not 'slipping' - it has settled, and the player can go and look.
+        // A tutorial that describes something they can see is untrue teaches
+        // them to stop reading it. fatherMorale.test.ts holds that.
+        instruction: 'They are paid the average and doing average work. A bonus buys a quarter of it back.',
         conversation: 'father-morale',
         satisfied: [{ kind: 'flag', flag: 'tutorialBonusPaid' }],
         canEngage: [
@@ -120,7 +127,8 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // product, and a lock cannot light a control that is behind a closed
         // modal - the overlay would dim the screen and point at nothing. The
         // instruction carries the second step.
-        instruction: 'Open a product and put money behind it. A budget of zero is a product nobody has heard of.',
+        speaker: 'father',
+        instruction: 'Put money behind it. A product with no budget is a product nobody has heard of.',
         conversation: 'father-marketing',
         satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
         canEngage: [

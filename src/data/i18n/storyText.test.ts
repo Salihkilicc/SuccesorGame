@@ -23,6 +23,7 @@
 // ============================================================================
 
 import { CONVERSATIONS } from '../story/index';
+import { TUTORIAL_SEQUENCE } from '../tutorial/sequence';
 import { allStoryKeys, allStoryLines } from './storyKeys';
 import { useLocaleStore, type Locale } from '../../core/i18n';
 import {
@@ -41,13 +42,26 @@ describe('keys', () => {
         expect(new Set(keys).size).toBe(keys.length);
     });
 
-    it('covers every card, every answer and every subject line', () => {
+    it('covers every card, every answer, every subject line and every lock', () => {
         let expected = 0;
         for (const c of CONVERSATIONS) {
             if (c.subject) expected += 1;
             for (const n of c.nodes) expected += 1 + (n.choices?.length ?? 0);
         }
+        // The tutorial instructions are the father speaking over a dimmed
+        // screen. They are dialogue, they live in this dictionary, and
+        // leaving them out would have shipped a Turkish game whose first
+        // hour is in English.
+        expected += TUTORIAL_SEQUENCE.length;
         expect(allStoryKeys().length).toBe(expected);
+    });
+
+    it('and the tutorial lines are attributed to somebody', () => {
+        const locks = allStoryLines().filter(l => l.kind === 'lock');
+        expect(locks.length).toBe(TUTORIAL_SEQUENCE.length);
+        // Not 'system', not blank. A dimmed screen instructed by nobody is
+        // what this replaced.
+        expect(locks.every(l => !!l.speaker && l.speaker !== 'player')).toBe(true);
     });
 
     it('shapes match the three builders the runner calls', () => {

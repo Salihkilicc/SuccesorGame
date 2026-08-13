@@ -35,6 +35,9 @@ import { useStoryStore } from '../../core/store/useStoryStore';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { readWorld } from '../../core/story/world';
 import { useTutorialTargets } from './targets';
+import { CAST } from '../../data/story/cast';
+import { useLocale } from '../../core/i18n';
+import { line, lockKey } from '../../data/i18n/storyText';
 
 /** Breathing room around the highlighted control. */
 const HALO = 8;
@@ -136,7 +139,22 @@ const TutorialOverlay = () => {
             <View
                 style={[styles.card, hole && hole.y > H / 2 ? { top: 80 } : { bottom: 120 }]}
                 pointerEvents="box-none">
-                <Text style={styles.instruction}>{lock.instruction}</Text>
+                {/* ------------------------------------------------------
+                    SOMEBODY IS SAYING THIS
+
+                    The card used to be a bare sentence with no name on it,
+                    which made the first hour of the game a dimmed screen
+                    being instructed by nobody - manual copy in a place where
+                    a character was already standing. The conversation that
+                    arrives with the lock is the father's; the card is his
+                    too, and now says so.
+                   ------------------------------------------------------ */}
+                <Text style={styles.speaker}>
+                    {(CAST[lock.speaker ?? 'father']?.name ?? '').toUpperCase()}
+                </Text>
+                <Text style={styles.instruction}>
+                    {line(lockKey(lock.id), lock.instruction)}
+                </Text>
 
                 {escapeVisible && (
                     <View style={styles.escapes}>
@@ -183,6 +201,14 @@ const styles = StyleSheet.create({
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.borderStrong,
         gap: theme.spacing.md,
+    },
+    /** His name, in the same muted register the mail screen uses for a sender. */
+    speaker: {
+        color: theme.colors.brandMuted,
+        fontSize: theme.typography.micro,
+        fontWeight: '700',
+        letterSpacing: 0.8,
+        marginBottom: -4,
     },
     instruction: {
         color: theme.colors.textPrimary,

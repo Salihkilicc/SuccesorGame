@@ -45,6 +45,7 @@
 // ============================================================================
 
 import { testAll, type Condition } from '../story/conditions';
+import type { CastId } from '../story/cast';
 import type { World } from '../story/conditions';
 
 /**
@@ -64,8 +65,25 @@ export type TutorialLock = {
      * nothing, which the audit catches.
      */
     highlight: string;
-    /** One line. What to do, not why - the why is the character's job. */
+    /**
+     * One line, IN SOMEBODY'S VOICE. What to do, not why - the why is the
+     * scene's job, and the two must not say the same thing twice.
+     *
+     * It used to be written as manual copy ("Set a production target.
+     * Nothing else happens until something is being built.") and rendered
+     * with no name on it, which made the first hour of the game a dimmed
+     * screen being instructed by nobody. The father is standing right there
+     * in the conversation that arrives with it; the card should be him.
+     */
     instruction: string;
+    /**
+     * Who is saying it. Defaults to the father, who teaches the first year.
+     *
+     * A CastId rather than a name, so the label cannot drift from the name
+     * the same person uses in the inbox - and so a lock taught by the COO
+     * later is one field rather than a new component.
+     */
+    speaker?: CastId;
     /** When it clears and the sequence moves on. */
     satisfied: Condition[];
     /**
