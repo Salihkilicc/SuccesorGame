@@ -20,7 +20,7 @@ import { conversationById } from '../../../data/story';
 import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import { hostilePremiumFor } from '../../../core/market/negotiation';
+import { HOSTILE_MULTIPLE } from '../../../core/market/mergers';
 import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
 import { offerById } from '../../../core/market/sponsorship';
 import { formatMoney } from '../../../core/utils';
@@ -84,9 +84,10 @@ const MailDetailScreen = () => {
                     : demand.kind === 'reputation' ? 'Accept the condition.'
                         : 'Agree.';
 
-    const hostileLabel = negotiation
-        ? `${Math.round(hostilePremiumFor(negotiation.score) * 100)}% over market`
-        : '';
+    // Flat, and the same figure the acquisition screen prints and the engine
+    // charges. The resistance curve is shelved - see HOSTILE_MULTIPLE in
+    // core/market/mergers.ts for why a price nobody can see is not a mechanic.
+    const hostileLabel = `${HOSTILE_MULTIPLE}x market`;
 
     const onMeet = () => {
         if (!negotiation) return;
@@ -110,6 +111,32 @@ const MailDetailScreen = () => {
             Alert.alert('They have come back to you', 'The terms have changed. Read it again.');
             return;
         }
+
+        // ------------------------------------------------------------------
+        //  AND NOW YOU ACTUALLY BUY IT
+        // ------------------------------------------------------------------
+        //  This was `navigation.goBack()` and nothing else. A player wrote a
+        //  letter, waited a quarter, read the reply, met the condition - and
+        //  was returned to their inbox owning exactly what they owned before.
+        //  Every exit from this screen was a navigation call.
+        //
+        //  The acquisition screen owns financing, the cash check and the board
+        //  vote, and it is the only door into executeAcquisition. So the
+        //  agreed terms are handed to it rather than a second door being cut -
+        //  which is how the shelved NegotiationModal ended up moving money the
+        //  engine never saw.
+        // ------------------------------------------------------------------
+        if (result.agreed) {
+            navigation.navigate('HostileTakeover', {
+                acquire: {
+                    targetId: result.agreed.targetId,
+                    premiumRatio: result.agreed.premiumRatio,
+                    seat: result.agreed.seat,
+                    hostile: false,
+                },
+            });
+            return;
+        }
         navigation.goBack();
     };
 
@@ -128,7 +155,7 @@ const MailDetailScreen = () => {
         if (!negotiation) return;
         Alert.alert(
             'Tender to their shareholders',
-            `You would go over the board's head at ${hostileLabel}. Their people stay, and they will remember which of you they work for.`,
+            `You would go over the board's head at ${hostileLabel} — no negotiation, and you pay for that. Their people stay, and they will remember which of you they work for.`,
             [
                 { text: 'Not yet', style: 'cancel' },
                 {
@@ -140,7 +167,18 @@ const MailDetailScreen = () => {
                         // vote. Two doors into executeAcquisition is how the
                         // last negotiation screen ended up moving money the
                         // engine never saw - see the note in NegotiationModal.
-                        navigation.navigate('Assets', { hostileFor: negotiation.targetId });
+                        //
+                        // IT USED TO NAVIGATE TO 'Assets' WITH `hostileFor`,
+                        // and nothing anywhere read that param - Assets is the
+                        // tab, and the acquisition screen is 'HostileTakeover'
+                        // on the root stack. So the rudest, most expensive
+                        // decision in the game dropped the player on a list.
+                        navigation.navigate('HostileTakeover', {
+                            acquire: {
+                                targetId: negotiation.targetId,
+                                hostile: true,
+                            },
+                        });
                     },
                 },
             ],

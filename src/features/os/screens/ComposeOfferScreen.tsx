@@ -36,6 +36,7 @@ import { currentQuarter } from '../../../core/story/world';
 import { SUBJECTS, type Subject } from '../../../core/market/negotiation';
 import { INITIAL_MARKET_ITEMS } from '../../assets/data/marketData';
 import { formatMoney } from '../../../core/utils';
+import { FRIENDLY_LOCK_MARKET_CAP } from '../../../core/market/reach';
 
 const SUBJECT_LABEL: Record<Subject, string> = {
     purchase: 'Offer to acquire',
@@ -52,6 +53,27 @@ const SUBJECT_NOTE: Record<Subject, string> = {
     partnership: 'The slow route. Softens the hardest boards, and never gets you a plain yes.',
     notice: 'You tell them you are coming. The only letter a board that already refused you will read.',
 };
+
+/**
+ * The bands the market is folded into, largest first.
+ *
+ * The top boundary is FRIENDLY_LOCK_MARKET_CAP rather than a round number
+ * chosen for this screen: it is the same line the acquisition screen locks its
+ * Friendly button on, so "the ones you have to write to" is one fact stated in
+ * two places rather than two facts that will drift apart.
+ */
+const BANDS = [
+    {
+        id: 'locked',
+        title: 'Letters only',
+        note: 'Too big to buy over the counter. This is the only way in.',
+        min: FRIENDLY_LOCK_MARKET_CAP,
+        max: Infinity,
+    },
+    { id: 'large', title: 'Large', note: 'Serious companies. They will want something.', min: 10_000_000_000, max: FRIENDLY_LOCK_MARKET_CAP },
+    { id: 'mid', title: 'Mid-market', note: 'Big enough to have a board with opinions.', min: 1_000_000_000, max: 10_000_000_000 },
+    { id: 'small', title: 'Small', note: 'Most of these can simply be bought.', min: 0, max: 1_000_000_000 },
+];
 
 const ComposeOfferScreen = () => {
     const navigation = useNavigation<any>();
@@ -76,6 +98,30 @@ const ComposeOfferScreen = () => {
 
     const target = targets.find(t => t.id === targetId);
     const waiting = offers.filter(o => o.status === 'sent');
+
+    // ------------------------------------------------------------------
+    //  FIFTY-NINE COMPANIES IN ONE FLAT LIST
+    // ------------------------------------------------------------------
+    //  Every one of them was a card, in one column, sorted by size - so
+    //  choosing the subject line meant scrolling past the entire stock market
+    //  first, and choosing a big company meant scrolling past it twice.
+    //
+    //  Bands, collapsed, one open at a time. The top band is the one the
+    //  whole screen exists for: the companies that cannot be bought over the
+    //  counter at all, which is where a player who came here from a locked
+    //  button is heading. See core/market/reach.ts.
+    //
+    //  And once somebody is chosen the list folds away entirely, because the
+    //  question has been answered and the rest of the market is no longer a
+    //  decision - it is scenery between the player and the send button.
+    // ------------------------------------------------------------------
+    const [openBand, setOpenBand] = useState<string | undefined>(BANDS[0].id);
+
+    const banded = useMemo(() => BANDS.map(band => ({
+        band,
+        items: targets.filter(t =>
+            t.marketCap >= band.min && t.marketCap < band.max),
+    })).filter(g => g.items.length > 0), [targets]);
 
     const onSend = () => {
         if (!target) return;
@@ -117,31 +163,62 @@ const ComposeOfferScreen = () => {
                 )}
 
                 <Text style={styles.label}>TO</Text>
-                {targets.map(t => {
-                    const selected = t.id === targetId;
-                    const shut = !!closedForever[t.id];
-                    const pending = offers.some(o => o.targetId === t.id && o.status !== 'closed');
+
+                {target ? (
+                    // Chosen. One row and a way to change your mind.
+                    <Pressable
+                        onPress={() => setTargetId(undefined)}
+                        style={[styles.row, styles.rowSelected]}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.rowTitle}>{target.name}</Text>
+                            <Text style={styles.rowNote}>
+                                {formatMoney(target.marketCap)} · {target.risk ?? 'Medium'} risk
+                            </Text>
+                        </View>
+                        <Text style={styles.change}>Change</Text>
+                    </Pressable>
+                ) : banded.map(({ band, items }) => {
+                    const open = openBand === band.id;
                     return (
-                        <Pressable
-                            key={t.id}
-                            disabled={shut || pending}
-                            onPress={() => setTargetId(t.id)}
-                            style={[
-                                styles.row,
-                                selected && styles.rowSelected,
-                                (shut || pending) && styles.rowDisabled,
-                            ]}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={[styles.rowTitle, selected && styles.rowTitleSelected]}>
-                                    {t.name}
+                        <View key={band.id}>
+                            <Pressable
+                                onPress={() => setOpenBand(open ? undefined : band.id)}
+                                style={[styles.band, open && styles.bandOpen]}>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.bandTitle}>{band.title}</Text>
+                                    <Text style={styles.bandNote}>{band.note}</Text>
+                                </View>
+                                <Text style={styles.bandCount}>
+                                    {items.length}  {open ? '\u2303' : '\u2304'}
                                 </Text>
-                                <Text style={styles.rowNote}>
-                                    {formatMoney(t.marketCap)} · {t.risk ?? 'Medium'} risk
-                                    {shut ? ' · they asked you not to write again' : ''}
-                                    {pending && !shut ? ' · awaiting their reply' : ''}
-                                </Text>
-                            </View>
-                        </Pressable>
+                            </Pressable>
+
+                            {open && items.map(t => {
+                                const shut = !!closedForever[t.id];
+                                const pending = offers.some(
+                                    o => o.targetId === t.id && o.status !== 'closed');
+                                return (
+                                    <Pressable
+                                        key={t.id}
+                                        disabled={shut || pending}
+                                        onPress={() => setTargetId(t.id)}
+                                        style={[
+                                            styles.row,
+                                            styles.rowInBand,
+                                            (shut || pending) && styles.rowDisabled,
+                                        ]}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.rowTitle}>{t.name}</Text>
+                                            <Text style={styles.rowNote}>
+                                                {formatMoney(t.marketCap)} · {t.risk ?? 'Medium'} risk
+                                                {shut ? ' · they asked you not to write again' : ''}
+                                                {pending && !shut ? ' · awaiting their reply' : ''}
+                                            </Text>
+                                        </View>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
                     );
                 })}
 
@@ -221,6 +298,21 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
     },
     rowDisabled: { opacity: 0.45 },
+    /** Indented under its band, so the grouping is visible without a rule. */
+    rowInBand: { marginLeft: theme.spacing.md },
+    change: { color: theme.colors.guidance, fontSize: 13, fontWeight: '700' },
+    band: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: theme.colors.surfaceRaised,
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 8,
+    },
+    bandOpen: { marginBottom: 8 },
+    bandTitle: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '700' },
+    bandNote: { color: theme.colors.textMuted, fontSize: 12, marginTop: 3 },
+    bandCount: { color: theme.colors.textSecondary, fontSize: 13, fontWeight: '700' },
     rowTitle: { color: theme.colors.textPrimary, fontSize: 15, fontWeight: '600' },
     rowTitleSelected: { color: theme.colors.textPrimary },
     rowNote: { color: theme.colors.textMuted, fontSize: 12, marginTop: 3, lineHeight: 17 },

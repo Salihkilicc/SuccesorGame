@@ -33,7 +33,7 @@ import {
     NEGOTIATORS, negotiatorFor, genericNegotiator, shiftFor,
 } from '../../data/market/negotiators';
 import {
-    REFUSAL_THRESHOLD, FRIENDLY_PREMIUM, HOSTILE_PREMIUM,
+    REFUSAL_THRESHOLD, FRIENDLY_PREMIUM, HOSTILE_PREMIUM, HOSTILE_MULTIPLE,
     quoteAcquisition, estimateTargetEbit, boardWillSell,
 } from './mergers';
 
@@ -59,14 +59,31 @@ const scoreFor = (n: typeof vane, subject: Subject, over: Partial<{
 // ============================================================================
 //  THE PREMIUM THAT WAS 35%
 // ============================================================================
-describe('the hostile premium is a function of resistance, not a constant', () => {
-    it('the old number is still in the tree, shelved rather than deleted', () => {
-        expect(HOSTILE_PREMIUM).toBe(0.35);
+describe('the hostile route is a price, and the price is on the button', () => {
+    it('two and a half times the market, flat, for everybody', () => {
+        // ------------------------------------------------------------------
+        //  THE CURVE LOST TO A LABEL
+        // ------------------------------------------------------------------
+        //  0.45-0.75 on resistance was a better model than a constant and it
+        //  is shelved anyway, because the acquisition screen printed
+        //  `valuation * 1.2` beside the button while the engine charged the
+        //  curve. The one place the player decides was the one place the
+        //  number was wrong, so the model was invisible - and an invisible
+        //  model is a surprise at the till.
+        // ------------------------------------------------------------------
+        expect(HOSTILE_MULTIPLE).toBe(2.5);
+        expect(HOSTILE_PREMIUM).toBe(1.5);
+        const q = quoteAcquisition(100_000_000, 'Low', true, 500_000_000);
+        expect(q.price).toBeCloseTo(250_000_000, 0);
     });
 
-    it('and every price it can now produce is above it', () => {
-        // The floor IS the argument: 0.35 was not merely small, it was flat.
-        expect(HOSTILE_PREMIUM_FLOOR).toBeGreaterThan(HOSTILE_PREMIUM);
+    it('and it costs more than anything the curve could ask', () => {
+        // Which is the other half of the change: the rude route was cheap
+        // enough to be the default. Nobody takes this for convenience now.
+        expect(HOSTILE_PREMIUM).toBeGreaterThan(HOSTILE_PREMIUM_CEILING);
+    });
+
+    it('the shelved curve still computes, so bringing it back is a decision', () => {
         expect(hostilePremiumFor(REFUSAL_THRESHOLD)).toBe(HOSTILE_PREMIUM_FLOOR);
         expect(hostilePremiumFor(0)).toBe(HOSTILE_PREMIUM_FLOOR);
     });
@@ -98,9 +115,9 @@ describe('the hostile premium is a function of resistance, not a constant', () =
         expect(q.price).toBeCloseTo(160_000_000, 0);
     });
 
-    it('and an old caller that passes nothing still gets a hostile price', () => {
-        // Wrong by a known amount beats wrong by a silent one: the fallback is
-        // the shelved 0.35 and NOT the friendly rate.
+    it('and a caller that passes nothing gets the standing hostile price', () => {
+        // Which is now the RIGHT answer rather than a known-wrong fallback:
+        // there is one hostile number and everybody charges it.
         const q = quoteAcquisition(100_000_000, 'Low', true, 500_000_000);
         expect(q.premiumRatio).toBe(HOSTILE_PREMIUM);
         expect(q.premiumRatio).toBeGreaterThan(FRIENDLY_PREMIUM);

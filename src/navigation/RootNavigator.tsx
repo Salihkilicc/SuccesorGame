@@ -165,7 +165,21 @@ export type RootStackParamList = {
   TeamMorale: undefined;
   Finance: undefined;
   MyEmpire: undefined;
-  HostileTakeover: undefined;
+  /**
+   * The acquisition screen, optionally opened ON a company with terms
+   * already agreed - see MailDetailScreen. `undefined` is the ordinary
+   * route: the player browsing the market of their own accord.
+   */
+  HostileTakeover: {
+    acquire?: {
+      targetId: string;
+      hostile: boolean;
+      /** Negotiated premium, when a board agreed to one. */
+      premiumRatio?: number;
+      /** Whether a seat was part of the deal. */
+      seat?: boolean;
+    };
+  } | undefined;
   StockMarket: { onOpenIPO?: () => void } | undefined;
   BorrowLoan: undefined;
   RepayDebt: undefined;

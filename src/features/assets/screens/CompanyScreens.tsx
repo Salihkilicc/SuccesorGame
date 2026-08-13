@@ -119,9 +119,18 @@ export const MyEmpireScreen = () => {
     return <ExistingCompaniesModal asScreen visible onClose={close} />;
 };
 
-export const HostileTakeoverScreen = () => {
+export const HostileTakeoverScreen = ({ route }: any) => {
     const close = useGoBack();
-    return <AcquisitionModal asScreen visible onClose={close} />;
+    // ------------------------------------------------------------------
+    //  ARRIVING WITH A DEAL ALREADY DONE
+    // ------------------------------------------------------------------
+    //  The mail negotiation ends here: a board agreed, or refused and the
+    //  player went over its head. Either way the target and the terms are
+    //  settled and only the financing is left, which is what this screen
+    //  owns. Handed down as a param rather than read from the negotiation
+    //  store, so this screen has no opinion about where the deal came from.
+    // ------------------------------------------------------------------
+    return <AcquisitionModal asScreen visible onClose={close} acquire={route?.params?.acquire} />;
 };
 
 export const StockMarketScreen = ({ route }: any) => {

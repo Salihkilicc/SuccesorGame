@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import {
   Modal,
@@ -20,6 +20,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { INITIAL_MARKET_ITEMS } from '../../../features/assets/data/marketData';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 import { findCompetitorByStockId } from '../../../core/market/productMarkets';
+import { friendlyLock } from '../../../core/market/reach';
 import {
   FinancingMethod,
   FinancingQuote,
@@ -27,6 +28,7 @@ import {
   estimateTargetEbit,
   quoteAcquisition,
   quoteFinancing,
+  HOSTILE_MULTIPLE,
 } from '../../../core/market/mergers';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
@@ -41,13 +43,27 @@ interface AcquisitionModalProps {
   asScreen?: boolean;
   visible: boolean;
   onClose: () => void;
+  /**
+   * A deal that was settled somewhere else and only needs paying for.
+   *
+   * The mail negotiation ends here: a board agreed to a price, or refused and
+   * the player decided to go over its head. The target and the terms are done;
+   * this screen owns financing, the cash check and the board vote, and is the
+   * only door into executeAcquisition.
+   */
+  acquire?: {
+    targetId: string;
+    hostile: boolean;
+    premiumRatio?: number;
+    seat?: boolean;
+  };
 }
 
 const formatMoney = (value: number) => {
   return formatMoneyExact(value);
 };
 
-export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModalProps) => {
+export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: AcquisitionModalProps) => {
     useLocale();
   const navigation = useNavigation<any>();
   const { marketPrices } = useMarketStore();
@@ -56,6 +72,24 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
 
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [selectedTarget, setSelectedTarget] = useState<any | null>(null);
+
+  /**
+   * The deal handed in by the mail negotiation, while it is still about the
+   * company on screen. Cleared implicitly by picking somebody else, because
+   * terms agreed with one board are not terms agreed with another.
+   */
+  const negotiated =
+    acquire && selectedTarget && acquire.targetId === selectedTarget.id
+      ? acquire : undefined;
+
+  // Arriving from the post opens ON the company, because the player has
+  // already decided - making them find it again in a list of fifty-nine
+  // would be the screen pretending the letter did not happen.
+  useEffect(() => {
+    if (!acquire) return;
+    const found = (INITIAL_MARKET_ITEMS as any[]).find(i => i.id === acquire.targetId);
+    if (found) setSelectedTarget(found);
+  }, [acquire]);
   const [panel, setPanel] = useState<null | {
     title: string;
     summary?: string;
@@ -119,11 +153,33 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
 
     const hostile = type === 'HOSTILE';
     const currentValuation = getValuation(selectedTarget);
+
+    // ------------------------------------------------------------------
+    //  THE LOCK IS ENFORCED HERE, NOT ONLY DRAWN
+    // ------------------------------------------------------------------
+    //  The button below is disabled, which is what the player sees. This is
+    //  what makes it true: a disabled control is a drawing, and a drawing is
+    //  not a rule. See core/market/reach.ts.
+    // ------------------------------------------------------------------
+    const lock = friendlyLock(currentValuation);
+    if (!hostile && lock && !negotiated) {
+      setPanel({
+        title: selectedTarget.name,
+        summary: `${lock.reason}\n\n${lock.hint}`,
+        confirmLabel: 'OK',
+      });
+      return;
+    }
+
     const stats = useStatsStore.getState();
     const acquirerValuation = stats.companyValue || 0;
     const risk: TargetRisk = (selectedTarget.risk as TargetRisk) || 'Medium';
 
-    const q = quoteAcquisition(currentValuation, risk, hostile, acquirerValuation);
+    // A premium the board agreed to in the post beats the standing rate.
+    const q = quoteAcquisition(
+      currentValuation, risk, hostile, acquirerValuation,
+      !hostile ? negotiated?.premiumRatio : undefined,
+    );
 
     // ------------------------------------------------------------------
     //  FINANSMAN SECIMI
@@ -431,33 +487,72 @@ export const AcquisitionModal = ({ visible, onClose, asScreen }: AcquisitionModa
                 })()}
               </View>
 
-              <View style={styles.negActions}>
-                {/* Friendly Offer */}
-                <TouchableOpacity
-                  style={styles.optionBtn}
-                  onPress={() => handleAcquire('FRIENDLY')}
-                >
-                  <View style={styles.optionHeader}>
-                    <Text style={styles.optionTitle}>🤝 {t('acq.friendlyOffer')}</Text>
-                    <Text style={styles.optionPrice}>{formatMoney(selectedTarget.currentValuation)}</Text>
-                  </View>
-                  <Text style={styles.optionDesc}>{t('action.purchaseAtFairMarketValue')}</Text>
-                </TouchableOpacity>
+              {/* ------------------------------------------------------------
+                  BOTH PRICES ARE NOW THE PRICE
 
-                {/* Hostile Takeover */}
-                <TouchableOpacity
-                  style={[styles.optionBtn, styles.hostileBtn]}
-                  onPress={() => handleAcquire('HOSTILE')}
-                >
-                  <View style={styles.optionHeader}>
-                    <Text style={[styles.optionTitle, styles.hostileText]}>⚔️ {t('acq.hostileTakeover')}</Text>
-                    <Text style={[styles.optionPrice, styles.hostileText]}>
-                      {formatMoney(selectedTarget.currentValuation * 1.2)}
-                    </Text>
+                  Friendly printed `currentValuation` and hostile printed
+                  `currentValuation * 1.2`, and the engine charged neither -
+                  it charged FRIENDLY_PREMIUM and HOSTILE_PREMIUM through
+                  quoteAcquisition. So the two numbers the player weighed the
+                  decision on were both wrong, and the hostile one was wrong
+                  by a factor that changed when the premium was retuned.
+
+                  They come from the same quote the engine uses now.
+                 ------------------------------------------------------------ */}
+              {(() => {
+                const valuation = getValuation(selectedTarget);
+                const risk: TargetRisk = (selectedTarget.risk as TargetRisk) || 'Medium';
+                const acquirerValuation = useStatsStore.getState().companyValue || 0;
+                const friendlyQuote = quoteAcquisition(
+                  valuation, risk, false, acquirerValuation, negotiated?.premiumRatio,
+                );
+                const hostileQuote = quoteAcquisition(valuation, risk, true, acquirerValuation);
+                const lock = negotiated ? undefined : friendlyLock(valuation);
+
+                return (
+                  <View style={styles.negActions}>
+                    {/* Friendly Offer */}
+                    <TouchableOpacity
+                      style={[styles.optionBtn, !!lock && styles.optionBtnLocked]}
+                      disabled={!!lock}
+                      onPress={() => handleAcquire('FRIENDLY')}
+                    >
+                      <View style={styles.optionHeader}>
+                        <Text style={styles.optionTitle}>
+                          {lock ? '🔒' : '🤝'} {t('acq.friendlyOffer')}
+                        </Text>
+                        {!lock && (
+                          <Text style={styles.optionPrice}>{formatMoney(friendlyQuote.price)}</Text>
+                        )}
+                      </View>
+                      {/* THE LOCK SAYS WHERE TO GO INSTEAD. A shut door with
+                          no sign on it is the same as a broken one. */}
+                      <Text style={styles.optionDesc}>
+                        {lock ? lock.reason : negotiated
+                          ? 'Agreed in the post. Only the financing is left.'
+                          : t('action.purchaseAtFairMarketValue')}
+                      </Text>
+                      {!!lock && <Text style={styles.optionHint}>{lock.hint}</Text>}
+                    </TouchableOpacity>
+
+                    {/* Hostile Takeover */}
+                    <TouchableOpacity
+                      style={[styles.optionBtn, styles.hostileBtn]}
+                      onPress={() => handleAcquire('HOSTILE')}
+                    >
+                      <View style={styles.optionHeader}>
+                        <Text style={[styles.optionTitle, styles.hostileText]}>⚔️ {t('acq.hostileTakeover')}</Text>
+                        <Text style={[styles.optionPrice, styles.hostileText]}>
+                          {formatMoney(hostileQuote.price)}
+                        </Text>
+                      </View>
+                      <Text style={[styles.optionDesc, styles.hostileDesc]}>
+                        {HOSTILE_MULTIPLE}x market. No negotiation, and you pay for that.
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={[styles.optionDesc, styles.hostileDesc]}>{t('action.pay20PremiumInstantClose')}</Text>
-                </TouchableOpacity>
-              </View>
+                );
+              })()}
 
               <TouchableOpacity
                 style={styles.cancelBtn}
@@ -727,6 +822,16 @@ const styles = StyleSheet.create({
   optionDesc: {
     color: '#FFFFFF',
     fontSize: 12,
+  },
+  /** A locked route is dimmed, not hidden - the player should know it exists. */
+  optionBtnLocked: { opacity: 0.55 },
+  /** Where to go instead, in the one colour that means "somebody is teaching
+      you". See the note on `guidance` in core/theme.ts. */
+  optionHint: {
+    color: theme.colors.guidance,
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 6,
   },
   hostileBtn: {
     backgroundColor: 'rgba(5,168,246,0.1)',

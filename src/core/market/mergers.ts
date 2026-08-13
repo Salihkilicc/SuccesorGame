@@ -140,19 +140,32 @@ export const estimateTargetEbit = (marketCap: number, risk: TargetRisk = 'Medium
 /** Dostane devralmada odenen tipik prim. */
 export const FRIENDLY_PREMIUM = 0.15;
 /**
- * SHELVED — a flat hostile premium, replaced by a floor plus resistance.
+ * WHAT IT COSTS TO TAKE A COMPANY THAT DOES NOT WANT TO BE TAKEN.
  *
- * Kept as the DEFAULT for any caller that has no resistance score to hand, so
- * nothing silently prices a hostile deal at the friendly rate. The live number
- * is `hostilePremiumFor(score)` in core/market/negotiation.ts, which is where
- * the measurement and the argument for the change are written down.
+ * TWO AND A HALF TIMES THE MARKET, FLAT, FOR EVERY COMPANY. A premium of 1.5
+ * on top of the fair value is the same statement written the way the quote
+ * wants it.
  *
- * The short version: 0.35 was flat, so overrunning a board that barely refused
- * you cost exactly what overrunning one that would fight to the last share
- * cost - and `boardWillSell` was already computing the difference and throwing
- * it away. It now runs 0.45 to 0.75 on that score.
+ * ---------------------------------------------------------------------------
+ *  IT WAS 0.35, THEN IT WAS A CURVE, AND NOW IT IS A PRICE
+ * ---------------------------------------------------------------------------
+ *  The curve (`hostilePremiumFor`, shelved in negotiation.ts) ran 0.45 to 0.75
+ *  on how hard the board resisted, and the argument for it was good: a board
+ *  that would fight to the last share should cost more than one that barely
+ *  refused you.
+ *
+ *  What it could not survive is that NOTHING TOLD THE PLAYER. The acquisition
+ *  screen printed `valuation * 1.2` beside the hostile button and the engine
+ *  charged something else entirely, so the curve was invisible in exactly the
+ *  place the player decides. A price nobody can see is not a mechanic, it is
+ *  a surprise at the till.
+ *
+ *  So: one number, stated on the button, charged by the engine. The hostile
+ *  route is the route where you do not negotiate and you pay through the nose
+ *  for the privilege - and now the nose has a figure on it.
  */
-export const HOSTILE_PREMIUM = 0.35;
+export const HOSTILE_MULTIPLE = 2.5;
+export const HOSTILE_PREMIUM = HOSTILE_MULTIPLE - 1;
 
 /** Entegrasyon maliyeti islem bedelinin bu orani kadardir. */
 export const INTEGRATION_COST_RATIO = 0.04;

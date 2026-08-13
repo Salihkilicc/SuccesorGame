@@ -244,6 +244,23 @@ export const willEngage = (score: number): boolean => score < REFUSAL_THRESHOLD;
 //  thing this game should be willing to say.
 // ============================================================================
 
+// ---------------------------------------------------------------------------
+//  SHELVED: THE RESISTANCE CURVE
+// ---------------------------------------------------------------------------
+//  Everything below still computes, and nothing prices a deal with it any
+//  more. The hostile route is a flat 2.5x the market - see HOSTILE_MULTIPLE in
+//  core/market/mergers.ts, and the note there for why.
+//
+//  The short version: the curve was invisible. The acquisition screen printed
+//  `valuation * 1.2` next to the button while the engine charged the curve, so
+//  the one place the player decides was the one place the number was wrong. A
+//  price the player cannot see is a surprise at the till, not a mechanic.
+//
+//  Kept rather than removed because the argument for it is still right and the
+//  thing it needed - the price on the button being the price - now exists. If
+//  it comes back, it comes back visible.
+// ---------------------------------------------------------------------------
+
 /** What it costs to go over any board's head, however mild they are. */
 export const HOSTILE_PREMIUM_FLOOR = 0.45;
 /** Added per point of resistance above the refusal threshold. */
@@ -251,6 +268,7 @@ export const HOSTILE_RESISTANCE_SLOPE = 0.6;
 /** Nobody pays more than this. Beyond it the deal stops being a deal. */
 export const HOSTILE_PREMIUM_CEILING = 0.75;
 
+/** @orphan-ok-symbol hostilePremiumFor — shelved, see the note above. */
 export const hostilePremiumFor = (score: number): number => {
     const over = Math.max(0, score - REFUSAL_THRESHOLD);
     return Math.min(

@@ -27,7 +27,7 @@ import {
     type Offer, type Subject, type Demand, type Reply,
 } from '../market/negotiation';
 import { negotiatorFor, shiftFor } from '../../data/market/negotiators';
-import type { TargetRisk } from '../market/mergers';
+import { FRIENDLY_PREMIUM, type TargetRisk } from '../market/mergers';
 
 export interface NegotiationState {
     offers: Offer[];
@@ -73,15 +73,46 @@ type Store = NegotiationState & {
      * Returns the ones that just became readable so the caller can post mail.
      */
     resolveDue: (quarter: number) => Offer[];
-    /** The player's answer to a demand. */
+    /**
+     * The player's answer to what came back.
+     *
+     * A DEMAND or an ACCEPTANCE. It used to be demands only, and an
+     * acceptance - "the board will recommend the offer", the best outcome in
+     * the whole system - fell through to "There is nothing open to answer."
+     * The screen showed that as "Not yet", so the one reply that means yes was
+     * the one reply the player could not act on.
+     *
+     * `agreed` is the terms to buy at when the negotiation is over and the
+     * player has what they came for. Without it the answer closed the offer
+     * and nothing was ever bought: a year of letters ending in a `goBack()`.
+     */
     answer: (offerId: string, met: boolean, world: {
         publicReputation: number; capital: number; price: number;
-    }) => { ok: boolean; counter?: Demand; closed?: boolean; reason?: string };
+    }) => {
+        ok: boolean;
+        counter?: Demand;
+        closed?: boolean;
+        reason?: string;
+        agreed?: { targetId: string; targetName: string; premiumRatio: number; seat: boolean };
+    };
     /** Walk away without going hostile. */
     withdraw: (offerId: string) => void;
     /** Everything the player still has to answer. */
     open: () => Offer[];
-    /** What a hostile bid for this target would cost right now, as a ratio. */
+    /**
+     * What a hostile bid for this target would cost right now, as a ratio.
+     *
+     * @orphan-ok-symbol hostilePremium
+     *
+     * SHELVED with the resistance curve it reads. The hostile route is a flat
+     * 2.5x the market now - see HOSTILE_MULTIPLE in core/market/mergers.ts and
+     * the note on why a price the player cannot see is not a mechanic.
+     *
+     * Kept because the reasoning it encodes is still right: a board you dealt
+     * with honestly should be cheaper to overrun than one you never spoke to.
+     * If that comes back it comes back visible, and this is where it reads
+     * from.
+     */
     hostilePremium: (targetId: string, fallbackScore: number) => number;
     reset: () => void;
 };
@@ -179,7 +210,45 @@ export const useNegotiationStore = create<Store>()(
             answer: (offerId, met, world) => {
                 const state = get();
                 const offer = state.offers.find(o => o.id === offerId);
-                if (!offer || offer.status !== 'open' || offer.reply?.kind !== 'demand') {
+                if (!offer || offer.status !== 'open' || !offer.reply) {
+                    return { ok: false, reason: 'There is nothing open to answer.' };
+                }
+
+                // ------------------------------------------------------
+                //  A PLAIN YES
+                // ------------------------------------------------------
+                //  `replyFor` returns `accept` when the board asks for
+                //  nothing, and this branch did not exist - the guard above
+                //  demanded `kind === 'demand'` and everything else fell
+                //  through to "there is nothing open to answer".
+                //
+                //  So the best possible outcome was indistinguishable from a
+                //  bug, and it read as one: "Not yet" on a letter that said
+                //  the board would recommend the offer.
+                //
+                //  There is nothing to meet, so `met` is not consulted. If
+                //  the player pressed the other button they wanted to walk
+                //  away, and `withdraw` is what does that.
+                // ------------------------------------------------------
+                if (offer.reply.kind === 'accept') {
+                    if (!met) return { ok: false, reason: 'There is nothing to refuse.' };
+                    set(s => ({
+                        offers: s.offers.map(o => o.id === offerId
+                            ? { ...o, status: 'closed' } : o),
+                    }));
+                    return {
+                        ok: true,
+                        closed: true,
+                        agreed: {
+                            targetId: offer.targetId,
+                            targetName: offer.targetName,
+                            premiumRatio: FRIENDLY_PREMIUM,
+                            seat: false,
+                        },
+                    };
+                }
+
+                if (offer.reply.kind !== 'demand') {
                     return { ok: false, reason: 'There is nothing open to answer.' };
                 }
                 const demand = offer.reply.demand;
@@ -229,7 +298,32 @@ export const useNegotiationStore = create<Store>()(
                         ? { ...s.closedForever, [offer.targetId]: true as const }
                         : s.closedForever,
                 }));
-                return { ok: true, closed: true };
+
+                // ------------------------------------------------------
+                //  AND MEETING A DEMAND BUYS THE COMPANY
+                // ------------------------------------------------------
+                //  It used to close the offer and stop. The screen then called
+                //  goBack(), so a player who wrote a letter, waited a quarter,
+                //  read a demand and paid it was returned to their inbox
+                //  owning nothing. Every path through this system ended in a
+                //  navigation call.
+                //
+                //  The terms come from `termsFor`, which already knew what a
+                //  met demand was worth and had nobody to tell.
+                // ------------------------------------------------------
+                const terms = termsFor(demand, met);
+                return {
+                    ok: true,
+                    closed: true,
+                    agreed: met
+                        ? {
+                            targetId: offer.targetId,
+                            targetName: offer.targetName,
+                            premiumRatio: terms.premiumRatio,
+                            seat: terms.seat,
+                        }
+                        : undefined,
+                };
             },
 
             withdraw: offerId =>
