@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+import TutorialOverlay from '../../../components/tutorial/TutorialOverlay';
 import { theme } from '../../../core/theme';
 import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { StatRow } from '../../../components/common/Disclosure';
@@ -981,7 +983,21 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             Artik CEYREKLIK BUTCE. Barda iki isaret var:
                             bakim esigi (markanin yerinde kaldigi nokta) ve
                             kiyas butce (ses payinin %50 oldugu nokta). */}
-                        <View style={styles.controlGroup}>
+                        {/* ------------------------------------------------
+                            THE CONTROL THE FIRST LESSON IS ABOUT
+
+                            Registered so the overlay can cut its hole here.
+                            It could not before: an iOS Modal is presented in
+                            its own window above everything in the React
+                            tree, so the overlay mounted at the root of the
+                            navigator sits UNDERNEATH this sheet and the
+                            highlight simply never appeared.
+
+                            Which is why <TutorialOverlay /> is rendered
+                            again at the bottom of this modal, inside the
+                            same window as the control it is pointing at.
+                           ------------------------------------------------ */}
+                        <TutorialTarget tutorialKey="marketing" style={styles.controlGroup}>
                             <View style={styles.controlHeader}>
                                 <Text style={styles.controlTitle}>{t('product.marketingBudget')}</Text>
                                 <InfoDot
@@ -1081,7 +1097,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             )}
 
                             <Text style={styles.costLine}>{t('product.chargedEveryQuarterRegardlessOf', { v1: formatMoney(marketing) })}</Text>
-                        </View>
+                        </TutorialTarget>
 
                         {/* ══ CANLI ONIZLEME ══
                             Kaydetmeden once sonucunu gor. computeAttraction
@@ -1192,6 +1208,23 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                 confirmLabel={panel?.confirmLabel || 'OK'}
                 onCancel={() => setPanel(null)}
             />
+
+            {/* ------------------------------------------------------------
+                THE TUTORIAL, INSIDE THE SHEET
+
+                A second mount of the same component, not a second overlay:
+                it reads the same lock state and the same measurements, and
+                shows itself only when the lock on screen names a control
+                that has been measured HERE. The one at the root of the
+                navigator cannot reach inside this modal - iOS presents it
+                in its own window above the whole React tree - so without
+                this the step that points at the budget row would dim
+                nothing and light nothing, which is exactly what it did.
+
+                Both mounts are harmless together: each renders null unless
+                its own window holds the measured control.
+               ------------------------------------------------------------ */}
+            <TutorialOverlay />
         </Modal>
     );
 };

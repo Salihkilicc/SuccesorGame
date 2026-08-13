@@ -275,6 +275,19 @@ export type StoryFlag =
     // --- Teaching. Raised by the screens the first year points at, so a
     //     lock clears on the ACTION rather than on a screen being opened.
     | 'tutorialProductionSet'
+    /**
+     * The player opened a product's detail sheet.
+     *
+     * The opening lesson is two steps because the control it is about lives
+     * inside a modal, and an iOS Modal is presented in its own window ABOVE
+     * everything in the React tree - including the tutorial overlay mounted
+     * at the root. A single lock could light the card that opens the sheet or
+     * a control inside it, never both, and the second one not at all.
+     *
+     * So: step one lights the card and clears on this. Step two lights the
+     * budget row from inside the sheet, where the overlay can reach it.
+     */
+    | 'tutorialProductOpened'
     | 'tutorialBonusPaid'
     | 'tutorialMarketingSet'
     // --- Verdicts

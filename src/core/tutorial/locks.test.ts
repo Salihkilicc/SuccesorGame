@@ -247,7 +247,7 @@ describe('somebody is saying it', () => {
         // relying on a dedupe to cover a design with two sources is how the
         // second source eventually wins.
         expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
-            .toEqual(['q1-marketing']);
+            .toEqual(['q1-open-product', 'q1-marketing']);
     });
 
     it('the instruction stays short enough to sit on a dimmed screen', () => {
@@ -274,7 +274,7 @@ describe('somebody is saying it', () => {
 //  lifecycle is in TutorialTarget.tsx.
 // ============================================================================
 describe('a lock points at a control that exists', () => {
-    const REGISTERED = ['products', 'teamMorale'];
+    const REGISTERED = ['products', 'marketing', 'teamMorale'];
 
     it('every highlight key is one a screen actually registers', () => {
         // A key nothing registers is a lock that can now never appear at all,
@@ -290,5 +290,20 @@ describe('a lock points at a control that exists', () => {
         // If this grows, the list above is stale and the check is weaker than
         // it reads. Kept small on purpose.
         expect(REGISTERED.length).toBeLessThanOrEqual(4);
+    });
+
+    it('the opening lesson is two steps, and they light different things', () => {
+        // One lock could not do it. The budget row lives inside a modal, and
+        // iOS presents a modal above the whole React tree - so a lock that
+        // lit the card could never also light the control, and the control
+        // is the half the lesson is about.
+        const open = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-open-product')!;
+        const spend = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-marketing')!;
+        expect(open.highlight).toBe('products');
+        expect(spend.highlight).toBe('marketing');
+        // In this order, or the player is asked to spend before the sheet
+        // they would spend in has been opened.
+        expect(TUTORIAL_SEQUENCE.indexOf(open))
+            .toBeLessThan(TUTORIAL_SEQUENCE.indexOf(spend));
     });
 });

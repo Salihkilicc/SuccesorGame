@@ -42,15 +42,22 @@ const showing = (world: World, state: LockState = emptyLockState()) =>
     activeLock(TUTORIAL_SEQUENCE, state, world)?.id;
 
 describe('a new game', () => {
-    it('opens on the marketing step, pointing at the product', () => {
+    it('opens on the step that gets the player into the product', () => {
         // It used to open on a production target, and that read as nonsense
         // on the screen it pointed at: "nothing is real until something is
         // being built", said to a player looking at a phone that has been in
         // production since before they arrived. The budget is the hole they
         // can actually see.
         const lock = activeLock(TUTORIAL_SEQUENCE, emptyLockState(), opening());
-        expect(lock?.id).toBe('q1-marketing');
+        expect(lock?.id).toBe('q1-open-product');
         expect(lock?.highlight).toBe('products');
+    });
+
+    it('then points at the budget row, once the sheet has been opened', () => {
+        const after = opening({ flags: { tutorialProductOpened: true } });
+        const lock = activeLock(TUTORIAL_SEQUENCE, emptyLockState(), after);
+        expect(lock?.id).toBe('q1-marketing');
+        expect(lock?.highlight).toBe('marketing');
     });
 
     it('and not for a company that cannot afford to clear it', () => {
@@ -61,7 +68,7 @@ describe('a new game', () => {
 });
 
 describe('after the player buys some attention', () => {
-    const afterwards = opening({ flags: { tutorialMarketingSet: true } });
+    const afterwards = opening({ flags: { tutorialProductOpened: true, tutorialMarketingSet: true } });
 
     it('the tutorial goes quiet, and that is correct', () => {
         // THE ANSWER TO "why is nothing highlighted on Products". Nothing is
@@ -74,7 +81,7 @@ describe('after the player buys some attention', () => {
         // step needs 72 or below, which arrives in the second or third
         // quarter - see MORALE_EVENT_THRESHOLD and the note above it.
         expect(showing(opening({
-            flags: { tutorialMarketingSet: true },
+            flags: { tutorialProductOpened: true, tutorialMarketingSet: true },
             morale: 72,
         }))).toBe('morale-bonus');
     });
@@ -83,9 +90,14 @@ describe('after the player buys some attention', () => {
         // q3-marketing is shelved. It waited on the same flag the opening
         // lock now raises, so it was inert as well as redundant - see the
         // note in data/tutorial/sequence.ts.
-        expect(TUTORIAL_SEQUENCE.map(l => l.id)).toEqual(['q1-marketing', 'morale-bonus']);
+        expect(TUTORIAL_SEQUENCE.map(l => l.id))
+            .toEqual(['q1-open-product', 'q1-marketing', 'morale-bonus']);
         expect(showing(opening({
-            flags: { tutorialMarketingSet: true, tutorialBonusPaid: true },
+            flags: {
+                tutorialProductOpened: true,
+                tutorialMarketingSet: true,
+                tutorialBonusPaid: true,
+            },
             quarter: 3, morale: 75,
         }))).toBeUndefined();
     });
@@ -97,13 +109,13 @@ describe('the year ends', () => {
         // in year three is a bug, and this is the one line that prevents it.
         expect(showing(opening({ flags: { fatherDead: true } }))).toBeUndefined();
         expect(showing(opening({
-            flags: { fatherDead: true, tutorialMarketingSet: true },
+            flags: { fatherDead: true, tutorialProductOpened: true, tutorialMarketingSet: true },
             quarter: 3,
         }))).toBeUndefined();
     });
 
     it('a skipped step does not come back', () => {
-        const skipped: LockState = { ...emptyLockState(), skipped: ['q1-marketing'] };
+        const skipped: LockState = { ...emptyLockState(), skipped: ['q1-open-product', 'q1-marketing'] };
         expect(showing(opening(), skipped)).toBeUndefined();
     });
 

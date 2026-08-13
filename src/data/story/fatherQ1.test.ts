@@ -148,7 +148,7 @@ describe('it does NOT repeat the lock that dims the screen', () => {
     const spoken = () => fatherQ1.nodes.map(n => n.text).join(' ');
 
     it('leaves the where to the overlay', () => {
-        const q1 = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-marketing')!;
+        const q1 = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-open-product')!;
         expect(q1.highlight).toBe('products');
         // He never sends them to a screen by name. That is the card's job
         // and it is doing it three centimetres away.
@@ -156,12 +156,11 @@ describe('it does NOT repeat the lock that dims the screen', () => {
     });
 
     it('and does not restate the card word for word', () => {
-        const q1 = TUTORIAL_SEQUENCE.find(l => l.id === 'q1-marketing')!;
-        // The card asks the player to open the phone and put money behind
-        // it. He may still be about production - he is standing in front of
-        // a line he thinks is running cold - but no imperative belongs to
-        // both of them.
-        expect(spoken()).not.toContain(q1.instruction);
+        // Both steps of the opening lesson, and he restates neither.
+        for (const id of ['q1-open-product', 'q1-marketing']) {
+            const lock = TUTORIAL_SEQUENCE.find(l => l.id === id)!;
+            expect(spoken()).not.toContain(lock.instruction);
+        }
         expect(spoken()).not.toMatch(/\bSet a target\b/);
         expect(spoken()).not.toMatch(/put money behind it/i);
     });

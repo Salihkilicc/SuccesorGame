@@ -69,13 +69,27 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         //  budget lives INSIDE the product, and the instruction carries that
         //  second step because a lock cannot light a control behind a modal.
         // ------------------------------------------------------------------
-        id: 'q1-marketing',
+        //  ---------------------------------------------------------------
+        //  AND WHY IT IS TWO STEPS
+        //  ---------------------------------------------------------------
+        //  The budget lives INSIDE the product sheet, and on iOS a Modal is
+        //  presented in its own window above everything in the React tree -
+        //  including the overlay mounted at the root of the navigator. One
+        //  lock could light the card that opens the sheet or a control
+        //  inside it, never both, and in practice the second one not at all:
+        //  the hole simply never appeared, which is what "it does not
+        //  highlight the marketing" meant.
+        //
+        //  So the card is step one and the budget row is step two, and the
+        //  overlay is rendered inside the sheet as well so it can reach it.
+        //  ---------------------------------------------------------------
+        id: 'q1-open-product',
         highlight: 'products',
         // His voice, not the manual's. Short because it sits on a dimmed screen
         // for as long as it takes - the argument is in the conversation.
         speaker: 'father',
-        instruction: 'Open the phone and put money behind it. Nobody outside this building knows it exists.',
-        satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
+        instruction: 'Open the product. Everything that decides whether anyone hears about it is in there.',
+        satisfied: [{ kind: 'flag', flag: 'tutorialProductOpened' }],
         canEngage: [
             // Only in the first year. After that he is either dead or has
             // stopped explaining, and a tutorial that reappears in year three
@@ -86,6 +100,26 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
             // core/tutorial/locks.ts. The opening capital is 2,000,000, so
             // this holds on any ordinary first quarter and stops holding for
             // a player who has already spent their way into trouble.
+            { kind: 'capitalAtLeast', amount: 500_000 },
+        ],
+    },
+
+    {
+        // ------------------------------------------------------------------
+        //  Q1, STEP TWO — PUT SOMETHING BEHIND IT
+        // ------------------------------------------------------------------
+        //  Lit from inside the product sheet, which is the only place the
+        //  overlay can reach this control. See the note on the step above.
+        // ------------------------------------------------------------------
+        id: 'q1-marketing',
+        highlight: 'marketing',
+        speaker: 'father',
+        instruction: 'Put some marketing behind it, and save. Nobody outside this building knows it exists.',
+        satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
+        canEngage: [
+            { kind: 'noFlag', flag: 'fatherDead' },
+            // Clearing this one costs money, so it must not engage for a
+            // company that has none - the first of the three ways out.
             { kind: 'capitalAtLeast', amount: 500_000 },
         ],
     },

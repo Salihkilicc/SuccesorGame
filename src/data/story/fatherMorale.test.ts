@@ -98,7 +98,7 @@ describe('the lock', () => {
     const lock = () => TUTORIAL_SEQUENCE.find(l => l.id === 'morale-bonus')!;
     // The opening lock, cleared. It was 'q1-production' and is now
     // 'q1-marketing' - the first lesson changed, this one did not.
-    const state = () => ({ ...emptyLockState(), completed: ['q1-marketing'] });
+    const state = () => ({ ...emptyLockState(), completed: ['q1-open-product', 'q1-marketing'] });
 
     it('does not engage while morale is still healthy', () => {
         // It had NO morale condition at all before this - it would have

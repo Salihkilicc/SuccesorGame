@@ -111,3 +111,28 @@ describe('setting a marketing budget', () => {
         expect(raised('tutorialMarketingSet')).toBe(false);
     });
 });
+
+// ============================================================================
+//  OPENING THE SHEET IS ITSELF A STEP
+// ============================================================================
+//  The opening lesson is two locks because the control it is about lives
+//  inside a modal, and iOS presents a modal in its own window above the whole
+//  React tree - so the overlay mounted at the root cannot reach into it. The
+//  card is step one; the budget row is step two, lit by a second mount of the
+//  overlay inside the sheet.
+// ============================================================================
+describe('opening a product', () => {
+    it('raises the flag the first step waits on', () => {
+        expect(raised('tutorialProductOpened')).toBe(false);
+        // What useProductsLogic.openDetailModal does.
+        useStoryStore.getState().raise('tutorialProductOpened');
+        expect(raised('tutorialProductOpened')).toBe(true);
+    });
+
+    it('and it is a different flag from having spent anything', () => {
+        // If these were one flag the second step could never engage: the
+        // thing that satisfies it would already be true on arrival.
+        useStoryStore.getState().raise('tutorialProductOpened');
+        expect(raised('tutorialMarketingSet')).toBe(false);
+    });
+});

@@ -40,6 +40,15 @@ export const useProductsLogic = () => {
 
     const openDetailModal = (product: Product) => {
         const currentProduct = products.find((p: Product) => p.id === product.id) || product;
+        // The first lesson's first step clears here. See the note on
+        // `tutorialProductOpened` in core/story/state.ts: the control the
+        // lesson is actually about lives inside this sheet, and a modal is
+        // presented above the tutorial overlay, so the step that lights the
+        // CARD has to end the moment the card has been used.
+        try {
+            require('../../../core/store/useStoryStore')
+                .useStoryStore.getState().raise('tutorialProductOpened');
+        } catch { /* story store not ready */ }
         setSelectedProduct(currentProduct);
     };
 
