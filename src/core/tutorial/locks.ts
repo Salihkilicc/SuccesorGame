@@ -114,8 +114,32 @@ export type TutorialLock = {
      * later is one field rather than a new component.
      */
     speaker?: CastId;
-    /** When it clears and the sequence moves on. */
-    satisfied: Condition[];
+    /**
+     * When it clears and the sequence moves on.
+     *
+     * OPTIONAL, and only for an `acknowledge` step - see below. Every other
+     * lock must name the thing the player has to do, or it is a screen that
+     * dims until a timer offers a way out.
+     */
+    satisfied?: Condition[];
+    /**
+     * This step is READ, not done. A tap anywhere clears it.
+     *
+     * The research lesson ended with "hire a researcher", and that was the
+     * wrong shape for it. Hiring is expensive and it may be the wrong call
+     * this quarter - a tutorial has no business insisting on a purchase, and
+     * a player who correctly decides not to buy is then stuck in front of an
+     * instruction they have already understood and rejected.
+     *
+     * What that step actually needed to do was POINT and EXPLAIN: this is the
+     * control, this is what it buys you, it is not cheap. Then get out of the
+     * way.
+     *
+     * Blocking the screen for one tap is safe in a way no other lock is:
+     * the tap that clears it is any tap at all, so it cannot trap anybody -
+     * whatever the player reaches for next also dismisses this.
+     */
+    acknowledge?: boolean;
     /**
      * Do not engage unless this holds. THE FIRST WAY OUT.
      *
@@ -170,15 +194,28 @@ export const activeLock = (
         if (done(state, lock.id)) continue;
         if (!testAll(lock.canEngage, world)) continue;
         // Already true when we got here - nothing to teach.
-        if (testAll(lock.satisfied, world)) continue;
+        //
+        // THROUGH isSatisfied, not through testAll. It used to test the
+        // condition itself, which is the same question answered in two
+        // places - and the two disagreed the moment `satisfied` became
+        // optional: `testAll(undefined)` is TRUE, so an acknowledge step
+        // satisfied itself on arrival and was skipped without ever being
+        // shown.
+        if (isSatisfied(lock, world)) continue;
         return lock;
     }
     return undefined;
 };
 
 /** Has the lock on screen been cleared by what the player just did? */
-export const isSatisfied = (lock: TutorialLock, world: World): boolean =>
-    testAll(lock.satisfied, world);
+export const isSatisfied = (lock: TutorialLock, world: World): boolean => {
+    // An acknowledge step is cleared by being read, and being read is
+    // recorded in LockState.completed rather than in the world. `testAll` of
+    // nothing is TRUE, so without this it would satisfy itself on arrival and
+    // the player would never see it.
+    if (lock.acknowledge && !lock.satisfied) return false;
+    return testAll(lock.satisfied, world);
+};
 
 /**
  * WAY OUT NUMBER TWO: the lock is up and the world stopped supporting it.
@@ -236,7 +273,11 @@ export const validateLocks = (sequence: TutorialLock[]): LockProblem[] => {
         }
         seen.add(lock.id);
 
-        if (lock.satisfied.length === 0) {
+        // An acknowledge step is allowed to have none: it is cleared by being
+        // read, which is recorded in LockState rather than in the world. A
+        // step that is NOT acknowledge and names no condition can only ever be
+        // skipped, which is a screen that dims until a timer rescues it.
+        if (!lock.acknowledge && !(lock.satisfied ?? []).length) {
             problems.push({
                 lock: lock.id,
                 kind: 'unsatisfiable',
@@ -265,7 +306,7 @@ export const validateLocks = (sequence: TutorialLock[]): LockProblem[] => {
             problems.push({
                 lock: lock.id,
                 kind: 'no-escape',
-                detail: lock.satisfied.some(needsResources)
+                detail: (lock.satisfied ?? []).some(needsResources)
                     ? 'clearing it costs money but nothing stops it engaging when there is none'
                     : 'no canEngage: say when this is a fair thing to demand, even if the answer is "always in year one"',
             });

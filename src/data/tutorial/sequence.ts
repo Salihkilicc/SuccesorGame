@@ -102,17 +102,30 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
     },
 
     {
+        // ------------------------------------------------------------------
+        //  AND THEN IT EXPLAINS AND GETS OUT OF THE WAY
+        // ------------------------------------------------------------------
+        //  This asked the player to hire somebody, and that was the wrong
+        //  shape for it. Hiring is expensive and may be the wrong call this
+        //  quarter; a tutorial has no business insisting on a purchase, and a
+        //  player who correctly decides not to buy was then left in front of
+        //  an instruction they had already understood and rejected.
+        //
+        //  What the step actually needed to do was point at the control and
+        //  say what it buys. So it is an `acknowledge` step: read, tapped
+        //  away, done. No flag, no purchase, no waiting.
+        //
+        //  It says the price out loud as well. The reason a player hesitates
+        //  here is that the salary is real and permanent, and a lesson that
+        //  skips past that is selling rather than teaching.
+        // ------------------------------------------------------------------
         id: 'rnd-hire',
         highlight: 'rndHire',
         speaker: 'cto',
-        instruction: 'Hire a researcher. One is six hundred points a quarter.',
-        satisfied: [{ kind: 'flag', flag: 'rndHired' }],
+        acknowledge: true,
+        instruction: 'Researchers make points every quarter, and points open new products and improve the ones you have. They are expensive, and they are the only thing that changes what you can build.',
         canEngage: [
             { kind: 'flag', flag: 'rndLabOpened' },
-            // Hiring costs money now and salary every quarter after. The
-            // first of the three ways out: do not demand it of a company that
-            // cannot pay for it.
-            { kind: 'capitalAtLeast', amount: 250_000 },
         ],
     },
 

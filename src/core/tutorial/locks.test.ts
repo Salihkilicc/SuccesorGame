@@ -118,14 +118,24 @@ describe('the sequence that actually ships', () => {
     });
 
     it('every lock can be cleared by something', () => {
-        for (const l of TUTORIAL_SEQUENCE) expect(l.satisfied.length).toBeGreaterThan(0);
+        // An acknowledge step is cleared by being READ - recorded in
+        // LockState rather than in the world - so it is allowed to name no
+        // condition. Everything else must, or it is a screen that dims until
+        // the timed skip rescues the player.
+        for (const l of TUTORIAL_SEQUENCE) {
+            if (l.acknowledge) {
+                expect(l.satisfied ?? []).toEqual([]);
+                continue;
+            }
+            expect((l.satisfied ?? []).length).toBeGreaterThan(0);
+        }
     });
 
     it('every lock that costs money says when it may engage', () => {
         // The rule the validator enforces, asserted directly so it cannot be
         // weakened by loosening the validator.
         for (const l of TUTORIAL_SEQUENCE) {
-            const costs = JSON.stringify(l.satisfied).includes('Bonus');
+            const costs = JSON.stringify(l.satisfied ?? []).includes('Bonus');
             if (costs) expect((l.canEngage ?? []).length).toBeGreaterThan(0);
         }
     });
@@ -151,8 +161,10 @@ describe('the sequence that actually ships', () => {
                 TUTORIAL_SEQUENCE.forEach(x => { s = { ...s, skipped: [...s.skipped, x.id] }; });
                 break;
             }
-            const f = (l.satisfied[0] as any).flag;
-            flags[f] = true;
+            // An acknowledge step is cleared by a tap, which is recorded as
+            // completion and raises nothing in the world.
+            const first = (l.satisfied ?? [])[0] as any;
+            if (first?.flag) flags[first.flag] = true;
             s = { ...s, completed: [...s.completed, l.id] };
         }
         expect(guard).toBeLessThan(50);
@@ -278,8 +290,15 @@ describe('somebody is saying it', () => {
         // Not a layout limit - the overlay wraps. A limit on how much can be
         // said in a place the player cannot leave, which is a different and
         // stricter thing.
+        //
+        // An ACKNOWLEDGE step is the exception, and the exception is the
+        // rule's own logic: nobody is waiting to be let out of it. It is a
+        // paragraph the player reads and taps away, so the reason for the
+        // limit - do not make somebody read while they want to act - does
+        // not apply. It still gets a ceiling, because a wall of text on a
+        // dimmed screen is its own problem.
         const long = TUTORIAL_SEQUENCE
-            .filter(l => l.instruction.length > 110)
+            .filter(l => l.instruction.length > (l.acknowledge ? 220 : 110))
             .map(l => `${l.id}: ${l.instruction.length}ch`);
         expect(long).toEqual([]);
     });

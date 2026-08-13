@@ -209,6 +209,25 @@ const TutorialOverlay = () => {
                 because it is still the right way to leave a genuine gap in
                 the paint.
                ------------------------------------------------------------ */}
+            {/* ------------------------------------------------------------
+                AN ACKNOWLEDGE STEP IS DISMISSED BY ANY TAP
+
+                And only that kind. Every other lock leaves the screen alone
+                (see the note below) because a stale measurement must never
+                be able to trap anybody. This one is safe for the same
+                reason inverted: the tap that clears it is ANY tap, so
+                whatever the player reaches for next also dismisses it.
+
+                One tap, and the screen is theirs again.
+               ------------------------------------------------------------ */}
+            {lock.acknowledge && (
+                <Pressable
+                    style={StyleSheet.absoluteFill}
+                    onPress={() => completeLock(lock.id)}
+                    accessibilityLabel="Dismiss"
+                />
+            )}
+
             <View pointerEvents="none" style={StyleSheet.absoluteFill}>
                     <View style={[styles.dim, { top: 0, left: 0, right: 0, height: hole.y }]} />
                     <View style={[styles.dim, { top: hole.y + hole.h, left: 0, right: 0, bottom: 0 }]} />
@@ -251,7 +270,16 @@ const TutorialOverlay = () => {
                     {line(lockKey(lock.id), lock.instruction)}
                 </Text>
 
-                {escapeVisible && (
+                {/* Otherwise the player waits for a control that is not
+                    coming. The instruction says what the thing does; this
+                    says how to leave, which is a different sentence and the
+                    only one they need immediately. */}
+                {lock.acknowledge && (
+                    <Text style={styles.dismissHint}>Tap anywhere to continue</Text>
+                )}
+
+                {/* An acknowledge step needs no escape hatch: it IS one. */}
+                {escapeVisible && !lock.acknowledge && (
                     <View style={styles.escapes}>
                         <Pressable
                             onPress={() => skipLock(lock.id)}
@@ -328,6 +356,14 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         fontSize: theme.typography.subtitle,
         lineHeight: 22,
+    },
+    dismissHint: {
+        // textSecondary, not textMuted: muted measures 3.25 on the violet
+        // ground and this line is small. 4.5 at 12pt is the difference
+        // between a hint and a decoration.
+        color: theme.colors.textSecondary,
+        fontSize: theme.typography.caption,
+        fontWeight: '600',
     },
     escapes: { gap: theme.spacing.sm },
     escape: {

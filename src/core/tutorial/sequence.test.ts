@@ -61,29 +61,38 @@ describe('research, which the player asks for', () => {
         }))).toBe('rnd-hire');
     });
 
-    it('and is finished the moment somebody is hired', () => {
-        // Neither research step comes back. `rndHired` satisfies both, so a
-        // player who returns to the laboratory later is not told to open the
-        // laboratory they are looking at.
-        for (const flags of [
-            { rndOpened: true, rndLabOpened: true, rndHired: true },
-            // And for the one who hired without the lesson having reached
-            // its second step - a save from before this existed, or a fast
-            // player who was already in there.
-            { rndOpened: true, rndHired: true },
-        ] as const) {
-            const id = showing(opening({ flags }));
-            expect(id).not.toBe('rnd-lab');
-            expect(id).not.toBe('rnd-hire');
-        }
+    it('does not come back once the player has read it', () => {
+        // The last step is ACKNOWLEDGE: cleared by a tap, recorded in the
+        // lock state rather than in the world. So the thing that ends the
+        // lesson is not a purchase - see the note in data/tutorial/
+        // sequence.ts about why insisting on one was the wrong shape.
+        const read: LockState = {
+            ...emptyLockState(), completed: ['rnd-lab', 'rnd-hire'],
+        };
+        const id = showing(opening({ flags: { rndOpened: true } }), read);
+        expect(id).not.toBe('rnd-lab');
+        expect(id).not.toBe('rnd-hire');
+    });
+
+    it('and it never demands a purchase to get out of it', () => {
+        // A player who correctly decides research is the wrong call this
+        // quarter must not be left standing in front of an instruction they
+        // have already understood and rejected.
+        const hire = TUTORIAL_SEQUENCE.find(l => l.id === 'rnd-hire')!;
+        expect(hire.acknowledge).toBe(true);
+        expect(hire.satisfied).toBeUndefined();
+        // And it says the price out loud rather than selling.
+        expect(hire.instruction).toMatch(/expensive/i);
     });
 
     it('and once it is over the first year picks up where it left off', () => {
         // Interrupted, not cancelled. The marketing lesson was mid-flight
         // when the player wandered into research.
-        expect(showing(opening({
-            flags: { rndOpened: true, rndLabOpened: true, rndHired: true },
-        }))).toBe('q1-open-product');
+        const read: LockState = {
+            ...emptyLockState(), completed: ['rnd-lab', 'rnd-hire'],
+        };
+        expect(showing(opening({ flags: { rndOpened: true } }), read))
+            .toBe('q1-open-product');
     });
 
     it('still teaches it long after the father is dead', () => {
@@ -95,11 +104,15 @@ describe('research, which the player asks for', () => {
         }))).toBe('rnd-lab');
     });
 
-    it('but not to a company that cannot pay a salary', () => {
+    it('and a company with no money still gets the explanation', () => {
+        // It used to be gated on capital, because clearing it meant buying
+        // something. Reading costs nothing, so the poorest company in the
+        // game is still allowed to be told what a laboratory is for - and is
+        // arguably the one that most needs to know.
         expect(showing(opening({
             capital: 100_000,
             flags: { rndOpened: true, rndLabOpened: true },
-        }))).toBeUndefined();
+        }))).toBe('rnd-hire');
     });
 });
 
