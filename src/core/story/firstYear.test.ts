@@ -131,3 +131,44 @@ describe('the spine', () => {
         expect(unreadCount(useMessageStore.getState().threads)).toBe(1);
     });
 });
+
+// ============================================================================
+//  THE SCRIPT IS IN ONE LANGUAGE
+// ============================================================================
+//  One line was not. The friend's condolence said "geçmiş olsun", which is
+//  what you say to somebody who has been ILL - for a death it is "başın
+//  sağolsun". So the single foreign phrase in the whole game was a
+//  mistranslation, in the condolence scene, in the message that is meant to
+//  be the kindest thing anybody says all year.
+//
+//  It is also a thing a translator has to leave alone in every language,
+//  forever, for a joke that works better without it.
+// ============================================================================
+describe('the script', () => {
+    const spoken = () => CONVERSATIONS.flatMap(c => [
+        c.subject ?? '',
+        ...c.nodes.map(n => n.text),
+        ...c.nodes.flatMap(n => (n.choices ?? []).map(ch => ch.text)),
+    ]);
+
+    it('has no Turkish letters in any line the player reads', () => {
+        // The cheapest possible detector, and it would have caught the one
+        // that shipped. Comments are not checked - half this codebase reasons
+        // in Turkish and that is fine, because nobody plays the comments.
+        const offenders = spoken().filter(t => /[çğıİöşüÇĞÖŞÜ]/.test(t));
+        expect(offenders).toEqual([]);
+    });
+
+    it('and the friend still reaches for a phrase he cannot check', () => {
+        // The beat the Turkish was carrying: a man half-remembering a formula
+        // and asking whether he has it right. It is the father's now, which
+        // is better - the player would know it and Marco only ever heard it
+        // second-hand.
+        const friend = CONVERSATIONS.find(c => c.id === 'condolence-friend')!;
+        const text = friend.nodes.map(n => n.text).join(' ');
+        expect(text).toContain('he had a good run at it');
+        expect(text).toContain('you always said it wrong on purpose');
+        // And the reply that only makes sense if he was practising a phrase.
+        expect(text).toContain('to practise');
+    });
+});

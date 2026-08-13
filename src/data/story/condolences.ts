@@ -92,7 +92,27 @@ export const friendCondolence: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'mate\n\ni just heard. i am so sorry. i do not know what you say to this, i typed about four things and deleted them\n\ngeçmiş olsun. is that right? you always said it wrong on purpose so i cannot tell any more',
+            // ------------------------------------------------------------------
+            //  IT WAS A TURKISH PHRASE, AND IT WAS THE WRONG ONE
+            // ------------------------------------------------------------------
+            //  He said "geçmiş olsun", which is what you say to somebody who
+            //  has been ILL. For a death it is "başın sağolsun". So the one
+            //  line in the game written in another language was a
+            //  mistranslation, in the condolence scene, in the message that
+            //  is supposed to be the kindest thing anyone says all year.
+            //
+            //  It is gone rather than corrected. A single foreign phrase in
+            //  an English script is a thing the translator then has to leave
+            //  alone in every language, and it was carrying a joke that does
+            //  not need it: the beat is a man reaching for a formula he has
+            //  half-remembered and cannot check. His father's formula does
+            //  that better, because the player would know it and Marco only
+            //  ever heard it second-hand.
+            //
+            //  All three cards still work - "is that right", the wrong-on-
+            //  purpose reply, and practising it on his mother for a week.
+            // ------------------------------------------------------------------
+            text: 'mate\n\ni just heard. i am so sorry. i do not know what you say to this, i typed about four things and deleted them\n\ni keep wanting to say the thing your dad said when anybody died. "he had a good run at it." is that right? you always said it wrong on purpose so i cannot tell any more',
             choices: [
                 { text: 'It is right.', next: 'right' },
                 { text: 'I said it wrong on purpose because you never noticed.', next: 'wrong' },
