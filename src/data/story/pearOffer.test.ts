@@ -91,14 +91,26 @@ describe('the father dies at the end of the first year', () => {
     });
 
     it('asking for a day does not buy one', () => {
-        // Both answers schedule the offer for the same quarter. The first
-        // thing the new job teaches, taught without a line of dialogue.
+        // Both answers schedule the offer for the SAME quarter as each other,
+        // which is the assertion - the first thing the new job teaches,
+        // taught without a line of dialogue. Which quarter that is belongs to
+        // the scene and not to this test.
+        //
+        // It was 0 and is now 1, and the reason is written out in
+        // data/story/fatherDeath.ts: the inbox is drained by the tick, so a
+        // zero scheduled from inside a conversation meant "whenever the
+        // player next advances time" - the same delay wearing immediacy's
+        // clothes. One says it honestly.
         const close = fatherDeath.nodes.find(n => n.id === 'tellThem')!;
-        for (const choice of close.choices!) {
-            const s = (choice.effects ?? []).find(e => e.kind === 'schedule') as any;
+        const scheduled = close.choices!.map(choice =>
+            (choice.effects ?? []).find(e => e.kind === 'schedule') as any);
+
+        expect(scheduled.length).toBe(2);
+        for (const s of scheduled) {
             expect(s.conversation).toBe(pearOffer.id);
-            expect(s.afterQuarters).toBe(0);
+            expect(s.urgent).toBe(true);
         }
+        expect(scheduled[0].afterQuarters).toBe(scheduled[1].afterQuarters);
     });
 });
 

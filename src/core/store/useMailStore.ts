@@ -53,37 +53,53 @@ type MailStore = MailState & {
 const getInitials = (name: string): string =>
     name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
+// ============================================================================
+//  WHAT IS ALREADY IN THE INBOX ON DAY ONE
+// ============================================================================
+//
+//  NO REAL COMPANIES. There were three: a Google Workspace welcome, a letter
+//  from Vanguard Capital and a LinkedIn notification - all trademarks of firms
+//  that exist, two of them financial, put in a game about running a company
+//  badly. That is a risk nobody needs to carry for set dressing.
+//
+//  The replacements are invented and say the same things. The welcome is gone
+//  entirely rather than renamed: a mail app explaining what a mail app is for
+//  is the most skippable letter that could possibly open this game, and its
+//  slot is better spent on something that says the player has a job.
+// ============================================================================
 const seedMail = (): Mail[] => [
     {
         id: 'seed-1',
-        fromName: 'Google Workspace Team',
-        fromEmail: 'workspace-noreply@google.com',
-        subject: 'Welcome to your new professional inbox',
-        body: 'Hello,\n\nWelcome to your new email account. You can use this inbox to communicate with your board, partners, and employees.\n\nKeep an eye out for important updates!\n\nBest,\nThe Team',
+        // The building. It is the first letter because it is the first thing
+        // that treats the player as the person who now answers for the place.
+        fromName: 'Facilities',
+        fromEmail: 'facilities@hale.co',
+        subject: 'Parking bay 1 - reallocation',
+        body: 'Good morning,\n\nBay 1 has been reassigned to your name with immediate effect. The fob is at reception.\n\nWe have left the old plate in the store room rather than dispose of it. Let us know either way when you have a moment.\n\nFacilities',
         atMonth: 1,
         isRead: false,
         category: 'Updates',
     },
     {
         id: 'seed-2',
-        fromName: 'Vanguard Capital',
-        fromEmail: 'investments@vanguard.com',
-        subject: 'Q1 Investment Opportunities',
-        body: 'Dear CEO,\n\nWe have identified several emerging markets that align with your company\'s growth strategy. Please find the attached preliminary analysis for the upcoming quarter.\n\nLet us schedule a call to discuss this further.\n\nRegards,\nVanguard Capital',
+        fromName: 'Ashgrove Partners',
+        fromEmail: 'coverage@ashgrovepartners.com',
+        subject: 'Initiating coverage - HALE',
+        body: 'Dear Mr Hale,\n\nWe are initiating coverage of Hale Industries and would welcome an introductory call at your convenience.\n\nOur preliminary note is attached. We would flag that our estimates assume no change to current production policy, which we appreciate may not survive the year.\n\nRegards,\nAshgrove Partners',
         atMonth: 1,
         isRead: false,
         category: 'Primary',
     },
     {
         id: 'seed-3',
-        fromName: 'LinkedIn',
-        fromEmail: 'messages-noreply@linkedin.com',
+        fromName: 'Rolodex',
+        fromEmail: 'no-reply@rolodex.com',
         subject: 'You have 5 new connections waiting',
-        body: 'Hi there,\n\nYou are getting noticed! 5 people have requested to connect with you recently. Log in to your account to accept these requests and expand your network.\n\n- LinkedIn Team',
+        body: 'Hi there,\n\nYou are getting noticed. Five people have asked to connect with you this week.\n\nSign in to accept them and grow your network.\n\n- The Rolodex Team',
         atMonth: 1,
         isRead: true,
         category: 'Promotions',
-    }
+    },
 ];
 
 export const initialMailState: MailState = {

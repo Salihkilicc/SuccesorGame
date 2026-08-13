@@ -109,3 +109,68 @@ describe('so the act after the death can actually start', () => {
         }
     });
 });
+
+// ============================================================================
+//  AND WHEN PEAR ACTUALLY ARRIVES
+// ============================================================================
+//  The quarter after the funeral. It was written for the same quarter, under
+//  a note about the obscenity of the timing - and the note was right about the
+//  effect and wrong about the mechanism, so what it produced was "whenever the
+//  player next advances time": the same delay dressed as immediacy.
+//
+//  One quarter is the honest statement of the same thing, and it does not
+//  depend on a side effect of the scheduler to be true.
+// ============================================================================
+describe("the letter the father's death sends", () => {
+    const deathEffects = () => {
+        const death = CONVERSATIONS.find(c => c.id === 'father-death')!;
+        return death.nodes
+            .flatMap(n => n.choices?.flatMap(c => c.effects ?? []) ?? [])
+            .filter((e: any) => e.kind === 'schedule' && e.conversation === 'pear-offer') as any[];
+    };
+
+    it('is scheduled from both answers, identically', () => {
+        const scheduled = deathEffects();
+        expect(scheduled.length).toBe(2);
+        // Asking for a day does not buy one, and the two answers must not
+        // differ on when it lands or the choice becomes a delay tactic.
+        expect(scheduled[0].afterQuarters).toBe(scheduled[1].afterQuarters);
+    });
+
+    it('for the quarter after, and it jumps the queue when it comes', () => {
+        for (const e of deathEffects()) {
+            expect(e.afterQuarters).toBe(1);
+            expect(e.urgent).toBe(true);
+        }
+    });
+});
+
+// ============================================================================
+//  NO REAL COMPANIES IN THE INBOX
+// ============================================================================
+//  Three of them shipped: a Google Workspace welcome, a letter from Vanguard
+//  Capital and a LinkedIn notification - trademarks of firms that exist, two
+//  of them financial, in a game about running a company badly.
+// ============================================================================
+describe('the seeded inbox', () => {
+    it('names nobody real', () => {
+        const { initialMailState } = require('../store/useMailStore');
+        const text = JSON.stringify(initialMailState.inbox);
+        for (const name of [
+            'Google', 'LinkedIn', 'Vanguard', 'Microsoft', 'Apple', 'Meta',
+            'Amazon', 'Goldman', 'Salesforce',
+        ]) {
+            expect(text).not.toMatch(new RegExp(name, 'i'));
+        }
+    });
+
+    it('and still opens on something that says you have a job', () => {
+        const { initialMailState } = require('../store/useMailStore');
+        // The welcome-to-your-inbox letter is gone rather than renamed: a mail
+        // app explaining what a mail app is for is the most skippable letter
+        // that could open this game.
+        const first = initialMailState.inbox[0];
+        expect(first.subject).not.toMatch(/welcome/i);
+        expect(first.fromEmail).toContain('@hale.co');
+    });
+});

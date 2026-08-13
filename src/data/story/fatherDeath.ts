@@ -90,10 +90,29 @@ export const fatherDeath: Conversation = {
                         {
                             kind: 'schedule',
                             conversation: 'pear-offer',
-                            afterQuarters: 0,
-                            // It arrives in the same quarter, and it must not
-                            // queue behind anything. The obscenity of the
-                            // timing is the point.
+                            // ------------------------------------------------
+                            //  THE NEXT QUARTER, NOT THIS ONE
+                            // ------------------------------------------------
+                            //  It was 0, under a note about the obscenity of
+                            //  the timing. The note was right about the effect
+                            //  and wrong about the mechanism: the inbox is
+                            //  drained by the tick, and this is scheduled from
+                            //  inside a conversation - which happens after that
+                            //  quarter's drain has already run. So "this
+                            //  quarter" meant "whenever the player next
+                            //  advances time", which is the same delay dressed
+                            //  as immediacy.
+                            //
+                            //  gameSink now drains for a zero, so 0 would work.
+                            //  One is chosen anyway, because it is the honest
+                            //  statement of when this arrives and it does not
+                            //  depend on a side effect of the scheduler to be
+                            //  true. A letter that lands the quarter after the
+                            //  funeral is still obscene.
+                            // ------------------------------------------------
+                            afterQuarters: 1,
+                            // And it must not queue behind anything when it
+                            // does come.
                             urgent: true,
                         },
                     ],
@@ -110,7 +129,8 @@ export const fatherDeath: Conversation = {
                         {
                             kind: 'schedule',
                             conversation: 'pear-offer',
-                            afterQuarters: 0,
+                            // Same timing on both answers - see the note above.
+                            afterQuarters: 1,
                             urgent: true,
                         },
                         { kind: 'dial', dial: 'cfoTrust', delta: 2 },
