@@ -88,6 +88,20 @@ export const fatherDeath: Conversation = {
                         { kind: 'flag', flag: 'fatherDead' },
                         { kind: 'news', headline: 'Gerald Hale, founder, has died. He was seventy-one.' },
                         // ------------------------------------------------
+                        //  AND HIS THREAD CLOSES
+                        // ------------------------------------------------
+                        //  It used to stay exactly as it was - his name at
+                        //  the top of the messages screen, his last line
+                        //  about a filing cabinet, sitting above the message
+                        //  saying he is dead, openable for the next twenty
+                        //  years. That is not the phone being tender, it is
+                        //  the phone not having noticed.
+                        //
+                        //  On BOTH answers, like the flag, for the same
+                        //  reason: asking for a day does not buy one.
+                        // ------------------------------------------------
+                        { kind: 'closeThread', who: 'father' },
+                        // ------------------------------------------------
                         //  SHELVED: PEAR IS NOT SCHEDULED FROM HERE
                         // ------------------------------------------------
                         //  He wrote in the sixth quarter because the story
@@ -114,6 +128,20 @@ export const fatherDeath: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'fatherDead' },
                         { kind: 'news', headline: 'Gerald Hale, founder, has died. He was seventy-one.' },
+                        // ------------------------------------------------
+                        //  AND HIS THREAD CLOSES
+                        // ------------------------------------------------
+                        //  It used to stay exactly as it was - his name at
+                        //  the top of the messages screen, his last line
+                        //  about a filing cabinet, sitting above the message
+                        //  saying he is dead, openable for the next twenty
+                        //  years. That is not the phone being tender, it is
+                        //  the phone not having noticed.
+                        //
+                        //  On BOTH answers, like the flag, for the same
+                        //  reason: asking for a day does not buy one.
+                        // ------------------------------------------------
+                        { kind: 'closeThread', who: 'father' },
                         // Same schedule on both answers. Asking for a day does
                         // not buy one - which is the first thing the new job
                         // teaches, and it teaches it without a line of

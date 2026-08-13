@@ -73,6 +73,7 @@ const playable = () => {
     morale: () => { },
     boardSeat: () => { },
     risk: () => { },
+    closeThread: () => { },
     };
     return { w, sink };
 };

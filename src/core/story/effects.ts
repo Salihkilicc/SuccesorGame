@@ -206,6 +206,28 @@ export type Effect =
      * a company.
      */
     | { kind: 'boardSeat'; person: string; stake: number }
+    /**
+     * SOMEBODY STOPS WRITING TO YOU, AND WHAT THEY WROTE GOES WITH THEM.
+     *
+     * The father dies in the fifth quarter and his thread stayed on the
+     * messages screen exactly as it was: his name, his last line about a
+     * filing cabinet, sitting above the CFO's message saying he is dead. The
+     * player could open it and read a year of him, indefinitely, as though
+     * the phone had not noticed.
+     *
+     * There is a version of that which is deliberate and good, and this is
+     * not it - a phone that keeps a dead man's thread at the top of the list
+     * for the next twenty years is not tenderness, it is the app failing to
+     * update. So the thread closes when the news lands.
+     *
+     * It also drops anything of theirs still in the queue, which is the half
+     * that is easy to forget: a beat scheduled before the death would have
+     * been delivered afterwards and RE-CREATED the thread - the dead man
+     * texting you a fortnight later about the yield.
+     *
+     * `who` is a CAST id, like `message`.
+     */
+    | { kind: 'closeThread'; who: string }
     | {
         kind: 'risk';
         /** Probability the promise is kept, 0-1. */
@@ -248,6 +270,7 @@ export type EffectSink = {
     divest: (company: string, priceMultiple: number) => void;
     morale: (amount: number) => void;
     boardSeat: (person: string, stake: number) => void;
+    closeThread: (who: string) => void;
     risk: (chance: number, onBetrayal: string, afterQuarters: number) => void;
     schedule: (item: {
         conversation: string;
@@ -283,6 +306,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'divest': sink.divest(effect.company, effect.priceMultiple); return;
         case 'morale': sink.morale(effect.amount); return;
         case 'boardSeat': sink.boardSeat(effect.person, effect.stake); return;
+        case 'closeThread': sink.closeThread(effect.who); return;
         case 'risk': sink.risk(effect.chance, effect.onBetrayal, effect.afterQuarters); return;
         case 'schedule': sink.schedule(effect); return;
     }

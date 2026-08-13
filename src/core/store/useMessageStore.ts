@@ -73,6 +73,14 @@ type MessageStore = MessageState & {
     /** Mark a thread read. Called when it is opened, not when it is listed. */
     markRead: (threadId: string) => void;
     /**
+     * The thread is gone. See the `closeThread` effect.
+     *
+     * The one destructive action in this store, and it takes a thread id
+     * rather than a predicate on purpose: a delete that can be handed a
+     * filter is a delete that eventually clears the wrong three.
+     */
+    removeThread: (threadId: string) => void;
+    /**
      * The conversation on this thread has been played to the end.
      *
      * Nothing did this, and a thread holds exactly ONE conversation id, so
@@ -207,6 +215,9 @@ export const useMessageStore = create<MessageStore>()(
                         };
                     }),
                 })),
+
+            removeThread: (threadId) =>
+                set(state => ({ threads: state.threads.filter(t => t.id !== threadId) })),
 
             markRead: (threadId) =>
                 set(state => ({

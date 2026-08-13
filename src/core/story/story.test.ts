@@ -30,6 +30,7 @@ const recorder = () => {
         morale: a => log.push(`morale:${a}`),
         boardSeat: (p, st) => log.push(`boardSeat:${p}:${st}`),
         risk: (c, o, q) => log.push(`risk:${c}:${o}:+${q}`),
+        closeThread: (who) => log.push(`closeThread:${who}`),
         schedule: i => log.push(`schedule:${i.conversation}:+${i.afterQuarters}`),
     };
     return { log, sink };

@@ -28,7 +28,7 @@
 //  a player.
 // ============================================================================
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
@@ -176,6 +176,25 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     const done = !node;
 
     // ------------------------------------------------------------------
+    //  THE ANSWERS MOVE DOWN THE PAGE, SO THE PAGE HAS TO FOLLOW THEM
+    // ------------------------------------------------------------------
+    //  A pinned rack was always in the same place and never needed this.
+    //  In the scroll, the answers sit under the newest card - so from about
+    //  the third card of any scene they are below the fold, and a player who
+    //  answered and saw nothing happen would reasonably conclude the game
+    //  had stopped.
+    //
+    //  On the next frame rather than immediately: the new card has not been
+    //  laid out at the moment the state changes, so scrolling now scrolls to
+    //  where the end used to be.
+    // ------------------------------------------------------------------
+    const scroller = useRef<ScrollView>(null);
+    useEffect(() => {
+        const id = setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 60);
+        return () => clearTimeout(id);
+    }, [history.length]);
+
+    // ------------------------------------------------------------------
     //  THE ANSWERS, WHICH BELONG IN TWO DIFFERENT PLACES
     // ------------------------------------------------------------------
     //  On a MESSAGE they are a keyboard: pinned to the bottom, where a reply
@@ -228,7 +247,13 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
 
     return (
         <View style={styles.root}>
-            <ScrollView contentContainerStyle={styles.body}>
+            <ScrollView
+                ref={scroller}
+                contentContainerStyle={styles.body}
+                // A card can grow after its first layout - a long line
+                // wrapping, a font size the player changed - and the answers
+                // go with it.
+                onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: true })}>
                 {variant === 'mail' && !!conversation.subject && (
                     <Text style={styles.subject}>
                         {line(subjectKey(conversation.id), conversation.subject)}
@@ -263,25 +288,44 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                     </View>
                 ))}
 
-                {/* A letter is answered underneath it - see the note on
-                    `answers` above. Inside the scroll, so the last paragraph
-                    of what is being replied to stays readable. */}
-                {variant === 'mail' && (
-                    <View style={[styles.answers, styles.mailAnswers]}>{answers}</View>
-                )}
+                {/* ------------------------------------------------------
+                    BOTH CHANNELS ANSWER UNDER THE LAST THING SAID
+
+                    The letter did already. The message did not - its answers
+                    were a rack pinned to the bottom of the screen, and on a
+                    phone with a floating nav bar the bottom of the screen is
+                    where the nav bar is. They collided, and the answers were
+                    hardest to read on exactly the cards with most text above
+                    them.
+
+                    Pinning them was also a claim about what they are: a
+                    keyboard, a permanent fixture, the same two buttons in the
+                    same place every card. They are not. They are the thing
+                    the player is about to say, and it belongs where the next
+                    thing said goes - directly under the last bubble, moving
+                    up the screen as the conversation gets longer.
+
+                    So one block, in the scroll, for both variants. The bottom
+                    rack is shelved below rather than deleted.
+                   ------------------------------------------------------ */}
+                <View style={[styles.answers, styles.mailAnswers]}>{answers}</View>
             </ScrollView>
 
             {/* ------------------------------------------------------------
-                THE MESSAGE VARIANT KEEPS ITS BOTTOM RACK
+                SHELVED: THE MESSAGE VARIANT'S BOTTOM RACK
 
-                It scrolls rather than running off the screen: it was a plain
+                It scrolled rather than running off the screen: it was a plain
                 View, and at the largest accessibility text size two cards in
                 the game put the second answer below the bottom of an iPhone
                 SE with nothing to scroll, so the conversation could not be
                 finished. `maxHeight` rather than a fixed one, so the block
-                still hugs its content on every card that fits - which is all
-                of them at normal sizes. See answerFit.ts.
-               ------------------------------------------------------------ */}
+                still hugged its content on every card that fitted.
+
+                The measurement that produced it still holds and still applies
+                - the answers now sit in the body scroll, which has no bound
+                to run out of, so the tall-block case it was built for is
+                covered by the page scrolling instead. See answerFit.ts.
+
             {variant === 'message' && (
                 <ScrollView
                     style={styles.answersScroll}
@@ -292,6 +336,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                     {answers}
                 </ScrollView>
             )}
+               ------------------------------------------------------------ */}
         </View>
     );
 };
@@ -335,7 +380,11 @@ const styles = StyleSheet.create({
     mine: { backgroundColor: theme.colors.highlight },
 
     // --- Mail: stacked letters
-    /** The reply block, under the letter rather than pinned below it. */
+    /**
+     * The reply block, under what is being replied to rather than pinned to
+     * the bottom of the screen. Both variants now, despite the name - kept
+     * because it is what every reference to it says.
+     */
     mailAnswers: { marginTop: theme.spacing.md },
     letterWrap: {},
     letter: {

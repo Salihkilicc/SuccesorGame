@@ -20,6 +20,7 @@ import { useNewsStore } from '../store/useNewsStore';
 import { applyCorporateShock, corporateBrandFrom } from '../market/brand';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
+import { CONVERSATIONS } from '../../data/story';
 import { currentQuarter } from './world';
 import { BROTHER_ID, nudgeBrotherLoyalty, syncBrotherDial } from './brother';
 import { emailOf } from './cast';
@@ -339,6 +340,38 @@ export const gameSink = (): EffectSink => ({
                 useGameStore.getState().currentMonth,
             );
         } catch { /* shareholder store not ready */ }
+    },
+
+    // ------------------------------------------------------------------
+    //  A THREAD THAT ENDS BECAUSE THE PERSON DID
+    // ------------------------------------------------------------------
+    //  Three things, and only the first is obvious.
+    //
+    //  The THREAD goes, which is the visible half - his name stops sitting
+    //  at the top of the messages screen above the message saying he is
+    //  dead.
+    //
+    //  Anything of his still in the QUEUE goes too. A beat scheduled before
+    //  the death would have been delivered afterwards and re-created the
+    //  thread from scratch, which is the dead man texting you about the
+    //  yield a fortnight later. This is the half that is easy to miss,
+    //  because it only shows up in saves where the timing went a particular
+    //  way.
+    //
+    //  And any SAVED POSITION in one of his scenes - a conversation the
+    //  player was halfway through when the news came. It has nowhere to be
+    //  played now, so keeping where they got to would be a record of a
+    //  screen that no longer exists.
+    // ------------------------------------------------------------------
+    closeThread: (who) => {
+        useMessageStore.getState().removeThread(who);
+
+        const theirs = new Set(
+            CONVERSATIONS.filter(c => c.from === who).map(c => c.id),
+        );
+        const story = useStoryStore.getState();
+        story.setPending(story.pending.filter(p => !theirs.has(p.conversationId)));
+        theirs.forEach(id => story.clearScene(id));
     },
     // It has a home now - see core/store/useNewsStore.ts. This used to
     // console.log with a note saying so, which meant a scene could use the

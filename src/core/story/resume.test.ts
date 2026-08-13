@@ -134,3 +134,86 @@ describe('a scene that has been played out', () => {
         expect(useStoryStore.getState().sceneProgress).toBe(before);
     });
 });
+
+// ============================================================================
+//  AND A THREAD THAT ENDS BECAUSE THE PERSON DID
+// ============================================================================
+//  The father dies in the fifth quarter and his thread stayed exactly as it
+//  was: his name at the top of the messages screen, his last line about a
+//  filing cabinet, sitting above the CFO's message saying he is dead, openable
+//  for the rest of the game.
+//
+//  The visible half is the thread. The half that only shows up in saves where
+//  the timing went a particular way is the QUEUE - a beat of his scheduled
+//  before the news would have been delivered after it and re-created the
+//  thread from nothing, which is the dead man texting you about the yield.
+// ============================================================================
+
+import { gameSink } from './gameSink';
+import { CONVERSATIONS } from '../../data/story';
+
+describe('when somebody stops writing to you', () => {
+    beforeEach(() => {
+        useMessageStore.setState({
+            threads: [
+                {
+                    id: 'father', name: 'Your Father', role: 'Chairman',
+                    initials: 'YF', unread: 1, messages: [
+                        { id: 'f-1', from: 'them', text: 'Second cabinet.', atMonth: 12 },
+                    ],
+                },
+                {
+                    id: 'cfo', name: 'Arthur Vance', role: 'Chief Financial Officer',
+                    initials: 'AV', unread: 0, messages: [],
+                },
+            ],
+        });
+    });
+
+    it('their thread goes', () => {
+        gameSink().closeThread('father');
+        expect(useMessageStore.getState().threads.map(t => t.id)).toEqual(['cfo']);
+    });
+
+    it('and nobody else is touched', () => {
+        gameSink().closeThread('father');
+        expect(useMessageStore.getState().threads).toHaveLength(1);
+    });
+
+    it('AND WHAT WAS QUEUED FOR THEM GOES, so they cannot come back', () => {
+        // The one that matters. `sendFromCharacter` creates a thread when
+        // there is not one, so a delivery after the death does not fail
+        // quietly - it rebuilds him.
+        const his = CONVERSATIONS.find(c => c.from === 'father')!;
+        useStoryStore.getState().schedule({
+            conversationId: his.id, dueQuarter: 9, queuedAtQuarter: 4,
+        });
+        useStoryStore.getState().schedule({
+            conversationId: 'pear-offer', dueQuarter: 9, queuedAtQuarter: 4,
+        });
+
+        gameSink().closeThread('father');
+
+        expect(useStoryStore.getState().pending.map(p => p.conversationId))
+            .toEqual(['pear-offer']);
+    });
+
+    it('and a scene of theirs the player was halfway through', () => {
+        const his = CONVERSATIONS.find(c => c.from === 'father')!;
+        useStoryStore.getState().saveScene(his.id, { nodeId: 'open', history: [] });
+        gameSink().closeThread('father');
+        expect(useStoryStore.getState().sceneProgress[his.id]).toBeUndefined();
+    });
+
+    it('and the death scene is what does it, on either answer', () => {
+        // Both answers, like the flag beside it. Asking for a day does not
+        // buy one, and that has to be true of this as well or the thread
+        // survives for players who picked the gentler line.
+        const death = CONVERSATIONS.find(c => c.id === 'father-death')!;
+        const last = death.nodes.find(n => n.id === 'tellThem')!;
+        for (const choice of last.choices!) {
+            expect((choice.effects ?? []).some((e: any) =>
+                e.kind === 'closeThread' && e.who === 'father')).toBe(true);
+        }
+    });
+});
