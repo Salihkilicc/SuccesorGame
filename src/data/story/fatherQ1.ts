@@ -55,7 +55,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'open',
             speaker: 'father',
-            text: 'The line is cold. Three days you have had the chair and the line is cold.\n\nGo to Products and set a target. Not today — now, while I am telling you.',
+            text: 'The line is cold. Three days you have had the chair and the line is cold.\n\nYour grandfather ran it hot through a war. I ran it hot through two recessions, a bank that changed its mind on a Friday, and a man in California who decided we were a rounding error. Three days.\n\nGo to Products and set a target. Not today — now, while I am telling you.',
             choices: [
                 { text: 'How much should I make?', next: 'howMuch' },
                 { text: 'Good morning to you too.', next: 'goodMorning' },
@@ -91,7 +91,7 @@ export const fatherQ1: Conversation = {
             speaker: 'father',
             // The first real look at him. He is not arguing - he is
             // conceding the point in a way that makes it worse.
-            text: 'So far. Yes.\n\nI was fine so far for eleven years. Write down the date you started counting, so that later you know how long "so far" turned out to be.',
+            text: 'So far. Yes.\n\nWe had a supplier for eleven years. Eleven. Christmas card, knew his children. Then somebody in California put an order in front of him that was bigger than everything we had ever bought from him put together, and he took it, and he was RIGHT to take it, and that is what nobody tells you about the word loyalty.\n\nWrite down the date you started counting, so that later you know how long "so far" turned out to be.',
             choices: [
                 { text: 'What limits the number?', next: 'capacity' },
             ],
@@ -112,7 +112,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'fixed',
             speaker: 'father',
-            text: 'With a better floor, yes. With better people, a little. Do not let anyone tell you it is the people — that is the first thing a man says when he wants money for a hire and the second thing he says when he is covering for himself.\n\nIt is the floor. It is nearly always the floor.',
+            text: 'With a better floor, yes. With better people, a little. Do not let anyone tell you it is the people — that is the first thing a man says when he wants money for a hire and the second thing he says when he is covering for himself.\n\nIt is the floor. It is nearly always the floor. I asked for a new one three times. Three times a room full of people who own more of it than I did explained to me why not, in a tone, and then wrote it into the minutes as a discussion.',
             choices: [
                 { text: 'Understood.', next: 'close' },
             ],

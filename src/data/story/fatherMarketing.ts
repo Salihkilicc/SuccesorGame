@@ -70,7 +70,7 @@ export const fatherMarketing: Conversation = {
             // THE WRONG RIVAL. Microhard is real, large and strong - 24% and
             // 85 strength - so this is not a foolish answer. It is simply the
             // answer of a man who stopped updating in about 2012.
-            text: 'Microhard. It is always Microhard. They have been the wall in this market since before you could read, and every man who ever thought he had got past them found out he had been let past.',
+            text: 'Microhard. It is always Microhard. They have been the wall in this market since before you could read, and every man who ever thought he had got past them found out he had been let past.\n\nWe were in three of their catalogues once. Then a purchasing director none of us had met retired, and the man who replaced him had his own people, and that was the end of eleven years of work. No meeting. No letter. The orders simply stopped arriving and we found out from the numbers.',
             choices: [
                 { text: 'Pear is bigger than Microhard now.', next: 'pear' },
                 { text: 'So what do we do about them?', next: 'spend' },

@@ -41,6 +41,20 @@ type Common = {
     id: CastId;
     /** What the inbox row says. */
     name: string;
+    /**
+     * The name the WORLD uses, when it differs from the one you use.
+     *
+     * Only the father has one. Nobody saves their father in their phone under
+     * his full legal name, so the inbox says "Your Father" - but the news
+     * headline that reports his death, the letter Pear sends afterwards and
+     * the board's notice of condolence all say Gerald Hale, because to them
+     * that is who he was. The gap between the two names is the relationship,
+     * and it is doing work in the scene where those letters arrive.
+     *
+     * Falls back to `name` when absent, so this is not a field every member
+     * has to think about.
+     */
+    legalName?: string;
     /** Their relationship to you - shown under the name. */
     role: string;
     /**
@@ -71,6 +85,14 @@ export const canUseChannel = (member: CastMember | undefined, channel: Channel):
 /** Their address, or undefined for the ones who only ever text. */
 export const emailOf = (member: CastMember | undefined): string | undefined =>
     member && member.channels !== 'message' ? member.email : undefined;
+
+/**
+ * The name for a formal context: a headline, a legal notice, a stranger.
+ *
+ * Anything the player would not have typed themselves goes through here.
+ */
+export const formalNameOf = (member: CastMember | undefined): string =>
+    member ? (member.legalName ?? member.name) : '';
 
 /** Two letters for an avatar. Derived, so it cannot drift from the name. */
 export const initialsOf = (name: string): string =>

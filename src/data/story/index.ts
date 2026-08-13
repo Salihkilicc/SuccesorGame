@@ -14,6 +14,7 @@
 
 import type { Conversation } from '../../core/story/graph';
 import { cfoDividend } from './cfoDividend';
+import { fatherInheritance } from './fatherInheritance';
 import { fatherQ1 } from './fatherQ1';
 import { fatherQ1Invoice } from './fatherQ1Invoice';
 import { fatherMorale } from './fatherMorale';
@@ -96,6 +97,7 @@ import { friendAsks, friendGrows } from './friendArc';
 import { friendBoardSeat } from './friendBoard';
 
 export const CONVERSATIONS: Conversation[] = [
+    fatherInheritance,
     fatherQ1,
     fatherQ1Invoice,
     fatherMorale,
@@ -182,7 +184,15 @@ export const conversationById = (id: string): Conversation | undefined =>
 //  Queued rather than delivered directly, so it goes through the same door
 //  as everything else and the inbox's own rules apply to it.
 // ============================================================================
+//  ORDER IS THE DELIVERY ORDER. `seedOpening` walks this list and
+//  `nextPriority` hands out increasing priorities within the wave, so the
+//  first id here is the first thing the player reads.
+//
+//  The inheritance goes first because the alternative is a man telling you to
+//  set a production target before anybody has told you what you own, which is
+//  the tutorial backwards.
 export const OPENING_CONVERSATIONS: string[] = [
+    fatherInheritance.id,
     fatherQ1.id,
 ];
 

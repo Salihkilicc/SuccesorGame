@@ -282,7 +282,11 @@ const toGov = (m: BoardMember): GovMember => ({
 // CONSTANTS
 // ============================================================================
 
-const TOTAL_SHARES = 10_000_000; // 10 million shares total
+// Exported so the opening scene's figures can be pinned against the real
+// register rather than against a copy of it - see
+// data/story/fatherInheritance.test.ts. A second hand-written 35 in a test
+// would agree with the story and disagree with the game.
+export const TOTAL_SHARES = 10_000_000; // 10 million shares total
 
 // ============================================================================
 // INITIAL NPC BOARD MEMBERS (6.5M shares = 65% Total)
@@ -304,7 +308,7 @@ const TOTAL_SHARES = 10_000_000; // 10 million shares total
 //  makes the board a room you have to work rather than a screen you visit.
 // ============================================================================
 
-const INITIAL_BOARD_MEMBERS: BoardMember[] = [
+export const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     {
         id: 'npc-marcus-wolf',
         name: "Marcus 'The Wolf'",

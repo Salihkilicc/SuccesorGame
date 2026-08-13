@@ -68,7 +68,7 @@ export const fatherMorale: Conversation = {
             // He concedes and it costs him nothing, which is worse than
             // arguing. This is the scene's clearest look at the second
             // reading of him.
-            text: 'No. Machines are cheaper and they tell you when they are unhappy.\n\nI am not asking you to like this. I am telling you that a man who is paid the average does average work, and that when it matters he will be at home, correctly, on time, having done exactly what was asked.',
+            text: 'No. Machines are cheaper and they tell you when they are unhappy.\n\nI am not asking you to like this. I am telling you that a man who is paid the average does average work, and that when it matters he will be at home, correctly, on time, having done exactly what was asked.\n\nI had a foreman for nineteen years who would have slept in that building. He went to a competitor for eleven per cent more and I could not match it, because eleven per cent of a wage bill was a conversation with a board, and by the time the conversation finished he had a desk somewhere else.',
             choices: [
                 { text: 'What should it be?', next: 'shouldBe' },
             ],

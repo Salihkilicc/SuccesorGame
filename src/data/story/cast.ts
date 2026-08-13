@@ -37,7 +37,11 @@ export const CAST: Cast = {
     // ------------------------------------------------------------------
     father: {
         id: 'father',
-        name: 'Gerald Hale',
+        // What YOUR phone says. The world calls him Gerald Hale and so do
+        // the letters that arrive after he dies - see `legalName` on the
+        // type. Nobody saves their father under his full legal name.
+        name: 'Your Father',
+        legalName: 'Gerald Hale',
         role: 'Founder',
         // Both: he sends the formal thing and then explains it badly.
         channels: 'both',
