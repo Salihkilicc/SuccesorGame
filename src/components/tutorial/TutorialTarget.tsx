@@ -16,7 +16,7 @@
 //  rather than leaving it behind.
 // ============================================================================
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import { useTutorialTargets } from './targets';
 
@@ -29,7 +29,19 @@ type Props = {
 
 const TutorialTarget = ({ tutorialKey, style, children }: Props) => {
     const setRect = useTutorialTargets(s => s.setRect);
+    const clearRect = useTutorialTargets(s => s.clearRect);
     const ref = useRef<View>(null);
+
+    // ------------------------------------------------------------------
+    //  THE MEASUREMENT DIES WITH THE SCREEN
+    // ------------------------------------------------------------------
+    //  It used to outlive it. Nothing cleared a rect, so one visit to the
+    //  screen holding this control left a coordinate in the store forever -
+    //  and the overlay, which shows itself wherever its target is measured,
+    //  then dimmed every other screen in the app around a hole that pointed
+    //  at furniture the player had walked away from.
+    // ------------------------------------------------------------------
+    useEffect(() => () => clearRect(tutorialKey), [tutorialKey, clearRect]);
 
     const measure = useCallback((_: LayoutChangeEvent) => {
         // measureInWindow, not onLayout's own numbers: onLayout reports a

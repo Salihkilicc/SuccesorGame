@@ -100,26 +100,55 @@ const TutorialOverlay = () => {
     if (!lock) return null;
 
     const rect = rects[lock.highlight];
+
+    // ------------------------------------------------------------------
+    //  THE LESSON LIVES ON THE SCREEN IT IS ABOUT
+    // ------------------------------------------------------------------
+    //  No measurement means the control this lock is about is not on screen,
+    //  and the overlay shows NOTHING. The lock is not cleared and not
+    //  skipped - it waits, and engages the moment the player walks into the
+    //  screen that holds its control.
+    //
+    //  It used to dim the whole app instead. The comment here said the
+    //  overlay "stays out of the way" and the code below it rendered a
+    //  full-screen dim with the instruction card on top, so every screen in
+    //  the game was greyed out and pointing at nothing until the player
+    //  happened to find My Company. The intention was written down and never
+    //  implemented, and reading the file was not enough to notice.
+    //
+    //  Nothing is lost by waiting: the father's message says where to go,
+    //  and it is sitting in the inbox. The teaching is the reward for
+    //  arriving rather than a toll gate on the way.
+    // ------------------------------------------------------------------
+    if (!rect) return null;
+
     const { width: W, height: H } = Dimensions.get('window');
 
-    // No measurement yet - the screen holding this control is not on screen.
-    // Dimming the whole thing and pointing at nothing would be the worst of
-    // both, so the overlay stays out of the way and only offers the way out.
-    const hole = rect
-        ? {
-            x: Math.max(0, rect.x - HALO),
-            y: Math.max(0, rect.y - HALO),
-            w: rect.width + HALO * 2,
-            h: rect.height + HALO * 2,
-        }
-        : null;
+    // Unconditional now: the null case returned above, so there is always a
+    // control to cut a hole around.
+    const hole = {
+        x: Math.max(0, rect.x - HALO),
+        y: Math.max(0, rect.y - HALO),
+        w: rect.width + HALO * 2,
+        h: rect.height + HALO * 2,
+    };
 
     return (
         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-            {hole ? (
-                <>
-                    {/* Four panels, not one with a gap: a single overlay eats
-                        the touch even where it looks transparent. */}
+            {/* SHELVED: this was `hole ? (four panels) : (full-screen dim)`.
+                The second branch is what greyed out every screen in the game
+                while the player was anywhere but My Company, and it is now
+                unreachable - the component returns null above rather than
+                rendering it. Left as a note because the branch was not wrong
+                to write, only wrong to reach:
+
+                    ) : (
+                        <View style={[styles.dim, StyleSheet.absoluteFillObject]} />
+                    )}
+               */}
+            <>
+                {/* Four panels, not one with a gap: a single overlay eats
+                    the touch even where it looks transparent. */}
                     <View style={[styles.dim, { top: 0, left: 0, right: 0, height: hole.y }]} />
                     <View style={[styles.dim, { top: hole.y + hole.h, left: 0, right: 0, bottom: 0 }]} />
                     <View style={[styles.dim, { top: hole.y, left: 0, width: hole.x, height: hole.h }]} />
@@ -127,17 +156,14 @@ const TutorialOverlay = () => {
 
                     {/* The ring is drawn OUTSIDE the hole and ignores touches,
                         so it cannot become the thing that blocks the press. */}
-                    <View
-                        pointerEvents="none"
-                        style={[styles.ring, { top: hole.y, left: hole.x, width: hole.w, height: hole.h }]}
-                    />
-                </>
-            ) : (
-                <View style={[styles.dim, StyleSheet.absoluteFillObject]} />
-            )}
+                <View
+                    pointerEvents="none"
+                    style={[styles.ring, { top: hole.y, left: hole.x, width: hole.w, height: hole.h }]}
+                />
+            </>
 
             <View
-                style={[styles.card, hole && hole.y > H / 2 ? { top: 80 } : { bottom: 120 }]}
+                style={[styles.card, hole.y > H / 2 ? { top: 80 } : { bottom: 120 }]}
                 pointerEvents="box-none">
                 {/* ------------------------------------------------------
                     SOMEBODY IS SAYING THIS

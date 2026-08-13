@@ -96,7 +96,23 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
     const navigateTo = (screen: string) => {
         setIsStatsMode(false);
         if (screen === 'Company') {
-            navigation.navigate('MyCompany');
+            // ------------------------------------------------------------------
+            //  MyCompany IS NOT A ROOT ROUTE, SO IT HAS TO BE ADDRESSED THROUGH
+            //  THE NAVIGATOR THAT OWNS IT
+            // ------------------------------------------------------------------
+            //  It lives inside the swipe navigator that RootStack registers as
+            //  'Home'; the RootStack entry for it is shelved (see the comment
+            //  in RootNavigator.tsx). navigate() checks the current navigator
+            //  and then walks UP through its parents - it does not descend into
+            //  a sibling's children.
+            //
+            //  So this worked from Home, where the swipe navigator IS the
+            //  current one, and threw from anywhere in RootStack: Messages, a
+            //  message thread, Mail, a mail detail. Which is to say it worked
+            //  everywhere it was tested and broke on the tab bar that is
+            //  visible on every screen in the app.
+            // ------------------------------------------------------------------
+            navigation.navigate('Home', { screen: 'MyCompany' });
         } else if (screen === 'Contacts') {
             // Güvenlik ağı: modül rafta ise route kayıtlı değil, navigate crash eder.
             if (!FEATURES.love) return;

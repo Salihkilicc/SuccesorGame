@@ -260,3 +260,35 @@ describe('somebody is saying it', () => {
         expect(long).toEqual([]);
     });
 });
+
+// ============================================================================
+//  THE LESSON LIVES ON THE SCREEN IT IS ABOUT
+// ============================================================================
+//  The overlay used to dim the WHOLE APP from the moment a lock became
+//  active, wherever the player was, with a card pointing at nothing. Every
+//  screen in the game was greyed out until they happened to find My Company.
+//
+//  It now renders nothing unless the control the lock names has been measured
+//  on the screen currently up. These assert the data side of that contract -
+//  the overlay's own early return is in TutorialOverlay.tsx, and the rect
+//  lifecycle is in TutorialTarget.tsx.
+// ============================================================================
+describe('a lock points at a control that exists', () => {
+    const REGISTERED = ['products', 'teamMorale'];
+
+    it('every highlight key is one a screen actually registers', () => {
+        // A key nothing registers is a lock that can now never appear at all,
+        // where before it merely dimmed the app and lit nothing. The failure
+        // got quieter, so the check has to get louder.
+        const unknown = TUTORIAL_SEQUENCE
+            .filter(l => !REGISTERED.includes(l.highlight))
+            .map(l => `${l.id} -> ${l.highlight}`);
+        expect(unknown).toEqual([]);
+    });
+
+    it('and the keys it can point at are few enough to list', () => {
+        // If this grows, the list above is stale and the check is weaker than
+        // it reads. Kept small on purpose.
+        expect(REGISTERED.length).toBeLessThanOrEqual(4);
+    });
+});

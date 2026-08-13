@@ -14,6 +14,16 @@ export type Rect = { x: number; y: number; width: number; height: number };
 type TargetStore = {
     rects: Record<string, Rect>;
     setRect: (key: string, rect: Rect) => void;
+    /**
+     * The control has left the screen.
+     *
+     * Without this a measurement outlived the screen that produced it: the
+     * rect stayed in the store forever, so after one visit to My Company the
+     * overlay believed the control was still there and went on dimming every
+     * other screen in the app with a hole punched at coordinates belonging to
+     * a screen the player had left.
+     */
+    clearRect: (key: string) => void;
 };
 
 export const useTutorialTargets = create<TargetStore>((set) => ({
@@ -28,5 +38,13 @@ export const useTutorialTargets = create<TargetStore>((set) => ({
                 return state;
             }
             return { rects: { ...state.rects, [key]: rect } };
+        }),
+
+    clearRect: (key) =>
+        set(state => {
+            if (!(key in state.rects)) return state;
+            const next = { ...state.rects };
+            delete next[key];
+            return { rects: next };
         }),
 }));
