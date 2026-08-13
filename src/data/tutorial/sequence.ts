@@ -50,22 +50,44 @@ export const MORALE_EVENT_THRESHOLD = 72;
 export const TUTORIAL_SEQUENCE: TutorialLock[] = [
     {
         // ------------------------------------------------------------------
-        //  Q1 — MAKE SOMETHING
+        //  Q1 — BE HEARD
         // ------------------------------------------------------------------
-        //  The first thing a manufacturer does. Cleared by having any product
-        //  in production at all, so any route to it counts - the player is
-        //  not being made to press one particular button in one order.
+        //  THIS USED TO ASK FOR A PRODUCTION TARGET, and it read as nonsense
+        //  on the screen it pointed at. "Nothing in this company is real
+        //  until something is being built" - said to a player looking at a
+        //  phone that has been in production since before they arrived.
+        //
+        //  A first lesson has to name something the player can see is
+        //  missing, or the tutorial is telling them about a company that is
+        //  not the one in front of them. The phone is made and it is sold;
+        //  what is actually zero is the marketing budget. Nobody outside the
+        //  building knows the thing exists, and that is a real hole with a
+        //  real control attached to it.
+        //
+        //  Same highlight key as before, so the sequence still walks the
+        //  player from the department tile into the product card - the
+        //  budget lives INSIDE the product, and the instruction carries that
+        //  second step because a lock cannot light a control behind a modal.
         // ------------------------------------------------------------------
-        id: 'q1-production',
+        id: 'q1-marketing',
         highlight: 'products',
         // His voice, not the manual's. Short because it sits on a dimmed screen
         // for as long as it takes - the argument is in the conversation.
         speaker: 'father',
-        instruction: 'Set a target. In units. Nothing in this company is real until something is being built.',
-        satisfied: [{ kind: 'flag', flag: 'tutorialProductionSet' }],
-        // Only in the first year. After that he is either dead or has stopped
-        // explaining, and a tutorial that reappears in year three is a bug.
-        canEngage: [{ kind: 'noFlag', flag: 'fatherDead' }],
+        instruction: 'Open the phone and put money behind it. Nobody outside this building knows it exists.',
+        satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
+        canEngage: [
+            // Only in the first year. After that he is either dead or has
+            // stopped explaining, and a tutorial that reappears in year three
+            // is a bug.
+            { kind: 'noFlag', flag: 'fatherDead' },
+            // THE ESCAPE. Clearing this step costs money, so it must not
+            // engage for a company that has none - see the three ways out in
+            // core/tutorial/locks.ts. The opening capital is 2,000,000, so
+            // this holds on any ordinary first quarter and stops holding for
+            // a player who has already spent their way into trouble.
+            { kind: 'capitalAtLeast', amount: 500_000 },
+        ],
     },
 
     {
@@ -108,38 +130,47 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         ],
     },
 
-    {
-        // ------------------------------------------------------------------
-        //  Q3 — BEING HEARD
-        // ------------------------------------------------------------------
-        //  Time-based rather than triggered by a share number, and that is
-        //  deliberate after the morale threshold: a condition on share would
-        //  need share to actually fall, and a player doing well would never
-        //  see the lesson. Competitors ARE taking share in the third quarter
-        //  of every game - that is what a market with a 31% incumbent does.
-        //
-        //  The scene is where the father is out of date for the first time.
-        //  See data/story/fatherMarketing.ts.
-        // ------------------------------------------------------------------
-        id: 'q3-marketing',
-        highlight: 'products',
-        // Products again, on purpose: the marketing budget lives INSIDE a
-        // product, and a lock cannot light a control that is behind a closed
-        // modal - the overlay would dim the screen and point at nothing. The
-        // instruction carries the second step.
-        speaker: 'father',
-        instruction: 'Put money behind it. A product with no budget is a product nobody has heard of.',
-        conversation: 'father-marketing',
-        satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
-        canEngage: [
-            { kind: 'noFlag', flag: 'fatherDead' },
-            { kind: 'quarterAtLeast', quarter: 3 },
-            // THE ESCAPE, and the audit could not have demanded it. Its
-            // no-escape rule looks for money in `satisfied`, and `satisfied`
-            // here is a FLAG - which happens to be raised by spending. The
-            // cost is real and completely invisible to the check. See the
-            // note in core/tutorial/locks.ts validateLocks.
-            { kind: 'capitalAtLeast', amount: 500_000 },
-        ],
-    },
+    // ========================================================================
+    //  SHELVED: Q3 — BEING HEARD
+    // ========================================================================
+    //  Its lesson moved to the first quarter, where the hole it names is
+    //  actually visible: the phone ships from day one with a marketing
+    //  budget of zero. Kept here rather than removed because the REASONING
+    //  is still the best thing in this file and would be re-derived badly
+    //  if it were thrown away - particularly the note on why the escape
+    //  clause could not have been demanded by the audit.
+    //
+    //  It is inert as well as shelved: it waits on `tutorialMarketingSet`,
+    //  which the first lock now raises, so `activeLock` would skip it as
+    //  already satisfied even if it were still in the array.
+    //
+    //  Its conversation, father-marketing, is NOT lost. It is a story beat
+    //  now (data/story/index.ts) and still arrives in the third quarter,
+    //  which is where it belongs - the scene is about share being taken,
+    //  and share cannot have been taken in the first quarter.
+    //
+    //  {
+    //      // Time-based rather than triggered by a share number, and that
+    //      // is deliberate after the morale threshold: a condition on share
+    //      // would need share to actually fall, and a player doing well
+    //      // would never see the lesson. Competitors ARE taking share in
+    //      // the third quarter of every game - that is what a market with a
+    //      // 31% incumbent does.
+    //      id: 'q3-marketing',
+    //      highlight: 'products',
+    //      speaker: 'father',
+    //      instruction: 'Put money behind it. A product with no budget is a product nobody has heard of.',
+    //      conversation: 'father-marketing',
+    //      satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
+    //      canEngage: [
+    //          { kind: 'noFlag', flag: 'fatherDead' },
+    //          { kind: 'quarterAtLeast', quarter: 3 },
+    //          // THE ESCAPE, and the audit could not have demanded it. Its
+    //          // no-escape rule looks for money in `satisfied`, and
+    //          // `satisfied` here is a FLAG - which happens to be raised by
+    //          // spending. The cost is real and completely invisible to the
+    //          // check. See the note in core/tutorial/locks.ts validateLocks.
+    //          { kind: 'capitalAtLeast', amount: 500_000 },
+    //      ],
+    //  },
 ];

@@ -47,11 +47,32 @@
 // ============================================================================
 
 import type { Conversation } from '../../core/story/graph';
+import type { Condition } from '../../core/story/conditions';
+
+// ---------------------------------------------------------------------------
+//  IT HAD NO TIMING OF ITS OWN, AND NOW IT NEEDS SOME
+// ---------------------------------------------------------------------------
+//  This scene was delivered entirely by the q3-marketing lock, so the only
+//  statement of when it arrives lived on the lock. That lock is shelved - its
+//  lesson moved to the first quarter, where the hole it names is visible -
+//  and the scene became an ordinary beat.
+//
+//  Without this it would have fired in the first quarter: a man telling the
+//  player that competitors have been quietly taking share, three days into a
+//  job, before a single quarter has been reported. The old lock's own gate is
+//  what it says here, minus the money - reading a message costs nothing, and
+//  the capital condition existed because CLEARING the lock meant spending.
+// ---------------------------------------------------------------------------
+const WHEN: Condition[] = [
+    { kind: 'quarterAtLeast', quarter: 3 },
+    { kind: 'noFlag', flag: 'fatherDead' },
+];
 
 export const fatherMarketing: Conversation = {
     id: 'father-marketing',
     channel: 'message',
     from: 'father',
+    when: WHEN,
     start: 'open',
     nodes: [
         {

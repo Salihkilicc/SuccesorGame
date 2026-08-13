@@ -81,29 +81,32 @@ export const initialProductState: ProductState = {
             suggestedPrice: 600,
 
             // ------------------------------------------------------------------
-            //  THE LINE REALLY IS COLD, WHICH IT WAS NOT
+            //  THE PHONE IS ALREADY BEING MADE. NOBODY HAS HEARD OF IT.
             // ------------------------------------------------------------------
-            //  This read `productionLevel: 50` - the OLD percentage field, with
-            //  no `productionUnits` beside it. resolveTargetUnits() treats that
-            //  shape as a legacy save and migrates it, so a NEW GAME started at
-            //  half of capacity, producing and selling, with nobody having
-            //  decided anything.
+            //  This read `productionLevel: 50` - the OLD percentage field with
+            //  no units beside it, which resolveTargetUnits() treats as a
+            //  legacy save and migrates. It worked, and it worked by accident:
+            //  a new game ran at half capacity because a migration path fired,
+            //  not because anybody wrote a starting figure.
             //
-            //  Which made the first two things the game says untrue. The father
-            //  opens with "the line is cold. Three days you have had the chair
-            //  and the line is cold", and the tutorial card asks for a target -
-            //  both describing a state the game was not in, and both therefore
-            //  reading as the game not knowing what it had. A player who looks
-            //  and sees the phone already running concludes the tutorial has
-            //  lost track of its own world, and they are right.
+            //  2025 is that same half of capacity (4,050 units at 22 people on
+            //  a tier-one floor), now written down as units so the value is a
+            //  decision rather than the output of a compatibility branch.
+            //  Balance is unchanged; only the reason it holds is.
             //
-            //  `productionUnits: 0` says the same thing in the data. Nothing is
-            //  being built until the player builds it, the man is telling the
-            //  truth, and the first instruction asks for something that is
-            //  genuinely undone.
+            //  IT WAS BRIEFLY SET TO ZERO, and that was a misreading. The line
+            //  being cold made the father's opening literally true, and made
+            //  the first hour worse: an inherited company that builds nothing
+            //  is a company with no revenue, and the player's first act became
+            //  switching the machine on rather than deciding anything.
+            //
+            //  The thing that is genuinely undone is below. `marketingBudget:
+            //  0` - the phone is made, it is sold, and not one person outside
+            //  the building knows it exists. That is the first real decision
+            //  and the first lesson points at it.
             // ------------------------------------------------------------------
             sellingPrice: 600,
-            productionUnits: 0,
+            productionUnits: 2025,
             marketingBudget: 0,
             inventory: 0,
             revenue: 0,

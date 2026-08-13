@@ -15,7 +15,8 @@
 // ============================================================================
 
 import { fatherMarketing } from './fatherMarketing';
-import { CONVERSATIONS } from './index';
+import { STORY_BEATS, CONVERSATIONS } from './index';
+import { testAll } from '../../core/story/conditions';
 import { validate } from '../../core/story/graph';
 import { CAST } from './cast';
 import { TUTORIAL_SEQUENCE } from '../tutorial/sequence';
@@ -56,17 +57,33 @@ describe('it is a real scene in the game', () => {
         expect(validate(fatherMarketing, CAST, known)).toEqual([]);
     });
 
-    it('the Q3 lock carries it, and every lock now declares a gate', () => {
-        const lock = TUTORIAL_SEQUENCE.find(l => l.id === 'q3-marketing')!;
-        expect(lock.conversation).toBe(fatherMarketing.id);
+    it('is a story beat now, and no longer carried by a lock', () => {
+        // ------------------------------------------------------------------
+        //  IT USED TO RIDE ON q3-marketing, WHICH IS SHELVED
+        // ------------------------------------------------------------------
+        //  That lock's LESSON moved to the first quarter, where the hole it
+        //  names is visible: the phone ships with a marketing budget of zero.
+        //  The SCENE did not move with it - it is about share being taken,
+        //  and no share has been taken in the first quarter.
+        //
+        //  So the two came apart, which is allowed. A lock needs a scene; a
+        //  scene does not need a lock.
+        // ------------------------------------------------------------------
+        expect(TUTORIAL_SEQUENCE.find(l => l.id === 'q3-marketing')).toBeUndefined();
+        expect(TUTORIAL_SEQUENCE.some(l => l.conversation === fatherMarketing.id))
+            .toBe(false);
+        expect(STORY_BEATS.map(b => b.conversation)).toContain(fatherMarketing.id);
+    });
+
+    it('and every lock still declares a gate', () => {
         expect(validateLocks(TUTORIAL_SEQUENCE)).toEqual([]);
     });
 
-    it('does not engage before quarter three, or without the money to act on it', () => {
-        const done = { ...emptyLockState(), completed: ['q1-production', 'morale-bonus'] };
-        expect(activeLock(TUTORIAL_SEQUENCE, done, world({ quarter: 2 }))).toBeUndefined();
-        expect(activeLock(TUTORIAL_SEQUENCE, done, world({ capital: 0 }))).toBeUndefined();
-        expect(activeLock(TUTORIAL_SEQUENCE, done, world())?.id).toBe('q3-marketing');
+    it('its own timing does the work the lock used to do', () => {
+        // The `when` on the conversation was always the real gate; the lock
+        // repeated it. Now there is one statement of when this arrives.
+        expect(testAll(fatherMarketing.when, world({ quarter: 2 }))).toBe(false);
+        expect(testAll(fatherMarketing.when, world({ quarter: 3 }))).toBe(true);
     });
 });
 
@@ -161,9 +178,11 @@ describe('but he is not wrong, and that has to survive', () => {
     });
 
     it('and the advice he gives does work - marketing is a real factor', () => {
-        // He is behind, not mistaken. A product with no budget is a product
-        // nobody has heard of, and the lock's instruction says so.
-        const lock = TUTORIAL_SEQUENCE.find(l => l.id === 'q3-marketing')!;
-        expect(lock.instruction.toLowerCase()).toContain('nobody has heard of');
+        // He is behind, not mistaken. The scene's own words carry that now:
+        // the line used to be checked on the q3-marketing lock, which is
+        // shelved. Asserting it on the SCENE is the better place anyway - the
+        // lock was only ever repeating him.
+        expect(text.toLowerCase()).toContain('you buy the hearing');
+        expect(text.toLowerCase()).toContain('every quarter');
     });
 });

@@ -96,16 +96,19 @@ describe('the arithmetic the threshold depends on', () => {
 
 describe('the lock', () => {
     const lock = () => TUTORIAL_SEQUENCE.find(l => l.id === 'morale-bonus')!;
-    const state = () => ({ ...emptyLockState(), completed: ['q1-production'] });
+    // The opening lock, cleared. It was 'q1-production' and is now
+    // 'q1-marketing' - the first lesson changed, this one did not.
+    const state = () => ({ ...emptyLockState(), completed: ['q1-marketing'] });
 
     it('does not engage while morale is still healthy', () => {
         // It had NO morale condition at all before this - it would have
         // engaged in quarter one, on a workforce at 75, telling the player to
         // fix something that was not wrong.
         //
-        // Asserted as "not this lock" rather than "no lock at all": the Q3
-        // marketing lock sits behind it in the sequence and legitimately
-        // takes over, which is the step-over behaviour working.
+        // Asserted as "not this lock" rather than "no lock at all". It used
+        // to be the Q3 marketing lock stepping over it; that lock is shelved
+        // now, so at healthy morale there is simply nothing to show - which
+        // is the same assertion and a stronger outcome.
         expect(activeLock(TUTORIAL_SEQUENCE, state(), world({ morale: 75 }))?.id)
             .not.toBe('morale-bonus');
     });

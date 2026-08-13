@@ -240,14 +240,14 @@ describe('somebody is saying it', () => {
         // lock without one is a screen that dims and points at a button for
         // no stated reason.
         //
-        // q1-production is the exception and it is not an oversight: its
+        // The opening lock is the exception and it is not an oversight: its
         // scene is father-q1, which arrives through OPENING_CONVERSATIONS
         // because it is the opening. Naming it here as well would give one
         // conversation two delivery routes - deliver.ts would dedupe it, but
         // relying on a dedupe to cover a design with two sources is how the
         // second source eventually wins.
         expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
-            .toEqual(['q1-production']);
+            .toEqual(['q1-marketing']);
     });
 
     it('the instruction stays short enough to sit on a dimmed screen', () => {

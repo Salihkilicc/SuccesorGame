@@ -42,43 +42,52 @@ const showing = (world: World, state: LockState = emptyLockState()) =>
     activeLock(TUTORIAL_SEQUENCE, state, world)?.id;
 
 describe('a new game', () => {
-    it('opens on the production step, pointing at the product', () => {
+    it('opens on the marketing step, pointing at the product', () => {
+        // It used to open on a production target, and that read as nonsense
+        // on the screen it pointed at: "nothing is real until something is
+        // being built", said to a player looking at a phone that has been in
+        // production since before they arrived. The budget is the hole they
+        // can actually see.
         const lock = activeLock(TUTORIAL_SEQUENCE, emptyLockState(), opening());
-        expect(lock?.id).toBe('q1-production');
+        expect(lock?.id).toBe('q1-marketing');
         expect(lock?.highlight).toBe('products');
+    });
+
+    it('and not for a company that cannot afford to clear it', () => {
+        // The first of the three ways out: a step that costs money does not
+        // engage when there is none.
+        expect(showing(opening({ capital: 100_000 }))).toBeUndefined();
     });
 });
 
-describe('after the player sets a target', () => {
-    const afterwards = opening({ flags: { tutorialProductionSet: true } });
+describe('after the player buys some attention', () => {
+    const afterwards = opening({ flags: { tutorialMarketingSet: true } });
 
     it('the tutorial goes quiet, and that is correct', () => {
         // THE ANSWER TO "why is nothing highlighted on Products". Nothing is
-        // wrong. There is no step to show until the third quarter.
+        // wrong. There is no step to show until morale settles.
         expect(showing(afterwards)).toBeUndefined();
     });
 
-    it('and morale is not the next one, because morale has not settled yet', () => {
+    it('and morale is not next until morale has actually settled', () => {
         // Morale starts at 75 and approaches 70 asymptotically. The bonus
         // step needs 72 or below, which arrives in the second or third
         // quarter - see MORALE_EVENT_THRESHOLD and the note above it.
         expect(showing(opening({
-            flags: { tutorialProductionSet: true },
+            flags: { tutorialMarketingSet: true },
             morale: 72,
         }))).toBe('morale-bonus');
     });
 
-    it('marketing waits for the third quarter AND for money to spend', () => {
-        const q3 = { tutorialProductionSet: true, tutorialBonusPaid: true } as const;
-        // Right quarter, no money: nothing, rather than a step that cannot
-        // be cleared. That is the first of the three ways out.
+    it('and there is no third step, because its lesson moved to the first', () => {
+        // q3-marketing is shelved. It waited on the same flag the opening
+        // lock now raises, so it was inert as well as redundant - see the
+        // note in data/tutorial/sequence.ts.
+        expect(TUTORIAL_SEQUENCE.map(l => l.id)).toEqual(['q1-marketing', 'morale-bonus']);
         expect(showing(opening({
-            flags: q3, quarter: 3, capital: 100_000, morale: 75,
+            flags: { tutorialMarketingSet: true, tutorialBonusPaid: true },
+            quarter: 3, morale: 75,
         }))).toBeUndefined();
-
-        expect(showing(opening({
-            flags: q3, quarter: 3, capital: 2_000_000, morale: 75,
-        }))).toBe('q3-marketing');
     });
 });
 
@@ -88,13 +97,13 @@ describe('the year ends', () => {
         // in year three is a bug, and this is the one line that prevents it.
         expect(showing(opening({ flags: { fatherDead: true } }))).toBeUndefined();
         expect(showing(opening({
-            flags: { fatherDead: true, tutorialProductionSet: true },
+            flags: { fatherDead: true, tutorialMarketingSet: true },
             quarter: 3,
         }))).toBeUndefined();
     });
 
     it('a skipped step does not come back', () => {
-        const skipped: LockState = { ...emptyLockState(), skipped: ['q1-production'] };
+        const skipped: LockState = { ...emptyLockState(), skipped: ['q1-marketing'] };
         expect(showing(opening(), skipped)).toBeUndefined();
     });
 

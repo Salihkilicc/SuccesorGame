@@ -287,6 +287,19 @@ STORY_BEATS.push(
 //  being listened to, and the resignation needs him to have given up. None of
 //  them is urgent - he is not the spine, he is the person standing next to it.
 // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+//  THE MARKETING SCENE, WHICH USED TO BE CARRIED BY A LOCK
+// ----------------------------------------------------------------------------
+//  It rode on `q3-marketing`, and that lock is shelved: its lesson moved to
+//  the first quarter, where the hole it describes is actually visible. The
+//  SCENE did not move with it - it is about share being taken, and no share
+//  has been taken in the first quarter.
+//
+//  So it becomes an ordinary beat. Its own `when` already carries the timing;
+//  nothing about the writing changes, only what delivers it.
+// ----------------------------------------------------------------------------
+STORY_BEATS.push({ conversation: fatherMarketing.id });
+
 STORY_BEATS.push(
     { conversation: cfoBoardRoom.id },
     { conversation: cfoBragaName.id },

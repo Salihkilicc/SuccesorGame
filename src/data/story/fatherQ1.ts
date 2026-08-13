@@ -55,7 +55,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'open',
             speaker: 'father',
-            text: 'The line is cold. Three days you have had the chair and the line is cold.\n\nYour grandfather ran it hot through a war. I ran it hot through two recessions, a bank that changed its mind on a Friday, and a man in California who decided we were a rounding error.\n\nThree days. I am not going to tell you how to start it — somebody will show you where the buttons are. I want to tell you why I could never leave it cold.',
+            text: 'The line is running at half. It has been running at half since before you were born, because half is what I could sell.\n\nThat is the number nobody argues with and everybody should. Your grandfather ran it hot through a war. I ran it at half through two recessions, a bank that changed its mind on a Friday, and a man in California who decided we were a rounding error.\n\nI am not going to tell you which buttons to press. Somebody will show you. I want to tell you why the number stuck.',
             choices: [
                 { text: 'How much should I make?', next: 'howMuch' },
                 { text: 'Good morning to you too.', next: 'goodMorning' },

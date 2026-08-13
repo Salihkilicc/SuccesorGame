@@ -7,22 +7,22 @@
 //  It did not, and this is the fault behind every "the tutorial does not
 //  work" of the last few days.
 //
-//  The lock clears on `tutorialProductionSet`. That flag was raised only when
-//  an update carried `productionLevel` - the OLD percentage field. Production
-//  moved to absolute units some time ago and the detail modal has written
-//  `productionUnits` ever since, so a player who opened the phone, chose a
-//  number and saved raised nothing at all. The screen stayed dim, the card
-//  stayed up, and the only way out was the twelve-second skip.
+//  `tutorialProductionSet` was raised only when an update carried
+//  `productionLevel` - the OLD percentage field. Production moved to absolute
+//  units some time ago and the detail modal has written `productionUnits`
+//  ever since, so a player who opened the phone, chose a number and saved
+//  raised nothing at all. The screen stayed dim, the card stayed up, and the
+//  only way out was the twelve-second skip.
 //
 //  Which is the worst shape a bug can have: the player does exactly what they
 //  were told, the game does not acknowledge it, and the only available
 //  conclusion is that they misunderstood.
 //
-//  The second half of the same story is the seed. It carried
-//  `productionLevel: 50` with no units beside it, which production.ts reads as
-//  a legacy save and migrates - so a NEW GAME was already running at half
-//  capacity while the father said the line was cold and the card asked for a
-//  target. Both of them describing a world the game was not in.
+//  Both flags are covered here rather than just the one the opening lock
+//  happens to wait on today. That lock is now the marketing one - see
+//  data/tutorial/sequence.ts - and the production flag still has to work,
+//  because which lesson comes first is a design decision and this file is
+//  about the wiring underneath it.
 // ============================================================================
 
 import { useProductStore, initialProductState } from './useProductStore';
@@ -42,22 +42,30 @@ const phone = () =>
 
 beforeEach(fresh);
 
-describe('the line the player inherits', () => {
-    it('is cold, which is what the father says it is', () => {
-        // 22 employees, tier one. Whatever the capacity works out to, the
-        // target is zero until somebody sets one.
-        expect(resolveTargetUnits(phone(), 22, 1)).toBe(0);
+describe('the company the player inherits', () => {
+    it('is already making the phone, because a product exists', () => {
+        // It was briefly seeded at zero, on a reading of "the line is cold"
+        // that made the first hour worse: an inherited company that builds
+        // nothing has no revenue, and the player's opening act became
+        // switching the machine on rather than deciding anything.
+        expect(resolveTargetUnits(phone(), 22, 1)).toBeGreaterThan(0);
     });
 
-    it('carries units, not the percentage that triggers the migration', () => {
-        // The seed held `productionLevel` and no units, so every new game took
-        // the legacy branch of resolveTargetUnits and started at 50% of
-        // capacity. If this ever fails, the opening is lying again.
-        expect(phone().productionUnits).toBe(0);
+    it('at half of capacity, in units rather than by migration', () => {
+        // The seed used to hold `productionLevel` and no units, so every new
+        // game took the LEGACY branch of resolveTargetUnits - it ran at half
+        // capacity because a compatibility path fired, not because anybody
+        // wrote a starting figure. Same number, stated on purpose now.
+        const max = resolveTargetUnits(
+            { ...phone(), productionUnits: 999_999 }, 22, 1,
+        );
+        expect(phone().productionUnits).toBe(Math.floor(max / 2));
         expect(phone().productionLevel).toBeUndefined();
     });
 
-    it('and its marketing budget is zero, so being unknown is real', () => {
+    it('and nobody has heard of it, which is the first real hole', () => {
+        // The thing that is genuinely undone, and what the opening lesson
+        // now points at.
         expect(phone().marketingBudget).toBe(0);
     });
 });
