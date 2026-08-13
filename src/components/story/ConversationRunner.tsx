@@ -113,16 +113,47 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     });
 
     // ------------------------------------------------------------------
-    //  SAVED ON EVERY CARD, INCLUDING THE FIRST
+    //  SAVED WHEN THE CARD CHANGES, NOT AFTER IT HAS BEEN DRAWN
     // ------------------------------------------------------------------
-    //  The first card matters as much as the rest: a player who opens a
-    //  scene, reads the opening and backs out has been shown it, and the
-    //  effects of nothing have run. Writing it down costs one record and
-    //  means "where was I" always has an answer.
+    //  This was an effect on [nodeId, history], which is the obvious way to
+    //  write it and loses exactly one card: THE LAST ONE.
+    //
+    //  Picking a final answer sets the state and calls `onFinished`, and the
+    //  screen's `onFinished` navigates away. All of it is one event handler,
+    //  so React batches the lot and the screen unmounts in the same commit -
+    //  before the effect for the final state ever ran. The scene stayed saved
+    //  at the card BEFORE the last answer.
+    //
+    //  Which is what the player saw: told Arthur "I will write it myself",
+    //  left, came back, and was offered both answers again. Worse than the
+    //  wrong sentence being remembered - the dial had already moved when the
+    //  answer was picked, so choosing the other one moved it again.
+    //
+    //  So the write happens where the change does, synchronously, in
+    //  `record`. The effect is only for the opening card of a scene nobody
+    //  has started - a player who opens a scene, reads it and backs out has
+    //  been shown it, and there is no answer to hang that on.
     // ------------------------------------------------------------------
     useEffect(() => {
-        useStoryStore.getState().saveScene(conversation.id, { nodeId, history });
-    }, [conversation.id, nodeId, history]);
+        if (!resume) {
+            useStoryStore.getState().saveScene(conversation.id, { nodeId, history });
+        }
+        // Mount only. Every later write goes through `record`.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    /**
+     * Move to a card and write it down in the same breath.
+     *
+     * The ONLY place position and transcript change after mount. Two setters
+     * and a save, so there is no arrangement of unmounting, batching or
+     * navigation that can commit one without the others.
+     */
+    const record = (toNode: string | null, said: Said[]) => {
+        setNodeId(toNode);
+        setHistory(said);
+        useStoryStore.getState().saveScene(conversation.id, { nodeId: toNode, history: said });
+    };
 
     const node = nodeId ? nodeById(conversation, nodeId) : undefined;
 
@@ -149,7 +180,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     );
 
     const finish = (h: Said[] = history) => {
-        setNodeId(null);
+        record(null, h);
         onFinished?.(h);
     };
 
@@ -164,13 +195,16 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         }];
         const target = choice.next ? nodeById(conversation, choice.next) : undefined;
         if (target) next.push({ from: 'them', text: say(target.id, target.text) });
-        setHistory(next);
 
-        // Built outside setHistory rather than inside the updater, because
-        // `finish` has to hand the completed transcript to the screen and a
-        // state updater is not the place to read state back out of.
+        // Built outside a state updater, because `finish` has to hand the
+        // completed transcript to the screen and an updater is not the place
+        // to read state back out of.
+        //
+        // A `next` that does not resolve ends the scene: the audit means that
+        // cannot happen in shipped data, so this is for a save made against a
+        // version of the scene that has since been rewritten.
         if (!choice.next || !target) { finish(next); return; }
-        setNodeId(choice.next);
+        record(choice.next, next);
     };
 
     const done = !node;

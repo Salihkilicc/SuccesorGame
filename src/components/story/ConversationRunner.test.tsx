@@ -191,6 +191,38 @@ describe('a scene that is played to the end', () => {
         expect(useStoryStore.getState().sceneProgress['test-resume'].nodeId).toBeNull();
     });
 
+    it('SAVES THE LAST ANSWER EVEN THOUGH THE SCREEN LEAVES IMMEDIATELY', () => {
+        // ------------------------------------------------------------------
+        //  THE TEST BELOW PASSED WHILE THIS WAS BROKEN
+        // ------------------------------------------------------------------
+        //  It unmounts on its own line, one commit after the answer, which
+        //  gives a save-on-effect all the time in the world. The screen does
+        //  not: `onFinished` navigates away inside the same event handler, so
+        //  React batches the state change and the unmount together and the
+        //  effect for the final card never runs.
+        //
+        //  So this unmounts INSIDE onFinished, which is what the thread and
+        //  the mail screen actually do. Told Arthur "I will write it myself",
+        //  left, came back, and both answers were on offer again - and the
+        //  dial had already moved, so picking the other one moved it twice.
+        // ------------------------------------------------------------------
+        const before = useStoryStore.getState().dials.cfoTrust;
+        let leaving!: ReactTestRenderer;
+        leaving = runner(() => { leaving.unmount(); });
+        press(leaving, 'ANSWER ONE');
+        const after = useStoryStore.getState().dials.cfoTrust;
+        press(leaving, 'ANSWER TWO');
+
+        expect(useStoryStore.getState().sceneProgress['test-resume'].nodeId).toBeNull();
+
+        // And coming back cannot move the dial a second time.
+        const again = runner();
+        try { press(again, 'ANSWER TWO'); } catch { /* not on offer */ }
+        try { press(again, 'ANSWER ONE'); } catch { /* nor this */ }
+        expect(useStoryStore.getState().dials.cfoTrust).toBe(after);
+        expect(after).toBe(before + 5);
+    });
+
     it('so re-opening it shows what was said and offers only a way out', () => {
         // This is the mail case: a letter stays in the inbox after it has
         // been answered. Opening it must not replay it.
