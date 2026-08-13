@@ -174,3 +174,46 @@ describe('the seeded inbox', () => {
         expect(first.fromEmail).toContain('@hale.co');
     });
 });
+
+// ============================================================================
+//  AND THE LETTER HAS TO BE FINDABLE
+// ============================================================================
+//  Three commits went into "Pear's mail does not arrive". It arrived every
+//  time. It was at the top of the inbox, from "Nathan Vogel", subject "HALE /
+//  condolence + preliminary approach - ref 4471-C" - and the word Pear was
+//  nowhere on the row.
+//
+//  That is exactly the letter's character and exactly why it got scrolled
+//  past. The engine was right and the label was useless, which is a failure
+//  no amount of testing the engine would have found.
+// ============================================================================
+describe('who a letter says it is from', () => {
+    it('names the company when the sender represents one', () => {
+        const { senderLabel } = require('./deliver');
+        const { CAST } = require('../../data/story/cast');
+        expect(senderLabel(CAST.pear)).toContain('Pear');
+        expect(senderLabel(CAST.friend)).toContain('Planora');
+    });
+
+    it('and does not explain the people you already know', () => {
+        const { senderLabel } = require('./deliver');
+        const { CAST } = require('../../data/story/cast');
+        // Your own CFO, and your father. A label that appends "Founder" to
+        // "Your Father" is explaining a relationship to the person in it.
+        expect(senderLabel(CAST.cfo)).toBe('Arthur Vance');
+        expect(senderLabel(CAST.father)).toBe('Your Father');
+    });
+
+    it('and never repeats an organisation that is already the name', () => {
+        const { senderLabel } = require('./deliver');
+        const { CAST } = require('../../data/story/cast');
+        expect(senderLabel(CAST.vulture)).toBe('Halberd Partners');
+    });
+
+    it('so Pear is findable the quarter it lands', () => {
+        gameSink().schedule({ conversation: 'pear-offer', afterQuarters: 0, urgent: true });
+        const letter = inbox().find(m => m.conversationId === 'pear-offer');
+        expect(letter).toBeDefined();
+        expect(letter!.fromName).toContain('Pear');
+    });
+});

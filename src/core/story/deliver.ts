@@ -34,6 +34,35 @@ import { readWorld, currentQuarter } from './world';
 import { activeLock } from '../tutorial/locks';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 
+/**
+ * How a sender is named on a letter.
+ *
+ * A person gets their affiliation; an organisation is already its own
+ * affiliation and would read as "Halberd Partners (Halberd Partners)".
+ */
+export const senderLabel = (from: { name: string; role: string }): string => {
+    // ------------------------------------------------------------------
+    //  THE COMMA IS THE CONVENTION
+    // ------------------------------------------------------------------
+    //  Roles in data/story/cast.ts are written one of two ways, and the
+    //  difference is already meaningful:
+    //
+    //      "CEO, Pear"                 a title AT a company
+    //      "Chief Financial Officer"   a title, in your company
+    //
+    //  Only the first kind tells the player something the name does not, so
+    //  only the first kind is appended. Your own CFO stays "Arthur Vance" -
+    //  you know where he works - and your father stays "Your Father" rather
+    //  than becoming "Your Father - Founder", which would be the label
+    //  explaining a relationship to the person inside it.
+    //
+    //  Inferred from the writing rather than from a new field, because a
+    //  fifteenth field nobody has to fill in is a fifteenth field somebody
+    //  will forget.
+    // ------------------------------------------------------------------
+    return from.role.includes(',') ? `${from.name} - ${from.role}` : from.name;
+};
+
 /** Put one conversation in front of the player. */
 export const deliver = (conversationId: string): boolean => {
     const c = conversationById(conversationId);
@@ -46,7 +75,25 @@ export const deliver = (conversationId: string): boolean => {
 
     if (c.channel === 'mail') {
         useMailStore.getState().receiveMail({
-            fromName: from.name,
+            // ------------------------------------------------------------------
+            //  THE ORGANISATION, NOT JUST THE PERSON
+            // ------------------------------------------------------------------
+            //  A row in the inbox shows a name and a subject. Pear's approach
+            //  arrives from "Nathan Vogel" with the subject "HALE / condolence
+            //  + preliminary approach - ref 4471-C", and the word Pear appears
+            //  nowhere on it - which is exactly the letter's character and
+            //  exactly why it gets scrolled past.
+            //
+            //  The letter I spent three commits believing was undelivered was
+            //  sitting at the top of the inbox the whole time, unrecognisable.
+            //  The engine was right and the label was useless.
+            //
+            //  `role` already carries the affiliation for everyone who has
+            //  one - "CEO, Pear", "Chief Financial Officer" - so the sender
+            //  line says who AND where. It costs nothing and it is the one
+            //  thing a player needs before they decide whether to open it.
+            // ------------------------------------------------------------------
+            fromName: senderLabel(from),
             fromEmail: emailOf(from) ?? '',
             subject: c.subject ?? '(no subject)',
             // The opening card doubles as the preview. A separate summary
