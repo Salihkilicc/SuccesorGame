@@ -224,3 +224,67 @@ describe('and the casino counter is actually closed by the tick', () => {
         expect(readWorld().casinoStreak).toBe(0);
     });
 });
+
+// ============================================================================
+//  AN OFFER IS OPEN FOR ONE QUARTER
+// ============================================================================
+//  It used to sit in the inbox forever, and the third consequence is the one
+//  that mattered: it made the drought meaningless. The counter exists so that
+//  quarters without a sponsor cost brand - and a player sitting on four
+//  unanswered offers has not gone without one, they have declined one four
+//  times, which is a different thing and reads as a bug when the penalty
+//  lands.
+// ============================================================================
+describe('a sponsorship letter expires', () => {
+    const mail = () => require('../store/useMailStore').useMailStore;
+    const offers = () => mail().getState().inbox.filter((m: any) => !!m.sponsorOfferId);
+
+    beforeEach(() => {
+        const { initialMailState } = require('../store/useMailStore');
+        mail().setState({ ...initialMailState });
+    });
+
+    it('after one quarter, and not before', () => {
+        const { expireSponsorOffers, OFFER_OPEN_MONTHS } =
+            require('./postSponsorOffer');
+        mail().getState().receiveMail({
+            fromName: 'A Stadium', fromEmail: 'p@a.org',
+            subject: 'Sponsorship — A Stadium', body: '...',
+            atMonth: 1, category: 'Primary', sponsorOfferId: 'spon-x-1',
+        });
+        expect(offers().length).toBe(1);
+
+        // The last month it is still open.
+        expect(expireSponsorOffers(1 + OFFER_OPEN_MONTHS - 1)).toBe(0);
+        expect(offers().length).toBe(1);
+
+        expect(expireSponsorOffers(1 + OFFER_OPEN_MONTHS)).toBe(1);
+        expect(offers().length).toBe(0);
+    });
+
+    it('and takes nothing else with it', () => {
+        const { expireSponsorOffers, OFFER_OPEN_MONTHS } =
+            require('./postSponsorOffer');
+        const before = mail().getState().inbox.length;
+        mail().getState().receiveMail({
+            fromName: 'A Stadium', fromEmail: 'p@a.org',
+            subject: 'Sponsorship — A Stadium', body: '...',
+            atMonth: 1, category: 'Primary', sponsorOfferId: 'spon-x-1',
+        });
+        expireSponsorOffers(1 + OFFER_OPEN_MONTHS);
+        // The seeded letters are older than three months and are not offers.
+        expect(mail().getState().inbox.length).toBe(before);
+    });
+
+    it('and the sweep runs before a new one is sent', () => {
+        // Or a fresh letter lands beside the one it replaces, which is the
+        // inbox filling up by another name.
+        const source = require('fs').readFileSync(
+            require('path').join(__dirname, 'postSponsorOffer.ts'), 'utf8',
+        );
+        const sweep = source.indexOf('expireSponsorOffers(useGameStore');
+        const send = source.indexOf('receiveMail(');
+        expect(sweep).toBeGreaterThan(0);
+        expect(sweep).toBeLessThan(send);
+    });
+});

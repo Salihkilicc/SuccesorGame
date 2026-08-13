@@ -203,7 +203,25 @@ export const runInbox = (): void => {
     const { deliver: due, keep, expired } =
         drain(story.pending, quarter, canDeliver, undefined, senderOf);
 
-    due.forEach(p => deliver(p.conversationId));
+    // ------------------------------------------------------------------
+    //  ONE COPY PER DRAIN
+    // ------------------------------------------------------------------
+    //  Two pending entries for the same conversation used to produce two
+    //  letters, identical, one above the other. Nothing guarded it: the beat
+    //  queue and the lock path each check before QUEUING, and neither can
+    //  see what the other put in.
+    //
+    //  It is deduped here rather than at the queue because here is the only
+    //  place that knows what is actually about to be sent. Within one drain
+    //  only - a repeatable event delivering the same scene again in a later
+    //  quarter is a different thing and still works.
+    // ------------------------------------------------------------------
+    const sent = new Set<string>();
+    due.forEach(p => {
+        if (sent.has(p.conversationId)) return;
+        sent.add(p.conversationId);
+        deliver(p.conversationId);
+    });
     story.setPending(keep);
 
     if (__DEV__ && expired.length) {

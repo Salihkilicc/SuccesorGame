@@ -126,13 +126,42 @@ export const gameSink = (): EffectSink => ({
     // be honoured.
     schedule: ({ conversation, afterQuarters, urgent, expiresAfter }) => {
         const now = currentQuarter();
+        const dueQuarter = now + Math.max(0, Math.floor(afterQuarters));
         useStoryStore.getState().schedule({
             conversationId: conversation,
-            dueQuarter: now + Math.max(0, Math.floor(afterQuarters)),
+            dueQuarter,
             urgent,
             expiresAfter,
             queuedAtQuarter: now,
         });
+
+        // ------------------------------------------------------------------
+        //  `afterQuarters: 0` MEANS NOW, AND IT DID NOT
+        // ------------------------------------------------------------------
+        //  The inbox is drained by the quarterly tick. Everything scheduled
+        //  from inside a conversation is therefore scheduled AFTER this
+        //  quarter's drain has already happened - so a reply written to
+        //  arrive "in the same quarter" sat in the queue until the player
+        //  advanced time, and turned up a quarter late.
+        //
+        //  Which is where the father's death goes quiet. Pear's letter is
+        //  scheduled from that scene with afterQuarters 0 and a comment
+        //  saying "it arrives in the same quarter, the obscenity of the
+        //  timing is the point" - and it did not, and the condolence wave
+        //  behind it is gated on the player having answered Pear, so the
+        //  whole act stalled: nothing from Pear, nothing from the friend,
+        //  nothing from the CFO, nothing from the board.
+        //
+        //  Draining here makes the zero mean zero. It is the same call the
+        //  opening already makes for the same reason (see seedOpening), and
+        //  it is safe from inside a conversation: delivery only puts letters
+        //  in the inbox - effects run when the player opens them.
+        // ------------------------------------------------------------------
+        if (dueQuarter <= now) {
+            try {
+                require('./deliver').runInbox();
+            } catch { /* inbox not ready - the next tick will catch it */ }
+        }
     },
     // The one effect that stops the game. Written to the story store rather
     // than to a screen's local state, because the decision happens inside a
