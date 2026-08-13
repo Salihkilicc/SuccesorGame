@@ -159,11 +159,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     const closeButton = (onPress: () => void) => (
         <Pressable
             onPress={onPress}
-            style={({ pressed }) => [
-                styles.answer,
-                variant === 'mail' && styles.answerBubble,
-                pressed && styles.answerPressed,
-            ]}>
+            style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
             <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
                 Close
             </Text>
@@ -181,11 +177,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                 <Pressable
                     key={index}
                     onPress={() => pick(choice, index)}
-                    style={({ pressed }) => [
-                        styles.answer,
-                        variant === 'mail' && styles.answerBubble,
-                        pressed && styles.answerPressed,
-                    ]}>
+                    style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
                     <Text
                         style={styles.answerText}
                         // Honoured up to AX1 and then held. Past that the
@@ -240,7 +232,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                     `answers` above. Inside the scroll, so the last paragraph
                     of what is being replied to stays readable. */}
                 {variant === 'mail' && (
-                    <View style={styles.mailAnswers}>{answers}</View>
+                    <View style={[styles.answers, styles.mailAnswers]}>{answers}</View>
                 )}
             </ScrollView>
 
@@ -308,17 +300,8 @@ const styles = StyleSheet.create({
     mine: { backgroundColor: theme.colors.highlight },
 
     // --- Mail: stacked letters
-    /**
-     * The reply block, under the letter rather than pinned below it.
-     *
-     * Right-aligned because these are the player's own words and every other
-     * thing they say in this app sits on the right.
-     */
-    mailAnswers: {
-        gap: theme.spacing.sm,
-        marginTop: theme.spacing.md,
-        alignItems: 'flex-end',
-    },
+    /** The reply block, under the letter rather than pinned below it. */
+    mailAnswers: { marginTop: theme.spacing.md },
     letterWrap: {},
     letter: {
         backgroundColor: theme.colors.surface,
@@ -341,6 +324,25 @@ const styles = StyleSheet.create({
     /** Bounded, so a tall block scrolls instead of pushing itself off-screen. */
     answersScroll: { flexGrow: 0, maxHeight: MAX_ANSWER_BLOCK },
     answers: {
+        // ------------------------------------------------------------------
+        //  SIDE BY SIDE WHEN THEY FIT, STACKED WHEN THEY DO NOT
+        // ------------------------------------------------------------------
+        //  They were full-width rows, which made two answers read as a menu
+        //  of settings rather than as two things a person could say.
+        //
+        //  Each bubble hugs its own text and the row wraps, so a pair of
+        //  short answers sits together and a long one takes a line of its
+        //  own. Forcing two columns would have been worse: the longest
+        //  answer in the game is 59 characters and half a phone width holds
+        //  about nineteen, so every serious decision would have arrived as
+        //  two four-line slabs.
+        //
+        //  Centred, because a row of two is a pair of options rather than a
+        //  list, and a list is what left-alignment says.
+        // ------------------------------------------------------------------
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         gap: theme.spacing.sm,
         padding: theme.spacing.md,
         borderTopWidth: StyleSheet.hairlineWidth,
@@ -348,26 +350,30 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surface,
     },
     answer: {
+        // ------------------------------------------------------------------
+        //  A THING YOU CAN SAY, AND IT HAS TO LOOK LIKE ONE
+        // ------------------------------------------------------------------
+        //  It was `surfaceRaised` - the same grey as the card the character
+        //  is speaking from, and as every other panel in the app. Nothing on
+        //  the screen said which of the two blocks was pressable.
+        //
+        //  `guidance` is the palette's violet, and its sentence covers this:
+        //  it is already the ground for the tutorial card, which is the other
+        //  place the app speaks to the player rather than as the world.
+        //
+        //  NOT GREEN, which was the obvious answer and the one asked for.
+        //  Green in this palette says one thing - "you made money" - and
+        //  painting every conversation with it would spend that sentence on
+        //  a button. Violet measures 7.65 against white and separates from
+        //  the ground at 2.05, so it reads as pressable without borrowing a
+        //  meaning that is doing a job elsewhere.
+        // ------------------------------------------------------------------
+        maxWidth: '100%',
         paddingVertical: 13,
         paddingHorizontal: theme.spacing.md,
         borderRadius: theme.radius.md,
-        backgroundColor: theme.colors.surfaceRaised,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.borderStrong,
+        backgroundColor: theme.colors.guidance,
     },
-    /**
-     * The same answer, as a bubble.
-     *
-     * Hugs its text instead of filling the row, and takes the corner
-     * treatment the player's own message bubbles use - one square corner on
-     * the side it is spoken from.
-     */
-    answerBubble: {
-        maxWidth: '85%',
-        alignSelf: 'flex-end',
-        borderTopRightRadius: theme.radius.md,
-        borderBottomRightRadius: 4,
-    },
-    answerPressed: { backgroundColor: theme.colors.surfaceHigh },
+    answerPressed: { opacity: 0.72 },
     answerText: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, fontWeight: '600' },
 });

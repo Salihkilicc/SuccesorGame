@@ -98,9 +98,31 @@ export const pearOffer: Conversation = {
                 + 'Our indicative valuation is set out in the attached. In summary: '
                 + `$${(OFFER / 1_000_000).toFixed(0)} million, cash, no financing condition, `
                 + 'signed within thirty days.',
+            // ------------------------------------------------------------------
+            //  TWO WAYS OF SAYING "CONTINUE" IS NOT A CHOICE
+            // ------------------------------------------------------------------
+            //  This was "Read the rest." against "Look at the number again."
+            //  Both were the player pressing NEXT. Neither said anything, so
+            //  the card posed a decision and then took the same road either
+            //  way - which reads as the game not knowing it asked.
+            //
+            //  The rest of this story does the same thing correctly. Its
+            //  answers are the player SPEAKING, and one of the two usually
+            //  pushes back:
+            //
+            //      "And Elena Vance?"  |  "You could have closed the plant."
+            //      "What should it be?"  |  "People are not machines."
+            //
+            //  Those converge too - and they are decisions, because taking
+            //  one means saying something. The shape was never the problem.
+            //
+            //  So both answers here are now things a person says to a letter
+            //  like this, and the one that leads to the valuation says why it
+            //  is being looked at again.
+            // ------------------------------------------------------------------
             choices: [
-                { text: 'Read the rest.', next: 'rest' },
-                { text: 'Look at the number again.', next: 'number' },
+                { text: 'They wrote this before he was buried.', next: 'rest' },
+                { text: 'They have put a number on my father.', next: 'number' },
             ],
         },
 
@@ -117,7 +139,7 @@ export const pearOffer: Conversation = {
                 + 'We would not expect to improve on it and we would not expect the estate '
                 + 'to find better. This is not a negotiating position; it is the number.',
             choices: [
-                { text: 'Read the rest.', next: 'rest' },
+                { text: 'It is a fair number.', next: 'rest' },
             ],
         },
 
