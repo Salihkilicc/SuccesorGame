@@ -47,9 +47,18 @@ const publish = () =>
 
 const rects = () => useTutorialTargets.getState().rects;
 
+// A focused target polls its own position - scrolling does not fire a layout,
+// so the rect has to be refreshed on a timer. Under real timers that interval
+// keeps the test process alive after the assertions have passed.
 beforeEach(() => {
+    jest.useFakeTimers();
     mockFocused = true;
     useTutorialTargets.setState({ rects: {} });
+});
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
 });
 
 const mount = () =>
@@ -98,6 +107,18 @@ describe('a target', () => {
             let tree: renderer.ReactTestRenderer;
             act(() => { tree = mount(); });
             expect(JSON.stringify(tree!.toJSON())).toContain('tile');
+            act(() => { tree!.unmount(); });
         }
+    });
+
+    it('stops polling when it goes away', () => {
+        // The poll is the only thing in this component that outlives a
+        // render, so it is the only thing that can leak. A target that kept
+        // measuring after its screen was gone would publish coordinates for
+        // a control that no longer exists - the original bug, with a timer.
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+        act(() => { tree!.unmount(); });
+        expect(jest.getTimerCount()).toBe(0);
     });
 });

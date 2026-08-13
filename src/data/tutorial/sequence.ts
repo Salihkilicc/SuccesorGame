@@ -88,7 +88,10 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // His voice, not the manual's. Short because it sits on a dimmed screen
         // for as long as it takes - the argument is in the conversation.
         speaker: 'father',
-        instruction: 'Open the product. Everything that decides whether anyone hears about it is in there.',
+        // SHORT. It sits on a dimmed screen the player is trying to use, and
+        // every extra clause is a sentence read while waiting to be allowed
+        // to do the thing. The reasoning is his job, in the conversation.
+        instruction: 'Open the product.',
         satisfied: [{ kind: 'flag', flag: 'tutorialProductOpened' }],
         canEngage: [
             // Only in the first year. After that he is either dead or has
@@ -114,7 +117,7 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         id: 'q1-marketing',
         highlight: 'marketing',
         speaker: 'father',
-        instruction: 'Put some marketing behind it, and save. Nobody outside this building knows it exists.',
+        instruction: 'Raise the marketing, then save.',
         satisfied: [{ kind: 'flag', flag: 'tutorialMarketingSet' }],
         canEngage: [
             { kind: 'noFlag', flag: 'fatherDead' },
@@ -151,7 +154,7 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // Not 'slipping' - it has settled, and the player can go and look.
         // A tutorial that describes something they can see is untrue teaches
         // them to stop reading it. fatherMorale.test.ts holds that.
-        instruction: 'They are paid the average and doing average work. A bonus buys a quarter of it back.',
+        instruction: 'Pay a bonus. They are on the market rate and doing market work.',
         conversation: 'father-morale',
         satisfied: [{ kind: 'flag', flag: 'tutorialBonusPaid' }],
         canEngage: [

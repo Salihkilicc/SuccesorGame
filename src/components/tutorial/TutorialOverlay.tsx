@@ -42,6 +42,15 @@ import { line, lockKey } from '../../data/i18n/storyText';
 /** Breathing room around the highlighted control. */
 const HALO = 8;
 
+/**
+ * Where the card sits when it has to go above the highlight.
+ *
+ * Enough for a status bar, a notch and a modal's own header. It was 80, and
+ * on the product sheet that put the first line of the instruction behind the
+ * header - the card was there and could not be read.
+ */
+const CARD_TOP = 132;
+
 const TutorialOverlay = () => {
     const locks = useStoryStore(s => s.locks);
     const completeLock = useStoryStore(s => s.completeLock);
@@ -177,9 +186,25 @@ const TutorialOverlay = () => {
                         <View style={[styles.dim, StyleSheet.absoluteFillObject]} />
                     )}
                */}
-            <>
-                {/* Four panels, not one with a gap: a single overlay eats
-                    the touch even where it looks transparent. */}
+            {/* ------------------------------------------------------------
+                THE DIM IS PAINT, NOT A GATE
+
+                These panels used to be touchable, which is what made a
+                stale measurement fatal rather than untidy. The marketing
+                row sits inside a scrolling sheet; a scroll does not fire
+                onLayout, so the hole stayed where the row HAD been, and
+                every other pixel on the screen refused the touch. The
+                player could see the control and could not reach it, could
+                not scroll to it, and could not clear the step.
+
+                `pointerEvents="none"` on the whole group. The highlight is
+                now guidance and never a cage: if the hole is ever in the
+                wrong place the worst outcome is that it looks wrong, and
+                the player carries on. The four-panel construction stays
+                because it is still the right way to leave a genuine gap in
+                the paint.
+               ------------------------------------------------------------ */}
+            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
                     <View style={[styles.dim, { top: 0, left: 0, right: 0, height: hole.y }]} />
                     <View style={[styles.dim, { top: hole.y + hole.h, left: 0, right: 0, bottom: 0 }]} />
                     <View style={[styles.dim, { top: hole.y, left: 0, width: hole.x, height: hole.h }]} />
@@ -188,13 +213,21 @@ const TutorialOverlay = () => {
                     {/* The ring is drawn OUTSIDE the hole and ignores touches,
                         so it cannot become the thing that blocks the press. */}
                 <View
-                    pointerEvents="none"
                     style={[styles.ring, { top: hole.y, left: hole.x, width: hole.w, height: hole.h }]}
                 />
-            </>
+            </View>
 
             <View
-                style={[styles.card, hole.y > H / 2 ? { top: 80 } : { bottom: 120 }]}
+                // ------------------------------------------------------
+                //  IT FLIPS SO IT DOES NOT COVER WHAT IT IS POINTING AT,
+                //  AND THE TOP FIGURE WAS TOO SMALL
+                // ------------------------------------------------------
+                //  80 put the card under the status bar and the sheet's
+                //  own header on a notched phone - the first line of what
+                //  the father says was simply not readable. CARD_TOP
+                //  clears both.
+                // ------------------------------------------------------
+                style={[styles.card, hole.y > H / 2 ? { top: CARD_TOP } : { bottom: 120 }]}
                 pointerEvents="box-none">
                 {/* ------------------------------------------------------
                     SOMEBODY IS SAYING THIS

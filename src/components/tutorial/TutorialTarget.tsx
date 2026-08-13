@@ -42,6 +42,15 @@ import { View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { useTutorialTargets } from './targets';
 
+/**
+ * How often a focused target checks whether it has moved.
+ *
+ * Fast enough that the ring keeps up with a flick-scroll, slow enough to be
+ * free. The store ignores an identical measurement, so a screen that is not
+ * moving does not re-render at all.
+ */
+const MEASURE_EVERY_MS = 250;
+
 type Props = {
     /** Matches `highlight` on a lock. */
     tutorialKey: string;
@@ -81,7 +90,28 @@ const TutorialTarget = ({ tutorialKey, style, children }: Props) => {
         // coming back from another screen does not necessarily fire a layout,
         // and the page may have been scrolled since.
         measure();
-        return () => clearRect(tutorialKey);
+
+        // ------------------------------------------------------------------
+        //  AND KEPT MEASURED, BECAUSE SCROLLING DOES NOT FIRE A LAYOUT
+        // ------------------------------------------------------------------
+        //  The marketing row sits inside a scrolling sheet. onLayout runs
+        //  when the view is laid out, not when it moves past the viewport,
+        //  so the published rect was wherever the row happened to be when
+        //  the sheet opened - and it stayed there while the player scrolled
+        //  the row itself somewhere else.
+        //
+        //  A poll rather than plumbing onScroll through every screen that
+        //  ever holds a target: the callers should not have to know a
+        //  tutorial exists, which is the rule the whole targets module is
+        //  built on. measureInWindow is a native call, and setRect drops
+        //  identical measurements, so a still screen costs one native
+        //  measurement every quarter second and re-renders nothing.
+        // ------------------------------------------------------------------
+        const tick = setInterval(measure, MEASURE_EVERY_MS);
+        return () => {
+            clearInterval(tick);
+            clearRect(tutorialKey);
+        };
     }, [focused, tutorialKey, measure, clearRect]);
 
     return (
