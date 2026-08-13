@@ -1363,14 +1363,41 @@ for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
 //  silently emptied the check and it would have reported a clean pass while
 //  looking at nothing. Indentation is not a language feature here.
 // ---------------------------------------------------------------------------
-/** Members of every interface whose name matches, as declaration NODES. */
+//  ---------------------------------------------------------------------------
+//  AND IT WAS STILL ONLY READING A MINORITY OF THE STORES
+//  ---------------------------------------------------------------------------
+//  Two narrower assumptions survived the rewrite above, and between them they
+//  hid FIFTEEN of the stores in this project:
+//
+//    1. `ts.isInterfaceDeclaration` only. Most stores here are written
+//       `type XStore = XState & { ...actions }` - a type ALIAS holding an
+//       INTERSECTION, which this walked straight past.
+//    2. A name matcher of /State$/. In those same stores `XState` holds only
+//       the data; every action lives on `XStore`.
+//
+//  So `useMessageStore`, `useGameStore`, `useStatsStore`, `useStoryStore` and
+//  eleven others were never inspected at all, and the headline number was
+//  measured against whatever was left. A check that silently examines a third
+//  of its subject is worse than no check, because it reports OK.
+//  ---------------------------------------------------------------------------
+
+/** Members of every interface, type alias or intersection whose name matches. */
 const interfaceMembers = (f, matches) => {
     const out = [];
     const sf = REFERENCE_INDEX.sourceOf(f);
     if (!sf) return out;
+    // Members of a TypeLiteral, or of every literal inside an intersection.
+    const membersOf = (type) => {
+        if (!type) return [];
+        if (ts.isTypeLiteralNode(type)) return type.members;
+        if (ts.isIntersectionTypeNode(type)) return type.types.flatMap(membersOf);
+        return [];
+    };
     ts.forEachChild(sf, (node) => {
-        if (!ts.isInterfaceDeclaration(node) || !matches(node.name.text)) return;
-        for (const m of node.members) {
+        const named = ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node);
+        if (!named || !matches(node.name.text)) return;
+        const members = ts.isInterfaceDeclaration(node) ? node.members : membersOf(node.type);
+        for (const m of members) {
             if (!m.name || !ts.isIdentifier(m.name)) continue;
             const type = m.type;
             out.push({
@@ -1388,8 +1415,16 @@ const interfaceMembers = (f, matches) => {
 // --- 2) Store actions no component calls ------------------------------------
 for (const f of files.filter(f => /use\w+Store\.ts$/.test(f))) {
     if (isDisabled(f) || optedOut(f)) continue;   // shelved modules are not a finding
-    for (const member of interfaceMembers(f, n => /State$/.test(n))) {
+    for (const member of interfaceMembers(f, n => /(State|Store|Actions)$/.test(n))) {
         if (!member.isFunction) continue;
+        // Zustand's persist middleware calls this one, from inside the store's
+        // own file, through `onRehydrateStorage`. The pass below deliberately
+        // does not count same-file references - an action called only by its
+        // own neighbours can still be a dead chain - so this framework
+        // contract has to be named. It is one name with one meaning in every
+        // store, which is why it is allowed here rather than by twelve
+        // identical opt-out comments.
+        if (member.name === 'setHasHydrated') continue;
         // Files that reference THIS action, resolved by symbol - so an
         // identically named action on another store is not mistaken for a
         // caller, which is how two dead `acquireCompany`s kept each other

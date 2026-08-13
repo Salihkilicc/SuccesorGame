@@ -72,7 +72,20 @@ type MessageStore = MessageState & {
     setHasHydrated: (v: boolean) => void;
     /** Mark a thread read. Called when it is opened, not when it is listed. */
     markRead: (threadId: string) => void;
-    /** The player's reply. */
+    /**
+     * The player's reply.
+     *
+     * @orphan-ok-symbol sendFromPlayer
+     *
+     * DELIBERATELY UNCALLED as of the commit that closed the composer. The
+     * messages screen had a working text box: you could tell your Head of
+     * Production you were hiring fifty people, watch the bubble appear, and
+     * nothing in the game would read it. Not the staffing number, not her
+     * dial, not the scene that fires when the line is short.
+     *
+     * Kept, not removed, because the door is right - if replies ever become
+     * real, a parsed intent or a quick-reply strip arrives through here.
+     */
     sendFromPlayer: (threadId: string, text: string, atMonth: number) => void;
     /**
      * THE ENGINE'S DOOR. A character writes to the player; the thread is

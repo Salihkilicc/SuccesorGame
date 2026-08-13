@@ -30,10 +30,11 @@ const MessageThreadScreen = () => {
     const threads = useMessageStore(s => s.threads);
     const thread = threads.find(t => t.id === threadId);
 
-    const sendFromPlayer = useMessageStore(s => s.sendFromPlayer);
-    const currentMonth = useGameStore(s => s.currentMonth);
-    
-    const [draft, setDraft] = useState('');
+    // SHELVED with the composer below - see the note on it. Left here rather
+    // than removed so that whatever replaces the box knows where to reach.
+    // const sendFromPlayer = useMessageStore(s => s.sendFromPlayer);
+    // const currentMonth = useGameStore(s => s.currentMonth);
+    // const [draft, setDraft] = useState('');
     const scrollViewRef = useRef<ScrollView>(null);
 
     // Auto scroll to bottom
@@ -71,12 +72,30 @@ const MessageThreadScreen = () => {
         );
     }
 
-    const send = () => {
-        const text = draft.trim();
-        if (!text) return;
-        sendFromPlayer(thread.id, text, currentMonth);
-        setDraft('');
-    };
+    // ------------------------------------------------------------------
+    //  SHELVED: THE PLAYER USED TO BE ABLE TO SEND THIS
+    // ------------------------------------------------------------------
+    //  It worked, which was the problem. You could tell your Head of
+    //  Production that you were hiring fifty people, watch the bubble
+    //  appear in your own colour, and nothing anywhere in the game would
+    //  read it. Not the staffing number, not her dial, not the scene that
+    //  fires when the line is short.
+    //
+    //  A box that accepts a sentence is a promise that the sentence was
+    //  heard. This game answers with WRITTEN choices everywhere else
+    //  precisely so that every answer is one the world can act on, and one
+    //  free-text box undoes that claim for the whole phone.
+    //
+    //  Kept rather than deleted: if replies ever become real - a small set
+    //  of parsed intents, a quick-reply strip - this is the door they come
+    //  through.
+    // ------------------------------------------------------------------
+    // const send = () => {
+    //     const text = draft.trim();
+    //     if (!text) return;
+    //     sendFromPlayer(thread.id, text, currentMonth);
+    //     setDraft('');
+    // };
 
     return (
         <KeyboardAvoidingView
@@ -113,31 +132,42 @@ const MessageThreadScreen = () => {
                 })}
             </ScrollView>
 
-            <View style={[styles.composer, { paddingBottom: NAV_BAR_CLEARANCE }]}>
+            {/* ------------------------------------------------------------
+                THE COMPOSER IS SCENERY
+
+                It stays because a messages app without one does not look
+                like a messages app, and the phone is the fiction the whole
+                interface rests on. It does not accept text because the game
+                cannot read text - see the shelved `send` above.
+
+                `editable={false}` AND `pointerEvents="none"`: the first
+                refuses the keystrokes, the second refuses the tap, so there
+                is no cursor blinking in a box that will never take a word.
+                A caret is a promise too.
+               ------------------------------------------------------------ */}
+            <View
+                style={[styles.composer, { paddingBottom: NAV_BAR_CLEARANCE }]}
+                pointerEvents="none">
                 <View style={styles.composerInputWrap}>
                     <TextInput
                         style={styles.composerInput}
-                        value={draft}
-                        onChangeText={setDraft}
+                        editable={false}
                         placeholder="iMessage..."
                         placeholderTextColor={theme.colors.textMuted}
-                        selectionColor={theme.colors.primary}
                         multiline
                     />
-                    <Pressable
-                        onPress={send}
-                        disabled={!draft.trim()}
-                        style={({ pressed }) => [
-                            styles.sendCircle,
-                            !draft.trim() && styles.sendOff,
-                            pressed && !!draft.trim() && styles.sendPressed,
-                        ]}>
-                        <MaterialCommunityIcons 
-                            name="arrow-up" 
-                            size={20} 
-                            color={!draft.trim() ? theme.colors.textMuted : theme.colors.primaryText} 
+                    {/* Permanently in its empty state, which is what the
+                        button would show anyway beside a box nobody can type
+                        into. A View rather than a Pressable: a control that
+                        depresses and does nothing is worse than one that
+                        plainly is not a control. */}
+                    <View style={[styles.sendCircle, styles.sendOff]}>
+                        <MaterialCommunityIcons
+                            name="arrow-up"
+                            size={20}
+                            color={theme.colors.textMuted}
                         />
-                    </Pressable>
+                    </View>
                 </View>
             </View>
         </KeyboardAvoidingView>
