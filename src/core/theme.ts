@@ -201,6 +201,29 @@ export const theme = {
          * headings sit in the family without reading as figures.
          */
         brandMuted: '#D6A96C',
+        /**
+         * "somebody is teaching you."
+         *
+         * The tutorial card's ground, and a NEW SENTENCE rather than a shade
+         * of an old one - which is the only thing that earns a colour a place
+         * here (rule 3 above).
+         *
+         * It was `surfaceRaised`, so an instruction from a person looked
+         * exactly like every other card in the app: the same grey, on a
+         * dimmed screen, with no signal that this one was not part of the
+         * game. The player had to read it to find out what it was.
+         *
+         * Same hue as `brandMuted`, which is deliberate twice over - the app
+         * stays composed, and the speaker's name on that card is already
+         * brandMuted, so the label and its ground are one family.
+         *
+         * Dark rather than light because it is a FILL and this app's fills
+         * carry white text. brandMuted itself measures 1.99:1 against white
+         * and is unusable as a ground; this measures 6.66:1, and 2.18 from
+         * the ground, which separates the card better than surfaceRaised's
+         * 1.76 ever did.
+         */
+        guidance: '#6B5335',
 
         /** "This is research." RP, the letters RP, research spend, upgrades. */
         rp: '#C4B5FD',

@@ -292,16 +292,32 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: theme.spacing.lg,
         right: theme.spacing.lg,
-        backgroundColor: theme.colors.surfaceRaised,
+        // Not surfaceRaised. An instruction from a person used to look like
+        // every other card in the app - same grey, on a dimmed screen, with
+        // nothing to say it was not part of the game. See `guidance` in
+        // core/theme.ts for the measurements.
+        backgroundColor: theme.colors.guidance,
         borderRadius: theme.radius.lg,
         padding: theme.spacing.lg,
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.borderStrong,
         gap: theme.spacing.md,
     },
-    /** His name, in the same muted register the mail screen uses for a sender. */
+    /**
+     * His name.
+     *
+     * It was brandMuted, which is the register the mail screen uses for a
+     * sender - and correct while the card was grey. On the tobacco ground it
+     * measures 3.35:1: past the audit's floor and thin for ten-point
+     * uppercase, because the label and the card are now the same hue.
+     *
+     * textSecondary is 4.67 there. It is not a third colour - white turned
+     * down is documented in core/theme.ts as still being white - and the
+     * family resemblance the brandMuted was buying is now carried by the
+     * card's own ground, so nothing is lost by the label stepping back.
+     */
     speaker: {
-        color: theme.colors.brandMuted,
+        color: theme.colors.textSecondary,
         fontSize: theme.typography.micro,
         fontWeight: '700',
         letterSpacing: 0.8,
