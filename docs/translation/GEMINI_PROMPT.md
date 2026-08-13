@@ -73,10 +73,21 @@ The one exception: a choice wrapped in parentheses, like `(leave it)` or
 `(say nothing)`, IS an action rather than a line. Keep the parentheses and
 translate it as an action: `(bırak)`, `(hiçbir şey söyleme)`.
 
-Choices are also **short by design** — median 30 characters, because they are
-buttons on a phone screen. Turkish runs 10–20% longer than English. Where a
-choice would grow past about 60 characters, rewrite it shorter rather than
-letting it wrap onto three lines. Meaning over literalness, always.
+Choices are also **short by design** — median 21 characters, longest 59 —
+because they are buttons on a phone screen. Turkish runs 10–20% longer than
+English.
+
+**Hard limit: 82 characters for any `"kind": "choice"` line.** That is two
+lines on the smallest phone the game supports. Where a faithful translation
+would run past it, rewrite it shorter — drop the subordinate clause, use the
+shorter verb, cut the politeness the English did not need either. Meaning over
+literalness, always. A button that reads like a paragraph has stopped being
+something a person says.
+
+This is checked automatically and a line over the limit fails the build, so
+going long does not save anyone time.
+
+Body lines (`"kind": "body"`) have no limit. They scroll.
 
 ## Register: the game says *siz*, the people in it say *sen*
 

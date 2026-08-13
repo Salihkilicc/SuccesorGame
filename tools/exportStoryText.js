@@ -63,7 +63,14 @@ let words = 0;
 for (const c of CONVERSATIONS) {
     const entries = [];
     const add = (key, speaker, text, kind) => {
-        entries.push({ key, speaker, kind, en: text });
+        // The budget travels WITH the line rather than only in the brief.
+        // A model reading a thousand lines will forget a rule stated once at
+        // the top; it will not forget a field sitting on the line it is
+        // translating. See src/components/story/answerFit.ts for where 82
+        // comes from - it is two lines on an iPhone SE.
+        entries.push(kind === 'choice'
+            ? { key, speaker, kind, maxChars: 82, en: text }
+            : { key, speaker, kind, en: text });
         lines += 1;
         words += text.split(/\s+/).filter(Boolean).length;
         counts[speaker] = (counts[speaker] || 0) + 1;

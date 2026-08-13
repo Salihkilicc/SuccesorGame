@@ -34,6 +34,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../core/theme';
 import { useLocale } from '../../core/i18n';
 import { line, nodeKey, choiceKey, subjectKey } from '../../data/i18n/storyText';
+import { MAX_ANSWER_BLOCK, MAX_FONT_MULTIPLIER } from './answerFit';
 import { nodeById, type Conversation, type Choice } from '../../core/story/graph';
 import { applyEffects } from '../../core/story/effects';
 import { gameSink } from '../../core/story/gameSink';
@@ -176,12 +177,30 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                 ))}
             </ScrollView>
 
-            <View style={styles.answers}>
+            {/* ------------------------------------------------------------
+                THE ANSWERS SCROLL RATHER THAN RUNNING OFF THE SCREEN
+
+                It was a plain View, and at the largest accessibility text
+                size two cards in the game put the second answer below the
+                bottom of an iPhone SE - with nothing to scroll, so the
+                conversation simply could not be finished. That does not read
+                as a layout bug to the player.
+
+                `maxHeight` rather than a fixed one, so the block still hugs
+                its content on every card that fits, which is all of them at
+                normal sizes. See answerFit.ts for the measurements.
+               ------------------------------------------------------------ */}
+            <ScrollView
+                style={styles.answersScroll}
+                contentContainerStyle={styles.answers}
+                // The answers are the point of the screen; if they are tall
+                // enough to scroll, start at the top of them.
+                bounces={false}>
                 {done ? (
                     <Pressable
                         onPress={() => onFinished?.()}
                         style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                        <Text style={styles.answerText}>Close</Text>
+                        <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>Close</Text>
                     </Pressable>
                 ) : available.length === 0 ? (
                     // Either the card is terminal - they had the last word - or
@@ -190,7 +209,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                     <Pressable
                         onPress={finish}
                         style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                        <Text style={styles.answerText}>Close</Text>
+                        <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>Close</Text>
                     </Pressable>
                 ) : (
                     available.map(({ choice, index }) => (
@@ -198,13 +217,21 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                             key={index}
                             onPress={() => pick(choice, index)}
                             style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                            <Text style={styles.answerText}>
+                            <Text
+                                style={styles.answerText}
+                                // Honoured up to AX1 and then held. Past that
+                                // the block is taller than the phone - and
+                                // the container gives way rather than the
+                                // text shrinking, which would answer a player
+                                // who cannot read small text by making it
+                                // smaller. See answerFit.ts.
+                                maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
                                 {node ? answer(node.id, index, choice.text) : choice.text}
                             </Text>
                         </Pressable>
                     ))
                 )}
-            </View>
+            </ScrollView>
         </View>
     );
 };
@@ -255,6 +282,8 @@ const styles = StyleSheet.create({
     said: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, lineHeight: 21 },
     saidMine: { color: theme.colors.highlightText },
 
+    /** Bounded, so a tall block scrolls instead of pushing itself off-screen. */
+    answersScroll: { flexGrow: 0, maxHeight: MAX_ANSWER_BLOCK },
     answers: {
         gap: theme.spacing.sm,
         padding: theme.spacing.md,
