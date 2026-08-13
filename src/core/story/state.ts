@@ -290,6 +290,21 @@ export type StoryFlag =
     | 'tutorialProductOpened'
     | 'tutorialBonusPaid'
     | 'tutorialMarketingSet'
+    // ------------------------------------------------------------------
+    //  THE RESEARCH LESSON, WHICH IS NOT PART OF THE FIRST YEAR
+    // ------------------------------------------------------------------
+    //  Every other lock is gated on the father being alive, because the
+    //  first year is a tutorial with a narrator. Research is not: it is the
+    //  most indirect mechanic in the game - you buy people, the people make
+    //  points, the points buy products - and a player can reach it in the
+    //  first quarter or the fifteenth.
+    //
+    //  So it is triggered by the player OPENING it rather than by a
+    //  calendar, and these are the three moments that mark the way through.
+    // ------------------------------------------------------------------
+    | 'rndOpened'
+    | 'rndLabOpened'
+    | 'rndHired'
     // --- Verdicts
     | 'fbiCleared'
     | 'fbiGuilty'

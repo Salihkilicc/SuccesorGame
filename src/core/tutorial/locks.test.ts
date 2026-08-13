@@ -230,9 +230,31 @@ describe('somebody is saying it', () => {
         }
     });
 
-    it('the first year is taught by the father, not by the game', () => {
-        expect(TUTORIAL_SEQUENCE.every(l => (l.speaker ?? 'father') === 'father'))
-            .toBe(true);
+    it('the first year is taught by the father, and research is not', () => {
+        // The research pair is triggered by the player opening the page, not
+        // by a quarter, so it can fire in year four when he is long dead.
+        // Priya has been asking for a lab since before the player arrived.
+        const byWho = Object.fromEntries(
+            TUTORIAL_SEQUENCE.map(l => [l.id, l.speaker ?? 'father']),
+        );
+        expect(byWho['q1-open-product']).toBe('father');
+        expect(byWho['q1-marketing']).toBe('father');
+        expect(byWho['morale-bonus']).toBe('father');
+        expect(byWho['rnd-lab']).toBe('cto');
+        expect(byWho['rnd-hire']).toBe('cto');
+    });
+
+    it('and the research steps are the only ones the father does not gate', () => {
+        // Every first-year lock carries `noFlag fatherDead`. These two must
+        // not, or the lesson vanishes the moment he dies - which is most of
+        // the game.
+        const gatesOnFather = (id: string) =>
+            !!TUTORIAL_SEQUENCE.find(l => l.id === id)?.canEngage
+                ?.some(c => c.kind === 'noFlag' && c.flag === 'fatherDead');
+        expect(gatesOnFather('q1-open-product')).toBe(true);
+        expect(gatesOnFather('morale-bonus')).toBe(true);
+        expect(gatesOnFather('rnd-lab')).toBe(false);
+        expect(gatesOnFather('rnd-hire')).toBe(false);
     });
 
     it('and every lock carries the scene that argues for it, bar the first', () => {
@@ -247,7 +269,7 @@ describe('somebody is saying it', () => {
         // relying on a dedupe to cover a design with two sources is how the
         // second source eventually wins.
         expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
-            .toEqual(['q1-open-product', 'q1-marketing']);
+            .toEqual(['rnd-hire', 'q1-open-product', 'q1-marketing']);
     });
 
     it('the instruction stays short enough to sit on a dimmed screen', () => {
@@ -274,7 +296,7 @@ describe('somebody is saying it', () => {
 //  lifecycle is in TutorialTarget.tsx.
 // ============================================================================
 describe('a lock points at a control that exists', () => {
-    const REGISTERED = ['products', 'marketing', 'teamMorale'];
+    const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire'];
 
     it('every highlight key is one a screen actually registers', () => {
         // A key nothing registers is a lock that can now never appear at all,
@@ -289,7 +311,7 @@ describe('a lock points at a control that exists', () => {
     it('and the keys it can point at are few enough to list', () => {
         // If this grows, the list above is stale and the check is weaker than
         // it reads. Kept small on purpose.
-        expect(REGISTERED.length).toBeLessThanOrEqual(4);
+        expect(REGISTERED.length).toBeLessThanOrEqual(6);
     });
 
     it('the opening lesson is two steps, and they light different things', () => {

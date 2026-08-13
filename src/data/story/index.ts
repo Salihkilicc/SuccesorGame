@@ -19,6 +19,7 @@ import { fatherQ1 } from './fatherQ1';
 import { fatherQ1Invoice } from './fatherQ1Invoice';
 import { fatherMorale } from './fatherMorale';
 import { fatherMarketing } from './fatherMarketing';
+import { ctoResearch } from './ctoResearch';
 import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
@@ -105,6 +106,10 @@ export const CONVERSATIONS: Conversation[] = [
     fatherMarketing,
     fatherQ4,
     fatherDeath,
+    // Not part of the first year, and not on the spine. It is queued by the
+    // research lock when the player opens the laboratory - see
+    // data/tutorial/sequence.ts.
+    ctoResearch,
     pearOffer,
     friendCondolence, friendCondolencePublic,
     cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,

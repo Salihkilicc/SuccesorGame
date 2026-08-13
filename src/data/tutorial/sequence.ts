@@ -48,6 +48,57 @@ import type { TutorialLock } from '../../core/tutorial/locks';
 export const MORALE_EVENT_THRESHOLD = 72;
 
 export const TUTORIAL_SEQUENCE: TutorialLock[] = [
+    // ========================================================================
+    //  RESEARCH — TRIGGERED BY THE PLAYER, NOT BY THE CALENDAR
+    // ========================================================================
+    //  FIRST IN THE ARRAY ON PURPOSE, and that needs saying because it looks
+    //  like it should be last.
+    //
+    //  `activeLock` walks this list in order and shows the first unfinished
+    //  step whose gate holds. Both of these are gated on a flag the player
+    //  raises by OPENING the research page, so they are invisible until then
+    //  - a lock nothing has triggered is skipped, not shown.
+    //
+    //  Which means putting them first costs nothing and buys the thing that
+    //  matters: when somebody taps into research in the middle of quarter
+    //  one, the lesson they just asked for takes priority over the lesson the
+    //  first year was going to give them anyway. Placed at the end, the
+    //  marketing step would have won and the research lesson would simply
+    //  never have appeared.
+    //
+    //  And they are NOT gated on the father being alive. Everything else here
+    //  is, because the first year is a tutorial with a narrator. This one can
+    //  fire in year four, so it is Priya's - see data/story/ctoResearch.ts.
+    // ========================================================================
+    {
+        id: 'rnd-lab',
+        highlight: 'rndLab',
+        speaker: 'cto',
+        instruction: 'Open the laboratory.',
+        conversation: 'cto-research',
+        satisfied: [{ kind: 'flag', flag: 'rndLabOpened' }],
+        canEngage: [
+            // The trigger. Until the player has opened research at all, this
+            // lock does not exist as far as the overlay is concerned.
+            { kind: 'flag', flag: 'rndOpened' },
+        ],
+    },
+
+    {
+        id: 'rnd-hire',
+        highlight: 'rndHire',
+        speaker: 'cto',
+        instruction: 'Hire a researcher. One is six hundred points a quarter.',
+        satisfied: [{ kind: 'flag', flag: 'rndHired' }],
+        canEngage: [
+            { kind: 'flag', flag: 'rndLabOpened' },
+            // Hiring costs money now and salary every quarter after. The
+            // first of the three ways out: do not demand it of a company that
+            // cannot pay for it.
+            { kind: 'capitalAtLeast', amount: 250_000 },
+        ],
+    },
+
     {
         // ------------------------------------------------------------------
         //  Q1 — BE HEARD

@@ -89,11 +89,32 @@ export const FACILITY_TIERS: FacilityTier[] = [
 //  SALARY_PER_QUARTER sadece GERIYE DONUK uyum icin duruyor; motorun
 //  gercekten tahsil ettigi tutar workforce.ts'ten gelir.
 // ============================================================================
+import { researchOutput } from '../../../core/market/workforce';
+
 export const RESEARCHER_ECONOMICS = {
     /** ESKI ALAN — gercek maas core/market/workforce.ts -> researcherWage */
     SALARY_PER_QUARTER: 30_000,
-    /** Kisi basi ceyreklik arastirma puani */
-    RP_OUTPUT_PER_QUARTER: 10,
+    /**
+     * SHELVED — a second formula for a number the engine already computes.
+     *
+     * The screen multiplied headcount by this and showed the result as
+     * "Target Output". The engine awards `researchOutput(n)` - 600 x n^0.85,
+     * with diminishing returns - so the header understated what a researcher
+     * produces by between thirty and sixty times:
+     *
+     *      1 researcher    shown      10    actually     600
+     *     10 researchers   shown     100    actually   4,247
+     *    100 researchers   shown   1,000    actually  30,071
+     *
+     * Which is the one number a player reads before deciding whether to hire,
+     * and it told them the answer was no.
+     *
+     * Kept as a note rather than deleted so nobody reintroduces a per-head
+     * constant: research does not scale linearly on purpose, and a flat rate
+     * per person cannot express that.
+     *
+     *   RP_OUTPUT_PER_QUARTER: 10,
+     */
     /** 100'luk parti sinirI kaldirildi; tek tek de alinabilir */
     HIRE_INCREMENT: 1,
 };
@@ -111,6 +132,12 @@ export const calculateQuarterlyCost = (researcherCount: number): number => {
     return researcherCount * RESEARCHER_ECONOMICS.SALARY_PER_QUARTER;
 };
 
-export const calculateQuarterlyRP = (researcherCount: number): number => {
-    return researcherCount * RESEARCHER_ECONOMICS.RP_OUTPUT_PER_QUARTER;
-};
+/**
+ * What a research team produces in a quarter.
+ *
+ * Delegates rather than calculates. It used to hold its own arithmetic and
+ * disagreed with the engine by a factor of forty; a display formula that is
+ * not the engine's formula is a lie with a nice font.
+ */
+export const calculateQuarterlyRP = (researcherCount: number): number =>
+    researchOutput(researcherCount);

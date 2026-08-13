@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import {
+    View, Text, StyleSheet, Pressable, ScrollView, Animated, Dimensions, Easing,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../core/theme';
 import LaboratoryScreen from './LaboratoryScreen';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+import { useStoryStore } from '../../../core/store/useStoryStore';
 
 // Types
 type TabType = 'HUB' | 'LAB' | 'TREE';
@@ -13,7 +17,10 @@ type TabType = 'HUB' | 'LAB' | 'TREE';
 // --- COMPONENTS ---
 
 // 1. Research Hub (Main Menu)
-const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => {
+const ResearchHub = ({ onNavigate, onOpenLab }: {
+    onNavigate: (tab: TabType) => void;
+    onOpenLab: () => void;
+}) => {
     const navigation = useNavigation();
     return (
         <ScrollView contentContainerStyle={styles.hubContainer}>
@@ -22,19 +29,21 @@ const ResearchHub = ({ onNavigate }: { onNavigate: (tab: TabType) => void }) => 
 
             <View style={styles.cardsContainer}>
                 {/* Laboratory Card */}
-                <Pressable
-                    style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
-                    onPress={() => onNavigate('LAB')}
-                >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.15)' }]}>
-                        <Text style={styles.cardIcon}>🧪</Text>
-                    </View>
-                    <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{t('company.rDLaboratory')}</Text>
-                        <Text style={styles.cardDesc}>{t('company.hireScientistsAndGenerateResearch')}</Text>
-                    </View>
-                    <Text style={styles.chevron}>›</Text>
-                </Pressable>
+                <TutorialTarget tutorialKey="rndLab">
+                    <Pressable
+                        style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
+                        onPress={onOpenLab}
+                    >
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.15)' }]}>
+                            <Text style={styles.cardIcon}>🧪</Text>
+                        </View>
+                        <View style={styles.cardContent}>
+                            <Text style={styles.cardTitle}>{t('company.rDLaboratory')}</Text>
+                            <Text style={styles.cardDesc}>{t('company.hireScientistsAndGenerateResearch')}</Text>
+                        </View>
+                        <Text style={styles.chevron}>›</Text>
+                    </Pressable>
+                </TutorialTarget>
 
                 {/* Tech Tree Card */}
                 <Pressable
@@ -65,12 +74,63 @@ const TechTreeView = () => (
     </View>
 );
 
+/**
+ * The laboratory, arriving from the right.
+ *
+ * It is a TAB SWAP rather than a pushed route - the lab is rendered inside
+ * this screen - so it appeared instantly while every other forward move in
+ * the app slides. That inconsistency reads as a glitch rather than as a
+ * different kind of navigation, because the player has no way to know the
+ * difference.
+ *
+ * The animation is the stack's own: `slide_from_right` in RootNavigator,
+ * matched here in duration and easing so a tab swap and a push feel like the
+ * same gesture. It runs on mount, which is exactly when the tab becomes
+ * active, so there is no second piece of state saying whether to animate.
+ */
+const SlideInFromRight = ({ children }: { children: React.ReactNode }) => {
+    const width = Dimensions.get('window').width;
+    const offset = useRef(new Animated.Value(width)).current;
+
+    useEffect(() => {
+        Animated.timing(offset, {
+            toValue: 0,
+            duration: 260,
+            easing: Easing.out(Easing.cubic),
+            // The transform is a layout-free property, so this runs off the
+            // JS thread and survives a busy render.
+            useNativeDriver: true,
+        }).start();
+    }, [offset]);
+
+    return (
+        <Animated.View style={[styles.slide, { transform: [{ translateX: offset }] }]}>
+            {children}
+        </Animated.View>
+    );
+};
+
 // --- MAIN SCREEN ---
 const ResearchScreen = () => {
     useLocale();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const [activeTab, setActiveTab] = useState<TabType>('HUB');
+
+    // ------------------------------------------------------------------
+    //  OPENING THIS PAGE IS WHAT STARTS THE RESEARCH LESSON
+    // ------------------------------------------------------------------
+    //  Not a quarter, not the father, not a share number. Research is the
+    //  most indirect thing in the game and a player can arrive at it in the
+    //  first quarter or in year four, so the trigger is the only honest
+    //  signal there is: they came looking.
+    // ------------------------------------------------------------------
+    useEffect(() => { useStoryStore.getState().raise('rndOpened'); }, []);
+
+    const openLab = () => {
+        useStoryStore.getState().raise('rndLabOpened');
+        setActiveTab('LAB');
+    };
 
     const handleBack = () => {
         if (activeTab === 'HUB') {
@@ -92,8 +152,12 @@ const ResearchScreen = () => {
 
             {/* CONTENT AREA */}
             <View style={styles.content}>
-                {activeTab === 'HUB' && <ResearchHub onNavigate={setActiveTab} />}
-                {activeTab === 'LAB' && <LaboratoryScreen onBack={() => setActiveTab('HUB')} />}
+                {activeTab === 'HUB' && <ResearchHub onNavigate={setActiveTab} onOpenLab={openLab} />}
+                {activeTab === 'LAB' && (
+                    <SlideInFromRight>
+                        <LaboratoryScreen onBack={() => setActiveTab('HUB')} />
+                    </SlideInFromRight>
+                )}
                 {activeTab === 'TREE' && <TechTreeView />}
             </View>
         </View>
@@ -107,6 +171,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: theme.colors.background,
     },
+    /** The sliding panel needs a ground of its own, or the hub shows through it. */
+    slide: { flex: 1, backgroundColor: theme.colors.background },
     header: {
         flexDirection: 'row',
         alignItems: 'center',

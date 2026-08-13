@@ -17,6 +17,9 @@ import {
 } from '../../../features/laboratory/data/laboratoryData';
 import { formatMoney as formatMoneyExact, formatNumber } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+import { useStoryStore } from '../../../core/store/useStoryStore';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 
 // Paylasilan bicimlendiriciye devrediyor (core/utils).
 // Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
@@ -94,6 +97,10 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
             const toHire = tempCount - researcherCount;
             const result = hireResearchers(toHire, companyCapital, deductCapital);
             if (result.success) {
+                // The research lesson's second step clears here, and only on
+                // success - a failed hire teaches nothing and should not end
+                // the instruction that was asking for one.
+                useStoryStore.getState().raise('rndHired');
                 Alert.alert(t('alert.hiringComplete'), `Successfully hired ${toHire} researchers.`);
             } else {
                 Alert.alert(t('alert.error'), result.message);
@@ -139,14 +146,26 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                     </View>
                 }
             />
-            <View style={styles.shortcutRow}>
-                <Pressable
-                    style={styles.techTreeBtn}
-                    onPress={() => (navigation as any).navigate('TechTree')}
-                >
-                    <Text style={styles.techTreeIcon}>🔬</Text>
-                </Pressable>
-            </View>
+            {/* ------------------------------------------------------------
+                SHELVED: A LONE MICROSCOPE ON A STRIP OF ITS OWN
+
+                An icon with no label, in a band under the header, doing the
+                one job the header band is worst at. It read as a leftover.
+
+                Nothing is orphaned by taking it out: the tech tree is
+                reached from the research hub one screen back and from the
+                Discover New Tech card in Products, both of which say in
+                words where they go.
+
+                    <View style={styles.shortcutRow}>
+                        <Pressable
+                            style={styles.techTreeBtn}
+                            onPress={() => (navigation as any).navigate('TechTree')}
+                        >
+                            <Text style={styles.techTreeIcon}>🔬</Text>
+                        </Pressable>
+                    </View>
+               ------------------------------------------------------------ */}
 
             <ScrollView contentContainerStyle={styles.content}>
                 {/* FACILITY CARD */}
@@ -228,6 +247,8 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                         power of 0.85 — doubling the team does not double the discoveries.
                     </Text>
 
+                    {/* The control the research lesson points at. */}
+                    <TutorialTarget tutorialKey="rndHire">
                     <StepperBar
                         value={tempCount}
                         onChange={setTempCount}
@@ -237,6 +258,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                         steps={[1, 10, 100]}
                         fillColor={canAfford ? '#CFD0D2' : '#FF8A8A'}
                     />
+                    </TutorialTarget>
 
                     {/* Summary & Confirm */}
                     <View style={styles.confirmSection}>
@@ -357,7 +379,9 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        paddingBottom: 40, // Ensure bottom padding for scrolling
+        // Clear of the floating nav bar. 40 left the last card sitting
+        // against it, so the page looked cut off rather than finished.
+        paddingBottom: NAV_BAR_CLEARANCE + 24,
         gap: 16,
     },
     card: {

@@ -41,6 +41,49 @@ const opening = (over: Partial<World> = {}): World => ({
 const showing = (world: World, state: LockState = emptyLockState()) =>
     activeLock(TUTORIAL_SEQUENCE, state, world)?.id;
 
+describe('research, which the player asks for', () => {
+    it('is invisible until they open the page', () => {
+        // First in the array and gated on a trigger flag, so it costs the
+        // opening lesson nothing while it waits.
+        expect(showing(opening())).toBe('q1-open-product');
+    });
+
+    it('and takes priority the moment they do, even mid-tutorial', () => {
+        // The point of putting it first. A player who taps into research
+        // during the first quarter gets the lesson they just asked for,
+        // rather than the one the calendar had queued.
+        expect(showing(opening({ flags: { rndOpened: true } }))).toBe('rnd-lab');
+    });
+
+    it('then points at hiring, once the laboratory is open', () => {
+        expect(showing(opening({
+            flags: { rndOpened: true, rndLabOpened: true },
+        }))).toBe('rnd-hire');
+    });
+
+    it('and hands back to the first year once somebody is hired', () => {
+        expect(showing(opening({
+            flags: { rndOpened: true, rndLabOpened: true, rndHired: true },
+        }))).toBe('q1-open-product');
+    });
+
+    it('still teaches it long after the father is dead', () => {
+        // Every other lock is gated on him. This one is the reason the
+        // gate is per-lock rather than global.
+        expect(showing(opening({
+            quarter: 17,
+            flags: { fatherDead: true, rndOpened: true },
+        }))).toBe('rnd-lab');
+    });
+
+    it('but not to a company that cannot pay a salary', () => {
+        expect(showing(opening({
+            capital: 100_000,
+            flags: { rndOpened: true, rndLabOpened: true },
+        }))).toBeUndefined();
+    });
+});
+
 describe('a new game', () => {
     it('opens on the step that gets the player into the product', () => {
         // It used to open on a production target, and that read as nonsense
@@ -90,8 +133,12 @@ describe('after the player buys some attention', () => {
         // q3-marketing is shelved. It waited on the same flag the opening
         // lock now raises, so it was inert as well as redundant - see the
         // note in data/tutorial/sequence.ts.
-        expect(TUTORIAL_SEQUENCE.map(l => l.id))
-            .toEqual(['q1-open-product', 'q1-marketing', 'morale-bonus']);
+        expect(TUTORIAL_SEQUENCE.map(l => l.id)).toEqual([
+            // Research first in the ARRAY, invisible until triggered - see
+            // the note at the top of data/tutorial/sequence.ts.
+            'rnd-lab', 'rnd-hire',
+            'q1-open-product', 'q1-marketing', 'morale-bonus',
+        ]);
         expect(showing(opening({
             flags: {
                 tutorialProductOpened: true,
