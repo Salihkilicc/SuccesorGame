@@ -38,6 +38,8 @@ import { useSponsorshipStore } from './store/useSponsorshipStore';
 import { useCasinoRiskStore } from './store/useCasinoRiskStore';
 import { useMailStore } from './store/useMailStore';
 import { useNewsStore } from './store/useNewsStore';
+import { useIdentityStore } from './store/useIdentityStore';
+import { OPENING_ACT, SKIPPED_ACT_FLAGS } from '../data/story/openingAct';
 
 /**
  * EVERY game key in AsyncStorage.
@@ -248,7 +250,27 @@ const resetInMemoryStores = () => {
  *
  * The caller should send the player back to Home once this resolves.
  */
-export const startNewGame = async (): Promise<void> => {
+/**
+ * What a run starts WITHOUT.
+ *
+ * Both of these are facts about the PLAYER rather than about the company, and
+ * both are read from useIdentityStore, which a new game does not wipe - see
+ * the note at the top of that file. A person who has been taught does not need
+ * teaching again, and a person who has buried this man once should not have to
+ * sit through the funeral to get to their second company.
+ */
+export type NewGameOptions = {
+    /**
+     * Skip the first year: the father, the death, Pear, the condolences.
+     *
+     * Offered rather than assumed. Somebody may want to play it again, and
+     * deciding on their behalf that the best writing in the game is now
+     * skippable-by-default is not a call this function should make.
+     */
+    skipOpening?: boolean;
+};
+
+export const startNewGame = async (options: NewGameOptions = {}): Promise<void> => {
     console.log('[newGame] Yeni oyun baslatiliyor...');
 
     // 1) Reset memory. Do this first — the persist middleware then writes the
@@ -279,7 +301,10 @@ export const startNewGame = async (): Promise<void> => {
     //    rather than dependent on timing.
     resetInMemoryStores();
 
-    // 4) Audit, and say so loudly.
+    // 4) The two things a returning player does not start over with.
+    applyReturningPlayer(options);
+
+    // 5) Audit, and say so loudly.
     const problems = verifyNewGame();
     if (__DEV__ && problems.length > 0) {
         // A console warning was not enough - it is easy to miss and the player
@@ -295,6 +320,51 @@ export const startNewGame = async (): Promise<void> => {
     }
 
     console.log('[newGame] Hazir.');
+};
+
+// ============================================================================
+//  WHAT A SECOND RUN LOOKS LIKE
+// ============================================================================
+//  Run AFTER the wipe, deliberately: everything here is state a fresh run does
+//  not have, so writing it before the reset would simply delete it. That is
+//  also why it is a named function rather than three lines inside
+//  `startNewGame` - the ordering is the whole correctness argument.
+// ============================================================================
+const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
+    const player = useIdentityStore.getState();
+
+    // ------------------------------------------------------------------
+    //  THE TUTORIAL DOES NOT COME BACK
+    // ------------------------------------------------------------------
+    //  It used to, with a "Skip the whole tutorial" button on it for anybody
+    //  who had finished it before - which is a dimmed screen, a card and a tap
+    //  to arrive at the state they were always going to choose. Somebody who
+    //  has been taught the game is not asked again.
+    // ------------------------------------------------------------------
+    if (player.tutorialCompleted) {
+        useStoryStore.setState(s => ({ locks: { ...s.locks, disabled: true } }));
+    }
+
+    if (!skipOpening) return;
+
+    // ------------------------------------------------------------------
+    //  AND THE FIRST YEAR IS ALREADY BEHIND THEM
+    // ------------------------------------------------------------------
+    //  `seenScenes` rather than a flag per beat: it is exactly the list the
+    //  deliverer checks before queueing anything, so marking the act as seen
+    //  is the same mechanism that stops a scene arriving twice in an ordinary
+    //  run. Nothing new has to be taught to understand it.
+    //
+    //  The father's thread goes with it, for the same reason it goes when he
+    //  dies on screen - see the `closeThread` effect. A skipped act must not
+    //  leave a dead man at the top of the messages list.
+    // ------------------------------------------------------------------
+    useStoryStore.setState(s => ({
+        seenScenes: Array.from(new Set([...s.seenScenes, ...OPENING_ACT])),
+        flags: { ...s.flags, ...Object.fromEntries(SKIPPED_ACT_FLAGS.map(f => [f, true])) },
+    }));
+    useMessageStore.getState().removeThread('father');
+    console.log('[newGame] Opening act skipped.');
 };
 
 // ============================================================================

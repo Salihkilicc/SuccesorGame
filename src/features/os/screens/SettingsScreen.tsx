@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
-import { startNewGame } from '../../../core/newGame';
+import { startNewGameAsking } from '../../../core/newGamePrompt';
 import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
 // START_EMPLOYEES was only read by the confirmation box removed below.
 import { theme } from '../../../core/theme';
@@ -114,7 +114,7 @@ const SettingsScreen = () => {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            await startNewGame();
+                            await startNewGameAsking();
                             navigation.goBack();
                             // ------------------------------------------------------
                             //  NO SECOND BOX

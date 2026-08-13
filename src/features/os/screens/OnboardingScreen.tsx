@@ -103,15 +103,23 @@ const Field = ({
     </View>
 );
 
+/**
+ * The name the player inherits.
+ *
+ * Written here rather than in the identity store because this is the only
+ * place it is decided; everywhere else reads what onboarding wrote. If a
+ * future run ever lets the player marry into a different one, this is the
+ * constant that stops being a constant.
+ */
+export const FAMILY_NAME = 'Hale';
+
 const OnboardingScreen = ({ mode, onDone }: Props) => {
     const insets = useSafeAreaInsets();
     const setIdentity = useIdentityStore(s => s.setIdentity);
     const existingFirst = useIdentityStore(s => s.firstName);
-    const existingLast = useIdentityStore(s => s.lastName);
     const update = useStatsStore(s => s.update);
 
     const [firstName, setFirstName] = useState(existingFirst);
-    const [lastName, setLastName] = useState(existingLast);
     const [gender, setGender] = useState<Gender>(useIdentityStore.getState().gender);
     const [company, setCompany] = useState('');
     /** Only shown after a failed submit - see the note on `submit`. */
@@ -133,8 +141,6 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
         if (wantsIdentity) {
             const f = checkName(firstName, 'A first name');
             if (!f.ok) next.firstName = f.reason;
-            const l = checkName(lastName, 'A last name');
-            if (!l.ok) next.lastName = l.reason;
         }
         const c = checkCompany(company);
         if (!c.ok) next.company = c.reason;
@@ -145,7 +151,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
         if (wantsIdentity) {
             // The store validates again. If it somehow refuses, say so rather
             // than continuing into a game with no name.
-            const written = setIdentity({ firstName, lastName, gender });
+            const written = setIdentity({ firstName, lastName: FAMILY_NAME, gender });
             if (!written.ok) {
                 setErrors({ firstName: written.reason });
                 return;
@@ -202,14 +208,27 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                             error={errors.firstName}
                             autoFocus
                         />
-                        <Field
-                            label="Last name"
-                            value={lastName}
-                            onChangeText={setLastName}
-                            placeholder="Rich"
-                            maxLength={NAME_MAX}
-                            error={errors.lastName}
-                        />
+                        {/* ------------------------------------------------
+                            THE SURNAME IS NOT A QUESTION
+
+                            It was a text field, and the answer was load-bearing
+                            in a way the field never admitted: the company is
+                            Hale, the founder in the news is Gerald Hale, and
+                            the man who dies in the sixth quarter is the
+                            player's father. A player who typed "Smith" spent
+                            the game being told about a stranger.
+
+                            So it is stated rather than asked. The first name
+                            is the player's; the surname is what they inherited,
+                            which is the entire premise.
+                           ------------------------------------------------ */}
+                        <View style={styles.field}>
+                            <Text style={styles.fieldLabel}>Last name</Text>
+                            <Text style={styles.familyName}>{FAMILY_NAME}</Text>
+                            <Text style={styles.familyNote}>
+                                Your father's name, and the company's. That part is not yours to choose.
+                            </Text>
+                        </View>
 
                         <View style={styles.field}>
                             <Text style={styles.fieldLabel}>Gender</Text>
@@ -314,6 +333,19 @@ const styles = StyleSheet.create({
      * part that says what is wrong anyway.
      */
     inputError: { borderColor: theme.colors.borderStrong, borderWidth: 1.5 },
+    /** Stated, not entered - so it reads as a fact rather than a disabled field. */
+    familyName: {
+        color: theme.colors.textPrimary,
+        fontSize: 20,
+        fontWeight: '800',
+        marginTop: 2,
+    },
+    familyNote: {
+        color: theme.colors.textMuted,
+        fontSize: 12,
+        lineHeight: 17,
+        marginTop: 4,
+    },
     error: { color: theme.colors.negative, fontSize: theme.typography.caption, marginTop: 6, lineHeight: 16 },
 
     genderRow: { flexDirection: 'row', gap: theme.spacing.sm },

@@ -248,7 +248,16 @@ const BASE_SHARES = 10_000_000;
 //  Kaynak: features/shareholders/stores/useShareholderStore.ts
 // ============================================================================
 
-const START_COMPANY_CAPITAL = 2_000_000;
+/**
+ * THREE MILLION, up from two.
+ *
+ * The first year asks the player to set a production target, put money behind
+ * a product, pay a morale bonus and - if they take the lesson - hire a
+ * researcher, and the researcher alone is most of a million. Two million meant
+ * the tutorial taught four moves and could only afford three, which is a
+ * teaching problem dressed as a difficulty one.
+ */
+const START_COMPANY_CAPITAL = 3_000_000;
 const START_PLAYER_CASH = 50_000;
 const START_FACTORIES = 1;
 // Tier 1 asks for a crew of 22. Starting at 20 meant opening the game

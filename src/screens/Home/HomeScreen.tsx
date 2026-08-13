@@ -33,7 +33,7 @@ import { startNewQuarter } from '../../features/life/components/Sanctuary/store/
 import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
-import { startNewGame } from '../../core/newGame';
+import { startNewGameAsking } from '../../core/newGamePrompt';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { fullName } from '../../core/identity';
 import UnreadBadge from '../../components/common/UnreadBadge';
@@ -205,7 +205,9 @@ const HomeScreen = () => {
     fadeAnim.setValue(0);
 
     try {
-      await startNewGame();
+      // Asks first, for somebody who has been through the first year - see
+      // core/newGamePrompt.ts.
+      await startNewGameAsking();
       Alert.alert(
         'New Game',
         t('newgame.freshStartBody', { v1: String(START_EMPLOYEES) }),
