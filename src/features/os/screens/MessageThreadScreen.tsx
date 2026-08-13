@@ -19,6 +19,7 @@ import { useMessageStore, type Thread } from '../../../core/store/useMessageStor
 import { useGameStore } from '../../../core/store/useGameStore';
 import ConversationRunner from '../../../components/story/ConversationRunner';
 import { conversationById } from '../../../data/story';
+import { useStoryStore } from '../../../core/store/useStoryStore';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -33,7 +34,8 @@ const MessageThreadScreen = () => {
     // SHELVED with the composer below - see the note on it. Left here rather
     // than removed so that whatever replaces the box knows where to reach.
     // const sendFromPlayer = useMessageStore(s => s.sendFromPlayer);
-    // const currentMonth = useGameStore(s => s.currentMonth);
+    // Still live: a finished scene is dated with the month it was played.
+    const currentMonth = useGameStore(s => s.currentMonth);
     // const [draft, setDraft] = useState('');
     const scrollViewRef = useRef<ScrollView>(null);
 
@@ -66,7 +68,7 @@ const MessageThreadScreen = () => {
                 <ConversationRunner
                     conversation={conversation}
                     variant="message"
-                    onFinished={() => {
+                    onFinished={(history) => {
                         // ------------------------------------------------------
                         //  PLAYED IS NOT THE SAME AS DELIVERED
                         // ------------------------------------------------------
@@ -80,7 +82,23 @@ const MessageThreadScreen = () => {
                         //  is what stops the next scene being delivered - see
                         //  the note in core/story/deliver.ts.
                         // ------------------------------------------------------
+                        //
+                        //  AND PLAYED IS NOT THE SAME AS GONE EITHER
+                        //
+                        //  Clearing the id alone deleted the scene from the
+                        //  screen it happened on. The transcript becomes
+                        //  ordinary messages first, so the thread reads like
+                        //  a thread - then the id goes and the next scene
+                        //  from this person has somewhere to land.
+                        //
+                        //  The saved position goes with it: the store copy
+                        //  exists so a half-played scene survives being left,
+                        //  and once the lines are in the thread it would be a
+                        //  second copy of the same conversation.
+                        useMessageStore.getState()
+                            .appendTranscript(thread.id, history, currentMonth);
                         useMessageStore.getState().clearConversation(thread.id);
+                        useStoryStore.getState().clearScene(conversation.id);
                         navigation.goBack();
                     }}
                 />

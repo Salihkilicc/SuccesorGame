@@ -91,6 +91,23 @@ type MessageStore = MessageState & {
      */
     clearConversation: (threadId: string) => void;
     /**
+     * Keep what was said in a played scene as ordinary messages.
+     *
+     * A scene used to vanish the moment it ended: `clearConversation` freed
+     * the thread for the next one and the thread went back to whatever plain
+     * messages it had, so a player who finished a conversation with their
+     * father and opened the thread again found no trace of it.
+     *
+     * This is a messages app. Answering somebody does not delete the exchange.
+     * The transcript goes in as messages - which is what it always was - and
+     * the thread stays free for the next scene.
+     */
+    appendTranscript: (
+        threadId: string,
+        lines: { from: MessageSender; text: string }[],
+        atMonth: number,
+    ) => void;
+    /**
      * The player's reply.
      *
      * @orphan-ok-symbol sendFromPlayer
@@ -167,6 +184,28 @@ export const useMessageStore = create<MessageStore>()(
                 set(state => ({
                     threads: state.threads.map(t =>
                         t.id === threadId ? { ...t, conversationId: undefined } : t),
+                })),
+
+            appendTranscript: (threadId, lines, atMonth) =>
+                set(state => ({
+                    threads: state.threads.map(t => {
+                        if (t.id !== threadId || lines.length === 0) return t;
+                        const base = t.messages.length;
+                        return {
+                            ...t,
+                            messages: [
+                                ...t.messages,
+                                ...lines.map((l, i) => ({
+                                    // Offset by what is already there, so ids
+                                    // stay unique and stable as keys.
+                                    id: `${threadId}-${base + i + 1}`,
+                                    from: l.from,
+                                    text: l.text,
+                                    atMonth,
+                                })),
+                            ],
+                        };
+                    }),
                 })),
 
             markRead: (threadId) =>

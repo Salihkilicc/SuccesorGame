@@ -28,7 +28,7 @@
 //  a player.
 // ============================================================================
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
@@ -42,20 +42,44 @@ import { gameSink } from '../../core/story/gameSink';
 import { testAll } from '../../core/story/conditions';
 import { readWorld } from '../../core/story/world';
 import { CAST } from '../../data/story/cast';
+import { useStoryStore, type SceneProgress, type Said } from '../../core/store/useStoryStore';
 
 type Props = {
     conversation: Conversation;
     /** Chat bubbles or a letter. Presentation only. */
     variant: 'message' | 'mail';
-    /** Called when the conversation ends, so the screen can close or return. */
-    onFinished?: () => void;
+    /**
+     * Called when the conversation ends, so the screen can close or return.
+     *
+     * It is handed the transcript, because a screen may want to keep what was
+     * said - the message thread turns it into ordinary messages.
+     */
+    onFinished?: (history: Said[]) => void;
 };
 
-/** One thing that was said, kept so the card history reads as a conversation. */
-type Said = { from: 'them' | 'player'; text: string };
+// ============================================================================
+//  A SCENE REMEMBERS WHERE IT GOT TO
+// ============================================================================
+//  This used to be plain component state, which meant leaving a conversation
+//  halfway - back arrow, tab bar, or the phone locking - started it again from
+//  the first card next time. And the runner applies effects as answers are
+//  picked, so the half already played was applied twice.
+//
+//  Position and transcript now come in and go out through the store. The
+//  component still owns them while it is on screen; the store is where they
+//  survive the screen not being.
+// ============================================================================
 
 const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
-    const [nodeId, setNodeId] = useState<string | null>(conversation.start);
+    const saved = useStoryStore(s => s.sceneProgress[conversation.id]);
+    // Read ONCE, on mount. Subscribing the position to the store would fight
+    // the local state on every answer - and the value only ever changes
+    // because this component changed it.
+    const [resume] = useState<SceneProgress | undefined>(saved);
+
+    const [nodeId, setNodeId] = useState<string | null>(
+        resume ? resume.nodeId : conversation.start,
+    );
     // ------------------------------------------------------------------
     //  EVERY LINE GOES THROUGH THE DICTIONARY
     // ------------------------------------------------------------------
@@ -83,9 +107,22 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         line(choiceKey(conversation.id, nodeIdent, index), text);
 
     const [history, setHistory] = useState<Said[]>(() => {
+        if (resume) return resume.history;
         const first = nodeById(conversation, conversation.start);
         return first ? [{ from: 'them', text: say(first.id, first.text) }] : [];
     });
+
+    // ------------------------------------------------------------------
+    //  SAVED ON EVERY CARD, INCLUDING THE FIRST
+    // ------------------------------------------------------------------
+    //  The first card matters as much as the rest: a player who opens a
+    //  scene, reads the opening and backs out has been shown it, and the
+    //  effects of nothing have run. Writing it down costs one record and
+    //  means "where was I" always has an answer.
+    // ------------------------------------------------------------------
+    useEffect(() => {
+        useStoryStore.getState().saveScene(conversation.id, { nodeId, history });
+    }, [conversation.id, nodeId, history]);
 
     const node = nodeId ? nodeById(conversation, nodeId) : undefined;
 
@@ -111,9 +148,9 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         [node, world],
     );
 
-    const finish = () => {
+    const finish = (h: Said[] = history) => {
         setNodeId(null);
-        onFinished?.();
+        onFinished?.(h);
     };
 
     const pick = (choice: Choice, index: number) => {
@@ -121,21 +158,19 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
         // opens a card mentioning the payment has to happen in that order.
         applyEffects(choice.effects, gameSink());
 
-        setHistory(h => {
-            const next = [...h, {
-                from: 'player' as const,
-                text: node ? answer(node.id, index, choice.text) : choice.text,
-            }];
-            const target = choice.next ? nodeById(conversation, choice.next) : undefined;
-            if (target) next.push({ from: 'them', text: say(target.id, target.text) });
-            return next;
-        });
+        const next: Said[] = [...history, {
+            from: 'player' as const,
+            text: node ? answer(node.id, index, choice.text) : choice.text,
+        }];
+        const target = choice.next ? nodeById(conversation, choice.next) : undefined;
+        if (target) next.push({ from: 'them', text: say(target.id, target.text) });
+        setHistory(next);
 
-        if (!choice.next) { finish(); return; }
-        // A link that survived the audit always resolves; this guard is for
-        // data loaded from an older save of a scene that has since changed.
-        setNodeId(nodeById(conversation, choice.next) ? choice.next : null);
-        if (!nodeById(conversation, choice.next)) onFinished?.();
+        // Built outside setHistory rather than inside the updater, because
+        // `finish` has to hand the completed transcript to the screen and a
+        // state updater is not the place to read state back out of.
+        if (!choice.next || !target) { finish(next); return; }
+        setNodeId(choice.next);
     };
 
     const done = !node;
@@ -167,12 +202,12 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
     );
 
     const answers = done
-        ? closeButton(() => onFinished?.())
+        ? closeButton(() => onFinished?.(history))
         // Either the card is terminal - they had the last word - or every
         // answer was gated out. Both end the same way for the player; only
         // the audit tells them apart.
         : available.length === 0
-            ? closeButton(finish)
+            ? closeButton(() => finish())
             : available.map(({ choice, index }) => (
                 <Pressable
                     key={index}

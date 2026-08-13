@@ -34,6 +34,22 @@ import { nextPriority, type Pending } from '../story/inbox';
 import { emptyHistory, type EventHistory } from '../events/types';
 import { emptyLockState, type LockState } from '../tutorial/locks';
 
+/**
+ * One line of a scene as the player read it.
+ *
+ * The TEXT rather than a key, because it was resolved through the dictionary
+ * when the card arrived and the player may have changed language since. What
+ * they read is what they should find when they come back.
+ */
+export type Said = { from: 'them' | 'player'; text: string };
+
+/** Where a scene was left, and everything said up to that point. */
+export type SceneProgress = {
+    /** The card on screen. `null` when the scene has been played out. */
+    nodeId: string | null;
+    history: Said[];
+};
+
 export type StoryState = {
     dials: Dials;
     /** Set membership, stored as a map because JSON has no Set. */
@@ -80,6 +96,29 @@ export type StoryState = {
      * come back to a running company they no longer own.
      */
     ending: string | null;
+    /**
+     * WHERE THE PLAYER GOT TO IN A SCENE THEY HAVE NOT FINISHED.
+     *
+     * The runner held its position in component state, so backing out of a
+     * conversation halfway - the back arrow, the tab bar, the home gesture -
+     * threw it away and re-opening started the scene from its first card.
+     *
+     * That is not merely annoying. The runner applies effects as answers are
+     * picked, so the half a scene the player had already played was applied
+     * again: dials nudged twice, money moved twice, a `schedule` firing a
+     * second copy of whatever it queued. The story quietly diverged from
+     * itself in the middle of a save.
+     *
+     * Keyed by CONVERSATION id, not by thread or mail id, because the scene
+     * is the thing with a position in it - and the same id is what both
+     * channels look it up by.
+     *
+     * `nodeId: null` means finished. That is worth storing rather than
+     * deleting: a letter stays in the inbox after it has been answered, and
+     * re-opening it should show what was said, not an empty scene or a
+     * replay.
+     */
+    sceneProgress: Record<string, SceneProgress>;
     _hasHydrated: boolean;
 };
 
@@ -125,6 +164,20 @@ type StoryStore = StoryState & {
     /** Stop the game. See data/story/endings.ts for the ids. */
     endGame: (endingId: string) => void;
 
+    /**
+     * Write down where the player is in a scene. Called on every answer, so
+     * the position on disk is never more than one card behind the screen.
+     */
+    saveScene: (conversationId: string, progress: SceneProgress) => void;
+    /**
+     * Forget a scene's position.
+     *
+     * For a scene whose transcript has been moved somewhere permanent - a
+     * message thread keeps what was said as ordinary messages - so the saved
+     * copy would be a second one.
+     */
+    clearScene: (conversationId: string) => void;
+
     /** A lock cleared by doing the thing. */
     completeLock: (id: string) => void;
     /** A lock the player walked away from. Recorded apart, so it is visible. */
@@ -143,6 +196,7 @@ export const initialStoryState: StoryState = {
     eventHistory: emptyHistory(),
     seenScenes: [],
     ending: null,
+    sceneProgress: {},
     _hasHydrated: false,
 };
 
@@ -180,6 +234,19 @@ export const useStoryStore = create<StoryStore>()(
 
             endGame: (endingId) => set({ ending: endingId }),
 
+            saveScene: (conversationId, progress) =>
+                set(state => ({
+                    sceneProgress: { ...state.sceneProgress, [conversationId]: progress },
+                })),
+
+            clearScene: (conversationId) =>
+                set(state => {
+                    if (!state.sceneProgress[conversationId]) return state;
+                    const next = { ...state.sceneProgress };
+                    delete next[conversationId];
+                    return { sceneProgress: next };
+                }),
+
             markSceneSeen: (id) =>
                 set(state => (state.seenScenes.includes(id) ? state : {
                     seenScenes: [...state.seenScenes, id],
@@ -207,6 +274,8 @@ export const useStoryStore = create<StoryStore>()(
                 eventHistory: emptyHistory(),
                 seenScenes: [],
                 ending: null,
+                // A new company plays the same scenes again from the top.
+                sceneProgress: {},
                 _hasHydrated: true,
             }),
         }),
@@ -217,6 +286,7 @@ export const useStoryStore = create<StoryStore>()(
                 dials: state.dials, flags: state.flags, pending: state.pending,
                 locks: state.locks, eventHistory: state.eventHistory,
                 seenScenes: state.seenScenes, ending: state.ending,
+                sceneProgress: state.sceneProgress,
             }),
             /**
              * A save made before a dial existed has no value for it, and
@@ -230,6 +300,8 @@ export const useStoryStore = create<StoryStore>()(
                     ...p,
                     dials: { ...INITIAL_DIALS, ...(p.dials ?? {}) },
                     flags: { ...(p.flags ?? {}) },
+                    // Saves written before scenes remembered their position.
+                    sceneProgress: { ...(p.sceneProgress ?? {}) },
                     pending: p.pending ?? [],
                     locks: p.locks ?? emptyLockState(),
                     // Saves made before events existed have no history. An
