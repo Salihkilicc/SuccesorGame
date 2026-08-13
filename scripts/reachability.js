@@ -387,7 +387,12 @@ const problems = { components: [], storeActions: [], engineExports: [], statsFie
 //  not fail tsc and it only crashes on the path the developer does not take
 //  while testing, so it needs a machine to catch it.
 const HOOK = /\b(useState|useEffect|useMemo|useCallback|useRef|useReducer|useContext|use[A-Z]\w*Store)\s*\(/;
-for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
+// A .tsx TEST is not a component that nothing renders - it is a test, and
+// what renders it is jest. This project's first .tsx test file appeared as a
+// finding the moment it was written, which would have taught whoever wrote
+// the second one that the audit punishes rendering tests.
+for (const f of files.filter(f =>
+    f.endsWith('.tsx') && !/\.test\.tsx$/.test(f) && !isDisabled(f))) {
     const lines = read(f).split('\n');
     let guard = -1;
     for (let i = 0; i < lines.length; i++) {
@@ -1338,7 +1343,12 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 //  regex, so a filename mentioned in a comment - or in a commented-out import,
 //  which is exactly what shelving one produces - no longer counts as rendering
 //  the screen.
-for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f))) {
+// A .tsx TEST is not a component that nothing renders - it is a test, and
+// what renders it is jest. This project's first .tsx test file appeared as a
+// finding the moment it was written, which would have taught whoever wrote
+// the second one that the audit punishes rendering tests.
+for (const f of files.filter(f =>
+    f.endsWith('.tsx') && !/\.test\.tsx$/.test(f) && !isDisabled(f))) {
     if (optedOut(f)) continue;
     const base = path.basename(f).replace(/\.tsx$/, '');
     const imported = [...REFERENCE_INDEX.importsOf].some(([g, specs]) =>

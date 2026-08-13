@@ -1,6 +1,6 @@
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, type ViewStyle } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
@@ -8,6 +8,20 @@ import { ProductLaunchModal, ProductDetailModal } from '../components/ProductMod
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+
+/**
+ * The first product card, and only the first, is what the tutorial points at.
+ *
+ * A component rather than a ternary at the call site so the card markup is
+ * written once - two copies of it would be two places to change a price
+ * format and one place to forget.
+ */
+const Wrap = ({ target, style, children }: {
+    target: boolean; style: ViewStyle; children: React.ReactNode;
+}) => (target
+    ? <TutorialTarget tutorialKey="products" style={style}>{children}</TutorialTarget>
+    : <View style={style}>{children}</View>);
 
 const ProductsScreen = () => {
     useLocale();
@@ -34,8 +48,30 @@ const ProductsScreen = () => {
         {/* ACTIVE PRODUCTS */}
         <Text style={styles.sectionTitle}>{t('product.activeProductsV1', { v1: activeProducts.length })}</Text>
         <View style={styles.activeList}>
-          {activeProducts.map(prod => (
-            <Pressable key={prod.id} style={styles.activeCard} onPress={() => actions.openDetailModal(prod)}>
+          {activeProducts.map((prod, i) => (
+            // ------------------------------------------------------------------
+            //  THE FIRST CARD IS WHAT THE TUTORIAL MEANS BY "products", HERE
+            // ------------------------------------------------------------------
+            //  Same key the department tile on My Company uses, deliberately.
+            //  A target publishes its position only while its own screen has
+            //  focus, so one lock lights the tile that gets you here and then
+            //  the card you actually have to press once you have arrived -
+            //  which is the control the instruction is about.
+            //
+            //  Before this the step went dark on arrival, and worse: the rect
+            //  measured on My Company survived the push and put the hole over
+            //  the Discover New Tech card, so the only pressable thing on the
+            //  screen was the one control that could not clear the step.
+            //
+            //  The wrapper carries the card's own width. A plain View here
+            //  defaults to auto and collapses the two-column layout to one.
+            // ------------------------------------------------------------------
+            //  Only the FIRST card is a target. Wrapping all of them would
+            //  publish a rect for every product that no lock ever names, and
+            //  a store full of coordinates nobody reads is how the last bug
+            //  in this file started.
+            <Wrap key={prod.id} target={i === 0} style={styles.activeCardWrap}>
+            <Pressable style={styles.activeCardFill} onPress={() => actions.openDetailModal(prod)}>
               <View style={styles.activeHeader}>
                 <Text style={styles.activeIcon}>{prod.icon}</Text>
                 <View style={styles.statusBadge}><Text style={styles.statusText}>{t('product.active')}</Text></View>
@@ -47,6 +83,7 @@ const ProductsScreen = () => {
               <MarketPositionPanel category={prod.category} compact />
               <Text style={styles.activePrice}>{formatMoney(prod.sellingPrice)}</Text>
             </Pressable>
+            </Wrap>
           ))}
           {/* Discover New Tech Card */}
           <Pressable
@@ -108,6 +145,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12
+  },
+  /** The tutorial wrapper takes the card's width so the grid keeps two columns. */
+  activeCardWrap: { width: '48%', minWidth: 150 },
+  /** The card itself then fills the wrapper rather than sizing itself. */
+  activeCardFill: {
+    width: '100%',
+    height: 160,
+    backgroundColor: theme.colors.card,
+    borderRadius: 16,
+    padding: 12,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   activeCard: {
     width: '48%', // Approx 2 columns accounting for gap. Or calculation. 
