@@ -39,7 +39,7 @@ export const startNewGameAsking = (): Promise<boolean> =>
 
         Alert.alert(
             'The first year',
-            'You have played the opening before — your father, the phone call, '
+            'You have played the opening before, your father, the phone call, '
             + 'the letter that followed it.\n\nPlay it again, or start with all '
             + 'of that already behind you?',
             [

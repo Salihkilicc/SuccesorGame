@@ -420,7 +420,7 @@ export const checkCapacityBreach = (
         excess,
         demandedRepayment: excess * FORCED_REPAYMENT_RATIO,
         message: isRetooling
-            ? 'Your build has cut EBITDA, and with it your borrowing base. The banks want part of the loan back — while you are producing less.'
+            ? 'Your build has cut EBITDA, and with it your borrowing base. The banks want part of the loan back, while you are producing less.'
             : 'Your debt is above what your earnings support. The banks are calling part of it in.',
     };
 };
@@ -500,7 +500,7 @@ export const applyTax = (
 
 export const CREDIT_EXPLANATIONS = {
     rating:
-        'Your credit rating comes from two ratios, not from how big you are. Leverage is debt against a year of operating cash flow; coverage is operating profit against the interest you owe. Growing does not make debt cheaper — earning does.',
+        'Your credit rating comes from two ratios, not from how big you are. Leverage is debt against a year of operating cash flow; coverage is operating profit against the interest you owe. Growing does not make debt cheaper, earning does.',
     leverage:
         'Debt divided by annual EBITDA. Roughly: how many years of operating cash flow it would take to repay everything. Under 2× is comfortable, over 4× breaks your covenants.',
     coverage:
@@ -508,7 +508,7 @@ export const CREDIT_EXPLANATIONS = {
     covenant:
         'The promises written into your loan agreements. Break them and the bank raises your rate, then stops lending, then forces you to sell things. This is what keeps real CEOs awake.',
     taxShield:
-        'Interest is deductible, so borrowing lowers your tax bill. That is what makes debt genuinely cheaper than equity — up to the point where the risk of not being able to pay outweighs the saving.',
+        'Interest is deductible, so borrowing lowers your tax bill. That is what makes debt genuinely cheaper than equity, up to the point where the risk of not being able to pay outweighs the saving.',
 } as const;
 
 // ============================================================================

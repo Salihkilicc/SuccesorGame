@@ -41,7 +41,7 @@ const ROOMS: Array<{
     {
       id: 'vip',
       get label() { return t('ui.vipRoom'); },
-      minBet: '$50K — premium required',
+      minBet: '$50K, premium required',
       emoji: '💎',
       requiresPremium: true,
       flavor: 'Private tables & signature drinks.',
@@ -49,7 +49,7 @@ const ROOMS: Array<{
     {
       id: 'ultra',
       get label() { return t('ui.ultraVip'); },
-      minBet: '$250K — premium + $1M NW',
+      minBet: '$250K, premium + $1M NW',
       emoji: '🃏',
       requiresPremium: true,
       minNetWorth: MIN_ULTRA_NET_WORTH,

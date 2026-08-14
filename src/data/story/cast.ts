@@ -46,7 +46,7 @@ export const CAST: Cast = {
         // Both: he sends the formal thing and then explains it badly.
         channels: 'both',
         email: 'g.hale@hale.co',
-        tone: 'Certain of everything, wrong about a third of it, and never in doubt about which third. Instructs rather than explains. Blames the market, Pear, the banks - never a decision he made. Warmth arrives sideways, in the middle of an instruction, and is gone before you can answer it.',
+        tone: 'Certain of everything, wrong about a third of it, and never in doubt about which third. Instructs rather than explains. Blames the market, Pear, the banks, never a decision he made. Warmth arrives sideways, in the middle of an instruction, and is gone before you can answer it.',
     },
 
     brother: {
@@ -55,7 +55,7 @@ export const CAST: Cast = {
         role: 'Shareholder · 15%',
         // Message only. He has your number and has never respected it.
         channels: 'message',
-        tone: 'Affectionate on the surface, auditing underneath. Compliments that are really questions. Says "just asking" after things that were not questions. Sends at eleven at night. When he is genuinely hurt he gets shorter, not longer - that is the tell.',
+        tone: 'Affectionate on the surface, auditing underneath. Compliments that are really questions. Says "just asking" after things that were not questions. Sends at eleven at night. When he is genuinely hurt he gets shorter, not longer, that is the tell.',
     },
 
     // ------------------------------------------------------------------
@@ -97,7 +97,7 @@ export const CAST: Cast = {
         role: 'CEO, Planora',
         // Message only. You came up together; letters would be an insult.
         channels: 'message',
-        tone: 'Fragments, lower case, three messages where one would do. Generous with information and bad at asking for help - when he finally asks it is because it is already serious. Calls you by a nickname nobody else uses.',
+        tone: 'Fragments, lower case, three messages where one would do. Generous with information and bad at asking for help, when he finally asks it is because it is already serious. Calls you by a nickname nobody else uses.',
     },
 
     pear: {
@@ -109,7 +109,7 @@ export const CAST: Cast = {
         // in him - which is a scene worth saving for.
         channels: 'mail',
         email: 'office.vogel@pear.com',
-        tone: 'Corporate to the point of contempt. Never insults you directly; the insult is the format - a template, a reference number, an assistant\'s sign-off. Uses "we" for Pear and "you" for a person. Reasonable in a way designed to make objecting look emotional.',
+        tone: 'Corporate to the point of contempt. Never insults you directly; the insult is the format, a template, a reference number, an assistant\'s sign-off. Uses "we" for Pear and "you" for a person. Reasonable in a way designed to make objecting look emotional.',
     },
 
     vulture: {
@@ -118,7 +118,7 @@ export const CAST: Cast = {
         role: 'Special Situations Fund',
         channels: 'mail',
         email: 'origination@halberd.partners',
-        tone: 'Cheerful about your disaster. Frames the worst offer you will ever receive as a favour, with genuine warmth, because to them it is simply Tuesday. Never threatens - just describes your position accurately, which is worse.',
+        tone: 'Cheerful about your disaster. Frames the worst offer you will ever receive as a favour, with genuine warmth, because to them it is simply Tuesday. Never threatens, just describes your position accurately, which is worse.',
     },
 
     // ------------------------------------------------------------------
@@ -142,7 +142,7 @@ export const CAST: Cast = {
         role: 'Chief Executive, Edison Motors',
         channels: 'mail',
         email: 'h.brennerman@edisonmotors.com',
-        tone: 'Thirty-one years in a business of dealers and service bays, and he talks like it: parts, counties, contract terms, people who answer phones at two in the morning. Never threatens - describes an arrangement that already exists and lets you work out that you are outside it. Agrees with your accusations, which is worse than denying them.',
+        tone: 'Thirty-one years in a business of dealers and service bays, and he talks like it: parts, counties, contract terms, people who answer phones at two in the morning. Never threatens, describes an arrangement that already exists and lets you work out that you are outside it. Agrees with your accusations, which is worse than denying them.',
     },
 
     // The Deep Tech incumbent, and she is at OpenAI-ish rather than Novidia
@@ -166,7 +166,7 @@ export const CAST: Cast = {
         role: 'Chair, Category Standards Committee',
         channels: 'mail',
         email: 'chair@devicestandards.org',
-        tone: 'Never threatens anything, because she does not have to - she describes a process, and every sentence of it is true, procedural and entirely outside your control. Scrupulously fair and aware of how that reads. The only antagonist in the game with nobody in her to argue with.',
+        tone: 'Never threatens anything, because she does not have to, she describes a process, and every sentence of it is true, procedural and entirely outside your control. Scrupulously fair and aware of how that reads. The only antagonist in the game with nobody in her to argue with.',
     },
 
     // ------------------------------------------------------------------
@@ -197,7 +197,7 @@ export const CAST: Cast = {
         // is written to be read aloud somewhere else later.
         channels: 'mail',
         email: 'notices@csd.gov',
-        tone: 'Neither hostile nor sympathetic - a process with letterhead. Cites the section before the finding. Deadlines are stated as dates, never as warnings, and the absence of any threat is the most alarming thing about it. Never uses the word "you" where "the undertaking" will do.',
+        tone: 'Neither hostile nor sympathetic, a process with letterhead. Cites the section before the finding. Deadlines are stated as dates, never as warnings, and the absence of any threat is the most alarming thing about it. Never uses the word "you" where "the undertaking" will do.',
     },
 
     fbi: {

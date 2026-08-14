@@ -125,7 +125,7 @@ export const SPONSOR_OFFERS: SponsorOffer[] = [
         'Two hundred thousand visitors over four days, most of them ours, and the main ring has been sponsored by a bank that no longer exists.',
         140_000, 0.7),
     local('spon-l-3', 'Riverside Community Pool',
-        'It closes in March without somebody. I am not going to dress that up — there is no marketing case, there is a pool.',
+        'It closes in March without somebody. I am not going to dress that up, there is no marketing case, there is a pool.',
         90_000, 0.6),
     local('spon-l-4', 'The Harbour Light Festival',
         'Eleven nights, forty thousand people, and a projection on the old grain silo that everybody photographs. Your name goes on the silo.',

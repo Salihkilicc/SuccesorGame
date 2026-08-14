@@ -40,7 +40,7 @@ import { FRIENDLY_LOCK_MARKET_CAP } from '../../../core/market/reach';
 
 const SUBJECT_LABEL: Record<Subject, string> = {
     purchase: 'Offer to acquire',
-    merger: 'Proposal — merger of equals',
+    merger: 'Proposal, merger of equals',
     partnership: 'Commercial partnership',
     notice: 'Notice of intent',
 };

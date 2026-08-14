@@ -55,7 +55,7 @@ export const fatherMorale: Conversation = {
             speaker: 'father',
             // The engine's actual behaviour, stated plainly: the anchor is
             // where market pay parks you and it does not move on its own.
-            text: 'It is exactly fine. That is the problem — it is the number you get for paying precisely what everyone else pays, and it will sit there for nine years if you let it.\n\nFine is not a plateau you are resting on. It is the one you were put on.',
+            text: 'It is exactly fine. That is the problem, it is the number you get for paying precisely what everyone else pays, and it will sit there for nine years if you let it.\n\nFine is not a plateau you are resting on. It is the one you were put on.',
             choices: [
                 { text: 'What should it be?', next: 'shouldBe' },
                 { text: 'People are not machines you tune.', next: 'notMachines' },
@@ -91,7 +91,7 @@ export const fatherMorale: Conversation = {
             speaker: 'father',
             // Accurate: wageMoraleTarget has a ceiling of 85, and the
             // pay-cut shock makes a raise a commitment rather than a dial.
-            text: 'You can. It is permanent, it compounds, and it will carry you to about eighty-five and no further — money alone has a ceiling and that is where it is.\n\nAnd you will not be taking it back. Cut a wage you have raised and you will pay for it twice: once in the money and once in what they decide about you.',
+            text: 'You can. It is permanent, it compounds, and it will carry you to about eighty-five and no further, money alone has a ceiling and that is where it is.\n\nAnd you will not be taking it back. Cut a wage you have raised and you will pay for it twice: once in the money and once in what they decide about you.',
             choices: [
                 { text: 'Then a bonus, this quarter.', next: 'bonus' },
                 { text: 'I will take the ceiling.', next: 'ceiling' },
@@ -112,7 +112,7 @@ export const fatherMorale: Conversation = {
             speaker: 'father',
             // The instruction the lock is gating. Honest about the decay:
             // a bonus is a one-off and the tick treats it as one.
-            text: 'A bonus is a different instrument and you should not confuse them. It is one quarter of goodwill, bought outright, and it fades. That is not a flaw — sometimes one quarter is precisely what you need.\n\nDo it now. Team Morale, on your company screen. And do it while the quarter is good, not when you need something.',
+            text: 'A bonus is a different instrument and you should not confuse them. It is one quarter of goodwill, bought outright, and it fades. That is not a flaw, sometimes one quarter is precisely what you need.\n\nDo it now. Team Morale, on your company screen. And do it while the quarter is good, not when you need something.',
             choices: [
                 { text: 'Why does that matter?', next: 'whyTiming' },
                 { text: 'Paying it.', next: 'close' },

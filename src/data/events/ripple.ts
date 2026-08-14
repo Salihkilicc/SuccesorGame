@@ -87,7 +87,7 @@ export const rippleVoltmotors: Conversation = {
             speaker: 'edison',
             // He is not angry. He is doing arithmetic out loud, and the
             // arithmetic is about your people.
-            text: 'Congratulations. I mean it — I had a folder on that company for six years and you closed it in a quarter, which is faster than my board has ever moved on anything.\n\nAnders and I have had dinner twice a year since 1998. He rang me the night it was signed, before he rang his own people, which tells you something about both of us.\n\nI am going to hire his cell engineers. I wanted you to hear it from me rather than from an exit interview.',
+            text: 'Congratulations. I mean it, I had a folder on that company for six years and you closed it in a quarter, which is faster than my board has ever moved on anything.\n\nAnders and I have had dinner twice a year since 1998. He rang me the night it was signed, before he rang his own people, which tells you something about both of us.\n\nI am going to hire his cell engineers. I wanted you to hear it from me rather than from an exit interview.',
             choices: [
                 { text: 'They are under contract.', next: 'contract' },
                 { text: 'What would stop you?', next: 'stop' },
@@ -110,7 +110,7 @@ export const rippleVoltmotors: Conversation = {
             speaker: 'edison',
             // The honest answer, given plainly, including the part where it is
             // a bad deal on paper.
-            text: 'Money, in their hands, this quarter. Not a raise — a retention package with a number on it that makes leaving embarrassing.\n\nIt will cost you more than the synergy is worth for about a decade. I am telling you that because you will work it out anyway and I would rather you heard the real version: you are not buying a return, you are buying the thing you thought you had bought in the first place.',
+            text: 'Money, in their hands, this quarter. Not a raise, a retention package with a number on it that makes leaving embarrassing.\n\nIt will cost you more than the synergy is worth for about a decade. I am telling you that because you will work it out anyway and I would rather you heard the real version: you are not buying a return, you are buying the thing you thought you had bought in the first place.',
             choices: [
                 {
                     text: 'Pay them.',
@@ -225,7 +225,7 @@ export const rippleNovidia: Conversation = {
             id: 'needIt',
             speaker: 'openai',
             // She agrees, and then explains why that does not save you.
-            text: 'I do. The plant will keep running — you will keep selling to us because the alternative is a very expensive empty fab, and I will keep buying because the alternative is stopping.\n\nThat is why I am taking the design team rather than the line. You will have the building and the orders. The next generation will be designed in my building instead, and in four years the one in yours will be a place where old chips are made well.',
+            text: 'I do. The plant will keep running, you will keep selling to us because the alternative is a very expensive empty fab, and I will keep buying because the alternative is stopping.\n\nThat is why I am taking the design team rather than the line. You will have the building and the orders. The next generation will be designed in my building instead, and in four years the one in yours will be a place where old chips are made well.',
             choices: [
                 { text: 'Name your price for leaving them alone.', next: 'price' },
                 {
@@ -281,7 +281,7 @@ export const rippleBiogen: Conversation = {
         {
             id: 'open',
             speaker: 'swanson',
-            text: 'I had a term sheet with that company. It was worse than yours and it was going to be signed in November, and I am not writing to complain about being outbid — that is the process working.\n\nI am writing because their four principal investigators hold their trial slots personally rather than institutionally. That is normal in this field and it is about to be inconvenient for you.\n\nTwo have already asked me whether the slots travel. They do.',
+            text: 'I had a term sheet with that company. It was worse than yours and it was going to be signed in November, and I am not writing to complain about being outbid, that is the process working.\n\nI am writing because their four principal investigators hold their trial slots personally rather than institutionally. That is normal in this field and it is about to be inconvenient for you.\n\nTwo have already asked me whether the slots travel. They do.',
             choices: [
                 { text: 'You are taking my trials.', next: 'takingTrials' },
                 { text: 'Can they be persuaded to stay?', next: 'stay' },
@@ -303,7 +303,7 @@ export const rippleBiogen: Conversation = {
         {
             id: 'stay',
             speaker: 'swanson',
-            text: 'Yes, and not by me. Give them budget, and equipment, and a decade — investigators do not move for money, they move because somebody senior stopped answering their emails.\n\nIt will cost more than it looks like it should. What you would be buying is the eighteen months of trust their last employer had already paid for and did not get to keep.',
+            text: 'Yes, and not by me. Give them budget, and equipment, and a decade, investigators do not move for money, they move because somebody senior stopped answering their emails.\n\nIt will cost more than it looks like it should. What you would be buying is the eighteen months of trust their last employer had already paid for and did not get to keep.',
             choices: [
                 {
                     text: 'Fund all four. Properly.',
@@ -340,7 +340,7 @@ export const rippleSkynet: Conversation = {
     id: 'event-ripple-skynet',
     channel: 'mail',
     from: 'vulture',
-    subject: 'Note to clients — enclosed for your information',
+    subject: 'Note to clients, enclosed for your information',
     when: SKYNET,
     start: 'open',
     nodes: [
@@ -348,7 +348,7 @@ export const rippleSkynet: Conversation = {
             id: 'open',
             speaker: 'vulture',
             // Genuinely warm about your disaster, which is the whole character.
-            text: 'Well played, and I am not being sarcastic — we had that company down for the first quarter of next year at roughly a third of what you paid, and you have cost us a very enjoyable eighteen months.\n\nWe circulate a note to clients when a situation we were tracking resolves. Yours is attached. It is eleven pages and the phrase "strategic premium" appears in it four times, each time in quotation marks.\n\nI am sending it to you first as a courtesy. It goes out Thursday either way.',
+            text: 'Well played, and I am not being sarcastic, we had that company down for the first quarter of next year at roughly a third of what you paid, and you have cost us a very enjoyable eighteen months.\n\nWe circulate a note to clients when a situation we were tracking resolves. Yours is attached. It is eleven pages and the phrase "strategic premium" appears in it four times, each time in quotation marks.\n\nI am sending it to you first as a courtesy. It goes out Thursday either way.',
             choices: [
                 { text: 'Publish it. Nobody reads your notes.', next: 'nobodyReads' },
                 { text: 'What is in it?', next: 'whatsInIt' },
@@ -359,7 +359,7 @@ export const rippleSkynet: Conversation = {
             speaker: 'vulture',
             // The note is not a threat to the player. It is a threat to the
             // acquired company's staff, which is the mechanic.
-            text: 'Nothing untrue, which is the difficulty. Her burn rate, her cash on the day you signed, the two funding conversations that had already failed, and what those two facts together say about the price.\n\nOur clients will find it interesting. Her researchers will find it devastating — most of them accepted equity in a company they believed had eighteen months, and the note explains that it had four. People do not stay somewhere they have just read about.',
+            text: 'Nothing untrue, which is the difficulty. Her burn rate, her cash on the day you signed, the two funding conversations that had already failed, and what those two facts together say about the price.\n\nOur clients will find it interesting. Her researchers will find it devastating, most of them accepted equity in a company they believed had eighteen months, and the note explains that it had four. People do not stay somewhere they have just read about.',
             choices: [
                 { text: 'What stops it?', next: 'stops' },
                 {
@@ -426,14 +426,14 @@ export const ripplePlanora: Conversation = {
     id: 'event-ripple-planora',
     channel: 'mail',
     from: 'vulture',
-    subject: 'Note to clients — enclosed for your information',
+    subject: 'Note to clients, enclosed for your information',
     when: PLANORA,
     start: 'open',
     nodes: [
         {
             id: 'open',
             speaker: 'vulture',
-            text: 'A small one, this, but we do the note regardless — the discipline is the product.\n\nWe had been watching Planora since the year they nearly went under. Lovely software, no pricing power, and a founder who is much better at the product than at the rest of it. We expected to buy it in about three years for very little.\n\nThe note goes out Thursday.',
+            text: 'A small one, this, but we do the note regardless, the discipline is the product.\n\nWe had been watching Planora since the year they nearly went under. Lovely software, no pricing power, and a founder who is much better at the product than at the rest of it. We expected to buy it in about three years for very little.\n\nThe note goes out Thursday.',
             choices: [
                 { text: 'It is a small company. Leave it alone.', next: 'small' },
                 { text: 'What is in it?', next: 'whatsInIt' },
@@ -444,7 +444,7 @@ export const ripplePlanora: Conversation = {
             speaker: 'vulture',
             // The line that makes this different from the SkyNet letter,
             // arriving as an aside he does not think is significant.
-            text: 'Everything is a small company until it is not, and we have been wrong about that often enough to stop making exceptions.\n\nOne thing I will say, and it is not a negotiating position: the two hundred thousand dollars that kept them open in the bad year came from an account we could not identify at the time. We can now, obviously — it is in the note as a related-party disclosure. Two lines, entirely factual, and it will be the first thing anybody asks him about for a year.',
+            text: 'Everything is a small company until it is not, and we have been wrong about that often enough to stop making exceptions.\n\nOne thing I will say, and it is not a negotiating position: the two hundred thousand dollars that kept them open in the bad year came from an account we could not identify at the time. We can now, obviously, it is in the note as a related-party disclosure. Two lines, entirely factual, and it will be the first thing anybody asks him about for a year.',
             choices: [
                 { text: 'What stops it?', next: 'stops' },
                 {

@@ -63,7 +63,7 @@ export const casinoScandalScene: Conversation = {
         {
             id: 'ownMoney',
             speaker: 'cfo',
-            text: 'It is, entirely, and I would say so if anybody asked me.\n\nNobody is going to ask me. The story is not about the money — it is about a pattern, and a pattern is the only thing a paper can print without a lawyer in the room.',
+            text: 'It is, entirely, and I would say so if anybody asked me.\n\nNobody is going to ask me. The story is not about the money, it is about a pattern, and a pattern is the only thing a paper can print without a lawyer in the room.',
             choices: [
                 { text: 'What do they actually have?', next: 'whatTheyHave' },
                 { text: 'Say nothing. Let it run.', next: 'sayNothing' },

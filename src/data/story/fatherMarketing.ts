@@ -78,7 +78,7 @@ export const fatherMarketing: Conversation = {
         {
             id: 'open',
             speaker: 'father',
-            text: 'They are taking share off you. Not dramatically — half a point here, half a point there, the way it always goes, which is why nobody notices until it is four points.\n\nYou are not being beaten on the product. You are being beaten on being heard.',
+            text: 'They are taking share off you. Not dramatically, half a point here, half a point there, the way it always goes, which is why nobody notices until it is four points.\n\nYou are not being beaten on the product. You are being beaten on being heard.',
             choices: [
                 { text: 'Who is taking it?', next: 'who' },
                 { text: 'Then we spend on marketing.', next: 'spend' },
@@ -129,7 +129,7 @@ export const fatherMarketing: Conversation = {
             // SEAM 1. The number is his and it is fixed, and that is the
             // point: he is quoting an absolute from a company that was not
             // growing, to a company that is.
-            text: 'You put money behind it and you leave it there. Not one quarter — every quarter. That part somebody will show you.\n\nFour hundred thousand held our line for nine years. I never once raised it and I never once had to.',
+            text: 'You put money behind it and you leave it there. Not one quarter, every quarter. That part somebody will show you.\n\nFour hundred thousand held our line for nine years. I never once raised it and I never once had to.',
             choices: [
                 { text: 'Nine years at the same number?', next: 'nineYears' },
                 { text: 'And that builds the brand?', next: 'brand' },
@@ -142,7 +142,7 @@ export const fatherMarketing: Conversation = {
             // He hears the question as a compliment about his discipline. The
             // player has just handed him the exact fact that undoes his
             // advice - his company was flat - and he presents it as the moral.
-            text: 'The same number. That is what discipline looks like — everyone else raised theirs in the good years and cut it in the bad ones, and their name went up and down with it.\n\nWe were the same size in 2014 as in 2005 and we were still there. Half of them were not.',
+            text: 'The same number. That is what discipline looks like, everyone else raised theirs in the good years and cut it in the bad ones, and their name went up and down with it.\n\nWe were the same size in 2014 as in 2005 and we were still there. Half of them were not.',
             choices: [
                 { text: 'And that builds the brand?', next: 'brand' },
                 { text: 'The same size for nine years.', next: 'sameSize' },
@@ -206,7 +206,7 @@ export const fatherMarketing: Conversation = {
             speaker: 'father',
             // Terminal. The last line is him being right again, immediately
             // after being out of date, which is the whole difficulty of him.
-            text: 'Good.\n\nAnd watch what it buys you. Not the share next quarter — the share the quarter after, when the money has stopped and you find out whether anybody remembered.',
+            text: 'Good.\n\nAnd watch what it buys you. Not the share next quarter, the share the quarter after, when the money has stopped and you find out whether anybody remembered.',
         },
     ],
 };

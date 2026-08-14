@@ -1,6 +1,8 @@
 // src/core/store/useMailStore.ts
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { honorific } from '../identity';
+import { useIdentityStore } from './useIdentityStore';
 import { zustandStorage } from '../../storage/persist';
 
 export type MailCategory = 'Primary' | 'Updates' | 'Promotions';
@@ -74,7 +76,7 @@ const seedMail = (): Mail[] => [
         // that treats the player as the person who now answers for the place.
         fromName: 'Facilities',
         fromEmail: 'facilities@hale.co',
-        subject: 'Parking bay 1 - reallocation',
+        subject: 'Parking bay 1, reallocation',
         body: 'Good morning,\n\nBay 1 has been reassigned to your name with immediate effect. The fob is at reception.\n\nWe have left the old plate in the store room rather than dispose of it. Let us know either way when you have a moment.\n\nFacilities',
         atMonth: 1,
         isRead: false,
@@ -84,8 +86,8 @@ const seedMail = (): Mail[] => [
         id: 'seed-2',
         fromName: 'Ashgrove Partners',
         fromEmail: 'coverage@ashgrovepartners.com',
-        subject: 'Initiating coverage - HALE',
-        body: 'Dear Mr Hale,\n\nWe are initiating coverage of Hale Industries and would welcome an introductory call at your convenience.\n\nOur preliminary note is attached. We would flag that our estimates assume no change to current production policy, which we appreciate may not survive the year.\n\nRegards,\nAshgrove Partners',
+        subject: 'Initiating coverage, HALE',
+        body: `Dear ${honorific(useIdentityStore.getState().gender)} Hale,\n\nWe are initiating coverage of Hale Industries and would welcome an introductory call at your convenience.\n\nOur preliminary note is attached. We would flag that our estimates assume no change to current production policy, which we appreciate may not survive the year.\n\nRegards,\nAshgrove Partners`,
         atMonth: 1,
         isRead: false,
         category: 'Primary',
@@ -95,7 +97,7 @@ const seedMail = (): Mail[] => [
         fromName: 'Rolodex',
         fromEmail: 'no-reply@rolodex.com',
         subject: 'You have 5 new connections waiting',
-        body: 'Hi there,\n\nYou are getting noticed. Five people have asked to connect with you this week.\n\nSign in to accept them and grow your network.\n\n- The Rolodex Team',
+        body: 'Hi there,\n\nYou are getting noticed. Five people have asked to connect with you this week.\n\nSign in to accept them and grow your network.\n\nThe Rolodex Team',
         atMonth: 1,
         isRead: true,
         category: 'Promotions',

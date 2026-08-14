@@ -170,7 +170,7 @@ export const ENCOUNTER_DATA: Record<string, EncounterScenario[]> = {
     generic: [
         {
             id: 'gen_1',
-            text: 'At a local coffee shop, the barista accidentally gives you someone else’s order—and that person is right behind you.',
+            text: 'At a local coffee shop, the barista accidentally gives you someone else’s order, and that person is right behind you.',
             flirt: 'Joke about fate bringing you together over coffee.',
         },
         {

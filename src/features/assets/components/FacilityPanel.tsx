@@ -313,8 +313,8 @@ const FacilityPanel: React.FC = () => {
                         <Text style={totalRP >= next.upgradeRP ? styles.rpLine : styles.rpLineShort}>
                             {t('fac.researchProgress', { v1: formatNumber(Math.floor(totalRP)), v2: formatNumber(next.upgradeRP) })}
                             {totalRP < next.upgradeRP
-                                ? ' — money alone will not build this. Fund the lab.'
-                                : ' — cleared.'}
+                                ? ', money alone will not build this. Fund the lab.'
+                                : ', cleared.'}
                         </Text>
                     )}
 

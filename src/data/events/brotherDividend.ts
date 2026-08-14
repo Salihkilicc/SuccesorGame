@@ -114,7 +114,7 @@ export const brotherDividendCold: Conversation = {
         {
             id: 'agenda',
             speaker: 'brother',
-            text: 'I will.\n\nAnd when it fails — because it will fail, you have thirty-five and the room likes you this quarter — it will be in the minutes that I raised it and you refused it. Minutes last a very long time.',
+            text: 'I will.\n\nAnd when it fails, because it will fail, you have thirty-five and the room likes you this quarter, it will be in the minutes that I raised it and you refused it. Minutes last a very long time.',
             choices: [
                 {
                     text: '(leave it)',
@@ -335,7 +335,7 @@ export const brotherDividendClose: Conversation = {
             speaker: 'brother',
             // Delivered as a favour, and it IS a favour, and it is also the
             // sentence that should make the player's stomach drop.
-            text: 'I have had dinner with Halberd twice this year.\n\nBefore you say anything — I am telling you, which is the whole reason I am telling you. They approach me about every eight months and I would rather you heard the number from me than wondered.',
+            text: 'I have had dinner with Halberd twice this year.\n\nBefore you say anything, I am telling you, which is the whole reason I am telling you. They approach me about every eight months and I would rather you heard the number from me than wondered.',
             choices: [
                 { text: 'What do they want?', next: 'whatWant' },
                 { text: 'Twice.', next: 'twice' },
@@ -372,7 +372,7 @@ export const brotherDividendClose: Conversation = {
             speaker: 'brother',
             // The information is real and valuable, which is exactly the
             // problem: refusing him costs the player something concrete.
-            text: 'They are not buying. They are lending — to somebody else who wants to buy, and they were fishing for whether the family would split if it came to a vote.\n\nI told them the family is one vote. Which is true, and which I am now aware I said without asking you.',
+            text: 'They are not buying. They are lending, to somebody else who wants to buy, and they were fishing for whether the family would split if it came to a vote.\n\nI told them the family is one vote. Which is true, and which I am now aware I said without asking you.',
             choices: [
                 {
                     text: 'Thank you for telling me.',

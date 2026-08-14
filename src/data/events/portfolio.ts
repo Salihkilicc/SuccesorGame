@@ -90,7 +90,7 @@ export const portfolioPear: Conversation = {
     id: 'event-portfolio-pear',
     channel: 'mail',
     from: 'pear',
-    subject: 'Ref: CORP/ACQ/0442-1 — indicative offer',
+    subject: 'Ref: CORP/ACQ/0442-1, indicative offer',
     when: PEAR_OFFER,
     start: 'open',
     nodes: [
@@ -200,7 +200,7 @@ export const portfolioVulture: Conversation = {
             id: 'theft',
             speaker: 'vulture',
             // He agrees, without any pleasure and without moving.
-            text: 'It is a price. Theft would be if I took it.\n\nYou are welcome to run a proper process — six weeks, three bidders, a fair number. I would advise it if you had six weeks. What I am selling is Thursday, and Thursday is the whole product.',
+            text: 'It is a price. Theft would be if I took it.\n\nYou are welcome to run a proper process, six weeks, three bidders, a fair number. I would advise it if you had six weeks. What I am selling is Thursday, and Thursday is the whole product.',
             choices: [
                 { text: 'Sixty-five and we can talk.', next: 'haggle' },
                 {

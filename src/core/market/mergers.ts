@@ -464,7 +464,7 @@ export const MERGER_EXPLANATIONS = {
     premium:
         'What you pay above the target\'s market value. It is handed to their shareholders on day one and never comes back. This single line is the main reason most acquisitions destroy value.',
     integration:
-        'Severance, systems, consultants. It lands in the first four quarters, before any benefit arrives. A hostile deal costs nearly twice as much to integrate — the team resists and key people leave.',
+        'Severance, systems, consultants. It lands in the first four quarters, before any benefit arrives. A hostile deal costs nearly twice as much to integrate, the team resists and key people leave.',
     synergy:
         'Cost and revenue benefits from combining. They arrive slowly, over about six quarters, and a hostile deal only realises about 60% of them.',
     accretion:
@@ -604,9 +604,9 @@ export const quoteFinancing = (
 };
 
 export const FINANCING_EXPLANATIONS: Record<FinancingMethod, string> = {
-    cash: 'Paid from the company treasury. Simple, and it costs you nothing in ownership — but you can only buy what you can afford.',
+    cash: 'Paid from the company treasury. Simple, and it costs you nothing in ownership, but you can only buy what you can afford.',
     debt: 'A leveraged buyout. No dilution and no cash needed up front, but the interest eats your profit every quarter and the debt sits against your valuation. If the deal disappoints, the debt does not.',
-    stock: 'You hand the target\'s owners newly issued shares in your company. No cash required, so you can buy something far larger than yourself — but everyone, including you, is diluted. Buy a company a hundred times your size this way and you will own almost none of what results.',
+    stock: 'You hand the target\'s owners newly issued shares in your company. No cash required, so you can buy something far larger than yourself, but everyone, including you, is diluted. Buy a company a hundred times your size this way and you will own almost none of what results.',
 };
 
 // ============================================================================

@@ -15,7 +15,9 @@
 //  insulted is a form of being noticed. Every device here is administrative:
 //
 //    - The subject line is a workflow, with a reference number and a slash.
-//    - The salutation is "Dear Mr Hale", which is the dead man and also, now,
+//    - The salutation is "Dear {title} Hale", which is the dead man and also,
+//      now, you. The title is filled in from the gender the player gave on the
+//      first screen - see the note on the token in data/i18n/storyText.ts.
 //      the player. Nobody updated the address book. It is not even wrong.
 //    - One merge field did not populate. ONE - used once, so it lands as a
 //      fact about the machine rather than as a running gag.
@@ -84,14 +86,14 @@ export const pearOffer: Conversation = {
     from: 'pear',
     when: WHEN,
     // The subject is an internal workflow with the player's family in it.
-    subject: 'HALE / condolence + preliminary approach — ref 4471-C',
+    subject: 'HALE / condolence + preliminary approach, ref 4471-C',
     start: 'open',
     nodes: [
         {
             id: 'open',
             speaker: 'pear',
             text:
-                'Dear Mr Hale,\n\n'
+                'Dear {title} Hale,\n\n'
                 + 'Pear was saddened to learn of the passing of Gerald Hale, and we extend '
                 + 'our condolences to the family and to the wider «COMPANY» team. In light '
                 + 'of the transition, and to avoid a period of uncertainty for your staff '
@@ -225,7 +227,7 @@ export const pearOffer: Conversation = {
                         { kind: 'flag', flag: 'refusedPearPublicly' },
                         {
                             kind: 'news',
-                            headline: 'Hale rejects Pear approach publicly. "Not for sale" — the new chief executive.',
+                            headline: 'Hale rejects Pear approach publicly. "Not for sale", the new chief executive.',
                         },
                     ],
                 },

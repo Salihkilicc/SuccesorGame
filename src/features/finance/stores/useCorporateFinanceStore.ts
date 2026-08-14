@@ -688,7 +688,7 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
             /** Sozlesme ihlali ve temerrut kademesi. */
             payMonthlyInterests: () => {
                 console.warn(
-                    '[Finance] payMonthlyInterests is retired — it never reduced the balance. ' +
+                    '[Finance] payMonthlyInterests is retired, it never reduced the balance. ' +
                     'Use serviceDebtQuarter instead.'
                 );
                 return { totalPayment: 0, success: false };

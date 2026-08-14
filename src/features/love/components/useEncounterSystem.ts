@@ -182,7 +182,7 @@ export const useEncounterSystem = () => {
             let catchChance = partner.stats.jealousy > 70 ? 50 : 10;
             if (partner.isMarried) {
                 catchChance = 100;
-                console.log('🚨 MARRIED PARTNER - 100% CATCH RATE ACTIVATED');
+                console.log('🚨 MARRIED PARTNER, 100% CATCH RATE ACTIVATED');
             }
 
             console.log(`🎲 Catch Probability: ${catchChance}% | isMarried: ${partner.isMarried} | Jealousy: ${partner.stats.jealousy}`);

@@ -639,7 +639,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                     label={t('company.goodwillImpairment')}
                     amount={report.acquisitionImpairment ?? 0}
                     negative
-                    explanation="A target that still is not earning after two years. You are writing off what you overpaid — a public admission that the deal failed."
+                    explanation="A target that still is not earning after two years. You are writing off what you overpaid, a public admission that the deal failed."
                   />
                 )}
 
@@ -692,7 +692,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                         amount={report.principalRepaid ?? 0}
                         negative
                         explanation={
-                          'Not an expense — it does not touch your profit. It pays down what you owe, ' +
+                          'Not an expense, it does not touch your profit. It pays down what you owe, ' +
                           'so your debt falls by the same amount. But it leaves the bank account all ' +
                           'the same. This is why a profitable company can still run out of cash.'
                         }
@@ -711,7 +711,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                           `Your year is up. This is 2% of the ${formatMoney(report.ceoBonusBase ?? 0)} ` +
                           'the company kept after tax over the last four quarters, moved out of ' +
                           'company capital and into your personal cash. Unlike a dividend, none of ' +
-                          'it goes to the other shareholders — and a year that lost money pays nothing.'
+                          'it goes to the other shareholders, and a year that lost money pays nothing.'
                         }
                       />
                     )}

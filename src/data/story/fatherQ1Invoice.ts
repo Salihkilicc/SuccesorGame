@@ -93,7 +93,7 @@ export const fatherQ1Invoice: Conversation = {
             // THE CRACK, second half. The year has moved to 2011, and the
             // arithmetic has quietly stopped working. Nothing draws attention
             // to it. If the player does the sum, it is theirs to do.
-            text: 'Who was going to catch it? My accountant signed it. My brother signed it. I signed it.\n\nEleven, it would have been. Two thousand and eleven. You do not forget the season, you forget the year — the season is when it happened to you and the year is only a number somebody else keeps.',
+            text: 'Who was going to catch it? My accountant signed it. My brother signed it. I signed it.\n\nEleven, it would have been. Two thousand and eleven. You do not forget the season, you forget the year, the season is when it happened to you and the year is only a number somebody else keeps.',
             choices: [
                 { text: 'What am I looking for in there?', next: 'lookingFor' },
                 { text: 'You said oh-nine a moment ago.', next: 'corrected' },
@@ -127,7 +127,7 @@ export const fatherQ1Invoice: Conversation = {
             // All of this is true of the engine: COGS is charged on units
             // PRODUCED, and storage is charged per unsold unit per quarter.
             // core/reportTypes.ts says so in as many words.
-            text: 'Two things, and neither is the total.\n\nWhat you paid to build, against what you actually sold. You are charged for everything that leaves the line, not everything that leaves the warehouse — build four hundred and sell three hundred and you have bought yourself a hundred units and the shelf they sit on.\n\nAnd the shelf is not free either. It is a small line. It is small every quarter and then it is not.',
+            text: 'Two things, and neither is the total.\n\nWhat you paid to build, against what you actually sold. You are charged for everything that leaves the line, not everything that leaves the warehouse, build four hundred and sell three hundred and you have bought yourself a hundred units and the shelf they sit on.\n\nAnd the shelf is not free either. It is a small line. It is small every quarter and then it is not.',
             choices: [
                 { text: 'So overproducing is the trap.', next: 'trap' },
                 { text: 'And if I underbuild?', next: 'underbuild' },

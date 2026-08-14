@@ -272,7 +272,7 @@ export interface QuarterReport {
 
 /** Boş rapor — henüz hiç çeyrek geçilmemişken UI'ın patlamaması için. */
 export const EMPTY_QUARTER_REPORT: QuarterReport = {
-    periodLabel: '—',
+    periodLabel: ', ',
     months: 0,
     revenue: 0,
     expenses: {
@@ -375,13 +375,13 @@ export const EXPENSE_EXPLANATIONS: Record<keyof ExpenseLines, string> = {
     contractManufacturing: 'Paid to a third-party factory. Costs 30-60% more per unit than your own line, but needs no construction and no capacity. The fast way to grow, not the cheap one.',
     cogs: 'Charged on units PRODUCED, not sold. Overproduce and you burn cash on goods sitting in a warehouse.',
     wages: 'Production headcount, charged every quarter whether the line runs or not. This is why hiring is a real decision and not a free lever.',
-    hiring: 'Recruiting, onboarding and equipping new people — roughly 25% of a year of their pay. New hires arrive next quarter and work at half speed for their first one.',
+    hiring: 'Recruiting, onboarding and equipping new people, roughly 25% of a year of their pay. New hires arrive next quarter and work at half speed for their first one.',
     severance: 'One quarter of pay per person let go. The cash cost lands immediately; the morale damage lasts longer, and it is worse if you just reported a profit.',
     marketing: 'A fixed quarterly budget, charged whether you sell or not. What matters is your budget against the market benchmark: match it and you own roughly half the attention in your category. Beating the benchmark builds Brand Value; falling under the maintenance level lets it erode.',
     storage: '$5 per unsold unit, every quarter. This is what overproduction actually costs you.',
-    factoryOverhead: 'Your facility\'s fixed running cost, paid whether the line runs or not. This is the line that punishes idle capacity — a bigger tier is cheaper per unit but brutal if you cannot fill it.',
+    factoryOverhead: 'Your facility\'s fixed running cost, paid whether the line runs or not. This is the line that punishes idle capacity, a bigger tier is cheaper per unit but brutal if you cannot fill it.',
     rnd: '$500K per researcher per quarter. Buys Research Points, which is the only way to improve products.',
     fixed: 'General running costs. Independent of how much you produce.',
     interest: 'Interest on outstanding debt, at the rate your credit rating earns you. If you have breached a covenant, the penalty rate is in here too.',
-    tax: 'Corporate tax on profit after interest. Because interest is deductible, borrowing lowers this line — that is the tax shield, and it is why debt is genuinely cheaper than equity. A loss-making quarter pays nothing, and the loss carries forward against future profits.',
+    tax: 'Corporate tax on profit after interest. Because interest is deductible, borrowing lowers this line, that is the tax shield, and it is why debt is genuinely cheaper than equity. A loss-making quarter pays nothing, and the loss carries forward against future profits.',
 };

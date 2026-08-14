@@ -205,7 +205,7 @@ const CHARISMA_SCENARIOS: HookupScenario[] = [
         clue: "She's wearing a vintage band tee and arguing about music history.",
         correctStrategy: 'CHARISMA',
         options: {
-            charisma: "Finally, someone who knows real music. What's your take on—",
+            charisma: "Finally, someone who knows real music. What's your take on, ",
             money: "I have original vinyl from that era. Want to hear it?",
             fame: "I interviewed the lead singer. Want the story?"
         }

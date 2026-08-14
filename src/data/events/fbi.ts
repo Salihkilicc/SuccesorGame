@@ -127,7 +127,7 @@ export const fbiFinancial: Conversation = {
     id: 'event-fbi-financial',
     channel: 'mail',
     from: 'fbi',
-    subject: 'Request for interview — File 24-CR-0891',
+    subject: 'Request for interview, File 24-CR-0891',
     when: FINANCIAL,
     start: 'open',
     nodes: [
@@ -238,7 +238,7 @@ export const fbiInsider: Conversation = {
     id: 'event-fbi-insider',
     channel: 'mail',
     from: 'fbi',
-    subject: 'Request for interview — File 24-CR-1140',
+    subject: 'Request for interview, File 24-CR-1140',
     when: INSIDER,
     start: 'open',
     nodes: [
@@ -343,7 +343,7 @@ export const fbiEspionage: Conversation = {
     id: 'event-fbi-espionage',
     channel: 'mail',
     from: 'fbi',
-    subject: 'Request for interview — File 24-CR-2207',
+    subject: 'Request for interview, File 24-CR-2207',
     when: ESPIONAGE,
     start: 'open',
     nodes: [

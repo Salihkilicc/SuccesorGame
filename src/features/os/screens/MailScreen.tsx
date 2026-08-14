@@ -12,6 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import { theme, avatarTintFor } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
 
@@ -69,6 +70,7 @@ const MailScreen = () => {
     const navigation = useNavigation<any>();
     const inbox = useMailStore(s => s.inbox);
     const markRead = useMailStore(s => s.markRead);
+    const deleteMail = useMailStore(s => s.deleteMail);
     
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -104,14 +106,20 @@ const MailScreen = () => {
                     <Text style={styles.empty}>Nothing in Primary.</Text>
                 ) : (
                     filteredInbox.map(m => (
-                        <MailRow
+                        // `deleteMail` had been on the store since it was
+                        // written, with nothing calling it.
+                        <SwipeToDelete
                             key={m.id}
-                            mail={m}
-                            onPress={() => {
-                                markRead(m.id);
-                                navigation.navigate('MailDetail', { mailId: m.id });
-                            }}
-                        />
+                            label={`"${m.subject}"`}
+                            onDelete={() => deleteMail(m.id)}>
+                            <MailRow
+                                mail={m}
+                                onPress={() => {
+                                    markRead(m.id);
+                                    navigation.navigate('MailDetail', { mailId: m.id });
+                                }}
+                            />
+                        </SwipeToDelete>
                     ))
                 )}
             </ScrollView>

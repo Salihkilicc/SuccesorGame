@@ -143,7 +143,7 @@ export const cooLineShort: Conversation = {
             speaker: 'coo',
             // The actual mechanism, said plainly, because the player genuinely
             // cannot see it anywhere else in the game.
-            text: 'You bought a bigger building.\n\nThat is not a dig, it is the arithmetic. A tier up is more capacity and more crew. The capacity arrives the day the build finishes. The crew arrives when I am allowed to go and find them — and the number I am allowed to find is set on your screen, not mine.',
+            text: 'You bought a bigger building.\n\nThat is not a dig, it is the arithmetic. A tier up is more capacity and more crew. The capacity arrives the day the build finishes. The crew arrives when I am allowed to go and find them, and the number I am allowed to find is set on your screen, not mine.',
             choices: [
                 { text: 'So what do you need?', next: 'need' },
                 { text: 'Then it corrects itself.', next: 'evenOut' },
@@ -182,7 +182,7 @@ export const cooLineShort: Conversation = {
         {
             id: 'need',
             speaker: 'coo',
-            text: 'Two things, and one of them is free.\n\nRaise the headcount target on the staff screen. I cannot do that and you can, and nothing does it automatically when the plant grows — I have checked, twice, in front of your father.\n\nSecond: do not switch overtime on to cover the gap.',
+            text: 'Two things, and one of them is free.\n\nRaise the headcount target on the staff screen. I cannot do that and you can, and nothing does it automatically when the plant grows, I have checked, twice, in front of your father.\n\nSecond: do not switch overtime on to cover the gap.',
             choices: [
                 { text: 'Overtime is cheaper.', next: 'overtime' },
                 {
@@ -283,7 +283,7 @@ export const cooWalkout: Conversation = {
         {
             id: 'want',
             speaker: 'coo',
-            text: 'Market. That is the entire demand. Not above it.\n\nAnd the number is on your salary screen as a ratio, so you already know what you have been running. What you do not know is that below this point we lose people at twice the rate — that is not me being dramatic, it is what the last four quarters did — and I have been replacing them quietly, and I have run out of quietly.',
+            text: 'Market. That is the entire demand. Not above it.\n\nAnd the number is on your salary screen as a ratio, so you already know what you have been running. What you do not know is that below this point we lose people at twice the rate, that is not me being dramatic, it is what the last four quarters did, and I have been replacing them quietly, and I have run out of quietly.',
             choices: [
                 {
                     text: 'Put it back to market.',
@@ -402,7 +402,7 @@ export const cooOpsNote: Conversation = {
     id: 'coo-ops-note',
     channel: 'mail',
     from: 'coo',
-    subject: 'Operations — quarter close',
+    subject: 'Operations, quarter close',
     start: 'open',
     nodes: [
         {
@@ -426,7 +426,7 @@ export const cooOpsNoteCc: Conversation = {
     id: 'coo-ops-note-cc',
     channel: 'mail',
     from: 'coo',
-    subject: 'Operations — quarter close',
+    subject: 'Operations, quarter close',
     start: 'open',
     nodes: [
         {

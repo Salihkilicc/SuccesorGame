@@ -572,7 +572,7 @@ export const useStatsStore = create<StatsStore>()(
       addAcquisition: (id, companyData) =>
         set(state => {
           console.warn(
-            '[StatsStore] addAcquisition is retired — the engine does not read this. ' +
+            '[StatsStore] addAcquisition is retired, the engine does not read this. ' +
             'Use useCorporateFinanceStore.executeAcquisition instead.'
           );
           const purchasePrice = companyData.marketCap * 1.15; // Assume 15% premium
@@ -841,7 +841,7 @@ export const useStatsStore = create<StatsStore>()(
       borrowCapital: (amount, interestRate) =>
         set(state => {
           console.warn(
-            '[StatsStore] borrowCapital is retired — no amortisation, no covenant. ' +
+            '[StatsStore] borrowCapital is retired, no amortisation, no covenant. ' +
             'Use useCorporateFinanceStore.takeLoan instead.'
           );
           // Interest is handled in recalculateFinancials based on TotalDebt

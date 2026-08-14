@@ -77,7 +77,7 @@ export const espionageKestrel: Conversation = {
             speaker: 'cto',
             // She is not composed. It is the only scene in her arc where she
             // writes the way people actually write at that hour.
-            text: 'I am in the building. It is quarter past two.\n\nSomebody has had access to the design share for at least nine weeks. Not encrypted — copied. They have the current platform, the next one, and the supplier file with every unit price in it.\n\nI have pulled the share offline. That is closing a door in an empty room.',
+            text: 'I am in the building. It is quarter past two.\n\nSomebody has had access to the design share for at least nine weeks. Not encrypted, copied. They have the current platform, the next one, and the supplier file with every unit price in it.\n\nI have pulled the share offline. That is closing a door in an empty room.',
             choices: [
                 { text: 'Nine weeks?', next: 'nineWeeks' },
                 { text: 'Have they asked for anything?', next: 'asked' },
@@ -117,7 +117,7 @@ export const espionageKestrel: Conversation = {
         {
             id: 'assumeOut',
             speaker: 'cto',
-            text: 'Then I change the platform. Not the drawings — the parts. Every price we negotiated on the assumption nobody else had the file is now a price somebody else has.\n\nIt is nine months and it is the only version where I know where we stand.',
+            text: 'Then I change the platform. Not the drawings, the parts. Every price we negotiated on the assumption nobody else had the file is now a price somebody else has.\n\nIt is nine months and it is the only version where I know where we stand.',
             choices: [
                 {
                     text: 'Do it. Assume everything is out.',
@@ -179,7 +179,7 @@ export const espionageBroker: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'Four in the morning. I am sorry.\n\nOur research directory has been exfiltrated — eleven years of it, including the two programmes that are the entire reason this department exists. I found out because a man emailed me directly, politely, at my personal address, which he should not have.',
+            text: 'Four in the morning. I am sorry.\n\nOur research directory has been exfiltrated, eleven years of it, including the two programmes that are the entire reason this department exists. I found out because a man emailed me directly, politely, at my personal address, which he should not have.',
             choices: [
                 { text: 'Who is he?', next: 'whoIsHe' },
                 { text: 'What does he want?', next: 'wants' },
@@ -188,7 +188,7 @@ export const espionageBroker: Conversation = {
         {
             id: 'whoIsHe',
             speaker: 'cto',
-            text: 'He describes himself as a facilitator. He says — and this is a quote — that he has never seen our files, will never see them, and could not decrypt them if he wanted to.\n\nI believe him. That is the arrangement: whoever took it does not want to talk to us, and he does not want to know what he is selling.',
+            text: 'He describes himself as a facilitator. He says, and this is a quote, that he has never seen our files, will never see them, and could not decrypt them if he wanted to.\n\nI believe him. That is the arrangement: whoever took it does not want to talk to us, and he does not want to know what he is selling.',
             choices: [
                 { text: 'What does he want?', next: 'wants' },
                 { text: 'Then he is useless to us.', next: 'refuse' },
@@ -220,7 +220,7 @@ export const espionageBroker: Conversation = {
             speaker: 'cto',
             // The cost of refusing is the CTO's own arc, which is what makes
             // this variant hurt somewhere the other two do not.
-            text: 'Then I have to assume both programmes are for sale, and I have to tell the team, because they will find out and I would rather it was from me.\n\nI will lose people over this. Not because of what happened — because of what I will have to say about what we are going to do instead.',
+            text: 'Then I have to assume both programmes are for sale, and I have to tell the team, because they will find out and I would rather it was from me.\n\nI will lose people over this. Not because of what happened, because of what I will have to say about what we are going to do instead.',
             choices: [
                 {
                     text: 'Tell them yourself. Today.',
@@ -249,7 +249,7 @@ export const espionageBrokerBetrayal: Conversation = {
             id: 'open',
             speaker: 'cto',
             // The most elegant betrayal of the three: he did not lie.
-            text: 'A second facilitator has emailed me. Different name, same phrasing, same assurance that he has never seen the files.\n\nHe is aware we paid. He says that payment was to a different party and that he is sorry for the confusion, and I do not think he is lying — I think we bought a promise from somebody who genuinely was not holding anything.',
+            text: 'A second facilitator has emailed me. Different name, same phrasing, same assurance that he has never seen the files.\n\nHe is aware we paid. He says that payment was to a different party and that he is sorry for the confusion, and I do not think he is lying, I think we bought a promise from somebody who genuinely was not holding anything.',
             choices: [
                 {
                     text: 'And now he wants his own number.',
@@ -320,7 +320,7 @@ export const espionageOracle: Conversation = {
         {
             id: 'want',
             speaker: 'cto',
-            text: 'They do not want money. I have read it three times.\n\nThey want us out of Deep Tech — no new programmes, no hires, nothing announced, for two years. In exchange the file is deleted and they never contact us again.\n\nThere is no account number anywhere in the message. That is what frightens me about it.',
+            text: 'They do not want money. I have read it three times.\n\nThey want us out of Deep Tech, no new programmes, no hires, nothing announced, for two years. In exchange the file is deleted and they never contact us again.\n\nThere is no account number anywhere in the message. That is what frightens me about it.',
             choices: [
                 {
                     text: 'Take the deal. Two years.',
@@ -382,7 +382,7 @@ export const espionageOracleBetrayal: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'I have a name. Not theirs — the name on the retainer that paid them.\n\nIt is a procurement entity registered in Delaware with one director and one client, and the client files consolidated accounts under a parent you and I both write letters to.',
+            text: 'I have a name. Not theirs, the name on the retainer that paid them.\n\nIt is a procurement entity registered in Delaware with one director and one client, and the client files consolidated accounts under a parent you and I both write letters to.',
             choices: [
                 { text: 'Say it.', next: 'sayIt' },
                 { text: 'I know who it is.', next: 'knew' },

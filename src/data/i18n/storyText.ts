@@ -33,6 +33,8 @@
 //  Mail subjects are `scene/@subject`.
 // ============================================================================
 
+import { honorific } from '../../core/identity';
+import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useLocaleStore } from '../../core/i18n';
 
 export type StoryDictionary = Record<string, string>;
@@ -108,10 +110,42 @@ export const storyLanguage = (): string | undefined => {
  */
 export const line = (key: string, english: string): string => {
     const active = storyLanguage();
-    if (!active) return english;
-    const translated = DICTIONARIES[active][key];
-    return translated && translated.trim() ? translated : english;
+    const translated = active ? DICTIONARIES[active][key] : undefined;
+    return fillTitle(translated && translated.trim() ? translated : english);
 };
+
+// ============================================================================
+//  THE ONE TOKEN, AND WHY THERE IS EXACTLY ONE
+// ============================================================================
+//
+//  This file exists so that scenes are DATA. The moment a scene can contain
+//  code, the first one that needs something unusual writes it inline, the
+//  second copies it, and within a month the script is a hundred small programs
+//  in a data file - which is the argument written at the top of effects.ts and
+//  it applies here word for word.
+//
+//  So `{title}` is a deliberate, single exception, and it is worth stating why
+//  it earns one. The game asks the player their gender on the first screen. It
+//  then had exactly one place where the answer appeared in words - Pear's
+//  salutation, "Dear Mr Hale" - and that place ignored it. A question asked and
+//  then contradicted is worse than a question not asked.
+//
+//  It cannot be solved by writing two versions of the letter: the scene is
+//  static data and there is no conditional text, and a second copy of a scene
+//  is a second copy to translate and to keep in step.
+//
+//  IT GOES THROUGH `line`, AFTER the dictionary, so a translator's version of
+//  the salutation substitutes too. `storyKeys` exports the English with the
+//  token intact, which is correct - the translator should see the placeholder
+//  and put it where their language wants it.
+//
+//  If a second token is ever proposed, that is the moment to stop and build
+//  something rather than to add a third.
+// ============================================================================
+const fillTitle = (text: string): string =>
+    text.includes('{title}')
+        ? text.replace(/\{title\}/g, honorific(useIdentityStore.getState().gender))
+        : text;
 
 // ============================================================================
 //  WHAT IS LEFT

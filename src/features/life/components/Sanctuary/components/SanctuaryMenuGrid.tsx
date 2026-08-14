@@ -62,7 +62,7 @@ const SanctuaryMenuGrid = ({
                 <HubCard
                     icon="👑"
                     title={t('life.vipPlatinumAccess')}
-                    subtitle="$20,000 - FREE Massages This Quarter"
+                    subtitle="$20,000, FREE Massages This Quarter"
                     onPress={onBuyMembership}
                     isVIP
                 />

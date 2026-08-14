@@ -76,10 +76,10 @@ const vane: Negotiator = {
     onAnswered: 'withdraw',
     lines: {
         engage: 'I read it twice, which is more than I usually manage.\n\nI am not going to pretend the runway is longer than it is. You know what we spend and you know what we have sold, which is nothing, and I am aware those two facts have a date on them.',
-        demandLine: 'One condition, and it is not money.\n\nI take a seat. Not for me — so that there is somebody in the room in three years when a quarter goes badly and the lab is the obvious thing to cut. I have watched this happen from the outside twice. I would like to be inside for it.',
-        refuseLine: 'No. Not at that price and not at any other one — I have had this letter from better-funded people than you and the answer has been the same each time.',
+        demandLine: 'One condition, and it is not money.\n\nI take a seat. Not for me, so that there is somebody in the room in three years when a quarter goes badly and the lab is the obvious thing to cut. I have watched this happen from the outside twice. I would like to be inside for it.',
+        refuseLine: 'No. Not at that price and not at any other one, I have had this letter from better-funded people than you and the answer has been the same each time.',
         met: 'Then we are agreed, and I will be difficult about research for as long as you keep me.\n\nI did not build it to be owned. I built it to be finished.',
-        rebuffed: 'Understood, and I would rather have a clear no than a slow one.\n\nDo not write again. I mean that without any heat — I will not be able to give you a different answer later, so there is no point either of us spending the postage.',
+        rebuffed: 'Understood, and I would rather have a clear no than a slow one.\n\nDo not write again. I mean that without any heat, I will not be able to give you a different answer later, so there is no point either of us spending the postage.',
     },
 };
 
@@ -156,9 +156,9 @@ const okonjo: Negotiator = {
     lines: {
         engage: 'Well, finally.\n\nI have been waiting for one of these for about two years and I had begun to worry it would be someone boring. Let us not do the part where we pretend either of us is reluctant.',
         demandLine: 'Fifteen over, give or take, and you should know that I picked the number by looking at how much you seem to want it rather than at what the company is worth.\n\nI am telling you that because you were going to work it out and I would rather be the one who said it.',
-        refuseLine: 'Not today. Ask me in a bad quarter — mine or yours, either works.',
+        refuseLine: 'Not today. Ask me in a bad quarter, mine or yours, either works.',
         met: 'You said yes very quickly.\n\nThat was a mistake and I am going to be honest about making you pay for it: the number has moved. Five more. Same company, same day, different information.',
-        rebuffed: 'Fine. The original, then. I would rather have the deal than the argument.\n\nGood price. Congratulations to us both — one of us more than the other.',
+        rebuffed: 'Fine. The original, then. I would rather have the deal than the argument.\n\nGood price. Congratulations to us both, one of us more than the other.',
     },
 };
 

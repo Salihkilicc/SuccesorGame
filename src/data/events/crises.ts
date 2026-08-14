@@ -207,7 +207,7 @@ export const crisisForcedRecall: Conversation = {
     id: 'event-crisis-forced-recall',
     channel: 'mail',
     from: 'regulator',
-    subject: 'Notice under s.14(2) — mandatory corrective action',
+    subject: 'Notice under s.14(2), mandatory corrective action',
     when: BURIED,
     start: 'open',
     nodes: [
@@ -272,7 +272,7 @@ export const crisisSupplier: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'Our second-tier connector supplier filed this morning. Not a warning, not a restructuring — filed.\n\nThey are in about a third of what we ship. There is one alternative source, they know exactly what has happened, and their price reflects it.',
+            text: 'Our second-tier connector supplier filed this morning. Not a warning, not a restructuring, filed.\n\nThey are in about a third of what we ship. There is one alternative source, they know exactly what has happened, and their price reflects it.',
             choices: [
                 { text: 'What is the price?', next: 'price' },
                 { text: 'Can we design around it?', next: 'redesign' },
@@ -281,7 +281,7 @@ export const crisisSupplier: Conversation = {
         {
             id: 'price',
             speaker: 'coo',
-            text: 'Four times, for eighteen months, on a take-or-pay contract. It is not gouging exactly — they have to build a line for us and they know we cannot walk.\n\nI can also just build fewer things. That is a real option and I will not pretend otherwise.',
+            text: 'Four times, for eighteen months, on a take-or-pay contract. It is not gouging exactly, they have to build a line for us and they know we cannot walk.\n\nI can also just build fewer things. That is a real option and I will not pretend otherwise.',
             choices: [
                 {
                     text: 'Sign it. We keep shipping.',
@@ -587,7 +587,7 @@ export const crisisCounterfeit: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'There is a copy of our product in the channel. Good copy — same housing, same box, our name on it, about forty per cent of the price and it fails at nine months.\n\nOur returns desk has been repairing them under warranty since March because they could not tell either.',
+            text: 'There is a copy of our product in the channel. Good copy, same housing, same box, our name on it, about forty per cent of the price and it fails at nine months.\n\nOur returns desk has been repairing them under warranty since March because they could not tell either.',
             choices: [
                 { text: 'Stop honouring the warranty.', next: 'stopWarranty' },
                 { text: 'How do we get them out of the channel?', next: 'channel' },
@@ -611,7 +611,7 @@ export const crisisCounterfeit: Conversation = {
         {
             id: 'channel',
             speaker: 'coo',
-            text: 'Buy them. Seriously — we go into the market and buy the fakes at retail, publicly, and we keep honouring the warranty while we do it.\n\nIt is an absurd amount of money for a pile of broken plastic. It is also the only version where our name comes out of this meaning what it meant.',
+            text: 'Buy them. Seriously, we go into the market and buy the fakes at retail, publicly, and we keep honouring the warranty while we do it.\n\nIt is an absurd amount of money for a pile of broken plastic. It is also the only version where our name comes out of this meaning what it meant.',
             choices: [
                 {
                     text: 'Buy them off the shelves.',
@@ -727,7 +727,7 @@ export const crisisOutage: Conversation = {
         {
             id: 'getItOut',
             speaker: 'cto',
-            text: 'It is going out now. The question is what we say while it does — nine hours of silence, or nine hours of us explaining a certificate to people who do not want to know what one is.',
+            text: 'It is going out now. The question is what we say while it does, nine hours of silence, or nine hours of us explaining a certificate to people who do not want to know what one is.',
             choices: [
                 {
                     text: 'Say what happened, in plain words.',
@@ -770,7 +770,7 @@ export const crisisAllocation: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'Our controller allocation has been cut by forty per cent for the next three quarters. No explanation and none is owed — we are on a standard contract and standard contracts say they can.\n\nSomebody bigger than us asked for more. That is the whole story.',
+            text: 'Our controller allocation has been cut by forty per cent for the next three quarters. No explanation and none is owed, we are on a standard contract and standard contracts say they can.\n\nSomebody bigger than us asked for more. That is the whole story.',
             choices: [
                 { text: 'Buy on the spot market.', next: 'spot' },
                 { text: 'Then we build forty per cent fewer.', next: 'fewer' },

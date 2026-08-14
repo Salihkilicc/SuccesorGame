@@ -44,7 +44,7 @@ export const ENDINGS: Record<string, Ending> = {
         id: 'soldToPear',
         title: 'YOU TOOK THE OFFER',
         body:
-            'The money cleared on a Tuesday. It was a fair price — Vogel does not '
+            'The money cleared on a Tuesday. It was a fair price, Vogel does not '
             + 'underpay, because underpaying invites a conversation.\n\n'
             + 'The factory ran for eleven more months and closed. The Hale name '
             + 'appears once in the integration report, in a footnote, spelled '

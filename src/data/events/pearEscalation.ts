@@ -53,7 +53,7 @@ export const pearPatent: Conversation = {
     id: 'event-pear-patent',
     channel: 'mail',
     from: 'pear',
-    subject: 'Notice — portfolio overlap, ref 7724-B',
+    subject: 'Notice, portfolio overlap, ref 7724-B',
     start: 'open',
     nodes: [
         {
@@ -136,7 +136,7 @@ export const pearSuppliers: Conversation = {
     id: 'event-pear-suppliers',
     channel: 'mail',
     from: 'pear',
-    subject: 'FW: Capacity commitment 2031-33 — for your information',
+    subject: 'FW: Capacity commitment 2031-33, for your information',
     start: 'open',
     nodes: [
         {
@@ -222,7 +222,7 @@ export const pearPriceWar: Conversation = {
     id: 'event-pear-price-war',
     channel: 'mail',
     from: 'pear',
-    subject: 'Pricing notification — consumer category',
+    subject: 'Pricing notification, consumer category',
     start: 'open',
     nodes: [
         {

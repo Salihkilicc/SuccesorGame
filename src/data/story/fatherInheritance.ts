@@ -88,7 +88,7 @@ export const fatherInheritance: Conversation = {
             speaker: 'father',
             // He starts mid-thought and mid-argument, with somebody who is
             // not in the room. That is the whole man in two lines.
-            text: 'Sit down. And I mean sit — I can hear you standing.\n\nThey will have given you a folder. Whatever is in the folder, it will not have said the one number, because nobody who is paid by the hour puts the bad number on the first page.',
+            text: 'Sit down. And I mean sit, I can hear you standing.\n\nThey will have given you a folder. Whatever is in the folder, it will not have said the one number, because nobody who is paid by the hour puts the bad number on the first page.',
             choices: [
                 { text: 'What number?', next: 'thirtyFive' },
                 { text: 'I have read the folder.', next: 'readIt' },
@@ -247,7 +247,7 @@ export const fatherInheritance: Conversation = {
             // Pushed twice, he still does not arrive. What he offers instead
             // is the closest he comes to an apology in the entire game, and
             // it is addressed to a circumstance rather than to a choice.
-            text: 'And I have told you. I signed them. What would you like me to add to it — that I felt terrible? I felt terrible. It is not a line on the register.\n\nEvery one of those was a Thursday where the alternative was worse. You will have your own Thursdays. Then we will talk about pens.',
+            text: 'And I have told you. I signed them. What would you like me to add to it, that I felt terrible? I felt terrible. It is not a line on the register.\n\nEvery one of those was a Thursday where the alternative was worse. You will have your own Thursdays. Then we will talk about pens.',
             choices: [
                 { text: 'What is left, then?', next: 'whatIsLeft' },
             ],
@@ -268,7 +268,7 @@ export const fatherInheritance: Conversation = {
         {
             id: 'noDebt',
             speaker: 'father',
-            text: 'It is the whole thing. It is what four bad decisions bought — and yes, I hear it, I am telling you that giving away two thirds of a company was the thing that kept it.\n\nIt was. Both of those are true at once and you will spend a while not liking that.',
+            text: 'It is the whole thing. It is what four bad decisions bought, and yes, I hear it, I am telling you that giving away two thirds of a company was the thing that kept it.\n\nIt was. Both of those are true at once and you will spend a while not liking that.',
             choices: [
                 { text: 'So what do I do first?', next: 'close' },
             ],

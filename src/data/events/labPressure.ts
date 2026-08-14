@@ -102,7 +102,7 @@ export const ctoDarkLab: Conversation = {
             speaker: 'cto',
             // She defends him accurately before criticising him, and the
             // criticism she lands on is of herself.
-            text: 'He said research is what a company does when it has run out of ideas about selling.\n\nAnd I want to be fair to him — he was right about that for roughly fifteen years. Then he was wrong for eleven, and nobody could tell him, including me. I stopped trying somewhere around the third attempt. That part is mine, not his.',
+            text: 'He said research is what a company does when it has run out of ideas about selling.\n\nAnd I want to be fair to him, he was right about that for roughly fifteen years. Then he was wrong for eleven, and nobody could tell him, including me. I stopped trying somewhere around the third attempt. That part is mine, not his.',
             choices: [
                 { text: 'What would you do with it?', next: 'what' },
                 { text: 'He built a good company without it.', next: 'goodCompany' },
@@ -115,7 +115,7 @@ export const ctoDarkLab: Conversation = {
             // The strongest case against her own department, made by her,
             // because a character who cannot state the opposing argument is
             // not making an argument.
-            text: 'He did. I am not being sarcastic — he built it out of one product and thirty years of not being distracted, and half the labs I admire are attached to companies that never made money.\n\nI am not asking because research is virtuous. I am asking because the thing he was selling has a ceiling and we are standing on it.',
+            text: 'He did. I am not being sarcastic, he built it out of one product and thirty years of not being distracted, and half the labs I admire are attached to companies that never made money.\n\nI am not asking because research is virtuous. I am asking because the thing he was selling has a ceiling and we are standing on it.',
             choices: [
                 { text: 'Then tell me the number.', next: 'what' },
                 { text: 'Not this year.', next: 'notThisYear' },
@@ -125,7 +125,7 @@ export const ctoDarkLab: Conversation = {
         {
             id: 'what',
             speaker: 'cto',
-            text: 'Fifteen people. Not fifty.\n\nFifty is not three times fifteen — the output curve flattens hard and you would be paying three and a third times the wages for under three times the work. Anyone quoting you a bigger number is selling you a building.\n\nFifteen is a team small enough to hold one problem in its head. It is roughly the difference between a second product in two years and not having one.',
+            text: 'Fifteen people. Not fifty.\n\nFifty is not three times fifteen, the output curve flattens hard and you would be paying three and a third times the wages for under three times the work. Anyone quoting you a bigger number is selling you a building.\n\nFifteen is a team small enough to hold one problem in its head. It is roughly the difference between a second product in two years and not having one.',
             choices: [
                 {
                     text: 'Do it. Fifteen.',
@@ -148,7 +148,7 @@ export const ctoDarkLab: Conversation = {
             speaker: 'cto',
             // No sulking, no closed door. She is an employee, she will ask
             // again, and the memo arrives regardless - that is what a memo is.
-            text: 'Fine. I mean that — it is a real answer and I would rather have it than a maybe.\n\nI will send the formal version at quarter close anyway, because if I do not put it in writing then in three years this conversation will not have happened.',
+            text: 'Fine. I mean that, it is a real answer and I would rather have it than a maybe.\n\nI will send the formal version at quarter close anyway, because if I do not put it in writing then in three years this conversation will not have happened.',
             choices: [
                 {
                     text: 'Send it.',
@@ -218,7 +218,7 @@ export const ctoAlarm: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'They shipped it.\n\nI have one on my desk. I bought it at retail on the way in, which is the part I want you to sit with — not a prototype, not a demo behind glass. In a shop. With a queue.',
+            text: 'They shipped it.\n\nI have one on my desk. I bought it at retail on the way in, which is the part I want you to sit with, not a prototype, not a demo behind glass. In a shop. With a queue.',
             choices: [
                 { text: 'How far ahead are they?', next: 'howFar' },
                 { text: 'Can we answer it?', next: 'answer' },
@@ -338,7 +338,7 @@ export const ctoTooLate: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'They shipped it. I have one on my desk — bought it at retail, there was a queue.\n\nI am not going to ask you for anything this time. I want to be clear that this is not a negotiating position. There is nothing to ask for.',
+            text: 'They shipped it. I have one on my desk, bought it at retail, there was a queue.\n\nI am not going to ask you for anything this time. I want to be clear that this is not a negotiating position. There is nothing to ask for.',
             choices: [
                 { text: 'There must be something.', next: 'something' },
                 { text: 'Say it anyway.', next: 'sayIt' },
@@ -409,7 +409,7 @@ export const ctoBudgetMemo: Conversation = {
     id: 'cto-budget-memo',
     channel: 'mail',
     from: 'cto',
-    subject: 'R&D headcount — revised request',
+    subject: 'R&D headcount, revised request',
     start: 'open',
     nodes: [
         {
@@ -428,7 +428,7 @@ export const ctoBudgetMemo: Conversation = {
             // The output curve, read the other way. 8^0.85 ~ 5.8 against
             // 15^0.85 ~ 10.0 - a bit under six tenths of the work - which is
             // where "two years becomes closer to three" comes from.
-            text: 'Time, and only time. Eight people do a bit under six tenths of the work of fifteen, so the two years I quoted becomes closer to three.\n\nI have put that sentence in the memo itself rather than in this reply, so that nobody — including me, in three years, when I have had time to reorganise my memory — can claim they were not told.',
+            text: 'Time, and only time. Eight people do a bit under six tenths of the work of fifteen, so the two years I quoted becomes closer to three.\n\nI have put that sentence in the memo itself rather than in this reply, so that nobody, including me, in three years, when I have had time to reorganise my memory, can claim they were not told.',
             choices: [
                 {
                     text: 'Then ask for fifteen. I will carry the board.',
@@ -448,7 +448,7 @@ export const ctoBudgetMemo: Conversation = {
         {
             id: 'fine',
             speaker: 'cto',
-            text: 'Then eight it is, and I will not sulk about it — eight is a team and a team is not nothing.\n\nI will send the same memo next year with a bigger number and a worse reason, which I suspect is the actual job.',
+            text: 'Then eight it is, and I will not sulk about it, eight is a team and a team is not nothing.\n\nI will send the same memo next year with a bigger number and a worse reason, which I suspect is the actual job.',
         },
     ],
 };
@@ -479,7 +479,7 @@ export const ctoStillEmpty: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'Small thing.\n\nThe lab headcount is still zero. I am not chasing you — I know what a quarter looks like from your side. I am checking that it was a decision and not a thing that fell off a list.',
+            text: 'Small thing.\n\nThe lab headcount is still zero. I am not chasing you, I know what a quarter looks like from your side. I am checking that it was a decision and not a thing that fell off a list.',
             choices: [
                 { text: 'It fell off a list.', next: 'fellOff' },
                 { text: 'It was a decision.', next: 'decision' },

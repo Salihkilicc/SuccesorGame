@@ -200,7 +200,7 @@ export const territoryDeepTech: Conversation = {
     id: 'event-territory-deeptech',
     channel: 'mail',
     from: 'openai',
-    subject: 'Research hiring — an arrangement',
+    subject: 'Research hiring, an arrangement',
     when: DEEP_TECH,
     start: 'open',
     nodes: [
@@ -287,7 +287,7 @@ export const territoryBioTech: Conversation = {
     id: 'event-territory-biotech',
     channel: 'mail',
     from: 'swanson',
-    subject: 'Standards participation — invitation',
+    subject: 'Standards participation, invitation',
     when: BIO_TECH,
     start: 'open',
     nodes: [
@@ -304,7 +304,7 @@ export const territoryBioTech: Conversation = {
         {
             id: 'whoElse',
             speaker: 'swanson',
-            text: 'Everyone. That is not a boast, it is the difficulty — a standards body that some of the industry belongs to is not a standard, it is an opinion, so over twenty years everyone has joined.\n\nIt does mean that when your specification and the committee\'s specification disagree, there is a room where that gets resolved, and you are not currently in it.',
+            text: 'Everyone. That is not a boast, it is the difficulty, a standards body that some of the industry belongs to is not a standard, it is an opinion, so over twenty years everyone has joined.\n\nIt does mean that when your specification and the committee\'s specification disagree, there is a room where that gets resolved, and you are not currently in it.',
             choices: [
                 { text: 'And if we do not join?', next: 'notJoin' },
                 {
@@ -373,7 +373,7 @@ export const territoryConsumer: Conversation = {
     id: 'event-territory-consumer',
     channel: 'mail',
     from: 'pear',
-    subject: 'Category review — no action required',
+    subject: 'Category review, no action required',
     when: CONSUMER,
     start: 'open',
     nodes: [
@@ -404,7 +404,7 @@ export const territoryConsumer: Conversation = {
             speaker: 'pear',
             // The most quietly brutal thing in the four letters: he tells the
             // player exactly how little he has thought about them until now.
-            text: 'The one at which a competitor stops being described in our planning documents as "other".\n\nYou were in "other" for eleven years. It is not a small number and there is no contempt in it — most of the category is "other" and always has been. But the line item is there, it is annual, and somebody in a room this month said your name out loud in order to move you out of it.\n\nI thought you would rather hear that from us.',
+            text: 'The one at which a competitor stops being described in our planning documents as "other".\n\nYou were in "other" for eleven years. It is not a small number and there is no contempt in it, most of the category is "other" and always has been. But the line item is there, it is annual, and somebody in a room this month said your name out loud in order to move you out of it.\n\nI thought you would rather hear that from us.',
             choices: [
                 { text: 'And now?', next: 'terms' },
                 { text: 'My father would have found that funny.', next: 'father' },

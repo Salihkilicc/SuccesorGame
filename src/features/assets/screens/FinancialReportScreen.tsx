@@ -183,7 +183,7 @@ const FinancialReportScreen = () => {
                                     amount={report.principalRepaid ?? 0}
                                     negative
                                     explanation={
-                                        'Not an expense — it does not reduce profit. It pays down what you ' +
+                                        'Not an expense, it does not reduce profit. It pays down what you ' +
                                         'owe, so your debt falls by the same amount. But the cash leaves ' +
                                         'the account all the same.'
                                     }
@@ -202,7 +202,7 @@ const FinancialReportScreen = () => {
                                     explanation={
                                         `2% of the year's after-tax profit of ` +
                                         `${formatMoney(report.ceoBonusBase ?? 0)}, paid once every four ` +
-                                        'quarters. It leaves the company and lands in your personal cash — ' +
+                                        'quarters. It leaves the company and lands in your personal cash, ' +
                                         'unlike a dividend, none of it goes to the other shareholders. ' +
                                         'A year that lost money pays nothing.'
                                     }

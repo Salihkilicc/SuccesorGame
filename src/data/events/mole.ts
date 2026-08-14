@@ -403,7 +403,7 @@ export const fbiFirstContact: Conversation = {
     id: 'event-fbi-first-contact',
     channel: 'mail',
     from: 'fbi',
-    subject: 'Request for voluntary assistance — file 24-CR-0891',
+    subject: 'Request for voluntary assistance, file 24-CR-0891',
     start: 'open',
     nodes: [
         {

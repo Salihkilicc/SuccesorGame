@@ -58,7 +58,7 @@ export const fatherDeath: Conversation = {
             speaker: 'cfo',
             // The CFO of thirty years, being professional at the worst
             // possible moment because it is the only tool he has.
-            text: 'I am very sorry. Your father died this morning, at home. It was quick, they think — he was found at his desk and the coffee was still warm.\n\nI have not told the floor yet. I wanted you to decide how.',
+            text: 'I am very sorry. Your father died this morning, at home. It was quick, they think, he was found at his desk and the coffee was still warm.\n\nI have not told the floor yet. I wanted you to decide how.',
             choices: [
                 { text: 'When did he last write to me?', next: 'lastWrote' },
                 { text: 'Tell them yourself. I cannot do it today.', next: 'tellThem' },
@@ -93,7 +93,7 @@ export const fatherDeath: Conversation = {
         {
             id: 'tellThem',
             speaker: 'cfo',
-            text: 'I will do it at four, when the line stops. They will want to hear it from you eventually, but not today.\n\nThere is one other thing and I would rather it waited. It will not wait — it came in an hour ago and it is addressed to you.',
+            text: 'I will do it at four, when the line stops. They will want to hear it from you eventually, but not today.\n\nThere is one other thing and I would rather it waited. It will not wait, it came in an hour ago and it is addressed to you.',
             choices: [
                 {
                     text: 'Send it.',

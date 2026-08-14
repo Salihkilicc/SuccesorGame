@@ -427,7 +427,7 @@ export const CONTROL_NOTES: Record<ControlStatus, string> = {
     majority:
         'You hold a simple majority. Ordinary decisions are yours, but a charter change needs others to agree.',
     contested:
-        'You are below 50%. A coalition of shareholders can outvote you — and can remove you as CEO.',
+        'You are below 50%. A coalition of shareholders can outvote you, and can remove you as CEO.',
     lost:
         'You have lost effective control of your own company.',
 };
@@ -470,11 +470,11 @@ export const EQUITY_EXPLANATIONS = {
     sharePrice:
         'Valuation divided by total shares outstanding. Issuing new shares lowers it; buying shares back raises it.',
     ownership:
-        'Your shares divided by all shares. Above 50% ordinary decisions are yours. Below it, a coalition can outvote you — and can remove you as CEO.',
+        'Your shares divided by all shares. Above 50% ordinary decisions are yours. Below it, a coalition can outvote you, and can remove you as CEO.',
     change:
         'The move in share price since last quarter. Most of it comes from what the company actually did; a small band of market sentiment sits on top.',
     volatility:
-        'Big companies move less. As market cap grows, the price reprices more slowly and the sentiment band narrows — diversification, deeper liquidity and institutional holders all absorb shocks that would swing a small company.',
+        'Big companies move less. As market cap grows, the price reprices more slowly and the sentiment band narrows, diversification, deeper liquidity and institutional holders all absorb shocks that would swing a small company.',
 } as const;
 
 // ============================================================================

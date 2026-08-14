@@ -244,7 +244,7 @@ describe('the memo is where she talks herself down', () => {
 
     it('but writes the cost down so the record shows she knew', () => {
         expect(ctoBudgetMemo.nodes.find(n => n.id === 'cost')!.text)
-            .toContain('nobody — including me');
+            .toContain('nobody, including me');
     });
 
     it('and the player can hand her the number back', () => {

@@ -143,7 +143,7 @@ const MyCompanyScreen = () => {
           { label: 'Minimum', value: formatMoney(IPO_MIN_VALUATION) },
           { label: 'You are at', value: formatMoney(stats.companyValue), strong: true },
         ],
-        note: 'Grow revenue and profit first — the multiple follows.',
+        note: 'Grow revenue and profit first, the multiple follows.',
         confirmLabel: 'OK',
       });
       return;

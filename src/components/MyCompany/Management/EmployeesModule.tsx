@@ -266,7 +266,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                 <CollapsibleSection
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
-                    summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : '—'}
+                    summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : ', '}
                     summaryColor={canBonus ? theme.colors.up : theme.colors.down}
                 >
                     <Text style={styles.line}>

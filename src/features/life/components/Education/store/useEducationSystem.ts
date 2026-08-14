@@ -589,7 +589,7 @@ export const useEducationSystem = create<EducationSystemState>()(
             },
 
             graduate: () => {
-                console.log('[Education] Graduate called - handled by progressQuarter');
+                console.log('[Education] Graduate called, handled by progressQuarter');
             },
 
             studyLibrary: () => {

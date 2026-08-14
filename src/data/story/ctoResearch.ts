@@ -93,7 +93,7 @@ export const ctoResearch: Conversation = {
             speaker: 'cto',
             // The real curve. Six hundred at one, and the exponent named -
             // she is the one character in the game allowed to be this exact.
-            text: 'One is not a rounding error. One researcher is six hundred points a quarter, which is more than nothing by an infinite margin.\n\nAfter that it bends. The output goes with the team to the power of nought point eight five, so ten people are not ten times one - they are about seven. Salary is not on a curve. It is ten times ten.',
+            text: 'One is not a rounding error. One researcher is six hundred points a quarter, which is more than nothing by an infinite margin.\n\nAfter that it bends. The output goes with the team to the power of nought point eight five, so ten people are not ten times one, they are about seven. Salary is not on a curve. It is ten times ten.',
             choices: [
                 { text: 'So a big team is a bad deal.', next: 'bigTeam' },
                 { text: 'Then start small.', next: 'close' },
@@ -105,7 +105,7 @@ export const ctoResearch: Conversation = {
             speaker: 'cto',
             // She corrects the misreading rather than letting it stand,
             // because a player who leaves believing it will never hire again.
-            text: 'A big team is an expensive deal. It is not a bad one - it is the only way to reach the things at the far end of the tree, and those are the things that decide whether this company exists in ten years.\n\nWhat I am telling you is to know which you are buying. Cheap discoveries or fast ones.',
+            text: 'A big team is an expensive deal. It is not a bad one, it is the only way to reach the things at the far end of the tree, and those are the things that decide whether this company exists in ten years.\n\nWhat I am telling you is to know which you are buying. Cheap discoveries or fast ones.',
             choices: [
                 { text: 'Start small, then.', next: 'close' },
             ],

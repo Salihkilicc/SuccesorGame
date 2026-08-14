@@ -209,7 +209,7 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                             </Text>
                                         </View>
                                         <Text style={[styles.typeRateText, active && styles.typeNameActive]}>
-                                            {info.locked ? '—' : `${info.rate.toFixed(1)}%`}
+                                            {info.locked ? ', ' : `${info.rate.toFixed(1)}%`}
                                         </Text>
                                     </Pressable>
                                 );
@@ -219,7 +219,7 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                         {selectedType === 'mezzanine' && amount > 0 && (
                             <Text style={styles.warningText}>
                                 ⚖️ If unpaid, this becomes {mezzQuote.dilutionPercent.toFixed(1)}% of your company
-                                {mezzQuote.costsBoardSeat ? ' — and a board seat.' : '.'}
+                                {mezzQuote.costsBoardSeat ? ', and a board seat.' : '.'}
                             </Text>
                         )}
 

@@ -62,7 +62,7 @@ export const cashWarningConversation: Conversation = {
         {
             id: 'options',
             speaker: 'cfo',
-            text: 'Three, and none of them are clever.\n\nBuild less for a quarter and let the shelf empty. Borrow while the numbers still look like this. Or do nothing and find out, which is a real option and I am not being sarcastic — sometimes the invoice arrives.',
+            text: 'Three, and none of them are clever.\n\nBuild less for a quarter and let the shelf empty. Borrow while the numbers still look like this. Or do nothing and find out, which is a real option and I am not being sarcastic, sometimes the invoice arrives.',
             choices: [
                 { text: 'Which would you do?', next: 'whichWould' },
                 { text: 'I will handle it.', next: 'handleIt' },

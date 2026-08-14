@@ -141,7 +141,7 @@ export const cfoBoardRoom: Conversation = {
         {
             id: 'mood',
             speaker: 'cfo',
-            text: 'Impatient, this quarter. Not hostile — impatient, which is earlier and easier to fix.\n\nThey want to hear you say a number out loud and be held to it. Any number. The size matters far less than the being held to it.',
+            text: 'Impatient, this quarter. Not hostile, impatient, which is earlier and easier to fix.\n\nThey want to hear you say a number out loud and be held to it. Any number. The size matters far less than the being held to it.',
             choices: [
                 { text: 'Noted.', next: 'goodTrade' },
             ],
@@ -150,7 +150,7 @@ export const cfoBoardRoom: Conversation = {
         {
             id: 'goodTrade',
             speaker: 'cfo',
-            text: 'Then that is what we will do.\n\nAnd — thank you. Your father never said yes to this arrangement. He simply started acting on what I told him, which I chose to take as agreement.',
+            text: 'Then that is what we will do.\n\nAnd, thank you. Your father never said yes to this arrangement. He simply started acting on what I told him, which I chose to take as agreement.',
             choices: [
                 {
                     text: 'I am saying yes to it.',
@@ -364,7 +364,7 @@ export const cfoBragaTruth: Conversation = {
             speaker: 'cfo',
             // The line the whole first act pays off into. "Trust nobody" was
             // not a philosophy. It was a man describing himself.
-            text: 'He knew exactly. That is what I keep arriving at.\n\nEvery time he told you somebody was taking three percent off the top — he was not warning you about the world. He was telling you what a person does when the opportunity is there and nobody is looking, and he had the example to hand.',
+            text: 'He knew exactly. That is what I keep arriving at.\n\nEvery time he told you somebody was taking three percent off the top, he was not warning you about the world. He was telling you what a person does when the opportunity is there and nobody is looking, and he had the example to hand.',
             choices: [
                 { text: 'What do we do now?', next: 'decision' },
             ],
@@ -393,7 +393,7 @@ export const cfoBragaTruth: Conversation = {
                         { kind: 'dial', dial: 'cfoTrust', delta: 5 },
                     ],
                 },
-                { text: 'Actually — tell her.', next: 'tellHer' },
+                { text: 'Actually, tell her.', next: 'tellHer' },
             ],
         },
 
@@ -472,7 +472,7 @@ export const cfoResignation: Conversation = {
             text:
                 'Nothing I could put in a letter, which is rather the problem.\n\n'
                 + 'I brought you eleven things in two years. You acted on two. That is '
-                + 'your prerogative entirely — but I am sixty-three, and I have worked out '
+                + 'your prerogative entirely, but I am sixty-three, and I have worked out '
                 + 'that what I am doing here is producing documents nobody reads, and I '
                 + 'would like the last stretch of it to be something else.',
             choices: [

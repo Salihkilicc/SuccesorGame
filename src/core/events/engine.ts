@@ -132,7 +132,7 @@ export const validateEvents = (
         // The whole point of the system: an event nobody hears about is
         // indistinguishable from a scripted beat.
         if (!e.headline || !e.headline.trim()) {
-            at(e.id, 'silent', 'no headline - the world would never know this happened');
+            at(e.id, 'silent', 'no headline, the world would never know this happened');
         }
     }
 

@@ -35,7 +35,7 @@ export const recallConversation: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'We have a bad batch. Not a rumour — I have the returns in front of me and the failure rate is about one in forty. It is a supplier part, which does not help us, because our name is on the box.',
+            text: 'We have a bad batch. Not a rumour, I have the returns in front of me and the failure rate is about one in forty. It is a supplier part, which does not help us, because our name is on the box.',
             choices: [
                 { text: 'How many are out there?', next: 'scale' },
                 { text: 'Can we quietly fix it in the next run?', next: 'quiet' },
@@ -55,7 +55,7 @@ export const recallConversation: Conversation = {
         {
             id: 'quiet',
             speaker: 'coo',
-            text: 'We can. We would also be selling eleven thousand units we know are faulty while we do it. I will do it if you tell me to — I would like it in writing.',
+            text: 'We can. We would also be selling eleven thousand units we know are faulty while we do it. I will do it if you tell me to, I would like it in writing.',
             choices: [
                 {
                     text: 'Then we announce.',

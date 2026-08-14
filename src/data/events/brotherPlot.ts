@@ -72,7 +72,7 @@ export const brotherVote: Conversation = {
             speaker: 'brother',
             // He is right about the mechanism and wrong about the relationship,
             // and he cannot tell those apart.
-            text: 'I raised it. In writing, in the pack, eleven days ago. Page four.\n\nI am not being clever — I genuinely thought you had read it and disagreed, which would have been fine.',
+            text: 'I raised it. In writing, in the pack, eleven days ago. Page four.\n\nI am not being clever, I genuinely thought you had read it and disagreed, which would have been fine.',
             choices: [
                 { text: 'I had not read page four.', next: 'pageFour' },
                 { text: 'Raising it in a pack is not telling me.', next: 'notTelling' },
@@ -202,7 +202,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'whatDoIDo',
             speaker: 'cfo',
-            text: 'Ask him. Tonight, plainly, and do not dress it up.\n\nIf he tells you the truth immediately — and I think he will — then you have learned something valuable and nothing has gone wrong yet. If he does not, you have learned something worse and you have learned it early.',
+            text: 'Ask him. Tonight, plainly, and do not dress it up.\n\nIf he tells you the truth immediately, and I think he will, then you have learned something valuable and nothing has gone wrong yet. If he does not, you have learned something worse and you have learned it early.',
             choices: [
                 {
                     text: 'I will ask him.',
@@ -279,7 +279,7 @@ export const brotherCaught: Conversation = {
             // Genuinely puzzled, and it is the most damning thing in the arc
             // precisely because it is not a defence - it is a description of
             // how he sees the world.
-            text: 'I was going to. I was going to tell you at the meeting, in front of everybody, because I thought that was the correct place for it.\n\nWhat would you have had me do — ring you from the restaurant?',
+            text: 'I was going to. I was going to tell you at the meeting, in front of everybody, because I thought that was the correct place for it.\n\nWhat would you have had me do, ring you from the restaurant?',
             choices: [
                 { text: 'Yes.', next: 'yes' },
                 { text: 'What did he want?', next: 'whatWanted' },
@@ -300,7 +300,7 @@ export const brotherCaught: Conversation = {
             speaker: 'brother',
             // The actual information, and it is bad. He delivers it without
             // any sense that he is the subject of it.
-            text: 'To know whether fifteen percent would move. Not to buy it — to know whether it WOULD, in principle, one day, if the price were serious.\n\nI said what I have always said. That it is not for sale while it is a family company.',
+            text: 'To know whether fifteen percent would move. Not to buy it, to know whether it WOULD, in principle, one day, if the price were serious.\n\nI said what I have always said. That it is not for sale while it is a family company.',
             choices: [
                 { text: 'That is a condition, not a no.', next: 'aCondition' },
                 { text: 'Thank you for telling me.', next: 'thankYou' },
@@ -312,7 +312,7 @@ export const brotherCaught: Conversation = {
             speaker: 'brother',
             // The line the whole arc has been building to. He does not deny
             // it. He clarifies it, and the clarification is worse.
-            text: 'It is a condition.\n\nEverything is a condition. Yours is a condition too — you would not sell while it is worth building, and one day it will not be, and then we will find out what we both meant.',
+            text: 'It is a condition.\n\nEverything is a condition. Yours is a condition too, you would not sell while it is worth building, and one day it will not be, and then we will find out what we both meant.',
             choices: [
                 {
                     text: '(leave it)',
@@ -338,7 +338,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'thankYou',
             speaker: 'brother',
-            text: 'You are welcome. Genuinely.\n\nAnd — ask me. Always ask me. I have never once said no to a direct question and I am not going to start.',
+            text: 'You are welcome. Genuinely.\n\nAnd, ask me. Always ask me. I have never once said no to a direct question and I am not going to start.',
             choices: [
                 {
                     text: 'I will ask.',

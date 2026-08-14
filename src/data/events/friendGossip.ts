@@ -108,7 +108,7 @@ export const friendGossipReal: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'ok this one is actually something\n\nfacespace are launching into your category. not next year - eleven weeks. i know because they tried to hire my head of design on friday and he came and told me the whole pitch deck',
+            text: 'ok this one is actually something\n\nfacespace are launching into your category. not next year, eleven weeks. i know because they tried to hire my head of design on friday and he came and told me the whole pitch deck',
             choices: [
                 { text: 'Eleven weeks.', next: 'elevenWeeks' },
                 { text: 'Does he know he told you?', next: 'doesHeKnow' },

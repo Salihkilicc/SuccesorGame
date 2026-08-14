@@ -91,7 +91,7 @@ export const fatherQ1: Conversation = {
             speaker: 'father',
             // Every fact here is true of the engine: absolute units, not a
             // percentage. See core/market/production.ts -> resolveTargetUnits.
-            text: 'Whatever the number is, it is a number. Units. Not a percentage — I never want to hear a percentage out of you.\n\nA percentage is what a man says when he does not want to be held to a figure. Ask a supplier for "about eighty percent" and see what arrives.',
+            text: 'Whatever the number is, it is a number. Units. Not a percentage, I never want to hear a percentage out of you.\n\nA percentage is what a man says when he does not want to be held to a figure. Ask a supplier for "about eighty percent" and see what arrives.',
             choices: [
                 { text: 'What limits the number?', next: 'capacity' },
                 { text: 'Suppliers have been fine so far.', next: 'soFar' },
@@ -114,7 +114,7 @@ export const fatherQ1: Conversation = {
             speaker: 'father',
             // True: capacity is shared and allocated proportionally when the
             // requests exceed it. core/market/capacity.ts
-            text: 'The floor. One floor, and everything you build shares it — ask for more than it holds and every product gets cut back in proportion. Nobody warns you. It simply comes out short and the report explains it afterwards, politely.\n\nAnd of what you do build, the workshop ruins about one in ten. You pay for those too.',
+            text: 'The floor. One floor, and everything you build shares it, ask for more than it holds and every product gets cut back in proportion. Nobody warns you. It simply comes out short and the report explains it afterwards, politely.\n\nAnd of what you do build, the workshop ruins about one in ten. You pay for those too.',
             choices: [
                 { text: 'Then I will aim under capacity.', next: 'under' },
                 { text: 'One in ten. Can that be fixed?', next: 'fixed' },
@@ -124,7 +124,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'fixed',
             speaker: 'father',
-            text: 'With a better floor, yes. With better people, a little. Do not let anyone tell you it is the people — that is the first thing a man says when he wants money for a hire and the second thing he says when he is covering for himself.\n\nIt is the floor. It is nearly always the floor. I asked for a new one three times. Three times a room full of people who own more of it than I did explained to me why not, in a tone, and then wrote it into the minutes as a discussion.',
+            text: 'With a better floor, yes. With better people, a little. Do not let anyone tell you it is the people, that is the first thing a man says when he wants money for a hire and the second thing he says when he is covering for himself.\n\nIt is the floor. It is nearly always the floor. I asked for a new one three times. Three times a room full of people who own more of it than I did explained to me why not, in a tone, and then wrote it into the minutes as a discussion.',
             choices: [
                 { text: 'Understood.', next: 'close' },
             ],
@@ -166,7 +166,7 @@ export const fatherQ1: Conversation = {
         {
             id: 'everyLine',
             speaker: 'father',
-            text: 'Every line. Every quarter. Including the ones that have been the same for four years — those are the ones worth reading, because a number that never moves is either honest or unexamined and there is no third option.',
+            text: 'Every line. Every quarter. Including the ones that have been the same for four years, those are the ones worth reading, because a number that never moves is either honest or unexamined and there is no third option.',
             choices: [
                 { text: 'Setting the target now.', next: 'close' },
             ],
@@ -178,7 +178,7 @@ export const fatherQ1: Conversation = {
             // Terminal card: he has the last word, which is how every
             // conversation with him ends. The schedule effect is what brings
             // him back once the quarter has closed and the invoice exists.
-            text: 'Good.\n\nOne more thing and then I will leave you to it. Whatever they tell you this quarter — the floor manager, the accountant, your brother — write down what they said and the date. Not because they are lying. Because in a year you will want to know who was wrong, and everybody remembers themselves as having been right.',
+            text: 'Good.\n\nOne more thing and then I will leave you to it. Whatever they tell you this quarter, the floor manager, the accountant, your brother, write down what they said and the date. Not because they are lying. Because in a year you will want to know who was wrong, and everybody remembers themselves as having been right.',
             choices: [
                 {
                     text: 'I will.',

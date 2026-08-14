@@ -195,7 +195,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     {loans.length === 0 ? (
                         <StatRow
                             label={t('finance.noActiveDebt')}
-                            value="—"
+                            value=", "
                             why={t('finance.cleanBalanceSheet')}
                         />
                     ) : (

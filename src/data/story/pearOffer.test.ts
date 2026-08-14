@@ -135,7 +135,25 @@ describe('the letter is dictated, not written', () => {
     it('is addressed to the dead man', () => {
         // "Dear Mr Hale" is the father and, now, the player. Nobody updated
         // the address book. It is not even wrong.
-        expect(letter).toContain('Dear Mr Hale');
+        //
+        // The TITLE is a token, filled from the gender the player gave on the
+        // first screen - the game asked and then addressed everybody as Mr,
+        // which is a question asked in order to be contradicted. The surname
+        // is the joke and stays literal. See the note on `{title}` in
+        // data/i18n/storyText.ts.
+        expect(letter).toContain('Dear {title} Hale');
+    });
+
+    it('and the title is the one thing in it that knows who you are', () => {
+        const { line, nodeKey } = require('../i18n/storyText');
+        const { useIdentityStore } = require('../../core/store/useIdentityStore');
+        const node = pearOffer.nodes.find(n => n.id === pearOffer.start)!;
+
+        useIdentityStore.setState({ gender: 'female' });
+        expect(line(nodeKey(pearOffer.id, node.id), node.text)).toContain('Dear Ms Hale');
+
+        useIdentityStore.setState({ gender: 'male' });
+        expect(line(nodeKey(pearOffer.id, node.id), node.text)).toContain('Dear Mr Hale');
     });
 
     it('one merge field did not populate, and only one', () => {

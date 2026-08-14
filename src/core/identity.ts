@@ -86,11 +86,26 @@ export const checkCompany = (raw: string): Check => {
     const len = lengthCheck(v, COMPANY_MIN, COMPANY_MAX, 'A company name');
     if (len) return len;
     if (!COMPANY_SHAPE.test(v)) {
-        return { ok: false, reason: 'A company name can only use letters, numbers, spaces and & . - \'' };
+        return { ok: false, reason: 'A company name can only use letters, numbers, spaces and & ., \'' };
     }
     return { ok: true };
 };
 
 /** Both names as one string, for the places that show a person rather than a field. */
+/**
+ * HOW A STRANGER ADDRESSES THE PLAYER IN WRITING.
+ *
+ * Pear's letter opened "Dear Mr Hale" for everybody, which is a sentence the
+ * game asked the player their gender in order to get wrong. It asks on the
+ * first screen and then had exactly one place where the answer showed up in
+ * words, and that place ignored it.
+ *
+ * A function rather than a string on the identity store: the store holds facts
+ * the player entered, and this is a rendering of one of them. Two spellings of
+ * the same fact is how "Mr Hale" got out of step in the first place.
+ */
+export const honorific = (gender: Gender): string =>
+    gender === 'female' ? 'Ms' : 'Mr';
+
 export const fullName = (firstName: string, lastName: string): string =>
     tidy(`${firstName} ${lastName}`);

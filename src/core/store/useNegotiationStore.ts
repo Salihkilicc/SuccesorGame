@@ -283,7 +283,7 @@ export const useNegotiationStore = create<Store>()(
                     return {
                         ok: false,
                         reason: demand.kind === 'price'
-                            ? 'You cannot raise what they are asking. They have not withdrawn — the letter stays open until you can.'
+                            ? 'You cannot raise what they are asking. They have not withdrawn, the letter stays open until you can.'
                             : 'You cannot meet that today.',
                     };
                 }

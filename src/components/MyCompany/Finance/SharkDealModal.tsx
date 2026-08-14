@@ -94,7 +94,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                     { label: 'Due within', value: `${DEADLINE_QUARTERS} quarters` },
                     { label: 'Collateral pledged', value: formatMoney(collateralValue), strong: true },
                 ],
-                note: 'Miss the date and he takes the shares — not the money. This is now enforced every quarter.',
+                note: 'Miss the date and he takes the shares, not the money. This is now enforced every quarter.',
                 confirmLabel: 'OK',
                 tone: 'danger',
                 onConfirm: undefined,

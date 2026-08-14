@@ -85,7 +85,7 @@ export const poachConversation: Conversation = {
         {
             id: 'released',
             speaker: 'cto',
-            text: 'Fine. Honestly — fine. I would rather be told no than be told yes by someone who cannot afford it. Research slows down for two quarters and then we are level again.',
+            text: 'Fine. Honestly, fine. I would rather be told no than be told yes by someone who cannot afford it. Research slows down for two quarters and then we are level again.',
             choices: [
                 {
                     text: 'Thank you.',

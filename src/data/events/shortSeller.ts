@@ -26,7 +26,7 @@ export const shortSellerConversation: Conversation = {
     id: 'event-short-seller',
     channel: 'mail',
     from: 'vulture',
-    subject: 'Courtesy copy — publishing Tuesday',
+    subject: 'Courtesy copy, publishing Tuesday',
     start: 'open',
     nodes: [
         {
@@ -44,7 +44,7 @@ export const shortSellerConversation: Conversation = {
             speaker: 'vulture',
             // He answers the rebuttal himself, which is the point: it lands,
             // and he is unbothered, and both of those are true at once.
-            text: 'Your finance director published a response before we published the report. That is a first, and it is a good one — half the desks now have your numbers next to ours.\n\nWe still think we are right. But we have stopped being the only voice.',
+            text: 'Your finance director published a response before we published the report. That is a first, and it is a good one, half the desks now have your numbers next to ours.\n\nWe still think we are right. But we have stopped being the only voice.',
             choices: [
                 {
                     text: 'We will see on Tuesday.',

@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
 
@@ -121,6 +122,7 @@ const MessagesScreen = () => {
     const navigation = useNavigation<any>();
     const threads = useMessageStore(s => s.threads);
     const markRead = useMessageStore(s => s.markRead);
+    const removeThread = useMessageStore(s => s.removeThread);
 
     // The reorder when a thread jumps to the top, animated rather than cut.
     const count = threads.reduce((n, t) => n + t.messages.length, 0);
@@ -140,14 +142,21 @@ const MessagesScreen = () => {
                     <Text style={styles.empty}>No messages yet.</Text>
                 ) : (
                     threads.map(t => (
-                        <ThreadRow
+                        // `removeThread` has existed since the father's death
+                        // and was reachable only by dying. This is the gesture
+                        // that was missing, not the function.
+                        <SwipeToDelete
                             key={t.id}
-                            thread={t}
-                            onPress={() => {
-                                markRead(t.id);
-                                navigation.navigate('MessageThread', { threadId: t.id });
-                            }}
-                        />
+                            label={`your conversation with ${t.name}`}
+                            onDelete={() => removeThread(t.id)}>
+                            <ThreadRow
+                                thread={t}
+                                onPress={() => {
+                                    markRead(t.id);
+                                    navigation.navigate('MessageThread', { threadId: t.id });
+                                }}
+                            />
+                        </SwipeToDelete>
                     ))
                 )}
             </ScrollView>

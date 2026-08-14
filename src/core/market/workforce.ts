@@ -490,13 +490,13 @@ export const eventMoraleGain = (event: TeamEvent, alreadyHosted: number): number
 
 export const WORKFORCE_EXPLANATIONS = {
     salaryRatio:
-        'What you pay relative to the market rate for your facility tier. Pay the market and morale settles around 70. Below that it erodes; above it builds, but only up to 85 — money alone cannot make a team love the place.',
+        'What you pay relative to the market rate for your facility tier. Pay the market and morale settles around 70. Below that it erodes; above it builds, but only up to 85, money alone cannot make a team love the place.',
     morale:
         'Morale is not a threshold any more. It continuously changes three things: how much of your capacity actually runs, how many units come out defective, and how many people quit.',
     hiringCap:
         'You cannot hire everyone at once. Each quarter you can take on about a quarter of your current headcount. A strong brand and high morale raise that limit; a bad reputation lowers it.',
     overtime:
-        'Runs the line above its rated capacity. Useful when demand spikes and a stockout would burn Brand Value — but the hours cost 1.5× and morale drops every quarter it stays on.',
+        'Runs the line above its rated capacity. Useful when demand spikes and a stockout would burn Brand Value, but the hours cost 1.5× and morale drops every quarter it stays on.',
     events:
-        'Priced per person, so they never become free as you grow. A second event in the same quarter has half the effect — you cannot simply buy morale.',
+        'Priced per person, so they never become free as you grow. A second event in the same quarter has half the effect, you cannot simply buy morale.',
 } as const;

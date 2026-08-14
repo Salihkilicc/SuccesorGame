@@ -326,7 +326,7 @@ export const cfoCondolenceMessage: Conversation = {
         {
             id: 'nextWeek',
             speaker: 'cfo',
-            text: 'Next week.\n\nAnd — for what it is worth. He was insufferable about you and I do not think he ever told you.',
+            text: 'Next week.\n\nAnd, for what it is worth. He was insufferable about you and I do not think he ever told you.',
             choices: [
                 {
                     text: 'He never did.',
@@ -360,7 +360,7 @@ export const brotherCondolence: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Hey. I know we have not spoken properly. I am glad you were the one there at the end, honestly — you were always better in a room than me.\n\nHow are you holding up? And how is the company holding up, because I imagine those are different answers.',
+            text: 'Hey. I know we have not spoken properly. I am glad you were the one there at the end, honestly, you were always better in a room than me.\n\nHow are you holding up? And how is the company holding up, because I imagine those are different answers.',
             choices: [
                 { text: 'Both are fine.', next: 'bothFine' },
                 { text: 'They are the same answer.', next: 'sameAnswer' },
@@ -392,7 +392,7 @@ export const brotherCondolence: Conversation = {
         {
             id: 'didNotAsk',
             speaker: 'brother',
-            text: 'No. I suppose I did not.\n\nFine — the question is whether I am going to find out what happens to my fifteen percent from you, or from a newspaper.',
+            text: 'No. I suppose I did not.\n\nFine, the question is whether I am going to find out what happens to my fifteen percent from you, or from a newspaper.',
             choices: [
                 { text: 'From me.', next: 'fromMe' },
                 { text: 'Nothing is happening to your fifteen percent.', next: 'nothing' },
@@ -488,7 +488,7 @@ export const boardCondolence: Conversation = {
     when: AFTER_THE_ANSWER,
     channel: 'mail',
     from: 'cfo',
-    subject: 'Board of Directors — minute 118/4 and matters arising',
+    subject: 'Board of Directors, minute 118/4 and matters arising',
     start: 'open',
     nodes: [
         {
@@ -690,7 +690,7 @@ export const brotherCondolencePublic: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Sorry — one more and then I will let you sleep.\n\nSeven point two million. That is my fifteen percent of what you turned down, and I found out the way the man from Halberd found out.\n\nI am not angry. I want to be clear that I am not angry.',
+            text: 'Sorry, one more and then I will let you sleep.\n\nSeven point two million. That is my fifteen percent of what you turned down, and I found out the way the man from Halberd found out.\n\nI am not angry. I want to be clear that I am not angry.',
             choices: [
                 { text: 'You would have said yes.', next: 'wouldHave' },
                 { text: 'You are right. I should have asked.', next: 'shouldHave' },
@@ -743,7 +743,7 @@ export const boardCondolencePublic: Conversation = {
     id: 'condolence-board-public',
     channel: 'mail',
     from: 'cfo',
-    subject: 'Board of Directors — further matter arising',
+    subject: 'Board of Directors, further matter arising',
     when: [...AFTER_THE_ANSWER, ...PUBLIC_ONLY],
     start: 'open',
     nodes: [

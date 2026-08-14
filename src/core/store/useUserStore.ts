@@ -131,7 +131,7 @@ type UserStore = UserState & {
 
 export const initialUserState: UserState = {
   name: 'John Rich',
-  bio: 'Beta Tester - CEO Edition',
+  bio: 'Beta Tester, CEO Edition',
   gender: 'male',
   profilePhoto: null,
   avatarUrl: null,

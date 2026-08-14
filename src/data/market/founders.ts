@@ -128,7 +128,7 @@ export const FOUNDER_BY_COMPANY: Record<string, NamedFounder> = {
         hostileTrust: 18,
         motivation: 'money',
         petIssue: 'dividend',
-        line: 'Good price. Congratulations to us both — one of us more than the other.',
+        line: 'Good price. Congratulations to us both, one of us more than the other.',
         hostileLine: 'You overpaid to humiliate me. I can work with a man who does that.',
     },
 

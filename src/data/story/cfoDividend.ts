@@ -35,7 +35,7 @@ export const cfoDividend: Conversation = {
         {
             id: 'open',
             speaker: 'cfo',
-            text: 'Your brother called an item onto the agenda again. He wants a dividend declared this quarter, and he has the language for it — "returning value to shareholders". He has been practising.',
+            text: 'Your brother called an item onto the agenda again. He wants a dividend declared this quarter, and he has the language for it, "returning value to shareholders". He has been practising.',
             choices: [
                 { text: 'How much is he asking for?', next: 'amount' },
                 {
@@ -49,7 +49,7 @@ export const cfoDividend: Conversation = {
         {
             id: 'amount',
             speaker: 'cfo',
-            text: 'Two million. The cash is there — that is the problem, because everyone can see it is there. If we had nothing, this would not be a conversation.',
+            text: 'Two million. The cash is there, that is the problem, because everyone can see it is there. If we had nothing, this would not be a conversation.',
             choices: [
                 { text: 'And if we spend it instead?', next: 'advice' },
                 { text: 'Pay him. I want the quarter quiet.', next: 'paid' },

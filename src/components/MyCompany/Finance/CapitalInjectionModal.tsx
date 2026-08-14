@@ -77,7 +77,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
                     <StatRow
                         label={t('finance.availableCash')}
                         value={formatMoney(money)}
-                        why="your own account - this is what you can put in"
+                        why="your own account, this is what you can put in"
                     />
                     <StatRow
                         label="Company capital"
