@@ -2195,6 +2195,13 @@ export const useGameStore = create<GameStore>()(
             console.warn('[events] roll failed', e);
           }
 
+          try {
+            const currentQ = Math.max(1, Math.ceil((get().currentMonth || 1) / 3));
+            require('../news/newsEngine').generateQuarterlyNews(currentQ);
+          } catch (e) {
+            console.warn('[news] quarterly news generation failed', e);
+          }
+
           // Beats whose moment has come - the father's death is the first.
           // Before the tutorial check, because a beat can lift every lock and
           // there is no sense queueing an explanation for one that is about

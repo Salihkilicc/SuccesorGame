@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePlayerStore } from '../../core/store/usePlayerStore';
 import { theme } from '../../core/theme';
 
+import { SiliconNewsButton } from '../../features/news';
+
 type StatPillProps = {
   label: string;
   value: number;
@@ -12,6 +14,7 @@ type StatPillProps = {
 
 type BottomStatsBarProps = {
   onHomePress?: () => void;
+  showNewsButton?: boolean;
 };
 
 const StatPill = ({ label, value, color }: StatPillProps) => {
@@ -30,7 +33,7 @@ const StatPill = ({ label, value, color }: StatPillProps) => {
   );
 };
 
-const BottomStatsBar = ({ onHomePress }: BottomStatsBarProps) => {
+const BottomStatsBar = ({ onHomePress, showNewsButton = false }: BottomStatsBarProps) => {
   const { core, attributes } = usePlayerStore();
   const { health, stress } = core;
   const charisma = attributes.charm;
@@ -38,14 +41,17 @@ const BottomStatsBar = ({ onHomePress }: BottomStatsBarProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Pressable
-          onPress={onHomePress}
-          style={({ pressed }) => [styles.homeButton, pressed && styles.homeButtonPressed]}>
-          <Text style={styles.homeIcon}>🏠</Text>
-        </Pressable>
+        {onHomePress && (
+          <Pressable
+            onPress={onHomePress}
+            style={({ pressed }) => [styles.homeButton, pressed && styles.homeButtonPressed]}>
+            <Text style={styles.homeIcon}>🏠</Text>
+          </Pressable>
+        )}
         <StatPill label={t('ui.health')} value={health} color={theme.colors.success} />
         <StatPill label={t('ui.stress')} value={stress} color={theme.colors.danger} />
         <StatPill label={t('ui.charisma')} value={charisma} color={theme.colors.accent} />
+        {showNewsButton && <SiliconNewsButton compact />}
       </View>
     </View>
   );
