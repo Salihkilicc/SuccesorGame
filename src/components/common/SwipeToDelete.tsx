@@ -68,10 +68,20 @@ type Props = {
     children: React.ReactNode;
     /** Named in the confirmation, so the player knows what they are binning. */
     label: string;
+    /**
+     * An extra sentence, for a row that is not merely clutter.
+     *
+     * A finished conversation and an unread one look identical in a list, and
+     * the whole reason this gesture exists is that the player wants to clear
+     * the finished ones. Throwing away a scene nobody has played, or a
+     * negotiation somebody is waiting on, should not be the same tap with the
+     * same words on it.
+     */
+    warning?: string;
     onDelete: () => void;
 };
 
-const SwipeToDelete = ({ children, label, onDelete }: Props) => {
+const SwipeToDelete = ({ children, label, warning, onDelete }: Props) => {
     const x = useRef(new Animated.Value(0)).current;
     const settle = () =>
         Animated.spring(x, { toValue: 0, useNativeDriver: true, bounciness: 0 }).start();
@@ -89,7 +99,9 @@ const SwipeToDelete = ({ children, label, onDelete }: Props) => {
                 if (g.dx > -DELETE_THRESHOLD) { settle(); return; }
                 Alert.alert(
                     'Delete',
-                    `Delete ${label}? This cannot be undone.`,
+                    warning
+                        ? `Delete ${label}?\n\n${warning}`
+                        : `Delete ${label}? This cannot be undone.`,
                     [
                         { text: 'Keep', style: 'cancel', onPress: settle },
                         {

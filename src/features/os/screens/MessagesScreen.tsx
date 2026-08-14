@@ -148,6 +148,22 @@ const MessagesScreen = () => {
                         <SwipeToDelete
                             key={t.id}
                             label={`your conversation with ${t.name}`}
+                            // ------------------------------------------------
+                            //  A THREAD WITH A SCENE ON IT IS NOT CLUTTER
+                            // ------------------------------------------------
+                            //  The gesture is for tidying finished threads, and
+                            //  a finished one looks exactly like one holding a
+                            //  conversation nobody has played. The scene is
+                            //  already marked seen, so deleting the thread is
+                            //  the only way in this game to lose a piece of the
+                            //  story permanently and silently.
+                            //
+                            //  It is still allowed. It is their phone. It just
+                            //  does not happen without the sentence.
+                            // ------------------------------------------------
+                            warning={t.conversationId
+                                ? 'There is a conversation here you have not played. It will not come back.'
+                                : undefined}
                             onDelete={() => removeThread(t.id)}>
                             <ThreadRow
                                 thread={t}

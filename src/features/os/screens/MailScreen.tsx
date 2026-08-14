@@ -15,6 +15,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
+import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -71,8 +72,64 @@ const MailScreen = () => {
     const inbox = useMailStore(s => s.inbox);
     const markRead = useMailStore(s => s.markRead);
     const deleteMail = useMailStore(s => s.deleteMail);
+    const offers = useNegotiationStore(s => s.offers);
+    const withdrawOffer = useNegotiationStore(s => s.withdraw);
+
+    // ------------------------------------------------------------------
+    //  A LETTER SOMEBODY IS WAITING ON AN ANSWER TO
+    // ------------------------------------------------------------------
+    //  The gesture is for tidying, and most of the inbox is tidy-able: a
+    //  sponsorship offer nobody wants, a scene that has been played out. Two
+    //  kinds of letter are not.
+    //
+    //  A BOARD WAITING FOR AN ANSWER is the dangerous one, and it is dangerous
+    //  in a way that has nothing to do with losing the letter. The offer stays
+    //  `open` in the negotiation store, and `send` refuses a second approach
+    //  while one is open - so binning the reply would lock that company out of
+    //  the game for ever, with the reason living in a store the player cannot
+    //  see. Deleting the letter now withdraws the approach, which is what
+    //  throwing away somebody's reply means.
+    //
+    //  AN UNPLAYED SCENE is the other, and is merely lost. Said out loud
+    //  rather than prevented: it is their inbox.
+    // ------------------------------------------------------------------
     
     const [searchQuery, setSearchQuery] = useState('');
+
+    // ------------------------------------------------------------------
+    //  BELOW EVERY HOOK, DELIBERATELY
+    // ------------------------------------------------------------------
+    //  These sat above `useState` and the audit called it: a plain `return`
+    //  inside a helper reads, to a scan of the function body, exactly like an
+    //  early return before a hook. The heuristic was wrong about the danger
+    //  and right about the shape, and the shape is worth keeping - hooks
+    //  first, then everything that is merely a function.
+    // ------------------------------------------------------------------
+    const openOfferFor = (mail: Mail) =>
+        mail.negotiationId
+            ? offers.find(o => o.id === mail.negotiationId && o.status === 'open')
+            : undefined;
+
+    const warningFor = (mail: Mail): string | undefined => {
+        const offer = openOfferFor(mail);
+        if (offer) {
+            return `${offer.targetName} is waiting for an answer. Throwing this away withdraws your approach, and you can write to them again later.`;
+        }
+        if (mail.conversationId) {
+            return 'There is a conversation here you have not played. It will not come back.';
+        }
+        return undefined;
+    };
+
+    const binMail = (mail: Mail) => {
+        const offer = openOfferFor(mail);
+        // Withdraw FIRST. If the delete somehow fails the player still has the
+        // letter; if the withdrawal failed they would have neither the letter
+        // nor the ability to write again, and nothing on screen to explain it.
+        if (offer) withdrawOffer(offer.id);
+        deleteMail(mail.id);
+    };
+
 
     const filteredInbox = inbox.filter(m => 
         m.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -111,7 +168,8 @@ const MailScreen = () => {
                         <SwipeToDelete
                             key={m.id}
                             label={`"${m.subject}"`}
-                            onDelete={() => deleteMail(m.id)}>
+                            warning={warningFor(m)}
+                            onDelete={() => binMail(m)}>
                             <MailRow
                                 mail={m}
                                 onPress={() => {
