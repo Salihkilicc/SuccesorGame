@@ -41,7 +41,7 @@ const VARIANTS = [
 const world = (brotherTrust: number): World => ({
     dials: { ...INITIAL_DIALS, brotherTrust },
     flags: { fatherDead: true },
-    quarter: 12,
+    quarter: 16,
     capital: 20_000_000,
     cash: 200_000,
     morale: 71,

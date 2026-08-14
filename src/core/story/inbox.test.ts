@@ -42,29 +42,27 @@ describe('when things are due', () => {
 });
 
 describe('the per-quarter allowance', () => {
-    it('lets two through and holds the rest', () => {
+    it('lets one through and holds the rest', () => {
         const six = ['a', 'b', 'c', 'd', 'e', 'f'].map((c, i) =>
             item({ conversationId: c, priority: i }));
         const r = drain(six, 1, always);
         expect(r.deliver).toHaveLength(DELIVERIES_PER_QUARTER);
-        expect(ids(r.deliver)).toEqual(['a', 'b']);
-        expect(ids(r.keep)).toEqual(['c', 'd', 'e', 'f']);
+        expect(ids(r.deliver)).toEqual(['a']);
+        expect(ids(r.keep)).toEqual(['b', 'c', 'd', 'e', 'f']);
     });
 
     it('drops nothing - the overflow arrives next quarter, in order', () => {
-        // This is the whole point of a queue rather than a cap: a wave of four
-        // condolences becomes two and two, not two and forgotten.
-        const wave = ['a', 'b', 'c', 'd'].map((c, i) => item({ conversationId: c, priority: i }));
+        const wave = ['a', 'b'].map((c, i) => item({ conversationId: c, priority: i }));
         const first = drain(wave, 1, always);
         const second = drain(first.keep, 2, always);
-        expect(ids(first.deliver)).toEqual(['a', 'b']);
-        expect(ids(second.deliver)).toEqual(['c', 'd']);
+        expect(ids(first.deliver)).toEqual(['a']);
+        expect(ids(second.deliver)).toEqual(['b']);
         expect(second.keep).toEqual([]);
     });
 
     it('serves the oldest queue first, however important the new arrival thinks it is', () => {
-        const held = item({ conversationId: 'waiting-since-q1', dueQuarter: 1, priority: 9 });
         const fresh = item({ conversationId: 'new', dueQuarter: 3, priority: 0 });
+        const held = item({ conversationId: 'waiting-since-q1', dueQuarter: 1, priority: 9 });
         const r = drain([fresh, held], 3, always, 1);
         expect(ids(r.deliver)).toEqual(['waiting-since-q1']);
     });
@@ -93,13 +91,13 @@ describe('urgent', () => {
         expect(r.deliver).toHaveLength(DELIVERIES_PER_QUARTER + 1);
     });
 
-    it('does not spend the allowance, so the routine two still arrive', () => {
+    it('does not spend the allowance, so the routine one still arrives', () => {
         const r = drain([
             item({ conversationId: 'urgent', priority: 0, urgent: true }),
             item({ conversationId: 'a', priority: 1 }),
             item({ conversationId: 'b', priority: 2 }),
         ], 1, always);
-        expect(ids(r.deliver).sort()).toEqual(['a', 'b', 'urgent']);
+        expect(ids(r.deliver).sort()).toEqual(['a', 'urgent']);
     });
 });
 

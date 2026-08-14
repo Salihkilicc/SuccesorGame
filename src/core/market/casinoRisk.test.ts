@@ -111,12 +111,8 @@ describe('three in a row is where it becomes printable', () => {
         expect(testAll(casinoScandalEvent.when, world({ casinoStreak: 9 }))).toBe(true);
     });
 
-    it('and it is thirty per cent, rolled again every quarter the streak survives', () => {
-        // Deliberately not the espionage coin. There the player pays once and
-        // the outcome settles; here they are choosing, every quarter, to go on
-        // doing the thing - and a single roll would let somebody survive one
-        // bad quarter and then play for a decade in perfect safety.
-        expect(casinoScandalEvent.chance).toBeCloseTo(0.30, 6);
+    it('and it is fifteen per cent, rolled again every quarter the streak survives', () => {
+        expect(casinoScandalEvent.chance).toBeCloseTo(0.15, 6);
     });
 
     it('and once it has run it cannot run again', () => {

@@ -33,7 +33,7 @@ const ARC = [cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation, cashWarn
 const world = (over: Partial<World> = {}): World => ({
     dials: { ...INITIAL_DIALS },
     flags: { fatherDead: true },
-    quarter: 8,
+    quarter: 16,
     capital: 20_000_000,
     cash: 200_000,
     morale: 71,

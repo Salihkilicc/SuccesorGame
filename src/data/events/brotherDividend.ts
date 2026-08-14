@@ -53,7 +53,7 @@ import type { GameEvent } from '../../core/events/types';
 /** He has to have something to be aggrieved about, and a company to bleed. */
 const BASE = [
     { kind: 'flag' as const, flag: 'fatherDead' as const },
-    { kind: 'quarterAtLeast' as const, quarter: 8 },
+    { kind: 'quarterAtLeast' as const, quarter: 16 },
 ];
 
 const DIVIDEND = 2_000_000;
@@ -81,6 +81,9 @@ const DIVIDEND = 2_000_000;
 // ============================================================================
 //  COLD — he has stopped talking to you and started talking about you
 // ============================================================================
+// ============================================================================
+//  COLD — he has stopped talking to you and started talking about you
+// ============================================================================
 export const brotherDividendCold: Conversation = {
     id: 'event-brother-dividend-cold',
     channel: 'message',
@@ -90,9 +93,7 @@ export const brotherDividendCold: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            // Not shouting. Worse: procedural. He has learned the words and
-            // he is using them at his brother.
-            text: 'I have asked Farrow to write to the company, so you will get this properly on Monday, but I would rather you heard it from me.\n\nI am requisitioning an item for the next meeting. A distribution to shareholders. I have the fifteen percent to do it and I have checked that I do.',
+            text: 'I had Farrow requisition an agenda item for the next board meeting: a shareholder distribution. I hold the 15% required to force the vote.',
             choices: [
                 { text: 'You could have just asked me.', next: 'couldHaveAsked' },
                 { text: 'Then I will see it on the agenda.', next: 'agenda' },
@@ -102,9 +103,7 @@ export const brotherDividendCold: Conversation = {
         {
             id: 'couldHaveAsked',
             speaker: 'brother',
-            // The line that tells you how far it has gone, and it is a
-            // reasonable complaint delivered as an ultimatum.
-            text: 'I asked you in March. I asked you in June. In September you sent me a link to the quarterly report.\n\nThis is what asking looks like when the asking stops working. It is not a threat, it is a procedure, and I would like the difference on the record.',
+            text: 'I asked twice this year and got pointed to quarterly reports. This is what asking looks like when informal requests get ignored.',
             choices: [
                 { text: 'Two million. Fine.', next: 'paid' },
                 { text: 'Then use the procedure.', next: 'agenda' },
@@ -114,13 +113,11 @@ export const brotherDividendCold: Conversation = {
         {
             id: 'agenda',
             speaker: 'brother',
-            text: 'I will.\n\nAnd when it fails, because it will fail, you have thirty-five and the room likes you this quarter, it will be in the minutes that I raised it and you refused it. Minutes last a very long time.',
+            text: 'I will. Even if it fails, the minutes will show I raised it and you refused. Minutes last a long time.',
             choices: [
                 {
                     text: '(leave it)',
                     effects: [
-                        // Two quarters of drift. A legal requisition against
-                        // your own brother is not a -6 moment.
                         { kind: 'dial', dial: 'brotherTrust', delta: -12 },
                         { kind: 'flag', flag: 'brotherPlottedOpenly' },
                         {
@@ -136,16 +133,12 @@ export const brotherDividendCold: Conversation = {
         {
             id: 'paid',
             speaker: 'brother',
-            // Paying him does not warm him up much. He got it by force and
-            // both of them know what that means for next time.
-            text: 'Thank you.\n\nI would like it noted that I had to do it this way, and that I did not enjoy it, and that I will do it this way again because it worked.',
+            text: 'Thank you. I note that I had to force the issue, but the distribution is appreciated.',
             choices: [
                 {
                     text: '(leave it)',
                     effects: [
                         { kind: 'capital', amount: -DIVIDEND },
-                        // Below the warm branch's +12 on purpose: he got it
-                        // by force and they both know what that means.
                         { kind: 'dial', dial: 'brotherTrust', delta: 10 },
                     ],
                 },
@@ -157,7 +150,7 @@ export const brotherDividendCold: Conversation = {
 export const brotherDividendColdEvent: GameEvent = {
     id: 'brother-dividend-cold',
     when: [...BASE, { kind: 'dialAtMost', dial: 'brotherTrust', band: 'low' }],
-    chance: 0.45,
+    chance: 0.25,
     cooldown: 6,
     conversation: brotherDividendCold,
     headline: 'A minority shareholder at Hale is understood to be pressing for a distribution.',
@@ -180,29 +173,19 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Are you around this week? Nothing dramatic. I want to talk about a distribution and I would rather do it over a table than in a room with Farrow in it.\n\nDad used to do these things over lunch. He was better at it than either of us.',
+            text: 'Are you free to talk over a table about a dividend? Two million total across all shares, which means three hundred thousand for me.',
             choices: [
-                { text: 'How much?', next: 'howMuch' },
-                { text: 'You can ask me on a phone, Julian.', next: 'onAPhone' },
-            ],
-        },
-
-        {
-            id: 'onAPhone',
-            speaker: 'brother',
-            text: 'I can. I just find it easier when I can see whether you have already decided.\n\nTwo million. Across all of us, so three hundred to me, which is not the point and I know it will sound like the point.',
-            choices: [
-                { text: 'It does sound like the point.', next: 'soundsLike' },
-                { text: 'What is the point?', next: 'thePoint' },
+                { text: 'How much for the company?', next: 'howMuch' },
+                { text: 'What is the point of this?', next: 'thePoint' },
             ],
         },
 
         {
             id: 'howMuch',
             speaker: 'brother',
-            text: 'Two million across the register. Three hundred thousand of that is mine, which is a number small enough that you are about to tell me it is not worth the conversation.',
+            text: 'Two million across the register. Small enough that you might think it is not worth discussing.',
             choices: [
-                { text: 'It is not worth the conversation.', next: 'soundsLike' },
+                { text: 'It is not worth discussing.', next: 'soundsLike' },
                 { text: 'What is the point, then?', next: 'thePoint' },
             ],
         },
@@ -210,22 +193,17 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'thePoint',
             speaker: 'brother',
-            // The real grievance, and it is legitimate. He is not asking for
-            // money. He is asking to be a shareholder rather than a relative.
-            text: 'That I own a piece of something and it has never once behaved like I own a piece of it.\n\nA dividend is the only thing a company does that says out loud "some of this is yours". Everything else it does says "some of this is his and you are related to him".',
+            text: 'A dividend is the only thing a company does that acknowledges its shareholders directly.',
             choices: [
                 { text: 'Then we declare one.', next: 'paid' },
-                { text: 'Not this year. I need the cash in the business.', next: 'notThisYear' },
+                { text: 'Not this year. I need cash in the business.', next: 'notThisYear' },
             ],
         },
 
         {
             id: 'soundsLike',
             speaker: 'brother',
-            // THE NEEDLE. Delivered gently, with a smile, and it is the
-            // single cruellest line he has - because it is true, and because
-            // it is dressed as a compliment to the dead man.
-            text: 'I know.\n\nDad trusted you with all of it, you know. Every share of it. He must have thought very hard about that and decided I would be fine.\n\nAnd I am. I am fine. I just did not get a vote on being fine.',
+            text: 'Dad trusted you with all of it and assumed I would be fine without a say. I just want some recognition.',
             choices: [
                 { text: 'That is not fair.', next: 'notFair' },
                 { text: 'Then we declare one.', next: 'paid' },
@@ -235,7 +213,7 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'notFair',
             speaker: 'brother',
-            text: 'No. It is not.\n\nI have been carrying that sentence around for a year looking for somewhere to put it and I am sorry it was you. There was only ever going to be you.',
+            text: 'It is not. But I am telling you honestly how it feels.',
             choices: [
                 { text: 'We declare one.', next: 'paid' },
                 { text: 'Not this year.', next: 'notThisYear' },
@@ -245,17 +223,14 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'notThisYear',
             speaker: 'brother',
-            // He takes it well. He is not pretending to take it well - he
-            // does take it well, and that is what makes the next quarter's
-            // version of him confusing rather than predictable.
-            text: 'All right.\n\nI mean that. I would rather be told no on a phone by my brother than yes on paper by a company. Ask me again in a year whether I still mean it.',
+            text: 'All right. I would rather hear no directly from my brother than get ignored by corporate counsel.',
             choices: [
                 {
-                    text: 'I will.',
+                    text: 'I appreciate that.',
                     effects: [{ kind: 'dial', dial: 'brotherTrust', delta: 4 }],
                 },
                 {
-                    text: 'You will not have to ask.',
+                    text: 'Next year will be better.',
                     effects: [{ kind: 'dial', dial: 'brotherTrust', delta: 7 }],
                 },
             ],
@@ -264,10 +239,10 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'paid',
             speaker: 'brother',
-            text: 'Thank you. Genuinely.\n\nI will spend some of it on something stupid so that you can be annoyed about it, which is the closest thing we have to a tradition.',
+            text: 'Thank you. Genuinely. I will put it to good use.',
             choices: [
                 {
-                    text: 'Buy the boat.',
+                    text: 'Glad we sorted it.',
                     effects: [
                         { kind: 'capital', amount: -DIVIDEND },
                         { kind: 'dial', dial: 'brotherTrust', delta: 12 },
@@ -285,7 +260,7 @@ export const brotherDividendWarmEvent: GameEvent = {
         { kind: 'dialAtLeast', dial: 'brotherTrust', band: 'high' },
         { kind: 'dialAtMost', dial: 'brotherTrust', band: 'high' },
     ],
-    chance: 0.40,
+    chance: 0.20,
     cooldown: 6,
     conversation: brotherDividendWarm,
     headline: 'Hale is understood to be reviewing its distribution policy.',
@@ -299,11 +274,6 @@ export const brotherDividendWarmEvent: GameEvent = {
 //  anywhere else - and then mentions, in the same breath and without any
 //  sense that it is a confession, that he has been having dinner with the
 //  people who want to take the company off you.
-//
-//  He is not lying. He has not betrayed anybody. He simply does not
-//  experience "I like my brother" and "I keep my options open" as being in
-//  tension, and the player has to decide what to do with a person like that
-//  while he is being nicer to them than anyone else in the game.
 // ============================================================================
 export const brotherDividendClose: Conversation = {
     id: 'event-brother-dividend-close',
@@ -314,43 +284,19 @@ export const brotherDividendClose: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Two things, one boring and one that I have been putting off.\n\nBoring first: I am not going to push on the dividend this year. The cash is doing more inside than it would in my account, and I can read a balance sheet now, which is entirely your fault.',
+            text: 'Two things: first, I am not pushing on dividends this year. The cash is better reinvested in the company.\n\nSecond: I had dinner with Halberd again. They are lending against tech acquisitions.',
             choices: [
-                { text: 'And the second thing?', next: 'second' },
-                { text: 'You could have kept pushing.', next: 'keptPushing' },
-            ],
-        },
-
-        {
-            id: 'keptPushing',
-            speaker: 'brother',
-            text: 'I could. Farrow thinks I should. Farrow thinks I should do a lot of things and I have started noticing that all of them end with Farrow billing me.\n\nSecond thing.',
-            choices: [
-                { text: 'Go on.', next: 'second' },
-            ],
-        },
-
-        {
-            id: 'second',
-            speaker: 'brother',
-            // Delivered as a favour, and it IS a favour, and it is also the
-            // sentence that should make the player's stomach drop.
-            text: 'I have had dinner with Halberd twice this year.\n\nBefore you say anything, I am telling you, which is the whole reason I am telling you. They approach me about every eight months and I would rather you heard the number from me than wondered.',
-            choices: [
-                { text: 'What do they want?', next: 'whatWant' },
-                { text: 'Twice.', next: 'twice' },
+                { text: 'What did Halberd want?', next: 'whatWant' },
+                { text: 'How many times have they approached you?', next: 'twice' },
             ],
         },
 
         {
             id: 'twice',
             speaker: 'brother',
-            // He is genuinely puzzled by the objection. This is the character
-            // in one exchange: no guilt, because in his own account he has
-            // done nothing.
-            text: 'Twice. It was dinner, not a transaction.\n\nI am allowed to have dinner. I would be a strange sort of shareholder if I refused to hear what my own stake is worth to somebody else.',
+            text: 'Twice this year over dinner. As a shareholder, I listen to what people value the stake at.',
             choices: [
-                { text: 'You would be a normal sort of brother.', next: 'normalBrother' },
+                { text: 'Keep family business private.', next: 'normalBrother' },
                 { text: 'What do they want?', next: 'whatWant' },
             ],
         },
@@ -358,10 +304,7 @@ export const brotherDividendClose: Conversation = {
         {
             id: 'normalBrother',
             speaker: 'brother',
-            // The one moment he almost sees it. He does not, and it is not
-            // played as villainy - it is played as a blind spot he has had
-            // his whole life and nobody has ever made him look at.
-            text: 'That is not fair.\n\nI have never once done anything with it. Not once. I have sat in restaurants and let men tell me things and then I have come and told you, and you are looking at the restaurants.',
+            text: 'I am telling you openly because I am allowed to have dinner with who I want, and I bring the intel straight to you.',
             choices: [
                 { text: 'What did they tell you?', next: 'whatWant' },
             ],
@@ -370,9 +313,7 @@ export const brotherDividendClose: Conversation = {
         {
             id: 'whatWant',
             speaker: 'brother',
-            // The information is real and valuable, which is exactly the
-            // problem: refusing him costs the player something concrete.
-            text: 'They are not buying. They are lending, to somebody else who wants to buy, and they were fishing for whether the family would split if it came to a vote.\n\nI told them the family is one vote. Which is true, and which I am now aware I said without asking you.',
+            text: 'They are looking to back a buyer and checking if the family would split in a vote. I told them we vote as one block.',
             choices: [
                 {
                     text: 'Thank you for telling me.',
@@ -387,7 +328,7 @@ export const brotherDividendClose: Conversation = {
                     ],
                 },
                 {
-                    text: 'Do not have dinner with them again.',
+                    text: 'Do not meet them again.',
                     next: 'doNotAgain',
                 },
             ],
@@ -396,12 +337,10 @@ export const brotherDividendClose: Conversation = {
         {
             id: 'doNotAgain',
             speaker: 'brother',
-            // He agrees. He means it. He will do it again, and he will tell
-            // you again, and he will not understand why that is not enough.
-            text: 'All right.\n\nI will say yes to that and we both know I will pick up the phone if it rings, because it is my fifteen percent and nobody has ever pretended otherwise.\n\nBut I will tell you. That is the bit I can actually promise.',
+            text: 'Understood. But if they ring, we both know I will pick up the phone.',
             choices: [
                 {
-                    text: 'Then tell me.',
+                    text: 'Keep me posted.',
                     effects: [
                         { kind: 'dial', dial: 'brotherTrust', delta: 5 },
                         { kind: 'dial', dial: 'pearHostility', delta: 4 },
@@ -411,9 +350,6 @@ export const brotherDividendClose: Conversation = {
                 {
                     text: 'That is not a promise.',
                     effects: [
-                        // Refusing him here is entirely reasonable and it
-                        // costs the player the channel. He does not get angry;
-                        // he just stops volunteering.
                         { kind: 'dial', dial: 'brotherTrust', delta: -13 },
                     ],
                 },
@@ -425,7 +361,7 @@ export const brotherDividendClose: Conversation = {
 export const brotherDividendCloseEvent: GameEvent = {
     id: 'brother-dividend-close',
     when: [...BASE, { kind: 'dialAtLeast', dial: 'brotherTrust', band: 'extreme' }],
-    chance: 0.40,
+    chance: 0.20,
     cooldown: 8,
     conversation: brotherDividendClose,
     headline: 'Family shareholders at Hale are described as aligned.',

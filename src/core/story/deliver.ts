@@ -33,6 +33,7 @@ import { testAll, firstFailing } from './conditions';
 import { readWorld, currentQuarter } from './world';
 import { activeLock } from '../tutorial/locks';
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
+import { OPENING_ACT } from '../../data/story/openingAct';
 
 /**
  * How a sender is named on a letter.
@@ -136,7 +137,8 @@ export const deliver = (conversationId: string): boolean => {
  */
 export const seedOpening = (): void => {
     const story = useStoryStore.getState();
-    if (story.flags.openingQueued) return;
+    if (story.flags.openingQueued || story.flags.fatherDead) return;
+    if (OPENING_CONVERSATIONS.some(id => story.seenScenes.includes(id))) return;
 
     const now = currentQuarter();
     OPENING_CONVERSATIONS.forEach(id => {
@@ -303,7 +305,8 @@ export const runInbox = (
         // A queued conversation that no longer exists - a scene renamed or
         // removed between versions - is dropped rather than retried forever.
         if (!c) return false;
-        if (quiet && !p.urgent && c.channel === 'message') return false;
+        const isOpeningOrUrgent = p.urgent || OPENING_ACT.includes(p.conversationId as any);
+        if (quiet && !isOpeningOrUrgent && c.channel === 'message') return false;
         return testAll(c.when, world);
     };
 

@@ -40,7 +40,7 @@ import type { GameEvent } from '../../core/events/types';
 /** He has to have somewhere to be aggrieved from, and time to have got there. */
 const LATE_AND_COLD = [
     { kind: 'flag' as const, flag: 'fatherDead' as const },
-    { kind: 'quarterAtLeast' as const, quarter: 12 },
+    { kind: 'quarterAtLeast' as const, quarter: 28 },
     { kind: 'dialAtMost' as const, dial: 'brotherTrust' as const, band: 'low' as const },
 ];
 
@@ -60,7 +60,7 @@ export const brotherVote: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'I voted against the capital plan. I wanted you to hear it from me before you saw the tally.\n\nIt is not personal. I would have voted against it if Dad had put it up, and I told him so twice about things he put up.',
+            text: 'I voted against the capital plan today. It is not personal: wanted you to hear it directly from me before the tally went out.',
             choices: [
                 { text: 'You did not tell me you had concerns.', next: 'concerns' },
                 { text: 'Fine. That is what the vote is for.', next: 'thatIsWhat' },
@@ -70,9 +70,7 @@ export const brotherVote: Conversation = {
         {
             id: 'concerns',
             speaker: 'brother',
-            // He is right about the mechanism and wrong about the relationship,
-            // and he cannot tell those apart.
-            text: 'I raised it. In writing, in the pack, eleven days ago. Page four.\n\nI am not being clever, I genuinely thought you had read it and disagreed, which would have been fine.',
+            text: 'I raised it in writing in the board pack eleven days ago on page four. I assumed you had read it and disagreed.',
             choices: [
                 { text: 'I had not read page four.', next: 'pageFour' },
                 { text: 'Raising it in a pack is not telling me.', next: 'notTelling' },
@@ -82,7 +80,7 @@ export const brotherVote: Conversation = {
         {
             id: 'pageFour',
             speaker: 'brother',
-            text: 'Then that is the actual problem and it is not one either of us wants to look at tonight.\n\nRead the pack. I will keep writing things in it.',
+            text: 'Then that is the real issue. Read the pack next time; I will keep putting my notes in it.',
             choices: [
                 {
                     text: 'I will read it.',
@@ -94,8 +92,7 @@ export const brotherVote: Conversation = {
         {
             id: 'notTelling',
             speaker: 'brother',
-            // The needle, in its cold form: not a jab, a correction.
-            text: 'It is exactly telling you. It is the only way of telling you that leaves a record, which I have learned to want.\n\nYou get to run it. I get to write things down. I did not choose that division and I am not going to apologise for using my half of it.',
+            text: 'It creates a record. You run the business, I write things down. I am using my half of the role.',
             choices: [
                 {
                     text: '(leave it)',
@@ -114,7 +111,7 @@ export const brotherVote: Conversation = {
         {
             id: 'thatIsWhat',
             speaker: 'brother',
-            text: 'It is.\n\nI would rather we were the kind of family that argued before the meeting instead of during it, but this is fine too. This is a perfectly normal way for a company to work.',
+            text: 'It is. I would rather discuss things beforehand, but this is a standard way to run a board.',
             choices: [
                 {
                     text: '(leave it)',
@@ -132,7 +129,7 @@ export const brotherVote: Conversation = {
 export const brotherVoteEvent: GameEvent = {
     id: 'brother-vote',
     when: LATE_AND_COLD,
-    chance: 0.5,
+    chance: 0.25,
     cooldown: 5,
     conversation: brotherVote,
     headline: 'A split vote on the Hale board. The company said the item was carried.',
@@ -158,7 +155,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'open',
             speaker: 'cfo',
-            text: 'A factual message, and I want to be careful to keep it factual.\n\nYour brother had lunch on the fourteenth at Cavendish with two people. One of them was Nathan Vogel. I know because I was there, at a different table, for an entirely boring reason.',
+            text: 'A quick factual note: your brother had lunch on the fourteenth with Nathan Vogel of Pear.',
             choices: [
                 { text: 'Did he see you?', next: 'didHeSeeMe' },
                 { text: 'That is not necessarily anything.', next: 'notNecessarily' },
@@ -168,9 +165,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'notNecessarily',
             speaker: 'cfo',
-            // He agrees with the objection completely and then adds one fact,
-            // which is how a careful man says something enormous.
-            text: 'It is not. I have thought about that for a week before writing to you.\n\nThe fact I keep returning to is that Vogel does not have lunch. In eleven years of watching that man I have never known him eat with somebody he was not buying something from.',
+            text: 'Perhaps. But in eleven years, Vogel has never had lunch with someone he was not actively trying to acquire from.',
             choices: [
                 { text: 'Did he see you?', next: 'didHeSeeMe' },
                 { text: 'What do you want me to do?', next: 'whatDoIDo' },
@@ -180,8 +175,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'didHeSeeMe',
             speaker: 'cfo',
-            // The detail that decides it, and it is small enough to be true.
-            text: 'Yes. He came over, and he was warm, and he introduced me to the other man as "my brother\'s finance director".\n\nHe did not introduce me to Vogel. Vogel and I have met four times.',
+            text: 'Yes. He came over warmly and introduced me as "my brother\'s finance director", but did not introduce Vogel.',
             choices: [
                 { text: 'What do you want me to do?', next: 'whatDoIDo' },
                 { text: 'He is not hiding it, then.', next: 'notHiding' },
@@ -191,9 +185,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'notHiding',
             speaker: 'cfo',
-            // The distinction the whole brother arc turns on, stated by
-            // somebody who has watched him do it for a year.
-            text: 'No. That is what makes it hard to do anything about.\n\nHe is not hiding it. He is simply not telling you, and he would say those are different, and in a court they are.',
+            text: 'No, he simply did not volunteer the information. He would argue those are different.',
             choices: [
                 { text: 'What do you want me to do?', next: 'whatDoIDo' },
             ],
@@ -202,7 +194,7 @@ export const cfoWarnsAboutBrother: Conversation = {
         {
             id: 'whatDoIDo',
             speaker: 'cfo',
-            text: 'Ask him. Tonight, plainly, and do not dress it up.\n\nIf he tells you the truth immediately, and I think he will, then you have learned something valuable and nothing has gone wrong yet. If he does not, you have learned something worse and you have learned it early.',
+            text: 'Ask him directly tonight. If he tells you honestly, no harm done. If not, you learn his intent early.',
             choices: [
                 {
                     text: 'I will ask him.',
@@ -219,8 +211,6 @@ export const cfoWarnsAboutBrother: Conversation = {
                 {
                     text: 'I would rather watch him for a quarter.',
                     effects: [
-                        // Also a real answer, and it costs the CFO something
-                        // to be told his advice is being sat on.
                         { kind: 'dial', dial: 'cfoTrust', delta: -3 },
                         { kind: 'dial', dial: 'pearHostility', delta: 5 },
                     ],
@@ -235,14 +225,10 @@ export const cfoWarnsAboutBrotherEvent: GameEvent = {
     when: [
         ...LATE_AND_COLD,
         { kind: 'noFlag', flag: 'cfoResigned' },
-        // THE GATE THAT MATTERS. He does not bring you this if you have spent
-        // two years not listening to him - not out of spite, but because a man
-        // who has been ignored eleven times does not bring you the twelfth
-        // thing, and this one he would have to stick his neck out for.
         { kind: 'dialAtLeast', dial: 'cfoTrust', band: 'high' },
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'low' },
     ],
-    chance: 0.7,
+    chance: 0.35,
     cooldown: 10,
     conversation: cfoWarnsAboutBrother,
     headline: 'Sector chatter about informal contact between Pear and Hale shareholders.',
@@ -266,7 +252,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Yes. Cavendish, the fourteenth. Vogel and a man from their corporate team whose name I did not catch.\n\nI assume Sinclair told you. Good. I would rather you heard it than wondered why I was in town.',
+            text: 'Yes. I had lunch with Vogel at Cavendish on the fourteenth. I assume Arthur told you.',
             choices: [
                 { text: 'What did he want?', next: 'whatWanted' },
                 { text: 'You did not tell me.', next: 'didNotTell' },
@@ -276,10 +262,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'didNotTell',
             speaker: 'brother',
-            // Genuinely puzzled, and it is the most damning thing in the arc
-            // precisely because it is not a defence - it is a description of
-            // how he sees the world.
-            text: 'I was going to. I was going to tell you at the meeting, in front of everybody, because I thought that was the correct place for it.\n\nWhat would you have had me do, ring you from the restaurant?',
+            text: 'I planned to mention it at the board meeting. What would you have had me do, ring you from the table?',
             choices: [
                 { text: 'Yes.', next: 'yes' },
                 { text: 'What did he want?', next: 'whatWanted' },
@@ -289,7 +272,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'yes',
             speaker: 'brother',
-            text: 'Right.\n\nI will remember that you said yes, and I will do it next time, and I will feel ridiculous doing it. Noted.',
+            text: 'Understood. I will keep that in mind for next time.',
             choices: [
                 { text: 'What did he want?', next: 'whatWanted' },
             ],
@@ -298,9 +281,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'whatWanted',
             speaker: 'brother',
-            // The actual information, and it is bad. He delivers it without
-            // any sense that he is the subject of it.
-            text: 'To know whether fifteen percent would move. Not to buy it, to know whether it WOULD, in principle, one day, if the price were serious.\n\nI said what I have always said. That it is not for sale while it is a family company.',
+            text: 'He wanted to know if my 15% stake would move. I gave my usual answer: not for sale while it is a family company.',
             choices: [
                 { text: 'That is a condition, not a no.', next: 'aCondition' },
                 { text: 'Thank you for telling me.', next: 'thankYou' },
@@ -310,9 +291,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'aCondition',
             speaker: 'brother',
-            // The line the whole arc has been building to. He does not deny
-            // it. He clarifies it, and the clarification is worse.
-            text: 'It is a condition.\n\nEverything is a condition. Yours is a condition too, you would not sell while it is worth building, and one day it will not be, and then we will find out what we both meant.',
+            text: 'Everything is a condition. You would not sell while it is worth building either.',
             choices: [
                 {
                     text: '(leave it)',
@@ -325,9 +304,6 @@ export const brotherCaught: Conversation = {
                 {
                     text: 'Then tell me the day it changes.',
                     effects: [
-                        // The only durable thing available: not loyalty, but
-                        // notice. He can actually deliver that, and he knows
-                        // the difference even if he cannot see the rest.
                         { kind: 'dial', dial: 'brotherTrust', delta: 12 },
                         { kind: 'dial', dial: 'pearHostility', delta: 4 },
                     ],
@@ -338,7 +314,7 @@ export const brotherCaught: Conversation = {
         {
             id: 'thankYou',
             speaker: 'brother',
-            text: 'You are welcome. Genuinely.\n\nAnd, ask me. Always ask me. I have never once said no to a direct question and I am not going to start.',
+            text: 'Always ask me directly. I will always tell you what was said.',
             choices: [
                 {
                     text: 'I will ask.',
@@ -373,10 +349,7 @@ export const brotherMeetsPearQuietly: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            // He is not being sinister. He is making conversation, and the
-            // player has no reason to read anything into it - because nobody
-            // has told them there is anything to read.
-            text: 'In town on the fourteenth if you are around. Probably not, I know what your Thursdays look like.\n\nNo agenda. Lunch is already spoken for, but drinks after if you fancy it.',
+            text: 'I am in town on the fourteenth if you want drinks. Lunch is already booked with an acquaintance.',
             choices: [
                 {
                     text: 'Not this week.',
@@ -395,10 +368,7 @@ export const brotherMeetsPearQuietly: Conversation = {
         {
             id: 'whoWith',
             speaker: 'brother',
-            // A DIRECT QUESTION, AND HE ANSWERS IT. The player who happens to
-            // ask gets the whole thing for free, which is the rule he stated
-            // and the game honouring it. Almost nobody will ask.
-            text: 'Some people from Pear, actually. They have been asking for a year and I ran out of polite reasons.\n\nIt is nothing. I will tell you what they say.',
+            text: 'Some people from Pear. They have been asking for a meeting, so I agreed to hear them out. I will let you know what they say.',
             choices: [
                 {
                     text: 'Tell me afterwards.',
@@ -439,7 +409,7 @@ export const brotherMeetsPearQuietlyEvent: GameEvent = {
             ],
         },
     ],
-    chance: 0.7,
+    chance: 0.35,
     cooldown: 10,
     conversation: brotherMeetsPearQuietly,
     headline: 'Sector chatter about informal contact between Pear and Hale shareholders.',

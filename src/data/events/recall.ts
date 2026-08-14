@@ -114,7 +114,7 @@ export const recallConversation: Conversation = {
 export const recallEvent: GameEvent = {
     id: 'recall',
     when: [
-        { kind: 'quarterAtLeast', quarter: 5 },
+        { kind: 'quarterAtLeast', quarter: 16 },
         // You need something to recall. Capital is the cheapest available
         // proxy for "this is a real manufacturer now" - the condition
         // vocabulary has no unit count, and inventing one for a single event

@@ -131,31 +131,27 @@ export const cooLineShort: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'The plant is under crew and it has been for the whole quarter.\n\nThe part people upstairs never believe: a unit we do not build this quarter is not late, it is gone. It does not queue up and arrive in the spring. We are paying rent on capacity we cannot run.',
+            text: 'The plant ran below crew all quarter. Unbuilt capacity is lost revenue; we are paying facility overhead on lines we cannot staff.',
             choices: [
-                { text: 'How did we get short?', next: 'how' },
-                { text: 'It will even out.', next: 'evenOut' },
+                { text: 'Why are we understaffed?', next: 'how' },
+                { text: 'It will balance out.', next: 'evenOut' },
             ],
         },
 
         {
             id: 'how',
             speaker: 'coo',
-            // The actual mechanism, said plainly, because the player genuinely
-            // cannot see it anywhere else in the game.
-            text: 'You bought a bigger building.\n\nThat is not a dig, it is the arithmetic. A tier up is more capacity and more crew. The capacity arrives the day the build finishes. The crew arrives when I am allowed to go and find them, and the number I am allowed to find is set on your screen, not mine.',
+            text: 'Facility expansion added line capacity, but staff targets on your dashboard were not adjusted to match.',
             choices: [
-                { text: 'So what do you need?', next: 'need' },
-                { text: 'Then it corrects itself.', next: 'evenOut' },
+                { text: 'What is required?', next: 'need' },
+                { text: 'It will balance out.', next: 'evenOut' },
             ],
         },
 
         {
             id: 'evenOut',
             speaker: 'coo',
-            // She does not argue and does not sulk. She tells you what she is
-            // going to do about being ignored, which is the whole character.
-            text: 'It might.\n\nI will put it in the quarterly note either way. That is not a threat, that is what the note is for.',
+            text: 'I will document the capacity gap in the quarterly report for the operational record.',
             choices: [
                 {
                     text: '(leave it)',
@@ -165,16 +161,10 @@ export const cooLineShort: Conversation = {
                             kind: 'schedule',
                             conversation: 'coo-ops-note-cc',
                             afterQuarters: 1,
-                            // If it cannot be delivered within a year the
-                            // quarter it describes is ancient history and a
-                            // note about it would be a ghost.
                             expiresAfter: 4,
                         },
                     ],
                 },
-                // The way back. Same rule as the Pear ending and the friend's
-                // refusal: a lasting consequence arrived at by tapping through
-                // is one the player will not own.
                 { text: 'Wait. What do you need?', next: 'need' },
             ],
         },
@@ -182,11 +172,11 @@ export const cooLineShort: Conversation = {
         {
             id: 'need',
             speaker: 'coo',
-            text: 'Two things, and one of them is free.\n\nRaise the headcount target on the staff screen. I cannot do that and you can, and nothing does it automatically when the plant grows, I have checked, twice, in front of your father.\n\nSecond: do not switch overtime on to cover the gap.',
+            text: 'Raise the headcount target on the staff screen; nothing does it automatically. Avoid relying on overtime to patch production gaps.',
             choices: [
-                { text: 'Overtime is cheaper.', next: 'overtime' },
+                { text: 'Overtime is cheaper short-term.', next: 'overtime' },
                 {
-                    text: 'I will raise it today.',
+                    text: 'I will adjust the target.',
                     effects: [
                         {
                             kind: 'schedule',
@@ -202,13 +192,10 @@ export const cooLineShort: Conversation = {
         {
             id: 'overtime',
             speaker: 'coo',
-            // She concedes the point completely, which is what makes the rest
-            // of it land. Overtime really is cheaper this quarter, and the
-            // engine really does take morale every quarter it stays on.
-            text: 'It is cheaper this quarter. I am not going to pretend otherwise.\n\nBut the people on that line are the same people next quarter and the quarter after, and it takes morale off them every quarter it is switched on. You are not buying hours. You are borrowing them, and morale is the interest.',
+            text: 'It is cheaper this quarter. But morale is the interest we pay later: running it anyway burns out experienced hands.',
             choices: [
                 {
-                    text: 'Run it. I will pay the interest.',
+                    text: 'Run it anyway.',
                     effects: [
                         {
                             kind: 'schedule',
@@ -219,7 +206,7 @@ export const cooLineShort: Conversation = {
                     ],
                 },
                 {
-                    text: 'Then we hire. Raise the target.',
+                    text: 'Hire crew instead.',
                     effects: [
                         {
                             kind: 'schedule',
@@ -237,9 +224,7 @@ export const cooLineShort: Conversation = {
 export const cooLineShortEvent: GameEvent = {
     id: 'coo-line-short',
     when: LINE_SHORT,
-    chance: 0.8,
-    // Often enough to catch a player who upgraded and forgot, not so often
-    // that she becomes the weather of a plant that is merely growing.
+    chance: 0.40,
     cooldown: 4,
     conversation: cooLineShort,
     headline: 'Hale is understood to be running its main line below rated crew.',
@@ -248,15 +233,6 @@ export const cooLineShortEvent: GameEvent = {
 
 // ============================================================================
 //  2. THE FLOOR STOPS
-// ============================================================================
-//  The one the prompt calls a revolt, and the writing decision is that it is
-//  not one. Nobody shouts. They clock on and stand there, which is worse to be
-//  told about and much worse to look at.
-//
-//  Their demand is market pay and not a penny over it - the exact number the
-//  salary screen is a ratio OF. There is no negotiation in this scene because
-//  there is nothing to negotiate: they have asked for the thing the game
-//  already defines as normal.
 // ============================================================================
 const FLOOR_STOPPED: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
@@ -273,24 +249,22 @@ export const cooWalkout: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'I am standing on the floor. Nobody is working.\n\nNobody is shouting either. They came in, they clocked on, and they are at their stations doing nothing. I have been asked to pass on one sentence and I am going to pass it on exactly as it was given to me.\n\n"We are not asking for more than the people down the road."',
+            text: 'Production has halted. The floor clocked in and stood at stations. They are not asking for more than the people down the road.',
             choices: [
-                { text: 'What do they want?', next: 'want' },
-                { text: 'Send them home.', next: 'sendHome' },
+                { text: 'What is their demand?', next: 'want' },
+                { text: 'Dismiss shift.', next: 'sendHome' },
             ],
         },
 
         {
             id: 'want',
             speaker: 'coo',
-            text: 'Market. That is the entire demand. Not above it.\n\nAnd the number is on your salary screen as a ratio, so you already know what you have been running. What you do not know is that below this point we lose people at twice the rate, that is not me being dramatic, it is what the last four quarters did, and I have been replacing them quietly, and I have run out of quietly.',
+            text: 'Market rate wages. Not above it. Sub-market pay loses people at twice the rate.',
             choices: [
                 {
-                    text: 'Put it back to market.',
+                    text: 'Restore market wages.',
                     effects: [
                         { kind: 'flag', flag: 'plantWalkout' },
-                        // It happened, so it is news either way. The quiet
-                        // version: a stoppage that ended the same day.
                         {
                             kind: 'news',
                             headline: 'Brief stoppage at the Hale plant ends the same afternoon.',
@@ -303,16 +277,16 @@ export const cooWalkout: Conversation = {
                         },
                     ],
                 },
-                { text: 'They can be replaced.', next: 'replaced' },
+                { text: 'Workers are replaceable.', next: 'replaced' },
             ],
         },
 
         {
             id: 'sendHome',
             speaker: 'coo',
-            text: 'I did that at ten. They went without a word, which you should find more worrying than if they had argued.\n\nThey will be back tomorrow. So will this.',
+            text: 'Sent home for the day, but the stoppage resumes tomorrow without a wage adjustment.',
             choices: [
-                { text: 'What do they want?', next: 'want' },
+                { text: 'What is their demand?', next: 'want' },
                 {
                     text: '(leave it)',
                     effects: [
@@ -337,14 +311,10 @@ export const cooWalkout: Conversation = {
         {
             id: 'replaced',
             speaker: 'coo',
-            // True, and the order of the sentence is the argument: she agrees
-            // first. Everything the engine does here is real - hiring is a
-            // quarter delayed, new staff run at half efficiency for a quarter,
-            // and low morale lowers the hiring cap, so the good ones go first.
-            text: 'They can. It takes a quarter to hire them and a quarter before they are worth their wage.\n\nAnd the ones who leave first are the ones who can walk into a job tomorrow. What you keep is whoever nobody else wanted. I have watched a plant do this once before and it does not look like a disaster, it looks like everything taking slightly longer forever.',
+            text: 'They can. But those worth their wage leave first, and we recruit whoever nobody else wanted.',
             choices: [
                 {
-                    text: 'Do it my way.',
+                    text: 'Maintain current pay.',
                     effects: [
                         { kind: 'flag', flag: 'plantWalkout' },
                         { kind: 'flag', flag: 'cooOverruled' },
@@ -361,7 +331,7 @@ export const cooWalkout: Conversation = {
                         },
                     ],
                 },
-                { text: '...no. Put it back to market.', next: 'want' },
+                { text: 'Restore to market rate.', next: 'want' },
             ],
         },
     ],
@@ -370,33 +340,15 @@ export const cooWalkout: Conversation = {
 export const cooWalkoutEvent: GameEvent = {
     id: 'coo-walkout',
     when: FLOOR_STOPPED,
-    chance: 0.9,
+    chance: 0.45,
     cooldown: 8,
     conversation: cooWalkout,
     headline: 'Unrest reported on the Hale production floor.',
-    // The joint highest in the pool, alongside the cash warning, and by the
-    // same rule: priority is how much the player must act THIS quarter rather
-    // than how large the story is. The line is stopped.
     priority: 5,
 };
 
 // ============================================================================
 //  3. THE QUARTERLY NOTE, IN TWO VERSIONS
-// ============================================================================
-//  This is the "formal mail at quarter end" half of the character, and the two
-//  versions are the point of writing her at all.
-//
-//  THEY DIFFER ON ONE THING: WHETHER YOU ANSWERED HER. Not whether you were
-//  right, not whether the plant recovered - the scene cannot know either of
-//  those, because the fix happens on a screen a quarter later and no effect in
-//  the vocabulary can verify it. It CAN know whether the player replied,
-//  because that happened in the conversation. So that is all it claims.
-//
-//  The second version is the same letter with two additions: a sentence saying
-//  she raised it and got no reply, and a cc line. She is not being vindictive.
-//  She is a professional creating a record that protects her, which is what
-//  people do around a boss who does not answer, and the player gets to notice
-//  that they have become that boss.
 // ============================================================================
 export const cooOpsNote: Conversation = {
     id: 'coo-ops-note',
@@ -408,16 +360,16 @@ export const cooOpsNote: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            text: 'Standard note, no surprises in it.\n\nLine ran below rated crew for part of the quarter. Output tracked staffing, as it always does. Scrap was in band. Overtime as authorised.\n\nAs discussed.\n\nD.W.',
+            text: 'Line ran below rated crew for part of the quarter. Output tracked staffing, as it always does. Scrap was in band. Overtime as authorised.\n\nD.W.',
             choices: [
-                { text: 'Thanks. Anything I should be watching?', next: 'watching' },
+                { text: 'Anything to watch next quarter?', next: 'watching' },
                 { text: '(file it)' },
             ],
         },
         {
             id: 'watching',
             speaker: 'coo',
-            text: 'The staff target, every time the plant grows. It is the one number in this company that does not move on its own and everyone assumes does.\n\nI will keep saying it until it stops being true.',
+            text: 'Keep staffing targets aligned with facility scale as capacity expands.\n\nD.W.',
         },
     ],
 };
@@ -432,21 +384,16 @@ export const cooOpsNoteCc: Conversation = {
         {
             id: 'open',
             speaker: 'coo',
-            // Identical body. The two added sentences and the cc are the whole
-            // difference, and they are the sound of somebody protecting
-            // themselves rather than attacking you.
-            text: 'Standard note, no surprises in it.\n\nLine ran below rated crew for part of the quarter. Output tracked staffing, as it always does. Scrap was in band. Overtime as authorised.\n\nI raised the staffing position with the CEO during the quarter and did not receive a decision, so I am recording it here.\n\nD.W.\n\ncc: Board of Directors',
+            text: 'Line ran below rated crew for part of the quarter. Output tracked staffing, as it always does. Scrap was in band. Overtime as authorised.\n\nNote: did not receive a decision on staffing.\n\nD.W.\n\ncc: Board of Directors',
             choices: [
-                { text: 'Why is the board on this?', next: 'why' },
+                { text: 'Why copy the board?', next: 'why' },
                 { text: '(file it)' },
             ],
         },
         {
             id: 'why',
             speaker: 'coo',
-            // No apology and no accusation. She explains the procedure, which
-            // is more damning than either.
-            text: 'Because the plant lost a quarter of output and somebody will ask who knew.\n\nI am not making a point. I am answering that question in advance, in writing, once, so that I do not have to answer it under oath later. Your father understood the difference and never took it personally.\n\nAnswer me next time and the note goes back to one page.',
+            text: 'I am not making a point. I am writing down what happened. Answer me next time.\n\nD.W.',
         },
     ],
 };

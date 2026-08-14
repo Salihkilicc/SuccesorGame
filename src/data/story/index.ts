@@ -307,9 +307,9 @@ STORY_BEATS.push(
 //  A HALF EACH, so the arc still lands inside a year or two of its gate
 //  opening and no two runs walk it at the same pace. See `chance` above.
 STORY_BEATS.push(
-    { conversation: cfoBoardRoom.id, chance: 0.5 },
-    { conversation: cfoBragaName.id, chance: 0.5 },
-    { conversation: cfoResignation.id, chance: 0.5 },
+    { conversation: cfoBoardRoom.id, chance: 0.25 },
+    { conversation: cfoBragaName.id, chance: 0.25 },
+    { conversation: cfoResignation.id, chance: 0.25 },
 );
 
 // ----------------------------------------------------------------------------
@@ -321,6 +321,6 @@ STORY_BEATS.push(
 //  transactional.
 // ----------------------------------------------------------------------------
 STORY_BEATS.push(
-    { conversation: friendAsks.id, chance: 0.5 },
-    { conversation: friendGrows.id, chance: 0.5 },
+    { conversation: friendAsks.id, chance: 0.25 },
+    { conversation: friendGrows.id, chance: 0.25 },
 );

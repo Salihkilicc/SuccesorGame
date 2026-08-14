@@ -386,22 +386,34 @@ describe('the events that actually ship', () => {
             //  three different specific things - so this is the one place three
             //  archetypes are genuinely three people rather than one described
             //  three ways.
-            // ------------------------------------------------------------------
             ['who kept paying the beneficiary after he was told', {
                 capital: 60_000_000,
+                quarter: 85,
                 flags: { fatherDead: true, bragaKeptPaying: true },
             }],
             ['whose brother has an account', {
                 capital: 60_000_000,
+                quarter: 85,
                 flags: { fatherDead: true },
                 dials: { ...INITIAL_DIALS, brotherTrust: 15 },
+            }],
+            ['who engaged the mole', {
+                capital: 60_000_000,
+                quarter: 85,
+                flags: { fatherDead: true, moleEngaged: true },
             }],
             // ------------------------------------------------------------------
             //  AND THE ONE WHO KEEPS GOING BACK
             // ------------------------------------------------------------------
+            ['who helped his friend grow', {
+                capital: 80_000_000,
+                quarter: 85,
+                flags: { fatherDead: true, friendHelped: true, friendGrewUp: true },
+                dials: { ...INITIAL_DIALS, friendLoyalty: 90, pearHostility: 80 },
+            }],
             ['who kept his friend, bought his company, and stayed decent', {
                 capital: 200_000_000,
-                quarter: 44,
+                quarter: 200,
                 flags: {
                     fatherDead: true, friendHelped: true, friendGrewUp: true,
                     planoraOffered: true,
@@ -427,8 +439,9 @@ describe('the events that actually ship', () => {
 
         const seen = new Set<string>();
         for (const [, over] of archetypes) {
-            const w = world({ quarter: 40, ...over });
-            rollQuarter(EVENTS, w, emptyHistory(), 40, () => 1)
+            const q = (over as any).quarter ?? 40;
+            const w = world({ quarter: q, ...over });
+            rollQuarter(EVENTS, w, emptyHistory(), q, () => 1)
                 .eligible.forEach(e => seen.add(e.id));
         }
 

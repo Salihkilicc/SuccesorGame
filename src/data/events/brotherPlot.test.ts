@@ -37,7 +37,7 @@ const world = (over: { cfoTrust?: number; cfoResigned?: boolean } = {}): World =
         cfoTrust: over.cfoTrust ?? 70,
     },
     flags: { fatherDead: true, ...(over.cfoResigned ? { cfoResigned: true } : {}) },
-    quarter: 20,
+    quarter: 28,
     capital: 30_000_000,
     cash: 200_000,
     morale: 71,

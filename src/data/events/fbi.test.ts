@@ -41,7 +41,7 @@ const known = new Set(CONVERSATIONS.map(c => c.id));
 const world = (over: Partial<World> = {}): World => ({
     dials: { ...INITIAL_DIALS },
     flags: { fatherDead: true },
-    quarter: 24,
+    quarter: 80,
     capital: 100_000_000,
     cash: 500_000,
     morale: 71,

@@ -50,11 +50,11 @@ import type { GameEvent } from '../../core/events/types';
 // ---------------------------------------------------------------------------
 const GROWN: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
-    { kind: 'quarterAtLeast', quarter: 6 },
+    { kind: 'quarterAtLeast', quarter: 16 },
 ];
 
 /** Ordinary difficulty for this pack: often enough to be the weather of running a company. */
-const USUAL = { chance: 0.25, cooldown: 10, priority: 3 } as const;
+const USUAL = { chance: 0.15, cooldown: 10, priority: 3 } as const;
 
 // ============================================================================
 //  1. RANSOMWARE

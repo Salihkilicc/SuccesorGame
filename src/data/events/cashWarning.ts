@@ -119,7 +119,7 @@ export const cashWarningEvent: GameEvent = {
         // a reasonable response to noise.
         { kind: 'capitalAtMost', amount: THRESHOLD },
     ],
-    chance: 0.85,
+    chance: 0.40,
     // Often enough to be the arc's engine, not so often it becomes weather.
     cooldown: 6,
     conversation: cashWarningConversation,

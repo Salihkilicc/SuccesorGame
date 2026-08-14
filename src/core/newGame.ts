@@ -361,7 +361,11 @@ const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
     // ------------------------------------------------------------------
     useStoryStore.setState(s => ({
         seenScenes: Array.from(new Set([...s.seenScenes, ...OPENING_ACT])),
-        flags: { ...s.flags, ...Object.fromEntries(SKIPPED_ACT_FLAGS.map(f => [f, true])) },
+        flags: {
+            ...s.flags,
+            ...Object.fromEntries(SKIPPED_ACT_FLAGS.map(f => [f, true])),
+            openingQueued: true,
+        },
     }));
     useMessageStore.getState().removeThread('father');
     console.log('[newGame] Opening act skipped.');

@@ -48,7 +48,7 @@ const world = (over: {
         pearHostility: over.pearHostility ?? 80,
     },
     flags: { fatherDead: true, friendHelped: true, ...(over.flags ?? {}) },
-    quarter: 30,
+    quarter: 80,
     capital: 80_000_000,
     cash: 1_000_000,
     morale: 71,

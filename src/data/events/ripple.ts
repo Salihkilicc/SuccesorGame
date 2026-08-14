@@ -128,7 +128,7 @@ export const rippleVoltmotors: Conversation = {
 export const rippleVoltmotorsEvent: GameEvent = {
     id: 'ripple-voltmotors',
     when: VOLT,
-    chance: 0.85,
+    chance: 0.40,
     conversation: rippleVoltmotors,
     headline: 'Edison Motors is recruiting battery engineers. The timing is being noticed.',
     priority: 3,
@@ -192,7 +192,7 @@ export const rippleStreamify: Conversation = {
 export const rippleStreamifyEvent: GameEvent = {
     id: 'ripple-streamify',
     when: STREAMIFY,
-    chance: 0.85,
+    chance: 0.40,
     conversation: rippleStreamify,
     headline: 'Seven senior hires move from Streamify to Pear in a fortnight.',
     priority: 3,
@@ -255,7 +255,7 @@ export const rippleNovidia: Conversation = {
 export const rippleNovidiaEvent: GameEvent = {
     id: 'ripple-novidia',
     when: NOVIDIA,
-    chance: 0.85,
+    chance: 0.40,
     conversation: rippleNovidia,
     headline: 'OpenAI-ish opens a process design centre. Recruiters are working one address.',
     priority: 3,
@@ -321,7 +321,7 @@ export const rippleBiogen: Conversation = {
 export const rippleBiogenEvent: GameEvent = {
     id: 'ripple-biogen',
     when: BIOGEN,
-    chance: 0.85,
+    chance: 0.40,
     conversation: rippleBiogen,
     headline: 'Two BioGen investigators are in discussions with Johnson & Swanson.',
     priority: 3,
@@ -404,7 +404,7 @@ export const rippleSkynet: Conversation = {
 export const rippleSkynetEvent: GameEvent = {
     id: 'ripple-skynet',
     when: SKYNET,
-    chance: 0.85,
+    chance: 0.40,
     conversation: rippleSkynet,
     headline: 'Halberd Partners circulates a client note on the SkyNet transaction.',
     priority: 3,
@@ -486,7 +486,7 @@ export const ripplePlanora: Conversation = {
 export const ripplePlanoraEvent: GameEvent = {
     id: 'ripple-planora',
     when: PLANORA,
-    chance: 0.85,
+    chance: 0.40,
     conversation: ripplePlanora,
     headline: 'A Halberd client note names Planora, and a private loan made three years ago.',
     priority: 3,

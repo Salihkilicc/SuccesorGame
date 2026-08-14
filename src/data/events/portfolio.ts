@@ -154,7 +154,7 @@ export const portfolioPear: Conversation = {
 export const portfolioPearEvent: GameEvent = {
     id: 'portfolio-pear',
     when: PEAR_OFFER,
-    chance: 0.6,
+    chance: 0.30,
     cooldown: 10,
     conversation: portfolioPear,
     headline: 'Pear is understood to have approached Hale about a streaming asset.',
@@ -349,7 +349,7 @@ export const portfolioFriend: Conversation = {
 export const portfolioFriendEvent: GameEvent = {
     id: 'portfolio-friend',
     when: FRIEND_ASK,
-    chance: 0.7,
+    chance: 0.35,
     cooldown: 8,
     conversation: portfolioFriend,
     headline: 'Quiet interest in Planora from its former owner, according to two people.',

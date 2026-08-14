@@ -52,7 +52,7 @@ const world = (over: {
     dials: { ...INITIAL_DIALS, pearHostility: over.hostility ?? 85 },
     flags: over.onlyFlags
         ?? { fatherDead: true, refusedPear: true, ...(over.flags ?? {}) },
-    quarter: 24,
+    quarter: 32,
     capital: 80_000_000,
     cash: 500_000,
     morale: 71,

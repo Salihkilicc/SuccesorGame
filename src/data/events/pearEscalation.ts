@@ -43,7 +43,7 @@ import type { GameEvent } from '../../core/events/types';
 /** He has to have been told no, and be at war rather than merely irritated. */
 const AT_WAR = [
     { kind: 'flag' as const, flag: 'refusedPear' as const },
-    { kind: 'quarterAtLeast' as const, quarter: 10 },
+    { kind: 'quarterAtLeast' as const, quarter: 20 },
 ];
 
 // ============================================================================
@@ -59,14 +59,7 @@ export const pearPatent: Conversation = {
         {
             id: 'open',
             speaker: 'pear',
-            text:
-                'We are writing to remind you of Pear\'s portfolio in the areas in which '
-                + 'your current products operate. A schedule of the relevant grants is '
-                + 'attached for your records.\n\n'
-                + 'We are not at this time asserting any of them. This letter should not be '
-                + 'construed as an allegation of infringement, and we would ask that it is '
-                + 'not characterised as one.\n\n'
-                + 'Sent on behalf of Nathan Vogel.',
+            text: 'We are writing to remind you of Pear\'s patent portfolio in your operating categories. A schedule of relevant grants is attached.\n\nWe are not currently asserting infringement. Sent on behalf of Nathan Vogel.',
             choices: [
                 { text: 'Have counsel read the schedule.', next: 'counsel' },
                 { text: 'File it.', next: 'file' },
@@ -76,16 +69,10 @@ export const pearPatent: Conversation = {
         {
             id: 'counsel',
             speaker: 'pear',
-            // The reply to a reply is always the same document with one more
-            // sentence, and the sentence is always about the record.
-            text:
-                'Acknowledged.\n\n'
-                + 'Your counsel will find that four of the eleven grants are of doubtful '
-                + 'relevance and that we have said so ourselves, in writing, in 2019.\n\n'
-                + 'The remaining seven are the reason for the letter.',
+            text: 'Acknowledged. Your counsel will find that four of eleven grants are borderline, but the remaining seven are the reason for this notice.',
             choices: [
                 {
-                    text: 'Seven.',
+                    text: 'Noted.',
                     effects: [
                         { kind: 'capital', amount: -450_000 },
                         { kind: 'dial', dial: 'pearHostility', delta: 4 },
@@ -98,10 +85,7 @@ export const pearPatent: Conversation = {
         {
             id: 'file',
             speaker: 'pear',
-            text:
-                'Noted.\n\n'
-                + 'For the record, this office sends approximately forty such letters a '
-                + 'year and litigates two. We have found the ratio to be stable.',
+            text: 'Noted. This office issues forty such notices annually and litigates two.',
             choices: [
                 {
                     text: '(file it)',
@@ -118,7 +102,7 @@ export const pearPatent: Conversation = {
 export const pearPatentEvent: GameEvent = {
     id: 'pear-patent',
     when: [...AT_WAR, { kind: 'dialAtLeast', dial: 'pearHostility', band: 'high' }],
-    chance: 0.4,
+    chance: 0.20,
     cooldown: 8,
     conversation: pearPatent,
     headline: 'Pear is understood to have written to several smaller manufacturers about its patent portfolio.',
@@ -142,13 +126,7 @@ export const pearSuppliers: Conversation = {
         {
             id: 'open',
             speaker: 'pear',
-            text:
-                'Forwarded for your information.\n\n'
-                + '"...Pear is pleased to offer a three-year capacity commitment across all '
-                + 'lines, at the volumes discussed, subject to exclusivity within the '
-                + 'consumer category..."\n\n'
-                + 'Your assembler has forty days to respond. We thought it courteous that '
-                + 'you should hear it from us rather than from them.',
+            text: 'Forwarded for your information:\n\n"...Pear offers a three-year exclusivity commitment across consumer assembly lines..."\n\nYour assembler has 40 days to respond.',
             choices: [
                 { text: 'Match it.', next: 'match' },
                 { text: 'Let them go.', next: 'letGo' },
@@ -158,13 +136,7 @@ export const pearSuppliers: Conversation = {
         {
             id: 'match',
             speaker: 'pear',
-            // He does not gloat about the money. He observes the ratio, which
-            // is the only thing he actually cares about.
-            text:
-                'We understand a competing commitment has been made.\n\n'
-                + 'For context: the sum you have committed represents roughly nine percent '
-                + 'of your annual revenue and under one tenth of one percent of ours. We '
-                + 'note this not as a taunt but because the ratio is the whole of it.',
+            text: 'We understand a competing commitment was made. That sum represents 9% of your revenue and 0.1% of ours. The ratio speaks for itself.',
             choices: [
                 {
                     text: 'Noted.',
@@ -184,10 +156,7 @@ export const pearSuppliers: Conversation = {
         {
             id: 'letGo',
             speaker: 'pear',
-            text:
-                'Acknowledged.\n\n'
-                + 'We will of course honour any outstanding orders placed through them on '
-                + 'your behalf, at the prevailing rate.',
+            text: 'Acknowledged. We will honour outstanding orders placed through them at prevailing market rates.',
             choices: [
                 {
                     text: '(close)',
@@ -208,7 +177,7 @@ export const pearSuppliers: Conversation = {
 export const pearSuppliersEvent: GameEvent = {
     id: 'pear-suppliers',
     when: [...AT_WAR, { kind: 'dialAtLeast', dial: 'pearHostility', band: 'extreme' }],
-    chance: 0.4,
+    chance: 0.20,
     cooldown: 8,
     conversation: pearSuppliers,
     headline: 'Pear is said to be locking in multi-year assembly capacity.',
@@ -228,12 +197,7 @@ export const pearPriceWar: Conversation = {
         {
             id: 'open',
             speaker: 'pear',
-            text:
-                'As a courtesy: from the first of next month Pear will be reducing '
-                + 'consumer pricing in the categories in which we compete with you, by '
-                + 'between eighteen and twenty-four percent.\n\n'
-                + 'This is a category decision and is not directed at any particular '
-                + 'participant.',
+            text: 'As a courtesy: Pear will reduce consumer pricing by 18% to 24% across competing categories next month. It is not directed at any particular participant.',
             choices: [
                 { text: 'It is directed at one participant.', next: 'directed' },
                 { text: 'We will hold our price.', next: 'hold' },
@@ -243,12 +207,7 @@ export const pearPriceWar: Conversation = {
         {
             id: 'directed',
             speaker: 'pear',
-            // The single most Vogel sentence in the game: he agrees, in a way
-            // that makes agreeing worse than denying.
-            text:
-                'It is available to every participant in the category.\n\n'
-                + 'We are aware that the effect is not evenly distributed. That is a '
-                + 'property of the participants rather than of the decision.',
+            text: 'It is a property of the participants rather than of the decision. How competitors absorb margin compression is an internal matter.',
             choices: [
                 {
                     text: '(close)',
@@ -267,10 +226,7 @@ export const pearPriceWar: Conversation = {
         {
             id: 'hold',
             speaker: 'pear',
-            text:
-                'That is the correct decision for a company with a brand and the wrong one '
-                + 'for a company without.\n\n'
-                + 'We look forward to finding out which you are.',
+            text: 'A valid strategy for a premier brand; risky for others. We look forward to seeing the result.',
             choices: [
                 {
                     text: 'So do I.',
@@ -293,9 +249,9 @@ export const pearPriceWarEvent: GameEvent = {
     when: [
         ...AT_WAR,
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'extreme' },
-        { kind: 'quarterAtLeast', quarter: 16 },
+        { kind: 'quarterAtLeast', quarter: 32 },
     ],
-    chance: 0.35,
+    chance: 0.15,
     cooldown: 10,
     conversation: pearPriceWar,
     headline: 'Pricing pressure building in consumer electronics.',
@@ -307,23 +263,11 @@ export const pearPriceWarEvent: GameEvent = {
 // ============================================================================
 //  The channel break. See the note at the top of this file and `channelBreak`
 //  in core/story/graph.ts.
-//
-//  It is not a threat. The letters were the threats and they are finished. He
-//  has nothing left to send, so he sends the only thing he has never sent,
-//  from a number the player did not know he had - and the fact that he has it
-//  is the loudest thing in the message.
-//
-//  He is not angry either. He is INTERESTED, which is worse from him, and he
-//  says one true thing about the player's father that he has been holding
-//  since the very first letter about a panel in Lisbon.
 // ============================================================================
 export const pearMidnight: Conversation = {
     id: 'event-pear-midnight',
     channel: 'message',
     from: 'pear',
-    // ------------------------------------------------------------------
-    //  THE DECLARED EXCEPTION
-    // ------------------------------------------------------------------
     channelBreak:
         'Pear is mail-only, and the cast file has said since prompt 3 that a '
         + 'text from him means something has broken in him. This is that scene '
@@ -334,7 +278,7 @@ export const pearMidnight: Conversation = {
         {
             id: 'open',
             speaker: 'pear',
-            text: '00:41\n\nI have your number from the 2019 supplier register. I have had it for six years and this is the first time I have used it.\n\nYou took eleven points off me in a category I have led since before you could drive. Nobody has done that to me. Not once.',
+            text: '00:41. Found this in our 2019 supplier register.\n\nYou took eleven market share points from me in a category I led for decades. Nobody has done that before.',
             choices: [
                 { text: 'Is this a threat?', next: 'threat' },
                 { text: 'It is nearly one in the morning.', next: 'oneInTheMorning' },
@@ -344,8 +288,7 @@ export const pearMidnight: Conversation = {
         {
             id: 'threat',
             speaker: 'pear',
-            // The answer is no, and the no is worse.
-            text: 'No. I have sent you the threats. There are three of them and you have read them all and they did not work.\n\nThis is the other thing. I wanted to know what it was like to type it.',
+            text: 'No. I have sent you the threats. I wanted to know what it was like to type it.',
             choices: [
                 { text: 'And?', next: 'and' },
                 { text: 'Go to bed, Nathan.', next: 'goToBed' },
@@ -355,17 +298,17 @@ export const pearMidnight: Conversation = {
         {
             id: 'oneInTheMorning',
             speaker: 'pear',
-            text: 'It is 00:43 now. I have been sitting with the category numbers since nine.\n\nI am not upset. I want to be clear that I am not upset, because I know how this looks and I have thought about that too.',
+            text: 'It is 00:43. I have reviewed the category numbers all evening. I am clear-headed.',
             choices: [
                 { text: 'And?', next: 'and' },
-                { text: 'It looks like you are upset.', next: 'looksLike' },
+                { text: 'You sound frustrated.', next: 'looksLike' },
             ],
         },
 
         {
             id: 'looksLike',
             speaker: 'pear',
-            text: 'Yes.\n\nI am aware.',
+            text: 'Perhaps. I am aware of how it looks.',
             choices: [
                 { text: 'And?', next: 'and' },
             ],
@@ -374,9 +317,7 @@ export const pearMidnight: Conversation = {
         {
             id: 'and',
             speaker: 'pear',
-            // The true thing, and it is generous, and it costs him everything
-            // to say. This is the only warmth Vogel shows in the entire game.
-            text: 'Your father was better than me and I have never said that out loud. He was slower and he was smaller and he was right about the things I was wrong about, and the reason he never beat me is that he would not do the two or three things I was willing to do.\n\nI assumed you would be him. I have run this company for four years on that assumption.',
+            text: 'Your father was better than me in ways I never admitted. He lost only because he would not do the two or three things I was willing to do. I assumed you would be identical.',
             choices: [
                 { text: 'I am not him.', next: 'notHim' },
                 { text: 'I would like to be him.', next: 'likeToBe' },
@@ -386,12 +327,10 @@ export const pearMidnight: Conversation = {
         {
             id: 'notHim',
             speaker: 'pear',
-            // He is relieved. It is the closest he comes to a compliment and
-            // it is also him deciding to stop being careful.
-            text: 'No.\n\nGood. That is a great deal simpler.\n\nI will be in touch through the office.',
+            text: 'Good. That makes the competition simpler. I will be in touch through formal channels.',
             choices: [
                 {
-                    text: '(he does not reply again)',
+                    text: '(close message)',
                     effects: [
                         { kind: 'flag', flag: 'droveHimToIt' },
                         { kind: 'dial', dial: 'pearHostility', delta: 12 },
@@ -408,10 +347,10 @@ export const pearMidnight: Conversation = {
         {
             id: 'likeToBe',
             speaker: 'pear',
-            text: 'Then you will lose, eventually, the way he did. Slowly, and with everybody\'s respect, and it will be entirely your own decision.\n\nI would think less of you if you chose differently. I would also buy you in about six years.',
+            text: 'Then you will lose honorably as he did. I respect the choice, even as I prepare to acquire you in due course.',
             choices: [
                 {
-                    text: '(he does not reply again)',
+                    text: '(close message)',
                     effects: [
                         { kind: 'flag', flag: 'droveHimToIt' },
                         { kind: 'dial', dial: 'pearHostility', delta: 8 },
@@ -428,12 +367,10 @@ export const pearMidnight: Conversation = {
         {
             id: 'goToBed',
             speaker: 'pear',
-            // He does. And he never uses the number again, which the player
-            // will only notice in retrospect.
-            text: 'Yes.\n\nThat was the correct thing to say and I will not use this number again.',
+            text: 'Fair advice. I will not use this number again.',
             choices: [
                 {
-                    text: '(he does not)',
+                    text: '(close message)',
                     effects: [
                         { kind: 'flag', flag: 'droveHimToIt' },
                         { kind: 'dial', dial: 'pearHostility', delta: 10 },
@@ -468,7 +405,7 @@ export const pearMidnightEvent: GameEvent = {
     ],
     // Near-certain, because by this point it is not a random event. It is a
     // consequence with a delay.
-    chance: 0.8,
+    chance: 0.40,
     conversation: pearMidnight,
     headline: 'Unusual overnight trading in Pear. No announcement accompanied it.',
     priority: 6,

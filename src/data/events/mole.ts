@@ -55,6 +55,7 @@ import type { GameEvent } from '../../core/events/types';
 /** He does not hand this over lightly, and both conditions are him, not you. */
 const THE_DOOR_IS_THERE = [
     { kind: 'flag' as const, flag: 'fatherDead' as const },
+    { kind: 'quarterAtLeast' as const, quarter: 80 },
     { kind: 'noFlag' as const, flag: 'friendRefused' as const },
     { kind: 'flag' as const, flag: 'friendHelped' as const },
     { kind: 'dialAtLeast' as const, dial: 'friendLoyalty' as const, band: 'extreme' as const },
@@ -77,9 +78,9 @@ export const moleNumber: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'i am going to say something and then i am going to say a second thing and the second thing is the important one\n\nthere is a bloke. he used to do security for the assembler in penang and he does not any more, and the reason he does not is that he is very good at getting into places',
+            text: 'a contact who used to handle security for our assembler in penang is offering access. he is very effective at getting into places.',
             choices: [
-                { text: 'What is the second thing?', next: 'secondThing' },
+                { text: 'What is the catch?', next: 'secondThing' },
                 { text: 'Marco, no.', next: 'marcoNo' },
             ],
         },
@@ -87,24 +88,20 @@ export const moleNumber: Conversation = {
         {
             id: 'marcoNo',
             speaker: 'friend',
-            // He is relieved. The scene lets the player close it here and it
-            // does not come back, and he never mentions it again.
-            text: 'yeah\n\nyeah ok. i have been carrying his number around for a month feeling clever about it and i think i wanted someone to tell me not to\n\nforget it',
+            text: 'yeah ok. i had his number and i think i wanted someone to tell me not to. forgotten.',
             choices: [
                 {
                     text: 'Forgotten.',
                     effects: [{ kind: 'dial', dial: 'friendLoyalty', delta: 8 }],
                 },
-                { text: 'Tell me the second thing anyway.', next: 'secondThing' },
+                { text: 'Give me the details anyway.', next: 'secondThing' },
             ],
         },
 
         {
             id: 'secondThing',
             speaker: 'friend',
-            // THE SECOND THING, and it is the whole ethic of the scene: he
-            // will not be the one who introduced them.
-            text: 'if you ring him, do not tell me\n\ni mean it. i do not want to know, and it is not because of you. it is because i have a company and a person called priya who has a mortgage and if this goes wrong i would like to be a man who genuinely did not know',
+            text: 'if you contact him, do not tell me. i want zero involvement or knowledge if things go south.',
             choices: [
                 { text: 'Then do not give me the number.', next: 'doNotGive' },
                 { text: 'Send it.', next: 'sendIt' },
@@ -114,10 +111,10 @@ export const moleNumber: Conversation = {
         {
             id: 'doNotGive',
             speaker: 'friend',
-            text: 'that is the correct answer and i am going to send it anyway, because if i do not you will find someone worse in about eight months\n\nat least this one is careful',
+            text: 'right call. but i am sending it anyway because you might need it sooner than you think.',
             choices: [
                 {
-                    text: 'That is not a reason.',
+                    text: 'Noted.',
                     effects: [
                         { kind: 'flag', flag: 'moleUnlocked' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 4 },
@@ -129,13 +126,12 @@ export const moleNumber: Conversation = {
         {
             id: 'sendIt',
             speaker: 'friend',
-            text: 'sent\n\nlast thing and then i am going to go and be somewhere else: he does not do favours and he is not on your side. he is on the side of the invoice',
+            text: 'sent. remember: he does not do favours, he only works for invoices.',
             choices: [
                 {
                     text: 'Understood.',
                     effects: [
                         { kind: 'flag', flag: 'moleUnlocked' },
-                        // Not a loyalty gain. He is not pleased with himself.
                         { kind: 'dial', dial: 'friendLoyalty', delta: -3 },
                     ],
                 },
@@ -147,7 +143,7 @@ export const moleNumber: Conversation = {
 export const moleNumberEvent: GameEvent = {
     id: 'mole-number',
     when: [...THE_DOOR_IS_THERE, { kind: 'noFlag', flag: 'moleUnlocked' }],
-    chance: 0.5,
+    chance: 0.25,
     cooldown: 6,
     conversation: moleNumber,
     headline: 'Security consultants report rising interest in supply-chain intelligence.',
@@ -170,34 +166,28 @@ export const moleFirstContact: Conversation = {
         {
             id: 'open',
             speaker: 'unknown',
-            // Every sentence is deniable. That is the character and it is also
-            // what makes the player's answer feel like theirs.
-            text: 'Marco said you might not.\n\nI do research. Public filings, supplier registers, shipping manifests, the things people put in job adverts without thinking. All of it legal, all of it boring, most of it nobody bothers to assemble.\n\nThat is the first tier.',
+            text: 'Marco said you might not.\n\nI compile market intelligence from filings, manifests, and supplier registers. Legal, thorough research.\n\nThat is tier one.',
             choices: [
-                { text: 'And the second tier?', next: 'secondTier' },
-                { text: 'The first tier is fine.', next: 'firstTierOnly' },
+                { text: 'And tier two?', next: 'secondTier' },
+                { text: 'Tier one is fine.', next: 'firstTierOnly' },
             ],
         },
 
         {
             id: 'firstTierOnly',
             speaker: 'unknown',
-            // A genuine, legal, mildly useful service. Taking it is not a
-            // crime and the arc does not punish it - it simply does not open.
-            text: 'Sensible. Most of what people pay me for on the second tier they could have had from the first with more patience.\n\nEighty thousand a year. You will get a document every quarter and it will be dull and about one in five will be worth the whole fee.',
+            text: 'Eighty thousand a year. Quarterly reports on competitor supplier flows and public data synthesis.',
             choices: [
                 {
                     text: 'Send an invoice.',
                     effects: [
                         { kind: 'capital', amount: -80_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
-                        // Real value, no risk. This is the honest door and it
-                        // is deliberately not worthless.
                         { kind: 'brand', amount: 2 },
                     ],
                 },
                 {
-                    text: 'Not even that.',
+                    text: 'Not interested.',
                     effects: [{ kind: 'dial', dial: 'publicReputation', delta: 1 }],
                 },
             ],
@@ -206,9 +196,9 @@ export const moleFirstContact: Conversation = {
         {
             id: 'secondTier',
             speaker: 'unknown',
-            text: 'The second tier is the same information before it is public.\n\nI am not going to describe how on a telephone. I will say that nobody gets hurt, nothing gets broken, and the only person who ever goes to prison for it is the one at your end.',
+            text: 'Tier two is the same intelligence before public release. Confidential, high-value, and sensitive.',
             choices: [
-                { text: 'That is an odd sales pitch.', next: 'oddPitch' },
+                { text: 'How do you operate?', next: 'oddPitch' },
                 { text: 'Not interested.', next: 'notInterested' },
             ],
         },
@@ -216,11 +206,10 @@ export const moleFirstContact: Conversation = {
         {
             id: 'oddPitch',
             speaker: 'unknown',
-            // The most honest character in the game, and it is the criminal.
-            text: 'It is an accurate one. I have been doing this for nine years and I have never once been the one in the room with the lawyers.\n\nYou are buying a document. Where it came from is a thing you will decide not to ask about, and that decision is the product.',
+            text: 'I source documents. You purchase them. The origin is something you choose not to question.',
             choices: [
                 {
-                    text: 'What would the first one be?',
+                    text: 'What would the first document be?',
                     effects: [
                         { kind: 'flag', flag: 'moleEngaged' },
                         {
@@ -237,12 +226,10 @@ export const moleFirstContact: Conversation = {
         {
             id: 'notInterested',
             speaker: 'unknown',
-            // He does not push. The number stays live, which is worse than a
-            // hard close - the player can come back, and knows it.
-            text: 'Fine.\n\nThis number works for about two years. I will not contact you again.',
+            text: 'Understood. This channel remains open for two years.',
             choices: [
                 {
-                    text: '(delete the thread)',
+                    text: '(delete thread)',
                     effects: [{ kind: 'dial', dial: 'publicReputation', delta: 2 }],
                 },
             ],
@@ -256,27 +243,10 @@ export const moleFirstContactEvent: GameEvent = {
         { kind: 'flag', flag: 'moleUnlocked' },
         { kind: 'noFlag', flag: 'moleEngaged' },
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'high' },
-        // ------------------------------------------------------------------
-        //  HIS FIRST LINE NAMES MARCO, SO MARCO MUST HAVE SENT IT
-        // ------------------------------------------------------------------
-        //  `moleUnlocked` was already being raised by two OTHER arcs before
-        //  this file existed - the CFO's "look into Braga" and the brother's
-        //  Halberd disclosure - and both are reasonable ways to learn this
-        //  world exists. Neither involves Marco.
-        //
-        //  Gated on the flag alone, a player who took either of those paths
-        //  would get a stranger opening with "Marco said you might not" about
-        //  a number Marco never sent. Nothing would have crashed; the scene
-        //  would simply have been about something that did not happen.
-        //
-        //  The other two arcs keep raising the flag. It means "you now know
-        //  this world exists", which is a real thing for a later prompt to
-        //  read. It just is not this scene.
-        // ------------------------------------------------------------------
         { kind: 'flag', flag: 'friendHelped' },
         { kind: 'noFlag', flag: 'friendRefused' },
     ],
-    chance: 0.6,
+    chance: 0.30,
     cooldown: 4,
     conversation: moleFirstContact,
     headline: 'Corporate intelligence firms report a busy quarter.',
@@ -301,9 +271,9 @@ export const moleOffer: Conversation = {
         {
             id: 'open',
             speaker: 'unknown',
-            text: 'Pear\'s wholesale price book for the next two quarters. Every SKU, every volume band, every distributor discount.\n\nThree hundred thousand. It is worth more than that to you and we both know it, and I price on what I can get rather than what it is worth.',
+            text: 'Pear wholesale price book for the next two quarters: every SKU and distributor tier. Three hundred thousand.',
             choices: [
-                { text: 'How do I know it is real?', next: 'howDoIKnow' },
+                { text: 'How do I verify authenticity?', next: 'howDoIKnow' },
                 { text: 'No.', next: 'no' },
             ],
         },
@@ -311,9 +281,9 @@ export const moleOffer: Conversation = {
         {
             id: 'howDoIKnow',
             speaker: 'unknown',
-            text: 'You will have last quarter\'s free, this afternoon, and you can check it against what they actually charged you.\n\nIf it is wrong you have lost an afternoon. If it is right you will pay me, and you will pay me again in November.',
+            text: 'I provide last quarter\'s actual pricing today for free to cross-reference against your invoices.',
             choices: [
-                { text: 'Send it.', next: 'sendIt' },
+                { text: 'Send verification.', next: 'sendIt' },
                 { text: 'No.', next: 'no' },
             ],
         },
@@ -321,18 +291,13 @@ export const moleOffer: Conversation = {
         {
             id: 'sendIt',
             speaker: 'unknown',
-            // He is right, which is the trap. The information is real and
-            // immediately valuable, and the cost arrives in a different
-            // quarter through a different door.
-            text: 'It was right. You have checked; that is what the afternoon was for.\n\nAccount details are in the next message. Do not pay it out of the company.',
+            text: 'Verification confirmed. Wire details attached. Do not remit from corporate accounts.',
             choices: [
                 {
-                    text: 'Pay it.',
+                    text: 'Pay fee ($300k).',
                     effects: [
                         { kind: 'capital', amount: -300_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
-                        // Real and large. It has to be, or the risk is a
-                        // moralising tax rather than a decision.
                         { kind: 'brand', amount: 6 },
                         { kind: 'dial', dial: 'pearHostility', delta: 5 },
                         {
@@ -346,8 +311,6 @@ export const moleOffer: Conversation = {
                     effects: [
                         { kind: 'capital', amount: -300_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
-                        // THE LINE THAT MOVES THE ODDS. Nothing tells the
-                        // player it did.
                         { kind: 'flag', flag: 'moleRepeated' },
                         { kind: 'brand', amount: 9 },
                         { kind: 'dial', dial: 'pearHostility', delta: 8 },
@@ -363,7 +326,7 @@ export const moleOffer: Conversation = {
         {
             id: 'no',
             speaker: 'unknown',
-            text: 'Noted.\n\nThe number still works.',
+            text: 'Noted. Channel remains active.',
             choices: [
                 {
                     text: '(close)',
@@ -378,26 +341,19 @@ export const moleOfferEvent: GameEvent = {
     id: 'mole-offer',
     when: [
         { kind: 'flag', flag: 'moleEngaged' },
-        { kind: 'noFlag', flag: 'fbiGuilty' },
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'high' },
+        { kind: 'noFlag', flag: 'fbiIndicted' },
+        { kind: 'noFlag', flag: 'droveHimToIt' },
     ],
-    chance: 0.45,
-    cooldown: 5,
+    chance: 0.15,
+    cooldown: 8,
     conversation: moleOffer,
-    headline: 'Corporate intelligence firms report a busy quarter.',
-    priority: 2,
+    headline: 'Market participants notice unusual pricing agility in consumer hardware.',
+    priority: 3,
 };
 
 // ============================================================================
-//  4. THE LETTER — two tiers, and the tier is the odds
-// ============================================================================
-//  Identical text, different probability. That is the entire mechanism and it
-//  is invisible: the player who bought once and the player who said "there
-//  will be more" get exactly the same letter, and one of them gets it three
-//  times sooner.
-//
-//  It is written as a request for assistance, because that is what the first
-//  one always is.
+//  4. THE FBI FIRST CONTACT — standard and repeated
 // ============================================================================
 export const fbiFirstContact: Conversation = {
     id: 'event-fbi-first-contact',
@@ -425,8 +381,6 @@ export const fbiFirstContact: Conversation = {
         {
             id: 'notRequired',
             speaker: 'fbi',
-            // The second letter, and it is the first one with the sentence
-            // taken out. Nothing else changes.
             text:
                 'Acknowledged.\n\n'
                 + 'For completeness: this office has issued the same request to eleven '
@@ -458,8 +412,6 @@ export const fbiFirstContact: Conversation = {
                     text: 'Understood.',
                     effects: [
                         { kind: 'flag', flag: 'fbiContacted' },
-                        // Cooperating early is worth something real, and the
-                        // player has no way to know how much until later.
                         { kind: 'dial', dial: 'publicReputation', delta: 4 },
                         {
                             kind: 'news',
@@ -489,11 +441,6 @@ export const fbiFirstContactEvent: GameEvent = {
 
 /**
  * Bought more than once. Three times the odds, same letter.
- *
- * A separate event rather than a modifier because the engine takes a fixed
- * chance per event, and the exclusive gates make exactly one of the two live
- * at a time. The player is never shown either number and nothing anywhere
- * says the odds moved - the only evidence is that it comes sooner.
  */
 export const fbiFirstContactRepeatEvent: GameEvent = {
     id: 'fbi-first-contact-repeat',

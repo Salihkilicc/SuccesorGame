@@ -129,7 +129,7 @@ export const casinoScandalEvent: GameEvent = {
     when: CAUGHT,
     // Thirty per cent, rolled again every quarter the streak survives. The
     // player is choosing to keep going, and each quarter is a fresh choice.
-    chance: 0.30,
+    chance: 0.15,
     // No cooldown: once per game, because the flag closes the gate anyway and
     // a second identical story is not a second story.
     conversation: casinoScandalScene,

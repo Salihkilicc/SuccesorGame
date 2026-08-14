@@ -106,8 +106,8 @@ export const initialProductState: ProductState = {
             //  and the first lesson points at it.
             // ------------------------------------------------------------------
             sellingPrice: 620,
-            productionUnits: 2025,
-            marketingBudget: 0,
+            productionUnits: 3500,
+            marketingBudget: 67_000,
             inventory: 0,
             revenue: 0,
 

@@ -37,7 +37,7 @@ const CHANNEL_OPEN = [
     { kind: 'flag' as const, flag: 'fatherDead' as const },
     { kind: 'noFlag' as const, flag: 'friendRefused' as const },
     { kind: 'flag' as const, flag: 'friendHelped' as const },
-    { kind: 'quarterAtLeast' as const, quarter: 11 },
+    { kind: 'quarterAtLeast' as const, quarter: 24 },
 ];
 
 // ============================================================================
@@ -52,7 +52,7 @@ export const friendGossipSmall: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'this is probably nothing but i heard it twice this week so i am passing it on\n\nsomeone at microhard is telling people their consumer line is "under review". could mean they are killing it. could mean a man in a meeting said a word',
+            text: 'heard a rumour this week: someone at microhard says their consumer line is "under review". might mean killing it, might be nothing.',
             choices: [
                 { text: 'Where did you hear it?', next: 'where' },
                 { text: 'Keep listening.', next: 'keep' },
@@ -61,7 +61,7 @@ export const friendGossipSmall: Conversation = {
         {
             id: 'where',
             speaker: 'friend',
-            text: 'a conference. and then from someone who was at the same conference, which is how one rumour becomes two rumours\n\nso: nothing. i am aware it is nothing',
+            text: 'a conference. from someone who heard it from someone else.\n\nso: likely nothing, just passing it along.',
             choices: [
                 { text: 'Keep listening anyway.', next: 'keep' },
             ],
@@ -69,7 +69,7 @@ export const friendGossipSmall: Conversation = {
         {
             id: 'keep',
             speaker: 'friend',
-            text: 'always do\n\ni am a terrible gossip. it is my one business skill',
+            text: 'always do.\n\ni am a terrible gossip. my one business skill.',
             choices: [
                 {
                     text: 'It is a real one.',
@@ -86,7 +86,7 @@ export const friendGossipSmallEvent: GameEvent = {
         ...CHANNEL_OPEN,
         { kind: 'dialAtMost', dial: 'friendLoyalty', band: 'high' },
     ],
-    chance: 0.35,
+    chance: 0.15,
     cooldown: 5,
     conversation: friendGossipSmall,
     headline: 'Trade press picks up talk of a strategic review at Microhard.',
@@ -108,7 +108,7 @@ export const friendGossipReal: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'ok this one is actually something\n\nfacespace are launching into your category. not next year, eleven weeks. i know because they tried to hire my head of design on friday and he came and told me the whole pitch deck',
+            text: 'ok this one is real.\n\nfacespace is launching into your category in eleven weeks. they tried hiring my design head and pitched him the whole deck.',
             choices: [
                 { text: 'Eleven weeks.', next: 'elevenWeeks' },
                 { text: 'Does he know he told you?', next: 'doesHeKnow' },
@@ -117,9 +117,7 @@ export const friendGossipReal: Conversation = {
         {
             id: 'doesHeKnow',
             speaker: 'friend',
-            // A small joke that is also the character: he does not experience
-            // any of this as espionage, because it is not.
-            text: 'he told me on purpose, he was showing off. people love telling you about the job they did not take\n\nhe is staying by the way. i gave him the design lead thing i was going to give him anyway and now it looks like i fought for him',
+            text: 'he told me on purpose, showing off. people love bragging about jobs they turned down.\n\nhe is staying, i matched it.',
             choices: [
                 { text: 'Eleven weeks.', next: 'elevenWeeks' },
             ],
@@ -127,14 +125,12 @@ export const friendGossipReal: Conversation = {
         {
             id: 'elevenWeeks',
             speaker: 'friend',
-            text: 'eleven. and they are going in cheap, which is the bit that should worry you rather than the date\n\nanyway. that is what i have. do something clever with it',
+            text: 'eleven weeks, and they are pricing cheap.\n\ndo something clever with the heads-up.',
             choices: [
                 {
                     text: 'Thank you. Genuinely.',
                     effects: [
                         { kind: 'dial', dial: 'friendLoyalty', delta: 6 },
-                        // Real and usable: a quarter's warning is worth a
-                        // brand point or two if the player acts on it.
                         { kind: 'brand', amount: 3 },
                         {
                             kind: 'news',
@@ -151,9 +147,7 @@ export const friendGossipReal: Conversation = {
         {
             id: 'shouldYou',
             speaker: 'friend',
-            // The player checking is the moment the arc is quietly about, and
-            // he does not understand the question - which is the answer.
-            text: 'probably not? it is not my information\n\nit is not theirs either though. a bloke told me a thing in a pub. i am not going to start running my friendships through a lawyer',
+            text: 'probably not? but someone told me in a pub. i am not running my friendships through legal.',
             choices: [
                 {
                     text: 'Thank you.',
@@ -178,7 +172,7 @@ export const friendGossipRealEvent: GameEvent = {
         { kind: 'dialAtLeast', dial: 'friendLoyalty', band: 'extreme' },
         { kind: 'noFlag', flag: 'knowsPearWeakness' },
     ],
-    chance: 0.4,
+    chance: 0.20,
     cooldown: 6,
     conversation: friendGossipReal,
     headline: 'Trade press picks up talk of a new consumer entrant.',
@@ -202,7 +196,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'are you up\n\ni have had three glasses of something a man in a waistcoat described to me at length and i have been sitting here for twenty minutes deciding whether to send this',
+            text: 'are you up\n\ni have been sitting here deciding whether to send this after a late dinner.',
             choices: [
                 { text: 'Go to bed, Marco.', next: 'goToBed' },
                 { text: 'I am up.', next: 'iAmUp' },
@@ -212,10 +206,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'goToBed',
             speaker: 'friend',
-            // THE EXPENSIVE DECENT ANSWER. He is grateful, the player gets
-            // nothing, and the door does not close - it just does not open
-            // tonight. The scene can come round again.
-            text: 'yeah\n\nyeah you are right. i will ring you about it when i am boring and it is daylight and i will probably not say it then either\n\nnight x',
+            text: 'yeah you are right. better said in daylight anyway.\n\nnight x',
             choices: [
                 {
                     text: 'Night.',
@@ -227,7 +218,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'iAmUp',
             speaker: 'friend',
-            text: 'right\n\nthe pear thing. i have been sat next to their supply people twice this year because we use the same contract assembler in penang, which nobody knows and which i am now telling you',
+            text: 'the pear thing. we use the same assembler in penang, and their supply reps let something slip.',
             choices: [
                 { text: 'What about them?', next: 'whatAbout' },
                 { text: 'You should not tell me this.', next: 'shouldNot' },
@@ -237,7 +228,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'shouldNot',
             speaker: 'friend',
-            text: 'no\n\ni know. i have thought about that and i have decided i do not care, which is not the same as it being fine\n\ndo you want it or not',
+            text: 'i know. but i want to tell you.\n\ndo you want it or not?',
             choices: [
                 { text: 'No. Not like this.', next: 'notLikeThis' },
                 { text: 'Tell me.', next: 'whatAbout' },
@@ -247,7 +238,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'notLikeThis',
             speaker: 'friend',
-            text: 'ok\n\nfor what it is worth i think you are being an idiot and i also think it is the right call, which is the most annoying combination of things to be on the end of\n\nnight',
+            text: 'ok. you are stubborn and it is the right call.\n\nnight.',
             choices: [
                 {
                     text: 'Night.',
@@ -259,17 +250,13 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'whatAbout',
             speaker: 'friend',
-            // The actual intelligence, and it is specific enough to be worth
-            // something: a single point of failure with a date on it.
-            text: 'they are single sourced on the display driver. one fab, one line, and the line is being retooled in the autumn\n\nfor about six weeks pear cannot increase volume on anything. they can hold, they cannot grow. if you were going to pick a quarter to take a category off them it is that one',
+            text: 'pear is single sourced on display drivers, and the line retools this autumn. for six weeks they cannot increase volume at all. that is your window.',
             choices: [
                 {
                     text: 'That is enormous.',
                     effects: [
                         { kind: 'flag', flag: 'knowsPearWeakness' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 5 },
-                        // A real, usable advantage. Pear cannot answer for a
-                        // quarter, and the market notices the gap being taken.
                         { kind: 'brand', amount: 8 },
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
                         {
@@ -288,7 +275,7 @@ export const friendPearWeakness: Conversation = {
         {
             id: 'notAnyone',
             speaker: 'friend',
-            text: 'i am not going to tell anyone else, i am telling YOU, that is the entire\n\noh. yes. i see',
+            text: 'only telling you. sleep well.',
             choices: [
                 {
                     text: 'Get some sleep.',
@@ -317,7 +304,7 @@ export const friendPearWeaknessEvent: GameEvent = {
         { kind: 'noFlag', flag: 'knowsPearWeakness' },
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'low' },
     ],
-    chance: 0.5,
+    chance: 0.25,
     cooldown: 4,
     conversation: friendPearWeakness,
     headline: 'Quiet talk of capacity constraints among the large assemblers.',
@@ -345,7 +332,7 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'sitting down? probably not, it is a tuesday\n\ni have had an offer for planora. a real one, from people with a data room and a lawyer who says "quantum" instead of "amount"',
+            text: 'i had a buyout offer for planora. real term sheet, serious buyer.',
             choices: [
                 { text: 'Is it a good offer?', next: 'goodOffer' },
                 { text: 'Do you want to sell?', next: 'doYouWant' },
@@ -355,9 +342,7 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'doYouWant',
             speaker: 'friend',
-            // He is honest about being tired, which is the real reason
-            // founders sell and almost never the reason they give.
-            text: 'i think so? i am forty-one and i have run this for nine years and last month i realised i was excited about a spreadsheet\n\nthat is not a crisis. that is just what it is now',
+            text: 'i think so. nine years is long enough and i am tired.',
             choices: [
                 { text: 'Is it a good offer?', next: 'goodOffer' },
             ],
@@ -366,7 +351,7 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'goodOffer',
             speaker: 'friend',
-            text: 'it is a fine offer. it is what the company is worth to somebody who has never met it\n\nwhich is why i am messaging you instead of signing it',
+            text: 'fair price. but i would rather sell to you than a faceless fund.',
             choices: [
                 { text: 'What are you asking?', next: 'whatAsking' },
                 { text: 'Take their money, Marco.', next: 'takeTheirs' },
@@ -376,11 +361,7 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'takeTheirs',
             speaker: 'friend',
-            // The player being decent, again, at a real cost - and the door
-            // stays shut afterwards. This is the version most people should
-            // take and the game does not reward it with anything but a
-            // sentence.
-            text: 'you are a genuinely terrible businessman and i am very glad about it\n\nfine. i will take theirs. come to the thing in june, i will be the one in a suit looking like a hostage',
+            text: 'fair enough. i will take their deal. come celebrate when it closes.',
             choices: [
                 {
                     text: 'I will be there.',
@@ -398,16 +379,13 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'whatAsking',
             speaker: 'friend',
-            text: 'less than them. properly less, not politely less\n\ni would rather it went to someone who will not fire priya in the first fortnight. that is worth money to me and i have decided i am allowed to spend it',
+            text: 'a solid discount. i want planora in good hands who will keep the team.',
             choices: [
                 {
                     text: 'Then I will look at it properly.',
                     effects: [
                         { kind: 'flag', flag: 'planoraOffered' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 8 },
-                        // The discount is real and it persists - the anchor
-                        // moves, not just the price, so it does not drift
-                        // back to the listed value within a few quarters.
                         { kind: 'reprice', company: 'tech_planora', multiplier: 0.55 },
                         {
                             kind: 'news',
@@ -425,7 +403,7 @@ export const friendOffersPlanora: Conversation = {
         {
             id: 'notGoingTo',
             speaker: 'friend',
-            text: 'that is what i thought you would say and i am annoyed about how much i wanted you to say the other thing\n\nno, you are right. it would have been weird forever',
+            text: 'figured you might say that. you are right, keeping business separate is cleaner.',
             choices: [
                 {
                     text: 'It would have.',
@@ -451,9 +429,9 @@ export const friendOffersPlanoraEvent: GameEvent = {
         { kind: 'flag', flag: 'friendGrewUp' },
         { kind: 'noFlag', flag: 'planoraOffered' },
         { kind: 'dialAtLeast', dial: 'friendLoyalty', band: 'extreme' },
-        { kind: 'quarterAtLeast', quarter: 20 },
+        { kind: 'quarterAtLeast', quarter: 80 },
     ],
-    chance: 0.45,
+    chance: 0.25,
     cooldown: 8,
     conversation: friendOffersPlanora,
     headline: 'Planora is said to have attracted interest.',

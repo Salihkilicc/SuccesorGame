@@ -119,8 +119,8 @@ describe('refusing closes every door', () => {
 describe('and says nothing about it', () => {
     it('the refusal card is gracious rather than final', () => {
         const no = friendAsks.nodes.find(n => n.id === 'no')!;
-        expect(no.text).toContain('forget i said anything');
-        expect(no.text).toContain('see you soon');
+        expect(no.text).toContain('forget i asked');
+        expect(no.text).toContain('talk soon');
     });
 
     it('nothing anywhere announces that a door shut', () => {

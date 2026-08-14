@@ -219,14 +219,14 @@ describe('two conversations from one person cannot collide', () => {
     const senderOf = (p: Pending) => senders[p.conversationId];
 
     it('the second is held back a quarter', () => {
-        const r = drain([P('a', 0), P('b', 1), P('c', 2)], 1, () => true, undefined, senderOf);
+        const r = drain([P('a', 0), P('b', 1), P('c', 2)], 1, () => true, 2, senderOf);
         expect(r.deliver.map(d => d.conversationId)).toEqual(['a', 'c']);
         expect(r.keep.map(d => d.conversationId)).toEqual(['b']);
     });
 
     it('and arrives the next one', () => {
-        const first = drain([P('a', 0), P('b', 1), P('c', 2)], 1, () => true, undefined, senderOf);
-        const second = drain(first.keep, 2, () => true, undefined, senderOf);
+        const first = drain([P('a', 0), P('b', 1), P('c', 2)], 1, () => true, 2, senderOf);
+        const second = drain(first.keep, 2, () => true, 2, senderOf);
         expect(second.deliver.map(d => d.conversationId)).toEqual(['b']);
     });
 

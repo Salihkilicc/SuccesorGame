@@ -52,7 +52,7 @@ export const FRIEND_STAKE = 0.01;
 const WHEN: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
     // Late. A seat handed over in year three is a transaction.
-    { kind: 'quarterAtLeast', quarter: 40 },
+    { kind: 'quarterAtLeast', quarter: 200 },
     // You own his company - which means he sold it to you, which is its own
     // small tragedy and the reason this scene has to exist.
     { kind: 'owns', company: 'tech_planora' },
@@ -73,8 +73,7 @@ export const friendBoardSeat: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            // He opens by making it small, because he assumes it is small.
-            text: 'your assistant put something in my calendar called "board induction" and i have been staring at it for twenty minutes\n\nis this a real thing or did somebody click the wrong person',
+            text: 'your assistant scheduled a "board induction" on my calendar. is this genuine or an error?',
             choices: [
                 { text: 'It is real. I want you on the board.', next: 'why' },
                 { text: 'Wrong person. Sorry.', next: 'wrongPerson' },
@@ -84,49 +83,43 @@ export const friendBoardSeat: Conversation = {
         {
             id: 'wrongPerson',
             speaker: 'friend',
-            // The door does not slam. It just does not open, and he is fine,
-            // and that is worse than if he minded.
-            text: 'ha ok. i did think it was a lot\n\nno bother at all. tell whoever it was i said hi',
+            text: 'no worries at all. thought it sounded like a mixup.',
             choices: [
                 {
                     text: '(leave it)',
-                    // No dial movement. He is not hurt and pretending he is
-                    // would be the game telling the player how to feel.
                     effects: [],
                 },
-                { text: 'No. It was not a mistake.', next: 'why' },
+                { text: 'No, it was not a mistake.', next: 'why' },
             ],
         },
 
         {
             id: 'why',
             speaker: 'friend',
-            text: 'why though. genuinely\n\ni sold you my company. i am not being falsely modest, i am asking what the job is, because if the job is being your friend at a table then i already do that for free and it does not need a calendar invite',
+            text: 'genuinely asking: what is my role? if it is just giving feedback, we already do that as friends.',
             choices: [
-                { text: 'The job is arguing with me in front of other people.', next: 'stake' },
-                { text: 'Because you are the only one who has never wanted anything.', next: 'stake' },
+                { text: 'The job is challenging decisions constructively.', next: 'stake' },
+                { text: 'Because you have always given candid advice.', next: 'stake' },
             ],
         },
 
         {
             id: 'stake',
             speaker: 'friend',
-            // The turn. He works out the number himself and it changes the
-            // conversation completely.
-            text: 'ok. ok\n\nthe pack says one per cent. i looked up what the company is worth this morning because i could not sleep and then i did the multiplication twice because i thought i had put a comma wrong\n\nthats not a board seat. thats a house. two houses',
+            text: 'the pack mentions a one per cent equity grant. that is significant value for a board seat.',
             choices: [
-                { text: 'A seat without shares is a favour. With them it is a vote.', next: 'accept' },
-                { text: 'It is what everyone else at that table has.', next: 'accept' },
+                { text: 'A seat with shares represents real governance.', next: 'accept' },
+                { text: 'Standard alignment for directors.', next: 'accept' },
             ],
         },
 
         {
             id: 'accept',
             speaker: 'friend',
-            text: 'right\n\nthen i am going to say yes before i think about it any more, and i am going to be difficult about research spending, and you are going to regret both of those things in about a year',
+            text: 'in that case, yes. i will accept and be difficult about research spending on the board.',
             choices: [
                 {
-                    text: 'I am counting on it.',
+                    text: 'Glad to have you aboard.',
                     effects: [
                         { kind: 'boardSeat', person: 'tech_planora', stake: FRIEND_STAKE },
                         { kind: 'flag', flag: 'friendOnBoard' },
@@ -138,10 +131,7 @@ export const friendBoardSeat: Conversation = {
                     ],
                 },
                 {
-                    text: 'Take the week. Think about it properly.',
-                    // Same outcome, and it should be: the offer was made and
-                    // he said yes. A version where thinking about it loses him
-                    // the seat would be punishing the careful answer.
+                    text: 'Take time to review the formal pack.',
                     effects: [
                         { kind: 'boardSeat', person: 'tech_planora', stake: FRIEND_STAKE },
                         { kind: 'flag', flag: 'friendOnBoard' },

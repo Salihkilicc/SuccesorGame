@@ -59,7 +59,7 @@ export const KESTREL_PROMISE = 0.55;
 
 const GROWN: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
-    { kind: 'quarterAtLeast', quarter: 8 },
+    { kind: 'quarterAtLeast', quarter: 24 },
 ];
 
 // ============================================================================
@@ -75,34 +75,31 @@ export const espionageKestrel: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            // She is not composed. It is the only scene in her arc where she
-            // writes the way people actually write at that hour.
-            text: 'I am in the building. It is quarter past two.\n\nSomebody has had access to the design share for at least nine weeks. Not encrypted, copied. They have the current platform, the next one, and the supplier file with every unit price in it.\n\nI have pulled the share offline. That is closing a door in an empty room.',
+            text: 'I am at the office late. Someone had access to our design repository for weeks: current architecture, pipeline, and supplier costing.',
             choices: [
-                { text: 'Nine weeks?', next: 'nineWeeks' },
-                { text: 'Have they asked for anything?', next: 'asked' },
+                { text: 'How long?', next: 'nineWeeks' },
+                { text: 'Have they made demands?', next: 'asked' },
             ],
         },
         {
             id: 'nineWeeks',
             speaker: 'cto',
-            text: 'Nine that I can prove. The logs roll at ninety days and they were in before that.\n\nI want to say something and then not say it again: this is mine. The share was open because I opened it, in a bad week, for a contractor who is no longer here.',
+            text: 'At least nine weeks. An open staging credential was exploited. I take responsibility for the lapse.',
             choices: [
-                { text: 'Have they asked for anything?', next: 'asked' },
-                { text: 'It is not yours. Keep working.', next: 'asked' },
+                { text: 'Have they made demands?', next: 'asked' },
+                { text: 'Keep working on containment.', next: 'asked' },
             ],
         },
         {
             id: 'asked',
             speaker: 'cto',
-            text: 'An hour ago. They call themselves Kestrel and they want one point eight million to delete their copy and tell us how they got in.\n\nIt is a small number. I noticed that too and I do not know whether it is good news.',
+            text: 'A group calling itself Kestrel is asking $1.8M to delete the data and disclose the vector.',
             choices: [
                 {
-                    text: 'Pay them.',
+                    text: 'Pay ransom ($1.8M).',
                     effects: [
                         { kind: 'capital', amount: -1_800_000 },
                         { kind: 'flag', flag: 'paidTheRansom' },
-                        // The cheap crew, and the worst coin in the file.
                         {
                             kind: 'risk',
                             chance: KESTREL_PROMISE,
@@ -111,16 +108,16 @@ export const espionageKestrel: Conversation = {
                         },
                     ],
                 },
-                { text: 'No. Assume it is out.', next: 'assumeOut' },
+                { text: 'Refuse. Assume data leaked.', next: 'assumeOut' },
             ],
         },
         {
             id: 'assumeOut',
             speaker: 'cto',
-            text: 'Then I change the platform. Not the drawings, the parts. Every price we negotiated on the assumption nobody else had the file is now a price somebody else has.\n\nIt is nine months and it is the only version where I know where we stand.',
+            text: 'We must redesign component sourcing from scratch. It will take nine months and compress margins.',
             choices: [
                 {
-                    text: 'Do it. Assume everything is out.',
+                    text: 'Initiate platform overhaul.',
                     effects: [
                         { kind: 'capital', amount: -2_600_000 },
                         { kind: 'brand', amount: -3 },
@@ -141,11 +138,10 @@ export const espionageKestrelBetrayal: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            // No drama. She is reading a forum post.
-            text: 'The supplier file is on a forum. Posted eleven days ago, free, by an account that has posted four other companies this year.\n\nWe paid them. I checked the wallet this morning out of some feeling I could not name and the money is long gone.',
+            text: 'Our supplier file was published on an illicit trading forum despite the ransom payment.',
             choices: [
                 {
-                    text: 'So we paid for nothing.',
+                    text: 'Understood.',
                     effects: [
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
                         { kind: 'brand', amount: -7 },
@@ -179,28 +175,28 @@ export const espionageBroker: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'Four in the morning. I am sorry.\n\nOur research directory has been exfiltrated, eleven years of it, including the two programmes that are the entire reason this department exists. I found out because a man emailed me directly, politely, at my personal address, which he should not have.',
+            text: 'Our research directory was exfiltrated. A facilitator contacted me directly offering to handle remediation.',
             choices: [
                 { text: 'Who is he?', next: 'whoIsHe' },
-                { text: 'What does he want?', next: 'wants' },
+                { text: 'What is the fee?', next: 'wants' },
             ],
         },
         {
             id: 'whoIsHe',
             speaker: 'cto',
-            text: 'He describes himself as a facilitator. He says, and this is a quote, that he has never seen our files, will never see them, and could not decrypt them if he wanted to.\n\nI believe him. That is the arrangement: whoever took it does not want to talk to us, and he does not want to know what he is selling.',
+            text: 'A facilitator who handles corporate disputes privately without retaining data himself.',
             choices: [
-                { text: 'What does he want?', next: 'wants' },
-                { text: 'Then he is useless to us.', next: 'refuse' },
+                { text: 'What is the fee?', next: 'wants' },
+                { text: 'Refuse contact.', next: 'refuse' },
             ],
         },
         {
             id: 'wants',
             speaker: 'cto',
-            text: 'Seven and a half million, and a signed acknowledgement that no law enforcement agency has been contacted.\n\nHe was very clear that the second part is not a threat. He said his clients simply prefer tidy files, and then he said the word "tidy" again in a way I have been thinking about since.',
+            text: 'Seven and a half million dollars for complete deletion and non-disclosure.',
             choices: [
                 {
-                    text: 'Pay him. All of it.',
+                    text: 'Pay fee ($7.5M).',
                     effects: [
                         { kind: 'capital', amount: -7_500_000 },
                         { kind: 'flag', flag: 'paidTheRansom' },
@@ -212,18 +208,16 @@ export const espionageBroker: Conversation = {
                         },
                     ],
                 },
-                { text: 'No.', next: 'refuse' },
+                { text: 'Reject terms.', next: 'refuse' },
             ],
         },
         {
             id: 'refuse',
             speaker: 'cto',
-            // The cost of refusing is the CTO's own arc, which is what makes
-            // this variant hurt somewhere the other two do not.
-            text: 'Then I have to assume both programmes are for sale, and I have to tell the team, because they will find out and I would rather it was from me.\n\nI will lose people over this. Not because of what happened, because of what I will have to say about what we are going to do instead.',
+            text: 'I must inform R&D leadership that programmes are exposed. We will face talent attrition.',
             choices: [
                 {
-                    text: 'Tell them yourself. Today.',
+                    text: 'Brief the team today.',
                     effects: [
                         { kind: 'brand', amount: -5 },
                         { kind: 'morale', amount: -8 },
@@ -248,11 +242,10 @@ export const espionageBrokerBetrayal: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            // The most elegant betrayal of the three: he did not lie.
-            text: 'A second facilitator has emailed me. Different name, same phrasing, same assurance that he has never seen the files.\n\nHe is aware we paid. He says that payment was to a different party and that he is sorry for the confusion, and I do not think he is lying, I think we bought a promise from somebody who genuinely was not holding anything.',
+            text: 'A second entity reached out claiming the first broker was unauthorized. The vulnerability remains unaddressed.',
             choices: [
                 {
-                    text: 'And now he wants his own number.',
+                    text: 'We were double-crossed.',
                     effects: [
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
                         { kind: 'brand', amount: -6 },
@@ -291,43 +284,39 @@ export const espionageOracle: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'Something is wrong and I cannot tell you how wrong yet.\n\nThere is a message on my machine that was not delivered by anything. It is a single line: "Ask him what he bought last year." I do not know who "him" is and I do not like that I have a guess.\n\nAttached to it is our Deep Tech programme file. All of it.',
+            text: 'An anonymous note was dropped on my workstation with our full Deep Tech research archive attached.',
             choices: [
-                { text: 'Forward me the message.', next: 'forwarded' },
-                { text: 'What do they want?', next: 'want' },
+                { text: 'Forward the message.', next: 'forwarded' },
+                { text: 'What are their terms?', next: 'want' },
             ],
         },
         {
             id: 'forwarded',
             speaker: 'cto',
-            text: 'Sent. There is a second line under the attachment that I did not read at first because it is formatted like a footer.\n\n"This is reciprocal. Nothing further will be taken."',
+            text: 'The note is formatted like a footer: "This is reciprocal. Nothing further will be taken."',
             choices: [
-                { text: 'What do they want?', next: 'want' },
+                { text: 'What are their terms?', next: 'want' },
                 { text: 'Reciprocal for what?', next: 'reciprocal' },
             ],
         },
         {
             id: 'reciprocal',
             speaker: 'cto',
-            // She does not know what the player did. She is simply good at her
-            // job, and the player has to sit with the fact that she is asking.
-            text: 'That is my question. I have asked it four times today in four different rooms and everybody has looked at me the way you are about to.\n\nI am not going to ask a fifth time. But I would like you to know that I stopped asking rather than that I got an answer.',
+            text: 'I am asking the same question. I stopped asking once I realized someone retaliated for prior intelligence gathering.',
             choices: [
                 { text: 'What do they want?', next: 'want' },
-                { text: 'Nothing you need to carry.', next: 'want' },
+                { text: 'Focus on containment.', next: 'want' },
             ],
         },
         {
             id: 'want',
             speaker: 'cto',
-            text: 'They do not want money. I have read it three times.\n\nThey want us out of Deep Tech, no new programmes, no hires, nothing announced, for two years. In exchange the file is deleted and they never contact us again.\n\nThere is no account number anywhere in the message. That is what frightens me about it.',
+            text: 'They do not want money. They demand we stay out of Deep Tech for two years. In exchange, no disclosure occurs.',
             choices: [
                 {
-                    text: 'Take the deal. Two years.',
+                    text: 'Accept terms (2-yr freeze).',
                     effects: [
                         { kind: 'flag', flag: 'paidTheRansom' },
-                        // The ransom IS the concession: two years of somebody
-                        // else's weight on the category you agreed to leave.
                         { kind: 'siege', category: 'Deep Tech', quarters: 6, pressure: 1.5 },
                         { kind: 'brand', amount: -2 },
                         {
@@ -338,21 +327,19 @@ export const espionageOracle: Conversation = {
                         },
                     ],
                 },
-                { text: 'No. Find out who they are.', next: 'findOut' },
+                { text: 'Reject. Trace origin.', next: 'findOut' },
             ],
         },
         {
             id: 'findOut',
             speaker: 'cto',
-            text: 'I can try and it will cost a great deal and I will probably fail, and if I succeed the answer will be a company in a country neither of us can sue in.\n\nMeanwhile the file is out and I would build on the assumption that everything in it is known.',
+            text: 'Tracing will require specialized forensics with substantial expense and uncertain success.',
             choices: [
                 {
-                    text: 'Find out anyway.',
+                    text: 'Commission forensics.',
                     effects: [
                         { kind: 'capital', amount: -3_800_000 },
                         { kind: 'brand', amount: -4 },
-                        // Refusing is how you learn who sent them, and it is
-                        // the only route to that fact.
                         {
                             kind: 'schedule',
                             conversation: 'event-espionage-oracle-betrayal',
@@ -382,21 +369,20 @@ export const espionageOracleBetrayal: Conversation = {
         {
             id: 'open',
             speaker: 'cto',
-            text: 'I have a name. Not theirs, the name on the retainer that paid them.\n\nIt is a procurement entity registered in Delaware with one director and one client, and the client files consolidated accounts under a parent you and I both write letters to.',
+            text: 'Forensics traced the corporate entity funding the intrusion back to an affiliate of Pear.',
             choices: [
-                { text: 'Say it.', next: 'sayIt' },
-                { text: 'I know who it is.', next: 'knew' },
+                { text: 'Confirm the finding.', next: 'sayIt' },
+                { text: 'I suspected as much.', next: 'knew' },
             ],
         },
         {
             id: 'knew',
             speaker: 'cto',
-            // The line that closes the mole arc from the other end.
-            text: 'Yes. I thought you might.\n\nI have spent a week being frightened of a stranger and it turns out I should have been frightened of an arrangement, which is worse, because arrangements are reciprocal and I do not know what we did first.',
+            text: 'It confirms escalating corporate countermeasures between our firms.',
             choices: [
-                { text: 'Say it out loud anyway.', next: 'sayIt' },
+                { text: 'Document the evidence.', next: 'sayIt' },
                 {
-                    text: '(let it go)',
+                    text: '(keep quiet)',
                     effects: [
                         { kind: 'flag', flag: 'pearHiredThem' },
                         { kind: 'dial', dial: 'pearHostility', delta: 10 },
@@ -408,10 +394,10 @@ export const espionageOracleBetrayal: Conversation = {
         {
             id: 'sayIt',
             speaker: 'cto',
-            text: 'Pear. Two removes, deniable, and absolutely them.\n\nI am not going to advise you on what to do with that. I will say that whoever they used is now a person who has been paid by both of us, and that is not a stable arrangement for anybody.',
+            text: 'Pear orchestrated the operation through shell entities. The competitive posture is now openly adversarial.',
             choices: [
                 {
-                    text: 'Then we know where we stand.',
+                    text: 'We are prepared.',
                     effects: [
                         { kind: 'flag', flag: 'pearHiredThem' },
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
@@ -439,7 +425,7 @@ export const espionageOracleBetrayal: Conversation = {
 export const espionageKestrelEvent: GameEvent = {
     id: 'espionage-kestrel',
     when: GROWN,
-    chance: 0.2,
+    chance: 0.10,
     conversation: espionageKestrel,
     headline: 'A credential broker is advertising access to an unnamed manufacturer.',
     priority: 4,
@@ -448,7 +434,7 @@ export const espionageKestrelEvent: GameEvent = {
 export const espionageBrokerEvent: GameEvent = {
     id: 'espionage-broker',
     when: GROWN,
-    chance: 0.15,
+    chance: 0.10,
     conversation: espionageBroker,
     headline: 'Researchers report a large exfiltration from a mid-cap technology firm.',
     priority: 4,
@@ -457,7 +443,7 @@ export const espionageBrokerEvent: GameEvent = {
 export const espionageOracleEvent: GameEvent = {
     id: 'espionage-oracle',
     when: RETALIATION,
-    chance: 0.4,
+    chance: 0.20,
     conversation: espionageOracle,
     headline: 'Quiet talk of a second intrusion in the sector. Nobody will be named.',
     priority: 5,

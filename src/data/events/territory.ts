@@ -169,7 +169,7 @@ export const territoryRobotics: Conversation = {
 export const territoryRoboticsEvent: GameEvent = {
     id: 'territory-robotics',
     when: ROBOTICS,
-    chance: 0.9,
+    chance: 0.45,
     conversation: territoryRobotics,
     headline: 'Edison Motors is understood to have written to Hale over the drivetrain category.',
     priority: 4,
@@ -264,7 +264,7 @@ export const territoryDeepTech: Conversation = {
 export const territoryDeepTechEvent: GameEvent = {
     id: 'territory-deeptech',
     when: DEEP_TECH,
-    chance: 0.9,
+    chance: 0.45,
     conversation: territoryDeepTech,
     headline: 'OpenAI-ish has opened a research access programme. Two rivals have already signed.',
     priority: 4,
@@ -336,7 +336,7 @@ export const territoryBioTech: Conversation = {
 export const territoryBioTechEvent: GameEvent = {
     id: 'territory-biotech',
     when: BIO_TECH,
-    chance: 0.9,
+    chance: 0.45,
     conversation: territoryBioTech,
     headline: 'Hale has been invited to the medical device standards committee.',
     priority: 4,
@@ -455,7 +455,7 @@ export const territoryConsumer: Conversation = {
 export const territoryConsumerEvent: GameEvent = {
     id: 'territory-consumer',
     when: CONSUMER,
-    chance: 0.85,
+    chance: 0.40,
     conversation: territoryConsumer,
     headline: 'Pear\'s category review names a domestic rival for the first time in a decade.',
     priority: 4,

@@ -108,7 +108,7 @@ export const poachConversation: Conversation = {
 export const poachEvent: GameEvent = {
     id: 'poach',
     when: [
-        { kind: 'quarterAtLeast', quarter: 6 },
+        { kind: 'quarterAtLeast', quarter: 20 },
         { kind: 'dialAtLeast', dial: 'pearHostility', band: 'low' },
     ],
     chance: 0.18,

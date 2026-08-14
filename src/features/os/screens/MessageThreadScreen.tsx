@@ -86,7 +86,7 @@ const MessageThreadScreen = () => {
                         <TextInput
                             style={styles.composerInput}
                             editable={false}
-                            placeholder="iMessage..."
+                            placeholder="Message..."
                             placeholderTextColor={theme.colors.textMuted}
                             multiline
                         />

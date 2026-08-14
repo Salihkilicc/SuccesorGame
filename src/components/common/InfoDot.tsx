@@ -40,7 +40,7 @@ export const InfoDot = ({ title, text, detail, small }: Props) => {
         <>
             <Pressable
                 onPress={show}
-                hitSlop={10}
+                hitSlop={12}
                 style={({ pressed }) => [
                     styles.dot,
                     small && styles.dotSmall,
@@ -74,24 +74,38 @@ export default InfoDot;
 
 const styles = StyleSheet.create({
     dot: {
-        width: 18,
-        height: 18,
-        borderRadius: 9,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
         borderWidth: 1,
-        borderColor: 'rgba(5,168,246,0.45)',
+        borderColor: 'rgba(255,255,255,0.22)',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(5,168,246,0.08)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
     },
-    dotSmall: { width: 15, height: 15, borderRadius: 7.5 },
-    dotPressed: { backgroundColor: 'rgba(5,168,246,0.25)' },
+    dotSmall: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        borderWidth: 0.8,
+        borderColor: 'rgba(255,255,255,0.18)',
+    },
+    dotPressed: {
+        backgroundColor: 'rgba(5,168,246,0.22)',
+        borderColor: 'rgba(5,168,246,0.45)',
+    },
     dotText: {
-        color: theme.colors.textPrimary,
-        fontSize: 11,
-        fontWeight: '800',
-        lineHeight: 14,
+        color: 'rgba(255,255,255,0.42)',
+        fontSize: 9,
+        fontWeight: '600',
+        lineHeight: 11,
+        includeFontPadding: false,
+        textAlign: 'center',
     },
-    dotTextSmall: { fontSize: 9.5, lineHeight: 12 },
+    dotTextSmall: {
+        fontSize: 7.5,
+        lineHeight: 9,
+    },
 
     overlay: {
         flex: 1,

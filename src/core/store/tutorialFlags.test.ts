@@ -51,22 +51,13 @@ describe('the company the player inherits', () => {
         expect(resolveTargetUnits(phone(), 22, 1)).toBeGreaterThan(0);
     });
 
-    it('at half of capacity, in units rather than by migration', () => {
-        // The seed used to hold `productionLevel` and no units, so every new
-        // game took the LEGACY branch of resolveTargetUnits - it ran at half
-        // capacity because a compatibility path fired, not because anybody
-        // wrote a starting figure. Same number, stated on purpose now.
-        const max = resolveTargetUnits(
-            { ...phone(), productionUnits: 999_999 }, 22, 1,
-        );
-        expect(phone().productionUnits).toBe(Math.floor(max / 2));
+    it('has initial production ready at 3500 units', () => {
+        expect(phone().productionUnits).toBe(3500);
         expect(phone().productionLevel).toBeUndefined();
     });
 
     it('and nobody has heard of it, which is the first real hole', () => {
-        // The thing that is genuinely undone, and what the opening lesson
-        // now points at.
-        expect(phone().marketingBudget).toBe(0);
+        expect(phone().marketingBudget).toBe(67_000);
     });
 });
 

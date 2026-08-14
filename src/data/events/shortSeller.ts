@@ -89,7 +89,7 @@ export const shortSellerConversation: Conversation = {
 export const shortSellerEvent: GameEvent = {
     id: 'short-seller',
     when: [
-        { kind: 'quarterAtLeast', quarter: 12 },
+        { kind: 'quarterAtLeast', quarter: 28 },
         { kind: 'capitalAtLeast', amount: 25_000_000 },
     ],
     chance: 0.10,

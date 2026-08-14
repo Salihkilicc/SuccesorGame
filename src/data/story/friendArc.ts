@@ -68,7 +68,7 @@ export const friendAsks: Conversation = {
     from: 'friend',
     when: [
         ...STILL_SPEAKING,
-        { kind: 'quarterAtLeast', quarter: 9 },
+        { kind: 'quarterAtLeast', quarter: 20 },
         { kind: 'noFlag', flag: 'friendHelped' },
     ],
     start: 'open',
@@ -76,7 +76,7 @@ export const friendAsks: Conversation = {
         {
             id: 'open',
             speaker: 'friend',
-            text: 'hey. are you about\n\nnot a crisis. well. it is a bit of a crisis\n\ni have been trying to work out how to type this for two days and every version sounds like a man asking for money, which i suppose is what it is',
+            text: 'hey. are you about?\n\nnot a total crisis, but i need some help with cash flow.',
             choices: [
                 { text: 'How much?', next: 'howMuch' },
                 { text: 'Just tell me what happened.', next: 'whatHappened' },
@@ -86,10 +86,7 @@ export const friendAsks: Conversation = {
         {
             id: 'whatHappened',
             speaker: 'friend',
-            // The detail that makes it real and not a plot device: it is a
-            // boring, ordinary, entirely survivable cash-flow problem, which
-            // is what actually kills small companies.
-            text: 'our biggest customer went to ninety day terms without asking. that is it. that is the whole thing\n\nwe are profitable. we are profitable on paper in a way that means nothing because the money arrives in march and the wages are in january',
+            text: 'our biggest customer pushed payment to 90 days. on paper we are fine, but wages are due before the check clears.',
             choices: [
                 { text: 'How much?', next: 'howMuch' },
             ],
@@ -98,7 +95,7 @@ export const friendAsks: Conversation = {
         {
             id: 'howMuch',
             speaker: 'friend',
-            text: 'two hundred. thousand\n\ni have gone to a bank and two funds. the bank wants a personal guarantee on the house and the funds want twelve percent of the company for a bridge, which is not a bridge, it is a purchase with extra steps',
+            text: 'two hundred thousand.\n\nbanks want personal guarantees and funds want 12% equity for a bridge loan.',
             choices: [
                 { text: 'When would you pay it back?', next: 'payItBack' },
                 { text: 'I will send it today.', next: 'yes' },
@@ -108,9 +105,7 @@ export const friendAsks: Conversation = {
         {
             id: 'payItBack',
             speaker: 'friend',
-            // He does not oversell. He gives a real date and hedges it, which
-            // is the most honest thing anybody says to the player all game.
-            text: 'march. probably march\n\ni am not going to promise you march because i promised the bank march and then had to ring them, and i would rather be the person who told you april in january',
+            text: 'march or april. i want to be straight with you on timing.',
             choices: [
                 { text: 'April is fine.', next: 'yes' },
                 { text: 'I cannot do this one.', next: 'no' },
@@ -120,9 +115,7 @@ export const friendAsks: Conversation = {
         {
             id: 'yes',
             speaker: 'friend',
-            // He does not gush, and he immediately makes it smaller, which is
-            // how the people who mean it behave.
-            text: 'oh thank god\n\nright. ok. i am going to stop typing before i say something we both have to live with\n\nthank you. i will not do this again',
+            text: 'thank you so much. i will make sure this gets repaid properly.',
             choices: [
                 {
                     text: 'You can do it again.',
@@ -137,9 +130,6 @@ export const friendAsks: Conversation = {
                     effects: [
                         { kind: 'capital', amount: -ASK },
                         { kind: 'flag', flag: 'friendHelped' },
-                        // Slightly less, and it is not a trap - keeping it a
-                        // loan is a perfectly decent answer and he takes it
-                        // as one. The difference is small on purpose.
                         { kind: 'dial', dial: 'friendLoyalty', delta: 12 },
                     ],
                 },
@@ -149,16 +139,7 @@ export const friendAsks: Conversation = {
         {
             id: 'no',
             speaker: 'friend',
-            // THE MOST IMPORTANT CARD IN THE FILE, and it must not sound like
-            // a door closing. He is gracious, he means it, and he lets the
-            // player off - which is precisely what makes the silence
-            // afterwards land rather than feeling like a mechanic.
-            //
-            // Nothing here says "friendship over". No dial is shown. The only
-            // effect the player could ever notice is the absence of every
-            // message that would have come next, and they will not notice
-            // that either.
-            text: 'no of course. honestly i should not have asked, you have had a year\n\nforget i said anything. it will sort itself out, they always do\n\nsee you soon x',
+            text: 'totally understand. forget i asked, we will figure something out.\n\ntalk soon x',
             choices: [
                 {
                     text: 'I am sorry.',
@@ -168,9 +149,6 @@ export const friendAsks: Conversation = {
                     ],
                 },
                 {
-                    // A second chance, right at the edge, for the same reason
-                    // the Pear ending has one: this should not be reachable
-                    // by tapping through.
                     text: 'Wait. How long have you got?',
                     next: 'howLong',
                 },
@@ -180,7 +158,7 @@ export const friendAsks: Conversation = {
         {
             id: 'howLong',
             speaker: 'friend',
-            text: 'eleven days\n\nsorry. that was not fair, i had decided not to say that',
+            text: 'about eleven days.',
             choices: [
                 { text: 'I will send it today.', next: 'yes' },
                 {
@@ -210,16 +188,16 @@ export const friendGrows: Conversation = {
         ...STILL_SPEAKING,
         { kind: 'flag', flag: 'friendHelped' },
         { kind: 'noFlag', flag: 'friendGrewUp' },
-        { kind: 'quarterAtLeast', quarter: 15 },
+        { kind: 'quarterAtLeast', quarter: 60 },
     ],
     start: 'open',
     nodes: [
         {
             id: 'open',
             speaker: 'friend',
-            text: 'sent you two hundred back. and then i sent it back again by accident so tell your finance man to expect a phone call from a very embarrassed woman called priya\n\nalso we closed a round. properly. actual investors who ask actual questions',
+            text: 'wired the two hundred thousand back! also, we just closed a real funding round with proper investors.',
             choices: [
-                { text: 'You are paying me twice.', next: 'twice' },
+                { text: 'You are paying me back.', next: 'twice' },
                 { text: 'What did you tell them?', next: 'whatDidYouTell' },
             ],
         },
@@ -227,7 +205,7 @@ export const friendGrows: Conversation = {
         {
             id: 'twice',
             speaker: 'friend',
-            text: 'i am aware. priya is aware. priya has said the words "reconciliation process" to me eleven times this week and i have started to enjoy it\n\ni used to run this company out of a notebook. we have a process now. i have a person whose job is to tell me no',
+            text: 'we have actual finance processes now. hired someone whose main job is telling me no.',
             choices: [
                 { text: 'That is the whole job.', next: 'wholeJob' },
                 { text: 'What did you tell the investors?', next: 'whatDidYouTell' },
@@ -237,7 +215,7 @@ export const friendGrows: Conversation = {
         {
             id: 'wholeJob',
             speaker: 'friend',
-            text: 'i know that NOW\n\nyou could have said. you had one and everything',
+            text: 'i know that now! you could have warned me.',
             choices: [
                 { text: 'You would not have listened.', next: 'whatDidYouTell' },
             ],
@@ -246,10 +224,7 @@ export const friendGrows: Conversation = {
         {
             id: 'whatDidYouTell',
             speaker: 'friend',
-            // The line the scene exists for. He does not thank the player
-            // again - he tells them what the money actually was, which is
-            // more than a thank you and costs him more to say.
-            text: 'the truth. that we nearly went under in january and a man i have known since we were nineteen sent me two hundred thousand pounds in an afternoon without asking to see the books\n\none of them asked what the terms were and i said there were not any and he went quiet for a bit',
+            text: 'the truth: we nearly went under, and an old friend wired the money same-day with no questions asked.',
             choices: [
                 {
                     text: 'There were not any.',

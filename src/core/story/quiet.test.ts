@@ -39,7 +39,7 @@ const quarterEight = () => {
 };
 
 /** A message-channel scene whose gate is open in the world above. */
-const MESSAGE_BEAT = 'condolence-friend';
+const MESSAGE_BEAT = 'friend-asks';
 /** A letter, for the half of this that must NOT be affected. */
 const MAIL_BEAT = 'pear-offer';
 
@@ -97,15 +97,12 @@ describe('what a quiet quarter must not touch', () => {
 });
 
 describe('the odds', () => {
-    it('are half, so the phone is worth checking and not a chore', () => {
-        expect(QUIET_QUARTER_CHANCE).toBe(0.5);
+    it('are twenty-five percent, so the phone is worth checking and not a chore', () => {
+        expect(QUIET_QUARTER_CHANCE).toBe(0.75);
     });
 
     it('and the allowance still bounds the noisy ones', () => {
-        // The two mechanisms are separate: this one decides WHETHER, the
-        // allowance decides HOW MANY. Turning the volume down was never the
-        // job of the thing that sets the rhythm.
-        expect(DELIVERIES_PER_QUARTER).toBe(2);
+        expect(DELIVERIES_PER_QUARTER).toBe(1);
     });
 });
 
@@ -124,7 +121,7 @@ describe('the spine has no dice in it', () => {
     it('while the optional arcs are not', () => {
         for (const id of ['cfo-board-room', 'cfo-braga-name', 'cfo-resignation',
             'friend-asks', 'friend-grows']) {
-            expect(beatFor(id)!.chance).toBe(0.5);
+            expect(beatFor(id)!.chance).toBe(0.25);
         }
     });
 

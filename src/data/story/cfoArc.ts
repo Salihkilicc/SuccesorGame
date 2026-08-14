@@ -71,7 +71,7 @@ export const cfoBoardRoom: Conversation = {
     from: 'cfo',
     when: [
         ...STILL_HERE,
-        { kind: 'quarterAtLeast', quarter: 7 },
+        { kind: 'quarterAtLeast', quarter: 16 },
         { kind: 'noFlag', flag: 'cfoToldBoardRoom' },
         // He does not do this for someone who has been brushing him off.
         { kind: 'dialAtLeast', dial: 'cfoTrust', band: 'high' },

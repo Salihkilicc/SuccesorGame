@@ -76,10 +76,11 @@ export type Pending = {
 /**
  * How many non-urgent conversations may arrive in one quarter.
  *
- * Two. One feels like the story is asleep; three already reads as a pile,
- * because each one is a decision rather than a notification.
+ * One. The game is a simulation, not a messaging game; more than one optional
+ * conversation a quarter turns the inbox into a chore. Two was already a pile
+ * when combined with events, and players were skimming rather than reading.
  */
-export const DELIVERIES_PER_QUARTER = 2;
+export const DELIVERIES_PER_QUARTER = 1;
 
 /**
  * HOW OFTEN A QUARTER IS QUIET.
@@ -103,7 +104,7 @@ export const DELIVERIES_PER_QUARTER = 2;
  * URGENT IS NEVER QUIET. The spine bypasses the allowance already and it
  * bypasses this for the same reason: the father does not die on a coin flip.
  */
-export const QUIET_QUARTER_CHANCE = 0.5;
+export const QUIET_QUARTER_CHANCE = 0.75;
 
 export type DrainResult = {
     /** Send these now, in this order. */

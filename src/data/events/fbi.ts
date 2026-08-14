@@ -102,7 +102,7 @@ const bribeNode = (speaker: string) => ({
 
 const OPEN: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
-    { kind: 'quarterAtLeast', quarter: 10 },
+    { kind: 'quarterAtLeast', quarter: 80 },
     // One verdict per campaign. Once you have been cleared or convicted, the
     // other two cases are somebody else's problem.
     { kind: 'noFlag', flag: 'fbiGuilty' },
@@ -434,7 +434,7 @@ const fbiEvent = (
     when: Condition[],
     headline: string,
 ): GameEvent => ({
-    id, when, conversation, headline, chance: 0.5, priority: 5,
+    id, when, conversation, headline, chance: 0.25, priority: 5,
 });
 
 export const fbiFinancialEvent = fbiEvent('fbi-financial', fbiFinancial, FINANCIAL,

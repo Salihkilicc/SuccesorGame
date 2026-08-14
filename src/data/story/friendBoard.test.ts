@@ -26,7 +26,7 @@ const known = new Set(CONVERSATIONS.map(c => c.id));
 const earned = (over: Partial<World> = {}): World => ({
     dials: { ...INITIAL_DIALS, friendLoyalty: 95 },
     flags: { fatherDead: true, friendHelped: true, friendGrewUp: true },
-    quarter: 44,
+    quarter: 200,
     capital: 200_000_000,
     cash: 500_000,
     morale: 71,

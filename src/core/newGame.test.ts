@@ -165,4 +165,12 @@ describe('starting again, having been through it once', () => {
         await startNewGame({ skipOpening: true });
         expect(story().getState().seenScenes.length).toBe(OPENING_ACT.length);
     });
+
+    it('and seedOpening does not message when opening was skipped', async () => {
+        returning(true);
+        await startNewGame({ skipOpening: true });
+        require('./story/deliver').seedOpening();
+        expect(messages().getState().threads.some((t: any) => t.id === 'father')).toBe(false);
+        expect(story().getState().pending.length).toBe(0);
+    });
 });
