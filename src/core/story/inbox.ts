@@ -81,6 +81,30 @@ export type Pending = {
  */
 export const DELIVERIES_PER_QUARTER = 2;
 
+/**
+ * HOW OFTEN A QUARTER IS QUIET.
+ *
+ * The allowance bounded the volume and did nothing about the RHYTHM: two
+ * optional conversations arrived every quarter, every quarter, for ever. Two
+ * complaints fall out of that and they are the same complaint. It is too much
+ * post - a phone that has something on it every single time you look stops
+ * being a phone and becomes a chore. And it is the same post - a beat becomes
+ * due the first quarter its `when` holds, so with no die anywhere the second
+ * playthrough delivers the same scenes in the same order as the first.
+ *
+ * So half of all quarters deliver no optional MESSAGE at all.
+ *
+ * MESSAGES ONLY, and that is the whole precision of it. Mail is where the
+ * business is - a negotiation reply, a sponsorship offer with a quarter to run
+ * on it - and a letter that arrives late because a coin came up tails is a
+ * mechanic being decided by weather. Messages are people, and people do not
+ * write on a schedule.
+ *
+ * URGENT IS NEVER QUIET. The spine bypasses the allowance already and it
+ * bypasses this for the same reason: the father does not die on a coin flip.
+ */
+export const QUIET_QUARTER_CHANCE = 0.5;
+
 export type DrainResult = {
     /** Send these now, in this order. */
     deliver: Pending[];

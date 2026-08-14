@@ -227,6 +227,21 @@ export const OPENING_CONVERSATIONS: string[] = [
 export interface StoryBeat {
     conversation: string;
     /**
+     * The odds it queues in any quarter its gate is open. Absent means certain.
+     *
+     * ABSENT FOR THE SPINE AND FOR THE FIRST YEAR. The father dies when he
+     * dies; Pear writes when the story says he writes; the condolences follow
+     * a death that already happened. None of that is weather and none of it
+     * should be rolled for.
+     *
+     * PRESENT FOR EVERYBODY ELSE. The CFO's arc and the friend's arc are people
+     * getting round to things, and a beat that queues the first quarter its
+     * `when` holds means the second playthrough is the first one again in the
+     * same order. Re-rolled every quarter, so the scene is not lost - it
+     * arrives somewhere in a window rather than on a date.
+     */
+    chance?: number;
+    /**
      * Bypass the two-a-quarter allowance.
      *
      * True only for the spine. The condolence wave is deliberately NOT urgent:
@@ -318,10 +333,12 @@ STORY_BEATS.push(
 // ----------------------------------------------------------------------------
 STORY_BEATS.push({ conversation: fatherMarketing.id });
 
+//  A HALF EACH, so the arc still lands inside a year or two of its gate
+//  opening and no two runs walk it at the same pace. See `chance` above.
 STORY_BEATS.push(
-    { conversation: cfoBoardRoom.id },
-    { conversation: cfoBragaName.id },
-    { conversation: cfoResignation.id },
+    { conversation: cfoBoardRoom.id, chance: 0.5 },
+    { conversation: cfoBragaName.id, chance: 0.5 },
+    { conversation: cfoResignation.id, chance: 0.5 },
 );
 
 // ----------------------------------------------------------------------------
@@ -333,6 +350,6 @@ STORY_BEATS.push(
 //  transactional.
 // ----------------------------------------------------------------------------
 STORY_BEATS.push(
-    { conversation: friendAsks.id },
-    { conversation: friendGrows.id },
+    { conversation: friendAsks.id, chance: 0.5 },
+    { conversation: friendGrows.id, chance: 0.5 },
 );

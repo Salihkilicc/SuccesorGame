@@ -28,7 +28,7 @@ import { useStoryStore } from '../store/useStoryStore';
 import { CAST } from '../../data/story/cast';
 import { conversationById, OPENING_CONVERSATIONS, STORY_BEATS } from '../../data/story';
 import { emailOf } from './cast';
-import { drain, type Pending } from './inbox';
+import { drain, QUIET_QUARTER_CHANCE, type Pending } from './inbox';
 import { testAll, firstFailing } from './conditions';
 import { readWorld, currentQuarter } from './world';
 import { activeLock } from '../tutorial/locks';
@@ -197,6 +197,23 @@ export const runStoryBeats = (): void => {
             continue;
         }
 
+        // ------------------------------------------------------------------
+        //  AND SOME OF THEM ARE NOT ON A CALENDAR AT ALL
+        // ------------------------------------------------------------------
+        //  A beat is queued the first quarter its `when` holds, which for the
+        //  spine is exactly right - the father dies when he dies - and for
+        //  everybody else means the second playthrough is the first one
+        //  again, in the same order.
+        //
+        //  A `chance` re-rolls every quarter the gate is open, so an optional
+        //  arc arrives somewhere in a window rather than on a date. It is
+        //  never lost: nothing here marks the beat seen unless it queues.
+        // ------------------------------------------------------------------
+        if (beat.chance !== undefined && Math.random() >= beat.chance) {
+            explain(`chance ${beat.chance} did not come up this quarter`);
+            continue;
+        }
+
         useStoryStore.getState().schedule({
             conversationId: id,
             dueQuarter: now,
@@ -249,16 +266,44 @@ export const runTutorialScenes = (): void => {
  * Called once per tick. Everything it decides comes from `drain`, which is
  * pure and tested; this only performs the result.
  */
-export const runInbox = (): void => {
+export const runInbox = (
+    /**
+     * Force the quarter quiet or noisy, instead of rolling for it.
+     *
+     * A SEAM FOR TESTS, and it exists because everything else about delivery
+     * in this file is deterministic on purpose - the whole story system was
+     * built against a shelved modal that decided outcomes with `Math.random()`
+     * behind a spinner. One die was added here deliberately; a test that has
+     * to pass half the time is not a test, so the die can be held.
+     *
+     * The game never passes it.
+     */
+    forceQuiet?: boolean,
+): void => {
     const story = useStoryStore.getState();
     const quarter = currentQuarter();
     const world = readWorld();
+
+    // ------------------------------------------------------------------
+    //  SOME QUARTERS NOBODY WRITES
+    // ------------------------------------------------------------------
+    //  Rolled ONCE per drain rather than per item, so a quiet quarter is
+    //  quiet rather than being quiet for the scenes that happened to be
+    //  checked after the coin turned. See QUIET_QUARTER_CHANCE.
+    //
+    //  A held item keeps its due quarter and is retried next time, so the
+    //  cost of a tails is one quarter of waiting. The one thing this can
+    //  interact badly with is `expiresAfter`, and nothing that expires is a
+    //  message: the expiring things in this game are letters.
+    // ------------------------------------------------------------------
+    const quiet = forceQuiet ?? (Math.random() < QUIET_QUARTER_CHANCE);
 
     const canDeliver = (p: Pending): boolean => {
         const c = conversationById(p.conversationId);
         // A queued conversation that no longer exists - a scene renamed or
         // removed between versions - is dropped rather than retried forever.
         if (!c) return false;
+        if (quiet && !p.urgent && c.channel === 'message') return false;
         return testAll(c.when, world);
     };
 
