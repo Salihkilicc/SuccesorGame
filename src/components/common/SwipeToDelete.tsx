@@ -23,12 +23,20 @@
 //  band at the end of its travel. Neither is worth a native module.
 //
 //  ---------------------------------------------------------------------------
-//  IT ASKS FIRST, AND THE PROMPT IS THE POINT
+//  IT DOES NOT ASK
 //  ---------------------------------------------------------------------------
-//  A thread can hold a scene the player has not finished, and a swipe is the
-//  easiest gesture on a phone to make by accident while scrolling. Undo would
-//  be better and is a bigger piece of work; a confirmation is what this can
-//  honestly offer today, and the row springs back if the answer is no.
+//  The first version put an Alert in the way. It was wrong for the job: the
+//  whole point of the gesture is clearing five finished threads in five
+//  seconds, and a box after each one turns a sweep into an interrogation.
+//
+//  So the confirmation is gone and the DISTANCE does the work instead. An
+//  ordinary row goes at a quarter of the screen. A row carrying something that
+//  cannot come back needs most of the screen, which is a deliberate movement
+//  rather than a flick and is still one gesture.
+//
+//  That is a worse guard than a box and a much better control, and the trade
+//  is worth stating: a player CAN lose an unplayed scene to a long accidental
+//  swipe. They cannot lose one to a careless one.
 // ============================================================================
 
 import React, { useRef } from 'react';
@@ -38,7 +46,6 @@ import {
     StyleSheet,
     Animated,
     PanResponder,
-    Alert,
     Dimensions,
 } from 'react-native';
 
@@ -55,6 +62,16 @@ const { width: SCREEN } = Dimensions.get('window');
 export const DELETE_THRESHOLD = SCREEN * 0.25;
 
 /**
+ * And how far a row that is carrying something has to go.
+ *
+ * Most of the screen. There is no dialog any more, so this is the only thing
+ * standing between a careless flick and a scene nobody will ever read - and it
+ * has to be reachable, because the player is allowed to throw these away. A
+ * deliberate movement rather than a flick.
+ */
+export const GUARDED_THRESHOLD = SCREEN * 0.6;
+
+/**
  * How much sideways movement claims the gesture from the list.
  *
  * The second number is what stops the row fighting the scroll view: the drag
@@ -66,22 +83,28 @@ const CLAIM_RATIO = 1.6;
 
 type Props = {
     children: React.ReactNode;
-    /** Named in the confirmation, so the player knows what they are binning. */
+    /**
+     * What this row is, for anything that needs to name it.
+     *
+     * @orphan-ok-symbol label
+     *
+     * DELIBERATELY UNUSED as of the commit that removed the confirmation - it
+     * was the only thing that read it. Kept because the next thing this
+     * component wants is an undo toast, and a toast has to say what it undid.
+     */
     label: string;
     /**
-     * An extra sentence, for a row that is not merely clutter.
+     * This row is carrying something that cannot come back.
      *
-     * A finished conversation and an unread one look identical in a list, and
-     * the whole reason this gesture exists is that the player wants to clear
-     * the finished ones. Throwing away a scene nobody has played, or a
-     * negotiation somebody is waiting on, should not be the same tap with the
-     * same words on it.
+     * A finished conversation and an unplayed one look identical in a list,
+     * and the whole reason this gesture exists is to clear the finished ones.
+     * A guarded row needs a longer swipe and says so on the panel behind it.
      */
-    warning?: string;
+    guarded?: boolean;
     onDelete: () => void;
 };
 
-const SwipeToDelete = ({ children, label, warning, onDelete }: Props) => {
+const SwipeToDelete = ({ children, label, guarded, onDelete }: Props) => {
     const x = useRef(new Animated.Value(0)).current;
     const settle = () =>
         Animated.spring(x, { toValue: 0, useNativeDriver: true, bounciness: 0 }).start();
@@ -96,31 +119,15 @@ const SwipeToDelete = ({ children, label, warning, onDelete }: Props) => {
                 x.setValue(Math.min(0, g.dx));
             },
             onPanResponderRelease: (_e, g) => {
-                if (g.dx > -DELETE_THRESHOLD) { settle(); return; }
-                Alert.alert(
-                    'Delete',
-                    warning
-                        ? `Delete ${label}?\n\n${warning}`
-                        : `Delete ${label}? This cannot be undone.`,
-                    [
-                        { text: 'Keep', style: 'cancel', onPress: settle },
-                        {
-                            text: 'Delete',
-                            style: 'destructive',
-                            onPress: () => {
-                                // Off the edge first, then out of the store, so
-                                // the row leaves rather than blinking out from
-                                // under the finger.
-                                Animated.timing(x, {
-                                    toValue: -SCREEN,
-                                    duration: 160,
-                                    useNativeDriver: true,
-                                }).start(() => onDelete());
-                            },
-                        },
-                    ],
-                    { cancelable: true, onDismiss: settle },
-                );
+                const needed = guarded ? GUARDED_THRESHOLD : DELETE_THRESHOLD;
+                if (g.dx > -needed) { settle(); return; }
+                // Off the edge first, then out of the store, so the row leaves
+                // rather than blinking out from under the finger.
+                Animated.timing(x, {
+                    toValue: -SCREEN,
+                    duration: 160,
+                    useNativeDriver: true,
+                }).start(() => onDelete());
             },
             onPanResponderTerminate: settle,
         }),
@@ -140,7 +147,13 @@ const SwipeToDelete = ({ children, label, warning, onDelete }: Props) => {
                 White on it measures 5.77.
                ------------------------------------------------------------ */}
             <View style={styles.behind} pointerEvents="none">
-                <Text style={styles.behindText}>Delete</Text>
+                {/* The panel is the only warning there is now, so a guarded
+                    row says what it is rather than saying Delete twice as
+                    loudly. `label` is not repeated here - the row itself is
+                    directly on top of this and already says who it is from. */}
+                <Text style={styles.behindText}>
+                    {guarded ? 'Not played yet' : 'Delete'}
+                </Text>
             </View>
 
             <Animated.View

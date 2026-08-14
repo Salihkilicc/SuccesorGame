@@ -156,14 +156,13 @@ const MessagesScreen = () => {
                             //  conversation nobody has played. The scene is
                             //  already marked seen, so deleting the thread is
                             //  the only way in this game to lose a piece of the
-                            //  story permanently and silently.
+                            //  story permanently.
                             //
-                            //  It is still allowed. It is their phone. It just
-                            //  does not happen without the sentence.
+                            //  Still allowed - it is their phone - but it costs
+                            //  a full swipe rather than a flick, and the panel
+                            //  behind says which kind of row this is.
                             // ------------------------------------------------
-                            warning={t.conversationId
-                                ? 'There is a conversation here you have not played. It will not come back.'
-                                : undefined}
+                            guarded={!!t.conversationId}
                             onDelete={() => removeThread(t.id)}>
                             <ThreadRow
                                 thread={t}

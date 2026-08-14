@@ -22,9 +22,20 @@
 //    the row is the only way in this game to lose a piece of the story
 //    permanently and silently.
 //
-//  Neither is prevented. It is the player's phone, and a delete that argues
-//  with you is worse than one that tells you. Both are said out loud, and the
-//  negotiation is cleaned up rather than stranded.
+//  Neither is prevented. It is the player's phone.
+//
+//  The confirmation that used to stand in front of both is GONE, at the
+//  player's request and rightly: the whole point of the gesture is clearing
+//  five finished threads in five seconds, and a box after each turns a sweep
+//  into an interrogation. What replaces it is distance and cleanup.
+//
+//    The negotiation is cleaned up rather than warned about. Withdrawing is
+//    what throwing somebody's reply away means, so it happens, and that letter
+//    needs no extra friction at all.
+//
+//    The unplayed scene costs a full swipe instead of a flick. A worse guard
+//    than a box and a much better control: a player can lose one to a long
+//    accidental swipe, but not to a careless one.
 // ============================================================================
 
 import { useNegotiationStore, initialNegotiationState } from '../store/useNegotiationStore';
@@ -83,6 +94,26 @@ describe('a company that is waiting on you', () => {
             marketCap: 1e9, risk: 'Medium', acquirerValuation: 1e9, quarter: 9,
         });
         expect(r.ok).toBe(false);
+    });
+});
+
+describe('how much swipe each row costs', () => {
+    const { DELETE_THRESHOLD, GUARDED_THRESHOLD } =
+        require('../../components/common/SwipeToDelete');
+
+    it('an ordinary row goes on a flick', () => {
+        // A quarter of the screen. The gesture has to be worth using or the
+        // player goes back to living with the clutter.
+        expect(DELETE_THRESHOLD).toBeGreaterThan(0);
+        expect(GUARDED_THRESHOLD).toBeGreaterThan(DELETE_THRESHOLD * 2);
+    });
+
+    it('and a guarded one needs a deliberate movement', () => {
+        // Reachable, because the player is allowed to throw these away. It is
+        // the only thing left between a flick and a scene nobody will read.
+        expect(GUARDED_THRESHOLD).toBeLessThan(
+            require('react-native').Dimensions.get('window').width,
+        );
     });
 });
 

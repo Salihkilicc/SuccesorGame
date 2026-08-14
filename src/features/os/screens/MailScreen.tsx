@@ -110,16 +110,17 @@ const MailScreen = () => {
             ? offers.find(o => o.id === mail.negotiationId && o.status === 'open')
             : undefined;
 
-    const warningFor = (mail: Mail): string | undefined => {
-        const offer = openOfferFor(mail);
-        if (offer) {
-            return `${offer.targetName} is waiting for an answer. Throwing this away withdraws your approach, and you can write to them again later.`;
-        }
-        if (mail.conversationId) {
-            return 'There is a conversation here you have not played. It will not come back.';
-        }
-        return undefined;
-    };
+    /**
+     * A letter that is carrying something, so it costs a full swipe.
+     *
+     * ONLY THE UNPLAYED SCENE. A letter with an open negotiation on it is NOT
+     * guarded, and that is the interesting half: the danger there was never
+     * losing the letter, it was the offer staying `open` and locking the
+     * company out of the game with the reason in a store the player cannot
+     * see. `binMail` withdraws the approach, so throwing the reply away now
+     * means what it looks like it means and needs no extra friction.
+     */
+    const isGuarded = (mail: Mail): boolean => !!mail.conversationId;
 
     const binMail = (mail: Mail) => {
         const offer = openOfferFor(mail);
@@ -168,7 +169,7 @@ const MailScreen = () => {
                         <SwipeToDelete
                             key={m.id}
                             label={`"${m.subject}"`}
-                            warning={warningFor(m)}
+                            guarded={isGuarded(m)}
                             onDelete={() => binMail(m)}>
                             <MailRow
                                 mail={m}
