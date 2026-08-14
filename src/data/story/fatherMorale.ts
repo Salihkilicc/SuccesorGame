@@ -33,11 +33,18 @@
 // ============================================================================
 
 import type { Conversation } from '../../core/story/graph';
+import type { Condition } from '../../core/story/conditions';
+
+const WHEN: Condition[] = [
+    { kind: 'quarterAtLeast', quarter: 2 },
+    { kind: 'noFlag', flag: 'fatherDead' },
+];
 
 export const fatherMorale: Conversation = {
     id: 'father-morale',
     channel: 'message',
     from: 'father',
+    when: WHEN,
     start: 'open',
     nodes: [
         {

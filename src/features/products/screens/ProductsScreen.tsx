@@ -9,6 +9,7 @@ import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+import InfoDot from '../../../components/common/InfoDot';
 
 /**
  * The first product card, and only the first, is what the tutorial points at.
@@ -41,7 +42,16 @@ const ProductsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title={t('product.productLines')} />
+      <ScreenHeader
+        title={t('product.productLines')}
+        right={
+          <InfoDot
+            title={t('tactic.productsTitle')}
+            text={t('tactic.productsText')}
+            detail={t('tactic.productsDetail')}
+          />
+        }
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 

@@ -78,7 +78,7 @@ export const initialProductState: ProductState = {
             competition: 'High',
             baseProductionCost: 250,
             unitCost: 250,
-            suggestedPrice: 600,
+            suggestedPrice: 620,
 
             // ------------------------------------------------------------------
             //  THE PHONE IS ALREADY BEING MADE. NOBODY HAS HEARD OF IT.
@@ -105,7 +105,7 @@ export const initialProductState: ProductState = {
             //  the building knows it exists. That is the first real decision
             //  and the first lesson points at it.
             // ------------------------------------------------------------------
-            sellingPrice: 600,
+            sellingPrice: 620,
             productionUnits: 2025,
             marketingBudget: 0,
             inventory: 0,

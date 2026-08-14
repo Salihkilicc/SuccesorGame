@@ -29,6 +29,7 @@ import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
+import InfoDot from '../../../components/common/InfoDot';
 
 // Helper Component
 //
@@ -40,13 +41,18 @@ import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 //
 //  They share one surface now. The icon distinguishes them; the press state
 //  lifts the card by one rung of the elevation ladder instead of tinting it.
-const DepartmentCard = ({ icon, title, subtitle, onPress }: any) => (
+const DepartmentCard = ({ icon, title, subtitle, onPress, info }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
       styles.deptCard,
       pressed && styles.deptCardPressed,
     ]}>
+    {info && (
+      <View style={styles.deptInfoWrap}>
+        <InfoDot title={info.title} text={info.text} detail={info.detail} small />
+      </View>
+    )}
     <Text style={{ fontSize: 32 }}>{icon}</Text>
     <Text style={styles.deptTitle}>{title}</Text>
     <Text style={styles.deptSub}>{subtitle}</Text>
@@ -248,7 +254,12 @@ const MyCompanyScreen = () => {
             title={companyName || t('company.myCompany')}
             onPress={() => navigation.navigate('FinancialReport')}
             rightContent={
-              <View style={{ flexDirection: 'row', gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <InfoDot
+                  title={t('tactic.companyTitle')}
+                  text={t('tactic.companyText')}
+                  detail={t('tactic.companyDetail')}
+                />
                 <Text style={styles.sharePrice}>{formatPrice(stockPrice)}</Text>
                 <Text style={{ color: (stats.companyDailyChange || 0) >= 0 ? theme.colors.success : theme.colors.danger, fontWeight: '700' }}>
                   {(stats.companyDailyChange || 0).toFixed(2)}%
@@ -312,17 +323,24 @@ const MyCompanyScreen = () => {
               title={t('company.financing')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => navigation.navigate('Finance')}
+              info={{
+                title: t('tactic.financingTitle'),
+                text: t('tactic.financingText'),
+                detail: t('tactic.financingDetail'),
+              }}
             />
 
-            {/* Registered so the first year can point at it. The key is the
-                only thing the tutorial knows about this card; the card knows
-                nothing about the tutorial. */}
             <TutorialTarget tutorialKey="products" style={styles.deptTargetWrap}>
               <DepartmentCard
                 icon="🏭"
                 title={t('company.products')}
                 subtitle={`${activeProductsCount} Active`}
                 onPress={() => navigation.navigate('Products')}
+                info={{
+                  title: t('tactic.productsTitle'),
+                  text: t('tactic.productsText'),
+                  detail: t('tactic.productsDetail'),
+                }}
               />
             </TutorialTarget>
 
@@ -331,20 +349,27 @@ const MyCompanyScreen = () => {
               title={t('company.financialReport')}
               subtitle={t('company.expensesProfitsRoi')}
               onPress={() => navigation.navigate('FinancialReport')}
+              info={{
+                title: t('tactic.financialReportTitle'),
+                text: t('tactic.financialReportText'),
+                detail: t('tactic.financialReportDetail'),
+              }}
             />
             <DepartmentCard
               icon="📈"
               title={t('company.equity')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => navigation.navigate('StockMarket', { onOpenIPO: handleLaunchIPO })}
+              info={{
+                title: t('tactic.equityTitle'),
+                text: t('tactic.equityText'),
+                detail: t('tactic.equityDetail'),
+              }}
             />
           </View>
 
 
           {/* OPERATIONS */}
-          {/* Fabrika +1/-1 butonlari ve "Employees" kartinin sayi kontrolu
-              kaldirildi. Kapasite artik tesis KADEMESINDEN geliyor ve kadro
-              HEDEF olarak veriliyor — bkz. core/market/capacity.ts */}
           <SectionHeader title={t('company.operations')} />
           <FacilityPanel />
 
@@ -353,16 +378,57 @@ const MyCompanyScreen = () => {
               title={`🎉 ${t('company.teamMorale')}`}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
               onPress={() => navigation.navigate('TeamMorale')}
+              info={{
+                title: t('tactic.teamMoraleTitle'),
+                text: t('tactic.teamMoraleText'),
+                detail: t('tactic.teamMoraleDetail'),
+              }}
             />
           </TutorialTarget>
 
           {/* QUICK ACTIONS */}
           <SectionHeader title={t('company.quickActions')} />
           <View style={{ gap: 8 }}>
-            <SectionCard title={`🔬 ${t('company.rDInvestment')}`} subtitle={t('company.investInFutureGrowth')} onPress={() => navigation.navigate('Research')} />
-            <SectionCard title={`🏢 ${t('company.hostileTakeover')}`} subtitle={t('company.buyPublicCompaniesToGain')} onPress={() => navigation.navigate('HostileTakeover')} />
-            <SectionCard title={`👔 ${t('company.boardMembers')}`} subtitle={t('company.viewShareholders')} onPress={() => navigation.navigate('BoardMembers')} />
-            <SectionCard title={`🏆 ${t('company.myEmpire')}`} subtitle={t('company.manageSubsidiaries')} onPress={() => navigation.navigate('MyEmpire')} />
+            <SectionCard
+              title={`🔬 ${t('company.rDInvestment')}`}
+              subtitle={t('company.investInFutureGrowth')}
+              onPress={() => navigation.navigate('Research')}
+              info={{
+                title: t('tactic.rdTitle'),
+                text: t('tactic.rdText'),
+                detail: t('tactic.rdDetail'),
+              }}
+            />
+            <SectionCard
+              title={`🏢 ${t('company.hostileTakeover')}`}
+              subtitle={t('company.buyPublicCompaniesToGain')}
+              onPress={() => navigation.navigate('HostileTakeover')}
+              info={{
+                title: t('tactic.takeoverTitle'),
+                text: t('tactic.takeoverText'),
+                detail: t('tactic.takeoverDetail'),
+              }}
+            />
+            <SectionCard
+              title={`👔 ${t('company.boardMembers')}`}
+              subtitle={t('company.viewShareholders')}
+              onPress={() => navigation.navigate('BoardMembers')}
+              info={{
+                title: t('tactic.boardTitle'),
+                text: t('tactic.boardText'),
+                detail: t('tactic.boardDetail'),
+              }}
+            />
+            <SectionCard
+              title={`🏆 ${t('company.myEmpire')}`}
+              subtitle={t('company.manageSubsidiaries')}
+              onPress={() => navigation.navigate('MyEmpire')}
+              info={{
+                title: t('tactic.empireTitle'),
+                text: t('tactic.empireText'),
+                detail: t('tactic.empireDetail'),
+              }}
+            />
           </View>
 
         </ScrollView>
@@ -512,6 +578,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   deptCardPressed: { backgroundColor: theme.colors.surfaceHigh, transform: [{ scale: 0.98 }] },
+  deptInfoWrap: { position: 'absolute', top: 10, right: 10, zIndex: 10 },
   deptTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: 0.3 },
   deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
   // The share PRICE is not a gain or a loss, it is just a number - the

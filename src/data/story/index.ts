@@ -253,34 +253,16 @@ export interface StoryBeat {
 
 export const STORY_BEATS: StoryBeat[] = [
     // ------------------------------------------------------------------
-    //  PEAR, AS A BACKSTOP RATHER THAN AS THE ROUTE
+    //  THE FIRST YEAR OF FATHER: Q2 Morale, Q3 Marketing, Q4 Year 1 Close
     // ------------------------------------------------------------------
-    //  The death scene schedules this letter, and normally that is what
-    //  delivers it - the schedule is queued in the quarter of the death and
-    //  the conversation's own gate does not open until the one after, so
-    //  runStoryBeats finds it already pending and skips.
-    //
-    //  This exists for the save where the schedule was lost. One effect,
-    //  firing once, with the whole second act behind it was a single point
-    //  of failure in front of the most important letter in the game.
-    // ------------------------------------------------------------------
-    { conversation: pearOffer.id, urgent: true },
-    // ------------------------------------------------------------------
-    //  THE LAST QUARTER OF HIM, AND THEN THE PHONE CALL
-    // ------------------------------------------------------------------
-    //  Q4 before Q5, and they cannot meet: father-q4 carries `noFlag
-    //  fatherDead` and the death carries `quarterAtLeast 5`, so the only
-    //  way they could share an inbox is a player who arrives at quarter
-    //  four late. The order in this list settles that - a beat is queued
-    //  the first quarter its `when` holds, and this one is checked first.
-    //
-    //  URGENT, and it is the only beat that teaches nothing which is. Its
-    //  window is exactly one quarter wide - see the `quarterAtMost` on it -
-    //  so waiting behind two random events would not delay it, it would
-    //  delete it.
-    // ------------------------------------------------------------------
+    { conversation: fatherMorale.id, urgent: true },
+    { conversation: fatherMarketing.id, urgent: true },
     { conversation: fatherQ4.id, urgent: true },
+    // ------------------------------------------------------------------
+    //  YEAR 2 (Q5): THE DEATH & PEAR OFFER
+    // ------------------------------------------------------------------
     { conversation: fatherDeath.id, urgent: true },
+    { conversation: pearOffer.id, urgent: true },
 ];
 
 // ============================================================================
@@ -320,18 +302,7 @@ STORY_BEATS.push(
 //  being listened to, and the resignation needs him to have given up. None of
 //  them is urgent - he is not the spine, he is the person standing next to it.
 // ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-//  THE MARKETING SCENE, WHICH USED TO BE CARRIED BY A LOCK
-// ----------------------------------------------------------------------------
-//  It rode on `q3-marketing`, and that lock is shelved: its lesson moved to
-//  the first quarter, where the hole it describes is actually visible. The
-//  SCENE did not move with it - it is about share being taken, and no share
-//  has been taken in the first quarter.
-//
-//  So it becomes an ordinary beat. Its own `when` already carries the timing;
-//  nothing about the writing changes, only what delivers it.
-// ----------------------------------------------------------------------------
-STORY_BEATS.push({ conversation: fatherMarketing.id });
+
 
 //  A HALF EACH, so the arc still lands inside a year or two of its gate
 //  opening and no two runs walk it at the same pace. See `chance` above.

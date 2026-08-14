@@ -10,7 +10,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
-import { formatMoney, formatNumber } from '../../../core/utils';
+import { formatMoney, formatNumber, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 
 type Props = {
@@ -28,18 +28,6 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     const { unlockProduct } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
     const { companyCapital, brandValue, update: updateStats } = useStatsStore();
-
-    const formatCurrency = (value: number) => {
-        return formatMoney(value);
-        // eslint-disable-next-line no-unreachable
-        return `$${value}`;
-    };
-
-    const formatRP = (value: number) => {
-        return `${formatNumber(value)} RP`;
-        // eslint-disable-next-line no-unreachable
-        return `${value} RP`;
-    };
 
     // ------------------------------------------------------------------
     //  CATEGORY GATE — earn your way out before you spread
@@ -166,11 +154,11 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                         <View style={styles.financialsGrid}>
                             <View style={styles.financialItem}>
                                 <Text style={styles.financialLabel}>{t('product.unitCost')}</Text>
-                                <Text style={styles.financialValue}>{formatCurrency(product.baseUnitCost)}</Text>
+                                <Text style={styles.financialValue}>{formatMoney(product.baseUnitCost)}</Text>
                             </View>
                             <View style={styles.financialItem}>
                                 <Text style={styles.financialLabel}>{t('product.sellingPrice')}</Text>
-                                <Text style={styles.financialValue}>{formatCurrency(product.baseSellingPrice)}</Text>
+                                <Text style={styles.financialValue}>{formatMoney(product.baseSellingPrice)}</Text>
                             </View>
                             <View style={styles.financialItem}>
                                 <Text style={styles.financialLabel}>{t('product.stockBoost')}</Text>
@@ -192,8 +180,8 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                             </View>
                             <View style={[styles.costBadge, companyCapital < product.unlockCashCost && styles.costBadgeInsufficient]}>
                                 <Text style={styles.costLabel}>{t('product.capital')}</Text>
-                                <Text style={styles.costValue}>{formatCurrency(product.unlockCashCost)}</Text>
-                                <Text style={styles.costAvailable}>{t('product.availableV1', { v1: formatCurrency(companyCapital) })}</Text>
+                                <Text style={styles.costValue}>{formatMoney(product.unlockCashCost)}</Text>
+                                <Text style={styles.costAvailable}>{t('product.availableV1', { v1: formatMoney(companyCapital) })}</Text>
                             </View>
                         </View>
                     </View>

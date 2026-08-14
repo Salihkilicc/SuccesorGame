@@ -45,7 +45,7 @@ import {
     quarterlyWage,
     severancePay,
 } from '../../../core/market/workforce';
-import { formatMoney, formatNumber, formatPercent } from '../../../core/utils';
+import { formatMoney, formatNumber, formatPercent, formatRP, formatCompact } from '../../../core/utils';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import StepperBar from '../../../components/common/StepperBar';
 import InfoDot from '../../../components/common/InfoDot';
@@ -97,7 +97,7 @@ const FacilityPanel: React.FC = () => {
         Alert.alert(
             t('fac.upgradeTo', { v1: next.name }),
             t('fac.upgradeBody', {
-                v1: formatMoney(next.upgradeCost) + (next.upgradeRP > 0 ? ` + ${formatNumber(next.upgradeRP)} RP` : ''),
+                v1: formatMoney(next.upgradeCost) + (next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''),
                 v2: next.buildQuarters,
                 v3: Math.round(tier.retoolingRatio * 100),
                 v4: formatNumber(next.capacity),
@@ -189,9 +189,9 @@ const FacilityPanel: React.FC = () => {
                 <View style={styles.facilityHead}>
                     <Text style={styles.tierDesc}>{tier.description}</Text>
                     <InfoDot
-                        title={t('company.facility')}
-                        text={t('company.yourProductionCapabilityItSets')}
-                        detail={t('fac.productionFormula')}
+                        title={t('tactic.operationsTitle')}
+                        text={t('tactic.operationsText')}
+                        detail={t('tactic.operationsDetail')}
                         small
                     />
                 </View>
@@ -295,12 +295,12 @@ const FacilityPanel: React.FC = () => {
                     </View>
                     <View style={styles.compareRow}>
                         <Compare label={t('company.unitCost')} from={`×${tier.unitCostMultiplier.toFixed(2)}`} to={`×${next.unitCostMultiplier.toFixed(2)}`} />
-                        <Compare label={t('company.brandCap')} from={`${tier.brandCeiling}`} to={`${next.brandCeiling}`} />
+                        <Compare label={t('company.brandCeiling')} from={`${tier.brandCeiling}`} to={`${next.brandCeiling}`} />
                     </View>
 
                     <Text style={styles.costLine}>
                         {formatMoney(next.upgradeCost)}
-                        {next.upgradeRP > 0 ? ` + ${formatNumber(next.upgradeRP)} RP` : ''} up front ·{' '}
+                        {next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''} up front ·{' '}
                         {next.buildQuarters} quarter(s) to build ·{' '}
                         {Math.round(tier.retoolingRatio * 100)}% capacity while building
                     </Text>
@@ -311,9 +311,9 @@ const FacilityPanel: React.FC = () => {
                         this shared with unrelated warnings. */}
                     {next.upgradeRP > 0 && (
                         <Text style={totalRP >= next.upgradeRP ? styles.rpLine : styles.rpLineShort}>
-                            {t('fac.researchProgress', { v1: formatNumber(Math.floor(totalRP)), v2: formatNumber(next.upgradeRP) })}
+                            {t('fac.researchProgress', { v1: formatCompact(Math.floor(totalRP)), v2: formatCompact(next.upgradeRP) })}
                             {totalRP < next.upgradeRP
-                                ? ', money alone will not build this. Fund the lab.'
+                                ? ` (${formatCompact(next.upgradeRP - totalRP)} short)`
                                 : ', cleared.'}
                         </Text>
                     )}

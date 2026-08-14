@@ -11,7 +11,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { brandIndex, BRAND_INDEX_SCALE } from '../../../core/market/brand';
-import { formatNumber as formatNumberShared, formatMoney, formatPercent } from '../../../core/utils';
+import { formatNumber as formatNumberShared, formatMoney, formatPercent, formatRP, formatCompact } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
@@ -539,7 +539,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                         onBack={onClose}
                         right={
                             <View style={styles.rpBadge}>
-                                <Text style={styles.rpBadgeText}>{formatNumberShared(totalRP)} RP</Text>
+                                <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
                             </View>
                         }
                     />
@@ -562,7 +562,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             note={t('product.spendResearchPointsToCut')}
                             info={t('product.optimizingTheProcessLowersYour')}
                             infoDetail={t('product.eachLevelCostsMoreThan')}
-                            summary={`${formatNumberShared(totalRP)} RP`}
+                            summary={formatRP(totalRP)}
                             summaryColor={theme.colors.rp}
                         >
                         <View style={styles.rdSection}>
@@ -588,7 +588,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     <Text style={styles.upgradeBtnTextCompact}>
                                         {isMaxEfficiency
                                             ? t('product.maxEfficiency')
-                                            : `${formatNumber(processUpgradeRP)} RP`}
+                                            : formatRP(processUpgradeRP)}
                                     </Text>
                                 </Pressable>
                             </View>
@@ -622,7 +622,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     disabled={!canUpgradeQuality}
                                 >
                                     <Text style={styles.upgradeBtnTextCompact}>
-                                        {`${formatNumber(qualityUpgradeRP)} RP`}
+                                        {formatRP(qualityUpgradeRP)}
                                     </Text>
                                 </Pressable>
                             </View>

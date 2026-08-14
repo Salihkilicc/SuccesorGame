@@ -125,7 +125,18 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
         <GameModal asScreen={asScreen} visible={visible} onClose={onClose}>
             {/* This screen had no exit control of any kind - as a popup it was
                 dismissed by tapping outside, which a screen cannot be. */}
-            <ScreenHeader inset={!!asScreen} title={t('ui.team')} onBack={onClose} />
+            <ScreenHeader
+                inset={!!asScreen}
+                title={t('ui.team')}
+                onBack={onClose}
+                right={
+                    <InfoDot
+                        title={t('tactic.teamMoraleTitle')}
+                        text={t('tactic.teamMoraleText')}
+                        detail={t('tactic.teamMoraleDetail')}
+                    />
+                }
+            />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.screenPad}>
                 {/* ══ MORAL ŞERİDİ ══ */}
                 <View style={styles.stripe}>
@@ -327,7 +338,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    screenPad: { padding: theme.spacing.md },
+    screenPad: { padding: theme.spacing.md, paddingBottom: 120 },
     stripe: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
     label: { color: '#FFFFFF', fontSize: 9.5, fontWeight: '800', letterSpacing: 0.8 },
     big: { color: theme.colors.textPrimary, fontSize: 26, fontWeight: '800', marginTop: 2 },

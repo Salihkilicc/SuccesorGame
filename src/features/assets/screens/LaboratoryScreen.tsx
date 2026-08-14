@@ -15,18 +15,12 @@ import {
     calculateQuarterlyRP,
     RESEARCHER_ECONOMICS,
 } from '../../../features/laboratory/data/laboratoryData';
-import { formatMoney as formatMoneyExact, formatNumber } from '../../../core/utils';
+import { formatMoney, formatNumber, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
-
-// Paylasilan bicimlendiriciye devrediyor (core/utils).
-// Eskiden her dosyada ayri kademe zinciri vardi; esikleri farkli oldugu icin
-// ayni deger farkli ekranlarda farkli gorunuyordu.
-const formatMoney = (value: number = 0): string => formatMoneyExact(value);
-
-const formatRP = (value: number): string => `${formatNumber(value)} RP`;
+import InfoDot from '../../../components/common/InfoDot';
 
 const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
     useLocale();
@@ -141,8 +135,15 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                 subtitle={t('company.targetOutputV1Q', { v1: formatRP(quarterlyRP) })}
                 onBack={onBack}
                 right={
-                    <View style={styles.rpBadge}>
-                        <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <InfoDot
+                            title={t('tactic.rdTitle')}
+                            text={t('tactic.rdText')}
+                            detail={t('tactic.rdDetail')}
+                        />
+                        <View style={styles.rpBadge}>
+                            <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
+                        </View>
                     </View>
                 }
             />
@@ -241,9 +242,9 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
                         {formatNumber(tempCount)} researchers produce{' '}
                         <Text style={{ color: theme.colors.rp, fontWeight: '800' }}>
-                            {formatNumber(researchOutput(tempCount))} RP
+                            {formatRP(researchOutput(tempCount))}
                         </Text>{' '}
-                        per quarter, at {formatMoneyExact(perResearcher)} each. Output scales with the
+                        per quarter, at {formatMoney(perResearcher)} each. Output scales with the
                         power of 0.85 — doubling the team does not double the discoveries.
                     </Text>
 

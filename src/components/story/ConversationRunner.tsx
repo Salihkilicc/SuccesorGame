@@ -1,48 +1,16 @@
 // src/components/story/ConversationRunner.tsx
-//
-// ============================================================================
-//  THE ONE THING THAT PLAYS A CONVERSATION
-// ============================================================================
-//
-//  Mail and Messages use this same component. The only difference between them
-//  is `variant`, which changes how a card LOOKS - a chat bubble or a letter -
-//  and nothing about how it behaves.
-//
-//  That is worth being firm about. The obvious alternative is a runner in each
-//  app, since one is a chat and the other is an inbox, and it would work for
-//  about three scenes. Then one of them gains a feature the other lacks, a
-//  writer has to remember which app a scene is destined for while writing it,
-//  and the branching rules quietly fork. One runner means a conversation is a
-//  conversation and the channel is a costume.
-//
-//  ---------------------------------------------------------------------------
-//  IT CANNOT HANG
-//  ---------------------------------------------------------------------------
-//  If a card's answers are all gated and every gate fails, there is nothing to
-//  press. The runner shows "Close" in that case rather than a card with no
-//  buttons - the player is never stuck.
-//
-//  The audit still fails on that card. Not hanging is the floor, not the goal:
-//  a card written to pose a decision that silently offers only an exit is a
-//  writing bug, and the check exists so it is found by a script rather than by
-//  a player.
-// ============================================================================
-
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
-import { useLocale } from '../../core/i18n';
-import { line, nodeKey, choiceKey, subjectKey } from '../../data/i18n/storyText';
 import { MAX_ANSWER_BLOCK, MAX_FONT_MULTIPLIER } from './answerFit';
 import { NAV_BAR_CLEARANCE } from '../../navigation/components/CrystalNavBar';
-import { nodeById, type Conversation, type Choice } from '../../core/story/graph';
-import { applyEffects } from '../../core/story/effects';
-import { gameSink } from '../../core/story/gameSink';
-import { testAll } from '../../core/story/conditions';
-import { readWorld } from '../../core/story/world';
+import type { Conversation } from '../../core/story/graph';
 import { CAST } from '../../data/story/cast';
-import { useStoryStore, type SceneProgress, type Said } from '../../core/store/useStoryStore';
+import type { Said } from '../../core/store/useStoryStore';
+import { useConversationRunnerLogic } from './logic/useConversationRunnerLogic';
+import AnimatedBubble from './AnimatedBubble';
+import TypingIndicator from './TypingIndicator';
 
 type Props = {
     conversation: Conversation;
@@ -50,200 +18,15 @@ type Props = {
     variant: 'message' | 'mail';
     /**
      * Called when the conversation ends, so the screen can close or return.
-     *
-     * It is handed the transcript, because a screen may want to keep what was
-     * said - the message thread turns it into ordinary messages.
      */
     onFinished?: (history: Said[]) => void;
 };
 
-// ============================================================================
-//  A SCENE REMEMBERS WHERE IT GOT TO
-// ============================================================================
-//  This used to be plain component state, which meant leaving a conversation
-//  halfway - back arrow, tab bar, or the phone locking - started it again from
-//  the first card next time. And the runner applies effects as answers are
-//  picked, so the half already played was applied twice.
-//
-//  Position and transcript now come in and go out through the store. The
-//  component still owns them while it is on screen; the store is where they
-//  survive the screen not being.
-// ============================================================================
-
 const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
-    const saved = useStoryStore(s => s.sceneProgress[conversation.id]);
-    // Read ONCE, on mount. Subscribing the position to the store would fight
-    // the local state on every answer - and the value only ever changes
-    // because this component changed it.
-    const [resume] = useState<SceneProgress | undefined>(saved);
+    const { state, actions } = useConversationRunnerLogic({ conversation, variant, onFinished });
+    const { history, isTyping, available, node, done, scroller, subject } = state;
+    const { pick, finish, answer } = actions;
 
-    const [nodeId, setNodeId] = useState<string | null>(
-        resume ? resume.nodeId : conversation.start,
-    );
-    // ------------------------------------------------------------------
-    //  EVERY LINE GOES THROUGH THE DICTIONARY
-    // ------------------------------------------------------------------
-    //  `line()` falls back to the English in the scene file when there is no
-    //  translation, so a half-finished language is playable and a missing key
-    //  is a stray English sentence rather than a crash in the middle of the
-    //  father's death. See src/data/i18n/storyText.ts.
-    //
-    //  Choices are keyed by INDEX, not by their own text - the button text is
-    //  what identifies the choice, so keying a translation on it would be
-    //  circular.
-    //
-    //  `useLocale()` subscribes this component to the app's language, which is
-    //  also the story's language - there is no second setting. Note that what
-    //  is ALREADY in `history` stays in the language it was read in: those
-    //  strings were resolved when the card arrived. Changing language during a
-    //  conversation therefore leaves the sentences above the fold as they were
-    //  and applies from the next card, which is both cheaper and closer to
-    //  right than retranslating a thing the player has already read.
-    // ------------------------------------------------------------------
-    useLocale();
-    const say = (nodeIdent: string, text: string) =>
-        line(nodeKey(conversation.id, nodeIdent), text);
-    const answer = (nodeIdent: string, index: number, text: string) =>
-        line(choiceKey(conversation.id, nodeIdent, index), text);
-
-    const [history, setHistory] = useState<Said[]>(() => {
-        if (resume) return resume.history;
-        const first = nodeById(conversation, conversation.start);
-        return first ? [{ from: 'them', text: say(first.id, first.text) }] : [];
-    });
-
-    // ------------------------------------------------------------------
-    //  SAVED WHEN THE CARD CHANGES, NOT AFTER IT HAS BEEN DRAWN
-    // ------------------------------------------------------------------
-    //  This was an effect on [nodeId, history], which is the obvious way to
-    //  write it and loses exactly one card: THE LAST ONE.
-    //
-    //  Picking a final answer sets the state and calls `onFinished`, and the
-    //  screen's `onFinished` navigates away. All of it is one event handler,
-    //  so React batches the lot and the screen unmounts in the same commit -
-    //  before the effect for the final state ever ran. The scene stayed saved
-    //  at the card BEFORE the last answer.
-    //
-    //  Which is what the player saw: told Arthur "I will write it myself",
-    //  left, came back, and was offered both answers again. Worse than the
-    //  wrong sentence being remembered - the dial had already moved when the
-    //  answer was picked, so choosing the other one moved it again.
-    //
-    //  So the write happens where the change does, synchronously, in
-    //  `record`. The effect is only for the opening card of a scene nobody
-    //  has started - a player who opens a scene, reads it and backs out has
-    //  been shown it, and there is no answer to hang that on.
-    // ------------------------------------------------------------------
-    useEffect(() => {
-        if (!resume) {
-            useStoryStore.getState().saveScene(conversation.id, { nodeId, history });
-        }
-        // Mount only. Every later write goes through `record`.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    /**
-     * Move to a card and write it down in the same breath.
-     *
-     * The ONLY place position and transcript change after mount. Two setters
-     * and a save, so there is no arrangement of unmounting, batching or
-     * navigation that can commit one without the others.
-     */
-    const record = (toNode: string | null, said: Said[]) => {
-        setNodeId(toNode);
-        setHistory(said);
-        useStoryStore.getState().saveScene(conversation.id, { nodeId: toNode, history: said });
-    };
-
-    const node = nodeId ? nodeById(conversation, nodeId) : undefined;
-
-    // The world is read fresh on every render rather than captured once: an
-    // effect from the previous card may have changed the money a gate on this
-    // card is about to test.
-    const world = readWorld();
-
-    // ------------------------------------------------------------------
-    //  THE ORIGINAL INDEX IS CARRIED, NOT RECOMPUTED
-    // ------------------------------------------------------------------
-    //  Translation keys are `scene/card#n` where n is the choice's position
-    //  in the DATA. This list is filtered by `when`, so its own index is not
-    //  that number - a card whose first answer is gated off would look up the
-    //  translation of the answer above the one being shown, and only for
-    //  players who failed the gate. Silent, conditional, and impossible to
-    //  reproduce on purpose.
-    // ------------------------------------------------------------------
-    const available: { choice: Choice; index: number }[] = useMemo(
-        () => (node?.choices ?? [])
-            .map((choice, index) => ({ choice, index }))
-            .filter(({ choice }) => testAll(choice.when, world)),
-        [node, world],
-    );
-
-    const finish = (h: Said[] = history) => {
-        record(null, h);
-        onFinished?.(h);
-    };
-
-    const pick = (choice: Choice, index: number) => {
-        // Effects first, then move. A choice that pays for something and then
-        // opens a card mentioning the payment has to happen in that order.
-        applyEffects(choice.effects, gameSink());
-
-        const next: Said[] = [...history, {
-            from: 'player' as const,
-            text: node ? answer(node.id, index, choice.text) : choice.text,
-        }];
-        const target = choice.next ? nodeById(conversation, choice.next) : undefined;
-        if (target) next.push({ from: 'them', text: say(target.id, target.text) });
-
-        // Built outside a state updater, because `finish` has to hand the
-        // completed transcript to the screen and an updater is not the place
-        // to read state back out of.
-        //
-        // A `next` that does not resolve ends the scene: the audit means that
-        // cannot happen in shipped data, so this is for a save made against a
-        // version of the scene that has since been rewritten.
-        if (!choice.next || !target) { finish(next); return; }
-        record(choice.next, next);
-    };
-
-    const done = !node;
-
-    // ------------------------------------------------------------------
-    //  THE ANSWERS MOVE DOWN THE PAGE, SO THE PAGE HAS TO FOLLOW THEM
-    // ------------------------------------------------------------------
-    //  A pinned rack was always in the same place and never needed this.
-    //  In the scroll, the answers sit under the newest card - so from about
-    //  the third card of any scene they are below the fold, and a player who
-    //  answered and saw nothing happen would reasonably conclude the game
-    //  had stopped.
-    //
-    //  On the next frame rather than immediately: the new card has not been
-    //  laid out at the moment the state changes, so scrolling now scrolls to
-    //  where the end used to be.
-    // ------------------------------------------------------------------
-    const scroller = useRef<ScrollView>(null);
-    useEffect(() => {
-        const id = setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 60);
-        return () => clearTimeout(id);
-    }, [history.length]);
-
-    // ------------------------------------------------------------------
-    //  THE ANSWERS, WHICH BELONG IN TWO DIFFERENT PLACES
-    // ------------------------------------------------------------------
-    //  On a MESSAGE they are a keyboard: pinned to the bottom, where a reply
-    //  field lives, with the conversation scrolling above them.
-    //
-    //  On a LETTER they are not. You answer a letter underneath it. Pinned to
-    //  the bottom they covered the last paragraph of the thing being replied
-    //  to, and on the mail screen - which has the nav bar floating over it -
-    //  the bottom row sat partly under the bar. The answers were hardest to
-    //  reach on exactly the screens with the most text above them.
-    //
-    //  So for mail they go inside the scroll, directly under the last card,
-    //  drawn as the player's own bubbles rather than a rack of buttons. Which
-    //  is what they are: the thing you are about to say.
-    // ------------------------------------------------------------------
     const closeButton = (onPress: () => void) => (
         <Pressable
             onPress={onPress}
@@ -256,47 +39,37 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
 
     const answers = done
         ? closeButton(() => onFinished?.(history))
-        // Either the card is terminal - they had the last word - or every
-        // answer was gated out. Both end the same way for the player; only
-        // the audit tells them apart.
         : available.length === 0
             ? closeButton(() => finish())
-            : available.map(({ choice, index }) => (
-                <Pressable
-                    key={index}
-                    onPress={() => pick(choice, index)}
-                    style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                    <Text
-                        style={styles.answerText}
-                        // Honoured up to AX1 and then held. Past that the
-                        // block is taller than the phone - and the container
-                        // gives way rather than the text shrinking, which
-                        // would answer a player who cannot read small text by
-                        // making it smaller. See answerFit.ts.
-                        maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
-                        {node ? answer(node.id, index, choice.text) : choice.text}
-                    </Text>
-                </Pressable>
-            ));
+            : isTyping
+                ? null
+                : available.map(({ choice, index }) => (
+                    <Pressable
+                        key={index}
+                        onPress={() => pick(choice, index)}
+                        style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
+                        <Text
+                            style={styles.answerText}
+                            maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
+                            {node ? answer(node.id, index, choice.text) : choice.text}
+                        </Text>
+                    </Pressable>
+                ));
 
     return (
         <View style={styles.root}>
             <ScrollView
                 ref={scroller}
                 contentContainerStyle={styles.body}
-                // A card can grow after its first layout - a long line
-                // wrapping, a font size the player changed - and the answers
-                // go with it.
                 onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: true })}>
-                {variant === 'mail' && !!conversation.subject && (
-                    <Text style={styles.subject}>
-                        {line(subjectKey(conversation.id), conversation.subject)}
-                    </Text>
+                {variant === 'mail' && !!subject && (
+                    <Text style={styles.subject}>{subject}</Text>
                 )}
 
                 {history.map((said, i) => (
-                    <View
-                        key={i}
+                    <AnimatedBubble
+                        key={`${i}-${said.from}`}
+                        delay={0}
                         style={[
                             variant === 'mail' ? styles.letterWrap : styles.bubbleWrap,
                             said.from === 'player' && variant === 'message' && styles.bubbleWrapMine,
@@ -304,73 +77,32 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                         <View
                             style={[
                                 variant === 'mail' ? styles.letter : styles.bubble,
-                                said.from === 'player' && styles.mine,
+                                said.from === 'player' && (variant === 'message' ? styles.mine : styles.letterMine),
+                                variant === 'message' && (said.from === 'player' ? styles.tailRight : styles.tailLeft),
                             ]}>
-                            {/* The player's own letter takes the light fill, so
-                                this label has to go black with it. The muted
-                                orange measures 1.29 there - caught by the
-                                audit, not by looking. */}
                             {variant === 'mail' && (
                                 <Text style={[styles.letterFrom, said.from === 'player' && styles.letterFromMine]}>
                                     {said.from === 'player' ? 'You replied' : (CAST[conversation.from]?.name ?? conversation.from)}
                                 </Text>
                             )}
-                            <Text style={[styles.said, said.from === 'player' && styles.saidMine]}>
+                            <Text style={[styles.said, said.from === 'player' && (variant === 'message' ? styles.saidMine : styles.saidLetterMine)]}>
                                 {said.text}
                             </Text>
                         </View>
-                    </View>
+                    </AnimatedBubble>
                 ))}
 
-                {/* ------------------------------------------------------
-                    BOTH CHANNELS ANSWER UNDER THE LAST THING SAID
+                {isTyping && (
+                    <TypingIndicator variant={variant} />
+                )}
 
-                    The letter did already. The message did not - its answers
-                    were a rack pinned to the bottom of the screen, and on a
-                    phone with a floating nav bar the bottom of the screen is
-                    where the nav bar is. They collided, and the answers were
-                    hardest to read on exactly the cards with most text above
-                    them.
-
-                    Pinning them was also a claim about what they are: a
-                    keyboard, a permanent fixture, the same two buttons in the
-                    same place every card. They are not. They are the thing
-                    the player is about to say, and it belongs where the next
-                    thing said goes - directly under the last bubble, moving
-                    up the screen as the conversation gets longer.
-
-                    So one block, in the scroll, for both variants. The bottom
-                    rack is shelved below rather than deleted.
-                   ------------------------------------------------------ */}
-                <View style={[styles.answers, styles.mailAnswers]}>{answers}</View>
+                {/* Answers / Choices block */}
+                {!!answers && (
+                    <View style={[styles.answers, styles.mailAnswers]}>
+                        {answers}
+                    </View>
+                )}
             </ScrollView>
-
-            {/* ------------------------------------------------------------
-                SHELVED: THE MESSAGE VARIANT'S BOTTOM RACK
-
-                It scrolled rather than running off the screen: it was a plain
-                View, and at the largest accessibility text size two cards in
-                the game put the second answer below the bottom of an iPhone
-                SE with nothing to scroll, so the conversation could not be
-                finished. `maxHeight` rather than a fixed one, so the block
-                still hugged its content on every card that fitted.
-
-                The measurement that produced it still holds and still applies
-                - the answers now sit in the body scroll, which has no bound
-                to run out of, so the tall-block case it was built for is
-                covered by the page scrolling instead. See answerFit.ts.
-
-            {variant === 'message' && (
-                <ScrollView
-                    style={styles.answersScroll}
-                    contentContainerStyle={styles.answers}
-                    // The answers are the point of the screen; if they are
-                    // tall enough to scroll, start at the top of them.
-                    bounces={false}>
-                    {answers}
-                </ScrollView>
-            )}
-               ------------------------------------------------------------ */}
         </View>
     );
 };
@@ -382,14 +114,6 @@ const styles = StyleSheet.create({
     body: {
         padding: theme.spacing.md,
         gap: theme.spacing.sm,
-        // ------------------------------------------------------------------
-        //  ROOM UNDER THE LAST THING ON THE PAGE
-        // ------------------------------------------------------------------
-        //  The nav bar floats over this screen. With the answers pinned to the
-        //  bottom it was their problem; now that a letter is answered inside
-        //  the scroll, the last bubble was the thing sitting under the bar -
-        //  which is to say the button the player was trying to press.
-        // ------------------------------------------------------------------
         paddingBottom: NAV_BAR_CLEARANCE + theme.spacing.lg,
     },
 
@@ -401,30 +125,54 @@ const styles = StyleSheet.create({
     },
 
     // --- Messages: bubbles
-    bubbleWrap: { alignItems: 'flex-start' },
+    bubbleWrap: { alignItems: 'flex-start', marginVertical: 2 },
     bubbleWrapMine: { alignItems: 'flex-end' },
     bubble: {
-        maxWidth: '85%',
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.radius.md,
-        paddingHorizontal: theme.spacing.md,
-        paddingVertical: 10,
+        maxWidth: '82%',
+        backgroundColor: '#2C3236',
+        paddingHorizontal: 16,
+        paddingVertical: 11,
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 2,
     },
-    /** The player's own line takes the light fill, so its text is black. */
-    mine: { backgroundColor: theme.colors.highlight },
+    tailLeft: {
+        borderTopLeftRadius: 18,
+        borderTopRightRadius: 18,
+        borderBottomRightRadius: 18,
+        borderBottomLeftRadius: 4,
+    },
+    tailRight: {
+        borderTopLeftRadius: 18,
+        borderTopRightRadius: 18,
+        borderBottomLeftRadius: 18,
+        borderBottomRightRadius: 4,
+    },
+    /** The player's own line takes the crisp highlight fill */
+    mine: {
+        backgroundColor: theme.colors.primary,
+    },
 
     // --- Mail: stacked letters
-    /**
-     * The reply block, under what is being replied to rather than pinned to
-     * the bottom of the screen. Both variants now, despite the name - kept
-     * because it is what every reference to it says.
-     */
     mailAnswers: { marginTop: theme.spacing.md },
-    letterWrap: {},
+    letterWrap: { marginVertical: 4 },
     letter: {
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.radius.md,
+        backgroundColor: '#2C3236',
+        borderRadius: 16,
         padding: theme.spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.08)',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    letterMine: {
+        backgroundColor: '#353D42',
+        borderColor: 'rgba(255, 255, 255, 0.12)',
     },
     letterFrom: {
         color: theme.colors.brandMuted,
@@ -434,64 +182,50 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         marginBottom: 6,
     },
-    letterFromMine: { color: theme.colors.highlightText },
+    letterFromMine: { color: theme.colors.primary },
 
-    said: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, lineHeight: 21 },
-    saidMine: { color: theme.colors.highlightText },
+    said: {
+        color: theme.colors.textPrimary,
+        fontSize: 15,
+        lineHeight: 22,
+    },
+    saidMine: {
+        color: theme.colors.primaryText,
+        fontWeight: '500',
+    },
+    saidLetterMine: {
+        color: theme.colors.textPrimary,
+    },
 
     /** Bounded, so a tall block scrolls instead of pushing itself off-screen. */
     answersScroll: { flexGrow: 0, maxHeight: MAX_ANSWER_BLOCK },
     answers: {
-        // ------------------------------------------------------------------
-        //  SIDE BY SIDE WHEN THEY FIT, STACKED WHEN THEY DO NOT
-        // ------------------------------------------------------------------
-        //  They were full-width rows, which made two answers read as a menu
-        //  of settings rather than as two things a person could say.
-        //
-        //  Each bubble hugs its own text and the row wraps, so a pair of
-        //  short answers sits together and a long one takes a line of its
-        //  own. Forcing two columns would have been worse: the longest
-        //  answer in the game is 59 characters and half a phone width holds
-        //  about nineteen, so every serious decision would have arrived as
-        //  two four-line slabs.
-        //
-        //  Centred, because a row of two is a pair of options rather than a
-        //  list, and a list is what left-alignment says.
-        // ------------------------------------------------------------------
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
         gap: theme.spacing.sm,
         padding: theme.spacing.md,
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: theme.colors.border,
-        backgroundColor: theme.colors.surface,
+        borderRadius: 18,
+        backgroundColor: 'rgba(44, 50, 54, 0.75)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.08)',
     },
     answer: {
-        // ------------------------------------------------------------------
-        //  A THING YOU CAN SAY, AND IT HAS TO LOOK LIKE ONE
-        // ------------------------------------------------------------------
-        //  It was `surfaceRaised` - the same grey as the card the character
-        //  is speaking from, and as every other panel in the app. Nothing on
-        //  the screen said which of the two blocks was pressable.
-        //
-        //  `guidance` is the palette's violet, and its sentence covers this:
-        //  it is already the ground for the tutorial card, which is the other
-        //  place the app speaks to the player rather than as the world.
-        //
-        //  NOT GREEN, which was the obvious answer and the one asked for.
-        //  Green in this palette says one thing - "you made money" - and
-        //  painting every conversation with it would spend that sentence on
-        //  a button. Violet measures 7.65 against white and separates from
-        //  the ground at 2.05, so it reads as pressable without borrowing a
-        //  meaning that is doing a job elsewhere.
-        // ------------------------------------------------------------------
         maxWidth: '100%',
         paddingVertical: 13,
         paddingHorizontal: theme.spacing.md,
-        borderRadius: theme.radius.md,
+        borderRadius: 14,
         backgroundColor: theme.colors.guidance,
+        shadowColor: theme.colors.guidance,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 3,
     },
-    answerPressed: { opacity: 0.72 },
-    answerText: { color: theme.colors.textPrimary, fontSize: theme.typography.body + 1, fontWeight: '600' },
+    answerPressed: { opacity: 0.72, transform: [{ scale: 0.98 }] },
+    answerText: {
+        color: theme.colors.textPrimary,
+        fontSize: theme.typography.body + 1,
+        fontWeight: '600',
+    },
 });

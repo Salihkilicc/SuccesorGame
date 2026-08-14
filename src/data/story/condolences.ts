@@ -72,7 +72,7 @@ import type { Conversation } from '../../core/story/graph';
 //  refusing him in public IS a choice, and what people say about it is a
 //  consequence. That is what a flag is for.
 // ---------------------------------------------------------------------------
-const AFTER_THE_ANSWER = [{ kind: 'quarterAtLeast' as const, quarter: 8 }];
+const AFTER_THE_ANSWER = [{ kind: 'quarterAtLeast' as const, quarter: 6 }];
 
 // ============================================================================
 //  1. THE FRIEND — bad at this, and the only one who is not after anything

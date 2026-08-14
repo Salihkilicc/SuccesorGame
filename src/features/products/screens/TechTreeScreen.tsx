@@ -10,8 +10,9 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
-import { formatNumber, formatMoney } from '../../../core/utils';
+import { formatNumber, formatMoney, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import InfoDot from '../../../components/common/InfoDot';
 
 const TechTreeScreen = () => {
     useLocale();
@@ -57,12 +58,6 @@ const TechTreeScreen = () => {
         }
     };
 
-    const formatRPShort = (value: number) => {
-        return `${formatNumber(value)} RP`;
-        // eslint-disable-next-line no-unreachable
-        return `${value} RP`;
-    };
-
     const groupedProducts = unlockableProducts.reduce((acc: Record<ProductCategory, UnlockableProduct[]>, product: UnlockableProduct) => {
         if (!acc[product.category]) {
             acc[product.category] = [];
@@ -79,9 +74,16 @@ const TechTreeScreen = () => {
                 title={t('product.futureTechnologies')}
                 right={
                     /* The balance every price on this page is measured against. */
-                    <View style={styles.balance}>
-                        <Text style={[styles.balanceValue, styles.rpFigure]}>{formatNumber(totalRP)} RP</Text>
-                        <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <InfoDot
+                            title={t('tactic.rdTitle')}
+                            text={t('tactic.rdText')}
+                            detail={t('tactic.rdDetail')}
+                        />
+                        <View style={styles.balance}>
+                            <Text style={[styles.balanceValue, styles.rpFigure]}>{formatRP(totalRP)}</Text>
+                            <Text style={styles.balanceCash}>{formatMoney(companyCapital)}</Text>
+                        </View>
                     </View>
                 }
             />
@@ -147,26 +149,30 @@ const TechTreeScreen = () => {
                                                 </View>
                                             ) : (
                                                 <View style={styles.lockedStatus}>
-                                                    <Text style={styles.lockIcon}>🔒</Text>
-                                                    {/* Affordability is now readable at a glance: the
-                                                        cost brightens when you can actually pay it. */}
-                                                    <Text
-                                                        style={[
-                                                            styles.costText,
-                                                            totalRP >= product.unlockRPCost && styles.rpFigure,
-                                                        ]}>
-                                                        {formatRPShort(product.unlockRPCost)}
-                                                    </Text>
+                                                    <View style={styles.costRow}>
+                                                        <Text style={styles.lockIcon}>🔒</Text>
+                                                        <Text
+                                                            style={[
+                                                                styles.costText,
+                                                                totalRP >= product.unlockRPCost && styles.rpFigure,
+                                                            ]}
+                                                            numberOfLines={1}
+                                                        >
+                                                            {formatRP(product.unlockRPCost)}
+                                                        </Text>
+                                                    </View>
                                                     <Text
                                                         style={[
                                                             styles.costCash,
                                                             companyCapital >= product.unlockCashCost && styles.costAffordable,
-                                                        ]}>
+                                                        ]}
+                                                        numberOfLines={1}
+                                                    >
                                                         {formatMoney(product.unlockCashCost)}
                                                     </Text>
                                                     {totalRP < product.unlockRPCost && (
-                                                        <Text style={styles.shortfall}>
-                                                            {formatNumber(product.unlockRPCost - totalRP)} RP short
+                                                        <Text style={styles.shortfall} numberOfLines={1}>
+                                                            {formatCompact(product.unlockRPCost - totalRP)} short
                                                         </Text>
                                                     )}
                                                 </View>
@@ -284,9 +290,11 @@ const styles = StyleSheet.create({
     },
     productInfo: {
         flex: 1,
+        marginRight: 10,
+        justifyContent: 'center',
     },
     productName: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
         color: theme.colors.textPrimary,
     },
@@ -302,7 +310,8 @@ const styles = StyleSheet.create({
     statusContainer: {
         alignItems: 'flex-end',
         justifyContent: 'center',
-        minWidth: 80,
+        minWidth: 90,
+        flexShrink: 0,
     },
     activeBadge: {
         paddingHorizontal: 8,
@@ -317,19 +326,24 @@ const styles = StyleSheet.create({
     },
     lockedStatus: {
         alignItems: 'flex-end',
+        justifyContent: 'center',
+    },
+    costRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
     },
     lockIcon: {
-        fontSize: 14,
+        fontSize: 11,
         color: theme.colors.textMuted,
-        marginBottom: 2,
     },
     costText: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 11.5,
+        fontWeight: '700',
         color: theme.colors.textMuted,
     },
     costCash: {
-        fontSize: 11,
+        fontSize: 10.5,
         color: theme.colors.textMuted,
         marginTop: 1,
     },
@@ -347,9 +361,9 @@ const styles = StyleSheet.create({
         color: theme.colors.rp,
     },
     shortfall: {
-        fontSize: 10,
+        fontSize: 9.5,
         color: theme.colors.warning,
-        marginTop: 2,
+        marginTop: 1,
     },
     balance: {
         alignItems: 'flex-end',

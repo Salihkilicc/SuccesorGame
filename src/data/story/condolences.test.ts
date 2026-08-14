@@ -101,13 +101,11 @@ describe('the wave is on a quarter, not on Pear being answered', () => {
     });
 
     it('and arrives the quarter after Pear writes, answered or not', () => {
-        // EIGHT, not seven. The whole act moved a quarter later when the
-        // death did - see the note in data/story/fatherDeath.ts.
-        const q8 = world({ fatherDead: true }, 8);
-        expect(testAll(friendCondolence.when, q8)).toBe(true);
-        expect(testAll(cfoCondolenceMail.when, q8)).toBe(true);
-        expect(testAll(brotherCondolence.when, q8)).toBe(true);
-        expect(testAll(boardCondolence.when, q8)).toBe(true);
+        const q6 = world({ fatherDead: true }, 6);
+        expect(testAll(friendCondolence.when, q6)).toBe(true);
+        expect(testAll(cfoCondolenceMail.when, q6)).toBe(true);
+        expect(testAll(brotherCondolence.when, q6)).toBe(true);
+        expect(testAll(boardCondolence.when, q6)).toBe(true);
     });
 
     it('and none of the four still names that flag', () => {

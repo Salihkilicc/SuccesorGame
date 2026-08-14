@@ -425,7 +425,7 @@ const RootNavigator = () => {
       onStateChange={() => {
         setCurrentRouteName(rootNavigationRef.getCurrentRoute()?.name);
       }}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <RootStack.Navigator
           screenOptions={{
             headerShown: false,

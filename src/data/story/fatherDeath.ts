@@ -48,7 +48,7 @@ export const fatherDeath: Conversation = {
         //  Everything behind it moved with it - Pear to seven, the condolence
         //  wave to eight. The act keeps its shape; it starts a quarter later.
         // ------------------------------------------------------------------
-        { kind: 'quarterAtLeast', quarter: 6 },
+        { kind: 'quarterAtLeast', quarter: 5 },
         { kind: 'noFlag', flag: 'fatherDead' },
     ],
     start: 'open',

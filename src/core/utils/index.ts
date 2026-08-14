@@ -46,6 +46,41 @@ export const formatNumber = (value: number | undefined | null): string => {
 };
 
 /**
+ * Kompakt sayi: `1.2K`, `50K`, `1.5M`, `2.4B`, `500`.
+ * 1.000'den itibaren K, M, B, T kisaltmasi yapar ve gereksiz ".0" eklerini temizler.
+ */
+export const formatCompact = (value: number | undefined | null): string => {
+    const val = Number.isFinite(value as number) ? (value as number) : 0;
+    const abs = Math.abs(val);
+    const sign = val < 0 ? '-' : '';
+
+    if (abs >= 1_000_000_000_000) {
+        const num = (abs / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '');
+        return `${sign}${num}T`;
+    }
+    if (abs >= 1_000_000_000) {
+        const num = (abs / 1_000_000_000).toFixed(1).replace(/\.0$/, '');
+        return `${sign}${num}B`;
+    }
+    if (abs >= 1_000_000) {
+        const num = (abs / 1_000_000).toFixed(1).replace(/\.0$/, '');
+        return `${sign}${num}M`;
+    }
+    if (abs >= 1_000) {
+        const num = (abs / 1_000).toFixed(1).replace(/\.0$/, '');
+        return `${sign}${num}K`;
+    }
+    return `${sign}${abs.toFixed(0)}`;
+};
+
+/**
+ * Ar-Ge / RP Puani formatlayici: `1.2K RP`, `50K RP`, `1.5M RP`, `500 RP`.
+ */
+export const formatRP = (value: number | undefined | null): string => {
+    return `${formatCompact(value)} RP`;
+};
+
+/**
  * Hassas fiyat: `$12.34`, `$249.50`, `$1.2M`.
  *
  * formatMoney kurusu yuvarlar — hisse/kripto fiyatlarinda bu bilgi kaybi olur.

@@ -52,6 +52,8 @@ const HALO = 8;
 const CARD_TOP = 132;
 
 const TutorialOverlay = () => {
+    return null;
+    // eslint-disable-next-line no-unreachable
     const locks = useStoryStore(s => s.locks);
     const completeLock = useStoryStore(s => s.completeLock);
     const skipLock = useStoryStore(s => s.skipLock);

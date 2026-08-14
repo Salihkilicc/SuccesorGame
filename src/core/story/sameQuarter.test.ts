@@ -342,8 +342,8 @@ describe('Pear cannot be lost', () => {
             quartersWithoutSponsor: 0,
         } as never);
         const { testAll } = require('./conditions');
-        expect(testAll(pear.when, w(6))).toBe(false);
-        expect(testAll(pear.when, w(7))).toBe(true);
+        expect(testAll(pear.when, w(4))).toBe(false);
+        expect(testAll(pear.when, w(5))).toBe(true);
         // And nothing else. A quarter number cannot go missing; a flag
         // raised by a scene in another app can, and did, four times.
         expect(pear.when).toHaveLength(1);
@@ -353,7 +353,7 @@ describe('Pear cannot be lost', () => {
         const pear = CONVERSATIONS.find(c => c.id === 'pear-offer')!;
         const { testAll } = require('./conditions');
         const w = (flags: Record<string, true>) => ({
-            dials: {} as never, flags, quarter: 7,
+            dials: {} as never, flags, quarter: 5,
             capital: 1, cash: 1, morale: 70, marketShare: 1, staffing: 100,
             researchers: 0, subsidiaries: [], casinoStreak: 0,
             quartersWithoutSponsor: 0,

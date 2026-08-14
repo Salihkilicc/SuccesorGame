@@ -48,7 +48,7 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
         id: 'smart_phone',
         get name() { return t('product.smartPhone'); },
         get description() { return t('product.essentialForModernLifeHigh'); },
-        baseSellingPrice: 600,
+        baseSellingPrice: 620,
         baseUnitCost: 250,
         complexity: 50, // BASE DIFFICULTY
         unlockRPCost: 0,

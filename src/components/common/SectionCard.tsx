@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import InfoDot from './InfoDot';
 
 type SectionCardProps = {
     title: string;
     subtitle?: string;
     rightText?: string;
+    rightContent?: React.ReactNode;
+    info?: { title: string; text: string; detail?: string };
     onPress?: () => void;
     style?: any;
     danger?: boolean;
@@ -13,7 +16,7 @@ type SectionCardProps = {
     disabled?: boolean;
 };
 
-const SectionCard = ({ title, subtitle, rightText, onPress, style, danger, selected, disabled }: SectionCardProps) => {
+const SectionCard = ({ title, subtitle, rightText, rightContent, info, onPress, style, danger, selected, disabled }: SectionCardProps) => {
     return (
         <Pressable
             onPress={disabled ? undefined : onPress}
@@ -30,9 +33,15 @@ const SectionCard = ({ title, subtitle, rightText, onPress, style, danger, selec
                 <Text style={[styles.title, danger && styles.dangerText, selected && styles.selectedText]}>{title}</Text>
                 {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
-            {rightText && (
-                <Text style={[styles.rightText, danger && styles.dangerText, selected && styles.selectedText]}>{rightText}</Text>
-            )}
+            <View style={styles.rightWrap}>
+                {info && (
+                    <InfoDot title={info.title} text={info.text} detail={info.detail} />
+                )}
+                {rightContent}
+                {rightText && (
+                    <Text style={[styles.rightText, danger && styles.dangerText, selected && styles.selectedText]}>{rightText}</Text>
+                )}
+            </View>
         </Pressable>
     );
 };
@@ -79,6 +88,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         color: '#FFFFFF', // Apple Blue
+    },
+    rightWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     dangerText: {
         color: theme.colors.warning,

@@ -1929,4 +1929,49 @@ export const tr: Record<string, string> = {
     'merger.boardOpen': 'Kurulları görüşmeye açık.',
     'contract.belowMinimum': '{v1} bu üründen {v2} adedin altında hat kurmuyor.',
     'contract.cappedAt': '{v1} siparişi bu üründen {v2} adette sınırladı.',
+
+    // ---- STRATEJİ VE TAKTİK İPUÇLARI (INFO BUTONLARI) ----
+    'tactic.companyTitle': 'Şirket Yönetimi & Değerleme',
+    'tactic.companyText': 'Şirket değerlemesi çeyreklik ciro ve net kâr çarpanlarına göre hesaplanır. Kârını ve pazar payını artırdıkça piyasa değerin katlanır.',
+    'tactic.companyDetail': 'İpucu: CEO Nakiti ile Şirket Sermayesi ayrıdır! Şirket sermayesi tükenirse maaş ve operasyonları ödeyemezsin. Gerekirse sermaye aktarımı yap.',
+
+    'tactic.financingTitle': 'Finans & Borç Yönetimi',
+    'tactic.financingText': 'Krediler fabrika ve Ar-Ge yatırımları için hızlı sermaye sağlar. Ancak yüksek faizler çeyreklik kârını eritir.',
+    'tactic.financingDetail': 'İpucu: Kredi notunu yüksek tutarak daha düşük faiz oranları yakala. Kasan dolduğunda yüksek faizli kredileri erken kapat.',
+
+    'tactic.productsTitle': 'Ürün & Fiyatlama Stratejisi',
+    'tactic.productsText': 'Üretim miktarını pazar talebine göre ayarla. Yetersiz üretim pazar payı kaybettirir, aşırı üretim ise stok depolama maliyeti doğurur.',
+    'tactic.productsDetail': 'İpucu: Pazarlama bütçesi bilinirliği ve talebi katlar. Fiyatını rekabetçi tutarak pazar liderliğine oyna.',
+
+    'tactic.financialReportTitle': 'Mali Rapor & Kârlılık',
+    'tactic.financialReportText': 'Gelir ve gider kalemlerini her çeyrek düzenli analiz et. En büyük maliyetler personel, fabrika işletmesi ve pazarlamadır.',
+    'tactic.financialReportDetail': 'İpucu: Sürekli pozitif net kâr şirketin iflas riskini sıfırlar ve hisse fiyatını doğrudan yukarı taşır.',
+
+    'tactic.equityTitle': 'Hisse, Halka Arz & Kontrol',
+    'tactic.equityText': 'Şirket yönetimini elinde tutmak için hisse oranını en az %51 tutmalısın. Halka arz (IPO) devasa sermaye getirir ama sahiplik oranını düşürür.',
+    'tactic.equityDetail': 'İpucu: Halka açıldıktan sonra kârlı dönemlerde hisse geri alımı (Buyback) yaparak kontrolünü tekrar güçlendirebilirsin.',
+
+    'tactic.operationsTitle': 'Operasyon & Fabrika Kapasitesi',
+    'tactic.operationsText': 'Tesis kademesini yükseltmek birim maliyetleri (COGS) düşürür ve maksimum üretim tavanını katlar.',
+    'tactic.operationsDetail': 'İpucu: Kademe yükseltirken inşaat sürecinde kapasite geçici olarak düşer. Yeterli Ar-Ge puanı (RP) ve nakit biriktirerek yükseltme yap.',
+
+    'tactic.teamMoraleTitle': 'Ekip Morali & Verimlilik',
+    'tactic.teamMoraleText': 'Morali her zaman 80 üzerinde tutmaya çalış. 70 direnç noktasıdır; moral 70 altına düştüğünde iş gücü verimi düşer ve üretimde fire oranı fırlar.',
+    'tactic.teamMoraleDetail': 'İpucu: Maaş oranını piyasa standardının (1.0x) üzerinde tut. Düzenli etkinlikler düzenle ve prim dağıt. Asla maaş düşürme, ağır moral şoku yaratır!',
+
+    'tactic.rdTitle': 'Ar-Ge & İnovasyon',
+    'tactic.rdText': 'Laboratuvara araştırmacı alarak her çeyrek Ar-Ge Puanı (RP) üret. RP ile Teknoloji Ağacı\'ndan çığır açan yeni ürünler aç ve tesislerini büyüt.',
+    'tactic.rdDetail': 'İpucu: Araştırmacı verimi azalan getiriye tabidir (^0.85). Daha fazla çıktı için tesis kademesini büyüterek laboratuvar kapasitesini artır.',
+
+    'tactic.takeoverTitle': 'Şirket Satın Alma & Devralma',
+    'tactic.takeoverText': 'Piyasadaki rakipleri satın alarak pazar payını ve gelirini bir anda katlayabilirsin.',
+    'tactic.takeoverDetail': 'İpucu: Hedef şirketin yönetim kurulu teklifini reddederse, doğrudan borsadan hisseleri toplayarak düşman devralma gerçekleştirebilirsin.',
+
+    'tactic.boardTitle': 'Yönetim Kurulu & Hissedarlar',
+    'tactic.boardText': 'Yönetim kurulu üyelerinin farklı mizaçları (Shark, Hawk, Dove) vardır. Kararlarında kurul desteğini kazanmak büyük avantaj sağlar.',
+    'tactic.boardDetail': 'İpucu: Köpekbalığı (Shark) üyelerden acil sermaye borcu alabilirsin. Hissedar ilişkilerini hediyeler ve yemeklerle yüksek tut.',
+
+    'tactic.empireTitle': 'Holding & Bağlı Ortaklıklar',
+    'tactic.empireText': 'Satın aldığın şirketler bağlı ortaklık olarak holdingine her çeyrek düzenli kâr ve temettü aktarır.',
+    'tactic.empireDetail': 'İpucu: Farklı sektörlerde şirketler toplayarak holding değerlemeni milyarlarca dolarlık zirvelere taşı.',
 };

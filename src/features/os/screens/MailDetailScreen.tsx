@@ -25,6 +25,7 @@ import { canAccept, priceFor } from '../../../core/market/negotiation';
 import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
 import { offerById } from '../../../core/market/sponsorship';
 import { formatMoney } from '../../../core/utils';
+import AnimatedBubble from '../../../components/story/AnimatedBubble';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -247,31 +248,37 @@ const MailDetailScreen = () => {
 
             <ScrollView contentContainerStyle={[styles.detailContent, { paddingBottom: NAV_BAR_CLEARANCE }]}>
                 {/* Subject */}
-                <View style={styles.subjectRow}>
-                    <Text style={styles.detailSubject}>{mail.subject}</Text>
-                    <View style={styles.inboxBadge}>
-                        <Text style={styles.inboxBadgeText}>Inbox</Text>
+                <AnimatedBubble delay={0}>
+                    <View style={styles.subjectRow}>
+                        <Text style={styles.detailSubject}>{mail.subject}</Text>
+                        <View style={styles.inboxBadge}>
+                            <Text style={styles.inboxBadgeText}>Inbox</Text>
+                        </View>
                     </View>
-                </View>
+                </AnimatedBubble>
 
                 {/* Sender Info */}
-                <View style={styles.senderSection}>
-                    <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
-                        <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
-                    </View>
-                    <View style={styles.senderInfo}>
-                        <View style={styles.senderNameRow}>
-                            <Text style={styles.detailFromName}>{mail.fromName}</Text>
-                            <Text style={styles.detailTime}>{formatMonth(mail.atMonth)}</Text>
+                <AnimatedBubble delay={50}>
+                    <View style={styles.senderSection}>
+                        <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
+                            <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
                         </View>
-                        <Text style={styles.detailToMe}>to me ▾</Text>
+                        <View style={styles.senderInfo}>
+                            <View style={styles.senderNameRow}>
+                                <Text style={styles.detailFromName}>{mail.fromName}</Text>
+                                <Text style={styles.detailTime}>{formatMonth(mail.atMonth)}</Text>
+                            </View>
+                            <Text style={styles.detailToMe}>to me ▾</Text>
+                        </View>
                     </View>
-                </View>
+                </AnimatedBubble>
 
                 {/* Body */}
-                <View style={styles.bodySection}>
-                    <Text style={styles.bodyText}>{mail.body}</Text>
-                </View>
+                <AnimatedBubble delay={100}>
+                    <View style={styles.bodySection}>
+                        <Text style={styles.bodyText}>{mail.body}</Text>
+                    </View>
+                </AnimatedBubble>
                 
                 {/* ==========================================================
                     THE TWO OPTIONS

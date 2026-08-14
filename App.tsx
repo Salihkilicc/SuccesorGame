@@ -50,8 +50,8 @@ const App = () => {
   //  existing one and steps aside, so nothing below changes.
   // ==========================================================================
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: '#1C242C' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
       <RootNavigator />
     </SafeAreaProvider>
   );

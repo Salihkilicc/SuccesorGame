@@ -200,7 +200,7 @@ type GameStore = GameState & {
 export const initialGameState: GameState = {
   _hasHydrated: false,
   currentMonth: 1,
-  age: 25, // Beta Start Age
+  age: 20, // Start Age: 20
   actionsUsedThisMonth: 0,
   maxActionsPerMonth: 999,
   // useStatsStore.initialStatsState.employeeMorale ile AYNI olmali.

@@ -1928,4 +1928,49 @@ export const en: Record<string, string> = {
     'merger.boardOpen': 'Their board is willing to talk.',
     'contract.belowMinimum': '{v1} will not run a line below {v2} units of this product.',
     'contract.cappedAt': '{v1} capped the order at {v2} units of this product.',
+
+    // ---- STRATEGY & TACTICS TIPS (INFO DOTS) ----
+    'tactic.companyTitle': 'Company Valuation & Growth',
+    'tactic.companyText': 'Company valuation is calculated based on revenue and quarterly profit multiples. Expanding profits and market share multiplies your valuation.',
+    'tactic.companyDetail': 'Tip: CEO Cash and Company Capital are strictly separate! If company capital runs out, operations stall. Inject personal capital if necessary.',
+
+    'tactic.financingTitle': 'Corporate Finance & Loans',
+    'tactic.financingText': 'Loans provide quick capital for facility expansions and R&D. However, interest payments drain your quarterly cash flow.',
+    'tactic.financingDetail': 'Tip: Maintain a high credit rating for lower interest rates. Repay expensive debt early when cash reserves allow.',
+
+    'tactic.productsTitle': 'Products & Pricing Strategy',
+    'tactic.productsText': 'Align production volume with market demand. Undersupplying surrenders market share, while overproducing incurs inventory storage costs.',
+    'tactic.productsDetail': 'Tip: Marketing budgets dramatically increase awareness and demand. Price competitively to seize market leadership.',
+
+    'tactic.financialReportTitle': 'Financial Analysis & ROI',
+    'tactic.financialReportText': 'Analyze your revenue and expense statements every quarter. Your biggest expenses are payroll, facility opex, and marketing.',
+    'tactic.financialReportDetail': 'Tip: Consistent quarterly profits eliminate bankruptcy risk and directly propel share price growth.',
+
+    'tactic.equityTitle': 'Equity, IPO & Corporate Control',
+    'tactic.equityText': 'Maintain at least 51% ownership to protect your boardroom control. An IPO raises substantial capital but dilutes your stake.',
+    'tactic.equityDetail': 'Tip: After listing, use excess profits for share buybacks to rebuild your ownership stake and support the stock price.',
+
+    'tactic.operationsTitle': 'Operations & Facility Scaling',
+    'tactic.operationsText': 'Upgrading facility tiers lowers unit production costs and dramatically increases your production ceiling.',
+    'tactic.operationsDetail': 'Tip: Facilities operate at reduced capacity during construction. Ensure you have accumulated enough RP and capital before building.',
+
+    'tactic.teamMoraleTitle': 'Team Morale & Productivity',
+    'tactic.teamMoraleText': 'Keep morale above 80 at all times. 70 is the critical threshold; below it, workforce output drops and scrap rates spike.',
+    'tactic.teamMoraleDetail': 'Tip: Keep salaries above the 1.0x market rate. Host regular events and distribute bonuses. Never cut pay, as it causes severe morale shock!',
+
+    'tactic.rdTitle': 'R&D & Innovation Tactics',
+    'tactic.rdText': 'Hire researchers to generate Research Points (RP) every quarter. Use RP in the Tech Tree to unlock revolutionary products and upgrade facilities.',
+    'tactic.rdDetail': 'Tip: Research output scales sublinearly (^0.85). Upgrade facility tiers to unlock larger laboratory capacities.',
+
+    'tactic.takeoverTitle': 'Hostile Takeovers & M&A',
+    'tactic.takeoverText': 'Acquiring market competitors instantly expands your market share, catalog, and quarterly revenue.',
+    'tactic.takeoverDetail': 'Tip: If target boards reject friendly buyout terms, launch a hostile takeover by acquiring controlling shares directly from the market.',
+
+    'tactic.boardTitle': 'Boardroom & Shareholder Tactics',
+    'tactic.boardText': 'Board members have distinct personalities (Shark, Hawk, Dove). Gaining their support unlocks critical strategic advantages.',
+    'tactic.boardDetail': 'Tip: Shark members offer quick emergency loans. Maintain shareholder relationships with gifts and executive dinners.',
+
+    'tactic.empireTitle': 'Subsidiaries & Empire Management',
+    'tactic.empireText': 'Acquired companies operate as subsidiaries, delivering passive quarterly profits and dividends to your holding.',
+    'tactic.empireDetail': 'Tip: Diversify across multiple industries to push your empire valuation into the tens of billions.',
 };

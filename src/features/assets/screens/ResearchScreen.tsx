@@ -10,6 +10,7 @@ import LaboratoryScreen from './LaboratoryScreen';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import { useStoryStore } from '../../../core/store/useStoryStore';
+import InfoDot from '../../../components/common/InfoDot';
 
 // Types
 type TabType = 'HUB' | 'LAB' | 'TREE';
@@ -145,8 +146,15 @@ const ResearchScreen = () => {
             {/* The lab draws its own header; the other tabs share this one. */}
             {activeTab !== 'LAB' && (
                 <ScreenHeader
-                    title={activeTab === 'HUB' ? 'Research Center' : 'Tech Tree'}
+                    title={activeTab === 'HUB' ? t('company.researchDevelopment') : t('company.innovationTechTree')}
                     onBack={handleBack}
+                    right={
+                        <InfoDot
+                            title={t('tactic.rdTitle')}
+                            text={t('tactic.rdText')}
+                            detail={t('tactic.rdDetail')}
+                        />
+                    }
                 />
             )}
 
