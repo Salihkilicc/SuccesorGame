@@ -2246,6 +2246,20 @@ export const useGameStore = create<GameStore>()(
             console.warn('[story] inbox could not run', e);
           }
 
+          // ------------------------------------------------------------------
+          //  AND THEN THE PEOPLE NOBODY ANSWERED
+          // ------------------------------------------------------------------
+          //  AFTER runInbox, and the order is the whole of it: a scene
+          //  delivered this morning has not been ignored. Chasing first would
+          //  have somebody complaining about a silence they broke in the same
+          //  tick. See core/story/runNeglect.ts.
+          // ------------------------------------------------------------------
+          try {
+            require('../story/runNeglect').runNeglect();
+          } catch (e) {
+            console.warn('[story] neglect could not run', e);
+          }
+
           // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
           if (FEATURES.love) {
             if (isEnabled('love')) useRelationshipStore.getState().advanceQuarterForNPCs();

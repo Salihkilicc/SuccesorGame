@@ -794,7 +794,13 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
         const isSceneFile = f =>
             /\.ts$/.test(f) && !/\.test\.ts$/.test(f)
             && f !== 'index.ts' && f !== 'cast.ts' && f !== 'endings.ts'
-            && f !== 'openingAct.ts';
+            && f !== 'openingAct.ts'
+            // `neglect.ts` is one line per character rather than a scene: what
+            // each of them says when a message has gone a quarter unanswered.
+            // It is not a Conversation because it has no branches - somebody
+            // writing to you again is not a decision you make - and it lives
+            // here because it is writing, and writing lives with the writing.
+            && f !== 'neglect.ts';
 
         const dataFiles = fs.readdirSync(dir).filter(isSceneFile);
 

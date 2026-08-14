@@ -55,6 +55,15 @@ export type Thread = {
     /** Messages from them that the player has not opened. */
     unread: number;
     /**
+     * The month this person last had to chase you for an answer.
+     *
+     * On the THREAD rather than in the story store, because it is a fact about
+     * this conversation and it has to be cleared by the same action that makes
+     * it untrue - opening the thread. A second store holding it would mean two
+     * places that have to agree about whether you have replied.
+     */
+    chasedAtMonth?: number;
+    /**
      * A branching conversation instead of a plain thread.
      *
      * Optional on purpose: every thread that exists today has none and keeps
@@ -72,6 +81,13 @@ type MessageStore = MessageState & {
     setHasHydrated: (v: boolean) => void;
     /** Mark a thread read. Called when it is opened, not when it is listed. */
     markRead: (threadId: string) => void;
+    /**
+     * Record that somebody had to write again to be noticed.
+     *
+     * See core/story/neglect.ts. Cleared by `markRead`, because the reason it
+     * exists stops being true the moment the player opens the thread.
+     */
+    markChased: (threadId: string, atMonth: number) => void;
     /**
      * The thread is gone. See the `closeThread` effect.
      *
@@ -252,7 +268,17 @@ export const useMessageStore = create<MessageStore>()(
             markRead: (threadId) =>
                 set(state => ({
                     threads: state.threads.map(t =>
-                        t.id === threadId ? { ...t, unread: 0 } : t),
+                        t.id === threadId
+                            // The chase record goes with the unread count. They
+                            // are the same fact seen from two sides.
+                            ? { ...t, unread: 0, chasedAtMonth: undefined }
+                            : t),
+                })),
+
+            markChased: (threadId, atMonth) =>
+                set(state => ({
+                    threads: state.threads.map(t =>
+                        t.id === threadId ? { ...t, chasedAtMonth: atMonth } : t),
                 })),
 
             sendFromPlayer: (threadId, text, atMonth) =>
