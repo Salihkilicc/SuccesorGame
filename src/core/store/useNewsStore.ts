@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
 
 export type NewsType = 'player' | 'rival' | 'world';
-export type NewsCategory = 'Breaking' | 'Exclusive' | 'Market' | 'Tech' | 'Corporate' | 'Analysis';
+export type NewsCategory = 'Breaking' | 'Exclusive' | 'Market' | 'Tech' | 'Corporate' | 'Analysis' | 'Legal' | 'Media';
 export type NewsKind = 'market' | 'deal' | 'company' | 'story' | NewsType;
 
 export interface NewsItem {

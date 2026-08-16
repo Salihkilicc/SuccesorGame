@@ -1,48 +1,47 @@
+// src/features/os/screens/SettingsScreen.tsx
 import React from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    Pressable,
     StatusBar,
     ScrollView,
     Switch,
-    Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useSettingsStore } from '../../../core/store/useSettingsStore';
-import { startNewGameAsking } from '../../../core/newGamePrompt';
-import { LOCALES, t, useLocale, useLocaleStore } from '../../../core/i18n';
-// START_EMPLOYEES was only read by the confirmation box removed below.
-import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { theme } from '../../../core/theme';
+import { t } from '../../../core/i18n';
+import { useSettingsLogic } from '../logic/useSettingsLogic';
 
-// ─── Settings Row ────────────────────────────────────────────────────────────
+// ─── Settings Row Component ──────────────────────────────────────────────────
 
-type SettingsRowProps = {
+interface SettingsRowProps {
     icon: string;
     label: string;
+    description?: string;
     value?: boolean;
     onToggle?: () => void;
     onPress?: () => void;
     isFirst?: boolean;
     isLast?: boolean;
-    color?: string;
-};
+    iconColor?: string;
+    isDestructive?: boolean;
+}
 
-const SettingsRow = ({
+const SettingsRow: React.FC<SettingsRowProps> = ({
     icon,
     label,
+    description,
     value,
     onToggle,
     onPress,
     isFirst,
     isLast,
-    color = theme.colors.primary,
-}: SettingsRowProps) => {
+    iconColor = theme.colors.primary,
+    isDestructive = false,
+}) => {
     return (
         <TouchableOpacity
             style={[
@@ -55,225 +54,261 @@ const SettingsRow = ({
             activeOpacity={onPress ? 0.7 : 1}
         >
             <View style={styles.rowLeft}>
-                <View style={styles.iconContainer}>
-                    <MaterialCommunityIcons name={icon} size={20} color={color} />
+                <View
+                    style={[
+                        styles.iconContainer,
+                        {
+                            backgroundColor: isDestructive
+                                ? 'rgba(255,138,138,0.12)'
+                                : 'rgba(255,255,255,0.06)',
+                        },
+                    ]}
+                >
+                    <MaterialCommunityIcons
+                        name={icon}
+                        size={20}
+                        color={isDestructive ? theme.colors.negative : iconColor}
+                    />
                 </View>
-                <Text style={styles.rowLabel}>{label}</Text>
+                <View style={styles.labelWrapper}>
+                    <Text
+                        style={[
+                            styles.rowLabel,
+                            isDestructive && styles.destructiveLabel,
+                        ]}
+                    >
+                        {label}
+                    </Text>
+                    {description ? (
+                        <Text style={styles.rowDescription} numberOfLines={1}>
+                            {description}
+                        </Text>
+                    ) : null}
+                </View>
             </View>
 
             {onToggle !== undefined ? (
                 <Switch
                     value={value}
                     onValueChange={onToggle}
-                    trackColor={{ false: '#1C242C', true: '#FF8A8A' }}
-                    thumbColor={value ? '#FFFFFF' : 'rgba(255,255,255,0.48)'}
-                    ios_backgroundColor="#1C242C"
+                    trackColor={{
+                        false: theme.colors.surfaceRaised,
+                        true: theme.colors.primary,
+                    }}
+                    thumbColor={value ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
+                    ios_backgroundColor={theme.colors.surfaceRaised}
                 />
             ) : (
-                <MaterialCommunityIcons name="chevron-right" size={20} color="#666E70" />
+                <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={isDestructive ? theme.colors.negative : theme.colors.borderStrong}
+                />
             )}
         </TouchableOpacity>
     );
 };
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// ─── Main Settings Screen ─────────────────────────────────────────────────────
 
-const SettingsScreen = () => {
-    const navigation = useNavigation();
-    // Dil degisince bu ekran yeniden cizilsin.
-    const locale = useLocale();
-    const insets = useSafeAreaInsets();
-
+const SettingsScreen: React.FC = () => {
+    const { state, actions } = useSettingsLogic();
     const {
+        locale,
+        locales,
+        isLanguageExpanded,
         isMusicEnabled,
         isSoundEnabled,
         isNotificationsEnabled,
         isHapticsEnabled,
-        toggleMusic,
-        toggleSound,
-        toggleNotifications,
-        toggleHaptics,
-    } = useSettingsStore();
+    } = state;
 
-    const handleUnavailable = () => {
-        Alert.alert('Successor OS', 'This document is currently unavailable.');
-    };
-
-    /**
-     * Temiz yeni oyun. startNewGame() tum store'lari ve AsyncStorage'i
-     * temizleyip initialStatsState, whose figures are the single source (see START_EMPLOYEES).
-     */
-    const handleNewGame = () => {
-        Alert.alert(
-            'New Game',
-            'All progress will be erased and a fresh run will be set up. Are you sure?',
-            [
-                { text: t('os.cancel'), style: 'cancel' },
-                {
-                    text: t('os.reset'),
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await startNewGameAsking();
-                            navigation.goBack();
-                            // ------------------------------------------------------
-                            //  NO SECOND BOX
-                            // ------------------------------------------------------
-                            //  There was a confirmation here - "a fresh run has
-                            //  been set up, you have N employees" - dismissed
-                            //  immediately after the player had already confirmed
-                            //  the destructive one. Two taps to be told a thing
-                            //  the screen behind the box is already showing.
-                            //
-                            //  The player is now looking at a company with 22
-                            //  people and a cold line, which says it better than
-                            //  a modal does.
-                            //
-                            //  `newgame.freshStartBody` stays in the catalogue; if
-                            //  a first-run welcome is ever wanted it belongs on the
-                            //  home screen and not on top of it.
-                            // ------------------------------------------------------
-                        } catch (e) {
-                            console.error('[Settings] Yeni oyun baslatilamadi', e);
-                            Alert.alert('Error', 'Could not start a new game. Check the console.');
-                        }
-                    },
-                },
-            ],
-        );
-    };
+    const currentLocaleObj = locales.find((l) => l.code === locale) || locales[0];
 
     return (
         <View style={styles.root}>
             <StatusBar barStyle="light-content" />
+
             <View style={styles.safeArea}>
                 <ScreenHeader title={t('os.settings')} />
 
-                {/* ── Content ── */}
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* ============================================================
-                        DİL
-                        ============================================================
-                        Once HomeScreen icinde `useState<'EN'|'TR'>('EN')` ve bir
-                        dugme vardi. Basinca yalnizca o ekrandaki etiket
-                        degisiyordu, hicbir metin cevrilmiyordu ve deger ekran
-                        kapaninca kayboluyordu. Artik tek kaynak ve kalici.
-                       ============================================================ */}
+                    {/* ── Section: Language (Collapsible Compact Row) ── */}
                     <Text style={styles.sectionTitle}>{t('settings.language').toUpperCase()}</Text>
                     <View style={styles.group}>
-                        {LOCALES.map((l, i) => (
-                            <React.Fragment key={l.code}>
-                                {i > 0 && <View style={styles.divider} />}
-                                <TouchableOpacity
-                                    style={styles.langRow}
-                                    onPress={() => useLocaleStore.getState().setLocale(l.code)}
-                                    activeOpacity={0.7}
-                                >
+                        <TouchableOpacity
+                            style={[
+                                styles.row,
+                                styles.rowFirst,
+                                !isLanguageExpanded && styles.rowLast,
+                            ]}
+                            onPress={actions.toggleLanguageExpanded}
+                            activeOpacity={0.7}
+                        >
+                            <View style={styles.rowLeft}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(5,168,246,0.12)' }]}>
                                     <MaterialCommunityIcons
                                         name="translate"
-                                        size={22}
-                                        color={locale === l.code ? '#FF8A8A' : 'rgba(255,255,255,0.48)'}
+                                        size={20}
+                                        color={theme.colors.primary}
                                     />
-                                    <Text
-                                        style={[
-                                            styles.langLabel,
-                                            locale === l.code && styles.langLabelActive,
-                                        ]}
-                                    >
-                                        {l.native}
-                                    </Text>
-                                    {locale === l.code && <Text style={styles.langCheck}>✓</Text>}
-                                </TouchableOpacity>
-                            </React.Fragment>
-                        ))}
-                    </View>
-                    <Text style={styles.langNote}>{t('settings.languageNote')}</Text>
+                                </View>
+                                <View style={styles.labelWrapper}>
+                                    <Text style={styles.rowLabel}>{t('settings.language')}</Text>
+                                </View>
+                            </View>
 
-                    {/* Preferences Group */}
-                    <Text style={styles.sectionTitle}>{t('os.preferences')}</Text>
+                            <View style={styles.langSelectorBadge}>
+                                <Text style={styles.langBadgeText}>
+                                    {currentLocaleObj.code === 'tr' ? '🇹🇷 Türkçe' : '🇬🇧 English'}
+                                </Text>
+                                <MaterialCommunityIcons
+                                    name="chevron-down"
+                                    size={18}
+                                    color={theme.colors.primary}
+                                    style={{
+                                        transform: [{ rotate: isLanguageExpanded ? '180deg' : '0deg' }],
+                                    }}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        {/* Collapsible language options list */}
+                        {isLanguageExpanded && (
+                            <View style={styles.langDropdownContent}>
+                                {locales.map((l, index) => {
+                                    const isSelected = locale === l.code;
+                                    const flag = l.code === 'tr' ? '🇹🇷' : '🇬🇧';
+                                    const isLastItem = index === locales.length - 1;
+
+                                    return (
+                                        <React.Fragment key={l.code}>
+                                            <View style={styles.divider} />
+                                            <TouchableOpacity
+                                                style={[
+                                                    styles.langOptionRow,
+                                                    isSelected && styles.langOptionRowSelected,
+                                                    isLastItem && styles.rowLast,
+                                                ]}
+                                                onPress={() => actions.setLocale(l.code)}
+                                                activeOpacity={0.7}
+                                            >
+                                                <View style={styles.langOptionLeft}>
+                                                    <Text style={styles.langFlagText}>{flag}</Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.langOptionLabel,
+                                                            isSelected && styles.langOptionLabelActive,
+                                                        ]}
+                                                    >
+                                                        {l.native}
+                                                    </Text>
+                                                    <Text style={styles.langCodeBadge}>
+                                                        ({l.code.toUpperCase()})
+                                                    </Text>
+                                                </View>
+                                                {isSelected && (
+                                                    <MaterialCommunityIcons
+                                                        name="check-circle"
+                                                        size={18}
+                                                        color={theme.colors.primary}
+                                                    />
+                                                )}
+                                            </TouchableOpacity>
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </View>
+                        )}
+                    </View>
+
+                    {/* ── Section: Preferences ── */}
+                    <Text style={styles.sectionTitle}>{t('os.preferences').toUpperCase()}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="music-note"
                             label={t('os.music')}
                             value={isMusicEnabled}
-                            onToggle={toggleMusic}
+                            onToggle={actions.toggleMusic}
                             isFirst
-                            color="#05A8F6"
+                            iconColor={theme.colors.primary}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="volume-high"
                             label={t('os.soundEffects')}
                             value={isSoundEnabled}
-                            onToggle={toggleSound}
-                            color="#CFD0D2"
+                            onToggle={actions.toggleSound}
+                            iconColor={theme.colors.rp}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="bell"
                             label={t('os.notifications')}
                             value={isNotificationsEnabled}
-                            onToggle={toggleNotifications}
-                            color={theme.colors.primary}
+                            onToggle={actions.toggleNotifications}
+                            iconColor={theme.colors.brand}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="vibrate"
                             label={t('os.haptics')}
                             value={isHapticsEnabled}
-                            onToggle={toggleHaptics}
+                            onToggle={actions.toggleHaptics}
                             isLast
-                            color={theme.colors.primary}
+                            iconColor={theme.colors.positive}
                         />
                     </View>
 
-                    {/* Legal & Support Group */}
-                    <Text style={styles.sectionTitle}>{t('os.about')}</Text>
+                    {/* ── Section: About / Legal ── */}
+                    <Text style={styles.sectionTitle}>{t('os.about').toUpperCase()}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="file-document-outline"
                             label={t('os.termsConditions')}
-                            onPress={handleUnavailable}
+                            onPress={() => actions.handleUnavailable(t('os.termsConditions'))}
                             isFirst
+                            iconColor={theme.categories.products}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="shield-check-outline"
                             label={t('os.privacyPolicy')}
-                            onPress={handleUnavailable}
+                            onPress={() => actions.handleUnavailable(t('os.privacyPolicy'))}
+                            iconColor={theme.categories.market}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="help-circle-outline"
                             label={t('os.helpSupport')}
-                            onPress={handleUnavailable}
+                            onPress={() => actions.handleUnavailable(t('os.helpSupport'))}
                             isLast
+                            iconColor={theme.categories.finance}
                         />
                     </View>
 
-                    {/* Oyun Yonetimi */}
-                    <Text style={styles.sectionTitle}>{t('os.game')}</Text>
+                    {/* ── Section: Game Reset ── */}
+                    <Text style={styles.sectionTitle}>{t('os.game').toUpperCase()}</Text>
                     <View style={styles.group}>
                         <SettingsRow
                             icon="restart"
                             label={t('os.newGame')}
-                            onPress={handleNewGame}
+                            onPress={actions.handleNewGame}
                             isFirst
                             isLast
+                            isDestructive
                         />
                     </View>
 
-                    {/* Footer */}
+                    {/* ── Footer ── */}
                     <View style={styles.footer}>
                         <Text style={styles.footerVersion}>{t('os.successorOsV100')}</Text>
                         <Text style={styles.footerTagline}>{t('os.designedForBillionaires')}</Text>
                     </View>
                 </ScrollView>
-
-                {/* Universal Crystal Navigation Bar */}
             </View>
         </View>
     );
@@ -284,149 +319,164 @@ export default SettingsScreen;
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-    langRow: {
-        flexDirection: 'row', alignItems: 'center', gap: 14,
-        paddingVertical: 15, paddingHorizontal: 16,
-    },
-    langLabel: { flex: 1, fontSize: 15, color: 'rgba(255,255,255,0.48)', fontWeight: '600' },
-    langLabelActive: { color: '#FFFFFF' },
-    langCheck: { color: theme.colors.textPrimary, fontSize: 16, fontWeight: '800' },
-    langNote: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 8, marginBottom: 4, paddingHorizontal: 4 },
     root: {
         flex: 1,
-        backgroundColor: '#434B50',
+        backgroundColor: theme.colors.background,
     },
     safeArea: {
         flex: 1,
     },
-
-    // ── Header ────────────────────────────────────────────────────────────────
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingBottom: 16,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: 'rgba(5,168,246,0.15)',
-        minHeight: 70,
-    },
-    backBtn: {
-        width: 38,
-        height: 38,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        left: 16,
-        bottom: 12,
-        zIndex: 10,
-        backgroundColor: 'rgba(5,168,246,0.08)',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(5,168,246,0.2)',
-    },
-    headerCenter: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '300',
-        color: '#FFFFFF',
-        letterSpacing: 6,
-        textTransform: 'uppercase',
-    },
-    headerAccent: {
-        width: 32,
-        height: 2,
-        backgroundColor: '#434B50',
-        marginTop: 6,
-        borderRadius: 2,
-        shadowColor: '#1C242C',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 6,
-        elevation: 4,
-    },
-
-    // ── Content ─────────────────────────────────────────────────────────────
     scrollContent: {
         paddingHorizontal: 16,
-        paddingTop: 24,
-        paddingBottom: 140,
+        paddingTop: 20,
+        paddingBottom: 120,
     },
+
+    // ── Section Title ─────────────────────────────────────────────────────────
     sectionTitle: {
         fontSize: 12,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.48)',
-        letterSpacing: 2,
-        marginLeft: 16,
+        fontWeight: '700',
+        color: theme.colors.brandMuted,
+        letterSpacing: 1.8,
+        marginLeft: 12,
         marginBottom: 8,
     },
+
+    // ── Group Card ────────────────────────────────────────────────────────────
     group: {
-        backgroundColor: '#434B50',
-        borderRadius: 16,
-        marginBottom: 32,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        marginBottom: 24,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.04)',
+        borderColor: theme.colors.border,
+        overflow: 'hidden',
     },
+
+    // ── Row ───────────────────────────────────────────────────────────────────
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        backgroundColor: '#434B50',
+        paddingVertical: 13,
+        paddingHorizontal: 14,
+        backgroundColor: theme.colors.surface,
     },
     rowFirst: {
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
     },
     rowLast: {
-        borderBottomLeftRadius: 16,
-        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 14,
+        borderBottomRightRadius: 14,
     },
     rowLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 14,
+        gap: 12,
+        flex: 1,
     },
     iconContainer: {
-        width: 30,
-        height: 30,
-        borderRadius: 8,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        width: 34,
+        height: 34,
+        borderRadius: 9,
+        backgroundColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
         justifyContent: 'center',
     },
+    labelWrapper: {
+        flex: 1,
+    },
     rowLabel: {
-        fontSize: 16,
-        color: '#FFFFFF',
-        fontWeight: '500',
-        letterSpacing: 0.3,
+        fontSize: 15,
+        color: theme.colors.textPrimary,
+        fontWeight: '600',
+        letterSpacing: 0.2,
+    },
+    destructiveLabel: {
+        color: theme.colors.negative,
+        fontWeight: '600',
+    },
+    rowDescription: {
+        fontSize: 12,
+        color: theme.colors.textMuted,
+        marginTop: 2,
     },
     divider: {
         height: StyleSheet.hairlineWidth,
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        marginLeft: 60, // Align with text
+        backgroundColor: theme.colors.border,
+        marginLeft: 60,
     },
 
-    // ── Footer ──────────────────────────────────────────────────────────────
+    // ── Language Selector Compact & Collapsible ───────────────────────────────
+    langSelectorBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(5,168,246,0.12)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(5,168,246,0.25)',
+    },
+    langBadgeText: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: theme.colors.highlight,
+    },
+    langDropdownContent: {
+        backgroundColor: theme.colors.surfaceRaised,
+    },
+    langOptionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    langOptionRowSelected: {
+        backgroundColor: 'rgba(5,168,246,0.08)',
+    },
+    langOptionLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    langFlagText: {
+        fontSize: 16,
+    },
+    langOptionLabel: {
+        fontSize: 14,
+        color: theme.colors.textSecondary,
+        fontWeight: '600',
+    },
+    langOptionLabelActive: {
+        color: theme.colors.textPrimary,
+        fontWeight: '700',
+    },
+    langCodeBadge: {
+        fontSize: 11,
+        color: theme.colors.textMuted,
+        fontWeight: '600',
+    },
+
+    // ── Footer ────────────────────────────────────────────────────────────────
     footer: {
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 16,
+        marginBottom: 16,
         opacity: 0.6,
     },
     footerVersion: {
-        fontSize: 13,
-        color: 'rgba(255,255,255,0.48)',
+        fontSize: 12,
+        color: theme.colors.textMuted,
         fontWeight: '600',
         letterSpacing: 1,
         marginBottom: 4,
     },
     footerTagline: {
-        fontSize: 11,
-        color: '#FFFFFF',
+        fontSize: 10,
+        color: theme.colors.textMuted,
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

@@ -20,7 +20,7 @@ import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStor
 import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
-import { formatMoney } from '../../core/utils';
+import { formatMoney, formatNumber } from '../../core/utils';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
 import type { RootStackParamList, SwipeTabParamList } from '../../navigation';
@@ -133,7 +133,7 @@ const HomeScreen = () => {
   const { age, currentMonth, advanceMonth, employeeMorale } = useGameStore();
   // Using useAssetsLogic for real-time financial data
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
-  const { setField, factoryCount, employeeCount } = useStatsStore();
+  const { setField, factoryCount, employeeCount, researchPoints, brandValue } = useStatsStore();
   const { reset: resetProducts } = useProductStore();
 
   // Real Net Worth Calculation
@@ -285,35 +285,22 @@ const HomeScreen = () => {
     return '⚪';
   }, [gender]);
 
-  const partnerBrief = partner
-    ? `${partner.name} — ${partner.love >= 70 ? 'Relationship stable' : 'Some drama ahead'} `
-    : 'Currently single.';
-
-  const assetsBrief =
-    netWorth > 25000
-      ? 'Your assets are growing steadily.'
-      : netWorth > 10000
-        ? 'Volatile month so far.'
-        : 'Time to build momentum.';
-
-  const lifeBrief = lastLifeEvent ?? 'Nothing remarkable happened recently.';
-
   const moraleBrief =
     employeeMorale >= 70
-      ? `Team morale high (${employeeMorale}%)`
+      ? `High (${Math.round(employeeMorale)}%)`
       : employeeMorale >= 40
-        ? `Team morale slipping (${employeeMorale}%)`
-        : `Team morale critical (${employeeMorale}%)`;
+        ? `Stable (${Math.round(employeeMorale)}%)`
+        : `Critical (${Math.round(employeeMorale)}%)`;
 
-  // Status widget satırları. Kapalı modüllerin satırı hiç basılmaz;
-  // yerini CEO'ya ait bir gösterge alır.
+  const rpBrief = `${formatNumber(researchPoints || 0)} RP`;
+  const brandBrief = `${Math.round(brandValue || 0)} / 100`;
+
+  // Status widget satırları: CEO ve Şirket Yönetim Paneli
   const statusRows = [
-    FEATURES.love ? { key: 'love', label: t('home.love'), value: partnerBrief } : null,
-    { key: 'assets', label: t('home.assets'), value: assetsBrief },
-    FEATURES.life
-      ? { key: 'life', label: t('home.life'), value: lifeBrief }
-      : { key: 'team', label: t('home.team'), value: moraleBrief },
-  ].filter((row): row is { key: string; label: string; value: string } => row !== null);
+    { key: 'team', label: 'Team Morale', value: moraleBrief },
+    { key: 'research', label: t('company.research') || 'R&D Points', value: rpBrief },
+    { key: 'brand', label: t('company.brandValue') || 'Brand Value', value: brandBrief },
+  ];
 
   const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {
     navigation.navigate(screen as any);
