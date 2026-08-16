@@ -1,10 +1,17 @@
+// src/features/shopping/components/AdBannerCarousel.tsx
+//
+// ============================================================================
+//  FEATURED LUXURY BOUTIQUE BANNERS
+// ============================================================================
+
 import React from 'react';
-import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { SHOPS } from '../data/shoppingRegistry';
 
 const { width } = Dimensions.get('window');
+const BANNER_WIDTH = width * 0.76;
 
 type AdBannerCarouselProps = {
     onPressBanner: (shopId: string) => void;
@@ -14,47 +21,42 @@ const ADS = [
     {
         id: 'ad_velocity',
         shopId: 'shop_velocity_motors',
-        title: t('ui.velocityMotors'),
-        subtitle: t('ui.startYourLegacy'),
+        title: 'Velocity Motors',
+        subtitle: 'Bespoke Track & Road Hypercars',
         cta: 'Drive Now →',
-        color: theme.colors.textPrimary,
-        emoji: '🏎️',
+        icon: 'car-sports',
     },
     {
         id: 'ad_dynasty',
         shopId: 'shop_dynasty8',
-        title: t('ui.dynasty8'),
-        subtitle: t('ui.liveAboveTheClouds'),
+        title: 'Dynasty 8 Luxury',
+        subtitle: 'Live Above The Clouds In Bel Air',
         cta: 'View Estates →',
-        color: '#FFFFFF',
-        emoji: '🏠',
+        icon: 'home-city-outline',
     },
     {
         id: 'ad_poseidon',
         shopId: 'shop_poseidon_yards',
-        title: t('ui.poseidonYards'),
-        subtitle: t('ui.summerSaleConquerTheOcean'),
+        title: 'Poseidon Superyachts',
+        subtitle: 'Flagship Megayachts & Transatlantic Luxury',
         cta: 'Set Sail →',
-        color: '#FFFFFF',
-        emoji: '⛵',
+        icon: 'ferry',
     },
 ];
 
-const AdBannerCarousel = ({ onPressBanner }: AdBannerCarouselProps) => {
-    useLocale();
+export const AdBannerCarousel: React.FC<AdBannerCarouselProps> = ({ onPressBanner }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>{t('ui.featured')}</Text>
+            <Text style={styles.sectionTitle}>FEATURED BOUTIQUES</Text>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
                 decelerationRate="fast"
-                snapToInterval={width * 0.75 + theme.spacing.md}
+                snapToInterval={BANNER_WIDTH + 12}
             >
                 {ADS.map((ad) => {
-                    // find shop to ensure it exists
-                    const shop = SHOPS.find(s => s.id === ad.shopId);
+                    const shop = SHOPS.find((s) => s.id === ad.shopId);
                     if (!shop) return null;
 
                     return (
@@ -63,20 +65,27 @@ const AdBannerCarousel = ({ onPressBanner }: AdBannerCarouselProps) => {
                             onPress={() => onPressBanner(ad.shopId)}
                             style={({ pressed }) => [
                                 styles.banner,
-                                { backgroundColor: ad.color },
-                                pressed && styles.pressed
+                                pressed && styles.pressed,
                             ]}
                         >
                             <View style={styles.bannerHeader}>
-                                <Text style={styles.emoji}>{ad.emoji}</Text>
+                                <View style={styles.iconWrap}>
+                                    <MaterialCommunityIcons
+                                        name={ad.icon as any}
+                                        size={22}
+                                        color="#05A8F6"
+                                    />
+                                </View>
                                 <View style={styles.ctaBadge}>
                                     <Text style={styles.ctaText}>{ad.cta}</Text>
                                 </View>
                             </View>
 
-                            <View>
+                            <View style={styles.infoBlock}>
                                 <Text style={styles.title}>{ad.title}</Text>
-                                <Text style={styles.subtitle}>{ad.subtitle}</Text>
+                                <Text style={styles.subtitle} numberOfLines={1}>
+                                    {ad.subtitle}
+                                </Text>
                             </View>
                         </Pressable>
                     );
@@ -86,69 +95,72 @@ const AdBannerCarousel = ({ onPressBanner }: AdBannerCarouselProps) => {
     );
 };
 
-export default AdBannerCarousel;
-
 const styles = StyleSheet.create({
     container: {
-        marginBottom: theme.spacing.xl,
+        marginBottom: 16,
     },
     sectionTitle: {
-        color: '#FFFFFF',
-        fontSize: 22,
+        color: '#05A8F6',
+        fontSize: 11,
         fontWeight: '700',
-        letterSpacing: -0.5,
-        marginBottom: theme.spacing.md,
-        paddingHorizontal: theme.spacing.lg,
+        letterSpacing: 1,
+        marginBottom: 10,
+        paddingHorizontal: 2,
     },
     scrollContent: {
-        paddingHorizontal: theme.spacing.lg,
-        gap: theme.spacing.md,
+        gap: 12,
+        paddingVertical: 2,
     },
     banner: {
-        width: width * 0.75,
-        height: 180,
-        borderRadius: 20,
-        padding: theme.spacing.xl,
+        width: BANNER_WIDTH,
+        backgroundColor: theme.colors.surface, // Solid surface, NO border
+        borderRadius: 16,
+        padding: 16,
         justifyContent: 'space-between',
-        elevation: 8,
-        shadowColor: '#1C242C',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
+        height: 125,
     },
     pressed: {
-        opacity: 0.9,
+        opacity: 0.85,
         transform: [{ scale: 0.98 }],
     },
     bannerHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
     },
-    emoji: {
-        fontSize: 42,
+    iconWrap: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        backgroundColor: '#183D5C',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     ctaBadge: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        paddingHorizontal: theme.spacing.md,
-        paddingVertical: 6,
-        borderRadius: 8,
+        backgroundColor: '#183D5C',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 6,
     },
     ctaText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '700',
+        color: '#7DD3FC',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    infoBlock: {
+        marginTop: 6,
     },
     title: {
         color: '#FFFFFF',
-        fontSize: 24,
-        fontWeight: '700',
-        letterSpacing: -0.5,
-        marginBottom: 4,
+        fontSize: 15,
+        fontWeight: '800',
+        marginBottom: 2,
     },
     subtitle: {
-        color: '#FFFFFF',
-        fontSize: 14,
-        letterSpacing: 0.3,
+        color: theme.colors.textMuted,
+        fontSize: 11,
     },
 });
+
+export default AdBannerCarousel;

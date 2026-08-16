@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import { t, useLocale } from '../../../core/i18n';
-import { View, Text, Modal, StyleSheet, ScrollView, Pressable, SafeAreaView, Dimensions, Alert } from 'react-native';
+// src/features/shopping/components/CartModal.tsx
+//
+// ============================================================================
+//  LUXONET SHOPPING CART MODAL
+// ============================================================================
+
+import React from 'react';
+import {
+    View,
+    Text,
+    Modal,
+    StyleSheet,
+    ScrollView,
+    Pressable,
+    Alert,
+} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
-import BrowserHeader from './BrowserHeader';
-import LuxeNetFooter from './LuxeNetFooter';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-
-
-const { width, height } = Dimensions.get('window');
+import ScreenHeader from '../../../components/common/ScreenHeader';
 
 interface CartModalProps {
     visible: boolean;
@@ -17,33 +27,45 @@ interface CartModalProps {
     onHomePress?: () => void;
 }
 
-const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToCheckout, onHomePress }) => {
-    useLocale();
+const getCategoryIcon = (category: string) => {
+    switch (category) {
+        case 'VEHICLE':
+            return 'car-sports';
+        case 'WATCH':
+            return 'watch';
+        case 'JEWELRY':
+            return 'diamond-stone';
+        case 'MARINE':
+            return 'ferry';
+        case 'AIRCRAFT':
+            return 'airplane';
+        default:
+            return 'home-city-outline';
+    }
+};
+
+export const CartModal: React.FC<CartModalProps> = ({
+    visible,
+    onClose,
+    onProceedToCheckout,
+}) => {
     const { cart, removeFromCart } = useAssetStore();
     const { money } = useStatsStore();
 
-    // ============================================================================
-    // CALCULATIONS (The Commerce Logic)
-    // ============================================================================
-
     const subtotal = cart.reduce((acc, item) => acc + item.price, 0);
-    const shippingCost = cart.length > 0 ? 5000 : 0; // Flat armored delivery
+    const shippingCost = cart.length > 0 ? 5000 : 0;
     const luxuryTax = subtotal * 0.08;
     const orderTotal = subtotal + shippingCost + luxuryTax;
 
     const canAfford = money >= orderTotal;
-
-    // ============================================================================
-    // HANDLERS
-    // ============================================================================
 
     const handleProceedToCheckout = () => {
         if (!onProceedToCheckout) return;
 
         if (!canAfford) {
             Alert.alert(
-                "Insufficient Funds",
-                `You need $${(orderTotal - money).toLocaleString()} more to complete this order.`
+                'Insufficient Funds',
+                `You need $${(orderTotal - money).toLocaleString()} more to complete this acquisition.`,
             );
             return;
         }
@@ -55,80 +77,81 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
         return `$${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     };
 
-    // ============================================================================
-    // RENDER
-    // ============================================================================
-
     return (
         <Modal
             visible={visible}
             animationType="slide"
-            transparent={false} // Full screen opaque like a new page
             presentationStyle="pageSheet"
+            onRequestClose={onClose}
         >
-            <SafeAreaView style={styles.container}>
-                {/* Browser Header */}
-                <BrowserHeader
-                    currentUrl="luxenet://cart"
-                    canGoBack={true}
+            <View style={styles.container}>
+                {/* Official Game Screen Header */}
+                <ScreenHeader
+                    title="ACQUISITION CART"
+                    subtitle="ORDER REVIEW & SETTLEMENT"
+                    category="company"
                     onBack={onClose}
-                    onCartPress={() => { }} // Already in cart
-                    onBelongingsPress={() => { }} // Cart modal does not navigate to belongings directly
+                    inset={false}
                 />
 
                 {cart.length === 0 ? (
                     <View style={styles.emptyCartContainer}>
-                        <Text style={styles.emptyCartEmoji}>🛒</Text>
-                        <Text style={styles.emptyCartTitle}>{t('ui.yourLuxenetCartIsEmpty')}</Text>
-                        <Text style={styles.emptyCartText}>{t('ui.checkYourSavedForLater')}</Text>
+                        <View style={styles.emptyIconWrap}>
+                            <MaterialCommunityIcons
+                                name="cart-outline"
+                                size={40}
+                                color={theme.colors.textMuted}
+                            />
+                        </View>
+                        <Text style={styles.emptyCartTitle}>Your Cart is Empty</Text>
+                        <Text style={styles.emptyCartText}>
+                            Explore the LuxoNet boutique departments to reserve ultra-luxury assets.
+                        </Text>
                         <Pressable onPress={onClose} style={styles.continueButton}>
-                            <Text style={styles.continueButtonText}>{t('ui.continueShopping')}</Text>
+                            <Text style={styles.continueButtonText}>CONTINUE SHOPPING</Text>
                         </Pressable>
                     </View>
                 ) : (
-                    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        showsVerticalScrollIndicator={false}
+                    >
                         {/* Items List */}
                         {cart.map((item) => (
                             <View key={item.id} style={styles.cartItemCard}>
-                                {/* Row Layout */}
                                 <View style={styles.itemRow}>
-                                    {/* Thumbnail (Left) */}
-                                    <View style={[styles.itemThumbnail, { backgroundColor: item.brandColor ? `${item.brandColor}20` : '#1C242C' }]}>
-                                        <Text style={styles.itemEmoji}>
-                                            {item.category === 'VEHICLE' ? '🏎️' :
-                                                item.category === 'WATCH' ? '⌚' :
-                                                    item.category === 'JEWELRY' ? '💎' :
-                                                        item.category === 'MARINE' ? '⛵' :
-                                                            item.category === 'AIRCRAFT' ? '✈️' : '🏠'}
-                                        </Text>
+                                    <View style={styles.itemThumbnail}>
+                                        <MaterialCommunityIcons
+                                            name={getCategoryIcon(item.category)}
+                                            size={22}
+                                            color="#05A8F6"
+                                        />
                                     </View>
 
-                                    {/* Details (Middle) */}
                                     <View style={styles.itemDetails}>
-                                        <Text style={styles.itemTitle} numberOfLines={2}>{item.name}</Text>
-                                        <Text style={styles.itemPrice}>{formatCurrency(item.price)}</Text>
-                                        <Text style={styles.inStockText}>{t('ui.inStock')}</Text>
-                                        <Text style={styles.soldByText}>
-                                            Sold by: <Text style={{ fontWeight: '600' }}>{item.website || 'LuxeNet Certified'}</Text>
+                                        <Text style={styles.itemTitle} numberOfLines={2}>
+                                            {item.name}
                                         </Text>
-                                        {item.specs && item.specs[0] && (
-                                            <Text style={styles.specText}>{item.specs[0]}</Text>
-                                        )}
+                                        <Text style={styles.itemPrice}>
+                                            {formatCurrency(item.price)}
+                                        </Text>
+                                        <Text style={styles.soldByText}>
+                                            Boutique: <Text style={styles.boldText}>{item.website || 'LuxoNet Sovereign'}</Text>
+                                        </Text>
                                     </View>
                                 </View>
 
-                                {/* Actions Row */}
                                 <View style={styles.itemActions}>
-                                    <Pressable style={styles.actionButton} onPress={() => removeFromCart(item.id)}>
-                                        <Text style={styles.actionText}>{t('ui.delete')}</Text>
-                                    </Pressable>
-                                    <View style={styles.divider} />
-                                    <Pressable style={styles.actionButton}>
-                                        <Text style={styles.actionText}>{t('ui.saveForLater')}</Text>
-                                    </Pressable>
-                                    <View style={styles.divider} />
-                                    <Pressable style={styles.actionButton}>
-                                        <Text style={styles.actionText}>{t('ui.compare')}</Text>
+                                    <Pressable
+                                        style={styles.actionButton}
+                                        onPress={() => removeFromCart(item.id)}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="trash-can-outline"
+                                            size={14}
+                                            color="#FF8A8A"
+                                        />
+                                        <Text style={styles.actionDeleteText}>REMOVE</Text>
                                     </Pressable>
                                 </View>
                             </View>
@@ -136,7 +159,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
 
                         {/* Order Summary */}
                         <View style={styles.summaryCard}>
-                            <Text style={styles.summaryTitle}>{t('ui.orderSummary')}</Text>
+                            <Text style={styles.summaryTitle}>ACQUISITION BREAKDOWN</Text>
 
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>Subtotal ({cart.length} items):</Text>
@@ -144,51 +167,45 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>{t('ui.shippingHandling')}</Text>
+                                <Text style={styles.summaryLabel}>Armored Logistics & Vault Escort:</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(shippingCost)}</Text>
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>{t('ui.luxuryTax80')}</Text>
+                                <Text style={styles.summaryLabel}>Luxury Duty / Tax (8%):</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(luxuryTax)}</Text>
                             </View>
 
                             <View style={styles.totalRow}>
-                                <Text style={styles.totalLabel}>{t('ui.orderTotal')}</Text>
+                                <Text style={styles.totalLabel}>TOTAL ACQUISITION COST</Text>
                                 <Text style={styles.totalValue}>{formatCurrency(orderTotal)}</Text>
                             </View>
                         </View>
-
-                        <LuxeNetFooter style={{ backgroundColor: 'transparent', marginTop: 10, borderTopColor: 'rgba(255,255,255,0.06)' }} />
                     </ScrollView>
                 )}
 
-
-                {/* Footer / Proceed Button */}
+                {/* Footer Checkout Bar */}
                 {cart.length > 0 && (
                     <View style={styles.checkoutFooter}>
                         <View style={styles.footerTotalContainer}>
-                            <Text style={styles.footerTotalLabel}>{t('ui.total')}</Text>
+                            <Text style={styles.footerTotalLabel}>PAYABLE TOTAL</Text>
                             <Text style={styles.footerTotalValue}>{formatCurrency(orderTotal)}</Text>
                         </View>
                         <Pressable
                             style={({ pressed }) => [
                                 styles.checkoutButton,
-                                pressed && { opacity: 0.9 },
-                                !canAfford && { backgroundColor: '#323A40' }
+                                !canAfford && styles.checkoutButtonDisabled,
+                                pressed && styles.btnPressed,
                             ]}
                             onPress={handleProceedToCheckout}
                         >
                             <Text style={styles.checkoutButtonText}>
-                                {canAfford ? 'Proceed to Checkout' : 'Insufficient Funds'}
+                                {canAfford ? 'AUTHORIZE TRANSFER' : 'INSUFFICIENT FUNDS'}
                             </Text>
-                            {canAfford && <Text style={styles.checkoutSubtext}>({cart.length} items)</Text>}
                         </Pressable>
                     </View>
                 )}
-
-                {/* Info / Stats Bar */}
-            </SafeAreaView>
+            </View>
         </Modal>
     );
 };
@@ -196,136 +213,128 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose, onProceedToChec
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1C242C', // Dark background like ShoppingScreen
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.06)',
-        backgroundColor: '#434B50',
-    },
-    headerTitle: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    closeButton: {
-        padding: 4,
-    },
-    closeButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+        backgroundColor: '#1C242C',
     },
     scrollContent: {
-        paddingTop: 16,
-        paddingBottom: 40,
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 110,
     },
-
-    // Cart Item
+    emptyCartContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 32,
+    },
+    emptyIconWrap: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: theme.colors.surfaceRaised,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 16,
+    },
+    emptyCartTitle: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '800',
+        marginBottom: 6,
+    },
+    emptyCartText: {
+        color: theme.colors.textMuted,
+        fontSize: 13,
+        textAlign: 'center',
+        lineHeight: 18,
+        marginBottom: 20,
+    },
+    continueButton: {
+        backgroundColor: '#183D5C',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 10,
+    },
+    continueButtonText: {
+        color: '#7DD3FC',
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
     cartItemCard: {
-        backgroundColor: '#434B50',
-        marginBottom: 12,
-        padding: 16,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 14,
+        marginBottom: 10,
     },
     itemRow: {
         flexDirection: 'row',
-        marginBottom: 16,
+        alignItems: 'center',
     },
     itemThumbnail: {
-        width: 100,
-        height: 100,
-        borderRadius: 8,
-        backgroundColor: '#434B50',
+        width: 44,
+        height: 44,
+        borderRadius: 10,
+        backgroundColor: '#183D5C',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-    },
-    itemEmoji: {
-        fontSize: 48,
+        marginRight: 12,
     },
     itemDetails: {
         flex: 1,
-        justifyContent: 'flex-start',
     },
     itemTitle: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
-        marginBottom: 4,
-        lineHeight: 22,
+        marginBottom: 2,
     },
     itemPrice: {
-        color: theme.colors.textPrimary, // Amazon-ish red for price/deal, or Gold
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 6,
-    },
-    inStockText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '600',
+        color: theme.colors.primary,
+        fontSize: 14,
+        fontWeight: '800',
         marginBottom: 2,
     },
     soldByText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        marginBottom: 4,
-    },
-    specText: {
-        color: '#FFFFFF',
+        color: theme.colors.textMuted,
         fontSize: 11,
     },
-
-    // Actions Row
+    boldText: {
+        color: theme.colors.textSecondary,
+        fontWeight: '700',
+    },
     itemActions: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        gap: 12,
+        justifyContent: 'flex-end',
+        marginTop: 10,
+        paddingTop: 8,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.05)',
     },
     actionButton: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        backgroundColor: '#434B50',
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
     },
-    actionText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '500',
+    actionDeleteText: {
+        color: '#FF8A8A',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
-    divider: {
-        width: 1,
-        height: 16,
-        backgroundColor: '#323A40',
-    },
-
-    // Order Summary
     summaryCard: {
-        backgroundColor: '#434B50',
-        marginTop: 12,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
         padding: 16,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        marginTop: 8,
     },
     summaryTitle: {
-        color: '#FFFFFF',
-        fontSize: 18,
+        color: '#05A8F6',
+        fontSize: 11,
         fontWeight: '700',
-        marginBottom: 16,
+        letterSpacing: 1,
+        marginBottom: 12,
     },
     summaryRow: {
         flexDirection: 'row',
@@ -333,118 +342,85 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     summaryLabel: {
-        color: '#FFFFFF',
-        fontSize: 14,
+        color: theme.colors.textMuted,
+        fontSize: 12,
     },
     summaryValue: {
         color: '#FFFFFF',
-        fontSize: 14,
-        fontVariant: ['tabular-nums'],
+        fontSize: 12,
+        fontWeight: '700',
     },
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 12,
+        alignItems: 'center',
+        marginTop: 10,
         paddingTop: 12,
         borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.06)',
+        borderTopColor: 'rgba(255, 255, 255, 0.08)',
     },
     totalLabel: {
-        color: theme.colors.textMuted, // Red for total
-        fontSize: 20,
-        fontWeight: '700',
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
     totalValue: {
-        color: theme.colors.textPrimary,
-        fontSize: 20,
-        fontWeight: '700',
+        color: theme.colors.primary,
+        fontSize: 18,
+        fontWeight: '900',
     },
-
-    // Checkout Footer (Above Stats Bar)
     checkoutFooter: {
-        backgroundColor: '#434B50',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: theme.colors.surface,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 28,
         borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.06)',
-        padding: 16,
-        paddingBottom: 68, // Exact spacing requested
+        borderTopColor: 'rgba(255, 255, 255, 0.08)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
     },
     footerTotalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        marginBottom: 12,
+        flex: 1,
     },
     footerTotalLabel: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+        color: theme.colors.textMuted,
+        fontSize: 9,
+        fontWeight: '700',
+        letterSpacing: 0.8,
     },
     footerTotalValue: {
-        color: theme.colors.textPrimary,
-        fontSize: 22,
-        fontWeight: '700',
+        color: theme.colors.primary,
+        fontSize: 18,
+        fontWeight: '900',
     },
     checkoutButton: {
-        backgroundColor: '#434B50', // Amazon Yellow/Gold
+        backgroundColor: '#183D5C',
+        paddingHorizontal: 18,
         paddingVertical: 14,
-        borderRadius: 8,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'row',
-        gap: 8,
-        shadowColor: '#1C242C',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+    },
+    checkoutButtonDisabled: {
+        backgroundColor: theme.colors.surfaceRaised,
+        opacity: 0.6,
     },
     checkoutButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
+        color: '#7DD3FC',
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.8,
     },
-    checkoutSubtext: {
-        color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-
-    // Empty State
-    emptyCartContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 32,
-    },
-    emptyCartEmoji: {
-        fontSize: 80,
-        marginBottom: 24,
-        opacity: 0.5,
-    },
-    emptyCartTitle: {
-        color: '#FFFFFF',
-        fontSize: 22,
-        fontWeight: '700',
-        marginBottom: 12,
-        textAlign: 'center',
-    },
-    emptyCartText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        textAlign: 'center',
-        lineHeight: 24,
-        marginBottom: 32,
-    },
-    continueButton: {
-        backgroundColor: '#323A40',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 20,
-    },
-    continueButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+    btnPressed: {
+        opacity: 0.85,
+        transform: [{ scale: 0.98 }],
     },
 });
 

@@ -1,139 +1,283 @@
-import React, { useMemo, useState } from 'react';
-import { t, useLocale } from '../../../core/i18n';
-import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
+// src/features/shopping/screens/ShoppingScreen.tsx
+//
+// ============================================================================
+//  LUXONET STORE — SOVEREIGN LUXURY MARKETPLACE SCREEN
+// ============================================================================
+//
+//  Full-fledged screen presenting hypercars, megamansions, haute horlogerie,
+//  superyachts, private jets with curated category colors, horizontal swipe
+//  gesture paging, official ScreenHeader, and bottom CrystalNavBar clearance.
+//
+// ============================================================================
+
+import React, { useMemo, useState, useRef } from 'react';
+import {
+    View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    Pressable,
+    Dimensions,
+    NativeSyntheticEvent,
+    NativeScrollEvent,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
-import { useUserStore } from '../../../core/store/useUserStore';
+import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useAssetStore } from '../store/useAssetStore';
-import CartModal from '../components/CartModal';
-import PaymentProcessingModal from '../components/PaymentProcessingModal';
-import { useStatsStore } from '../../../core/store/useStatsStore';
-import { Alert } from 'react-native';
-import { SHOPS, ITEMS } from '../data/shoppingRegistry';
+import { useShoppingWithInventory } from '../hooks/useShopping';
 import { useLuxeNetNavigation } from '../hooks/useLuxeNetNavigation';
-import BrowserHeader from '../components/BrowserHeader';
+import { SHOPS } from '../data/shoppingRegistry';
+import ScreenHeader from '../../../components/common/ScreenHeader';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import AdBannerCarousel from '../components/AdBannerCarousel';
 import ShopPreviewCard from '../components/ShopPreviewCard';
-import LuxeNetFooter from '../components/LuxeNetFooter';
-import { useShoppingWithInventory } from '../hooks/useShopping';
-import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
+const GRID_CARD_WIDTH = (width - 32 - 12) / 2;
 
-// Categories for Hub Grid
+// Categories for Hub Grid with curated game palette
 const CATEGORIES = [
-    { id: 'VEHICLE', name: t('ui.vehicles'), emoji: '🏎️', color: theme.colors.textPrimary },
-    { id: 'REAL_ESTATE', name: t('ui.realEstate'), emoji: '🏠', color: '#FFFFFF' },
-    { id: 'JEWELRY', name: t('ui.jewelry'), emoji: '💎', color: theme.colors.textPrimary },
-    { id: 'WATCH', name: t('ui.watches'), emoji: '⌚', color: '#FFFFFF' },
-    { id: 'MARINE', name: t('ui.marine'), emoji: '⛵', color: '#FFFFFF' },
-    { id: 'AIRCRAFT', name: t('ui.aircraft'), emoji: '✈️', color: theme.colors.textPrimary },
+    {
+        id: 'VEHICLE',
+        name: 'Vehicles',
+        icon: 'car-sports',
+        desc: 'Hypercars & Exotics',
+        color: '#FFA94D',
+        bg: '#4E3A20',
+    },
+    {
+        id: 'REAL_ESTATE',
+        name: 'Real Estate',
+        icon: 'home-city-outline',
+        desc: 'Mansions & Penthouses',
+        color: '#38BDF8',
+        bg: '#183852',
+    },
+    {
+        id: 'WATCH',
+        name: 'Watches',
+        icon: 'watch',
+        desc: 'Haute Horlogerie',
+        color: '#C084FC',
+        bg: '#3B2050',
+    },
+    {
+        id: 'JEWELRY',
+        name: 'Jewelry',
+        icon: 'diamond-stone',
+        desc: 'Heirloom & Rings',
+        color: '#FBBF24',
+        bg: '#4E3A20',
+    },
+    {
+        id: 'MARINE',
+        name: 'Marine',
+        icon: 'ferry',
+        desc: 'Superyachts',
+        color: '#22D3EE',
+        bg: '#163A48',
+    },
+    {
+        id: 'AIRCRAFT',
+        name: 'Aircraft',
+        icon: 'airplane',
+        desc: 'Private Jets',
+        color: '#818CF8',
+        bg: '#282C4A',
+    },
 ];
 
-const ShoppingScreen = () => {
-    useLocale();
+const TABS = [
+    {
+        id: 'ALL',
+        name: 'Overview',
+        icon: 'view-dashboard-outline',
+        color: '#05A8F6',
+        bg: '#183D5C',
+    },
+    ...CATEGORIES,
+];
+
+const getCategoryTheme = (category: string) => {
+    const found = CATEGORIES.find((c) => c.id === category);
+    if (found) return found;
+    return {
+        id: category,
+        name: category,
+        icon: 'briefcase-outline',
+        desc: 'Luxury',
+        color: '#05A8F6',
+        bg: '#183D5C',
+    };
+};
+
+export const ShoppingScreen = () => {
     const navigation = useNavigation<any>();
-    const userName = useUserStore((state) => state.name);
+    const playerMoney = usePlayerStore((state) => state.core.money);
     const { addToCart, isOwned, cart } = useAssetStore();
     const { getShopItems, getTrendingItems } = useShoppingWithInventory();
 
     // Internal Navigation Hook
     const {
-        currentUrl,
         currentView,
-        selectedCategory,
         selectedShopId,
-        goToCategory,
         visitShop,
-        goBack
+        goBack,
     } = useLuxeNetNavigation();
 
-    // Modal State
-    // Modal State
-    const [showCart, setShowCart] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [orderTotal, setOrderTotal] = useState(0);
-
-    // ============================================================================
-    // CHECKOUT HANDLERS
-    // ============================================================================
-    const { spendMoney } = useStatsStore();
-    const { purchaseCart } = useAssetStore();
-
-    const handleCheckoutStart = (amount: number) => {
-        setOrderTotal(amount);
-        setShowCart(false); // Close cart first
-        setTimeout(() => setIsProcessing(true), 500); // Open payment with slight delay for smooth transition
-    };
-
-    const handlePaymentComplete = () => {
-        // Actual Transaction Logic
-        spendMoney(orderTotal);
-        purchaseCart();
-
-        setIsProcessing(false);
-
-        // Final Success Message
-        setTimeout(() => {
-            Alert.alert(
-                "Acquisition Complete",
-                "The assets have been transferred to your portfolio. Delivery agents have been dispatched.",
-                [{
-                    text: t('ui.excellent'),
-                    onPress: () => navigation.navigate('Life')
-                }]
-            );
-        }, 500);
-    };
+    // Pager & Active Tab State
+    const [activeIndex, setActiveIndex] = useState<number>(0);
+    const previousCategoryIndexRef = useRef<number>(0);
+    const pagerRef = useRef<ScrollView>(null);
+    const pillScrollRef = useRef<ScrollView>(null);
 
     // ============================================================================
     // DATA HELPERS
     // ============================================================================
-
-    // Trending items (filtered by ownership)
     const trendingItems = useMemo(() => {
         return getTrendingItems(6);
     }, [getTrendingItems]);
 
     const formatPrice = (price: number) => {
-        if (price >= 1000000000) return `$${(price / 1000000000).toFixed(1)}B`;
-        if (price >= 1000000) return `$${(price / 1000000).toFixed(1)}M`;
-        if (price >= 1000) return `$${(price / 1000).toFixed(0)}K`;
-        return `$${price}`;
+        if (price >= 1_000_000_000_000) return `$${(price / 1_000_000_000_000).toFixed(2)}T`;
+        if (price >= 1_000_000_000) return `$${(price / 1_000_000_000).toFixed(2)}B`;
+        if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(2)}M`;
+        if (price >= 1_000) return `$${(price / 1_000).toFixed(0)}K`;
+        return `$${price.toLocaleString()}`;
     };
 
+    // Scroll pager to specified page index
+    const scrollToPage = (index: number) => {
+        setActiveIndex(index);
+        pagerRef.current?.scrollTo({ x: index * width, animated: true });
+        pillScrollRef.current?.scrollTo({ x: Math.max(0, index * 90 - 40), animated: true });
+    };
+
+    const handleVisitShop = (shopId: string) => {
+        const shop = SHOPS.find((s) => s.id === shopId);
+        if (shop) {
+            const catIndex = CATEGORIES.findIndex((c) => c.id === shop.category);
+            previousCategoryIndexRef.current = catIndex >= 0 ? catIndex + 1 : activeIndex;
+        } else {
+            previousCategoryIndexRef.current = activeIndex;
+        }
+        visitShop(shopId);
+    };
+
+    const handleBack = () => {
+        if (currentView === 'SHOP_DETAIL') {
+            goBack();
+            const targetIndex = previousCategoryIndexRef.current;
+            setTimeout(() => {
+                scrollToPage(targetIndex);
+            }, 60);
+        } else if (activeIndex > 0) {
+            scrollToPage(0);
+        } else {
+            navigation.goBack();
+        }
+    };
+
+    // Horizontal Swipe Listener
+    const handlePagerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const offsetX = e.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / width);
+        if (index !== activeIndex && index >= 0 && index < TABS.length) {
+            setActiveIndex(index);
+            pillScrollRef.current?.scrollTo({ x: Math.max(0, index * 90 - 40), animated: true });
+        }
+    };
+
+    // Right Cart Action Button
+    const renderCartButton = () => (
+        <Pressable
+            style={({ pressed }) => [styles.cartBtn, pressed && styles.cartBtnPressed]}
+            onPress={() => navigation.navigate('Cart')}
+        >
+            <MaterialCommunityIcons name="cart-outline" size={20} color="#FFFFFF" />
+            {cart.length > 0 && (
+                <View style={styles.cartBadge}>
+                    <Text style={styles.cartBadgeText}>{cart.length}</Text>
+                </View>
+            )}
+        </Pressable>
+    );
+
+    // Dynamic header subtitle
+    const headerSubtitle = useMemo(() => {
+        if (currentView === 'SHOP_DETAIL' && selectedShopId) {
+            const shop = SHOPS.find((s) => s.id === selectedShopId);
+            return shop ? shop.name.toUpperCase() : 'AUTHORIZED BOUTIQUE';
+        }
+        if (activeIndex > 0 && TABS[activeIndex]) {
+            return `${TABS[activeIndex].name.toUpperCase()} DIRECTORATE`;
+        }
+        return 'SOVEREIGN LUXURY MARKETPLACE';
+    }, [currentView, selectedShopId, activeIndex]);
+
     // ============================================================================
-    // RENDER: HUB VIEW
+    // RENDER: HUB / OVERVIEW PAGE (Page 0)
     // ============================================================================
-    const renderHub = () => (
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            {/* Welcome */}
-            <View style={styles.welcomeSection}>
-                <Text style={styles.welcomeText}>Welcome back, {userName}</Text>
-                <Text style={styles.subtitleText}>{t('ui.theWorldSMarketplaceIs')}</Text>
+    const renderHubPage = () => (
+        <ScrollView
+            style={{ width }}
+            contentContainerStyle={styles.pageContent}
+            showsVerticalScrollIndicator={false}
+        >
+            {/* VIP Balance & Hero Card */}
+            <View style={styles.heroCard}>
+                <View style={styles.heroTop}>
+                    <View style={styles.crownWrap}>
+                        <MaterialCommunityIcons name="crown" size={20} color="#FBBF24" />
+                    </View>
+                    <View style={styles.heroTitles}>
+                        <Text style={styles.heroTitle}>LUXONET BOUTIQUE</Text>
+                        <Text style={styles.heroSubtitle}>Exclusive Sovereign Acquisitions</Text>
+                    </View>
+                    <View style={styles.tierPill}>
+                        <Text style={styles.tierPillText}>CENTURION</Text>
+                    </View>
+                </View>
+
+                <View style={styles.cashRow}>
+                    <View>
+                        <Text style={styles.cashLabel}>AVAILABLE LIQUIDITY</Text>
+                        <Text style={styles.cashFigure}>{formatPrice(playerMoney)}</Text>
+                    </View>
+                </View>
             </View>
 
-            {/* Ads */}
-            <AdBannerCarousel onPressBanner={visitShop} />
+            {/* Ad Carousel */}
+            <View style={styles.bannerWrap}>
+                <AdBannerCarousel onPressBanner={handleVisitShop} />
+            </View>
 
-            {/* Departments Grid */}
+            {/* Luxury Departments Grid */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('ui.browseDepartments')}</Text>
+                <Text style={styles.sectionHeader}>LUXURY DEPARTMENTS</Text>
                 <View style={styles.categoryGrid}>
-                    {CATEGORIES.map(cat => (
+                    {CATEGORIES.map((cat, catIdx) => (
                         <Pressable
                             key={cat.id}
-                            onPress={() => goToCategory(cat.id)}
+                            onPress={() => scrollToPage(catIdx + 1)}
                             style={({ pressed }) => [
                                 styles.categoryCard,
-                                { backgroundColor: `${cat.color}15`, borderColor: cat.color },
-                                pressed && styles.pressed
+                                pressed && styles.cardPressed,
                             ]}
                         >
-                            <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                            <Text style={[styles.categoryName, { color: cat.color }]}>{cat.name}</Text>
+                            <View style={[styles.catIconWrap, { backgroundColor: cat.bg }]}>
+                                <MaterialCommunityIcons
+                                    name={cat.icon as any}
+                                    size={24}
+                                    color={cat.color}
+                                />
+                            </View>
+                            <Text style={styles.categoryName}>{cat.name}</Text>
+                            <Text style={styles.categoryDesc} numberOfLines={1}>
+                                {cat.desc}
+                            </Text>
                         </Pressable>
                     ))}
                 </View>
@@ -141,56 +285,79 @@ const ShoppingScreen = () => {
 
             {/* Trending Items */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>{t('ui.trendingNow')}</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalRow}>
-                    {trendingItems.map(item => {
-                        const shop = SHOPS.find(s => s.id === item.shopId);
-                        const color = shop?.bannerColor || '#FFFFFF';
+                <Text style={styles.sectionHeader}>TRENDING SHOWCASE</Text>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.trendingScroll}
+                >
+                    {trendingItems.map((item) => {
+                        const shop = SHOPS.find((s) => s.id === item.shopId);
+                        const itemCat = getCategoryTheme(item.category);
+
                         return (
                             <Pressable
                                 key={item.id}
-                                onPress={() => item.shopId && visitShop(item.shopId)}
-                                style={styles.trendingCard}
+                                onPress={() => item.shopId && handleVisitShop(item.shopId)}
+                                style={({ pressed }) => [
+                                    styles.trendingCard,
+                                    pressed && styles.cardPressed,
+                                ]}
                             >
-                                <View style={[styles.trendingIcon, { backgroundColor: `${color}20` }]}>
-                                    <Text style={styles.trendingEmoji}>
-                                        {item.category === 'VEHICLE' ? '🏎️' :
-                                            item.category === 'WATCH' ? '⌚' :
-                                                item.category === 'JEWELRY' ? '💎' :
-                                                    item.category === 'MARINE' ? '⛵' :
-                                                        item.category === 'AIRCRAFT' ? '✈️' : '🏠'}
-                                    </Text>
+                                <View style={[styles.trendingIconWrap, { backgroundColor: itemCat.bg }]}>
+                                    <MaterialCommunityIcons
+                                        name={itemCat.icon as any}
+                                        size={22}
+                                        color={itemCat.color}
+                                    />
                                 </View>
-                                <Text style={styles.trendingName} numberOfLines={2}>{item.name}</Text>
+                                <Text style={styles.trendingName} numberOfLines={2}>
+                                    {item.name}
+                                </Text>
                                 <Text style={styles.trendingPrice}>{formatPrice(item.price)}</Text>
+                                <Text style={styles.trendingShop}>
+                                    {shop?.name || 'Exclusive'}
+                                </Text>
                             </Pressable>
-                        )
+                        );
                     })}
                 </ScrollView>
             </View>
-
-            <LuxeNetFooter />
-
-        </ScrollView >
+        </ScrollView>
     );
 
     // ============================================================================
-    // RENDER: CATEGORY LIST VIEW
+    // RENDER: CATEGORY PAGE (Pages 1..6)
     // ============================================================================
-    const renderCategoryList = () => {
-        const filteredShops = SHOPS.filter(s => s.category === selectedCategory);
-        const categoryMeta = CATEGORIES.find(c => c.id === selectedCategory);
+    const renderCategoryPage = (cat: typeof CATEGORIES[0]) => {
+        const filteredShops = SHOPS.filter((s) => s.category === cat.id);
 
         return (
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <View style={[styles.categoryHeader, { borderColor: categoryMeta?.color || '#FFFFFF' }]}>
-                    <Text style={styles.categoryHeaderEmoji}>{categoryMeta?.emoji}</Text>
-                    <Text style={[styles.categoryHeaderTitle, { color: categoryMeta?.color }]}>
-                        {categoryMeta?.name} Directorate
-                    </Text>
+            <ScrollView
+                key={cat.id}
+                style={{ width }}
+                contentContainerStyle={styles.pageContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.catBanner}>
+                    <View style={[styles.catIconWrap, { backgroundColor: cat.bg }]}>
+                        <MaterialCommunityIcons
+                            name={cat.icon as any}
+                            size={22}
+                            color={cat.color}
+                        />
+                    </View>
+                    <View>
+                        <Text style={styles.catBannerTitle}>
+                            {cat.name.toUpperCase()} HOUSES
+                        </Text>
+                        <Text style={styles.catBannerSub}>
+                            {filteredShops.length} Authorized Boutiques
+                        </Text>
+                    </View>
                 </View>
 
-                {filteredShops.map(shop => (
+                {filteredShops.map((shop) => (
                     <ShopPreviewCard
                         key={shop.id}
                         shopId={shop.id}
@@ -198,12 +365,9 @@ const ShoppingScreen = () => {
                         description={shop.description}
                         emoji={shop.emoji}
                         color={shop.bannerColor}
-                        onVisit={() => visitShop(shop.id)}
+                        onVisit={() => handleVisitShop(shop.id)}
                     />
                 ))}
-
-                <LuxeNetFooter />
-
             </ScrollView>
         );
     };
@@ -212,10 +376,9 @@ const ShoppingScreen = () => {
     // RENDER: SHOP DETAIL VIEW
     // ============================================================================
     const renderShopDetail = () => {
-        const shop = SHOPS.find(s => s.id === selectedShopId);
+        const shop = SHOPS.find((s) => s.id === selectedShopId);
         if (!shop) return null;
 
-        // Get filtered shop items (hides owned items except rings)
         const shopItems = getShopItems(shop.id).map((item: any) => ({
             ...item,
             website: shop.name,
@@ -223,13 +386,18 @@ const ShoppingScreen = () => {
         }));
 
         return (
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.pageContent}
+                showsVerticalScrollIndicator={false}
+            >
                 {/* Shop Banner */}
-                <View style={[styles.shopBanner, { backgroundColor: shop.bannerColor }]}>
-                    <Text style={styles.shopBannerEmoji}>{shop.emoji}</Text>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.shopBannerTitle}>{shop.name}</Text>
-                        <Text style={styles.shopBannerDesc}>{shop.description}</Text>
+                <View style={styles.shopBanner}>
+                    <View style={styles.shopTitleRow}>
+                        <Text style={styles.shopEmoji}>{shop.emoji}</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.shopName}>{shop.name}</Text>
+                            <Text style={styles.shopDesc}>{shop.description}</Text>
+                        </View>
                     </View>
                 </View>
 
@@ -237,315 +405,492 @@ const ShoppingScreen = () => {
                 <View style={styles.itemsGrid}>
                     {shopItems.map((item: any) => {
                         const owned = isOwned(item.id);
-                        const isInCart = cart.some(c => c.id === item.id);
+                        const isInCart = cart.some((c) => c.id === item.id);
+                        const itemCat = getCategoryTheme(item.category);
 
                         return (
                             <View key={item.id} style={styles.itemCard}>
-                                <View style={[styles.itemImage, { backgroundColor: `${shop.bannerColor}20` }]}>
-                                    <Text style={styles.itemEmoji}>{shop.emoji}</Text>
+                                <View style={styles.itemTopRow}>
+                                    <View style={[styles.itemIconWrap, { backgroundColor: itemCat.bg }]}>
+                                        <MaterialCommunityIcons
+                                            name={itemCat.icon as any}
+                                            size={16}
+                                            color={itemCat.color}
+                                        />
+                                    </View>
+                                    <Text style={styles.itemPrice}>{formatPrice(item.price)}</Text>
                                 </View>
 
-                                <View style={styles.itemInfo}>
-                                    <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-                                    <Text style={styles.itemPrice}>{formatPrice(item.price)}</Text>
+                                <Text style={styles.itemName} numberOfLines={2}>
+                                    {item.name}
+                                </Text>
 
-                                    {/* Specs */}
+                                {/* Specs */}
+                                {item.specs && item.specs.length > 0 && (
                                     <View style={styles.specsRow}>
-                                        {item.specs?.slice(0, 2).map((spec: string, idx: number) => (
-                                            <View key={idx} style={[styles.specTag, { borderColor: shop.bannerColor }]}>
-                                                <Text style={[styles.specText, { color: shop.bannerColor }]}>{spec}</Text>
+                                        {item.specs.slice(0, 2).map((spec: string, idx: number) => (
+                                            <View key={idx} style={styles.specTag}>
+                                                <Text style={styles.specText}>{spec}</Text>
                                             </View>
                                         ))}
                                     </View>
-                                </View>
+                                )}
 
                                 {/* Add Button */}
                                 <Pressable
-                                    onPress={() => isInCart ? setShowCart(true) : !owned && addToCart(item)}
+                                    onPress={() =>
+                                        isInCart
+                                            ? navigation.navigate('Cart')
+                                            : !owned && addToCart(item)
+                                    }
                                     style={({ pressed }) => [
-                                        styles.addButton,
-                                        { backgroundColor: owned ? '#323A40' : isInCart ? '#05A8F6' : '#FF8A8A' },
-                                        pressed && !owned && styles.pressed
+                                        styles.buyButton,
+                                        owned && styles.buyButtonOwned,
+                                        isInCart && styles.buyButtonInCart,
+                                        pressed && !owned && styles.cardPressed,
                                     ]}
                                     disabled={owned}
                                 >
-                                    <Text style={styles.addButtonText}>
-                                        {owned ? 'Owned' : isInCart ? 'In Cart' : 'Add to Cart'}
+                                    <Text
+                                        style={[
+                                            styles.buyButtonText,
+                                            owned && styles.buyTextOwned,
+                                            isInCart && styles.buyTextInCart,
+                                        ]}
+                                    >
+                                        {owned ? 'OWNED' : isInCart ? 'IN CART' : 'ACQUIRE'}
                                     </Text>
                                 </Pressable>
                             </View>
                         );
                     })}
                 </View>
-
-                <LuxeNetFooter />
-
-            </ScrollView >
+            </ScrollView>
         );
     };
 
-    // ============================================================================
-    // MAIN RENDER
-    // ============================================================================
-    const handleGoToBelongings = () => navigation.navigate('Belongings');
-
-    // Handle Back Button: Exit if on HUB, otherwise go up hierarchy
-    const handleBack = () => {
-        if (currentView === 'HUB') {
-            navigation.goBack();
-        } else {
-            goBack();
-        }
-    };
-
     return (
-        <AppLaunchLoader
-            appName="LuxeNet"
-            appIcon={<MaterialCommunityIcons name="shopping" size={64} color="#FFFFFF" />}
-            backgroundColor="#1C242C"
-        >
-            <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
+        <View style={styles.root}>
+            {/* Screen Header with Back Arrow, Dynamic Subtitle and Category Underline */}
+            <ScreenHeader
+                title="LUXONET STORE"
+                subtitle={headerSubtitle}
+                category="company"
+                onBack={handleBack}
+                right={renderCartButton()}
+            />
 
-                {/* Persistent Browser Header */}
-                <BrowserHeader
-                    currentUrl={currentUrl}
-                    canGoBack={true} // Always enabled (Hub -> LifeScreen)
-                    onBack={handleBack}
-                    onCartPress={() => setShowCart(true)}
-                    onBelongingsPress={handleGoToBelongings}
-                />
-
-                {/* Dynamic Content */}
-                <View style={styles.contentArea}>
-                    {currentView === 'HUB' && renderHub()}
-                    {currentView === 'CATEGORY_LIST' && renderCategoryList()}
-                    {currentView === 'SHOP_DETAIL' && renderShopDetail()}
+            {/* Horizontal Category Pill Bar (when in Pager mode) */}
+            {currentView !== 'SHOP_DETAIL' && (
+                <View style={styles.pillBarWrap}>
+                    <ScrollView
+                        ref={pillScrollRef}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.pillScroll}
+                    >
+                        {TABS.map((tab, idx) => {
+                            const isActive = activeIndex === idx;
+                            return (
+                                <Pressable
+                                    key={tab.id}
+                                    style={[
+                                        styles.catPill,
+                                        isActive && styles.catPillActive,
+                                    ]}
+                                    onPress={() => scrollToPage(idx)}
+                                >
+                                    <MaterialCommunityIcons
+                                        name={tab.icon as any}
+                                        size={14}
+                                        color={isActive ? '#7DD3FC' : tab.color}
+                                        style={{ marginRight: 5 }}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.catPillText,
+                                            isActive && styles.catPillTextActive,
+                                        ]}
+                                    >
+                                        {tab.name.toUpperCase()}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
                 </View>
+            )}
 
-                {/* Footer */}
-                {/* Cart Modal */}
-                <CartModal
-                    visible={showCart}
-                    onClose={() => setShowCart(false)}
-                    onProceedToCheckout={handleCheckoutStart}
-                    onHomePress={() => {
-                        setShowCart(false);
-                        navigation.navigate('Home');
-                    }}
-                />
-
-                {/* Payment Processor */}
-                <PaymentProcessingModal
-                    visible={isProcessing}
-                    amount={orderTotal}
-                    onComplete={handlePaymentComplete}
-                />
-            </SafeAreaView>
-        </AppLaunchLoader>
+            {/* Screen Body */}
+            <View style={styles.contentArea}>
+                {currentView === 'SHOP_DETAIL' ? (
+                    renderShopDetail()
+                ) : (
+                    <ScrollView
+                        ref={pagerRef}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        onMomentumScrollEnd={handlePagerScroll}
+                        scrollEventThrottle={16}
+                    >
+                        {renderHubPage()}
+                        {CATEGORIES.map((cat) => renderCategoryPage(cat))}
+                    </ScrollView>
+                )}
+            </View>
+        </View>
     );
 };
 
-// ============================================================================
-// STYLES
-// ============================================================================
 const styles = StyleSheet.create({
-    container: {
+    root: {
         flex: 1,
         backgroundColor: '#1C242C',
     },
     contentArea: {
         flex: 1,
     },
-    scrollContent: {
-        padding: theme.spacing.lg,
+    pageContent: {
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: NAV_BAR_CLEARANCE + 32, // Clear CrystalNavBar safely
     },
-    section: {
-        marginBottom: theme.spacing.xl,
+    // Top Cart Button
+    cartBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: theme.colors.surfaceRaised,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    sectionTitle: {
+    cartBtnPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.95 }],
+    },
+    cartBadge: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        backgroundColor: '#05A8F6',
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cartBadgeText: {
         color: '#FFFFFF',
-        fontSize: 20,
-        fontWeight: '700',
-        marginBottom: theme.spacing.md,
-        letterSpacing: -0.5,
+        fontSize: 9,
+        fontWeight: '800',
     },
 
-    // Welcome
-    welcomeSection: {
-        marginBottom: theme.spacing.lg,
+    // Horizontal Pill Bar
+    pillBarWrap: {
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.04)',
     },
-    welcomeText: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '700',
+    pillScroll: {
+        paddingHorizontal: 16,
+        gap: 8,
     },
-    subtitleText: {
+    catPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: theme.colors.surface,
+        paddingHorizontal: 12,
+        paddingVertical: 7,
+        borderRadius: 8,
+    },
+    catPillActive: {
+        backgroundColor: '#183D5C',
+    },
+    catPillText: {
+        color: theme.colors.textMuted,
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.6,
+    },
+    catPillTextActive: {
+        color: '#7DD3FC',
+    },
+
+    // Hero Card
+    heroCard: {
+        backgroundColor: '#121417',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+    },
+    heroTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    crownWrap: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        backgroundColor: '#20242B',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+    },
+    heroTitles: {
+        flex: 1,
+    },
+    heroTitle: {
         color: '#FFFFFF',
         fontSize: 14,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
+    heroSubtitle: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        marginTop: 1,
+    },
+    tierPill: {
+        backgroundColor: '#20242B',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6,
+    },
+    tierPillText: {
+        color: '#FBBF24',
+        fontSize: 9,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    cashRow: {
+        marginTop: 2,
+    },
+    cashLabel: {
+        color: theme.colors.textMuted,
+        fontSize: 9,
+        fontWeight: '700',
+        letterSpacing: 0.8,
+        marginBottom: 2,
+    },
+    cashFigure: {
+        color: theme.colors.primary,
+        fontSize: 22,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
 
-    // Categories
+    bannerWrap: {
+        marginBottom: 14,
+    },
+
+    // Sections
+    section: {
+        marginBottom: 16,
+    },
+    sectionHeader: {
+        color: '#05A8F6',
+        fontSize: 11,
+        fontWeight: '700',
+        letterSpacing: 1,
+        marginBottom: 10,
+        paddingHorizontal: 2,
+    },
+
+    // Category Grid
     categoryGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: theme.spacing.md,
+        gap: 12,
     },
     categoryCard: {
-        width: (width - theme.spacing.lg * 3) / 2,
-        padding: theme.spacing.md,
-        borderRadius: 16,
-        borderWidth: 1,
-        alignItems: 'center',
-        gap: 8,
+        width: GRID_CARD_WIDTH,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 14,
+        alignItems: 'flex-start',
     },
-    categoryEmoji: {
-        fontSize: 32,
-    },
-    categoryName: {
-        fontSize: 14,
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    pressed: {
-        opacity: 0.8,
-        transform: [{ scale: 0.98 }],
-    },
-
-    // Trending
-    horizontalRow: {
-        gap: theme.spacing.md,
-        paddingRight: theme.spacing.md,
-    },
-    trendingCard: {
-        width: 140,
-        backgroundColor: '#434B50',
-        borderRadius: 16,
-        padding: theme.spacing.md,
-        gap: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-    },
-    trendingIcon: {
-        width: '100%',
-        aspectRatio: 1,
-        borderRadius: 12,
+    catIconWrap: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 4,
+        marginBottom: 10,
     },
-    trendingEmoji: { fontSize: 32 },
-    trendingName: {
-        color: '#FFFFFF',
-        fontSize: 13,
-        fontWeight: '600',
-        minHeight: 34,
-    },
-    trendingPrice: {
+    categoryName: {
         color: theme.colors.textPrimary,
         fontSize: 14,
         fontWeight: '700',
+        marginBottom: 2,
+    },
+    categoryDesc: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+    },
+    cardPressed: {
+        opacity: 0.85,
+        transform: [{ scale: 0.98 }],
     },
 
-    // Category List View
-    categoryHeader: {
+    // Trending Carousel
+    trendingScroll: {
+        gap: 10,
+        paddingVertical: 2,
+    },
+    trendingCard: {
+        width: 145,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 12,
+        justifyContent: 'space-between',
+    },
+    trendingIconWrap: {
+        width: 36,
+        height: 36,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 8,
+    },
+    trendingName: {
+        color: theme.colors.textPrimary,
+        fontSize: 12,
+        fontWeight: '700',
+        lineHeight: 15,
+        marginBottom: 6,
+    },
+    trendingPrice: {
+        color: theme.colors.primary,
+        fontSize: 12,
+        fontWeight: '800',
+        marginBottom: 2,
+    },
+    trendingShop: {
+        color: theme.colors.textMuted,
+        fontSize: 10,
+    },
+
+    // Category Header Banner
+    catBanner: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: theme.spacing.sm,
-        paddingBottom: theme.spacing.md,
-        borderBottomWidth: 1,
-        marginBottom: theme.spacing.lg,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 14,
+        marginBottom: 14,
+        gap: 12,
     },
-    categoryHeaderEmoji: { fontSize: 24 },
-    categoryHeaderTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
+    catBannerTitle: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
+    catBannerSub: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        marginTop: 2,
     },
 
     // Shop Detail View
     shopBanner: {
-        padding: theme.spacing.xl,
-        borderRadius: 20,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 16,
+        marginBottom: 14,
+    },
+    shopTitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: theme.spacing.md,
-        marginBottom: theme.spacing.xl,
+        gap: 12,
     },
-    shopBannerEmoji: { fontSize: 40 },
-    shopBannerTitle: {
+    shopEmoji: {
+        fontSize: 32,
+    },
+    shopName: {
         color: '#FFFFFF',
-        fontSize: 24,
-        fontWeight: '700',
-        letterSpacing: -0.5,
+        fontSize: 16,
+        fontWeight: '800',
     },
-    shopBannerDesc: {
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 14,
+    shopDesc: {
+        color: theme.colors.textMuted,
+        fontSize: 12,
+        marginTop: 2,
     },
     itemsGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: theme.spacing.md,
+        gap: 10,
     },
     itemCard: {
-        width: CARD_WIDTH,
-        backgroundColor: '#434B50',
-        borderRadius: 16,
-        padding: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-        gap: 8,
+        backgroundColor: theme.colors.surface,
+        borderRadius: 14,
+        padding: 14,
     },
-    itemImage: {
-        width: '100%',
-        aspectRatio: 1,
-        borderRadius: 12,
+    itemTopRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    itemIconWrap: {
+        width: 28,
+        height: 28,
+        borderRadius: 6,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    itemEmoji: { fontSize: 40 },
-    itemInfo: { gap: 4, flex: 1 },
     itemName: {
-        color: '#FFFFFF',
+        color: theme.colors.textPrimary,
         fontSize: 14,
-        fontWeight: '600',
-        height: 36,
+        fontWeight: '700',
+        marginBottom: 8,
     },
     itemPrice: {
-        color: theme.colors.textPrimary,
-        fontSize: 15,
-        fontWeight: '700',
+        color: theme.colors.primary,
+        fontSize: 14,
+        fontWeight: '800',
     },
     specsRow: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 4,
-        marginTop: 4,
+        gap: 6,
+        marginBottom: 12,
     },
     specTag: {
-        borderWidth: 1,
-        borderRadius: 4,
-        paddingHorizontal: 4,
-        paddingVertical: 2,
+        backgroundColor: theme.colors.surfaceRaised,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6,
     },
     specText: {
-        fontSize: 9,
-        fontWeight: '700',
+        color: theme.colors.textMuted,
+        fontSize: 10,
+        fontWeight: '600',
     },
-    addButton: {
+    buyButton: {
+        backgroundColor: '#183D5C',
         paddingVertical: 10,
-        borderRadius: 8,
+        borderRadius: 10,
         alignItems: 'center',
-        marginTop: 4,
+        justifyContent: 'center',
     },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+    buyButtonOwned: {
+        backgroundColor: theme.colors.surfaceRaised,
+    },
+    buyButtonInCart: {
+        backgroundColor: '#20242B',
+    },
+    buyButtonText: {
+        color: '#7DD3FC',
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    buyTextOwned: {
+        color: theme.colors.textMuted,
+    },
+    buyTextInCart: {
+        color: '#FBBF24',
     },
 });
 

@@ -15,9 +15,12 @@ export { default as BlackjackGameScreen } from '../features/casino/screens/Black
 export { default as ShoppingScreen } from '../features/shopping/screens/ShoppingScreen';
 export { default as ShopDetailScreen } from '../features/shopping/screens/ShopDetailScreen';
 export { default as BelongingsScreen } from '../features/shopping/screens/BelongingsScreen';
+export { default as CartScreen } from '../features/shopping/screens/CartScreen';
 export { default as ProductsScreen } from '../features/products/screens/ProductsScreen';
 export { default as TechTreeScreen } from '../features/products/screens/TechTreeScreen';
 export { default as DNAScreen } from '../features/life/screens/DNAScreen';
 export { default as ResearchScreen } from '../features/assets/screens/ResearchScreen';
 export { default as LaboratoryScreen } from '../features/assets/screens/LaboratoryScreen';
 export { default as FinancialReportScreen } from '../features/assets/screens/FinancialReportScreen';
+export { default as FamilyMemberScreen } from '../features/profile/screens/FamilyMemberScreen';
+export { default as ProfileScreen } from '../features/profile/screens/ProfileScreen';

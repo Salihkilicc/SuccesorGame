@@ -40,6 +40,7 @@ import {
   LaboratoryScreen,
   FinancialReportScreen,
   BelongingsScreen,
+  CartScreen,
 } from '../screens';
 
 import UnderworldScreen from '../features/life/screens/UnderworldScreen';
@@ -66,6 +67,7 @@ import MailDetailScreen from '../features/os/screens/MailDetailScreen';
 import ComposeOfferScreen from '../features/os/screens/ComposeOfferScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
+import FamilyMemberScreen from '../features/profile/screens/FamilyMemberScreen';
 import CrystalNavBar from './components/CrystalNavBar';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
@@ -94,7 +96,16 @@ const COMPANY_ROUTES = new Set([
 const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
     if (!route) return 'Home';
     if (COMPANY_ROUTES.has(route)) return 'Company';
-    if (route === 'Life' || route === 'LifeHome') return 'Life';
+    if (
+        route === 'Life' ||
+        route === 'LifeHome' ||
+        route === 'Profile' ||
+        route === 'FamilyMember' ||
+        route === 'Belongings' ||
+        route === 'Shopping' ||
+        route === 'Cart'
+    )
+        return 'Life';
     if (route === 'Love' || route === 'LoveHome') return 'Love';
     return 'Home';
 };
@@ -208,6 +219,10 @@ export type RootStackParamList = {
   ComposeOffer: undefined;
   Settings: undefined;
   Profile: undefined;
+  FamilyMember: { memberId: string; memberType?: 'child' | 'partner' };
+  Belongings: undefined;
+  Shopping: undefined;
+  Cart: undefined;
 };
 
 const LifeStackNavigator = () => (
@@ -523,6 +538,10 @@ const RootNavigator = () => {
           <RootStack.Screen name="ComposeOffer" component={ComposeOfferScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />
           <RootStack.Screen name="Profile" component={ProfileScreen} />
+          <RootStack.Screen name="FamilyMember" component={FamilyMemberScreen} />
+          <RootStack.Screen name="Belongings" component={BelongingsScreen} />
+          <RootStack.Screen name="Shopping" component={ShoppingScreen} />
+          <RootStack.Screen name="Cart" component={CartScreen} />
         </RootStack.Navigator>
 
         {/* --------------------------------------------------------------

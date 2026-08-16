@@ -86,7 +86,11 @@ export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onC
         />
 
         {/* Bottom Tab Bar for in-modal navigation consistency */}
-        <CrystalNavBar activeTab="Home" variant="dark" />
+        <CrystalNavBar
+          activeTab="Home"
+          variant="dark"
+          onTabPress={actions.handleClose}
+        />
       </View>
     </Modal>
   );

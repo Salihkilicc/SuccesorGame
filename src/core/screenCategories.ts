@@ -77,7 +77,11 @@ const BY_ROUTE: Record<string, ScreenCategory> = {
     //     place all the sections are reached from.
     Home: 'neutral',
     Settings: 'neutral',
-    Profile: 'neutral',
+    Profile: 'company',
+    FamilyMember: 'company',
+    Belongings: 'company',
+    Shopping: 'company',
+    Cart: 'company',
     Notes: 'neutral',
     Achievements: 'neutral',
     Calendar: 'neutral',

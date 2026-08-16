@@ -2426,6 +2426,15 @@ export const useGameStore = create<GameStore>()(
           }
         }
 
+        // 8b. ANNUAL FAMILY LIFECYCLE & HEIR AGING
+        if (newMonth === 1) {
+          try {
+            require('./useFamilyStore').useFamilyStore.getState().ageUpFamily();
+          } catch (e) {
+            console.warn('[Family] Age-up failed', e);
+          }
+        }
+
         // 9. Sonucu UI'ın beklediği formatta döndür
         const result: EconomyResult = {
           status: (() => {

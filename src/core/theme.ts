@@ -400,6 +400,8 @@ export const theme = {
         people: '#F09BD0',
         /** The stock market, takeovers. */
         market: '#93A0F7',
+        /** Personal Life, Brand, Lifestyle. */
+        brand: '#FFA94D',
         /** Home, settings, profile - anywhere with no section of its own. */
         neutral: '#666E70',
     },

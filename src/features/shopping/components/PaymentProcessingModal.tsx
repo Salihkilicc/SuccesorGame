@@ -1,6 +1,12 @@
+// src/features/shopping/components/PaymentProcessingModal.tsx
+//
+// ============================================================================
+//  LUXONET SECURE WIRE TRANSFER PROCESSING MODAL
+// ============================================================================
+
 import React, { useEffect, useState } from 'react';
-import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Modal, StyleSheet, ActivityIndicator, Animated } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 
 interface PaymentProcessingModalProps {
@@ -9,32 +15,29 @@ interface PaymentProcessingModalProps {
     onComplete: () => void;
 }
 
-const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible, amount, onComplete }) => {
-    useLocale();
-    const [step, setStep] = useState(0);
-    const [statusText, setStatusText] = useState('Connecting to Swiss Bank Secure Server...');
+export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
+    visible,
+    amount,
+    onComplete,
+}) => {
+    const [statusText, setStatusText] = useState('Connecting to Swiss Private Vault Wire...');
     const [showSuccess, setShowSuccess] = useState(false);
-
-    // Scale animation for checkmark
     const [scaleAnim] = useState(new Animated.Value(0));
 
     useEffect(() => {
         if (visible) {
-            setStep(0);
             setShowSuccess(false);
             scaleAnim.setValue(0);
-            setStatusText('Connecting to Swiss Bank Secure Server...');
+            setStatusText('Connecting to Swiss Private Vault Wire...');
 
-            // Sequence Timing
             const sequence = [
-                { time: 1000, text: t('ui.verifyingBiometricId') },
-                { time: 2500, text: t('ui.authorizingLargeAssetTransfer') },
-                { time: 4000, text: t('ui.transactionApproved') }
+                { time: 1000, text: 'Verifying Sovereign Biometric Signature...' },
+                { time: 2200, text: 'Authorizing Asset Title Transfer & Notarization...' },
+                { time: 3400, text: 'Acquisition Approved & Registered.' },
             ];
 
             const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-            // Schedule text updates
             sequence.forEach(({ time, text }) => {
                 const toast = setTimeout(() => {
                     setStatusText(text);
@@ -42,24 +45,19 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
                 timeouts.push(toast);
             });
 
-            // Success State
             const successTimeout = setTimeout(() => {
                 setShowSuccess(true);
                 Animated.spring(scaleAnim, {
                     toValue: 1,
-                    friction: 5,
-                    useNativeDriver: true
+                    friction: 6,
+                    useNativeDriver: true,
                 }).start();
-
-                // Haptic feedback logic would go here if available
-
-            }, 4000);
+            }, 3600);
             timeouts.push(successTimeout);
 
-            // Close/Complete
             const completeTimeout = setTimeout(() => {
                 onComplete();
-            }, 5500); // 1.5s after success shown
+            }, 4800);
             timeouts.push(completeTimeout);
 
             return () => {
@@ -68,30 +66,41 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
         }
     }, [visible]);
 
+    const formatCurrency = (val: number) => {
+        if (val >= 1000000000) return `$${(val / 1000000000).toFixed(2)}B`;
+        if (val >= 1000000) return `$${(val / 1000000).toFixed(2)}M`;
+        if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`;
+        return `$${val.toLocaleString()}`;
+    };
+
     return (
-        <Modal
-            visible={visible}
-            transparent={false} // Requested full black screen
-            animationType="fade"
-        >
+        <Modal visible={visible} transparent={false} animationType="fade">
             <View style={styles.container}>
                 {!showSuccess ? (
                     <View style={styles.content}>
-                        <ActivityIndicator size="large" color="#FF8A8A" style={styles.spinner} />
+                        <ActivityIndicator size="large" color="#05A8F6" style={styles.spinner} />
                         <Text style={styles.statusText}>{statusText}</Text>
-                        <Text style={styles.amountText}>-${amount.toLocaleString()}</Text>
+                        <Text style={styles.amountText}>-{formatCurrency(amount)}</Text>
 
                         <View style={styles.securityBadge}>
-                            <Text style={styles.securityText}>🔒 ENCRYPTED CONNECTION</Text>
+                            <MaterialCommunityIcons name="shield-lock" size={14} color="#7DD3FC" />
+                            <Text style={styles.securityText}>ENCRYPTED SWISS BANKING WIRE</Text>
                         </View>
                     </View>
                 ) : (
                     <View style={styles.content}>
-                        <Animated.View style={[styles.checkmarkCircle, { transform: [{ scale: scaleAnim }] }]}>
-                            <Text style={styles.checkmarkIcon}>✅</Text>
+                        <Animated.View
+                            style={[
+                                styles.checkmarkCircle,
+                                { transform: [{ scale: scaleAnim }] },
+                            ]}
+                        >
+                            <MaterialCommunityIcons name="check" size={36} color="#FFFFFF" />
                         </Animated.View>
-                        <Text style={styles.successText}>{t('ui.paymentSuccessful')}</Text>
-                        <Text style={styles.subtitleText}>{t('ui.assetsTransferredToYourName')}</Text>
+                        <Text style={styles.successText}>Acquisition Authorized</Text>
+                        <Text style={styles.subtitleText}>
+                            Asset deeds have been registered to your portfolio.
+                        </Text>
                     </View>
                 )}
             </View>
@@ -102,71 +111,75 @@ const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({ visible
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1C242C', // Pure black
-        justifyContent: 'center',
+        backgroundColor: '#121417',
         alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
     },
     content: {
         alignItems: 'center',
-        width: '80%',
+        justifyContent: 'center',
     },
     spinner: {
-        transform: [{ scale: 1.5 }],
-        marginBottom: 40,
+        marginBottom: 24,
+        transform: [{ scale: 1.2 }],
     },
     statusText: {
         color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 20,
-        letterSpacing: 0.5,
+        marginBottom: 12,
     },
     amountText: {
-        color: theme.colors.textPrimary, // Red for debit
-        fontSize: 32,
-        fontWeight: '700',
-        marginBottom: 60,
+        color: '#FF8A8A',
+        fontSize: 26,
+        fontWeight: '900',
+        letterSpacing: 0.5,
+        marginBottom: 28,
     },
     securityBadge: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        backgroundColor: '#434B50',
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#183D5C',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        gap: 6,
     },
     securityText: {
-        color: '#FFFFFF',
+        color: '#7DD3FC',
         fontSize: 10,
-        fontWeight: '700',
-        letterSpacing: 2,
+        fontWeight: '800',
+        letterSpacing: 0.8,
     },
-
-    // Success State
     checkmarkCircle: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: 'rgba(207,208,210,0.2)',
-        justifyContent: 'center',
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: '#05A8F6',
         alignItems: 'center',
-        marginBottom: 30,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-    },
-    checkmarkIcon: {
-        fontSize: 60,
+        justifyContent: 'center',
+        marginBottom: 20,
+        shadowColor: '#05A8F6',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 8,
     },
     successText: {
         color: '#FFFFFF',
-        fontSize: 28,
-        fontWeight: '700',
-        marginBottom: 10,
+        fontSize: 20,
+        fontWeight: '800',
+        marginBottom: 8,
+        textAlign: 'center',
     },
     subtitleText: {
-        color: '#FFFFFF',
-        fontSize: 16,
+        color: theme.colors.textMuted,
+        fontSize: 13,
+        textAlign: 'center',
+        lineHeight: 18,
+        maxWidth: 280,
     },
 });
 

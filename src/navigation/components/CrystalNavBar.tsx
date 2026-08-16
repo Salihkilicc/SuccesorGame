@@ -29,6 +29,7 @@ interface CrystalNavBarProps {
     activeTab: 'Life' | 'Home' | 'Company' | 'Love';
     variant: 'light' | 'dark';
     hideDots?: boolean;
+    onTabPress?: (targetScreen: string) => void;
 }
 
 /**
@@ -80,7 +81,7 @@ const NAV_ITEMS: Array<{
 
 const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]);
 
-const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots }) => {
+const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots, onTabPress }) => {
     const navigation = useNavigation<any>();
     const [isStatsMode, setIsStatsMode] = useState(false);
 
@@ -95,6 +96,9 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
 
     const navigateTo = (screen: string) => {
         setIsStatsMode(false);
+        if (onTabPress) {
+            onTabPress(screen);
+        }
         if (screen === 'Company') {
             // ------------------------------------------------------------------
             //  MyCompany IS NOT A ROOT ROUTE, SO IT HAS TO BE ADDRESSED THROUGH

@@ -183,8 +183,11 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     subtitle: {
-        color: theme.colors.textSecondary,
-        fontSize: theme.typography.caption + 1,
+        color: '#94A3B8',
+        fontSize: 9,
+        fontWeight: '600',
+        letterSpacing: 1.5,
+        textTransform: 'uppercase',
         marginTop: 4,
         textAlign: 'center',
     },

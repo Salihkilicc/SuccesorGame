@@ -59,6 +59,26 @@ export const ITEMS: ShoppingItem[] = [
 ];
 
 // ============================================================================
+// CATALOG TOTAL & PRESTIGE SCORING FORMULA
+// ============================================================================
+//
+// Total catalog valuation equals 100.0 Prestige points.
+// Player prestige score = (playerOwnedTotalValue / TOTAL_CATALOG_VALUE) * 100
+// e.g. 1.0, 3.7, 14.5, 100.0
+//
+export const TOTAL_CATALOG_VALUE = ITEMS.reduce((sum, item) => sum + (item.price || 0), 0);
+
+export const calculatePrestigeScore = (ownedValue: number): number => {
+    if (TOTAL_CATALOG_VALUE <= 0) return 0;
+    const raw = (ownedValue / TOTAL_CATALOG_VALUE) * 100;
+    return Math.min(100, Math.max(0, Math.round(raw * 10) / 10));
+};
+
+export const formatPrestigeScore = (ownedValue: number): string => {
+    return calculatePrestigeScore(ownedValue).toFixed(1);
+};
+
+// ============================================================================
 // LEGACY COMPATIBILITY
 // ============================================================================
 

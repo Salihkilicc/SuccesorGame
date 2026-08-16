@@ -39,6 +39,8 @@ import { useCasinoRiskStore } from './store/useCasinoRiskStore';
 import { useMailStore } from './store/useMailStore';
 import { useNewsStore } from './store/useNewsStore';
 import { useIdentityStore } from './store/useIdentityStore';
+import { useFamilyStore } from './store/useFamilyStore';
+import { useLuxoNetStore } from './store/useLuxoNetStore';
 import { OPENING_ACT, SKIPPED_ACT_FLAGS } from '../data/story/openingAct';
 
 /**
@@ -90,6 +92,10 @@ export const PERSIST_KEYS: string[] = [
     'relationship-storage',
     'travel-storage',
 
+    // Dynasty, Family & Luxury
+    'succesor_family_v1',
+    'succesor_luxonet_v1',
+
     // Keys left over from older versions — leaving them confuses migrations
     'succesor_game_v1',
     'succesor_user_v1',
@@ -119,6 +125,8 @@ const resetInMemoryStores = () => {
     useEducationStore.getState().reset();
     useMarketStore.getState().reset();
     useAchievementStore.getState().resetAchievements();
+    useFamilyStore.getState().reset();
+    useLuxoNetStore.getState().reset();
     // A new company gets a fresh inbox: the threads are story about THIS run.
     useMessageStore.getState().reset();
     // Your name outlives a run; your brother's opinion of you does not.

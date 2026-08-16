@@ -58,14 +58,22 @@ const ProposalWizardView: React.FC<Props> = ({
     if (proposalStep === 3 && proposalResult) {
         const isSuccess = proposalResult.success;
         return (
-            <View style={{ alignItems: 'center', gap: 16, padding: 20 }}>
+            <View style={{ alignItems: 'center', gap: 16, padding: 16, width: '100%' }}>
                 <Text style={{ fontSize: 60 }}>{isSuccess ? '💍' : '💔'}</Text>
-                <Text style={[styles.modalSubtitle, { fontSize: 24, color: isSuccess ? theme.colors.success : theme.colors.danger }]}>
+                <Text style={[styles.modalSubtitle, { fontSize: 22, color: isSuccess ? theme.colors.success : theme.colors.danger }]}>
                     {isSuccess ? 'JUST MARRIED!' : 'REJECTED'}
                 </Text>
-                <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 16 }}>
+                <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 15, lineHeight: 22 }}>
                     {proposalResult.message}
                 </Text>
+                <Pressable
+                    style={[styles.actionButton, { backgroundColor: theme.colors.accent, marginTop: 12, width: '100%', justifyContent: 'center' }]}
+                    onPress={onClose}
+                >
+                    <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', textAlign: 'center' }]}>
+                        {isSuccess ? 'Celebrate & Close' : 'Close'}
+                    </Text>
+                </Pressable>
             </View>
         );
     }
@@ -74,8 +82,8 @@ const ProposalWizardView: React.FC<Props> = ({
     if (proposalStep === 2) {
         return (
             <View style={{ gap: 16, padding: 10 }}>
+                <Text style={styles.modalSubtitle}>{t('love.sheSaidYesKindOf')}</Text>
                 <Text style={{ fontSize: 50, textAlign: 'center' }}>😲</Text>
-                <Text style={[styles.modalSubtitle, { textAlign: 'center' }]}>{t('love.sheSaidYesKindOf')}</Text>
 
                 <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
                     She is emotional and waiting for the ring. This is your moment.
@@ -95,6 +103,10 @@ const ProposalWizardView: React.FC<Props> = ({
                     style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
                     onPress={() => onDecidePrenup(false)}>
                     <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>❤️ No Prenup (Trust)</Text>
+                </Pressable>
+
+                <Pressable style={styles.cancelButton} onPress={onClose}>
+                    <Text style={styles.cancelButtonText}>Cancel Proposal</Text>
                 </Pressable>
             </View>
         );
@@ -135,6 +147,9 @@ const ProposalWizardView: React.FC<Props> = ({
                         )}
                     </Pressable>
                 ))}
+                <Pressable style={styles.cancelButton} onPress={() => onSetIsPickingRing(false)}>
+                    <Text style={styles.cancelButtonText}>Back to Proposal</Text>
+                </Pressable>
             </View>
         );
     }
@@ -197,10 +212,15 @@ const ProposalWizardView: React.FC<Props> = ({
             <Pressable
                 style={[
                     styles.actionButton,
-                    { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5 }
+                    { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5, justifyContent: 'center' }
                 ]}
                 onPress={onStartProposal}>
-                <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1 }]}>{t('love.propose2')}</Text>
+                <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1, textAlign: 'center' }]}>{t('love.propose2')}</Text>
+            </Pressable>
+
+            {/* Close Button */}
+            <Pressable style={styles.cancelButton} onPress={onClose}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
             </Pressable>
         </View>
     );
@@ -284,5 +304,17 @@ const styles = StyleSheet.create({
         color: theme.colors.onLight,
         fontSize: 12,
         fontWeight: '700',
+    },
+    cancelButton: {
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+    },
+    cancelButtonText: {
+        color: theme.colors.textSecondary,
+        fontSize: 13,
+        fontWeight: '600',
     },
 });
