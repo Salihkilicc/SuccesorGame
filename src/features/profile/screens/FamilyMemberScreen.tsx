@@ -30,6 +30,8 @@ import {
     handleGift,
     handleMarriage,
     handleMessyBreakup,
+    handleProposalRejected,
+    handleChildBirth,
 } from '../../../logic/relationshipEvents';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import BabyNamingModal from '../../love/components/BabyNamingModal';
@@ -163,9 +165,10 @@ export const FamilyMemberScreen: React.FC = () => {
             return;
         }
         if (partner && partner.love < 30) {
+            const rejRes = handleProposalRejected(name);
             setProposalResult({
                 success: false,
-                message: `${partner.name} doesn't feel ready yet... She declined.`,
+                message: `${partner.name} doesn't feel ready yet... She declined.\n\nNews: "${rejRes.newsHeadline}"`,
             });
             setProposalStep(3);
             return;
@@ -183,7 +186,7 @@ export const FamilyMemberScreen: React.FC = () => {
         if (res.success) {
             setProposalResult({
                 success: true,
-                message: `💍 ${name} said YES! Corporate Brand Surge: +${res.brandValueDelta} pts.`,
+                message: `💍 ${name} said YES! Corporate Brand Surge: +${res.brandValueDelta} pts.\n\nMedia: "${res.newsHeadline}"`,
             });
         } else {
             setProposalResult({
@@ -232,9 +235,15 @@ export const FamilyMemberScreen: React.FC = () => {
             allowance: 0,
         });
 
+        // Trigger dynamic media news & brand value boost
+        const birthRes = handleChildBirth(newChildName, pendingBabyGender);
+
         setIsBabyNamingVisible(false);
         setBabyName('');
-        Alert.alert('👶 Dynasty Expanded!', `${newChildName} Hale was born and added to your succession roster.`);
+        Alert.alert(
+            '👶 Dynasty Expanded!',
+            `${newChildName} Hale was born and added to your succession roster.\n\nMedia Headline: "${birthRes.newsHeadline}"`,
+        );
     };
 
     const handleBreakup = () => {

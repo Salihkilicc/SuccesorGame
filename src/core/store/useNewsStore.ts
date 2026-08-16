@@ -51,6 +51,7 @@ interface NewsState {
   markAcquisitionAnnounced: (id: string) => void;
   clearNews: () => void;
   publish: (headline: string, kind: NewsKind, atMonth: number) => NewsItem;
+  addSingleNews: (payload: NewsPayload) => NewsItem;
   reset: () => void;
 }
 
@@ -161,6 +162,42 @@ export const useNewsStore = create<NewsState>()(
           readTime: '2 min read',
           isHero: false,
           atMonth,
+          isRead: false,
+          createdAt: timestamp,
+        };
+
+        const nextHistory = [item, ...get().newsHistory].slice(0, MAX_ITEMS);
+        set((state) => ({
+          newsHistory: nextHistory,
+          items: nextHistory,
+          unreadCount: state.unreadCount + 1,
+        }));
+        return item;
+      },
+
+      addSingleNews: (payload) => {
+        const type = payload.type || (payload.kind ? mapKindToType(payload.kind) : 'player');
+        const text = payload.text || payload.headline || '';
+        const headline = payload.headline || text;
+        const category = payload.category || 'Exclusive';
+        const sourceList = DEFAULT_SOURCES[type] || DEFAULT_SOURCES.player;
+        const source = payload.source || sourceList[0];
+        const timestamp = Date.now();
+        const quarter = payload.quarter || 1;
+        const readTime = payload.readTime || `${Math.max(1, Math.min(4, Math.ceil(text.length / 80)))} min read`;
+
+        const item: NewsItem = {
+          id: `news_event_${quarter}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`,
+          type,
+          category,
+          source,
+          headline,
+          text,
+          quarter,
+          readTime,
+          isHero: payload.isHero ?? false,
+          kind: (payload.kind || type) as NewsKind,
+          atMonth: payload.atMonth ?? quarter * 3,
           isRead: false,
           createdAt: timestamp,
         };
