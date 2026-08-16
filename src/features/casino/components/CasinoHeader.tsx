@@ -1,8 +1,12 @@
+// src/features/casino/components/CasinoHeader.tsx
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
+import { formatCompact } from '../../../core/utils';
 
 interface CasinoHeaderProps {
   location: CasinoLocation;
@@ -10,135 +14,117 @@ interface CasinoHeaderProps {
   cash: number;
   onBack?: () => void;
   onLocationPress?: () => void;
-  hideLocationSelector?: boolean; // Kept for backward compat or explicit hiding, though onBack logic usually suffices
+  hideLocationSelector?: boolean;
 }
 
-const CasinoHeader = ({ location, reputation, cash, onBack, onLocationPress, hideLocationSelector }: CasinoHeaderProps) => {
+const CasinoHeader: React.FC<CasinoHeaderProps> = ({
+  location,
+  reputation,
+  cash,
+  onBack,
+  onLocationPress,
+  hideLocationSelector = false,
+}) => {
   const insets = useSafeAreaInsets();
 
   const getReputationRank = (rep: number) => {
     if (rep >= 600) return 'High Roller';
-    if (rep >= 300) return 'VIP';
+    if (rep >= 300) return 'VIP Lounge';
     if (rep >= 100) return 'Gambler';
-    return 'Guest';
+    return 'Member';
   };
 
-  const getTitleStyle = (locId: string) => {
-    // Dynamic Typography based on Location
-    switch (locId) {
-      case 'vegas':
-        return {
-          fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
-          fontWeight: '900' as '900',
-          fontStyle: 'italic' as 'italic',
-          color: '#FFFFFF', // Neon Purple
-          textShadowColor: '#05A8F6',
-          textShadowRadius: 10
-        };
-      case 'macau':
-        return {
-          fontFamily: Platform.OS === 'ios' ? 'Palatino' : 'serif',
-          fontWeight: '800' as '800',
-          color: theme.colors.textPrimary, // Gold
-          letterSpacing: 1
-        };
-      case 'athens':
-        return {
-          fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
-          fontWeight: '600' as '600',
-          color: '#FFFFFF',
-          letterSpacing: 3
-        };
-      default:
-        return {
-          fontWeight: '800' as '800',
-          color: '#FFFFFF',
-          letterSpacing: 2
-        };
-    }
-  };
-
-  const titleStyle = getTitleStyle(location.id);
-  const repProgress = Math.min(reputation / 1000, 1); // 0 to 1
+  const repProgress = Math.min(reputation / 700, 1);
   const rankName = getReputationRank(reputation);
 
-  // Layout Constants
-  // User requested ~5% height increase over base. 68 * 1.05 = ~72.
-  const HEADER_HEIGHT = 72 + insets.top;
-
   return (
-    <View style={[styles.container, { height: HEADER_HEIGHT, paddingTop: insets.top }]}>
-      {/* Dynamic Background Simulation */}
-      <View style={[styles.background, { backgroundColor: location.theme.primary }]} />
-      <View style={[styles.backgroundOverlay, { backgroundColor: '#434B50' }]} />
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 10) }]}>
+      {/* City Ambient Gradient */}
+      <LinearGradient
+        colors={[location.theme.bgGradient[0], '#1C242C']}
+        style={StyleSheet.absoluteFillObject}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      />
 
-      {/* Content */}
       <View style={styles.content}>
-
-        {/* 3-Zone Header Row */}
-        <View style={styles.headerRow}>
-
-          {/* LEFT ZONE: Back or Location */}
-          <View style={styles.leftZone}>
-            {onBack ? (
-              <Pressable onPress={onBack} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.7 }]}>
-                {/* @exit-ok the casino predates ScreenHeader and was switched back on
-                    as-is, deliberately. It gets the header standard in its own pass;
-                    until then this is a known inconsistency rather than a stray. */}
-                <Text style={styles.navIcon}>←</Text>
-              </Pressable>
-            ) : (
-              // If no back button, show Globe Icon here if enabled
-              !hideLocationSelector && onLocationPress && (
-                <Pressable onPress={onLocationPress} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.7 }]}>
-                  <Text style={styles.globeIcon}>🌍</Text>
-                </Pressable>
-              )
-            )}
-
-            {/* Show Globe next to back if both exist? User requested "Icon next to back" previously. 
-                But 3-zone usually implies one main element per zone or a group. 
-                Let's group them if both exist. */}
-            {onBack && !hideLocationSelector && onLocationPress && (
-              <Pressable onPress={onLocationPress} style={({ pressed }) => [styles.navBtn, { marginLeft: 8 }, pressed && { opacity: 0.7 }]}>
-                <Text style={styles.globeIcon}>🌍</Text>
-              </Pressable>
-            )}
-          </View>
-
-          {/* CENTER ZONE: Title */}
-          <View style={styles.centerZone}>
-            <Text
-              style={[styles.title, titleStyle]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.8}
-            >
-              {location.subTitle.toUpperCase()}
-            </Text>
-          </View>
-
-          {/* RIGHT ZONE: Cash */}
-          <View style={styles.rightZone}>
-            <View style={styles.cashPill}>
-              <Text style={styles.cashLabel}>💵</Text>
-              <Text style={styles.cashValue}>${cash.toLocaleString()}</Text>
+        {/* Top Action Row */}
+        <View style={styles.topRow}>
+          {/* Back button or Game Emblem */}
+          {onBack ? (
+            <TouchableOpacity onPress={onBack} style={styles.navBtn} activeOpacity={0.7}>
+              <MaterialCommunityIcons name="arrow-left" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          ) : (
+            <View style={[styles.navBtn, { borderColor: location.theme.primary }]}>
+              <Text style={{ fontSize: 16 }}>{location.theme.flag}</Text>
             </View>
+          )}
+
+          {/* Location Selector Pill */}
+          {!hideLocationSelector && onLocationPress ? (
+            <TouchableOpacity
+              onPress={onLocationPress}
+              style={[
+                styles.locationPill,
+                {
+                  borderColor: location.theme.primary,
+                  backgroundColor: location.theme.badgeBg,
+                },
+              ]}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.locationPillFlag}>{location.theme.flag}</Text>
+              <View style={styles.locationPillTextWrapper}>
+                <Text style={styles.locationPillCity}>{location.name.toUpperCase()}</Text>
+                <Text style={[styles.locationPillSub, { color: location.theme.textColor }]}>
+                  {location.subTitle}
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={16}
+                color={location.theme.primary}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.titleWrapper}>
+              <Text style={styles.title}>{location.name.toUpperCase()}</Text>
+              <Text style={[styles.subtitle, { color: location.theme.textColor }]}>
+                {location.subTitle}
+              </Text>
+            </View>
+          )}
+
+          {/* Cash Balance Pill */}
+          <View style={styles.cashPill}>
+            <MaterialCommunityIcons name="cash-multiple" size={14} color={theme.colors.positive} />
+            <Text style={styles.cashValue}>${formatCompact(cash)}</Text>
           </View>
         </View>
 
-        {/* Bottom Row: Reputation Bar */}
-        <View style={styles.repBarContainer}>
-          <View style={styles.repTrack}>
-            <View style={[styles.repFill, { width: `${repProgress * 100}%` }]} />
-          </View>
-          <View style={styles.repLabelContainer}>
-            <Text style={styles.repText}>
-              Reputation: {reputation.toFixed(0)} / 1000 <Text style={{ color: theme.colors.textPrimary }}>({rankName})</Text>
+        {/* Bottom Reputation Status Bar */}
+        <View style={styles.repContainer}>
+          <View style={styles.repHeaderRow}>
+            <View style={styles.repLeftLabel}>
+              <MaterialCommunityIcons name="star-circle-outline" size={12} color={location.theme.primary} />
+              <Text style={styles.repLabelText}>
+                CASINO VIP: <Text style={{ color: location.theme.textColor, fontWeight: '800' }}>{rankName.toUpperCase()}</Text>
+              </Text>
+            </View>
+            <Text style={styles.repNumbersText}>
+              {reputation.toFixed(0)} <Text style={{ color: theme.colors.textMuted }}>/ 700 REP</Text>
             </Text>
           </View>
+          <View style={styles.repTrack}>
+            <LinearGradient
+              colors={location.theme.gradient}
+              style={[styles.repFill, { width: `${Math.max(repProgress * 100, 3)}%` }]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            />
+          </View>
         </View>
-
       </View>
     </View>
   );
@@ -148,119 +134,121 @@ export default CasinoHeader;
 
 const styles = StyleSheet.create({
   container: {
-    overflow: 'hidden',
     backgroundColor: '#1C242C',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)'
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.2,
-  },
-  backgroundOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.8,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    overflow: 'hidden',
   },
   content: {
-    flex: 1,
-    paddingHorizontal: theme.spacing.md,
-    justifyContent: 'space-between',
-    paddingBottom: 8
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    gap: 10,
   },
-
-  // 3-ZONE LAYOUT
-  headerRow: {
-    flex: 1,
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
   },
-  leftZone: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  centerZone: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  rightZone: {
-    flex: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-
   navBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  navIcon: {
-    color: '#FFFFFF',
+  locationPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  locationPillFlag: {
     fontSize: 18,
-    marginTop: -2
   },
-  globeIcon: {
-    fontSize: 14
+  locationPillTextWrapper: {
+    flex: 1,
   },
-
+  locationPillCity: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  locationPillSub: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  titleWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 15,
-    textAlign: 'center',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 11,
+    fontWeight: '600',
   },
   cashPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(28,36,44,0.4)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    gap: 5,
+    backgroundColor: 'rgba(74, 222, 128, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)'
+    borderColor: 'rgba(74, 222, 128, 0.25)',
   },
-  cashLabel: { fontSize: 12 },
   cashValue: {
-    color: theme.colors.textPrimary,
+    color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 11, // Slightly reduced from 12.5 requested (12 is nice, 12.5 is specific, let's go 11 for safety/style)
-    fontVariant: ['tabular-nums']
+    fontSize: 12,
+    fontVariant: ['tabular-nums'],
   },
-
-  // Reputation Bar
-  repBarContainer: {
-    height: 12,
-    justifyContent: 'center',
-    marginBottom: 4
+  repContainer: {
+    gap: 4,
+  },
+  repHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  repLeftLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  repLabelText: {
+    color: theme.colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  repNumbersText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
   },
   repTrack: {
     height: 4,
-    backgroundColor: '#535B5F',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 2,
-    width: '100%',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   repFill: {
     height: '100%',
-    backgroundColor: '#434B50',
+    borderRadius: 2,
   },
-  repLabelContainer: {
-    position: 'absolute',
-    width: '100%',
-    alignItems: 'center',
-    top: -12
-  },
-  repText: {
-    color: 'rgba(255,255,255,0.48)',
-    fontSize: 9,
-    fontWeight: '600',
-    backgroundColor: '#434B50',
-    paddingHorizontal: 4
-  }
 });

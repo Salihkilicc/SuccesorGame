@@ -21,7 +21,7 @@
 //
 // ============================================================================
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Alert, LayoutAnimation } from 'react-native';
 import { theme } from '../../../core/theme';
@@ -46,6 +46,7 @@ import {
     severancePay,
 } from '../../../core/market/workforce';
 import { formatMoney, formatNumber, formatPercent, formatRP, formatCompact } from '../../../core/utils';
+import { currentQuarter } from '../../../core/story/world';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import StepperBar from '../../../components/common/StepperBar';
 import InfoDot from '../../../components/common/InfoDot';
@@ -71,6 +72,16 @@ const FacilityPanel: React.FC = () => {
     const isBuilding = !!facilityBuild;
 
     const [target, setTarget] = useState(targetHeadcount ?? employeeCount);
+    const [confirmedHeadcount, setConfirmedHeadcount] = useState<{ count: number; isHire: boolean; quarter: number } | null>(null);
+
+    const savedTarget = targetHeadcount ?? employeeCount;
+    const hasChanges = target !== savedTarget;
+
+    // Sync target with savedTarget when savedTarget updates externally
+    useEffect(() => {
+        setTarget(targetHeadcount ?? employeeCount);
+    }, [targetHeadcount, employeeCount]);
+
     /** The stripe IS the facility header now - tapping it opens the details. */
     const [facilityOpen, setFacilityOpen] = useState(false);
     const toggleFacility = useCallback(() => {
@@ -130,7 +141,16 @@ const FacilityPanel: React.FC = () => {
         );
     };
 
-    const applyTarget = () => setTargetHeadcount(target);
+    const applyTarget = () => {
+        if (!hasChanges) return;
+        setTargetHeadcount(target);
+        const nextQ = currentQuarter() + 1;
+        setConfirmedHeadcount({
+            count: Math.abs(target - employeeCount),
+            isHire: target > employeeCount,
+            quarter: nextQ,
+        });
+    };
 
     const step = Math.max(1, Math.round(tier.crew * 0.1));
 
@@ -370,7 +390,10 @@ const FacilityPanel: React.FC = () => {
                     Bkz. components/common/StepperBar.tsx */}
                 <StepperBar
                     value={target}
-                    onChange={setTarget}
+                    onChange={(val) => {
+                        setTarget(val);
+                        if (confirmedHeadcount) setConfirmedHeadcount(null);
+                    }}
                     max={Math.max(tier.crew * 2, employeeCount + perQuarterHiringCap * 4)}
                     unit="target headcount"
                     softLimit={tier.crew}
@@ -407,14 +430,24 @@ const FacilityPanel: React.FC = () => {
                 <Pressable
                     style={({ pressed }) => [
                         styles.primaryBtn,
-                        delta === 0 && styles.primaryBtnOff,
-                        pressed && delta !== 0 && styles.primaryBtnPressed,
+                        !hasChanges && !confirmedHeadcount && styles.primaryBtnOff,
+                        !hasChanges && !!confirmedHeadcount && styles.primaryBtnConfirmed,
+                        pressed && hasChanges && styles.primaryBtnPressed,
                     ]}
-                    disabled={delta === 0}
+                    disabled={!hasChanges}
                     onPress={applyTarget}
                 >
-                    <Text style={[styles.primaryBtnText, delta === 0 && styles.primaryBtnTextOff]}>
-                        {delta === 0 ? t('fac.noChange') : t('fac.confirmTarget')}
+                    <Text style={[
+                        styles.primaryBtnText,
+                        !hasChanges && !confirmedHeadcount && styles.primaryBtnTextOff,
+                    ]}>
+                        {hasChanges
+                            ? 'CONFIRM'
+                            : (confirmedHeadcount
+                                ? (confirmedHeadcount.isHire
+                                    ? `ARRIVES IN Q${confirmedHeadcount.quarter}`
+                                    : `UPDATED IN Q${confirmedHeadcount.quarter}`)
+                                : 'NO CHANGE')}
                     </Text>
                 </Pressable>
 
@@ -580,6 +613,12 @@ const styles = StyleSheet.create({
         alignItems: 'center', backgroundColor: theme.colors.primary,
     },
     primaryBtnOff: { backgroundColor: theme.colors.surfaceHigh },
+    primaryBtnConfirmed: {
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+        opacity: 0.65,
+    },
     primaryBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
     primaryBtnText: { color: theme.colors.onLight, fontSize: 13.5, fontWeight: '800' },
     /* Disabled the fill goes DARK, so the label has to go light with it -

@@ -19,4 +19,5 @@ export { default as ProductsScreen } from '../features/products/screens/Products
 export { default as TechTreeScreen } from '../features/products/screens/TechTreeScreen';
 export { default as DNAScreen } from '../features/life/screens/DNAScreen';
 export { default as ResearchScreen } from '../features/assets/screens/ResearchScreen';
+export { default as LaboratoryScreen } from '../features/assets/screens/LaboratoryScreen';
 export { default as FinancialReportScreen } from '../features/assets/screens/FinancialReportScreen';

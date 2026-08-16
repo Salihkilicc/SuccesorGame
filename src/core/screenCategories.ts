@@ -42,6 +42,11 @@ const BY_ROUTE: Record<string, ScreenCategory> = {
     CapitalInjection: 'finance',
     SharkDeal: 'finance',
     FinancialReport: 'finance',
+    Casino: 'finance',
+    BlackjackGame: 'finance',
+    RouletteGame: 'finance',
+    SlotsGame: 'finance',
+    PokerGame: 'finance',
 
     // --- What you make
     Products: 'products',

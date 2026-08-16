@@ -19,6 +19,7 @@ import { formatMoney, formatNumber, formatRP, formatCompact } from '../../../cor
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import { useStoryStore } from '../../../core/store/useStoryStore';
+import { currentQuarter } from '../../../core/story/world';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import InfoDot from '../../../components/common/InfoDot';
 
@@ -33,6 +34,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
 
     // Local state for draft changes
     const [tempCount, setTempCount] = useState(researcherCount);
+    const [hiredNotice, setHiredNotice] = useState<{ count: number; quarter: number; type: 'hired' | 'reduced' } | null>(null);
 
     // Sync tempCount when actual researcherCount changes (e.g. after confirm or external change)
     useEffect(() => {
@@ -95,7 +97,8 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                 // success - a failed hire teaches nothing and should not end
                 // the instruction that was asking for one.
                 useStoryStore.getState().raise('rndHired');
-                Alert.alert(t('alert.hiringComplete'), `Successfully hired ${toHire} researchers.`);
+                const nextQ = currentQuarter() + 1;
+                setHiredNotice({ count: toHire, quarter: nextQ, type: 'hired' });
             } else {
                 Alert.alert(t('alert.error'), result.message);
                 // Reset temp count on failure
@@ -105,7 +108,8 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
             // Firing
             const toFire = researcherCount - tempCount;
             fireResearchers(toFire);
-            Alert.alert(t('alert.headcountReduced'), `Reduced research staff by ${toFire}.`);
+            const nextQ = currentQuarter() + 1;
+            setHiredNotice({ count: toFire, quarter: nextQ, type: 'reduced' });
         }
     };
 
@@ -197,7 +201,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                                     {
                                         position: 'absolute',
                                         width: `${(tempCount / facility.capacity) * 100}%`,
-                                        backgroundColor: hasChanges ? (canAfford ? theme.colors.accent : theme.colors.danger) : theme.colors.accent
+                                        backgroundColor: hasChanges ? (canAfford ? theme.categories.research : theme.colors.danger) : theme.categories.research
                                     }
                                 ]}
                             />
@@ -252,12 +256,15 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                     <TutorialTarget tutorialKey="rndHire">
                     <StepperBar
                         value={tempCount}
-                        onChange={setTempCount}
+                        onChange={(val) => {
+                            setTempCount(val);
+                            if (hiredNotice) setHiredNotice(null);
+                        }}
                         max={facility.capacity}
                         unit="researchers"
                         markers={[{ value: researcherCount, label: 'Now', color: '#FFFFFF' }]}
                         steps={[1, 10, 100]}
-                        fillColor={canAfford ? '#CFD0D2' : '#FF8A8A'}
+                        fillColor={canAfford ? theme.colors.rp : '#FF8A8A'}
                     />
                     </TutorialTarget>
 
@@ -275,14 +282,24 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                         <Pressable
                             style={[
                                 styles.confirmBtn,
-                                !hasChanges && styles.confirmBtnDisabled,
-                                (!canAfford && tempCount > researcherCount) && styles.confirmBtnDanger
+                                !hasChanges && !hiredNotice && styles.confirmBtnDisabled,
+                                !hasChanges && !!hiredNotice && styles.confirmBtnConfirmed,
+                                (hasChanges && !canAfford && tempCount > researcherCount) && styles.confirmBtnDanger
                             ]}
                             onPress={handleConfirm}
                             disabled={!hasChanges}
                         >
-                            <Text style={styles.confirmBtnText}>
-                                {hasChanges ? 'CONFIRM' : 'NO CHANGE'}
+                            <Text style={[
+                                styles.confirmBtnText,
+                                !hasChanges && !hiredNotice && styles.confirmBtnTextDisabled,
+                            ]}>
+                                {hasChanges
+                                    ? 'CONFIRM'
+                                    : (hiredNotice
+                                        ? (hiredNotice.type === 'hired'
+                                            ? `ARRIVES IN Q${hiredNotice.quarter}`
+                                            : `UPDATED IN Q${hiredNotice.quarter}`)
+                                        : 'NO CHANGE')}
                             </Text>
                         </Pressable>
                     </View>
@@ -565,7 +582,7 @@ const styles = StyleSheet.create({
         color: theme.colors.danger,
     },
     confirmBtn: {
-        backgroundColor: theme.colors.accent,
+        backgroundColor: theme.categories.research,
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 10,
@@ -573,6 +590,13 @@ const styles = StyleSheet.create({
     },
     confirmBtnDisabled: {
         backgroundColor: theme.colors.border,
+        opacity: 0.5,
+    },
+    confirmBtnConfirmed: {
+        backgroundColor: 'rgba(167, 139, 250, 0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(167, 139, 250, 0.25)',
+        opacity: 0.65,
     },
     confirmBtnDanger: {
         backgroundColor: theme.colors.destructive,
@@ -581,6 +605,9 @@ const styles = StyleSheet.create({
     confirmBtnText: {
         color: '#FFFFFF',
         fontWeight: '700',
+    },
+    confirmBtnTextDisabled: {
+        color: theme.colors.textMuted,
     },
     statRow: {
         flexDirection: 'row',

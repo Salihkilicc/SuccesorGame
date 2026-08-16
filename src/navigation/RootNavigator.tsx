@@ -37,6 +37,7 @@ import {
   TechTreeScreen,
   DNAScreen,
   ResearchScreen,
+  LaboratoryScreen,
   FinancialReportScreen,
   BelongingsScreen,
 } from '../screens';
@@ -85,7 +86,7 @@ import TutorialOverlay from '../components/tutorial/TutorialOverlay';
  * lit rather than dropping the highlight the moment you open a detail page.
  */
 const COMPANY_ROUTES = new Set([
-    'MyCompany', 'Products', 'Research', 'TechTree', 'Assets', 'FinancialReport',
+    'MyCompany', 'Products', 'Research', 'TechTree', 'Laboratory', 'Assets', 'FinancialReport',
     'BoardMembers', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
     'BorrowLoan', 'RepayDebt',
 ]);
@@ -186,6 +187,7 @@ export type RootStackParamList = {
   CapitalInjection: undefined;
   SharkDeal: undefined;
   TechTree: undefined;
+  Laboratory: undefined;
   FinancialReport: undefined;
   Assets: NavigatorScreenParams<AssetsStackParamList>;
   Love: undefined;
@@ -472,8 +474,13 @@ const RootNavigator = () => {
           <RootStack.Screen name="RepayDebt" component={RepayDebtScreen} />
           <RootStack.Screen name="CapitalInjection" component={CapitalInjectionScreen} />
           <RootStack.Screen name="SharkDeal" component={SharkDealScreen} />
-          {/* ✅ RESEARCH EKRANI DE ARTIK ROOT'TA */}
+          {/* ✅ RESEARCH EKRANI VE LABORATUVAR DE ARTIK ROOT'TA */}
           <RootStack.Screen name="Research" component={ResearchScreen} />
+          <RootStack.Screen
+            name="Laboratory"
+            component={LaboratoryScreen}
+            options={{ title: t('company.rDLaboratory') }}
+          />
           <RootStack.Screen
             name="TechTree"
             component={TechTreeScreen}

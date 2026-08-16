@@ -1,46 +1,82 @@
+// src/features/casino/components/GameRoomCard.tsx
 import React from 'react';
-import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 
 interface GameRoomCardProps {
     title: string;
     subtitle: string;
-    image: ImageSourcePropType; // Expecting require('./path/to/image.png')
+    image: ImageSourcePropType;
     onPress: () => void;
     locked?: boolean;
+    themeColor?: string;
+    accentGlow?: string;
+    iconName?: string;
+    badgeText?: string;
 }
 
-export const GameRoomCard = ({ title, subtitle, image, onPress, locked = false }: GameRoomCardProps) => {
+export const GameRoomCard: React.FC<GameRoomCardProps> = ({
+    title,
+    subtitle,
+    image,
+    onPress,
+    locked = false,
+    themeColor = theme.colors.primary,
+    accentGlow = 'rgba(5, 168, 246, 0.25)',
+    iconName = 'cards-playing-outline',
+    badgeText,
+}) => {
     useLocale();
+
     return (
         <Pressable
             onPress={locked ? undefined : onPress}
             style={({ pressed }) => [
                 styles.container,
+                { borderColor: locked ? 'rgba(255,255,255,0.06)' : accentGlow },
                 pressed && !locked && styles.pressed,
-                locked && styles.lockedContainer
+                locked && styles.lockedContainer,
             ]}
         >
             <Image source={image} style={[styles.image, locked && styles.lockedImage]} resizeMode="cover" />
 
-            {/* Overlay Gradient/Tint */}
-            <View style={[styles.overlay, locked && styles.lockedOverlay]} />
+            {/* Dark Ambient Overlay Gradient */}
+            <LinearGradient
+                colors={['rgba(28, 36, 44, 0.25)', 'rgba(28, 36, 44, 0.88)', '#1C242C']}
+                style={StyleSheet.absoluteFillObject}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+            />
 
-            {/* Content */}
+            {/* Top Badge (Stakes / Type) */}
+            {badgeText && !locked && (
+                <View style={[styles.topBadge, { backgroundColor: 'rgba(28, 36, 44, 0.7)', borderColor: themeColor }]}>
+                    <Text style={[styles.topBadgeText, { color: themeColor }]}>{badgeText}</Text>
+                </View>
+            )}
+
+            {/* Content Body */}
             <View style={styles.content}>
-                <View>
-                    <Text style={styles.title}>{title.toUpperCase()}</Text>
+                <View style={styles.textBlock}>
+                    <View style={styles.titleRow}>
+                        <MaterialCommunityIcons name={iconName} size={20} color={locked ? theme.colors.textMuted : themeColor} />
+                        <Text style={styles.title}>{title.toUpperCase()}</Text>
+                    </View>
                     <Text style={styles.subtitle}>{subtitle}</Text>
                 </View>
 
                 {!locked ? (
-                    <View style={styles.playButton}>
-                        <Text style={styles.playText}>{t('ui.play2')}</Text>
+                    <View style={[styles.playButton, { backgroundColor: themeColor }]}>
+                        <Text style={styles.playText}>{t('ui.play2') || 'PLAY'}</Text>
+                        <MaterialCommunityIcons name="chevron-right" size={16} color="#000000" />
                     </View>
                 ) : (
                     <View style={styles.lockBadge}>
-                        <Text style={styles.lockText}>{t('ui.comingSoon')}</Text>
+                        <MaterialCommunityIcons name="lock" size={14} color={theme.colors.textMuted} />
+                        <Text style={styles.lockText}>{t('ui.comingSoon') || 'LOCKED'}</Text>
                     </View>
                 )}
             </View>
@@ -50,25 +86,24 @@ export const GameRoomCard = ({ title, subtitle, image, onPress, locked = false }
 
 const styles = StyleSheet.create({
     container: {
-        height: 160,
+        height: 156,
         borderRadius: 16,
         overflow: 'hidden',
-        backgroundColor: '#1C242C',
-        marginBottom: 16,
+        backgroundColor: theme.colors.surface,
+        marginBottom: 14,
         elevation: 4,
-        shadowColor: '#1C242C',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)'
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+        borderWidth: 1.5,
     },
     pressed: {
-        transform: [{ scale: 0.98 }],
-        opacity: 0.9
+        transform: [{ scale: 0.985 }],
+        opacity: 0.92,
     },
     lockedContainer: {
-        borderColor: 'transparent',
+        borderColor: 'rgba(255,255,255,0.06)',
     },
     image: {
         width: '100%',
@@ -76,16 +111,22 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     lockedImage: {
-        opacity: 0.4,
-        tintColor: 'gray'
+        opacity: 0.25,
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(28,36,44,0.3)', // Darken image for text readability
-        // Optional: add gradient if library available, else solid overlay is fine
+    topBadge: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        borderRadius: 8,
+        borderWidth: 1,
+        zIndex: 2,
     },
-    lockedOverlay: {
-        backgroundColor: 'rgba(28,36,44,0.6)',
+    topBadgeText: {
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.8,
     },
     content: {
         flex: 1,
@@ -93,48 +134,63 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         padding: 16,
+        zIndex: 1,
+    },
+    textBlock: {
+        flex: 1,
+        gap: 3,
+        paddingRight: 12,
+    },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     title: {
         color: '#FFFFFF',
-        fontSize: 24,
-        fontWeight: '800',
-        letterSpacing: 1,
-        textShadowColor: 'rgba(28,36,44,0.8)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
+        fontSize: 20,
+        fontWeight: '900',
+        letterSpacing: 0.5,
     },
     subtitle: {
-        color: '#FFFFFF', // Gray-200
-        fontSize: 14,
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 12,
         fontWeight: '500',
-        marginTop: 4,
-        textShadowColor: 'rgba(28,36,44,0.8)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
+        letterSpacing: 0.2,
     },
     playButton: {
-        backgroundColor: theme.colors.accent,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 2,
+        paddingHorizontal: 14,
         paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 8,
+        borderRadius: 10,
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
     },
     playText: {
-        color: theme.colors.onLight,
-        fontWeight: '800',
-        fontSize: 12,
-        letterSpacing: 1,
+        color: '#000000',
+        fontSize: 13,
+        fontWeight: '900',
+        letterSpacing: 0.6,
     },
     lockBadge: {
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.48)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        backgroundColor: 'rgba(28,36,44,0.7)',
+        paddingHorizontal: 10,
         paddingVertical: 6,
-        paddingHorizontal: 12,
         borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     lockText: {
-        color: 'rgba(255,255,255,0.48)',
+        color: theme.colors.textMuted,
+        fontSize: 11,
         fontWeight: '700',
-        fontSize: 10,
-        letterSpacing: 1,
-    }
+        letterSpacing: 0.5,
+    },
 });
