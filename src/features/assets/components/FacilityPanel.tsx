@@ -212,15 +212,11 @@ const FacilityPanel: React.FC = () => {
                         <Text style={styles.utilLabel}>{t('company.used')}</Text>
                     </View>
                 )}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <InfoDot
-                        title={t('tactic.operationsTitle')}
-                        text={t('tactic.operationsText')}
-                        detail={t('tactic.operationsDetail')}
-                        small
-                    />
-                    <Text style={styles.stripeChevron}>{facilityOpen ? '⌃' : '⌄'}</Text>
-                </View>
+                {/* The InfoDot that used to sit here is gone. The subheader
+                    already carries the same explanation, and a control with a
+                    second, smaller control inside it is two tap targets in one
+                    hit box. */}
+                <Text style={styles.stripeChevron}>{facilityOpen ? '⌃' : '⌄'}</Text>
             </Pressable>
 
             {staffing < 1 && (
@@ -235,16 +231,25 @@ const FacilityPanel: React.FC = () => {
                 </Pressable>
             )}
 
-            {facilityOpen && (
+            {/* ══════════════════════════════════════════════════════════════
+                SHELVED: WHAT THIS BUTTON USED TO OPEN
+
+                The current tier's own numbers - unit cost, yield, the two
+                ceilings, and the utilisation bar. All of it correct and none of
+                it a DECISION: the tier you are on cannot be changed, so a panel
+                describing it is a reference card behind a tap.
+
+                What the player actually opens this for is the next one, and
+                that was a second button underneath saying one word. So the
+                button keeps its header and inherits the other one's contents.
+
+                Kept rather than deleted: the utilisation bar in particular is
+                the only place the shape of the quarter is drawn, and it wants
+                a home. It is not this one.
+
             <View style={styles.facilityBody}>
                 <View style={styles.facilityHead}>
                     <Text style={styles.tierDesc}>{tier.description}</Text>
-                    <InfoDot
-                        title={t('tactic.operationsTitle')}
-                        text={t('tactic.operationsText')}
-                        detail={t('tactic.operationsDetail')}
-                        small
-                    />
                 </View>
 
                 <View style={styles.statRow}>
@@ -271,7 +276,7 @@ const FacilityPanel: React.FC = () => {
                     </View>
                 )}
             </View>
-            )}
+               ══════════════════════════════════════════════════════════════ */}
 
             {(isBuilding || incomingHires > 0) && (
                 <View style={styles.queue}>
@@ -522,7 +527,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.04)',
         borderRadius: 14,
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-        paddingVertical: 12, paddingHorizontal: 14,
+        // 12 to 18. It carries a fourth line now - the next tier and its
+        // price - and the old padding was set for three. Vertical only: the
+        // horizontal is shared with every other card on this screen and
+        // widening one of them would break the column.
+        paddingVertical: 18, paddingHorizontal: 14,
     },
     tierIconBadge: {
         width: 44,
