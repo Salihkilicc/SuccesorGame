@@ -43,6 +43,10 @@ export type Effect =
     | { kind: 'capital'; amount: number }
     /** The player's personal cash. Separate pool, separate effect. */
     | { kind: 'cash'; amount: number }
+    /** Company workforce headcount delta. Negative takes. */
+    | { kind: 'employees'; amount: number }
+    /** Laboratory researcher headcount delta. Negative takes. */
+    | { kind: 'researchers'; amount: number }
     /** Brand value, in points. */
     | { kind: 'brand'; amount: number }
     /** Move a relationship. Deltas compound; see useStoryStore.nudge. */
@@ -255,6 +259,8 @@ export type Effect =
 export type EffectSink = {
     capital: (amount: number) => void;
     cash: (amount: number) => void;
+    employees: (amount: number) => void;
+    researchers: (amount: number) => void;
     brand: (amount: number) => void;
     dial: (dial: Dial, delta: number) => void;
     flag: (flag: StoryFlag) => void;
@@ -291,6 +297,8 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
     switch (effect.kind) {
         case 'capital': sink.capital(effect.amount); return;
         case 'cash': sink.cash(effect.amount); return;
+        case 'employees': sink.employees(effect.amount); return;
+        case 'researchers': sink.researchers(effect.amount); return;
         case 'brand': sink.brand(effect.amount); return;
         case 'dial': sink.dial(effect.dial, effect.delta); return;
         case 'flag': sink.flag(effect.flag); return;

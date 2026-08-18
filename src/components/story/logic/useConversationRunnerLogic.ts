@@ -93,7 +93,7 @@ export const useConversationRunnerLogic = ({
         applyEffects(choice.effects, gameSink());
 
         const playerText = node ? answer(node.id, index, choice.text) : choice.text;
-        const playerSaid: Said = { from: 'player', text: playerText };
+        const playerSaid: Said = { from: 'player', text: playerText, effects: choice.effects };
         const withPlayer = [...history, playerSaid];
 
         const target = choice.next ? nodeById(conversation, choice.next) : undefined;

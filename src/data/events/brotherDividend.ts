@@ -105,7 +105,7 @@ export const brotherDividendCold: Conversation = {
             speaker: 'brother',
             text: 'I asked twice this year and got pointed to quarterly reports. This is what asking looks like when informal requests get ignored.',
             choices: [
-                { text: 'Two million. Fine.', next: 'paid' },
+                { text: '{brotherDividendTotal}. Fine.', next: 'paid' },
                 { text: 'Then use the procedure.', next: 'agenda' },
             ],
         },
@@ -126,7 +126,7 @@ export const brotherDividendCold: Conversation = {
                         },
                     ],
                 },
-                { text: 'Two million. Take it.', next: 'paid' },
+                { text: '{brotherDividendTotal}. Take it.', next: 'paid' },
             ],
         },
 
@@ -173,7 +173,7 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Are you free to talk over a table about a dividend? Two million total across all shares, which means three hundred thousand for me.',
+            text: 'Are you free to talk over a table about a dividend? {brotherDividendTotal} total across all shares, which means {brotherDividendCut} for me.',
             choices: [
                 { text: 'How much for the company?', next: 'howMuch' },
                 { text: 'What is the point of this?', next: 'thePoint' },
@@ -183,7 +183,7 @@ export const brotherDividendWarm: Conversation = {
         {
             id: 'howMuch',
             speaker: 'brother',
-            text: 'Two million across the register. Small enough that you might think it is not worth discussing.',
+            text: '{brotherDividendTotal} across the register. Small enough that you might think it is not worth discussing.',
             choices: [
                 { text: 'It is not worth discussing.', next: 'soundsLike' },
                 { text: 'What is the point, then?', next: 'thePoint' },

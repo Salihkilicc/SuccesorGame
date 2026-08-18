@@ -406,7 +406,7 @@ export const friendOffersPlanora: Conversation = {
             text: 'figured you might say that. you are right, keeping business separate is cleaner.',
             choices: [
                 {
-                    text: 'It would have.',
+                    text: 'It is for the best.',
                     effects: [{ kind: 'dial', dial: 'friendLoyalty', delta: 10 }],
                 },
                 {
@@ -429,7 +429,7 @@ export const friendOffersPlanoraEvent: GameEvent = {
         { kind: 'flag', flag: 'friendGrewUp' },
         { kind: 'noFlag', flag: 'planoraOffered' },
         { kind: 'dialAtLeast', dial: 'friendLoyalty', band: 'extreme' },
-        { kind: 'quarterAtLeast', quarter: 80 },
+        { kind: 'quarterAtLeast', quarter: 28 },
     ],
     chance: 0.25,
     cooldown: 8,

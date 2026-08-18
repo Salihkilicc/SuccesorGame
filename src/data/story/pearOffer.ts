@@ -98,7 +98,7 @@ export const pearOffer: Conversation = {
                 + 'and suppliers, we are writing to register a preliminary interest in '
                 + 'acquiring the business in its entirety.\n\n'
                 + 'Our indicative valuation is set out in the attached. In summary: '
-                + `$${(OFFER / 1_000_000).toFixed(0)} million, cash, no financing condition, `
+                + '{pearOffer}, cash, no financing condition, '
                 + 'signed within thirty days.',
             // ------------------------------------------------------------------
             //  TWO WAYS OF SAYING "CONTINUE" IS NOT A CHOICE

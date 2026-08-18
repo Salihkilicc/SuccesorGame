@@ -49,7 +49,7 @@ export const cfoDividend: Conversation = {
         {
             id: 'amount',
             speaker: 'cfo',
-            text: 'Two million. The cash is there, that is the problem, because everyone can see it is there. If we had nothing, this would not be a conversation.',
+            text: '{brotherDividendTotal}. The cash is there, that is the problem, because everyone can see it is there. If we had nothing, this would not be a conversation.',
             choices: [
                 { text: 'And if we spend it instead?', next: 'advice' },
                 { text: 'Pay him. I want the quarter quiet.', next: 'paid' },

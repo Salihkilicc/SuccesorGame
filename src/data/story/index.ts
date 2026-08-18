@@ -97,6 +97,15 @@ import { fbiFinancial, fbiInsider, fbiEspionage } from '../events/fbi';
 import { casinoScandalScene } from '../events/casino';
 import { friendAsks, friendGrows } from './friendArc';
 import { friendBoardSeat } from './friendBoard';
+import {
+    opsPlantEfficiency,
+    opsSupplyChain,
+    techLabBreakthrough,
+    techCloudScaling,
+    cfoTreasuryYield,
+    cfoInstitutionalInvestor,
+    boardEsgMilestone,
+} from '../events/corporateOps';
 
 export const CONVERSATIONS: Conversation[] = [
     fatherInheritance,
@@ -173,6 +182,14 @@ export const CONVERSATIONS: Conversation[] = [
     casinoScandalScene,
     // And the last thing in the friend's arc.
     friendBoardSeat,
+    // Corporate Operations & Management
+    opsPlantEfficiency,
+    opsSupplyChain,
+    techLabBreakthrough,
+    techCloudScaling,
+    cfoTreasuryYield,
+    cfoInstitutionalInvestor,
+    boardEsgMilestone,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

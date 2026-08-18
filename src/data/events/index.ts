@@ -69,6 +69,15 @@ import { espionageKestrelEvent, espionageBrokerEvent, espionageOracleEvent } fro
 import { fbiFinancialEvent, fbiInsiderEvent, fbiEspionageEvent } from './fbi';
 import { casinoScandalEvent } from './casino';
 import { friendBoardSeatEvent } from '../story/friendBoard';
+import {
+    opsPlantEfficiencyEvent,
+    opsSupplyChainEvent,
+    techLabBreakthroughEvent,
+    techCloudScalingEvent,
+    cfoTreasuryYieldEvent,
+    cfoInstitutionalInvestorEvent,
+    boardEsgMilestoneEvent,
+} from './corporateOps';
 
 export const EVENTS: GameEvent[] = [
     recallEvent,
@@ -173,6 +182,14 @@ export const EVENTS: GameEvent[] = [
     casinoScandalEvent,
     // Ten years of being decent, and one per cent.
     friendBoardSeatEvent,
+    // Corporate Operations & Management Pack
+    opsPlantEfficiencyEvent,
+    opsSupplyChainEvent,
+    techLabBreakthroughEvent,
+    techCloudScalingEvent,
+    cfoTreasuryYieldEvent,
+    cfoInstitutionalInvestorEvent,
+    boardEsgMilestoneEvent,
 ];
 
 export const eventById = (id: string): GameEvent | undefined =>

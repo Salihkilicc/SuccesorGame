@@ -833,34 +833,42 @@ const crisis = (
 });
 
 export const crisisRansomwareEvent = crisis('crisis-ransomware', crisisRansomware,
-    'Sector chatter about an intrusion at a mid-cap manufacturer.');
+    'Sector chatter about an intrusion at a mid-cap manufacturer.',
+    { cooldown: undefined, priority: 5 });
 export const crisisLeakEvent = crisis('crisis-leak', crisisLeak,
-    'A security researcher posts about an exposed database. No company is named yet.');
+    'A security researcher posts about an exposed database. No company is named yet.',
+    { cooldown: undefined });
 export const crisisForcedRecallEvent = crisis('crisis-forced-recall', crisisForcedRecall,
     'The Directorate has opened a file on a consumer product defect.',
     // Not weather and not optional: it is the consequence of a decision the
     // player made, and it arrives once.
     { chance: 0.9, cooldown: undefined, priority: 5 });
 export const crisisSupplierEvent = crisis('crisis-supplier', crisisSupplier,
-    'A component supplier files. Three of its customers are understood to be exposed.');
+    'A component supplier files. Three of its customers are understood to be exposed.',
+    { cooldown: 8 });
 export const crisisUnionEvent = crisis('crisis-union', crisisUnion,
-    'A strike ballot passes at the Hale plant.', { priority: 4 });
+    'A strike ballot passes at the Hale plant.', { priority: 4, cooldown: 16 });
 export const crisisExecutiveEvent = crisis('crisis-executive', crisisExecutive,
-    'A trade paper is understood to be preparing a story about a Hale executive.');
+    'A trade paper is understood to be preparing a story about a Hale executive.',
+    { cooldown: undefined });
 export const crisisPatentEvent = crisis('crisis-patent', crisisPatent,
-    'Hale is named in a patent action brought by a non-practising entity.');
+    'Hale is named in a patent action brought by a non-practising entity.',
+    { cooldown: 16 });
 export const crisisAccidentEvent = crisis('crisis-accident', crisisAccident,
     'A serious injury is reported at the Hale plant. The line is stopped.',
-    { priority: 5 });
+    { priority: 5, cooldown: undefined });
 export const crisisCounterfeitEvent = crisis('crisis-counterfeit', crisisCounterfeit,
-    'Counterfeit units bearing the Hale name are circulating in the channel.');
+    'Counterfeit units bearing the Hale name are circulating in the channel.',
+    { cooldown: 20 });
 export const crisisInquiryEvent = crisis('crisis-inquiry', crisisInquiry,
-    'Regulators have requested four years of supplier records from Hale.');
+    'Regulators have requested four years of supplier records from Hale.',
+    { cooldown: undefined });
 export const crisisOutageEvent = crisis('crisis-outage', crisisOutage,
     'Hale devices stopped responding overnight. The cause is not yet public.',
-    { priority: 4 });
+    { priority: 4, cooldown: 10 });
 export const crisisAllocationEvent = crisis('crisis-allocation', crisisAllocation,
-    'Controller allocations tighten across the sector. Smaller buyers are cut first.');
+    'Controller allocations tighten across the sector. Smaller buyers are cut first.',
+    { cooldown: 8 });
 
 export const CRISIS_CONVERSATIONS = [
     crisisRansomware, crisisLeak, crisisForcedRecall, crisisSupplier,

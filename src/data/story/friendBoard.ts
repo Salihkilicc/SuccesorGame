@@ -47,12 +47,12 @@ import type { GameEvent } from '../../core/events/types';
  * cap table rather than a decoration - he votes with it, and the sink clamps
  * to the same band so a scene cannot invent a larger one.
  */
-export const FRIEND_STAKE = 0.01;
+export const FRIEND_STAKE = 0.02;
 
 const WHEN: Condition[] = [
     { kind: 'flag', flag: 'fatherDead' },
-    // Late. A seat handed over in year three is a transaction.
-    { kind: 'quarterAtLeast', quarter: 200 },
+    // Reached in year 8+ once Planora is acquired and friendship is top tier.
+    { kind: 'quarterAtLeast', quarter: 32 },
     // You own his company - which means he sold it to you, which is its own
     // small tragedy and the reason this scene has to exist.
     { kind: 'owns', company: 'tech_planora' },
@@ -106,7 +106,7 @@ export const friendBoardSeat: Conversation = {
         {
             id: 'stake',
             speaker: 'friend',
-            text: 'the pack mentions a one per cent equity grant. that is significant value for a board seat.',
+            text: 'the pack mentions a two per cent equity grant. that is significant value for a board seat.',
             choices: [
                 { text: 'A seat with shares represents real governance.', next: 'accept' },
                 { text: 'Standard alignment for directors.', next: 'accept' },
@@ -126,7 +126,7 @@ export const friendBoardSeat: Conversation = {
                         { kind: 'dial', dial: 'friendLoyalty', delta: 10 },
                         {
                             kind: 'news',
-                            headline: 'Hale adds the founder of Planora to its board. He holds one per cent.',
+                            headline: 'Hale adds the founder of Planora to its board. He holds two per cent.',
                         },
                     ],
                 },
@@ -138,7 +138,7 @@ export const friendBoardSeat: Conversation = {
                         { kind: 'dial', dial: 'friendLoyalty', delta: 6 },
                         {
                             kind: 'news',
-                            headline: 'Hale adds the founder of Planora to its board. He holds one per cent.',
+                            headline: 'Hale adds the founder of Planora to its board. He holds two per cent.',
                         },
                     ],
                 },

@@ -14,6 +14,8 @@ const recorder = () => {
     const sink: EffectSink = {
         capital: a => log.push(`capital:${a}`),
         cash: a => log.push(`cash:${a}`),
+        employees: a => log.push(`employees:${a}`),
+        researchers: a => log.push(`researchers:${a}`),
         brand: a => log.push(`brand:${a}`),
         dial: (d, delta) => log.push(`dial:${d}:${delta}`),
         flag: f => log.push(`flag:${f}`),
@@ -88,6 +90,8 @@ describe('effects', () => {
         const all: Effect[] = [
             { kind: 'capital', amount: -500 },
             { kind: 'cash', amount: 200 },
+            { kind: 'employees', amount: 10 },
+            { kind: 'researchers', amount: -2 },
             { kind: 'brand', amount: -3 },
             { kind: 'dial', dial: 'pearHostility', delta: 20 },
             { kind: 'flag', flag: 'fatherDead' },
@@ -100,6 +104,8 @@ describe('effects', () => {
         expect(log).toEqual([
             'capital:-500',
             'cash:200',
+            'employees:10',
+            'researchers:-2',
             'brand:-3',
             'dial:pearHostility:20',
             'flag:fatherDead',

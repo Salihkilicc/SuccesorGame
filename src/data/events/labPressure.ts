@@ -360,7 +360,11 @@ export const ctoBudgetMemo: Conversation = {
             text: 'Following our discussion, I am formally requesting eight rather than the fifteen I said out loud. Eight is not what I would do, but it is a number you can approve.\n\nP.R.',
             choices: [
                 { text: 'What does eight cost us in timing?', next: 'cost' },
-                { text: 'Eight is approved.', next: 'fine' },
+                {
+                    text: 'Eight is approved.',
+                    next: 'fine',
+                    effects: [{ kind: 'researchers', amount: 8 }],
+                },
             ],
         },
 
@@ -372,6 +376,7 @@ export const ctoBudgetMemo: Conversation = {
                 {
                     text: 'Then ask for fifteen.',
                     effects: [
+                        { kind: 'researchers', amount: 15 },
                         { kind: 'flag', flag: 'labBacked' },
                         {
                             kind: 'message',
@@ -380,7 +385,11 @@ export const ctoBudgetMemo: Conversation = {
                         },
                     ],
                 },
-                { text: 'Eight is fine.', next: 'fine' },
+                {
+                    text: 'Eight is fine.',
+                    next: 'fine',
+                    effects: [{ kind: 'researchers', amount: 8 }],
+                },
             ],
         },
 

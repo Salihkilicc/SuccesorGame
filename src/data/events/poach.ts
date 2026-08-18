@@ -94,6 +94,7 @@ export const poachConversation: Conversation = {
                         // He got four engineers for nothing and learned you
                         // will not fight for them.
                         { kind: 'brand', amount: -2 },
+                        { kind: 'researchers', amount: -2 },
                         {
                             kind: 'news',
                             headline: 'Pear confirms four senior engineering hires from a competitor.',

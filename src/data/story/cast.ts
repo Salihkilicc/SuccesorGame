@@ -183,8 +183,8 @@ export const CAST: Cast = {
 
     hacker: {
         id: 'hacker',
-        name: 'ORACLE',
-        role: 'Unverified sender',
+        name: 'Cipher',
+        role: 'Encrypted / Anonymous',
         channels: 'message',
         tone: 'Bored professionalism, like a courier reading out a delivery slot. Deadlines stated as facts. Occasional flashes of something almost friendly, which is the most frightening part.',
     },

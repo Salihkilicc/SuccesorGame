@@ -60,7 +60,7 @@ const world = (over: Partial<World> = {}): World => ({
 const playable = () => {
     const w = world();
     const sink: EffectSink = {
-        capital: () => { }, cash: () => { }, brand: () => { },
+        capital: () => { }, cash: () => { }, employees: () => { }, researchers: () => { }, brand: () => { },
         dial: (d, delta) => { w.dials[d] = clampDial(w.dials[d] + delta); },
         flag: f => { (w.flags as any)[f] = true; },
         message: () => { }, mail: () => { }, news: () => { },

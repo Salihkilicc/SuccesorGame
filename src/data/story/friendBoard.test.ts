@@ -89,7 +89,7 @@ describe('the gate is as narrow as the scene claims', () => {
 describe('one per cent, and it is a real seat', () => {
     it('inside the same band every other director gets', () => {
         // Not a decoration. He votes with it, on the same cap table.
-        expect(FRIEND_STAKE).toBe(0.01);
+        expect(FRIEND_STAKE).toBe(0.02);
         expect(FRIEND_STAKE).toBeGreaterThanOrEqual(SEAT_MIN_STAKE);
         expect(FRIEND_STAKE).toBeLessThanOrEqual(SEAT_MAX_STAKE);
     });

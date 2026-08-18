@@ -34,6 +34,8 @@ import { nextPriority, type Pending } from '../story/inbox';
 import { emptyHistory, type EventHistory } from '../events/types';
 import { emptyLockState, type LockState } from '../tutorial/locks';
 
+import type { Effect } from '../story/effects';
+
 /**
  * One line of a scene as the player read it.
  *
@@ -41,7 +43,7 @@ import { emptyLockState, type LockState } from '../tutorial/locks';
  * when the card arrived and the player may have changed language since. What
  * they read is what they should find when they come back.
  */
-export type Said = { from: 'them' | 'player'; text: string };
+export type Said = { from: 'them' | 'player'; text: string; effects?: Effect[] };
 
 /** Where a scene was left, and everything said up to that point. */
 export type SceneProgress = {

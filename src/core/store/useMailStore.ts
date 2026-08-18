@@ -133,9 +133,10 @@ export const useMailStore = create<MailStore>()(
                         id: `mail-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                         isRead: false,
                     };
+                    const nextInbox = [newMail, ...state.inbox];
                     return {
-                        // Newest first
-                        inbox: [newMail, ...state.inbox],
+                        // Newest first, capped at 80 to prevent unbounded storage bloat
+                        inbox: nextInbox.length > 80 ? nextInbox.slice(0, 80) : nextInbox,
                     };
                 }),
                 

@@ -598,7 +598,7 @@ export const friendCondolencePublic: Conversation = {
             text: 'marcus is FINE. marcus asked a follow up question which is more than my own family have managed',
             choices: [
                 {
-                    text: 'Thursday.',
+                    text: 'See you Thursday.',
                     effects: [{ kind: 'dial', dial: 'friendLoyalty', delta: 5 }],
                 },
             ],
@@ -612,7 +612,7 @@ export const friendCondolencePublic: Conversation = {
             text: 'it is a bit\n\nsorry. i know it is not a good week to be pleased about something. i was pleased though\n\nthursday',
             choices: [
                 {
-                    text: 'Thursday.',
+                    text: 'Thursday. See you then.',
                     effects: [{ kind: 'dial', dial: 'friendLoyalty', delta: 4 }],
                 },
             ],
@@ -690,7 +690,7 @@ export const brotherCondolencePublic: Conversation = {
         {
             id: 'open',
             speaker: 'brother',
-            text: 'Sorry, one more and then I will let you sleep.\n\nSeven point two million. That is my fifteen percent of what you turned down, and I found out the way the man from Halberd found out.\n\nI am not angry. I want to be clear that I am not angry.',
+            text: 'Sorry, one more and then I will let you sleep.\n\n{brotherShare}. That is my fifteen percent of what you turned down, and I found out the way the man from Halberd found out.\n\nI am not angry. I want to be clear that I am not angry.',
             choices: [
                 { text: 'You would have said yes.', next: 'wouldHave' },
                 { text: 'You are right. I should have asked.', next: 'shouldHave' },

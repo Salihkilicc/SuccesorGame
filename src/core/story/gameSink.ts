@@ -39,7 +39,32 @@ export const gameSink = (): EffectSink => ({
     },
     cash: (amount) => {
         const s = useStatsStore.getState();
-        s.update({ money: (s.money || 0) + amount });
+        // If it is the Pear buyout offer (48_000_000), dynamically scale to 1.25x companyValue
+        const payout = amount === 48_000_000
+            ? Math.max(48_000_000, Math.round((s.companyValue || 0) * 1.25))
+            : amount;
+        s.update({ money: (s.money || 0) + payout });
+    },
+    employees: (amount) => {
+        try {
+            const s = useStatsStore.getState();
+            const current = s.employeeCount || 0;
+            const next = Math.max(0, current + amount);
+            s.update({ employeeCount: next });
+            const { useGameStore } = require('../store/useGameStore');
+            useGameStore.setState((gs: any) => ({
+                employeeCount: Math.max(0, (gs.employeeCount || 0) + amount),
+            }));
+        } catch { /* store not ready */ }
+    },
+    researchers: (amount) => {
+        try {
+            const { useLaboratoryStore } = require('../store/useLaboratoryStore');
+            const lab = useLaboratoryStore.getState();
+            const current = lab.researcherCount || 0;
+            const next = Math.max(0, current + amount);
+            useLaboratoryStore.setState({ researcherCount: next });
+        } catch { /* store not ready */ }
     },
     // ------------------------------------------------------------------
     //  A HIT TO YOUR REPUTATION HAS TO LAND WHERE REPUTATION IS KEPT

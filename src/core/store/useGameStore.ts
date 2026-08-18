@@ -2296,14 +2296,19 @@ export const useGameStore = create<GameStore>()(
           const currentAttributes = playerStore.attributes;
           const decay = calculateStatDecay(currentAttributes);
 
-          // Apply Decay
+          // Apply Decay (Batched into a single state update)
+          const updatedAttributes = { ...currentAttributes };
+          let hasDecay = false;
           Object.entries(decay).forEach(([stat, value]) => {
             if (value < 0) {
-              const currentVal = currentAttributes[stat as keyof typeof currentAttributes];
-              playerStore.updateAttribute(stat as any, Math.max(0, currentVal + value));
-
+              const currentVal = currentAttributes[stat as keyof typeof currentAttributes] ?? 0;
+              (updatedAttributes as any)[stat] = Math.max(0, currentVal + value);
+              hasDecay = true;
             }
           });
+          if (hasDecay) {
+            playerStore.setAll({ attributes: updatedAttributes });
+          }
 
           // 7c. PARTNER BUFFS (Gelişmiş Partner Sistemi)
           // RAFA KALDIRILDI: ilişki modülü kapalıyken partner statlara dokunmaz.

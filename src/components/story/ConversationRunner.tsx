@@ -9,6 +9,7 @@ import type { Conversation } from '../../core/story/graph';
 import { CAST } from '../../data/story/cast';
 import type { Said } from '../../core/store/useStoryStore';
 import { useConversationRunnerLogic } from './logic/useConversationRunnerLogic';
+import { getChoiceBadges } from './effectBadges';
 import AnimatedBubble from './AnimatedBubble';
 import TypingIndicator from './TypingIndicator';
 
@@ -43,18 +44,33 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
             ? closeButton(() => finish())
             : isTyping
                 ? null
-                : available.map(({ choice, index }) => (
-                    <Pressable
-                        key={index}
-                        onPress={() => pick(choice, index)}
-                        style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
-                        <Text
-                            style={styles.answerText}
-                            maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
-                            {node ? answer(node.id, index, choice.text) : choice.text}
-                        </Text>
-                    </Pressable>
-                ));
+                : available.map(({ choice, index }) => {
+                    const badges = getChoiceBadges(choice.effects);
+                    return (
+                        <Pressable
+                            key={index}
+                            onPress={() => pick(choice, index)}
+                            style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
+                            <Text
+                                style={styles.answerText}
+                                maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
+                                {node ? answer(node.id, index, choice.text) : choice.text}
+                            </Text>
+                            {badges.length > 0 && (
+                                <View style={styles.badgeRow}>
+                                    {badges.map(b => (
+                                        <View key={b.id} style={[styles.badge, (styles as any)[`badge_${b.tone}`]]}>
+                                            {b.icon ? <Text style={styles.badgeIcon}>{b.icon}</Text> : null}
+                                            <Text style={[styles.badgeText, (styles as any)[`badgeText_${b.tone}`]]}>
+                                                {b.label}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+                        </Pressable>
+                    );
+                });
 
     return (
         <View style={styles.root}>
@@ -88,6 +104,18 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                             <Text style={[styles.said, said.from === 'player' && (variant === 'message' ? styles.saidMine : styles.saidLetterMine)]}>
                                 {said.text}
                             </Text>
+                            {said.from === 'player' && !!said.effects && said.effects.length > 0 && (
+                                <View style={styles.historyBadgeRow}>
+                                    {getChoiceBadges(said.effects).map(b => (
+                                        <View key={b.id} style={[styles.badge, (styles as any)[`badge_${b.tone}`]]}>
+                                            {b.icon ? <Text style={styles.badgeIcon}>{b.icon}</Text> : null}
+                                            <Text style={[styles.badgeText, (styles as any)[`badgeText_${b.tone}`]]}>
+                                                {b.label}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </View>
                     </AnimatedBubble>
                 ))}
@@ -227,5 +255,61 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         fontSize: theme.typography.body + 1,
         fontWeight: '600',
+    },
+    badgeRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 6,
+    },
+    historyBadgeRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 8,
+    },
+    badge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 8,
+        borderWidth: 1,
+    },
+    badgeIcon: {
+        fontSize: 11,
+        marginRight: 4,
+    },
+    badgeText: {
+        fontSize: 11,
+        fontWeight: '700',
+    },
+    badge_positive: {
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+        borderColor: 'rgba(16, 185, 129, 0.4)',
+    },
+    badgeText_positive: {
+        color: '#34D399',
+    },
+    badge_negative: {
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+        borderColor: 'rgba(239, 68, 68, 0.4)',
+    },
+    badgeText_negative: {
+        color: '#F87171',
+    },
+    badge_neutral: {
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+    },
+    badgeText_neutral: {
+        color: theme.colors.textPrimary,
+    },
+    badge_accent: {
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        borderColor: 'rgba(245, 158, 11, 0.4)',
+    },
+    badgeText_accent: {
+        color: '#FBBF24',
     },
 });

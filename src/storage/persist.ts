@@ -27,8 +27,41 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /** Keys whose disk copy has been read at least once this session. */
 const hydrated = new Set<string>();
 
+/** Pending writes queued for debounce to avoid freezing the JS thread with dozens of JSON serializations per quarter tick. */
+const pendingWrites = new Map<string, string>();
+const writeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+/** Flush a single key immediately to AsyncStorage */
+const flushKey = async (name: string): Promise<void> => {
+    const timer = writeTimers.get(name);
+    if (timer) {
+        clearTimeout(timer);
+        writeTimers.delete(name);
+    }
+    const value = pendingWrites.get(name);
+    if (value !== undefined) {
+        pendingWrites.delete(name);
+        try {
+            await AsyncStorage.setItem(name, value);
+        } catch (e) {
+            console.error(`[persist] Error writing ${name} to AsyncStorage`, e);
+        }
+    }
+};
+
+/** Flush all pending writes immediately (e.g. before app sleep or reset) */
+export const flushPendingStorageWrites = async (): Promise<void> => {
+    const keys = Array.from(pendingWrites.keys());
+    await Promise.all(keys.map(flushKey));
+};
+
 export const zustandStorage = {
     getItem: async (name: string): Promise<string | null> => {
+        // If there is a pending write in memory, return it directly
+        if (pendingWrites.has(name)) {
+            hydrated.add(name);
+            return pendingWrites.get(name)!;
+        }
         const value = await AsyncStorage.getItem(name);
         hydrated.add(name);
         return value;
@@ -52,10 +85,33 @@ export const zustandStorage = {
             }
             return;
         }
-        await AsyncStorage.setItem(name, value);
+
+        // Cache the latest value immediately in memory
+        pendingWrites.set(name, value);
+
+        // Clear existing timer for this key if rapid updates are happening
+        const existingTimer = writeTimers.get(name);
+        if (existingTimer) {
+            clearTimeout(existingTimer);
+        }
+
+        // Debounce actual disk I/O by 50ms so rapid updates during a quarter tick coalesce into 1 write
+        const timer = setTimeout(() => {
+            flushKey(name);
+        }, 50);
+        if (timer && typeof (timer as any).unref === 'function') {
+            (timer as any).unref();
+        }
+        writeTimers.set(name, timer);
     },
 
     removeItem: async (name: string): Promise<void> => {
+        const timer = writeTimers.get(name);
+        if (timer) {
+            clearTimeout(timer);
+            writeTimers.delete(name);
+        }
+        pendingWrites.delete(name);
         // A deliberate delete - starting a new game - is not a race. Let it
         // through, and treat the key as settled so later writes are not held.
         hydrated.add(name);

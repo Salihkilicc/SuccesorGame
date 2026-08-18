@@ -118,7 +118,7 @@ export const friendAsks: Conversation = {
             text: 'thank you so much. i will make sure this gets repaid properly.',
             choices: [
                 {
-                    text: 'You can do it again.',
+                    text: 'You would do the same for me.',
                     effects: [
                         { kind: 'capital', amount: -ASK },
                         { kind: 'flag', flag: 'friendHelped' },
@@ -188,7 +188,7 @@ export const friendGrows: Conversation = {
         ...STILL_SPEAKING,
         { kind: 'flag', flag: 'friendHelped' },
         { kind: 'noFlag', flag: 'friendGrewUp' },
-        { kind: 'quarterAtLeast', quarter: 60 },
+        { kind: 'quarterAtLeast', quarter: 24 },
     ],
     start: 'open',
     nodes: [
@@ -227,7 +227,7 @@ export const friendGrows: Conversation = {
             text: 'the truth: we nearly went under, and an old friend wired the money same-day with no questions asked.',
             choices: [
                 {
-                    text: 'There were not any.',
+                    text: 'No questions needed between friends.',
                     effects: [
                         { kind: 'flag', flag: 'friendGrewUp' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 10 },

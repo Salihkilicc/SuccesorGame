@@ -139,7 +139,7 @@ describe('they know HOW you refused', () => {
         // people, one fact - that is the whole test.
         expect(textOf(friendCondolencePublic)).toContain('NOT FOR SALE');
         expect(textOf(cfoCondolencePublic)).toContain('started a file');
-        expect(textOf(brotherCondolencePublic)).toContain('Seven point two million');
+        expect(textOf(brotherCondolencePublic)).toContain('{brotherShare}');
         expect(textOf(boardCondolencePublic)).toContain('was not consulted');
     });
 });

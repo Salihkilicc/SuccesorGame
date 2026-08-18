@@ -245,19 +245,20 @@ export const useMessageStore = create<MessageStore>()(
                         if (toAdd.length === 0) return t;
 
                         const base = t.messages.length;
+                        const allMessages = [
+                            ...t.messages,
+                            ...toAdd.map((l, i) => ({
+                                // Offset by what is already there, so ids
+                                // stay unique and stable as keys.
+                                id: `${threadId}-${base + i + 1}`,
+                                from: l.from,
+                                text: l.text,
+                                atMonth,
+                            })),
+                        ];
                         return {
                             ...t,
-                            messages: [
-                                ...t.messages,
-                                ...toAdd.map((l, i) => ({
-                                    // Offset by what is already there, so ids
-                                    // stay unique and stable as keys.
-                                    id: `${threadId}-${base + i + 1}`,
-                                    from: l.from,
-                                    text: l.text,
-                                    atMonth,
-                                })),
-                            ],
+                            messages: allMessages.length > 50 ? allMessages.slice(-50) : allMessages,
                         };
                     }),
                 })),
@@ -283,16 +284,17 @@ export const useMessageStore = create<MessageStore>()(
 
             sendFromPlayer: (threadId, text, atMonth) =>
                 set(state => ({
-                    threads: state.threads.map(t =>
-                        t.id === threadId
-                            ? {
-                                ...t,
-                                messages: [
-                                    ...t.messages,
-                                    { id: `${threadId}-${t.messages.length + 1}`, from: 'player', text, atMonth },
-                                ],
-                            }
-                            : t),
+                    threads: state.threads.map(t => {
+                        if (t.id !== threadId) return t;
+                        const nextMsgs = [
+                            ...t.messages,
+                            { id: `${threadId}-${t.messages.length + 1}`, from: 'player' as const, text, atMonth },
+                        ];
+                        return {
+                            ...t,
+                            messages: nextMsgs.length > 50 ? nextMsgs.slice(-50) : nextMsgs,
+                        };
+                    }),
                 })),
 
             sendFromCharacter: (who, text, atMonth) =>
@@ -323,9 +325,14 @@ export const useMessageStore = create<MessageStore>()(
                     // which is what every messaging app does and what makes an
                     // unread count findable.
                     const others = state.threads.filter(t => t.id !== who.id);
+                    const updatedMsgs = [...existing.messages, message];
                     return {
                         threads: [
-                            { ...existing, messages: [...existing.messages, message], unread: existing.unread + 1 },
+                            {
+                                ...existing,
+                                messages: updatedMsgs.length > 50 ? updatedMsgs.slice(-50) : updatedMsgs,
+                                unread: existing.unread + 1,
+                            },
                             ...others,
                         ],
                     };
