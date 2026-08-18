@@ -455,10 +455,10 @@ export const verifyNewGame = (): string[] => {
         check('subsidiary', 'owned', (sub.subsidiaries ?? []).length, 0);
 
         check('news', 'items', useNewsStore.getState().items.length, 0);
-        // The value you left a company at is a fact about the LAST run. If it
-        // survives, the next player starts in a market someone else reshaped.
         const mk = useMarketStore.getState() as any;
         check('market', 'valueAnchors', mk.valueAnchors ?? {}, {});
+        check('market', 'currentQuarter', mk.currentQuarter ?? 0, 0);
+        check('market', 'holdings', mk.holdings ?? [], []);
     } catch (e) {
         problems.push(`denetim calistirilamadi: ${String(e)}`);
     }

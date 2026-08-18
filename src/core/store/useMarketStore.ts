@@ -290,7 +290,13 @@ export const useMarketStore = create<MarketState>()(
             // `valueAnchors` is cleared with the rest: the companies you
             // reshaped in the last run are strangers to the next one.
             reset: () => set({
-                holdings: [], marketPrices: {}, competitorShares: {}, valueAnchors: {},
+                holdings: [],
+                marketPrices: {},
+                competitorShares: {},
+                valueAnchors: {},
+                marketTrend: 'FLAT',
+                priceHistory: {},
+                currentQuarter: 0,
             }),
 
             setValueAnchor: (id, price) => {

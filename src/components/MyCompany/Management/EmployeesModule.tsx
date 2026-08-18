@@ -92,9 +92,11 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
     const efficiency = efficiencyMultiplier(morale);
     const scrap = scrapMultiplier(morale);
 
+    const quarterStartSalaryRatio = useGameStore(s => s.quarterStartSalaryRatio ?? salaryRatio);
+
     const changeRatio = (next: number) => {
         const clamped = Math.min(SALARY_RATIO_MAX, Math.max(SALARY_RATIO_MIN, next));
-        const shock = payCutShock(salaryRatio, clamped);
+        const shock = payCutShock(quarterStartSalaryRatio, clamped);
         if (shock > 0) {
             setPanel({
                 title: t('alert.cutPay'),

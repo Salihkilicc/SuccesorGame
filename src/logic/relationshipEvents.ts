@@ -81,27 +81,33 @@ export const handleMessyBreakup = (reason: string = 'drifted'): RelationshipEven
 
     useStatsStore.setState((s) => ({ ...s, brandValue: newBrand }));
 
-    // 2. Financial Settlement (if married without prenup)
+    // 2. Financial Settlement (if married without prenup -> 50% Wealth Halving!)
     const playerStore = usePlayerStore.getState();
+    let settlementAmount = 0;
     if (wasMarriedWithoutPrenup) {
         const cash = playerStore.core.money;
-        const settlement = Math.round(cash * 0.15); // 15% cash settlement
-        if (settlement > 0) {
-            playerStore.spendMoney(settlement);
+        settlementAmount = Math.floor(cash * 0.5); // 50% divorce settlement (Nakit yarılanıyor)
+        if (settlementAmount > 0) {
+            playerStore.spendMoney(settlementAmount);
         }
     }
 
     // Adjust Player Vitals
-    playerStore.updateCore('stress', Math.min(100, playerStore.core.stress + 15));
-    playerStore.updateCore('happiness', Math.max(0, playerStore.core.happiness - 20));
+    playerStore.updateCore('stress', Math.min(100, playerStore.core.stress + 25));
+    playerStore.updateCore('happiness', Math.max(0, playerStore.core.happiness - 30));
 
     // 3. Formulate Dynamic Media Headline
     let headline = `Executive Separation: ${ceo} and ${partnerName} part ways.`;
     let newsBody = `Following a personal separation between ${ceo} and ${partnerName}, market observers note leadership restructuring at ${company}.`;
 
     if (partner.isMarried) {
-        headline = `High-Stakes Divorce: ${ceo} and ${partnerName} split amid corporate scrutiny.`;
-        newsBody = `Marital dissolution for ${company} leadership rattles headline columns as ${ceo} and ${partnerName} officially dissolve their marriage.`;
+        if (wasMarriedWithoutPrenup) {
+            headline = `High-Stakes Divorce: ${ceo} forfeits 50% fortune ($${(settlementAmount / 1_000_000).toFixed(1)}M) in split with ${partnerName}!`;
+            newsBody = `Marital dissolution for ${company} leadership rattles Wall Street as ${ceo} dissolves marriage without a prenup, transferring $${settlementAmount.toLocaleString()} to ${partnerName}.`;
+        } else {
+            headline = `Ironclad Divorce: ${ceo} and ${partnerName} dissolve marriage with protected assets.`;
+            newsBody = `Following the dissolution of marriage between ${ceo} and ${partnerName}, corporate assets and personal reserves remain protected under prenuptial terms.`;
+        }
     } else if (isElite) {
         headline = `High-Society Fallout: ${ceo} and ${partnerName} end relationship.`;
         newsBody = `Elite social circles report that ${ceo}, head of ${company}, and ${partnerName} have officially separated.`;
@@ -133,9 +139,12 @@ export const handleMessyBreakup = (reason: string = 'drifted'): RelationshipEven
 };
 
 // ============================================================================
-//  2. HANDLE MARRIAGE
+//  2. HANDLE MARRIAGE & PRENUP NEGOTIATION
 // ============================================================================
-export const handleMarriage = (hasPrenup: boolean = true): RelationshipEventResult => {
+export const handleMarriage = (
+    wantsPrenup: boolean = true,
+    locationBonus: number = 0,
+): RelationshipEventResult & { wasForcedPrenup?: boolean; actualPrenup?: boolean; settlementProtected?: boolean } => {
     const familyStore = useFamilyStore.getState();
     const partner = familyStore.partner;
 
@@ -164,13 +173,46 @@ export const handleMarriage = (hasPrenup: boolean = true): RelationshipEventResu
     const company = getCompanyName();
     const partnerName = partner.name;
 
-    // 1. Moderate Brand Value Surge (+3 to +4 points)
+    // === 1. PRENUP ACCEPTANCE PROBABILITY LOGIC ===
+    // Base chance is partner's romantic love level (0-100)
+    const baseChance = partner.love;
+
+    // Intelligent partners resent prenups more: penalty = 30 + (intelligence / 5)
+    const partnerIntelligence = partner.stats?.intelligence || 50;
+    const prenupPenalty = wantsPrenup ? 30 + Math.floor(partnerIntelligence / 5) : 0;
+    const finalChance = Math.max(5, Math.min(98, baseChance - prenupPenalty + locationBonus));
+
+    // Special Classes (Royalty, BillionaireHeir) ALWAYS require a Prenup
+    const forcedPrenup = (['Royalty', 'BillionaireHeir'] as SocialClass[]).includes(partner.stats.socialClass);
+    const actualPrenup = wantsPrenup || forcedPrenup;
+
+    const roll = Math.random() * 100;
+
+    // Check if rejected due to prenup demand
+    if (roll > finalChance && wantsPrenup && !forcedPrenup) {
+        // Love drops by 20 due to prenup insult/trust issues
+        familyStore.updateLove(-20);
+        const playerStore = usePlayerStore.getState();
+        playerStore.updateCore('happiness', Math.max(0, playerStore.core.happiness - 15));
+        playerStore.updateCore('stress', Math.min(100, playerStore.core.stress + 10));
+
+        const rejRes = handleProposalRejected(partnerName);
+        return {
+            success: false,
+            error: `${partnerName} was insulted by the Prenup demand and refused your proposal! Trust damaged (-20 Love).`,
+            brandValueDelta: rejRes.brandValueDelta,
+            newBrandValue: rejRes.newBrandValue,
+            newsHeadline: rejRes.newsHeadline,
+            actualPrenup: false,
+        };
+    }
+
+    // === 2. MARRIAGE ACCEPTED ===
     const isElite = (
         ['HighSociety', 'OldMoney', 'Royalty', 'BillionaireHeir'] as SocialClass[]
     ).includes(partner.stats.socialClass);
 
     const brandBoost = isElite ? 4 : 3;
-
     const currentBrand = useStatsStore.getState().brandValue ?? 18;
     const newBrand = Math.min(100, currentBrand + brandBoost);
     const brandDelta = newBrand - currentBrand;
@@ -179,15 +221,21 @@ export const handleMarriage = (hasPrenup: boolean = true): RelationshipEventResu
 
     // Boost Player Vitals
     const playerStore = usePlayerStore.getState();
-    playerStore.updateCore('happiness', Math.min(100, playerStore.core.happiness + 20));
-    playerStore.updateCore('stress', Math.max(0, playerStore.core.stress - 10));
+    playerStore.updateCore('happiness', Math.min(100, playerStore.core.happiness + 25));
+    playerStore.updateCore('stress', Math.max(0, playerStore.core.stress - 15));
 
-    // 2. Formulate Positive Dynamic Headline
+    // Formulate Positive Dynamic Headline
+    const prenupNotice = forcedPrenup && !wantsPrenup
+        ? ' (Royal dynasty insisted on ironclad prenuptial agreement)'
+        : actualPrenup
+        ? ' (Protected with prenuptial accord)'
+        : ' (Without prenuptial agreement — 50% fortune at stake)';
+
     const headline = isElite
         ? `High-Society Wedding: ${ceo} and ${partnerName} marry in lavish ceremony!`
         : `Executive Milestone: ${company} CEO ${ceo} ties the knot with ${partnerName}.`;
 
-    const newsBody = `In a celebrated high-profile union, ${ceo}, CEO of ${company}, has married ${partnerName}. The union signals long-term stability and bolsters ${company}'s public prestige.`;
+    const newsBody = `In a celebrated high-profile union, ${ceo}, CEO of ${company}, has married ${partnerName}${prenupNotice}. The union signals long-term stability and bolsters ${company}'s public prestige.`;
 
     const newsPayload: NewsPayload = {
         type: 'player',
@@ -202,14 +250,17 @@ export const handleMarriage = (hasPrenup: boolean = true): RelationshipEventResu
 
     useNewsStore.getState().addSingleNews(newsPayload);
 
-    // 3. Update Family Store
-    familyStore.marry(hasPrenup);
+    // Save marriage status & prenup state to FamilyStore
+    familyStore.marry(actualPrenup);
 
     return {
         success: true,
         brandValueDelta: brandDelta,
         newBrandValue: newBrand,
         newsHeadline: headline,
+        wasForcedPrenup: forcedPrenup,
+        actualPrenup,
+        settlementProtected: actualPrenup,
     };
 };
 

@@ -1,45 +1,4 @@
-// src/components/common/SwipeToDelete.tsx
-//
-// ============================================================================
-//  DRAG A ROW LEFT TO THROW IT AWAY
-// ============================================================================
-//
-//  The inbox and the messages list both fill up and neither had any way to
-//  empty. `deleteMail` had been on the mail store since it was written and
-//  nothing called it; `removeThread` arrived with the father's death and was
-//  reachable only by dying. Two working deletes and no way for a player to
-//  reach either - which is this codebase's recurring failure, and this time it
-//  is the gesture that was missing rather than the function.
-//
-//  ---------------------------------------------------------------------------
-//  PANRESPONDER, NOT A LIBRARY
-//  ---------------------------------------------------------------------------
-//  react-native-gesture-handler is not in this project and adding a native
-//  dependency for one gesture means a pod install, a rebuild, and a second way
-//  of handling touches that the rest of the app does not use. PanResponder
-//  ships with React Native and does this one thing adequately.
-//
-//  The cost is honest: no velocity-based fling, and the row does not rubber-
-//  band at the end of its travel. Neither is worth a native module.
-//
-//  ---------------------------------------------------------------------------
-//  IT DOES NOT ASK
-//  ---------------------------------------------------------------------------
-//  The first version put an Alert in the way. It was wrong for the job: the
-//  whole point of the gesture is clearing five finished threads in five
-//  seconds, and a box after each one turns a sweep into an interrogation.
-//
-//  So the confirmation is gone and the DISTANCE does the work instead. An
-//  ordinary row goes at a quarter of the screen. A row carrying something that
-//  cannot come back needs most of the screen, which is a deliberate movement
-//  rather than a flick and is still one gesture.
-//
-//  That is a worse guard than a box and a much better control, and the trade
-//  is worth stating: a player CAN lose an unplayed scene to a long accidental
-//  swipe. They cannot lose one to a careless one.
-// ============================================================================
-
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     View,
     Text,
@@ -47,14 +6,16 @@ import {
     Animated,
     PanResponder,
     Dimensions,
+    Pressable,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { theme } from '../../core/theme';
 
 const { width: SCREEN } = Dimensions.get('window');
 
 /**
- * How far left the row must go before the delete counts.
+ * How far left the row must go before the delete counts for full swipe.
  *
  * A quarter of the screen. Short enough to be one movement, long enough that
  * the horizontal component of a scroll cannot reach it by accident.
@@ -62,72 +23,109 @@ const { width: SCREEN } = Dimensions.get('window');
 export const DELETE_THRESHOLD = SCREEN * 0.25;
 
 /**
- * And how far a row that is carrying something has to go.
+ * And how far a row that is carrying something has to go for full swipe.
  *
- * Most of the screen. There is no dialog any more, so this is the only thing
- * standing between a careless flick and a scene nobody will ever read - and it
- * has to be reachable, because the player is allowed to throw these away. A
- * deliberate movement rather than a flick.
+ * Most of the screen for direct drag fling. Alternatively, partial swipe
+ * reveals the Delete button which can be tapped directly.
  */
 export const GUARDED_THRESHOLD = SCREEN * 0.6;
 
-/**
- * How much sideways movement claims the gesture from the list.
- *
- * The second number is what stops the row fighting the scroll view: the drag
- * has to be more horizontal than vertical before this responder takes it, so a
- * finger travelling down the list is never intercepted.
- */
-const CLAIM_DX = 12;
-const CLAIM_RATIO = 1.6;
+const ACTION_WIDTH = 80;
+const CLAIM_DX = 10;
 
 type Props = {
     children: React.ReactNode;
     /**
-     * What this row is, for anything that needs to name it.
-     *
-     * @orphan-ok-symbol label
-     *
-     * DELIBERATELY UNUSED as of the commit that removed the confirmation - it
-     * was the only thing that read it. Kept because the next thing this
-     * component wants is an undo toast, and a toast has to say what it undid.
+     * What this row is, for accessibility / naming.
      */
     label: string;
     /**
      * This row is carrying something that cannot come back.
-     *
-     * A finished conversation and an unplayed one look identical in a list,
-     * and the whole reason this gesture exists is to clear the finished ones.
-     * A guarded row needs a longer swipe and says so on the panel behind it.
      */
     guarded?: boolean;
     onDelete: () => void;
 };
 
 const SwipeToDelete = ({ children, label, guarded, onDelete }: Props) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const isOpenRef = useRef(false);
+    const isDeleting = useRef(false);
     const x = useRef(new Animated.Value(0)).current;
-    const settle = () =>
-        Animated.spring(x, { toValue: 0, useNativeDriver: true, bounciness: 0 }).start();
+
+    const settle = () => {
+        isOpenRef.current = false;
+        setIsOpen(false);
+        Animated.spring(x, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 0,
+        }).start();
+    };
+
+    const open = () => {
+        isOpenRef.current = true;
+        setIsOpen(true);
+        Animated.spring(x, {
+            toValue: -ACTION_WIDTH,
+            useNativeDriver: true,
+            bounciness: 2,
+        }).start();
+    };
+
+    const triggerDelete = () => {
+        if (isDeleting.current) return;
+        isDeleting.current = true;
+        Animated.timing(x, {
+            toValue: -SCREEN,
+            duration: 180,
+            useNativeDriver: true,
+        }).start(() => onDelete());
+    };
 
     const responder = useRef(
         PanResponder.create({
+            onStartShouldSetPanResponder: () => false,
+            onStartShouldSetPanResponderCapture: () => false,
+            onMoveShouldSetPanResponderCapture: (_e, g) =>
+                Math.abs(g.dx) > CLAIM_DX && Math.abs(g.dx) > Math.abs(g.dy) * 1.2,
             onMoveShouldSetPanResponder: (_e, g) =>
-                g.dx < -CLAIM_DX && Math.abs(g.dx) > Math.abs(g.dy) * CLAIM_RATIO,
+                Math.abs(g.dx) > CLAIM_DX && Math.abs(g.dx) > Math.abs(g.dy) * 1.2,
+            onPanResponderTerminationRequest: () => false,
+            onPanResponderGrant: () => {
+                x.stopAnimation();
+            },
             onPanResponderMove: (_e, g) => {
-                // Left only. Dragging a row to the right does not mean
-                // anything here, and letting it move implies it might.
-                x.setValue(Math.min(0, g.dx));
+                if (isDeleting.current) return;
+                const base = isOpenRef.current ? -ACTION_WIDTH : 0;
+                const nextVal = Math.min(0, base + g.dx);
+                x.setValue(nextVal);
             },
             onPanResponderRelease: (_e, g) => {
+                if (isDeleting.current) return;
+                const base = isOpenRef.current ? -ACTION_WIDTH : 0;
+                const totalOffset = base + g.dx;
                 const needed = guarded ? GUARDED_THRESHOLD : DELETE_THRESHOLD;
-                if (g.dx > -needed) { settle(); return; }
-                // Off the edge first, then out of the store, so the row leaves
-                // rather than blinking out from under the finger.
-                Animated.timing(x, {
-                    toValue: -SCREEN,
-                    duration: 160,
-                    useNativeDriver: true,
-                }).start(() => onDelete());
+
+                // 1. Full swipe past threshold or fast flick left
+                if (totalOffset <= -needed || g.vx < -0.55) {
+                    triggerDelete();
+                    return;
+                }
+
+                // 2. Swiping right when already open closes the row
+                if (isOpenRef.current && g.dx > 20) {
+                    settle();
+                    return;
+                }
+
+                // 3. Partial swipe left opens the action button
+                if (totalOffset < -ACTION_WIDTH * 0.45) {
+                    open();
+                    return;
+                }
+
+                // 4. Default: snap back to closed
+                settle();
             },
             onPanResponderTerminate: settle,
         }),
@@ -135,31 +133,33 @@ const SwipeToDelete = ({ children, label, guarded, onDelete }: Props) => {
 
     return (
         <View style={styles.root}>
-            {/* ------------------------------------------------------------
-                BEHIND THE ROW, IN THE ONE COLOUR THAT MEANS THIS
-
-                `destructive` and not a red fill. Red in this game means
-                "this is costing you" and it is a TEXT token - a red panel
-                would be the third thing red says, and the rule is that a
-                colour which means something means one thing. See the palette
-                note in core/theme.ts.
-
-                White on it measures 5.77.
-               ------------------------------------------------------------ */}
-            <View style={styles.behind} pointerEvents="none">
-                {/* The panel is the only warning there is now, so a guarded
-                    row says what it is rather than saying Delete twice as
-                    loudly. `label` is not repeated here - the row itself is
-                    directly on top of this and already says who it is from. */}
-                <Text style={styles.behindText}>
-                    {guarded ? 'Not played yet' : 'Delete'}
-                </Text>
+            {/* Behind Action Panel */}
+            <View style={styles.behindContainer}>
+                <Pressable
+                    style={styles.deleteButton}
+                    onPress={triggerDelete}
+                    accessibilityRole="button"
+                    accessibilityLabel={guarded ? `Delete ${label} (not played yet)` : `Delete ${label}`}>
+                    <MaterialCommunityIcons name="trash-can-outline" size={22} color="#FFFFFF" />
+                    <Text style={styles.behindText} numberOfLines={1}>
+                        {guarded ? 'Not played' : 'Delete'}
+                    </Text>
+                </Pressable>
             </View>
 
+            {/* Foreground Row */}
             <Animated.View
                 style={{ transform: [{ translateX: x }] }}
                 {...responder.panHandlers}>
                 {children}
+
+                {/* Tap on row while open closes the row instead of triggering row navigation */}
+                {isOpen && (
+                    <Pressable
+                        style={StyleSheet.absoluteFill}
+                        onPress={settle}
+                    />
+                )}
             </Animated.View>
         </View>
     );
@@ -168,19 +168,32 @@ const SwipeToDelete = ({ children, label, guarded, onDelete }: Props) => {
 export default SwipeToDelete;
 
 const styles = StyleSheet.create({
-    root: { position: 'relative' },
-    behind: {
+    root: {
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: theme.radius.lg,
+    },
+    behindContainer: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: theme.colors.destructive,
         borderRadius: theme.radius.lg,
-        alignItems: 'flex-end',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    deleteButton: {
+        width: ACTION_WIDTH,
+        height: '100%',
         justifyContent: 'center',
-        paddingRight: theme.spacing.lg,
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 4,
     },
     behindText: {
         color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: '800',
-        letterSpacing: 0.5,
+        fontSize: 11,
+        fontWeight: '700',
+        letterSpacing: 0.3,
+        textTransform: 'uppercase',
     },
 });

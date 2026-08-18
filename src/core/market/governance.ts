@@ -264,6 +264,10 @@ export interface CompanyContext {
     lossStreak: number;
     /** Hisse fiyati zirveye gore nerede (0-1) */
     priceVsPeak: number;
+    /** Mevcut oyun ayi (1..n) */
+    currentMonth?: number;
+    /** Mevcut mutlak ceyrek (1..n) */
+    quarter?: number;
 }
 
 // ----------------------------------------------------------------------------
@@ -782,12 +786,22 @@ export interface NoConfidenceCheck {
     conditionsMet: number;
     /** How far to the next stage — an early warning */
     warning?: string;
+    /** Ilk 4 sene (48 ay / 16 ceyrek) kurucu korumasi devrede mi */
+    inGracePeriod?: boolean;
 }
 
 /** This many consecutive loss quarters trips the performance condition. */
 export const NO_CONFIDENCE_LOSS_STREAK = 4;
 /** Below this average board loyalty, the relationship condition is met. */
 export const NO_CONFIDENCE_TRUST = 35;
+
+/**
+ * Ilk 4 sene (48 ay / 16 ceyrek) kurucu korumasi.
+ * Sirket baslangicta Ar-Ge, fabrika ve kadro yatirimlari nedeniyle zararla calisir;
+ * kurul bu donemde CEO'yu gorevden alamaz.
+ */
+export const FOUNDER_GRACE_PERIOD_MONTHS = 48;
+export const FOUNDER_GRACE_PERIOD_QUARTERS = 16;
 
 /**
  * THE ODDS THAT A MEMBER ACTUALLY BACKS YOU.
@@ -827,6 +841,11 @@ export const checkNoConfidence = (
 ): NoConfidenceCheck => {
     const reasons: string[] = [];
 
+    // GRACE PERIOD (ilk 4 sene - 48 ay / 16 ceyrek):
+    // Sirket baslangicta yatirim ve olceklenme doneminde oldugundan kurul kurucuyu atamaz.
+    const inGracePeriod = (ctx.currentMonth !== undefined && ctx.currentMonth <= FOUNDER_GRACE_PERIOD_MONTHS) ||
+                          (ctx.quarter !== undefined && ctx.quarter <= FOUNDER_GRACE_PERIOD_QUARTERS);
+
     // 1) KONTROL — cogunluktaysan kimse seni indiremez. Matematiksel.
     const lostControl = playerOwnershipPercent < CONTROL_THRESHOLD;
     if (lostControl) {
@@ -863,16 +882,23 @@ export const checkNoConfidence = (
 
     const conditionsMet = [lostControl, lostRoom, failing].filter(Boolean).length;
 
-    // ERKEN UYARI: iki kosul saglandiysa oyuncu ucuncusunun geldigini
-    // gormeli. Habersiz kaybetmek adil degil.
+    // ERKEN UYARI / BILGILENDIRME:
     let warning: string | undefined;
-    if (conditionsMet === 2) {
+    if (inGracePeriod) {
+        warning = t('gov.inGracePeriod');
+    } else if (conditionsMet === 2) {
         if (!lostControl) warning = t('gov.warnControl');
         else if (!lostRoom) warning = t('gov.warnTrust');
         else warning = t('gov.warnPerformance');
     }
 
-    return { triggered: conditionsMet === 3, reasons, conditionsMet, warning };
+    return {
+        triggered: !inGracePeriod && conditionsMet === 3,
+        reasons,
+        conditionsMet,
+        warning,
+        inGracePeriod,
+    };
 };
 
 /**

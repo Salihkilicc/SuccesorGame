@@ -10,7 +10,7 @@
 //  The only way to get money out was a dividend, which pays every shareholder
 //  and therefore mostly pays other people.
 //
-//  This is the other lever: an annual bonus of 2% of the year's profit,
+//  This is the other lever: an annual bonus of 4% of the year's profit,
 //  struck AFTER tax, paid once every four quarters into personal cash.
 //
 //  Four rules, and each one exists for a reason:
@@ -38,8 +38,8 @@
 //  is the whole point of the mechanic.
 // ============================================================================
 
-/** 2% of the year's after-tax profit. */
-export const CEO_BONUS_RATE = 0.02;
+/** 4% of the year's after-tax profit. */
+export const CEO_BONUS_RATE = 0.04;
 
 /** Four quarters to a bonus year. */
 export const BONUS_PERIOD_QUARTERS = 4;

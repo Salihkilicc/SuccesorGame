@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, Pressable, Animated, Vibration, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { CasinoTheme } from '../data/casinoData';
 import { theme } from '../../../core/theme';
 
@@ -26,27 +26,19 @@ const ChipItem = ({
 
     const handlePressIn = () => {
         Animated.spring(scaleAnim, {
-            toValue: 1.2,
+            toValue: 1.06,
             useNativeDriver: true,
-            speed: 20,
-            bounciness: 10,
+            speed: 30,
+            bounciness: 2,
         }).start();
-
-        // Haptic feedback simulation
-        if (Platform.OS === 'ios') {
-            const type = isSelected ? 'impactLight' : 'selection'; // Logical placeholder if using expo-haptics, but here we use Vibration
-            Vibration.vibrate(10); // Light vibration
-        } else {
-            Vibration.vibrate(20);
-        }
     };
 
     const handlePressOut = () => {
         Animated.spring(scaleAnim, {
             toValue: 1,
             useNativeDriver: true,
-            speed: 20,
-            bounciness: 10,
+            speed: 30,
+            bounciness: 2,
         }).start();
     };
 

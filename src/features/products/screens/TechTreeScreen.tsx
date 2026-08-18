@@ -369,14 +369,14 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     balanceValue: {
-        fontSize: 18,
-        fontWeight: '800',
+        fontSize: 13,
+        fontWeight: '700',
         color: theme.colors.textPrimary,
     },
     balanceCash: {
-        fontSize: 12,
+        fontSize: 10.5,
         color: theme.colors.textSecondary,
-        marginTop: 2,
+        marginTop: 1,
     },
     gateNote: {
         marginHorizontal: theme.spacing.lg,

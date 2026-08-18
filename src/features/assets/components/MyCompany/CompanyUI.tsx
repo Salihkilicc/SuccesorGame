@@ -25,11 +25,12 @@ export const StatColumn = ({ label, value, colorType = 'default' }: { label: str
 // the card is nine numbers summarising the quarter, and the report is those
 // nine numbers explained. A chevron marks it, because a card that reacts to
 // being pressed without ever saying it would is a trap the second time.
-export const DashboardCard = ({ title, children, rightContent, onPress }: {
+export const DashboardCard = ({ title, children, rightContent, onPress, showChevron = false }: {
   title: string,
   children: React.ReactNode,
   rightContent?: React.ReactNode,
   onPress?: () => void,
+  showChevron?: boolean,
 }) => {
   const body = (
     <>
@@ -37,7 +38,7 @@ export const DashboardCard = ({ title, children, rightContent, onPress }: {
         <Text style={styles.cardTitle}>{title}</Text>
         <View style={styles.headerRight}>
           {rightContent}
-          {!!onPress && <Text style={styles.cardChevron}>›</Text>}
+          {showChevron && <Text style={styles.cardChevron}>›</Text>}
         </View>
       </View>
       <View style={styles.contentRow}>

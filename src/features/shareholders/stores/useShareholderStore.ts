@@ -1734,7 +1734,9 @@ export const useShareholderStore = create<ShareholderState>()(
             runNoConfidence: (ctx, quarter = 0) => {
                 const { members, playerShareCount, totalShares } = get();
                 const gov: GovMember[] = members.map(toGov);
-                const check = checkNoConfidence(gov, get().getPlayerOwnershipPercent(), ctx);
+                const currentMonth = ctx.currentMonth ?? (quarter > 0 ? quarter * 3 : 0);
+                const enrichedCtx = { ...ctx, quarter, currentMonth };
+                const check = checkNoConfidence(gov, get().getPlayerOwnershipPercent(), enrichedCtx);
                 set({ noConfidenceLevel: check.conditionsMet });
 
                 if (!check.triggered) {
@@ -1749,7 +1751,7 @@ export const useShareholderStore = create<ShareholderState>()(
                 }
 
                 applyGovernanceSignal('no_confidence_called');
-                const result = voteNoConfidence(gov, playerShareCount, ctx, totalShares);
+                const result = voteNoConfidence(gov, playerShareCount, enrichedCtx, totalShares);
                 applyGovernanceSignal(result.passed ? 'ceo_removed' : 'ceo_survived');
 
                 set(state => ({

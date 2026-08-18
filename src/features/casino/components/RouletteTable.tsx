@@ -12,6 +12,7 @@ interface RouletteTableProps {
 }
 
 // The standard roulette table layout: 3 columns × 12 rows
+// The standard roulette table layout: 3 columns × 12 rows
 // Column order (left to right): col1, col2, col3
 // Row 1: 1, 2, 3 ... Row 12: 34, 35, 36
 const ROULETTE_GRID: number[][] = [];
@@ -23,7 +24,7 @@ for (let row = 0; row < 12; row++) {
 const NUMBER_COLORS: Record<number, string> = {};
 for (let i = 0; i <= 36; i++) {
   const c = getNumberColor(i);
-  NUMBER_COLORS[i] = c === 'red' ? '#C0392B' : c === 'black' ? '#2C3E50' : '#27AE60';
+  NUMBER_COLORS[i] = c === 'red' ? '#B91C1C' : c === 'black' ? '#15191E' : '#166534';
 }
 
 const formatChipAmount = (val: number): string => {
@@ -75,6 +76,7 @@ const AreaBetButton = ({
   betAmount,
   onPress,
   color,
+  customBg,
   disabled,
 }: {
   label: string;
@@ -82,6 +84,7 @@ const AreaBetButton = ({
   betAmount: number;
   onPress: () => void;
   color?: string;
+  customBg?: string;
   disabled?: boolean;
 }) => (
   <Pressable
@@ -90,6 +93,7 @@ const AreaBetButton = ({
     style={({ pressed }) => [
       styles.areaBetBtn,
       color ? { borderColor: color } : {},
+      customBg ? { backgroundColor: customBg } : {},
       pressed && !disabled && styles.cellPressed,
       disabled && { opacity: 0.6 },
     ]}
@@ -178,19 +182,21 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           disabled={disabled}
         />
         <AreaBetButton
-          label="RED"
+          label="◆ RED"
           betType="RED"
           betAmount={getBetOnPosition('RED')}
           onPress={() => onPlaceBet('RED')}
-          color="#C0392B"
+          color="#FF6B6B"
+          customBg="#881337"
           disabled={disabled}
         />
         <AreaBetButton
-          label="BLACK"
+          label="◆ BLACK"
           betType="BLACK"
           betAmount={getBetOnPosition('BLACK')}
           onPress={() => onPlaceBet('BLACK')}
-          color="#2C3E50"
+          color="#E2E8F0"
+          customBg="#0F172A"
           disabled={disabled}
         />
         <AreaBetButton
@@ -216,35 +222,37 @@ export default RouletteTable;
 
 const styles = StyleSheet.create({
   container: {
-    gap: 6,
+    gap: 4,
   },
 
   // Grid
   gridScroll: {
-    maxHeight: 320,
+    maxHeight: 250,
   },
   gridContainer: {
-    gap: 3,
+    gap: 2,
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 3,
+    gap: 2,
   },
   numberCell: {
     flex: 1,
-    height: 44,
-    borderRadius: 6,
+    height: 32,
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   zeroCell: {
-    height: 44,
-    borderRadius: 6,
+    height: 32,
+    borderRadius: 5,
   },
   numberText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
   },
   cellPressed: {
@@ -264,11 +272,11 @@ const styles = StyleSheet.create({
     minWidth: 18,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.2)',
+    borderColor: 'rgba(0,0,0,0.3)',
   },
   areaChipIndicator: {
-    top: -6,
-    right: -6,
+    top: -5,
+    right: -5,
   },
   chipIndicatorText: {
     fontSize: 8,
@@ -280,7 +288,7 @@ const styles = StyleSheet.create({
   dozenRow: {
     flexDirection: 'row',
     gap: 3,
-    marginTop: 4,
+    marginTop: 2,
   },
 
   // Area bets
@@ -292,17 +300,17 @@ const styles = StyleSheet.create({
   areaBetBtn: {
     flexBasis: '32%',
     flexGrow: 1,
-    height: 40,
-    borderRadius: 6,
+    height: 32,
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.18)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     position: 'relative',
   },
   areaBetText: {
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.9)',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.5,

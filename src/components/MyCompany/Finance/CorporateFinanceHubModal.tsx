@@ -283,7 +283,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     value={formatMoney(bonusAccrual.profitAccrued)}
                                     tone={bonusAccrual.profitAccrued >= 0 ? 'positive' : 'negative'}
                                 />
-                                <DetailLine label="Your share" value="2%" />
+                                <DetailLine label="Your share" value="4%" />
                                 <DetailLine
                                     label="Paid on"
                                     value={`quarter ${BONUS_PERIOD_QUARTERS} of ${BONUS_PERIOD_QUARTERS}`}
@@ -296,7 +296,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                     />
                                 )}
                                 <DetailNote>
-                                    2% of what the company keeps after tax over four quarters, paid
+                                    4% of what the company keeps after tax over four quarters, paid
                                     into your personal cash. It comes out of company capital, so it
                                     is real money leaving the business. A year that lost money pays
                                     nothing, and that loss does not follow you into the next year.

@@ -182,11 +182,18 @@ export const FamilyMemberScreen: React.FC = () => {
     };
 
     const handleDecidePrenup = (wantsPrenup: boolean) => {
-        const res = handleMarriage(wantsPrenup);
+        const { PROPOSAL_LOCATIONS } = require('../../love/data/loveConstants');
+        const location = PROPOSAL_LOCATIONS[selectedLocationIndex];
+        const res = handleMarriage(wantsPrenup, location?.bonus || 0);
+
         if (res.success) {
+            const prenupBadge = res.actualPrenup
+                ? '\n\n🛡️ Prenup Signed: Your personal wealth is 100% protected in case of divorce.'
+                : '\n\n⚠️ No Prenup: In case of divorce, 50% of your personal fortune will be forfeited.';
+
             setProposalResult({
                 success: true,
-                message: `💍 ${name} said YES! Corporate Brand Surge: +${res.brandValueDelta} pts.\n\nMedia: "${res.newsHeadline}"`,
+                message: `💍 ${name} said YES! Corporate Brand Surge: +${res.brandValueDelta} pts.${prenupBadge}\n\nMedia: "${res.newsHeadline}"`,
             });
         } else {
             setProposalResult({

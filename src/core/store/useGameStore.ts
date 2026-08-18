@@ -161,6 +161,8 @@ export type GameState = {
   salaryPolicy: 'low' | 'avg' | 'high';
   /** Fazla mesai acik mi — kapasitenin %115'ine cikar, maas 1.5x, moral -3 */
   overtimeEnabled: boolean;
+  /** Ceyrek basinda fiilen odenmis olan baz maas orani */
+  quarterStartSalaryRatio: number;
   /** Bir sonraki ceyrek uygulanacak maas kesintisi soku */
   pendingPayCutShock: number;
   eventsHostedThisQuarter: number;
@@ -209,6 +211,7 @@ export const initialGameState: GameState = {
   employeeMorale: 75,
   salaryPolicy: 'avg',
   overtimeEnabled: false,
+  quarterStartSalaryRatio: 1.0,
   pendingPayCutShock: 0,
   eventsHostedThisQuarter: 0,
   lastQuarterProfit: 0,
@@ -1453,6 +1456,7 @@ export const useGameStore = create<GameStore>()(
 
         useStatsStore.getState().update({
           brandValue: corporateQ,
+          brandChange: corporateQ - (stats.brandValue || 0),
           brandByCategory: nextByCategory,
           brandFloorByCategory: nextFloors,
           employeeCount: headcount,
@@ -1844,12 +1848,16 @@ export const useGameStore = create<GameStore>()(
           const fmtMoney = require('../utils').formatMoney;
           const priceHist = useEquityStore.getState().priceHistory || [];
           const peak = priceHist.length ? Math.max(...priceHist, newSharePrice) : newSharePrice;
+          const currentMonthVal = get().currentMonth;
+          const absoluteQuarter = Math.ceil(currentMonthVal / 3);
           const boardCtx = {
             profitable: netProfit > 0,
             leverage: assessment.leverage === Infinity ? 99 : assessment.leverage,
             inBreach: assessment.inBreach,
             lossStreak: netProfit > 0 ? 0 : ((stats as any).lossStreak || 0) + 1,
             priceVsPeak: peak > 0 ? newSharePrice / peak : 1,
+            currentMonth: currentMonthVal,
+            quarter: absoluteQuarter,
           };
 
           const events: { kind: string; magnitude: number; label: string }[] = [];
@@ -2042,7 +2050,7 @@ export const useGameStore = create<GameStore>()(
             }
           } catch (e) { console.warn('[Board] demand review failed', e); }
 
-          const nc = shStore.getState().runNoConfidence(boardCtx, quarterIndex);
+          const nc = shStore.getState().runNoConfidence(boardCtx, absoluteQuarter);
           if (nc.called) {
             useStatsStore.getState().update({
               distressMessage: nc.result?.summary,
@@ -2079,6 +2087,7 @@ export const useGameStore = create<GameStore>()(
           set(state => ({
             ...state,
             employeeMorale: newMorale,
+            quarterStartSalaryRatio: stats.salaryRatio ?? 1.0,
             pendingPayCutShock: 0,
             eventsHostedThisQuarter: 0,
             lastQuarterProfit: netProfit,
@@ -2562,16 +2571,15 @@ export const useGameStore = create<GameStore>()(
 
       /**
        * Maas oranini degistirir.
-       * YUKARI cikmak serbest; ASAGI inmek tek seferlik agir bir moral
-       * cezasi getirir. Boylece maas da bir taahhut olur.
+       * Ceyrek basindaki fiili maasa gore ASAGI inmek ceyrek sonunda moral cezasi getirir.
+       * Ayni ceyrek icinde yapilan artirip azaltmalar gereksiz ceza olusturmaz.
        */
       setSalaryRatio: (ratio: number) => {
         const stats = useStatsStore.getState();
-        const shock = payCutShock(stats.salaryRatio ?? 1, ratio);
+        const baseline = get().quarterStartSalaryRatio ?? stats.salaryRatio ?? 1.0;
+        const shock = payCutShock(baseline, ratio);
         stats.setSalaryRatio(ratio);
-        if (shock > 0) {
-          set(state => ({ ...state, pendingPayCutShock: state.pendingPayCutShock + shock }));
-        }
+        set(state => ({ ...state, pendingPayCutShock: shock }));
       },
 
       setSalaryPolicy: (policy) => {

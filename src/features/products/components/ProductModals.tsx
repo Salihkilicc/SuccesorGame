@@ -1409,14 +1409,14 @@ const styles = StyleSheet.create({
     closeIcon: { fontSize: 24, color: 'rgba(255,255,255,0.48)' },
     rpBadge: {
         backgroundColor: theme.colors.surfaceRaised,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         borderRadius: 8,
     },
     rpBadgeText: {
         color: theme.colors.rp,
-        fontSize: 14,
-        fontWeight: '800',
+        fontSize: 12,
+        fontWeight: '700',
     },
     progressBarContainer: {
         marginVertical: 12,

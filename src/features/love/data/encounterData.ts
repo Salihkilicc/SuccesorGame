@@ -5,6 +5,78 @@ export type EncounterScenario = {
 };
 
 export const ENCOUNTER_DATA: Record<string, EncounterScenario[]> = {
+    VIP_LOUNGE: [
+        {
+            id: 'vip_davos',
+            text: 'In the private delegates lounge at the World Economic Forum in Davos, a brilliant managing director challenges your market thesis over an espresso by the snowbound fireplace.',
+            flirt: 'Smile and propose settling the debate over an intimate dinner in Klosters.',
+        },
+        {
+            id: 'vip_ma_war_room',
+            text: 'Following grueling 14-hour boardroom acquisition negotiations, the lead M&A partner for the opposing syndicate lingers in the executive hallway with a knowing smirk.',
+            flirt: 'Admit that their ruthless cross-examination was captivating, and invite them for a midnight drink.',
+        },
+        {
+            id: 'vip_silicon_summit',
+            text: 'At an invite-only Silicon Valley founders dinner in Woodside, a venture capital general partner across the table discreetly slides a sleek black card toward your glass.',
+            flirt: 'Whisper that your personal portfolio is open for private due diligence.',
+        },
+        {
+            id: 'vip_private_hangar',
+            text: 'During a tarmac delay at Teterboro private airport, a striking aerospace executive invites you to wait out the storm inside their Gulfstream G700 cabin.',
+            flirt: 'Accept with a smile and toast to spontaneous first-class detours and instant chemistry.',
+        },
+        {
+            id: 'vip_monaco_yacht',
+            text: 'Overlooking Monaco harbor from a 90-meter superyacht during Grand Prix qualifying, an old-money dynasty heiress raises her crystal flute to Hale’s surging valuation.',
+            flirt: 'Step beside her to the railing and toast to building sovereign empires together.',
+        },
+        {
+            id: 'vip_art_auction',
+            text: 'At an eight-figure Sotheby’s contemporary art auction in Mayfair, you both exchange subtle paddle raises for the same museum-grade masterpiece.',
+            flirt: 'Concede the winning bid in exchange for an exclusive private celebration dinner.',
+        },
+        {
+            id: 'vip_wallst_cigar',
+            text: 'Inside an elite private members club overlooking Wall Street, a hedge fund partner observes your market moves while savoring a rare single-malt scotch.',
+            flirt: 'Pull up a leather chair and propose an alliance of capital, influence, and chemistry.',
+        },
+        {
+            id: 'vip_geneva_vault',
+            text: 'Exiting a Swiss private wealth symposium on the shores of Lake Geneva, an aristocratic family office director strikes up a conversation about multi-generational dynasties.',
+            flirt: 'Remark that the most enduring dynasties are always ignited by an undeniable spark.',
+        },
+        {
+            id: 'vip_f1_paddock',
+            text: 'Inside the roaring VIP paddock club at Silverstone, a glamorous Formula 1 executive playfully bets that your next quarter will outpace their pole lap time.',
+            flirt: 'Take the wager with a confident grin and seal it over vintage champagne.',
+        },
+        {
+            id: 'vip_stbarts',
+            text: 'Anchored off St. Barts on New Year’s Eve, a tech founder and venture heiress pulls their speedboat up to your superyacht with a bottle of rare vintage Krug.',
+            flirt: 'Extend a hand to welcome them aboard for midnight fireworks under the stars.',
+        },
+        {
+            id: 'vip_taipei_foundry',
+            text: 'At an ultra-exclusive semiconductor symposium in Taipei, a leading chip foundry executive praises your aggressive silicon roadmap over dinner.',
+            flirt: 'Invite them to discuss secret architectural synergies over a private view of the city.',
+        },
+        {
+            id: 'vip_paris_fashion',
+            text: 'Front row at Paris Haute Couture Fashion Week, a luxury fashion house creative director leans over to whisper their admiration for your commanding executive presence.',
+            flirt: 'Offer to escort them to the private afterparty in Saint-Germain.',
+        },
+        {
+            id: 'vip_aspen_chalet',
+            text: 'Fireside at a private Aspen mountain retreat after a day on exclusive powder slopes, a biotech pioneer discusses market dominance and desire.',
+            flirt: 'Pour another glass of grand cru and lean in close to challenge their focus.',
+        },
+        {
+            id: 'vip_gala_charity',
+            text: 'At the Metropolitan Museum Gala, a royal philanthropy ambassador compliments your leadership influence while classical strings play under the arches.',
+            flirt: 'Offer a witty toast to high-stakes philanthropy and irresistible connections.',
+        },
+    ],
     gym: [
         {
             id: 'gym_1',
@@ -170,28 +242,23 @@ export const ENCOUNTER_DATA: Record<string, EncounterScenario[]> = {
     generic: [
         {
             id: 'gen_1',
-            text: 'At a local coffee shop, the barista accidentally gives you someone else’s order, and that person is right behind you.',
-            flirt: 'Joke about fate bringing you together over coffee.',
+            text: 'At a rooftop executive lounge, someone notices your wristwatch and strikes up a conversation about rare complications.',
+            flirt: 'Share the history of the piece and offer to buy the next round of cocktails.',
         },
         {
             id: 'gen_2',
-            text: 'You are browsing books at the library when you both reach for the same bestseller.',
-            flirt: 'Discuss the author.',
+            text: 'Browsing a private financial publication at an airport lounge, you both comment on the latest market volatility.',
+            flirt: 'Propose predicting the market together over coffee.',
         },
         {
             id: 'gen_3',
-            text: 'Walking your path in the park, a cute dog runs up to you, followed by its apologetic owner.',
-            flirt: 'Pet the dog and compliment the owner.',
+            text: 'At an exclusive tech conference cocktail hour, you exchange sharp perspectives on next-generation computing.',
+            flirt: 'Suggest continuing the debate in a quieter setting.',
         },
         {
             id: 'gen_4',
-            text: 'Stuck in an elevator for a few minutes, you strike up a conversation to pass the time.',
-            flirt: 'Ask what they would do if stuck for hours.',
-        },
-        {
-            id: 'gen_5',
-            text: 'At a grocery store, you debate the ripeness of avocados with a stranger.',
-            flirt: 'Claim to be an avocado expert.',
+            text: 'Stuck in an executive suite elevator for a few minutes, you share an amused laugh about high-rise corporate drama.',
+            flirt: 'Joke that power outages always create the most unexpected connections.',
         },
     ],
 };

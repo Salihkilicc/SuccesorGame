@@ -66,9 +66,13 @@ const formatMoney = (value: number) => {
 export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: AcquisitionModalProps) => {
     useLocale();
   const navigation = useNavigation<any>();
-  const { marketPrices } = useMarketStore();
+  const { marketPrices, initializePrices } = useMarketStore();
   const { subsidiaries, executeAcquisition } = useCorporateFinanceStore();
   const { companyCapital } = useStatsStore();
+
+  useEffect(() => {
+    initializePrices();
+  }, [initializePrices]);
 
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [selectedTarget, setSelectedTarget] = useState<any | null>(null);

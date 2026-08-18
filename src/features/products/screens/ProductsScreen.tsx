@@ -6,7 +6,7 @@ import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
 import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
-import { formatMoney } from '../../../core/utils';
+import { formatMoney, formatNumber } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import InfoDot from '../../../components/common/InfoDot';
@@ -87,7 +87,7 @@ const ProductsScreen = () => {
                 <View style={styles.statusBadge}><Text style={styles.statusText}>{t('product.active')}</Text></View>
               </View>
               <Text style={styles.activeName}>{prod.name}</Text>
-              <Text style={styles.activeProfit}>{t('product.prodV1', { v1: prod.productionLevel ?? 0 })}</Text>
+              <Text style={styles.activeProfit}>{t('product.prodV1', { v1: formatNumber(prod.productionUnits ?? 0) })}</Text>
               {/* Kategorisindeki pazar payi — son ceyregin gercek satisindan.
                   Bkz. core/market/useMarketPosition.ts */}
               <MarketPositionPanel category={prod.category} compact />

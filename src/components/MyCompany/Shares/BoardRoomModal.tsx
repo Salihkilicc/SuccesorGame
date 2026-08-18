@@ -3,7 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import MemberInteractionModal from './MemberInteractionModal';
-import { useStatsStore } from '../../../core/store';
+import { useStatsStore, useGameStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
@@ -14,6 +14,7 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
+    FOUNDER_GRACE_PERIOD_MONTHS,
     Proposal,
 } from '../../../core/market/governance';
 
@@ -70,6 +71,9 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
     } = useShareholderStore();
 
     const companyValue = useStatsStore(s => s.companyValue);
+    const currentMonth = useGameStore(s => s.currentMonth);
+    const inGracePeriod = (currentMonth || 1) <= FOUNDER_GRACE_PERIOD_MONTHS;
+
     const [tab, setTab] = useState<'board' | 'log'>('board');
     const [panel, setPanel] = useState<null | {
         title: string;
@@ -234,8 +238,20 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                         </View>
                     ))}
 
-                    {/* ---- GUVENSIZLIK ERKEN UYARISI ---- */}
-                    {noConfidenceLevel >= 2 && (
+                    {/* ---- GUVENSIZLIK ERKEN UYARISI / KURUCU KORUMASI ---- */}
+                    {inGracePeriod ? (
+                        <View style={[styles.dangerCard, { borderColor: theme.colors.highlight, backgroundColor: 'rgba(125,211,252,0.08)' }]}>
+                            <Text style={[styles.dangerTitle, { color: theme.colors.highlight }]}>
+                                🛡️ {t('board.inGracePeriod')}
+                            </Text>
+                            <Text style={styles.dangerBody}>
+                                {t('board.removalNeeds', {
+                                    threshold: CONTROL_THRESHOLD,
+                                    met: noConfidenceLevel,
+                                })}
+                            </Text>
+                        </View>
+                    ) : noConfidenceLevel >= 2 && (
                         <View style={styles.dangerCard}>
                             <Text style={styles.dangerTitle}>
                                 {noConfidenceLevel === 3

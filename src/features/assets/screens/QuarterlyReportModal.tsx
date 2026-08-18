@@ -708,7 +708,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                         amount={report.ceoBonusPaid ?? 0}
                         negative
                         explanation={
-                          `Your year is up. This is 2% of the ${formatMoney(report.ceoBonusBase ?? 0)} ` +
+                          `Your year is up. This is 4% of the ${formatMoney(report.ceoBonusBase ?? 0)} ` +
                           'the company kept after tax over the last four quarters, moved out of ' +
                           'company capital and into your personal cash. Unlike a dividend, none of ' +
                           'it goes to the other shareholders, and a year that lost money pays nothing.'

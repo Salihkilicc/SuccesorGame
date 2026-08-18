@@ -100,6 +100,8 @@ export type StatsState = Record<StatKey, number> & {
   brandByCategory: Record<string, number>;
   /** Kategorinin bir kez kazandigi ve bir daha altina dusmedigi marka tabani */
   brandFloorByCategory?: Record<string, number>;
+  /** Son ceyrekteki marka degeri degisimi (+/-) */
+  brandChange?: number;
   /** The board's open demand this quarter, already formatted for display. */
   boardDemandNotice?: string;
   /**
@@ -362,6 +364,7 @@ export const initialStatsState: StatsState = {
   //  thing, which is what it was always supposed to signal.
   // ----------------------------------------------------------------------
   brandValue: 18,
+  brandChange: 0,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,
 
@@ -958,6 +961,7 @@ export const useStatsStore = create<StatsStore>()(
         shareholders: state.shareholders,
         casinoReputation: state.casinoReputation,
         brandValue: state.brandValue,
+        brandChange: state.brandChange,
         brandByCategory: state.brandByCategory,
         factoryCount: state.factoryCount,
         facilityTier: state.facilityTier,

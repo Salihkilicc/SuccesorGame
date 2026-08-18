@@ -184,15 +184,15 @@ const RouletteGameScreen = () => {
           />
 
           <View style={styles.bottomControls}>
-            <View style={styles.betDisplay}>
-              <Text style={styles.betLabel}>TOTAL BET</Text>
-              <Text style={styles.betValueText}>${totalBetAmount.toLocaleString()}</Text>
-              {bets.length > 0 && (
-                <Text style={styles.betCount}>{bets.length} bet{bets.length > 1 ? 's' : ''}</Text>
-              )}
-            </View>
+            <View style={styles.summaryRow}>
+              <View style={styles.betDisplay}>
+                <Text style={styles.betLabel}>TOTAL BET</Text>
+                <Text style={styles.betValueText}>${totalBetAmount.toLocaleString()}</Text>
+                {bets.length > 0 && (
+                  <Text style={styles.betCount}>{bets.length} bet{bets.length > 1 ? 's' : ''}</Text>
+                )}
+              </View>
 
-            <View style={styles.actionRow}>
               {/* Clear Bets */}
               {bets.length > 0 && !isSpinning && (
                 <Pressable
@@ -202,26 +202,26 @@ const RouletteGameScreen = () => {
                   <Text style={styles.clearBtnText}>CLEAR</Text>
                 </Pressable>
               )}
-
-              {/* SPIN BTN */}
-              <Pressable
-                onPress={actions.handleSpin}
-                disabled={isSpinning || bets.length === 0}
-                style={({ pressed }) => [
-                  styles.spinButton,
-                  {
-                    backgroundColor: isSpinning || bets.length === 0
-                      ? '#535B5F'
-                      : currentLocation.theme.primary,
-                  },
-                  pressed && styles.spinButtonPressed,
-                ]}
-              >
-                <Text style={styles.spinText}>
-                  {isSpinning ? '...' : t('ui.spinWheel')}
-                </Text>
-              </Pressable>
             </View>
+
+            {/* Full-Width SPIN BTN */}
+            <Pressable
+              onPress={actions.handleSpin}
+              disabled={isSpinning || bets.length === 0}
+              style={({ pressed }) => [
+                styles.spinButton,
+                {
+                  backgroundColor: isSpinning || bets.length === 0
+                    ? '#3A4248'
+                    : currentLocation.theme.primary,
+                },
+                pressed && styles.spinButtonPressed,
+              ]}
+            >
+              <Text style={styles.spinText}>
+                {isSpinning ? '...' : t('ui.spinWheel')}
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -268,19 +268,19 @@ const styles = StyleSheet.create({
   spinningContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    gap: 8,
+    paddingVertical: 8,
+    gap: 4,
   },
   wheelIcon: {
-    width: 64,
-    height: 64,
+    width: 48,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  wheelEmoji: { fontSize: 48 },
+  wheelEmoji: { fontSize: 36 },
   spinningText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
   },
@@ -289,85 +289,88 @@ const styles = StyleSheet.create({
   resultContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 8,
+    paddingVertical: 8,
+    gap: 4,
   },
   resultCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.3)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 6,
+    elevation: 6,
   },
   resultNumber: {
     color: '#FFFFFF',
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: '900',
   },
   winText: {
     color: '#4ADE80',
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '900',
   },
 
   // Table
   tableContainer: {
-    backgroundColor: '#2C3E34',
-    borderRadius: 16,
-    padding: 10,
+    backgroundColor: '#1E2C22',
+    borderRadius: 14,
+    padding: 6,
     borderWidth: 1,
   },
 
   // Controls
-  controlsSection: { gap: 16 },
+  controlsSection: { gap: 10 },
   bottomControls: {
+    backgroundColor: '#384147',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    gap: 10,
+  },
+  summaryRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#434B50',
-    padding: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
   },
-  betDisplay: { gap: 2 },
-  betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700' },
-  betValueText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
+  betDisplay: { gap: 1 },
+  betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+  betValueText: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
   betCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
 
-  actionRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   clearBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   clearBtnText: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
   },
 
   spinButton: {
-    paddingHorizontal: 28,
+    width: '100%',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 5,
   },
   spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
-  spinText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
+  spinText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', letterSpacing: 1.2 },
 });

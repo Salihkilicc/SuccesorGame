@@ -200,7 +200,7 @@ const FinancialReportScreen = () => {
                                     amount={report.ceoBonusPaid ?? 0}
                                     negative
                                     explanation={
-                                        `2% of the year's after-tax profit of ` +
+                                        `4% of the year's after-tax profit of ` +
                                         `${formatMoney(report.ceoBonusBase ?? 0)}, paid once every four ` +
                                         'quarters. It leaves the company and lands in your personal cash, ' +
                                         'unlike a dividend, none of it goes to the other shareholders. ' +

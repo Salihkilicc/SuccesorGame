@@ -17,6 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
+import { useLaboratoryStore } from '../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
@@ -133,7 +134,8 @@ const HomeScreen = () => {
   const { age, currentMonth, advanceMonth, employeeMorale } = useGameStore();
   // Using useAssetsLogic for real-time financial data
   const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
-  const { setField, factoryCount, employeeCount, researchPoints, brandValue } = useStatsStore();
+  const { setField, factoryCount, employeeCount, brandValue, brandChange } = useStatsStore();
+  const totalRP = useLaboratoryStore(s => s.totalRP);
   const { reset: resetProducts } = useProductStore();
 
   // Real Net Worth Calculation
@@ -292,14 +294,15 @@ const HomeScreen = () => {
         ? `Stable (${Math.round(employeeMorale)}%)`
         : `Critical (${Math.round(employeeMorale)}%)`;
 
-  const rpBrief = `${formatNumber(researchPoints || 0)} RP`;
-  const brandBrief = `${Math.round(brandValue || 0)} / 100`;
+  const rpBrief = `${formatNumber(Math.floor(totalRP || 0))} RP`;
+  const brandBrief = `${Math.round(brandValue || 0)}`;
+  const brandDelta = typeof brandChange === 'number' && Math.abs(brandChange) >= 0.05 ? brandChange : undefined;
 
   // Status widget satırları: CEO ve Şirket Yönetim Paneli
-  const statusRows = [
+  const statusRows: { key: string; label: string; value: string; delta?: number }[] = [
     { key: 'team', label: 'Team Morale', value: moraleBrief },
     { key: 'research', label: t('company.research') || 'R&D Points', value: rpBrief },
-    { key: 'brand', label: t('company.brandValue') || 'Brand Value', value: brandBrief },
+    { key: 'brand', label: t('company.brandValue') || 'Brand Value', value: brandBrief, delta: brandDelta },
   ];
 
   const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {
@@ -518,7 +521,20 @@ const HomeScreen = () => {
                     ]}
                   >
                     <Text style={styles.statusLabel}>{row.label}</Text>
-                    <Text style={styles.widgetStatusText} numberOfLines={1}>{row.value}</Text>
+                    <View style={styles.statusValueContainer}>
+                      <Text style={styles.widgetStatusText} numberOfLines={1}>{row.value}</Text>
+                      {row.delta !== undefined && (
+                        <Text
+                          style={[
+                            styles.statusDeltaText,
+                            { color: row.delta > 0 ? theme.colors.up : theme.colors.down },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {row.delta > 0 ? `+${(Math.round(row.delta * 10) / 10).toFixed(1)}` : (Math.round(row.delta * 10) / 10).toFixed(1)}
+                        </Text>
+                      )}
+                    </View>
                   </View>
                 ))}
               </LinearGradient>
@@ -941,10 +957,19 @@ const styles = StyleSheet.create({
   widgetStatusRow: {
     marginBottom: theme.spacing.xs,
   },
+  statusValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   widgetStatusText: {
     color: theme.colors.textPrimary,
     fontSize: theme.typography.caption + 1,
     marginTop: 0,
+  },
+  statusDeltaText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
   statusCardAdjuster: {
     justifyContent: 'flex-start',

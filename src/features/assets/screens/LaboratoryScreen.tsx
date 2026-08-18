@@ -371,16 +371,16 @@ const styles = StyleSheet.create({
     },
     rpBadge: {
         backgroundColor: theme.colors.accentSoft,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
         borderWidth: 1,
         borderColor: theme.colors.accent,
     },
     rpBadgeText: {
         color: theme.colors.rp,
-        fontSize: 14,
-        fontWeight: '800',
+        fontSize: 12,
+        fontWeight: '700',
     },
     techTreeBtn: {
         width: 40,

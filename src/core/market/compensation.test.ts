@@ -35,7 +35,7 @@ describe('CEO annual bonus', () => {
 
     it('resets the counter, so eight quarters pay exactly twice', () => {
         const { paid } = runYears(Array(8).fill(1e6));
-        expect(paid.filter(x => x > 0)).toEqual([80_000, 80_000]);
+        expect(paid.filter(x => x > 0)).toEqual([160_000, 160_000]);
     });
 
     it('pays nothing on a losing year rather than clawing cash back', () => {
@@ -48,7 +48,7 @@ describe('CEO annual bonus', () => {
         // Tax already carries losses forward. Doing it here as well would
         // charge the player twice for the same bad year.
         const { paid } = runYears([-2e6, 5e5, 5e5, 5e5, 1e6, 1e6, 1e6, 1e6]);
-        expect(paid[7]).toBe(80_000);
+        expect(paid[7]).toBe(160_000);
     });
 
     it('nets the year rather than paying on the good quarters alone', () => {
@@ -58,7 +58,7 @@ describe('CEO annual bonus', () => {
 
     it('settles in one go when a tick advances the whole year', () => {
         const r = accrueCeoBonus({ ...EMPTY_ACCRUAL }, 4e6, 4);
-        expect(r.paid).toBe(80_000);
+        expect(r.paid).toBe(160_000);
         expect(r.next).toEqual(EMPTY_ACCRUAL);
     });
 
@@ -71,6 +71,6 @@ describe('CEO annual bonus', () => {
 
     it('survives a save that predates the field', () => {
         // Old saves have no accrual at all; the tick must not crash on them.
-        expect(accrueCeoBonus(undefined as any, 1e6, 4).paid).toBe(20_000);
+        expect(accrueCeoBonus(undefined as any, 1e6, 4).paid).toBe(40_000);
     });
 });

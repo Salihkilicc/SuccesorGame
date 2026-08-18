@@ -36,33 +36,44 @@ const getRandomWeighted = <T>(items: T[], weights: number[]): T => {
 
 // --- Helper: Convert Deep Persona Partner to PartnerProfile for backward compatibility ---
 const convertToPartnerProfile = (deepPartner: Partner): PartnerProfile => {
-    // Map SocialTier to SocialClass
-    const tierToClassMap: Record<string, SocialClass> = {
-        'HIGH_SOCIETY': 'HighSociety',
-        'CORPORATE_ELITE': 'OldMoney',
-        'UNDERGROUND': 'CriminalElite',
-        'BLUE_COLLAR': 'WorkingClass',
-        'STUDENT_LIFE': 'MiddleClass',
-        'ARTISTIC': 'MiddleClass',
-    };
+    // Dynamic SocialClass determination based on job & tier
+    let socialClass: SocialClass = 'HighSociety';
 
-    const socialClass = tierToClassMap[deepPartner.job.tier] || 'MiddleClass';
+    if (deepPartner.job.id === 'dynasty_heiress' || deepPartner.job.id === 'billionaire_heir') {
+        socialClass = 'BillionaireHeir';
+    } else if (deepPartner.job.id === 'royal_envoy') {
+        socialClass = 'Royalty';
+    } else if (deepPartner.job.tier === 'CORPORATE_ELITE') {
+        socialClass = 'OldMoney';
+    } else if (deepPartner.job.tier === 'HIGH_SOCIETY') {
+        socialClass = 'HighSociety';
+    } else if (deepPartner.job.tier === 'UNDERGROUND') {
+        socialClass = 'CriminalElite';
+    } else if (deepPartner.job.tier === 'ARTISTIC') {
+        socialClass = 'HighSociety';
+    } else if (deepPartner.job.tier === 'BLUE_COLLAR') {
+        socialClass = 'WorkingClass';
+    } else if (deepPartner.job.tier === 'STUDENT_LIFE') {
+        socialClass = 'MiddleClass';
+    }
+
+    const isTopTier = ['BillionaireHeir', 'Royalty', 'HighSociety', 'OldMoney'].includes(socialClass);
 
     const stats: PartnerStats = {
-        ethnicity: 'Mixed' as Ethnicity, // Default, could be enhanced later
+        ethnicity: 'RoyalEuropean' as Ethnicity,
         age: deepPartner.age,
         occupation: deepPartner.job.title,
-        looks: 70 + Math.floor(Math.random() * 30), // 70-100 range
-        style: 'Elegant' as const,
+        looks: isTopTier ? 75 + Math.floor(Math.random() * 25) : 60 + Math.floor(Math.random() * 35),
+        style: isTopTier ? 'Luxury' : 'Elegant',
         socialClass,
-        familyWealth: socialClass === 'BillionaireHeir' ? 95 : Math.random() * 100,
-        intelligence: 50 + Math.floor(Math.random() * 50),
-        jealousy: Math.random() * 100,
-        crazy: Math.random() * 100,
-        libido: Math.random() * 100,
-        reputationBuff: socialClass === 'Royalty' ? 50 : (Math.random() * 20 - 5),
-        financialAidChance: Math.random() * 100,
-        networkPower: Math.random() * 100,
+        familyWealth: socialClass === 'BillionaireHeir' ? 95 : socialClass === 'Royalty' ? 98 : isTopTier ? 75 + Math.floor(Math.random() * 25) : Math.floor(Math.random() * 60),
+        intelligence: isTopTier ? 82 + Math.floor(Math.random() * 18) : 70 + Math.floor(Math.random() * 30),
+        jealousy: Math.floor(Math.random() * 70),
+        crazy: Math.floor(Math.random() * 60),
+        libido: 60 + Math.floor(Math.random() * 40),
+        reputationBuff: socialClass === 'Royalty' ? 25 : socialClass === 'BillionaireHeir' ? 20 : isTopTier ? 15 : 5,
+        financialAidChance: isTopTier ? 40 + Math.floor(Math.random() * 40) : 15,
+        networkPower: isTopTier ? 80 + Math.floor(Math.random() * 20) : 40 + Math.floor(Math.random() * 40),
     };
 
     return {
@@ -110,15 +121,24 @@ export const useEncounterSystem = () => {
     // --- 2. Trigger Encounter ---
     const triggerEncounter = useCallback((context: string, countryId?: string, autoShow: boolean = true): { candidate: PartnerProfile, scenario: EncounterScenario } | null => {
         // 0. Probability Check (Internal)
-        let chance = 10; // Default 10% (Generic)
+        let chance = 10; // Default 10% (Generic passive background)
 
         switch (context) {
+            case 'VIP_LOUNGE':
+            case 'GALA':
+            case 'DIRECT':
+            case 'profile':
+                chance = 100; // 100% Guaranteed - Explicit user action to find a partner
+                break;
             case 'gym':
             case 'shopping':
-                chance = 5; // Very Rare - Don't interrupt gameplay often
+                chance = 5; // Very Rare - Passive gameplay interruptions
                 break;
             case 'club':
                 chance = 50; // High - Socializing is the point
+                break;
+            case 'travel':
+                chance = 60; // Very High - Vacation romance
                 break;
         }
 
@@ -141,6 +161,8 @@ export const useEncounterSystem = () => {
             scenarios = ENCOUNTER_DATA[`travel_${countryId}`];
         } else if (ENCOUNTER_DATA[context]) {
             scenarios = ENCOUNTER_DATA[context];
+        } else if (ENCOUNTER_DATA['VIP_LOUNGE']) {
+            scenarios = ENCOUNTER_DATA['VIP_LOUNGE'];
         }
 
         // 2. Pick Random Scenario
