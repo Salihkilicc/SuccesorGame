@@ -10,6 +10,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { PercentageSelector } from '../../atoms/PercentageSelector';
@@ -25,12 +26,12 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
  * The loan menu, in the order a company would actually work through it:
  * cheapest and most demanding first, most expensive and least fussy last.
  */
-const LOAN_CHOICES: { kind: LoanKind; icon: string; label: () => string }[] = [
-    { kind: 'term', icon: '🏛️', label: () => t('bank.type.term') },
-    { kind: 'bond', icon: '📜', label: () => t('bank.type.bond') },
-    { kind: 'secured', icon: '🏭', label: () => t('bank.type.secured') },
-    { kind: 'mezzanine', icon: '⚖️', label: () => t('bank.type.mezzanine') },
-    { kind: 'shark', icon: '🦈', label: () => t('bank.type.shark') },
+const LOAN_CHOICES: { kind: LoanKind; icon: string; color: string; label: () => string }[] = [
+    { kind: 'term', icon: 'bank-outline', color: '#60A5FA', label: () => t('bank.type.term') },
+    { kind: 'bond', icon: 'certificate-outline', color: '#A78BFA', label: () => t('bank.type.bond') },
+    { kind: 'secured', icon: 'factory', color: '#FBBF24', label: () => t('bank.type.secured') },
+    { kind: 'mezzanine', icon: 'scale-balance', color: '#38BDF8', label: () => t('bank.type.mezzanine') },
+    { kind: 'shark', icon: 'shark', color: '#F87171', label: () => t('bank.type.shark') },
 ];
 
 type Props = {
@@ -186,7 +187,7 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                             underneath is what the money actually costs you.
                            ------------------------------------------------ */}
                         <RowGroup title={t('bank.borrow.title')}>
-                            {LOAN_CHOICES.map(({ kind, icon, label }) => {
+                            {LOAN_CHOICES.map(({ kind, icon, color, label }) => {
                                 const info = productInfo(kind);
                                 const active = selectedType === kind;
                                 return (
@@ -199,7 +200,9 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                             !!info.locked && styles.typeRowLocked,
                                             pressed && styles.typeRowPressed,
                                         ]}>
-                                        <Text style={styles.typeIcon}>{icon}</Text>
+                                        <View style={[styles.typeIconBadge, { backgroundColor: `${color}15`, borderColor: active ? color : `${color}35` }]}>
+                                            <MaterialCommunityIcons name={icon} size={22} color={color} />
+                                        </View>
                                         <View style={{ flex: 1 }}>
                                             <Text style={[styles.typeName, active && styles.typeNameActive]}>
                                                 {label()}
@@ -217,10 +220,13 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                         </RowGroup>
 
                         {selectedType === 'mezzanine' && amount > 0 && (
-                            <Text style={styles.warningText}>
-                                ⚖️ If unpaid, this becomes {mezzQuote.dilutionPercent.toFixed(1)}% of your company
-                                {mezzQuote.costsBoardSeat ? ', and a board seat.' : '.'}
-                            </Text>
+                            <View style={styles.warningBox}>
+                                <MaterialCommunityIcons name="scale-balance" size={16} color={theme.colors.warning} style={{ marginRight: 6 }} />
+                                <Text style={styles.warningText}>
+                                    If unpaid, this becomes {mezzQuote.dilutionPercent.toFixed(1)}% of your company
+                                    {mezzQuote.costsBoardSeat ? ', and a board seat.' : '.'}
+                                </Text>
+                            </View>
                         )}
 
                         {/* Amount Selector */}
@@ -258,7 +264,7 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                         />
                                         <DetailNote>
                                             The first payment is mostly interest. Principal only starts
-                                            coming down once the balance does.
+                                             coming down once the balance does.
                                         </DetailNote>
                                     </>
                                 }
@@ -275,16 +281,24 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                 ? ((useStatsStore.getState().companyDebtTotal || 0) + amount) / ebitda
                                 : Infinity;
                             if (!distress.canBorrow) {
-                                return <Text style={styles.warningText}>⛔ {distress.message}</Text>;
+                                return (
+                                    <View style={styles.warningBox}>
+                                        <MaterialCommunityIcons name="alert-decagram-outline" size={16} color={theme.colors.negative} style={{ marginRight: 6 }} />
+                                        <Text style={[styles.warningText, { color: theme.colors.negative }]}>{distress.message}</Text>
+                                    </View>
+                                );
                             }
                             if (after > COVENANT_MAX_LEVERAGE) {
                                 return (
-                                    <Text style={styles.warningText}>
-                                        ⚠️ {t('bank.covenantWarn', {
-                                            leverage: after === Infinity ? '∞' : after.toFixed(1),
-                                            max: COVENANT_MAX_LEVERAGE,
-                                        })}
-                                    </Text>
+                                    <View style={styles.warningBox}>
+                                        <MaterialCommunityIcons name="alert-outline" size={16} color={theme.colors.warning} style={{ marginRight: 6 }} />
+                                        <Text style={styles.warningText}>
+                                            {t('bank.covenantWarn', {
+                                                leverage: after === Infinity ? '∞' : after.toFixed(1),
+                                                max: COVENANT_MAX_LEVERAGE,
+                                            })}
+                                        </Text>
+                                    </View>
                                 );
                             }
                             return null;
@@ -327,13 +341,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: theme.spacing.md,
         paddingHorizontal: theme.spacing.md,
-        paddingVertical: theme.spacing.sm + 2,
+        paddingVertical: theme.spacing.sm + 4,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: theme.colors.border,
     },
     typeRowActive: { backgroundColor: theme.colors.surfaceHigh },
     typeRowPressed: { backgroundColor: theme.colors.surfaceRaised },
     typeRowLocked: { opacity: 0.45 },
+    typeIconBadge: {
+        width: 38,
+        height: 38,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
     typeIcon: { fontSize: 22, width: 26, textAlign: 'center' },
     typeName: { color: theme.colors.textSecondary, fontSize: theme.typography.body, fontWeight: '700' },
     typeNameActive: { color: theme.colors.textPrimary },
@@ -343,6 +365,18 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.subtitle,
         fontWeight: '800',
         fontVariant: ['tabular-nums'],
+    },
+    warningBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(251, 191, 36, 0.08)',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(251, 191, 36, 0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        marginBottom: 12,
     },
 
     // ----------------------------------------------------------------------

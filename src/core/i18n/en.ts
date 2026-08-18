@@ -318,7 +318,7 @@ export const en: Record<string, string> = {
     'company.noQuarterHasBeenCompleted': 'No quarter has been completed yet.',
     'company.operatingExpenses': 'OPERATING EXPENSES',
     'company.operatingIncomeEbit': 'Operating Income (EBIT)',
-    'company.operations': 'OPERATIONS',
+    'company.operations': 'MANUFACTURING & FACILITIES',
     'company.outstanding': 'Outstanding',
     'company.ownership': 'Ownership',
     'company.perProductDemandSalesAnd': 'Per-product demand, sales and margin',
@@ -1959,9 +1959,9 @@ export const en: Record<string, string> = {
     'tactic.equityText': 'Maintain at least 51% ownership to protect your boardroom control. An IPO raises substantial capital but dilutes your stake.',
     'tactic.equityDetail': 'Tip: After listing, use excess profits for share buybacks to rebuild your ownership stake and support the stock price.',
 
-    'tactic.operationsTitle': 'Operations & Facility Scaling',
-    'tactic.operationsText': 'Upgrading facility tiers lowers unit production costs and dramatically increases your production ceiling.',
-    'tactic.operationsDetail': 'Tip: Facilities operate at reduced capacity during construction. Ensure you have accumulated enough RP and capital before building.',
+    'tactic.operationsTitle': 'Manufacturing & Facility Scaling',
+    'tactic.operationsText': 'Your facility mass-produces your researched products. Upgrading tiers (from Workshop to Mega Factory) significantly lowers unit cost (COGS) and expands maximum production capacity.',
+    'tactic.operationsDetail': 'Tip: Hire sufficient crew and accumulate required RP and capital to scale your facility to meet high market demand.',
 
     'tactic.teamMoraleTitle': 'Team Morale & Productivity',
     'tactic.teamMoraleText': 'Keep morale above 80 at all times. 70 is the critical threshold; below it, workforce output drops and scrap rates spike.',

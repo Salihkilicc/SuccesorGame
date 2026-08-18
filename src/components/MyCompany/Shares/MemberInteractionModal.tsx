@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import GameModal from '../../common/GameModal';
 import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
@@ -8,6 +9,7 @@ import { useShareholderStore, type BoardMember } from '../../../features/shareho
 import { useStatsStore } from '../../../core/store';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import { getTraitVisual } from './BoardRoomModal';
 
 interface Props {
     visible: boolean;
@@ -315,8 +317,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         <GameModal visible={visible} onClose={onClose}>
             {/* Hero Section */}
             <View style={styles.heroSection}>
-                <View style={styles.heroAvatar}>
-                    <Text style={styles.heroAvatarText}>{member.name.charAt(0)}</Text>
+                <View style={[styles.heroAvatar, { backgroundColor: `${getTraitVisual(member.trait).color}15`, borderWidth: 1, borderColor: `${getTraitVisual(member.trait).color}35` }]}>
+                    <MaterialCommunityIcons name={getTraitVisual(member.trait).icon} size={30} color={getTraitVisual(member.trait).color} />
                 </View>
                 <Text style={styles.heroName}>{member.name}</Text>
                 <Text style={styles.heroRole}>{t('equity.theV1', { v1: member.trait })}</Text>
@@ -410,7 +412,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 onPress={handleSendGift}
                                 disabled={money < 50000}
                             >
-                                <Text style={styles.actionIcon}>🎁</Text>
+                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderColor: 'rgba(251, 191, 36, 0.3)' }]}>
+                                    <MaterialCommunityIcons name="gift-outline" size={24} color="#FBBF24" />
+                                </View>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
                                 <Text style={[styles.actionEffect, { color: giftPreview >= 0 ? '#CFD0D2' : '#FF8A8A' }]}>
@@ -426,7 +430,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 ]}
                                 onPress={handlePrivateDinner}
                             >
-                                <Text style={styles.actionIcon}>🍽️</Text>
+                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(96, 165, 250, 0.15)', borderColor: 'rgba(96, 165, 250, 0.3)' }]}>
+                                    <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="#60A5FA" />
+                                </View>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
                                 <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#CFD0D2' : '#FF8A8A' }]}>
@@ -443,7 +449,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                                 ]}
                                 onPress={handleBlackmail}
                             >
-                                <Text style={styles.actionIcon}>🕵️</Text>
+                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)', borderColor: 'rgba(148, 163, 184, 0.3)' }]}>
+                                    <MaterialCommunityIcons name="incognito" size={24} color="#94A3B8" />
+                                </View>
                                 <Text style={styles.actionTitle}>{t('equity.blackmail')}</Text>
                                 <Text style={styles.actionCost}>🔒 Locked</Text>
                                 <Text style={styles.actionEffect}>{t('equity.forceVote')}</Text>
@@ -688,6 +696,15 @@ const styles = StyleSheet.create({
     actionButtonDisabled: {
         borderColor: 'rgba(255,255,255,0.06)',
         opacity: 0.5,
+    },
+    actionIconBadge: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        marginBottom: 2,
     },
     actionIcon: {
         fontSize: 32,

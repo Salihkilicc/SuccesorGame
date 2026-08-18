@@ -73,30 +73,11 @@ const HOMESCREEN_APPS: Array<{
   gradient: string[];
   feature?: FeatureKey;
 }> = [
-    // SHELVED from the home grid. The route stays registered.
-    // { key: 'calendar', get label() { return t('home.calendar'); }, icon: 'calendar', gradient: GRADIENTS.orangeYellow },
-    { key: 'mail', get label() { return t('home.mail'); }, icon: 'email', gradient: GRADIENTS.blueSky },
-    // ------------------------------------------------------------------
-    //  MESSAGES took My Company's place, and CASINO took Financials'.
-    //
-    //  Neither removal loses a destination, which is the only reason they
-    //  could go: My Company is the nav bar's Company tab, and the financial
-    //  report is what the company card on that screen opens. Both tiles were
-    //  a second door to a room that already had one - and the grid is small
-    //  enough that a duplicate costs a slot something new could use.
-    // ------------------------------------------------------------------
-    { key: 'messages', get label() { return t('home.messages'); }, icon: 'message-text', gradient: GRADIENTS.networkBlue },
-    // Life sekmesi rafa kaldırıldı; Education buraya taşındı (MBA / executive education).
-    { key: 'education', get label() { return t('home.education'); }, icon: 'school', gradient: GRADIENTS.purplePink, feature: 'education' },
+    { key: 'mail', get label() { return t('home.mail'); }, icon: 'email-outline', gradient: GRADIENTS.blueSky },
+    { key: 'messages', get label() { return t('home.messages'); }, icon: 'message-processing-outline', gradient: GRADIENTS.networkBlue },
+    { key: 'education', get label() { return t('home.education'); }, icon: 'school-outline', gradient: GRADIENTS.purplePink, feature: 'education' },
     { key: 'casino', get label() { return t('home.casino'); }, icon: 'cards-playing-outline', gradient: GRADIENTS.bluePurple, feature: 'casino' },
-    { key: 'news', get label() { return t('home.news'); }, icon: 'newspaper', gradient: GRADIENTS.tealCyan },
-    // SHELVED from the grid, both still reachable - see the note above.
-    // { key: 'myCompany', ... icon: 'office-building' },
-    // { key: 'financials', ... icon: 'file-chart', feature: 'financialReport' },
-    // SHELVED as a home-screen app: the gear in the header is the single way
-    // in now. The route stays registered and `handleNavigateStack('Settings')`
-    // still reaches it - only the duplicate icon is gone.
-    // { key: 'settings', get label() { return t('home.settings'); }, icon: 'cog', gradient: GRADIENTS.darkGrey, feature: 'os' },
+    { key: 'news', get label() { return t('home.news'); }, icon: 'newspaper-variant-outline', gradient: GRADIENTS.tealCyan },
   ];
 
 /** SHELVED: see the gear button in the header. */
@@ -940,7 +921,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.22)',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   appIconVector: {
     textShadowColor: 'rgba(28,36,44,0.3)',

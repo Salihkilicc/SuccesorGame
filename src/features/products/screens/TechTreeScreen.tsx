@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
@@ -10,6 +11,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { canUnlockAnotherCategory } from '../../../core/market/brand';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
+import { ProductIconBadge, getCategoryColor, getCategoryIconName } from '../components/ProductIcon';
 import { formatNumber, formatMoney, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import InfoDot from '../../../components/common/InfoDot';
@@ -47,16 +49,6 @@ const TechTreeScreen = () => {
         activeCategories.length === 0
         || (brandByCategory || {})[category] !== undefined
         || gate.allowed;
-
-    const getCategoryIcon = (category: ProductCategory) => {
-        switch (category) {
-            case 'Consumer': return '📱';
-            case 'Robotics': return '🤖';
-            case 'Bio-Tech': return '🧬'; // Changed from Health
-            case 'Deep Tech': return '⚡'; // Changed from Energy
-            default: return '🔬';
-        }
-    };
 
     const groupedProducts = unlockableProducts.reduce((acc: Record<ProductCategory, UnlockableProduct[]>, product: UnlockableProduct) => {
         if (!acc[product.category]) {
@@ -97,10 +89,15 @@ const TechTreeScreen = () => {
                     const products = groupedProducts[category] || [];
                     if (products.length === 0) return null;
 
+                    const catColor = getCategoryColor(category);
+                    const catIconName = getCategoryIconName(category);
+
                     return (
                         <View key={category} style={styles.categorySection}>
                             <View style={styles.categoryHeader}>
-                                <Text style={styles.categoryIcon}>{getCategoryIcon(category)}</Text>
+                                <View style={[styles.categoryIconBadge, { backgroundColor: `${catColor}18`, borderColor: `${catColor}38` }]}>
+                                    <MaterialCommunityIcons name={catIconName} size={18} color={catColor} />
+                                </View>
                                 <Text style={styles.categoryTitle}>{category}</Text>
                             </View>
 
@@ -126,10 +123,14 @@ const TechTreeScreen = () => {
                                         ]}
                                         onPress={() => !product.isUnlocked && setSelectedProduct(product)}
                                     >
-                                        {/* Left: Icon Placeholder */}
-                                        <View style={[styles.iconPlaceholder, product.isUnlocked && styles.iconUnlocked]}>
-                                            <Text style={styles.productIcon}>{getCategoryIcon(product.category)}</Text>
-                                        </View>
+                                        {/* Left: Product Icon */}
+                                        <ProductIconBadge
+                                            productId={product.id}
+                                            category={product.category}
+                                            size={44}
+                                            iconSize={22}
+                                            unlocked={product.isUnlocked}
+                                        />
 
                                         {/* Middle: Product Name */}
                                         <View style={styles.productInfo}>
@@ -150,7 +151,7 @@ const TechTreeScreen = () => {
                                             ) : (
                                                 <View style={styles.lockedStatus}>
                                                     <View style={styles.costRow}>
-                                                        <Text style={styles.lockIcon}>🔒</Text>
+                                                        <MaterialCommunityIcons name="lock-outline" size={13} color="rgba(255,255,255,0.4)" style={{ marginRight: 2 }} />
                                                         <Text
                                                             style={[
                                                                 styles.costText,
@@ -186,10 +187,11 @@ const TechTreeScreen = () => {
                 })}
             </ScrollView>
 
+            {/* UNLOCK MODAL */}
             {selectedProduct && (
                 <ProductUnlockModal
-                    product={selectedProduct}
                     visible={!!selectedProduct}
+                    product={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
                 />
             )}
@@ -244,13 +246,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.spacing.lg,
         paddingVertical: theme.spacing.md,
         backgroundColor: theme.colors.background, // Sticky header feel
+        gap: 10,
     },
-    categoryIcon: {
-        fontSize: 20,
-        marginRight: 8,
+    categoryIconBadge: {
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
     },
     categoryTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '700',
         color: theme.colors.textSecondary,
         textTransform: 'uppercase',
@@ -268,6 +275,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderWidth: 1,
         borderColor: theme.colors.border,
+        gap: 14,
     },
     productRowUnlocked: {
         backgroundColor: theme.colors.surfaceRaised,
@@ -290,6 +298,7 @@ const styles = StyleSheet.create({
     },
     productInfo: {
         flex: 1,
+        marginLeft: 4,
         marginRight: 10,
         justifyContent: 'center',
     },

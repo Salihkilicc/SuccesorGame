@@ -4,6 +4,7 @@ import {
     View, Text, StyleSheet, Pressable, ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
@@ -29,8 +30,8 @@ const ResearchHub = ({ onOpenLab }: {
                         style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                         onPress={onOpenLab}
                     >
-                        <View style={[styles.iconBox, { backgroundColor: 'rgba(207,208,210,0.15)' }]}>
-                            <Text style={styles.cardIcon}>🧪</Text>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(167, 139, 250, 0.15)', borderColor: 'rgba(167, 139, 250, 0.3)', borderWidth: 1 }]}>
+                            <MaterialCommunityIcons name="flask-outline" size={24} color="#A78BFA" />
                         </View>
                         <View style={styles.cardContent}>
                             <Text style={styles.cardTitle}>{t('company.rDLaboratory')}</Text>
@@ -45,8 +46,8 @@ const ResearchHub = ({ onOpenLab }: {
                     style={({ pressed }) => [styles.hubCard, pressed && styles.cardPressed]}
                     onPress={() => (navigation as any).navigate('TechTree')}
                 >
-                    <View style={[styles.iconBox, { backgroundColor: 'rgba(5,168,246,0.15)' }]}>
-                        <Text style={styles.cardIcon}>🧬</Text>
+                    <View style={[styles.iconBox, { backgroundColor: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.3)', borderWidth: 1 }]}>
+                        <MaterialCommunityIcons name="source-branch" size={24} color="#38BDF8" />
                     </View>
                     <View style={styles.cardContent}>
                         <Text style={styles.cardTitle}>{t('company.innovationTechTree')}</Text>

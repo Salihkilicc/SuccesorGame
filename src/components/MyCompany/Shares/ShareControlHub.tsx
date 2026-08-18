@@ -10,6 +10,7 @@ import {
     Alert,
     TouchableOpacity,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -287,8 +288,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 onPress={onOpenIPO}
                                 activeOpacity={0.7}
                             >
-                                <View style={[styles.actionIconBox, { backgroundColor: '#05A8F620' }]}>
-                                    <Text style={styles.actionIcon}>🔔</Text>
+                                <View style={[styles.actionIconBox, { backgroundColor: 'rgba(96, 165, 250, 0.15)', borderWidth: 1, borderColor: 'rgba(96, 165, 250, 0.3)' }]}>
+                                    <MaterialCommunityIcons name="bell-ring-outline" size={24} color="#60A5FA" />
                                 </View>
                                 <View style={styles.actionContent}>
                                     <Text style={styles.actionTitle}>{t('equity.launchIpo')}</Text>
@@ -303,8 +304,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 disabled={stockPrice <= 1000}
                                 activeOpacity={0.7}
                             >
-                                <View style={styles.actionIconBox}>
-                                    <Text style={styles.actionIcon}>✂️</Text>
+                                <View style={[styles.actionIconBox, { backgroundColor: 'rgba(56, 189, 248, 0.15)', borderWidth: 1, borderColor: 'rgba(56, 189, 248, 0.3)' }]}>
+                                    <MaterialCommunityIcons name="content-cut" size={24} color="#38BDF8" />
                                 </View>
                                 <View style={styles.actionContent}>
                                     <Text style={[styles.actionTitle, stockPrice <= 1000 && styles.textDisabled]}>{t('equity.stockSplit')}</Text>
@@ -321,8 +322,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#05A8F620' }]}>
-                                <Text style={styles.actionIcon}>📈</Text>
+                            <View style={[styles.actionIconBox, { backgroundColor: 'rgba(52, 211, 153, 0.15)', borderWidth: 1, borderColor: 'rgba(52, 211, 153, 0.3)' }]}>
+                                <MaterialCommunityIcons name="chart-box-plus-outline" size={24} color="#34D399" />
                             </View>
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.stockBuyback')}</Text>
@@ -340,19 +341,13 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#FF8A8A20' }]}>
-                                <Text style={styles.actionIcon}>📉</Text>
+                            <View style={[styles.actionIconBox, { backgroundColor: 'rgba(248, 113, 113, 0.15)', borderWidth: 1, borderColor: 'rgba(248, 113, 113, 0.3)' }]}>
+                                <MaterialCommunityIcons name="chart-box-outline" size={24} color="#F87171" />
                             </View>
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
                                     {t('equity.issueNew')}
                                 </Text>
-                                {/* ISIMLENDIRME: "Issue Shares" belirsizdi ve oyuncu
-                                    hakli olarak sordu — "para sirkete gidiyor ama benim
-                                    hissem azaliyor". Ikisi de dogru cunku bu YENI HISSE
-                                    IHRACI: pasta buyur, para SIRKETE girer, senin dilimin
-                                    kucululur. Kendi hisseni satmak AYRI bir islem ve
-                                    asagida ayri duruyor. */}
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
                                     {isPublic
                                         ? t('equity.issueNewDesc')
@@ -386,23 +381,23 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     tone: 'danger',
                                     onConfirm: () => {
                                         const r = eq.sellOwnShares(chunk, (n) => {
-                                            const st = useStatsStore.getState();
-                                            st.update({ money: (st.money || 0) + n });
-                                        });
+                                             const st = useStatsStore.getState();
+                                             st.update({ money: (st.money || 0) + n });
+                                         });
                                         setPanel({
                                             title: r.error ? 'Blocked' : 'Sold',
                                             summary: r.error
                                                 || `${formatMoney(r.netToFounder)} is in your personal account after ${formatMoney(r.tax)} of tax.`,
                                             confirmLabel: 'OK',
-                                        });
+                                         });
                                     },
                                 });
                             }}
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#CFD0D220' }]}>
-                                <Text style={styles.actionIcon}>💼</Text>
+                            <View style={[styles.actionIconBox, { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderWidth: 1, borderColor: 'rgba(251, 191, 36, 0.3)' }]}>
+                                <MaterialCommunityIcons name="briefcase-upload-outline" size={24} color="#FBBF24" />
                             </View>
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>
@@ -424,8 +419,8 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             disabled={!isPublic}
                             activeOpacity={0.7}
                         >
-                            <View style={[styles.actionIconBox, { backgroundColor: '#CFD0D220' }]}>
-                                <Text style={styles.actionIcon}>💰</Text>
+                            <View style={[styles.actionIconBox, { backgroundColor: 'rgba(74, 222, 128, 0.15)', borderWidth: 1, borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
+                                <MaterialCommunityIcons name="cash-multiple" size={24} color="#4ADE80" />
                             </View>
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.distributeDividends')}</Text>
@@ -600,7 +595,9 @@ const styles = StyleSheet.create({
     actionRow: {
         backgroundColor: '#434B50',
         borderRadius: 16,
-        padding: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+        padding: 14,
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 12,
@@ -609,13 +606,12 @@ const styles = StyleSheet.create({
         opacity: 0.4,
     },
     actionIconBox: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#434B50',
+        width: 44,
+        height: 44,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 16,
+        marginRight: 14,
     },
     actionIcon: {
         fontSize: 24,

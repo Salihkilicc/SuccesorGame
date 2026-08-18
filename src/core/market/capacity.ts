@@ -119,6 +119,32 @@ export interface FacilityTier {
     description: string;
 }
 
+export const getFacilityTierVisual = (level: number) => {
+    switch (level) {
+        case 1: return { icon: 'hammer-wrench', color: '#94A3B8' };
+        case 2: return { icon: 'conveyor-belt', color: '#94A3B8' };
+        case 3: return { icon: 'factory', color: '#60A5FA' };
+        case 4: return { icon: 'office-building-cog', color: '#60A5FA' };
+        case 5: return { icon: 'warehouse', color: '#38BDF8' };
+        case 6: return { icon: 'robot-industrial', color: '#38BDF8' };
+        case 7: return { icon: 'robot-industrial-outline', color: '#2DD4BF' };
+        case 8: return { icon: 'chip', color: '#34D399' };
+        case 9: return { icon: 'domain', color: '#4ADE80' };
+        case 10: return { icon: 'city', color: '#FBBF24' };
+        case 11: return { icon: 'earth', color: '#F59E0B' };
+        case 12: return { icon: 'fire', color: '#FB923C' };
+        case 13: return { icon: 'robot', color: '#F472B6' };
+        case 14: return { icon: 'office-building-marker', color: '#EC4899' };
+        case 15: return { icon: 'network-outline', color: '#A78BFA' };
+        case 16: return { icon: 'lightning-bolt-circle', color: '#8B5CF6' };
+        case 17: return { icon: 'atom', color: '#C084FC' };
+        case 18: return { icon: 'transit-connection-variant', color: '#E879F9' };
+        case 19: return { icon: 'earth-arrow-right', color: '#38BDF8' };
+        case 20: return { icon: 'orbit', color: '#FCD34D' };
+        default: return { icon: 'factory', color: '#60A5FA' };
+    }
+};
+
 /**
  * MERDIVEN — 20 kademe, adim basina ~1.63x.
  *

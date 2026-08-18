@@ -35,10 +35,10 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
             style={({ pressed }) => [styles.bannerCard, pressed && styles.pressed]}
             onPress={onPress}
         >
-            {/* Top Row: VIP Crown + Store Name + Action Chevron */}
+            {/* Top Row: VIP Diamond + Store Name + Action Chevron */}
             <View style={styles.topRow}>
                 <View style={styles.vipIconWrap}>
-                    <MaterialCommunityIcons name="crown" size={22} color="#FBBF24" />
+                    <MaterialCommunityIcons name="diamond-stone" size={24} color="#FBBF24" />
                 </View>
 
                 <View style={styles.titleBlock}>
@@ -47,7 +47,7 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
 
                 <View style={styles.enterButton}>
                     <Text style={styles.enterText}>ENTER</Text>
-                    <MaterialCommunityIcons name="chevron-right" size={16} color="#FFFFFF" />
+                    <MaterialCommunityIcons name="chevron-right" size={16} color="#FBBF24" />
                 </View>
             </View>
 
@@ -63,7 +63,7 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
                         onInventoryPress?.();
                     }}
                 >
-                    <MaterialCommunityIcons name="briefcase" size={14} color="#FFFFFF" />
+                    <MaterialCommunityIcons name="treasure-chest" size={14} color="#FBBF24" />
                     <Text style={styles.inventoryBtnText}>INVENTORY</Text>
                 </Pressable>
 
@@ -106,7 +106,9 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 12,
-        backgroundColor: '#20242B', // Elevated dark charcoal
+        backgroundColor: 'rgba(251, 191, 36, 0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(251, 191, 36, 0.35)',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 12,
@@ -124,14 +126,16 @@ const styles = StyleSheet.create({
     enterButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#262B33',
+        backgroundColor: 'rgba(251, 191, 36, 0.15)',
+        borderWidth: 1,
+        borderColor: 'rgba(251, 191, 36, 0.35)',
         paddingHorizontal: 12,
         paddingVertical: 7,
         borderRadius: 8,
         gap: 2,
     },
     enterText: {
-        color: '#FFFFFF',
+        color: '#FBBF24',
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 0.5,
@@ -149,6 +153,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#22272F',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 8,

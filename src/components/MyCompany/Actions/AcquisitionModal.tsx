@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useMarketStore } from '../../../core/store/useMarketStore';
@@ -35,6 +36,7 @@ import { useEquityStore } from '../../../features/finance/stores/useEquityStore'
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
+import { getCompanyVisual, CompanyVisual } from '../../../core/market/companyVisuals';
 
 const { width } = Dimensions.get('window');
 
@@ -345,6 +347,7 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
 
   const renderCompanyItem = ({ item }: { item: any }) => {
     const valuation = getValuation(item);
+    const visual = getCompanyVisual(item, valuation);
 
     return (
       <TouchableOpacity
@@ -352,11 +355,16 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
         activeOpacity={0.7}
         onPress={() => setSelectedTarget({ ...item, currentValuation: valuation })}
       >
-        <View style={styles.itemIcon}>
-          <Text style={styles.itemInitial}>{item.name.charAt(0)}</Text>
+        <View style={[styles.itemIcon, { backgroundColor: visual.badgeBg, borderWidth: 1, borderColor: visual.badgeBorder }]}>
+          <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
         </View>
         <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>{item.name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+            <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
+              <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
+            </View>
+          </View>
           <Text style={styles.itemSector}>{item.category || t('common.technology')}</Text>
         </View>
         <View style={styles.itemValue}>
@@ -385,7 +393,12 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
 
         {/* CAPITAL INDICATOR */}
         <View style={styles.capitalBar}>
-          <Text style={styles.capitalLabel}>{t('action.acquisitionPower')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={styles.capitalIconBadge}>
+              <MaterialCommunityIcons name="cash-multiple" size={20} color={theme.colors.success} />
+            </View>
+            <Text style={styles.capitalLabel}>{t('action.acquisitionPower')}</Text>
+          </View>
           <Text style={styles.capitalValue}>{formatMoney(companyCapital)}</Text>
         </View>
 
@@ -421,152 +434,143 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
 
         {/* Persistent Bottom Bar */}
         {/* NEGOTIATION OVERLAY */}
-        {selectedTarget && (
-          <View style={styles.overlayBackdrop}>
-            <View style={styles.negotiationCard}>
-              <View style={styles.negHeader}>
-                <Text style={styles.negTitle}>{t('action.acquireV1', { v1: selectedTarget.name })}</Text>
-                <Text style={styles.negSubtitle}>{t('action.chooseYourApproach')}</Text>
-              </View>
+        {selectedTarget && (() => {
+          const targetValuation = selectedTarget.currentValuation || getValuation(selectedTarget);
+          const targetVisual = getCompanyVisual(selectedTarget, targetValuation);
 
-              <View style={styles.negBody}>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>{t('action.currentValuation')}</Text>
-                  <Text style={styles.infoValue}>{formatMoney(selectedTarget.currentValuation)}</Text>
+          return (
+            <View style={styles.overlayBackdrop}>
+              <View style={styles.negotiationCard}>
+                <View style={styles.negHeader}>
+                  <View style={[styles.negIconHero, { backgroundColor: targetVisual.badgeBg, borderWidth: 1, borderColor: targetVisual.badgeBorder }]}>
+                    <MaterialCommunityIcons name={targetVisual.icon} size={36} color={targetVisual.color} />
+                  </View>
+                  <Text style={styles.negTitle}>{t('action.acquireV1', { v1: selectedTarget.name })}</Text>
+                  <View style={[styles.tierTag, { borderColor: `${targetVisual.tierColor}40`, backgroundColor: `${targetVisual.tierColor}15`, marginBottom: 6 }]}>
+                    <Text style={[styles.tierTagText, { color: targetVisual.tierColor }]}>{targetVisual.tierLabel}</Text>
+                  </View>
+                  <Text style={styles.negSubtitle}>{t('action.chooseYourApproach')}</Text>
                 </View>
 
-                {/* PAZAR PAYI — satin almanin asil gerekcesi.
-                    Bu sirket senin urun kategorilerinden birinde rakipse
-                    payini gosteriyoruz. Bkz. core/market/productMarkets.ts */}
-                {(() => {
-                  const found = findCompetitorByStockId(selectedTarget.id);
-                  if (!found) {
+                <View style={styles.negBody}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>{t('action.currentValuation')}</Text>
+                    <Text style={styles.infoValue}>{formatMoney(targetValuation)}</Text>
+                  </View>
+
+                  {/* PAZAR PAYI — satin almanin asil gerekcesi.
+                      Bu sirket senin urun kategorilerinden birinde rakipse
+                      payini gosteriyoruz. Bkz. core/market/productMarkets.ts */}
+                  {(() => {
+                    const found = findCompetitorByStockId(selectedTarget.id);
+                    if (!found) {
+                      return (
+                        <View style={styles.infoRow}>
+                          <Text style={styles.infoLabel}>{t('action.marketPosition')}</Text>
+                          <Text style={styles.infoValue}>{t('action.notADirectCompetitor')}</Text>
+                        </View>
+                      );
+                    }
                     return (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>{t('action.marketPosition')}</Text>
-                        <Text style={styles.infoValue}>{t('action.notADirectCompetitor')}</Text>
+                        <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
+                        <Text style={[styles.infoValue, { color: '#FFFFFF' }]}>
+                          {found.competitor.share.toFixed(1)}% of {found.market.category}
+                        </Text>
                       </View>
                     );
-                  }
-                  return (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>{t('action.marketShare')}</Text>
-                      <Text style={[styles.infoValue, { color: '#FFFFFF' }]}>
-                        {found.competitor.share.toFixed(1)}% of {found.market.category}
-                      </Text>
-                    </View>
-                  );
-                })()}
+                  })()}
 
-                {/* ----------------------------------------------------------
-                    WHAT YOU ARE ACTUALLY BUYING
+                  {(() => {
+                    const ebit = estimateTargetEbit(
+                      targetValuation,
+                      selectedTarget.risk as TargetRisk,
+                    );
+                    return (
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>{t('acq.theirAnnualProfit')}</Text>
+                        <Text style={[
+                          styles.infoValue,
+                          { color: ebit >= 0 ? theme.colors.positive : theme.colors.negative },
+                        ]}>
+                          {formatMoney(ebit)}
+                        </Text>
+                      </View>
+                    );
+                  })()}
+                </View>
 
-                    This row used to read "R&D Speed +15%" off the target's
-                    `acquisitionBuff`. The engine no longer applies those, so
-                    the row was a promise nothing kept - the worst kind of
-                    stale UI, because it reads as a reason to sign.
-
-                    Their annual profit replaces it: the number the price, the
-                    payback and the impairment test are all derived from, and
-                    the one an actual buyer asks for first.
-                ---------------------------------------------------------- */}
                 {(() => {
-                  const ebit = estimateTargetEbit(
-                    selectedTarget.currentValuation,
-                    selectedTarget.risk as TargetRisk,
+                  const valuation = targetValuation;
+                  const risk: TargetRisk = (selectedTarget.risk as TargetRisk) || 'Medium';
+                  const acquirerValuation = useStatsStore.getState().companyValue || 0;
+                  const friendlyQuote = quoteAcquisition(
+                    valuation, risk, false, acquirerValuation, negotiated?.premiumRatio,
                   );
+                  const hostileQuote = quoteAcquisition(valuation, risk, true, acquirerValuation);
+                  const lock = negotiated ? undefined : friendlyLock(valuation);
+
                   return (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>{t('acq.theirAnnualProfit')}</Text>
-                      <Text style={[
-                        styles.infoValue,
-                        // Sign only. A target that loses money should look
-                        // like one before you have opened the deal sheet.
-                        { color: ebit >= 0 ? theme.colors.positive : theme.colors.negative },
-                      ]}>
-                        {formatMoney(ebit)}
-                      </Text>
+                    <View style={styles.negActions}>
+                      {/* Friendly Offer */}
+                      <TouchableOpacity
+                        style={[styles.optionBtn, !!lock && styles.optionBtnLocked]}
+                        disabled={!!lock}
+                        onPress={() => handleAcquire('FRIENDLY')}
+                      >
+                        <View style={styles.optionHeader}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <MaterialCommunityIcons
+                              name={lock ? 'lock-outline' : 'handshake-outline'}
+                              size={20}
+                              color={lock ? theme.colors.textMuted : '#38BDF8'}
+                            />
+                            <Text style={styles.optionTitle}>{t('acq.friendlyOffer')}</Text>
+                          </View>
+                          {!lock && (
+                            <Text style={styles.optionPrice}>{formatMoney(friendlyQuote.price)}</Text>
+                          )}
+                        </View>
+                        <Text style={styles.optionDesc}>
+                          {lock ? lock.reason : negotiated
+                            ? 'Agreed in the post. Only the financing is left.'
+                            : t('action.purchaseAtFairMarketValue')}
+                        </Text>
+                        {!!lock && <Text style={styles.optionHint}>{lock.hint}</Text>}
+                      </TouchableOpacity>
+
+                      {/* Hostile Takeover */}
+                      <TouchableOpacity
+                        style={[styles.optionBtn, styles.hostileBtn]}
+                        onPress={() => handleAcquire('HOSTILE')}
+                      >
+                        <View style={styles.optionHeader}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <MaterialCommunityIcons name="sword-cross" size={20} color="#F87171" />
+                            <Text style={[styles.optionTitle, styles.hostileText]}>{t('acq.hostileTakeover')}</Text>
+                          </View>
+                          <Text style={[styles.optionPrice, styles.hostileText]}>
+                            {formatMoney(hostileQuote.price)}
+                          </Text>
+                        </View>
+                        <Text style={[styles.optionDesc, styles.hostileDesc]}>
+                          {HOSTILE_MULTIPLE}x market. No negotiation, and you pay for that.
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   );
                 })()}
+
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => setSelectedTarget(null)}
+                >
+                  <Text style={styles.cancelText}>{t('action.cancelNegotiation')}</Text>
+                </TouchableOpacity>
               </View>
-
-              {/* ------------------------------------------------------------
-                  BOTH PRICES ARE NOW THE PRICE
-
-                  Friendly printed `currentValuation` and hostile printed
-                  `currentValuation * 1.2`, and the engine charged neither -
-                  it charged FRIENDLY_PREMIUM and HOSTILE_PREMIUM through
-                  quoteAcquisition. So the two numbers the player weighed the
-                  decision on were both wrong, and the hostile one was wrong
-                  by a factor that changed when the premium was retuned.
-
-                  They come from the same quote the engine uses now.
-                 ------------------------------------------------------------ */}
-              {(() => {
-                const valuation = getValuation(selectedTarget);
-                const risk: TargetRisk = (selectedTarget.risk as TargetRisk) || 'Medium';
-                const acquirerValuation = useStatsStore.getState().companyValue || 0;
-                const friendlyQuote = quoteAcquisition(
-                  valuation, risk, false, acquirerValuation, negotiated?.premiumRatio,
-                );
-                const hostileQuote = quoteAcquisition(valuation, risk, true, acquirerValuation);
-                const lock = negotiated ? undefined : friendlyLock(valuation);
-
-                return (
-                  <View style={styles.negActions}>
-                    {/* Friendly Offer */}
-                    <TouchableOpacity
-                      style={[styles.optionBtn, !!lock && styles.optionBtnLocked]}
-                      disabled={!!lock}
-                      onPress={() => handleAcquire('FRIENDLY')}
-                    >
-                      <View style={styles.optionHeader}>
-                        <Text style={styles.optionTitle}>
-                          {lock ? '🔒' : '🤝'} {t('acq.friendlyOffer')}
-                        </Text>
-                        {!lock && (
-                          <Text style={styles.optionPrice}>{formatMoney(friendlyQuote.price)}</Text>
-                        )}
-                      </View>
-                      {/* THE LOCK SAYS WHERE TO GO INSTEAD. A shut door with
-                          no sign on it is the same as a broken one. */}
-                      <Text style={styles.optionDesc}>
-                        {lock ? lock.reason : negotiated
-                          ? 'Agreed in the post. Only the financing is left.'
-                          : t('action.purchaseAtFairMarketValue')}
-                      </Text>
-                      {!!lock && <Text style={styles.optionHint}>{lock.hint}</Text>}
-                    </TouchableOpacity>
-
-                    {/* Hostile Takeover */}
-                    <TouchableOpacity
-                      style={[styles.optionBtn, styles.hostileBtn]}
-                      onPress={() => handleAcquire('HOSTILE')}
-                    >
-                      <View style={styles.optionHeader}>
-                        <Text style={[styles.optionTitle, styles.hostileText]}>⚔️ {t('acq.hostileTakeover')}</Text>
-                        <Text style={[styles.optionPrice, styles.hostileText]}>
-                          {formatMoney(hostileQuote.price)}
-                        </Text>
-                      </View>
-                      <Text style={[styles.optionDesc, styles.hostileDesc]}>
-                        {HOSTILE_MULTIPLE}x market. No negotiation, and you pay for that.
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })()}
-
-              <TouchableOpacity
-                style={styles.cancelBtn}
-                onPress={() => setSelectedTarget(null)}
-              >
-                <Text style={styles.cancelText}>{t('action.cancelNegotiation')}</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        )}
+          );
+        })()}
 
       </View>
 
@@ -630,6 +634,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
   },
+  capitalIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(52, 211, 153, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   capitalLabel: {
     color: '#FFFFFF',
     fontSize: 14,
@@ -682,7 +696,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#434B50',
-    padding: 16,
+    padding: 14,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
@@ -691,10 +705,20 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#323A40',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: 14,
+  },
+  tierTag: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+  },
+  tierTagText: {
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   itemInitial: {
     fontSize: 20,
@@ -706,19 +730,14 @@ const styles = StyleSheet.create({
   },
   itemName: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    marginBottom: 4,
   },
   itemSector: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '500',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    color: theme.colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   itemValue: {
     alignItems: 'flex-end',
@@ -762,7 +781,15 @@ const styles = StyleSheet.create({
   },
   negHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+  },
+  negIconHero: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   negTitle: {
     color: '#FFFFFF',

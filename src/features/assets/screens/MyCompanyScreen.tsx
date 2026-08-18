@@ -13,6 +13,7 @@ import { useGameStore } from '../../../core/store/useGameStore';
 import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
+import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { IPO_MIN_VALUATION, quoteIpo } from '../../../core/market/equity';
 import { CONTROL_THRESHOLD } from '../../../core/market/governance';
 import { formatCurrency } from '../hooks/NativeEconomy';
@@ -27,21 +28,12 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
-import { formatMoney, formatPrice, formatNumber } from '../../../core/utils';
+import { formatMoney, formatPrice, formatNumber, formatRP } from '../../../core/utils';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import InfoDot from '../../../components/common/InfoDot';
 
 // Helper Component
-//
-//  Each of the four cards used to carry its own colour, and the colours were
-//  left over from two themes ago: the comments said Gold, Blue, Purple, Green
-//  while the values were all magenta or lavender. Four departments in four
-//  arbitrary colours is also the thing that made the screen look scattered -
-//  the colour said nothing, since none of them mean anything.
-//
-//  They share one surface now. The icon distinguishes them; the press state
-//  lifts the card by one rung of the elevation ladder instead of tinting it.
-const DepartmentCard = ({ icon, title, subtitle, onPress, info }: any) => (
+const DepartmentCard = ({ icon, iconColor = theme.colors.textPrimary, title, subtitle, onPress, info }: any) => (
   <Pressable
     onPress={onPress}
     style={({ pressed }) => [
@@ -53,7 +45,9 @@ const DepartmentCard = ({ icon, title, subtitle, onPress, info }: any) => (
         <InfoDot title={info.title} text={info.text} detail={info.detail} small />
       </View>
     )}
-    <Text style={{ fontSize: 32 }}>{icon}</Text>
+    <View style={[styles.deptIconBadge, { backgroundColor: `${iconColor}18`, borderColor: `${iconColor}38` }]}>
+      <MaterialCommunityIcons name={icon} size={24} color={iconColor} />
+    </View>
     <Text style={styles.deptTitle}>{title}</Text>
     <Text style={styles.deptSub}>{subtitle}</Text>
   </Pressable>
@@ -74,6 +68,7 @@ const MyCompanyScreen = () => {
   const { handleHireEmployees } = useCompanyLogic();
   const { products } = useProductStore();
   const { employeeMorale } = useGameStore();
+  const totalRP = useLaboratoryStore((state) => state.totalRP);
 
   // Store Data
   const stats = useStatsStore();
@@ -319,7 +314,8 @@ const MyCompanyScreen = () => {
           {/* DEPARTMENTS */}
           <View style={styles.grid}>
             <DepartmentCard
-              icon="🏦"
+              icon="bank-outline"
+              iconColor="#4ADE80"
               title={t('company.financing')}
               subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
               onPress={() => navigation.navigate('Finance')}
@@ -332,7 +328,8 @@ const MyCompanyScreen = () => {
 
             <TutorialTarget tutorialKey="products" style={styles.deptTargetWrap}>
               <DepartmentCard
-                icon="🏭"
+                icon="package-variant-closed"
+                iconColor="#60A5FA"
                 title={t('company.products')}
                 subtitle={`${activeProductsCount} Active`}
                 onPress={() => navigation.navigate('Products')}
@@ -345,18 +342,21 @@ const MyCompanyScreen = () => {
             </TutorialTarget>
 
             <DepartmentCard
-              icon="📊"
-              title={t('company.financialReport')}
-              subtitle={t('company.expensesProfitsRoi')}
-              onPress={() => navigation.navigate('FinancialReport')}
+              icon="flask-outline"
+              iconColor="#A78BFA"
+              title={t('company.rDInvestment')}
+              subtitle={`${formatRP(totalRP)} RP`}
+              onPress={() => navigation.navigate('Research')}
               info={{
-                title: t('tactic.financialReportTitle'),
-                text: t('tactic.financialReportText'),
-                detail: t('tactic.financialReportDetail'),
+                title: t('tactic.rdTitle'),
+                text: t('tactic.rdText'),
+                detail: t('tactic.rdDetail'),
               }}
             />
+
             <DepartmentCard
-              icon="📈"
+              icon="chart-timeline-variant-shimmer"
+              iconColor="#FBBF24"
               title={t('company.equity')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
               onPress={() => navigation.navigate('StockMarket', { onOpenIPO: handleLaunchIPO })}
@@ -368,14 +368,21 @@ const MyCompanyScreen = () => {
             />
           </View>
 
-
-          {/* OPERATIONS */}
-          <SectionHeader title={t('company.operations')} />
+          {/* OPERATIONS / FACILITIES */}
+          <SectionHeader
+            title={t('company.operations')}
+            info={{
+              title: t('tactic.operationsTitle'),
+              text: t('tactic.operationsText'),
+              detail: t('tactic.operationsDetail'),
+            }}
+          />
           <FacilityPanel />
 
           <TutorialTarget tutorialKey="teamMorale" style={{ marginTop: 12 }}>
             <SectionCard
-              title={`🎉 ${t('company.teamMorale')}`}
+              icon={<MaterialCommunityIcons name="heart-pulse" size={20} color="#F43F5E" />}
+              title={t('company.teamMorale')}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
               onPress={() => navigation.navigate('TeamMorale')}
               info={{
@@ -390,17 +397,8 @@ const MyCompanyScreen = () => {
           <SectionHeader title={t('company.quickActions')} />
           <View style={{ gap: 8 }}>
             <SectionCard
-              title={`🔬 ${t('company.rDInvestment')}`}
-              subtitle={t('company.investInFutureGrowth')}
-              onPress={() => navigation.navigate('Research')}
-              info={{
-                title: t('tactic.rdTitle'),
-                text: t('tactic.rdText'),
-                detail: t('tactic.rdDetail'),
-              }}
-            />
-            <SectionCard
-              title={`🏢 ${t('company.hostileTakeover')}`}
+              icon={<MaterialCommunityIcons name="domain-plus" size={20} color="#38BDF8" />}
+              title={t('company.hostileTakeover')}
               subtitle={t('company.buyPublicCompaniesToGain')}
               onPress={() => navigation.navigate('HostileTakeover')}
               info={{
@@ -410,7 +408,8 @@ const MyCompanyScreen = () => {
               }}
             />
             <SectionCard
-              title={`👔 ${t('company.boardMembers')}`}
+              icon={<MaterialCommunityIcons name="account-group-outline" size={20} color="#FBBF24" />}
+              title={t('company.boardMembers')}
               subtitle={t('company.viewShareholders')}
               onPress={() => navigation.navigate('BoardMembers')}
               info={{
@@ -420,7 +419,8 @@ const MyCompanyScreen = () => {
               }}
             />
             <SectionCard
-              title={`🏆 ${t('company.myEmpire')}`}
+              icon={<MaterialCommunityIcons name="crown-outline" size={20} color="#EC4899" />}
+              title={t('company.myEmpire')}
               subtitle={t('company.manageSubsidiaries')}
               onPress={() => navigation.navigate('MyEmpire')}
               info={{
@@ -579,10 +579,16 @@ const styles = StyleSheet.create({
   },
   deptCardPressed: { backgroundColor: theme.colors.surfaceHigh, transform: [{ scale: 0.98 }] },
   deptInfoWrap: { position: 'absolute', top: 10, right: 10, zIndex: 10 },
+  deptIconBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    marginBottom: 4,
+  },
   deptTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: 0.3 },
   deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
-  // The share PRICE is not a gain or a loss, it is just a number - the
-  // percentage next to it carries the direction. It was painted with the loss
-  // red, so the headline figure always read as bad news.
   sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
 });

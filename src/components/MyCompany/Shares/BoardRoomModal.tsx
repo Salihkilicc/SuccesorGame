@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import MemberInteractionModal from './MemberInteractionModal';
 import { useStatsStore, useGameStore } from '../../../core/store';
@@ -17,6 +18,17 @@ import {
     FOUNDER_GRACE_PERIOD_MONTHS,
     Proposal,
 } from '../../../core/market/governance';
+
+export const TRAIT_VISUALS: Record<string, { icon: string; color: string }> = {
+    Shark: { icon: 'shark', color: '#F87171' },
+    Visionary: { icon: 'lightbulb-on-outline', color: '#A78BFA' },
+    Bureaucrat: { icon: 'file-document-outline', color: '#94A3B8' },
+    OldMoney: { icon: 'bank-outline', color: '#FBBF24' },
+    Technocrat: { icon: 'chip', color: '#38BDF8' },
+    Opportunist: { icon: 'handshake-outline', color: '#34D399' },
+};
+
+export const getTraitVisual = (trait: string) => TRAIT_VISUALS[trait] || { icon: 'account-tie-outline', color: '#60A5FA' };
 
 /**
  * ============================================================================
@@ -241,9 +253,12 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                     {/* ---- GUVENSIZLIK ERKEN UYARISI / KURUCU KORUMASI ---- */}
                     {inGracePeriod ? (
                         <View style={[styles.dangerCard, { borderColor: theme.colors.highlight, backgroundColor: 'rgba(125,211,252,0.08)' }]}>
-                            <Text style={[styles.dangerTitle, { color: theme.colors.highlight }]}>
-                                🛡️ {t('board.inGracePeriod')}
-                            </Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                <MaterialCommunityIcons name="shield-check-outline" size={18} color={theme.colors.highlight} />
+                                <Text style={[styles.dangerTitle, { color: theme.colors.highlight, marginBottom: 0 }]}>
+                                    {t('board.inGracePeriod')}
+                                </Text>
+                            </View>
                             <Text style={styles.dangerBody}>
                                 {t('board.removalNeeds', {
                                     threshold: CONTROL_THRESHOLD,
@@ -253,11 +268,18 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                         </View>
                     ) : noConfidenceLevel >= 2 && (
                         <View style={styles.dangerCard}>
-                            <Text style={styles.dangerTitle}>
-                                {noConfidenceLevel === 3
-                                    ? `⛔ ${t('board.noConfidenceOnTable')}`
-                                    : `⚠️ ${t('board.noConfidenceNear')}`}
-                            </Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                <MaterialCommunityIcons
+                                    name={noConfidenceLevel === 3 ? "alert-decagram-outline" : "alert-outline"}
+                                    size={18}
+                                    color={noConfidenceLevel === 3 ? theme.colors.negative : theme.colors.warning}
+                                />
+                                <Text style={[styles.dangerTitle, { marginBottom: 0 }]}>
+                                    {noConfidenceLevel === 3
+                                        ? t('board.noConfidenceOnTable')
+                                        : t('board.noConfidenceNear')}
+                                </Text>
+                            </View>
                             <Text style={styles.dangerBody}>
                                 {t('board.removalNeeds', {
                                     threshold: CONTROL_THRESHOLD,
@@ -287,17 +309,11 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                     const weight = totalShares > 0 ? (m.shareCount / totalShares) * 100 : 0;
                                     const promised = promises.filter(p => p.memberId === m.id && !p.resolved);
                                     const alreadyLobbied = lobbied[m.id] !== undefined;
-                                    // Three tiers were painted with two colours,
-                                    // and the two bad ones were the SAME hex -
-                                    // so a director on 34 looked exactly like
-                                    // one on 59. Trust is also not money, so
-                                    // the loss red has no business here.
+                                    const traitVisual = getTraitVisual(m.trait);
                                     const trustColor =
                                         m.trust >= 60 ? theme.colors.up
                                             : m.trust >= 35 ? theme.colors.textSecondary
                                                 : theme.colors.down;
-                                    // The BAR is a fill, so it cannot take the
-                                    // text tokens. Same three steps in fills.
                                     const trustFill =
                                         m.trust >= 60 ? theme.colors.primary
                                             : m.trust >= 35 ? theme.colors.borderStrong
@@ -307,7 +323,10 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                         <View key={m.id} style={styles.memberCard}>
                                             <Pressable onPress={() => setOpenMemberId(m.id)}>
                                                 <View style={styles.memberTop}>
-                                                    <View style={{ flex: 1 }}>
+                                                    <View style={[styles.traitBadge, { backgroundColor: `${traitVisual.color}15`, borderColor: `${traitVisual.color}35` }]}>
+                                                        <MaterialCommunityIcons name={traitVisual.icon} size={20} color={traitVisual.color} />
+                                                    </View>
+                                                    <View style={{ flex: 1, marginLeft: 10 }}>
                                                         <Text style={styles.memberName}>{m.name} ›</Text>
                                                         <Text style={styles.memberTrait}>
                                                             {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
@@ -317,7 +336,6 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                                         <Text style={[styles.memberTrust, { color: trustColor }]}>
                                                             {m.trust}
                                                         </Text>
-                                                        {/* Trust and relationship are different things - show both. */}
                                                         <Text style={styles.memberRel}>
                                                             {t('board.relShort', { v1: String(Math.round(m.relationship ?? 50)) })}
                                                         </Text>
@@ -335,23 +353,26 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                             </View>
 
                                             {promised.map(p => (
-                                                <Text key={p.id} style={styles.promiseNote}>
-                                                    🤝 You promised to {p.description}
-                                                </Text>
+                                                <View key={p.id} style={styles.promiseBox}>
+                                                    <MaterialCommunityIcons name="handshake-outline" size={14} color="#FBBF24" style={{ marginRight: 6 }} />
+                                                    <Text style={styles.promiseNote}>
+                                                        You promised to {p.description}
+                                                    </Text>
+                                                </View>
                                             ))}
 
-                                            {/* Two different conversations, so two
-                                                buttons. Tapping the name alone was
-                                                too easy to miss - the player pressed
-                                                "speak privately" expecting the
-                                                director's screen and got the lobby
-                                                flow instead. */}
                                             <View style={styles.actionRow}>
                                                 <Pressable
                                                     style={[styles.lobbyBtn, alreadyLobbied && styles.lobbyBtnDone]}
                                                     disabled={alreadyLobbied}
                                                     onPress={() => handleLobby(m.id, m.name)}
                                                 >
+                                                    <MaterialCommunityIcons
+                                                        name={alreadyLobbied ? 'check' : 'message-lock-outline'}
+                                                        size={14}
+                                                        color={alreadyLobbied ? 'rgba(255,255,255,0.48)' : '#FFFFFF'}
+                                                        style={{ marginRight: 4 }}
+                                                    />
                                                     <Text style={styles.lobbyText}>
                                                         {alreadyLobbied
                                                             ? t('board.spokenAlready')
@@ -362,6 +383,7 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                                                     style={styles.openMemberBtn}
                                                     onPress={() => setOpenMemberId(m.id)}
                                                 >
+                                                    <MaterialCommunityIcons name="card-account-details-outline" size={14} color={theme.colors.textPrimary} style={{ marginRight: 4 }} />
                                                     <Text style={styles.openMemberText}>
                                                         {t('board.openMember')}
                                                     </Text>
@@ -497,19 +519,56 @@ const styles = StyleSheet.create({
     body: { flex: 1 },
     bodyContent: { paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.md },
 
-    memberCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 10 },
+    memberCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
+    traitBadge: {
+        width: 38,
+        height: 38,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
     memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#FFFFFF', marginTop: 2 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
     trustBarBg: { height: 5, backgroundColor: '#434B50', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },
-    promiseNote: { fontSize: 11, color: theme.colors.textMuted, marginTop: 8 },
-    actionRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-    openMemberBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#434B50', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    promiseBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(251, 191, 36, 0.08)',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(251, 191, 36, 0.2)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        marginTop: 8,
+    },
+    promiseNote: { fontSize: 11, color: '#FBBF24', fontWeight: '500', flex: 1 },
+    actionRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+    openMemberBtn: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingVertical: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#434B50',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+    },
     openMemberText: { color: theme.colors.textPrimary, fontSize: 12, fontWeight: '700' },
-    lobbyBtn: { flex: 1, padding: 10, borderRadius: 10, backgroundColor: '#434B50', alignItems: 'center' },
+    lobbyBtn: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: '#434B50',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     lobbyBtnDone: { opacity: 0.4 },
     lobbyText: { fontSize: 12, color: theme.colors.textPrimary, fontWeight: '700' },
 

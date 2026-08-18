@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '../types';
 import { UnlockableProduct, UNLOCKABLE_PRODUCTS } from '../../features/products/data/unlockableProductsData';
+import { getProductEmoji } from '../../features/products/components/ProductIcon';
 import { formatMoney, formatNumber } from '../../core/utils';
 import { productUpgradeRP } from '../market/production';
 import { zustandStorage } from '../../storage/persist';
@@ -461,7 +462,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
 
 
                         // Misc
-                        icon: '📦',
+                        icon: getProductEmoji(product.id),
                         rndCost: product.unlockRPCost,
                         complexity: product.complexity,
                         unlockCashCost: product.unlockCashCost,

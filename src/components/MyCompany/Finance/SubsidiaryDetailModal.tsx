@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
 import SellCompanyModal from '../Actions/SellCompanyModal';
 import { formatMoney } from '../../../core/utils';
+import { getCompanyVisual } from '../../../core/market/companyVisuals';
 
 type Props = {
     visible: boolean;
@@ -43,6 +45,8 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 
     if (!company) return null;
 
+    const visual = getCompanyVisual(company, company.valuation);
+
     const totalPoints = strategy.marketing + strategy.rnd + strategy.production + strategy.workforce;
     const maxPoints = 10;
     const remainingPoints = maxPoints - totalPoints;
@@ -72,11 +76,11 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 
     const isPositive = company.lastChangePercent >= 0;
 
-    const renderStrategyRow = (label: string, field: keyof SubsidiaryStrategy, icon: string, description: string) => (
+    const renderStrategyRow = (label: string, field: keyof SubsidiaryStrategy, iconName: string, iconColor: string, description: string) => (
         <View style={styles.strategyRow} key={field}>
             <View style={styles.strategyInfo}>
-                <View style={styles.iconBox}>
-                    <Text style={{ fontSize: 20 }}>{icon}</Text>
+                <View style={[styles.iconBox, { backgroundColor: `${iconColor}15`, borderWidth: 1, borderColor: `${iconColor}35` }]}>
+                    <MaterialCommunityIcons name={iconName} size={22} color={iconColor} />
                 </View>
                 <View>
                     <Text style={styles.strategyLabel}>{label}</Text>
@@ -122,9 +126,19 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                 <View style={[styles.container, { marginTop: 60 }]}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <View>
-                            <Text style={styles.companyName}>{company.name}</Text>
-                            <Text style={styles.sectorText}>{company.sector} Sector</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            <View style={[styles.headerIconBadge, { backgroundColor: visual.badgeBg, borderWidth: 1, borderColor: visual.badgeBorder }]}>
+                                <MaterialCommunityIcons name={visual.icon} size={26} color={visual.color} />
+                            </View>
+                            <View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                                    <Text style={styles.companyName}>{company.name}</Text>
+                                    <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
+                                        <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
+                                    </View>
+                                </View>
+                                <Text style={styles.sectorText}>{company.sector} Sector</Text>
+                            </View>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
                             <Ionicons name="close" size={24} color="#FFFFFF" />
@@ -162,10 +176,10 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                         </View>
 
                         <View style={styles.strategyList}>
-                            {renderStrategyRow(t('sub.marketing'), 'marketing', '📢', t('sub.marketingDesc'))}
-                            {renderStrategyRow(t('sub.rnd'), 'rnd', '🔬', t('sub.rndDesc'))}
-                            {renderStrategyRow(t('sub.production'), 'production', '🏭', t('sub.productionDesc'))}
-                            {renderStrategyRow(t('sub.workforce'), 'workforce', '👥', t('sub.workforceDesc'))}
+                            {renderStrategyRow(t('sub.marketing'), 'marketing', 'bullhorn-outline', '#38BDF8', t('sub.marketingDesc'))}
+                            {renderStrategyRow(t('sub.rnd'), 'rnd', 'flask-outline', '#A78BFA', t('sub.rndDesc'))}
+                            {renderStrategyRow(t('sub.production'), 'production', 'factory', '#FBBF24', t('sub.productionDesc'))}
+                            {renderStrategyRow(t('sub.workforce'), 'workforce', 'account-group-outline', '#34D399', t('sub.workforceDesc'))}
                         </View>
 
                         {/* Info Note */}
@@ -232,14 +246,32 @@ const styles = StyleSheet.create({
         borderBottomColor: '#1C242C',
         backgroundColor: '#434B50',
     },
+    headerIconBadge: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     companyName: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: '800',
         color: '#FFFFFF',
         letterSpacing: 0.5,
     },
+    tierTag: {
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        borderWidth: 1,
+    },
+    tierTagText: {
+        fontSize: 9,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
     sectorText: {
-        fontSize: 13,
+        fontSize: 12,
         color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         textTransform: 'uppercase',

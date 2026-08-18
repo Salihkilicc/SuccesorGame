@@ -3,6 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import StepperBar from '../../../components/common/StepperBar';
@@ -22,6 +23,14 @@ import { useStoryStore } from '../../../core/store/useStoryStore';
 import { currentQuarter } from '../../../core/story/world';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import InfoDot from '../../../components/common/InfoDot';
+
+const FACILITY_ICONS: Record<number, string> = {
+    1: 'office-building-outline',
+    2: 'domain',
+    3: 'office-building-cog',
+    4: 'city-variant-outline',
+    5: 'city',
+};
 
 const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
     useLocale();
@@ -176,7 +185,13 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                 {/* FACILITY CARD */}
                 <View style={styles.card}>
                     <View style={styles.facilityHeader}>
-                        <Text style={styles.facilityIcon}>{facility.icon}</Text>
+                        <View style={styles.facilityIconBadge}>
+                            <MaterialCommunityIcons
+                                name={FACILITY_ICONS[currentTier] || 'domain'}
+                                size={26}
+                                color="#A78BFA"
+                            />
+                        </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.facilityName}>{facility.name}</Text>
                             <Text style={styles.facilityDesc}>{facility.description}</Text>
@@ -228,7 +243,8 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
 
                     {!nextTier && (
                         <View style={styles.maxTierBadge}>
-                            <Text style={styles.maxTierText}>🏆 Maximum Tier Reached</Text>
+                            <MaterialCommunityIcons name="trophy-outline" size={14} color={theme.colors.accent} style={{ marginRight: 4 }} />
+                            <Text style={styles.maxTierText}>Maximum Tier Reached</Text>
                         </View>
                     )}
                 </View>
@@ -415,8 +431,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
     },
-    facilityIcon: {
-        fontSize: 40,
+    facilityIconBadge: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: 'rgba(167, 139, 250, 0.15)',
+        borderWidth: 1,
+        borderColor: 'rgba(167, 139, 250, 0.3)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     facilityName: {
         fontSize: 20,

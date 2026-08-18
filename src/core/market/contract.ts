@@ -155,6 +155,33 @@ export interface ContractOrderResult {
  * actually sells - time, not pieces. A phone is 1 standard unit and nothing
  * changes for it; a sedan is 60, and 800 of them now clear Meridian comfortably.
  */
+/**
+ * Calculates product-specific minimum order, maximum order, and clean step size
+ * based on the product's engineering complexity.
+ */
+export const partnerProductLimits = (
+    partner: ContractPartner,
+    complexity: number = STANDARD_COMPLEXITY,
+): { minUnits: number; maxUnits: number; step: number } => {
+    const perUnit = Math.max(1, complexity || STANDARD_COMPLEXITY) / STANDARD_COMPLEXITY;
+    const minUnits = Math.ceil(partner.minOrder / perUnit);
+    const maxUnits = Math.floor(partner.maxOrder / perUnit);
+
+    let step = 1;
+    if (maxUnits <= 10) step = 1;
+    else if (maxUnits <= 50) step = 5;
+    else if (maxUnits <= 250) step = 25;
+    else if (maxUnits <= 1_000) step = 50;
+    else if (maxUnits <= 5_000) step = 250;
+    else if (maxUnits <= 25_000) step = 500;
+    else if (maxUnits <= 100_000) step = 2_500;
+    else if (maxUnits <= 500_000) step = 10_000;
+    else if (maxUnits <= 2_000_000) step = 50_000;
+    else step = Math.max(50_000, Math.round(maxUnits * 0.02));
+
+    return { minUnits, maxUnits, step };
+};
+
 export const quoteContractOrder = (
     partner: ContractPartner,
     requestedUnits: number,

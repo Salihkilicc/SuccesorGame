@@ -6,6 +6,7 @@ import InfoDot from './InfoDot';
 type SectionCardProps = {
     title: string;
     subtitle?: string;
+    icon?: React.ReactNode;
     rightText?: string;
     rightContent?: React.ReactNode;
     info?: { title: string; text: string; detail?: string };
@@ -16,7 +17,7 @@ type SectionCardProps = {
     disabled?: boolean;
 };
 
-const SectionCard = ({ title, subtitle, rightText, rightContent, info, onPress, style, danger, selected, disabled }: SectionCardProps) => {
+const SectionCard = ({ title, subtitle, icon, rightText, rightContent, info, onPress, style, danger, selected, disabled }: SectionCardProps) => {
     return (
         <Pressable
             onPress={disabled ? undefined : onPress}
@@ -29,6 +30,11 @@ const SectionCard = ({ title, subtitle, rightText, rightContent, info, onPress, 
                 pressed && onPress && !disabled && styles.pressed,
                 style
             ]}>
+            {icon ? (
+                <View style={styles.iconContainer}>
+                    {icon}
+                </View>
+            ) : null}
             <View style={styles.content}>
                 <Text style={[styles.title, danger && styles.dangerText, selected && styles.selectedText]}>{title}</Text>
                 {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
@@ -57,6 +63,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: theme.spacing.sm,
+    },
+    iconContainer: {
+        width: 38,
+        height: 38,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.06)',
     },
     dangerCard: {
         backgroundColor: 'rgba(5,168,246,0.1)',

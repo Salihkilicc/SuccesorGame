@@ -59,10 +59,26 @@ export const DashboardCard = ({ title, children, rightContent, onPress, showChev
   );
 };
 
+import InfoDot from '../../../../components/common/InfoDot';
+
 // Bölüm Başlığı
-export const SectionHeader = ({ title }: { title: string }) => (
-  <View style={styles.sectionHeader}>
+export const SectionHeader = ({
+  title,
+  info,
+}: {
+  title: string;
+  info?: { title: string; text: string; detail?: string };
+}) => (
+  <View style={[styles.sectionHeader, info && styles.sectionHeaderWithInfo]}>
     <Text style={styles.sectionTitle}>{title}</Text>
+    {info && (
+      <InfoDot
+        title={info.title}
+        text={info.text}
+        detail={info.detail}
+        small
+      />
+    )}
   </View>
 );
 
@@ -79,8 +95,13 @@ const styles = StyleSheet.create({
   label: { fontSize: 11, color: 'rgba(255,255,255,0.48)', textTransform: 'uppercase' }, // Text Secondary
   value: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' }, // White
   success: { color: '#FFFFFF' }, // Green
-  danger: { color: theme.colors.danger },
   sectionHeader: { marginTop: theme.spacing.sm },
+  sectionHeaderWithInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 4,
+  },
   /**
    * OPERATIONS, QUICK ACTIONS and the rest. They were 48% white - the same
    * colour as every muted label on the screen - so the things that divide

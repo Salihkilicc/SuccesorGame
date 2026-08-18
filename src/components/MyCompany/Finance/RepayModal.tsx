@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
@@ -8,6 +9,15 @@ import { useStatsStore } from '../../../core/store';
 import { formatMoney } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
 import ScreenHost from '../../common/ScreenHost';
+
+const getLoanVisual = (kind?: string, name?: string) => {
+    const k = (kind || name || '').toLowerCase();
+    if (k.includes('shark')) return { icon: 'shark', color: '#F87171' };
+    if (k.includes('mezzanine')) return { icon: 'scale-balance', color: '#38BDF8' };
+    if (k.includes('secured')) return { icon: 'factory', color: '#FBBF24' };
+    if (k.includes('bond')) return { icon: 'certificate-outline', color: '#A78BFA' };
+    return { icon: 'bank-outline', color: '#60A5FA' };
+};
 
 type Props = {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -61,10 +71,15 @@ const RepayModal = ({ visible, onClose, asScreen }: Props) => {
                     <View style={styles.centeredView}>
                         <View style={styles.container}>
                             <ScreenHeader title={t('finance.debtFree')} onBack={onClose} />
-                            <Text style={styles.subtitle}>{t('finance.youHaveNoCorporateDebt')}</Text>
-                            <Pressable onPress={onClose} style={styles.confirmButton}>
-                                <Text style={styles.confirmText}>{t('finance.great')}</Text>
-                            </Pressable>
+                            <View style={styles.debtFreeContent}>
+                                <View style={styles.debtFreeBadge}>
+                                    <MaterialCommunityIcons name="shield-check-outline" size={48} color="#34D399" />
+                                </View>
+                                <Text style={styles.subtitle}>{t('finance.youHaveNoCorporateDebt')}</Text>
+                                <Pressable onPress={onClose} style={styles.confirmButton}>
+                                    <Text style={styles.confirmText}>{t('finance.great')}</Text>
+                                </Pressable>
+                            </View>
                         </View>
                     </View>
                     {/* Persistent Bottom Bar */}
@@ -87,13 +102,19 @@ const RepayModal = ({ visible, onClose, asScreen }: Props) => {
                         <ScrollView style={styles.loansScroll} contentContainerStyle={styles.loansContent} showsVerticalScrollIndicator={false}>
                             {loans.map((loan) => {
                                 const maxRepayable = Math.min(loan.balance, companyCapital);
+                                const visual = getLoanVisual(loan.kind, loan.name);
 
                                 return (
                                     <View key={loan.id} style={styles.loanCard}>
                                         <View style={styles.loanHeader}>
-                                            <View>
-                                                <Text style={styles.loanType}>{loan.name} Loan</Text>
-                                                <Text style={styles.loanRate}>{loan.rate}% APR</Text>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                                <View style={[styles.loanIconBadge, { backgroundColor: `${visual.color}15`, borderColor: `${visual.color}35` }]}>
+                                                    <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
+                                                </View>
+                                                <View>
+                                                    <Text style={styles.loanType}>{loan.name} Loan</Text>
+                                                    <Text style={styles.loanRate}>{loan.rate}% APR</Text>
+                                                </View>
                                             </View>
                                             <View style={{ alignItems: 'flex-end' }}>
                                                 <Text style={styles.loanRemainingLabel}>{t('finance.remaining')}</Text>
@@ -208,6 +229,23 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+    debtFreeContent: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        marginTop: 40,
+    },
+    debtFreeBadge: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(52, 211, 153, 0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(52, 211, 153, 0.35)',
+        marginBottom: 20,
+    },
     loansScroll: {
         maxHeight: 400,
         marginBottom: 20,
@@ -220,9 +258,18 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
     },
+    loanIconBadge: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
     loanHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 12,
         paddingBottom: 12,
         borderBottomWidth: 1,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenHeader from '../../common/ScreenHeader';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
@@ -110,7 +111,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 you pledge your own shares to a director - but it is a badge
                 beside the title now rather than a header of its own. */}
             <ScreenHeader
-                title={`⚠️  ${t('finance.offerTerms')}`}
+                title={t('finance.offerTerms')}
                 subtitle={t('finance.privateEquityAgreement')}
                 onBack={onClose}
                 inset={asScreen}
@@ -212,8 +213,8 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 </View>
                 {/* Lender Info */}
                 <View style={styles.lenderCard}>
-                    <View style={styles.lenderAvatar}>
-                        <Text style={styles.lenderAvatarText}>{sharkMember.name.charAt(0)}</Text>
+                    <View style={[styles.lenderAvatar, { backgroundColor: 'rgba(248, 113, 113, 0.15)', borderWidth: 1, borderColor: 'rgba(248, 113, 113, 0.35)' }]}>
+                        <MaterialCommunityIcons name="shark" size={24} color="#F87171" />
                     </View>
                     <View>
                         <Text style={styles.lenderName}>{sharkMember.name}</Text>
@@ -249,7 +250,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 {/* The Fine Print - CRITICAL */}
                 <View style={styles.warningBox}>
                     <View style={styles.warningHeader}>
-                        <Text style={styles.warningHeaderIcon}>⚠️</Text>
+                        <MaterialCommunityIcons name="alert-octagon-outline" size={20} color={theme.colors.warning} style={{ marginRight: 6 }} />
                         <Text style={styles.warningHeaderText}>{t('finance.collateralClause')}</Text>
                     </View>
                     <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>immediate seizure</Text> of your personal shares

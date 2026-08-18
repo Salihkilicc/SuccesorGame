@@ -10,6 +10,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
+import { ProductIconBadge } from './ProductIcon';
 import { formatMoney, formatNumber, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 
@@ -143,9 +144,12 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                     <ScreenHeader inset={false} title={product.name} onBack={onClose} />
                     <View style={styles.cardBody}>
 
-                    {/* Description */}
-                    <View style={styles.descriptionContainer}>
-                        <Text style={styles.description}>{product.description}</Text>
+                    {/* Header Row with Icon and Description */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: theme.spacing.md }}>
+                        <ProductIconBadge productId={product.id} category={product.category} size={48} iconSize={26} />
+                        <View style={[styles.descriptionContainer, { flex: 1, marginBottom: 0 }]}>
+                            <Text style={styles.description}>{product.description}</Text>
+                        </View>
                     </View>
 
                     {/* Financials */}

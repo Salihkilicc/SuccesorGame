@@ -51,6 +51,8 @@ type Props = {
     defaultOpen?: boolean;
     /** Icerik yoksa bolumu hic gosterme */
     hidden?: boolean;
+    /** Daha dar / kompakt baslik ve bosluklar */
+    compact?: boolean;
     style?: ViewStyle;
     children: React.ReactNode;
 };
@@ -64,6 +66,7 @@ export const CollapsibleSection = ({
     summaryColor = '#FFFFFF',
     defaultOpen = false,
     hidden = false,
+    compact = false,
     style,
     children,
 }: Props) => {
@@ -77,24 +80,28 @@ export const CollapsibleSection = ({
     if (hidden) return null;
 
     return (
-        <View style={[styles.wrapper, style]}>
+        <View style={[styles.wrapper, compact && styles.wrapperCompact, style]}>
             <Pressable
                 onPress={toggle}
-                style={({ pressed }) => [styles.header, pressed && styles.headerPressed]}
+                style={({ pressed }) => [
+                    styles.header,
+                    compact && styles.headerCompact,
+                    pressed && styles.headerPressed,
+                ]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: open }}
             >
                 <View style={styles.headerText}>
                     <View style={styles.titleRow}>
-                        <Text style={styles.title}>{title}</Text>
+                        <Text style={[styles.title, compact && styles.titleCompact]}>{title}</Text>
                         {info ? <InfoDot title={title} text={info} detail={infoDetail} small /> : null}
                     </View>
-                    {note ? <Text style={styles.note}>{note}</Text> : null}
+                    {note ? <Text style={[styles.note, compact && styles.noteCompact]}>{note}</Text> : null}
                 </View>
 
                 <View style={styles.headerRight}>
                     {summary ? (
-                        <Text style={[styles.summary, { color: summaryColor }]} numberOfLines={1}>
+                        <Text style={[styles.summary, compact && styles.summaryCompact, { color: summaryColor }]} numberOfLines={1}>
                             {summary}
                         </Text>
                     ) : null}
@@ -102,7 +109,7 @@ export const CollapsibleSection = ({
                 </View>
             </Pressable>
 
-            {open ? <View style={styles.body}>{children}</View> : null}
+            {open ? <View style={[styles.body, compact && styles.bodyCompact]}>{children}</View> : null}
         </View>
     );
 };
@@ -118,22 +125,32 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         overflow: 'hidden',
     },
+    wrapperCompact: {
+        borderRadius: 10,
+        marginBottom: 8,
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 13,
         paddingHorizontal: 14,
     },
+    headerCompact: {
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+    },
     headerPressed: { backgroundColor: 'rgba(255,255,255,0.04)' },
-    headerText: { flex: 1, paddingRight: 10 },
-    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+    headerText: { flex: 1, paddingRight: 6 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     title: {
-        // Was the loss red, which made EVERY section heading in the app read
-        // as a problem - "Competitors", "R&D Upgrades", "Income Statement".
         color: theme.colors.textMuted,
         fontSize: 10.5,
         fontWeight: '800',
         letterSpacing: 1.6,
+    },
+    titleCompact: {
+        fontSize: 9.5,
+        letterSpacing: 1.1,
     },
     note: {
         color: 'rgba(255,255,255,0.48)',
@@ -141,8 +158,14 @@ const styles = StyleSheet.create({
         marginTop: 3,
         lineHeight: 14,
     },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    noteCompact: {
+        fontSize: 9,
+        marginTop: 1,
+        lineHeight: 12,
+    },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     summary: { fontSize: 14, fontWeight: '800', maxWidth: 130, textAlign: 'right' },
+    summaryCompact: { fontSize: 12, maxWidth: 100 },
     chevron: {
         color: '#FFFFFF',
         fontSize: 16,
@@ -154,6 +177,11 @@ const styles = StyleSheet.create({
     body: {
         paddingHorizontal: 14,
         paddingBottom: 14,
+        paddingTop: 2,
+    },
+    bodyCompact: {
+        paddingHorizontal: 10,
+        paddingBottom: 10,
         paddingTop: 2,
     },
 });

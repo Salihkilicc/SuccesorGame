@@ -319,7 +319,7 @@ export const tr: Record<string, string> = {
     'company.noQuarterHasBeenCompleted': 'Henüz tamamlanmış çeyrek yok.',
     'company.operatingExpenses': 'Faaliyet giderleri',
     'company.operatingIncomeEbit': 'Faaliyet Kârı (EBIT)',
-    'company.operations': 'Operasyon',
+    'company.operations': 'Üretim Tesisleri & Fabrika',
     'company.outstanding': 'Dolaşımdaki',
     'company.ownership': 'Sahiplik',
     'company.perProductDemandSalesAnd': 'Ürün bazında talep, satış ve marj',
@@ -1960,9 +1960,9 @@ export const tr: Record<string, string> = {
     'tactic.equityText': 'Şirket yönetimini elinde tutmak için hisse oranını en az %51 tutmalısın. Halka arz (IPO) devasa sermaye getirir ama sahiplik oranını düşürür.',
     'tactic.equityDetail': 'İpucu: Halka açıldıktan sonra kârlı dönemlerde hisse geri alımı (Buyback) yaparak kontrolünü tekrar güçlendirebilirsin.',
 
-    'tactic.operationsTitle': 'Operasyon & Fabrika Kapasitesi',
-    'tactic.operationsText': 'Tesis kademesini yükseltmek birim maliyetleri (COGS) düşürür ve maksimum üretim tavanını katlar.',
-    'tactic.operationsDetail': 'İpucu: Kademe yükseltirken inşaat sürecinde kapasite geçici olarak düşer. Yeterli Ar-Ge puanı (RP) ve nakit biriktirerek yükseltme yap.',
+    'tactic.operationsTitle': 'Üretim Tesisleri & Fabrika Kademeleri',
+    'tactic.operationsText': 'Tesisin (Fabrikan), araştırdığın ürünlerin seri üretimini yapar. Kademeyi yükseltmek (Atölye -> Mega Fabrika) birim maliyetleri (COGS) ciddi oranda düşürür ve üretim kapasiteni katlar.',
+    'tactic.operationsDetail': 'İpucu: Yeterli çalışan (iş gücü) ve Ar-Ge puanı (RP) ile fabrikanı bir üst seviyeye büyüterek yüksek pazar talebini eksiksiz karşılayabilirsin.',
 
     'tactic.teamMoraleTitle': 'Ekip Morali & Verimlilik',
     'tactic.teamMoraleText': 'Morali her zaman 80 üzerinde tutmaya çalış. 70 direnç noktasıdır; moral 70 altına düştüğünde iş gücü verimi düşer ve üretimde fire oranı fırlar.',

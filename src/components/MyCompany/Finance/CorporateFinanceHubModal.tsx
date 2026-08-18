@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
@@ -136,7 +137,12 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                 <View style={styles.hero}>
                     <Text style={styles.heroLabel}>{t('finance.creditScore')}</Text>
                     <View style={styles.heroRow}>
-                        <Text style={[styles.heroValue, { color: rating.color }]}>{creditScore}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                            <View style={[styles.ratingShield, { backgroundColor: `${rating.color}15`, borderColor: `${rating.color}35` }]}>
+                                <MaterialCommunityIcons name="shield-check-outline" size={26} color={rating.color} />
+                            </View>
+                            <Text style={[styles.heroValue, { color: rating.color }]}>{creditScore}</Text>
+                        </View>
                         <View style={styles.heroBadge}>
                             <Text style={[styles.heroGrade, { color: rating.color }]}>{rating.label}</Text>
                             <Text style={styles.heroGradeNote}>{rating.description}</Text>
@@ -239,14 +245,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                    ------------------------------------------------------------ */}
                 <RowGroup title="Raise money">
                     <StatRow
-                        label={`💸  ${t('finance.injection')}`}
+                        label={t('finance.injection')}
                         value="›"
                         why={t('finance.personalInvestment')}
                         onPress={() => navigation.navigate('CapitalInjection')}
                     />
                     {!!sharkMember && (
                         <StatRow
-                            label={`⚠️  ${t('finance.privateEquityInjection')}`}
+                            label={t('finance.privateEquityInjection')}
                             value="›"
                             why={`from ${sharkMember.name} — no credit check, secured on your own shares`}
                             valueColor={theme.colors.warning}
@@ -320,12 +326,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         <Pressable
                             onPress={onRepayDebt}
                             style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
+                            <MaterialCommunityIcons name="cash-refund" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
                             <Text style={styles.btnSecondaryText}>{t('finance.repayDebt')}</Text>
                         </Pressable>
                     )}
                     <Pressable
                         onPress={onRequestLoan}
                         style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}>
+                        <MaterialCommunityIcons name="bank-plus" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
                         <Text style={styles.btnPrimaryText}>{t('finance.requestNewLoan')}</Text>
                     </Pressable>
                 </View>
@@ -372,9 +380,17 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         textTransform: 'uppercase',
     },
-    heroRow: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.md },
+    heroRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.md },
+    ratingShield: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
     heroValue: { fontSize: 44, fontWeight: '900', letterSpacing: -1.5, lineHeight: 48 },
-    heroBadge: { flex: 1, paddingBottom: 6 },
+    heroBadge: { paddingBottom: 2, alignItems: 'flex-end' },
     heroGrade: { fontSize: theme.typography.subtitle, fontWeight: '800', letterSpacing: 0.5 },
     heroGradeNote: { color: theme.colors.textSecondary, fontSize: theme.typography.caption },
 
@@ -392,9 +408,11 @@ const styles = StyleSheet.create({
     actions: { flexDirection: 'row', gap: theme.spacing.sm },
     btn: {
         flex: 1,
+        flexDirection: 'row',
         paddingVertical: theme.spacing.md,
         borderRadius: theme.radius.md,
         alignItems: 'center',
+        justifyContent: 'center',
     },
     btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
     btnPrimary: { backgroundColor: theme.colors.primary },

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Modal, Animated } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { Shareholder } from '../../../core/store/useStatsStore';
 // 👇 YOL GÜNCELLENDİ
@@ -42,7 +43,10 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
             <View style={styles.overlay} pointerEvents="box-none">
                 {result ? (
                     <View style={styles.resultContent}>
-                        <Text style={styles.resultTitle}>🎁 Gift Sent!</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+                            <MaterialCommunityIcons name="gift-open-outline" size={26} color="#FBBF24" />
+                            <Text style={styles.resultTitle}>Gift Sent!</Text>
+                        </View>
                         <Text style={styles.resultMessage}>{shareholder.name} loved the {result.giftName}!</Text>
 
                         <View style={styles.appreciationCard}>
@@ -76,7 +80,8 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                         <View style={styles.header}>
                             <Text style={styles.title}>{t('equity.sendGift')}</Text>
                             <View style={styles.walletBadge}>
-                                <Text style={styles.walletText}>💰 {formatMoney(money)}</Text>
+                                <MaterialCommunityIcons name="wallet-outline" size={16} color={theme.colors.accent} style={{ marginRight: 4 }} />
+                                <Text style={styles.walletText}>{formatMoney(money)}</Text>
                             </View>
                         </View>
 
@@ -88,7 +93,9 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                                     key={gift.id}
                                     style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
                                     onPress={() => sendGift(gift)}>
-                                    <Text style={styles.icon}>{gift.icon}</Text>
+                                    <View style={[styles.giftIconBadge, { backgroundColor: `${gift.color}15`, borderColor: `${gift.color}35` }]}>
+                                        <MaterialCommunityIcons name={gift.icon} size={28} color={gift.color} />
+                                    </View>
                                     <Text style={styles.name}>{gift.name}</Text>
                                     <Text style={styles.cost}>{formatMoney(gift.cost)}</Text>
                                     <View style={styles.impactBadge}>
@@ -136,6 +143,8 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
     },
     walletBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: theme.colors.cardSoft,
         paddingHorizontal: 12,
         paddingVertical: 6,
@@ -171,6 +180,15 @@ const styles = StyleSheet.create({
     cardPressed: {
         transform: [{ scale: 0.96 }],
         backgroundColor: theme.colors.background,
+    },
+    giftIconBadge: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        marginBottom: 4,
     },
     icon: {
         fontSize: 32,

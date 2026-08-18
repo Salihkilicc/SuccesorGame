@@ -11,6 +11,7 @@ import {
     Alert,
     ScrollView,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -20,6 +21,7 @@ import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
+import { getTraitVisual } from './BoardRoomModal';
 
 interface ShareholderProfileModalProps {
     visible: boolean;
@@ -287,22 +289,16 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         what is left here is the picture. */}
                     <View style={styles.header}>
                         <View style={styles.avatarContainer}>
-                            <View style={[styles.avatar, { backgroundColor: getTrustColor(member.trust) }]}>
-                                <Text style={styles.avatarText}>{member.name.charAt(0)}</Text>
+                            <View style={[styles.avatar, { backgroundColor: `${getTraitVisual(member.trait).color}15`, borderWidth: 2, borderColor: `${getTraitVisual(member.trait).color}40` }]}>
+                                <MaterialCommunityIcons name={getTraitVisual(member.trait).icon} size={36} color={getTraitVisual(member.trait).color} />
                             </View>
                         </View>
 
                         <Text style={styles.memberName}>{member.name}</Text>
 
-                        <View style={styles.traitBadge}>
-                            <Text style={styles.traitText}>
-                                {member.trait === 'Shark' && '🦈'}
-                                {member.trait === 'Conservative' && '🛡️'}
-                                {member.trait === 'Aggressive' && '⚡'}
-                                {member.trait === 'Visionary' && '🔮'}
-                                {member.trait === 'Snake' && '🐍'}
-                                {member.trait === 'Loyalist' && '🤝'}
-                                {' '}
+                        <View style={[styles.traitBadge, { backgroundColor: `${getTraitVisual(member.trait).color}15`, borderColor: `${getTraitVisual(member.trait).color}35`, flexDirection: 'row', alignItems: 'center', gap: 6 }]}>
+                            <MaterialCommunityIcons name={getTraitVisual(member.trait).icon} size={14} color={getTraitVisual(member.trait).color} />
+                            <Text style={[styles.traitText, { color: getTraitVisual(member.trait).color }]}>
                                 {t('data.trait.' + member.trait)}
                             </Text>
                         </View>
@@ -359,7 +355,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                             <View style={styles.relationsTab}>
                                 {/* Ask for Advice */}
                                 <TouchableOpacity style={styles.actionButton} onPress={handleAskAdvice}>
-                                    <Text style={styles.actionButtonIcon}>💬</Text>
+                                    <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.3)' }]}>
+                                        <MaterialCommunityIcons name="chat-question-outline" size={22} color="#38BDF8" />
+                                    </View>
                                     <Text style={styles.actionButtonText}>{t('equity.askForAdvice')}</Text>
                                 </TouchableOpacity>
 
@@ -383,7 +381,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     style={styles.actionButton}
                                     onPress={() => handleSendGift('small')}
                                 >
-                                    <Text style={styles.actionButtonIcon}>🎁</Text>
+                                    <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderColor: 'rgba(251, 191, 36, 0.3)' }]}>
+                                        <MaterialCommunityIcons name="gift-outline" size={22} color="#FBBF24" />
+                                    </View>
                                     <View style={styles.actionButtonContent}>
                                         <Text style={styles.actionButtonText}>{t('equity.sendGift')}</Text>
                                         <Text style={styles.actionButtonSubtext}>$10,000 • +5 Trust</Text>
@@ -395,7 +395,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     style={styles.actionButton}
                                     onPress={() => handleSendGift('large')}
                                 >
-                                    <Text style={styles.actionButtonIcon}>🍽️</Text>
+                                    <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(96, 165, 250, 0.15)', borderColor: 'rgba(96, 165, 250, 0.3)' }]}>
+                                        <MaterialCommunityIcons name="silverware-fork-knife" size={22} color="#60A5FA" />
+                                    </View>
                                     <View style={styles.actionButtonContent}>
                                         <Text style={styles.actionButtonText}>{t('equity.hostDinner')}</Text>
                                         <Text style={styles.actionButtonSubtext}>$100,000 • +15 Trust</Text>
@@ -571,7 +573,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         )}
                         {animationState === 'success' && (
                             <View style={styles.animationContent}>
-                                <Text style={styles.animationIcon}>✅</Text>
+                                <MaterialCommunityIcons name="check-circle-outline" size={48} color="#34D399" />
                                 <Text style={styles.animationText}>
                                     {tradeMode === 'buy' ? t('shp.offerAccepted') : t('shp.sharesSold')}
                                 </Text>
@@ -579,7 +581,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         )}
                         {animationState === 'failure' && (
                             <View style={styles.animationContent}>
-                                <Text style={styles.animationIcon}>❌</Text>
+                                <MaterialCommunityIcons name="close-circle-outline" size={48} color="#F87171" />
                                 <Text style={styles.animationText}>
                                     {tradeMode === 'buy' ? t('shp.offerRejected') : t('shp.saleRejected')}
                                 </Text>
@@ -781,6 +783,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
         gap: 16,
+    },
+    actionIconBadge: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
     },
     actionButtonIcon: {
         fontSize: 32,
