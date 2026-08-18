@@ -24,6 +24,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, Alert, LayoutAnimation } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -35,6 +36,7 @@ import {
     availableStandardUnits,
     getNextTier,
     getTier,
+    getFacilityTierVisual,
     staffingRatio,
     utilizationVerdict,
 } from '../../../core/market/capacity';
@@ -70,6 +72,8 @@ const FacilityPanel: React.FC = () => {
     const tier = getTier(facilityTier);
     const next = getNextTier(facilityTier);
     const isBuilding = !!facilityBuild;
+    const tierVisual = getFacilityTierVisual(tier.level);
+    const nextVisual = next ? getFacilityTierVisual(next.level) : null;
 
     const [target, setTarget] = useState(targetHeadcount ?? employeeCount);
     const [confirmedHeadcount, setConfirmedHeadcount] = useState<{ count: number; isHire: boolean; quarter: number } | null>(null);
@@ -85,7 +89,6 @@ const FacilityPanel: React.FC = () => {
     /** The stripe IS the facility header now - tapping it opens the details. */
     const [facilityOpen, setFacilityOpen] = useState(false);
     const toggleFacility = useCallback(() => {
-        // Same easing CollapsibleSection uses, so the two open the same way.
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setFacilityOpen(o => !o);
     }, []);
@@ -118,9 +121,9 @@ const FacilityPanel: React.FC = () => {
                 v8: next.qualityCeiling,
             }),
             [
-                { text: t('company.notNow'), style: 'cancel' },
+                { text: t('company.cancel'), style: 'cancel' },
                 {
-                    text: t('company.startBuild'),
+                    text: t('company.confirm'),
                     onPress: () => {
                         const result = startFacilityUpgrade();
                         if (!result.success) Alert.alert(t('alert.cannotStart'), result.message);
@@ -132,11 +135,11 @@ const FacilityPanel: React.FC = () => {
 
     const handleCancel = () => {
         Alert.alert(
-            t('alert.cancelTheBuild'),
-            t('alert.youGet40OfWhat'),
+            t('alert.cancelUpgrade'),
+            t('alert.theConstructionWillBeStopped'),
             [
                 { text: t('company.keepBuilding'), style: 'cancel' },
-                { text: t('company.cancelBuild'), style: 'destructive', onPress: cancelFacilityUpgrade },
+                { text: t('company.cancelUpgrade'), style: 'destructive', onPress: cancelFacilityUpgrade },
             ],
         );
     };
@@ -153,23 +156,20 @@ const FacilityPanel: React.FC = () => {
     };
 
     const step = Math.max(1, Math.round(tier.crew * 0.1));
+    /** Read twice - on the stripe and on the build button - so it is named once. */
+    const canAfford = !!next && companyCapital >= next.upgradeCost;
 
     return (
         <View style={styles.wrap}>
-            {/* ══ KOMPAKT SIRIT — her zaman gorunur ══
-                Panel cok yer kapliyordu. Ilk bakista sadece uc sey lazim:
-                hangi kademedeyim, ekip tam mi, hat ne kadar dolu.
-                Gerisi asagida katli duruyor. */}
-            {/* ══ THE STRIPE IS THE HEADER ══
-                It used to sit above a separate "Facility" section that then
-                repeated its numbers. One thing now: the strip you always see
-                is the control that opens the detail behind it. */}
             <Pressable
                 onPress={toggleFacility}
                 style={({ pressed }) => [styles.stripe, pressed && styles.stripePressed]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: facilityOpen }}>
-                <View style={{ flex: 1 }}>
+                <View style={[styles.tierIconBadge, { backgroundColor: `${tierVisual.color}18`, borderColor: `${tierVisual.color}38` }]}>
+                    <MaterialCommunityIcons name={tierVisual.icon} size={24} color={tierVisual.color} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={styles.tierLabel}>
                         {t('fac.tierBadge', { v1: tier.level, v2: MAX_TIER_LEVEL })}{isBuilding ? `  ·  ${t('fac.retooling')}` : ''}
                     </Text>
@@ -178,6 +178,31 @@ const FacilityPanel: React.FC = () => {
                         {formatNumber(capacityNow)} units · crew {formatNumber(employeeCount)}/
                         {formatNumber(tier.crew)}
                     </Text>
+                    {/* ------------------------------------------------------
+                        THE SECOND BUTTON'S HEADLINE, ON THE FIRST BUTTON
+
+                        There were two stacked controls here saying related
+                        things: this stripe, which is the facility you have,
+                        and a "Next tier" section underneath whose entire
+                        collapsed state was one word - Affordable or Saving.
+
+                        Two taps to learn one fact, and the fact belongs to
+                        the thing above it: what you own, and what the next
+                        one costs, are the same sentence. The next tier now
+                        opens with the facility rather than as a section of
+                        its own.
+                       ------------------------------------------------------ */}
+                    {next && (
+                        <Text
+                            style={[
+                                styles.stripeNext,
+                                { color: canAfford ? theme.colors.up : theme.colors.down },
+                            ]}
+                            numberOfLines={1}>
+                            {t('company.nextTier')}: {next.name} · {formatMoney(next.upgradeCost)} ·{' '}
+                            {canAfford ? t('fac.affordable') : t('fac.saving')}
+                        </Text>
+                    )}
                 </View>
                 {!!lastReport && (
                     <View style={styles.stripeUtil}>
@@ -187,10 +212,17 @@ const FacilityPanel: React.FC = () => {
                         <Text style={styles.utilLabel}>{t('company.used')}</Text>
                     </View>
                 )}
-                <Text style={styles.stripeChevron}>{facilityOpen ? '⌃' : '⌄'}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <InfoDot
+                        title={t('tactic.operationsTitle')}
+                        text={t('tactic.operationsText')}
+                        detail={t('tactic.operationsDetail')}
+                        small
+                    />
+                    <Text style={styles.stripeChevron}>{facilityOpen ? '⌃' : '⌄'}</Text>
+                </View>
             </Pressable>
 
-            {/* Ekip eksikse bu uyari KATLANMAZ — en ucuz uretim artisi budur */}
             {staffing < 1 && (
                 <Pressable style={styles.alertBox} onPress={() => setTarget(tier.crew)}>
                     <Text style={styles.alertText}>
@@ -203,7 +235,6 @@ const FacilityPanel: React.FC = () => {
                 </Pressable>
             )}
 
-            {/* ══ KADEME DETAYI — opened by the stripe above ══ */}
             {facilityOpen && (
             <View style={styles.facilityBody}>
                 <View style={styles.facilityHead}>
@@ -216,9 +247,6 @@ const FacilityPanel: React.FC = () => {
                     />
                 </View>
 
-                {/* Capacity and crew are NOT repeated here: the stripe above is
-                    always visible and already carries them. What is left is
-                    what the stripe cannot show - the limits this tier imposes. */}
                 <View style={styles.statRow}>
                     <Stat label={t('company.unitCost')} value={`×${tier.unitCostMultiplier.toFixed(2)}`} />
                     <Stat label={t('company.yield')} value={formatPercent(tier.yieldRate * 100)} />
@@ -229,18 +257,11 @@ const FacilityPanel: React.FC = () => {
                     <Stat label={t('company.qualityCeiling')} value={`${tier.qualityCeiling}`} />
                 </View>
 
-                {/* The number lives in the stripe. This adds the shape and the
-                    reading of it, not the figure again. */}
                 {lastReport && (
                     <View style={styles.utilBox}>
                         <View style={styles.utilTrack}>
                             <View style={[styles.utilFill, {
                                 width: `${Math.min(100, utilization)}%`,
-                                // A FILL, so it cannot use the signal tokens -
-                                // see the note on util_tight. `borderStrong`
-                                // stands in for the red at the ceiling: the
-                                // bar being full is already the alarm, and the
-                                // figure above it is red.
                                 backgroundColor: verdict === 'idle' ? theme.colors.disabled
                                     : verdict === 'tight' ? theme.colors.borderStrong
                                         : theme.colors.primary,
@@ -252,17 +273,16 @@ const FacilityPanel: React.FC = () => {
             </View>
             )}
 
-            {/* ══ TAAHHUT KUYRUGU ══
-                Zaman bu oyunun ana mekaniklerinden biri. Neyin ne zaman
-                gelecegini tek yerde gormek CEO'nun bakacagi tablo. */}
             {(isBuilding || incomingHires > 0) && (
                 <View style={styles.queue}>
                     <Text style={styles.queueTitle}>{t('company.inProgress')}</Text>
 
                     {isBuilding && facilityBuild && (
                         <View style={styles.queueRow}>
-                            <Text style={styles.queueIcon}>🏗</Text>
-                            <View style={{ flex: 1 }}>
+                            <View style={[styles.queueIconBadge, { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderColor: 'rgba(251, 191, 36, 0.3)' }]}>
+                                <MaterialCommunityIcons name="crane" size={20} color="#FBBF24" />
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 10 }}>
                                 <Text style={styles.queueName}>
                                     {getTier(facilityBuild.targetTier).name}
                                 </Text>
@@ -279,8 +299,10 @@ const FacilityPanel: React.FC = () => {
 
                     {incomingHires > 0 && (
                         <View style={styles.queueRow}>
-                            <Text style={styles.queueIcon}>👥</Text>
-                            <View style={{ flex: 1 }}>
+                            <View style={[styles.queueIconBadge, { backgroundColor: 'rgba(96, 165, 250, 0.15)', borderColor: 'rgba(96, 165, 250, 0.3)' }]}>
+                                <MaterialCommunityIcons name="account-multiple-plus-outline" size={20} color="#60A5FA" />
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 10 }}>
                                 <Text style={styles.queueName}>
                                     {formatNumber(incomingHires)} people hired
                                 </Text>
@@ -291,22 +313,29 @@ const FacilityPanel: React.FC = () => {
                 </View>
             )}
 
-            {/* ══ YUKSELTME ══ */}
-            {/* "Affordable" was light grey and "Saving" was a fainter grey -
-                the same colour twice, so the word was doing all the work.
-                Blue when you can pay for it, grey when you cannot. */}
-            {next ? (
-                <CollapsibleSection
-                    title={t('company.nextTier')}
-                    note={`${next.name} — ${formatMoney(next.upgradeCost)}, ${next.buildQuarters}q`}
-                    info={t('company.youCannotSkipTiersYou')}
-                    infoDetail={t('company.thatDowntimeIsTheReal')}
-                    summary={companyCapital >= next.upgradeCost ? t('fac.affordable') : t('fac.saving')}
-                    summaryColor={
-                        companyCapital >= next.upgradeCost ? theme.colors.up : theme.colors.down
-                    }
-                >
-                    <Text style={styles.nextName}>{next.name}</Text>
+            {facilityOpen && (next ? (
+                <View style={styles.card}>
+                    {/* The title and the InfoDot are what the section header
+                        carried. They stay; only the second tap is gone. */}
+                    <View style={styles.facilityHead}>
+                        <Text style={styles.sectionTitle}>
+                            {t('company.nextTier')} · {next.name}
+                        </Text>
+                        <InfoDot
+                            title={t('company.nextTier')}
+                            text={t('company.youCannotSkipTiersYou')}
+                            detail={t('company.thatDowntimeIsTheReal')}
+                            small
+                        />
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        {nextVisual && (
+                            <View style={[styles.tierIconBadge, { width: 34, height: 34, borderRadius: 10, backgroundColor: `${nextVisual.color}18`, borderColor: `${nextVisual.color}38` }]}>
+                                <MaterialCommunityIcons name={nextVisual.icon} size={18} color={nextVisual.color} />
+                            </View>
+                        )}
+                        <Text style={[styles.nextName, { marginBottom: 0 }]}>{next.name}</Text>
+                    </View>
                     <Text style={styles.tierDesc}>{next.description}</Text>
 
                     <View style={styles.compareRow}>
@@ -326,7 +355,7 @@ const FacilityPanel: React.FC = () => {
                     </Text>
 
                     {/* The research requirement, in the research colour when
-                        it is met and grey when it is not - "nothing good is
+                        it is met and grey when it is not, "nothing good is
                         happening here" rather than the caution blue, which
                         this shared with unrelated warnings. */}
                     {next.upgradeRP > 0 && (
@@ -364,7 +393,7 @@ const FacilityPanel: React.FC = () => {
                                         : t('fac.startBuild', { v1: next.name })}
                         </Text>
                     </Pressable>
-                </CollapsibleSection>
+                </View>
             ) : (
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>{t('company.topTierReached')}</Text>
@@ -373,7 +402,7 @@ const FacilityPanel: React.FC = () => {
                         pricing and acquisitions.
                     </Text>
                 </View>
-            )}
+            ))}
 
             {/* ══ KADRO ══ */}
             <CollapsibleSection
@@ -494,6 +523,35 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
         paddingVertical: 12, paddingHorizontal: 14,
+    },
+    tierIconBadge: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
+    queueIconBadge: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+    },
+    /**
+     * The next tier, on the row that already names the current one.
+     *
+     * Small and under the meta line rather than beside the utilisation: the
+     * right-hand side of this stripe is where "how full is it" lives, and a
+     * second figure there would make the reader choose which number the
+     * colour belonged to.
+     */
+    stripeNext: {
+        fontSize: 11,
+        fontWeight: '700',
+        marginTop: 3,
     },
     stripeMeta: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, marginTop: 3 },
     stripeUtil: { alignItems: 'flex-end' },
