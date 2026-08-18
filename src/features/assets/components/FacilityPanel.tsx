@@ -193,15 +193,31 @@ const FacilityPanel: React.FC = () => {
                         its own.
                        ------------------------------------------------------ */}
                     {next && (
-                        <Text
-                            style={[
-                                styles.stripeNext,
-                                { color: canAfford ? theme.colors.up : theme.colors.down },
-                            ]}
-                            numberOfLines={1}>
-                            {t('company.nextTier')}: {next.name} · {formatMoney(next.upgradeCost)} ·{' '}
-                            {canAfford ? t('fac.affordable') : t('fac.saving')}
-                        </Text>
+                        // ------------------------------------------------------
+                        //  THE VERDICT CANNOT BE THE THING THAT GETS CUT
+                        // ------------------------------------------------------
+                        //  One Text with numberOfLines={1} truncates the TAIL,
+                        //  and the tail was Affordable or Saving - so a tier
+                        //  with a long name read "Next tier: Assembly Line ..."
+                        //  and the only word the player came for was the one
+                        //  the ellipsis ate.
+                        //
+                        //  Two Texts in a row instead. The name and the price
+                        //  flex and truncate; the verdict is fixed, bold, and
+                        //  sits against the figure it is a verdict on.
+                        // ------------------------------------------------------
+                        <View style={styles.stripeNextRow}>
+                            <Text style={styles.stripeNext} numberOfLines={1}>
+                                {next.name} · {formatMoney(next.upgradeCost)}
+                            </Text>
+                            <Text
+                                style={[
+                                    styles.stripeVerdict,
+                                    { color: canAfford ? theme.colors.up : theme.colors.down },
+                                ]}>
+                                {canAfford ? t('fac.affordable') : t('fac.saving')}
+                            </Text>
+                        </View>
                     )}
                 </View>
                 {!!lastReport && (
@@ -557,10 +573,24 @@ const styles = StyleSheet.create({
      * second figure there would make the reader choose which number the
      * colour belonged to.
      */
+    stripeNextRow: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        marginTop: 3,
+        gap: 6,
+    },
+    /** Flexes and truncates, because the name is the part that can be long. */
     stripeNext: {
+        color: theme.colors.textMuted,
         fontSize: 11,
         fontWeight: '700',
-        marginTop: 3,
+        flexShrink: 1,
+    },
+    /** Never shrinks. It is the answer to the question the row asks. */
+    stripeVerdict: {
+        fontSize: 11,
+        fontWeight: '900',
+        flexShrink: 0,
     },
     stripeMeta: { color: 'rgba(255,255,255,0.48)', fontSize: 11.5, marginTop: 3 },
     stripeUtil: { alignItems: 'flex-end' },
