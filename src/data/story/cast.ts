@@ -89,6 +89,27 @@ export const CAST: Cast = {
     },
 
     // ------------------------------------------------------------------
+    //  AND THE NEXT ONE
+    // ------------------------------------------------------------------
+    //  A STAND-IN, and the only entry in this file that is not a person.
+    //
+    //  The children are named by the player and generated at runtime, so no
+    //  cast entry can hold them. This exists so their scenes can be ordinary
+    //  Conversations - validated by the audit, keyed for the translator,
+    //  played by the ordinary runner - while the poster puts the real child's
+    //  name on the thread.
+    //
+    //  See data/story/heirs.ts for why none of those scenes says a name.
+    heir: {
+        id: 'heir',
+        name: 'Your Heir',
+        role: 'Successor',
+        // Message only. A child does not write to their parent on letterhead.
+        channels: 'message',
+        tone: 'Sixteen or more and has worked out what the company is. Argues like somebody who has rehearsed it. Never says a sibling by name when they are angry, which is most of the time.',
+    },
+
+    // ------------------------------------------------------------------
     //  OUTSIDE
     // ------------------------------------------------------------------
     friend: {

@@ -1,0 +1,113 @@
+// src/features/love/logic/runHeirs.test.ts
+//
+// ============================================================================
+//  AND THE HALF THAT PUTS IT ON THE PHONE
+// ============================================================================
+//  heirs.test.ts proves the rule. This mounts it against the real stores. The
+//  interesting part is the two guards: a thread holds exactly ONE conversation
+//  id, and a family that writes every quarter is a family nobody wants.
+// ============================================================================
+
+import { runHeirs, HEIR_COOLDOWN_QUARTERS } from './runHeirs';
+import { useFamilyStore, initialFamilyState } from '../../../core/store/useFamilyStore';
+import { useMessageStore, initialMessageState } from '../../../core/store/useMessageStore';
+import { useGameStore } from '../../../core/store/useGameStore';
+import { HEIR_CONVERSATIONS } from '../../../data/story/heirs';
+
+const kid = (id: string, over: any = {}) => ({
+    id, name: `${id.toUpperCase()} Hale`, gender: 'Male' as const,
+    age: 18, birthYear: 2008, birthQuarter: 1,
+    educationLevel: 'University' as const, role: 'Student' as const,
+    relationshipWithPlayer: 70, isSuccessorCandidate: false, traits: [], allowance: 0,
+    stats: {
+        intellect: 70, charm: 70, businessAcumen: 70,
+        loyalty: 50, ambition: 90, health: 90, creativity: 70,
+    },
+    ...over,
+});
+
+const family = (children: any[], heir: string | null = null) => {
+    useMessageStore.setState({ ...initialMessageState, threads: [] });
+    useFamilyStore.setState({
+        ...initialFamilyState, _hasHydrated: true,
+        children, designatedSuccessorId: heir,
+    });
+    useGameStore.setState({ currentMonth: 60 } as never);
+};
+
+const thread = (id: string) =>
+    useMessageStore.getState().threads.find(t => t.id === id);
+
+describe('a child writing', () => {
+    it('arrives on their own thread, under their own name', () => {
+        // One thread per child, so two of them arguing at you over a year
+        // reads as two people rather than one queue.
+        family([kid('a')]);
+        const r = runHeirs();
+        expect(r.spoke).toBe('a');
+        expect(thread('a')?.name).toBe('A Hale');
+    });
+
+    it('and it is a playable scene, not a notice', () => {
+        // The whole reason these are Conversations: the player answers and it
+        // ends. The runner takes it from here.
+        family([kid('a')]);
+        runHeirs();
+        expect(thread('a')?.conversationId).toBe(HEIR_CONVERSATIONS.alone.id);
+    });
+
+    it('and the scene matches the family they are in', () => {
+        family([kid('a'), kid('b')], 'b');
+        runHeirs();
+        expect(thread('a')?.conversationId).toBe(HEIR_CONVERSATIONS.passedOver.id);
+    });
+
+    it('while a family of small children says nothing', () => {
+        family([kid('a', { age: 9 }), kid('b', { age: 4 })]);
+        expect(runHeirs().spoke).toBeNull();
+        expect(useMessageStore.getState().threads).toHaveLength(0);
+    });
+
+    it('and a player with no children is untouched', () => {
+        family([]);
+        expect(runHeirs().spoke).toBeNull();
+    });
+});
+
+describe('the two guards', () => {
+    it('a child with a scene still open does not start another', () => {
+        // A thread holds exactly ONE conversation id, so a second would
+        // overwrite the first - the bug that ate the second act of the story
+        // once already. See the note in core/story/deliver.ts.
+        family([kid('a')]);
+        runHeirs();
+        expect(runHeirs().spoke).toBeNull();
+        expect(thread('a')!.messages).toHaveLength(1);
+    });
+
+    it('and nobody writes again for a year', () => {
+        // A family that files a grievance every three months is not a family.
+        // The succession happens over twenty years and should feel like being
+        // reminded rather than being lobbied.
+        family([kid('a')]);
+        runHeirs();
+        useMessageStore.getState().clearConversation('a');
+
+        useGameStore.setState({ currentMonth: 60 + 3 } as never);
+        expect(runHeirs().spoke).toBeNull();
+
+        useGameStore.setState({ currentMonth: 60 + HEIR_COOLDOWN_QUARTERS * 3 } as never);
+        expect(runHeirs().spoke).toBe('a');
+    });
+
+    it('while a sibling who has been quiet can still speak', () => {
+        // The cooldown is per child, not per family - otherwise one loud
+        // teenager silences the rest of the house.
+        family([kid('a'), kid('b', { stats: { ...kid('b').stats, ambition: 95 } })], null);
+        const first = runHeirs();
+        expect(first.spoke).not.toBeNull();
+        useMessageStore.getState().clearConversation(first.spoke!);
+        const second = runHeirs();
+        expect(second.spoke).not.toBe(first.spoke);
+    });
+});

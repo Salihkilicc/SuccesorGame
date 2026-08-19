@@ -23,6 +23,7 @@ import { ctoResearch } from './ctoResearch';
 import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
+import { heirAlone, heirPassedOver, heirChosen } from './heirs';
 import {
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
 } from './cfoArc';
@@ -108,6 +109,16 @@ import {
 } from '../events/corporateOps';
 
 export const CONVERSATIONS: Conversation[] = [
+    // ------------------------------------------------------------------
+    //  THE CHILDREN. Registered here so the audit validates them and the
+    //  translator gets keys, but they have NO `when` and no STORY_BEAT: the
+    //  poster picks which one and who sends it, from the family's own state.
+    //  See features/love/logic/heirs.ts.
+    // ------------------------------------------------------------------
+    heirAlone,
+    heirPassedOver,
+    heirChosen,
+
     fatherInheritance,
     fatherQ1,
     fatherQ1Invoice,

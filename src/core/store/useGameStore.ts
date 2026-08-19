@@ -2335,6 +2335,23 @@ export const useGameStore = create<GameStore>()(
           // RAFA KALDIRILDI: ilişki modülü kapalıyken partner statlara dokunmaz.
           // Same store as the upkeep above and as every screen. There were
           // two, and this read the empty one.
+          // ------------------------------------------------------------
+          //  THE CHILDREN, WHO HAVE WORKED OUT WHAT THE COMPANY IS
+          // ------------------------------------------------------------
+          //  OUTSIDE the partner block, deliberately. A player with no
+          //  partner can still have grown children from an earlier one, and
+          //  hanging the succession on whether somebody is currently seeing
+          //  anybody is the kind of accidental coupling this whole migration
+          //  has been unpicking. The guard is the flag.
+          // ------------------------------------------------------------
+          if (FEATURES.love) {
+            try {
+              require('../../features/love/logic/runHeirs').runHeirs();
+            } catch (e) {
+              console.warn('[heirs] could not run', e);
+            }
+          }
+
           const buffPartner = FEATURES.love
             ? require('./useFamilyStore').useFamilyStore.getState().partner
             : null;
