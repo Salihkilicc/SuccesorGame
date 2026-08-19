@@ -120,6 +120,8 @@ export interface FamilyActions {
 
     // --- Utility ---
     reset: () => void;
+    /** Development only. See the note above DEMO_PARTNER. */
+    loadDemoFamily: () => void;
 }
 
 export type FamilyStore = FamilyState & FamilyActions;
@@ -131,7 +133,31 @@ export type FamilyStore = FamilyState & FamilyActions;
 const generateId = (prefix: string): string =>
     `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-export const initialPartnerPlaceholder: PartnerProfile = {
+// ============================================================================
+//  A NEW GAME HAS NO FAMILY IN IT
+// ============================================================================
+//
+//  These two constants were the store's INITIAL STATE, and `reset()` put them
+//  back. So every new game opened with a girlfriend of a year and three
+//  children - sixteen, eight and three - none of whom the player had met, and
+//  the player is twenty-five. The eldest would have arrived when they were
+//  nine.
+//
+//  It is worth being precise about why the new-game audit never caught it.
+//  That audit looks for state SURVIVING a reset, and nothing survived: the
+//  reset put the family back deliberately, every time, exactly as written.
+//  A wrong initial value and a leak look identical from the outside and only
+//  one of them is a leak.
+//
+//  They are demo data now, loaded only in a development build - see
+//  `loadDemoFamily` at the bottom of this file. Kept rather than deleted
+//  because they are the only fully-populated PartnerProfile and Child objects
+//  in the tree, and every screen in features/love and features/profile was
+//  laid out against them. Deleting them would mean guessing what those
+//  screens are supposed to render.
+// ============================================================================
+
+export const DEMO_PARTNER: PartnerProfile = {
     id: 'partner_sophia_vance',
     name: 'Sophia Vance',
     photo: null,
@@ -166,7 +192,7 @@ export const initialPartnerPlaceholder: PartnerProfile = {
     },
 };
 
-export const initialChildrenPlaceholder: Child[] = [
+export const DEMO_CHILDREN: Child[] = [
     {
         id: 'child_alexander_1',
         name: 'Alexander Hale',
@@ -239,11 +265,18 @@ export const initialChildrenPlaceholder: Child[] = [
 ];
 
 export const initialFamilyState: FamilyState = {
-    partner: initialPartnerPlaceholder,
+    partner: null,
     exPartners: [],
-    children: initialChildrenPlaceholder,
-    designatedSuccessorId: 'child_alexander_1',
-    familyReputation: 82,
+    children: [],
+    designatedSuccessorId: null,
+    /**
+     * FIFTY, not eighty-two.
+     *
+     * A dynasty's prestige at the start of a run is neither good nor bad: the
+     * player has inherited a company and done nothing with it yet. Eighty-two
+     * was the number that went with the family that is no longer here.
+     */
+    familyReputation: 50,
     _hasHydrated: false,
 };
 
@@ -473,6 +506,28 @@ export const useFamilyStore = create<FamilyStore>()(
 
             // --- Utility ---
             reset: () => set({ ...initialFamilyState, _hasHydrated: true }),
+
+            /**
+             * Put the demo family in, for looking at the screens.
+             *
+             * DEV ONLY, and it refuses in a release build rather than being
+             * stripped by the bundler - a function that silently does nothing
+             * is easier to debug than one that is not there.
+             *
+             * This is the one door to that data. It used to be the front door.
+             */
+            loadDemoFamily: () => {
+                if (!__DEV__) {
+                    console.warn('[family] loadDemoFamily is a development tool.');
+                    return;
+                }
+                set({
+                    partner: DEMO_PARTNER,
+                    children: DEMO_CHILDREN,
+                    designatedSuccessorId: 'child_alexander_1',
+                    familyReputation: 82,
+                });
+            },
         }),
         {
             name: 'succesor_family_v3',

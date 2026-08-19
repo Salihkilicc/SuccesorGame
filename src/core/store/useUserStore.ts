@@ -143,24 +143,26 @@ export const initialUserState: UserState = {
     title: 'CEO',
     salary: 50000
   },
-  family: [
-    {
-      id: 'mom-1',
-      name: 'Martha',
-      relation: 'Mother',
-      relationship: 85,
-    },
-    {
-      id: 'sib-1',
-      name: 'Tom',
-      relation: 'Brother',
-      relationship: 60,
-    },
-  ],
-  friends: [
-    { id: 'fr-1', name: 'Mike', relationship: 75 },
-    { id: 'fr-2', name: 'Sarah', relationship: 65 },
-  ],
+  // ------------------------------------------------------------------
+  //  EMPTY, AND THE BROTHER IS THE REASON
+  // ------------------------------------------------------------------
+  //  This shipped with a mother called Martha and a brother called TOM.
+  //  The player's brother is Julian Hale - he owns fifteen percent, he
+  //  writes at eleven at night, and the whole brotherDividend arc is his.
+  //  So the game held two brothers, in two stores, and the one that was
+  //  seeded is the one that does not exist.
+  //
+  //  Nothing reads either list. It survives its own partialize and that is
+  //  all it does, which is why the contradiction went unnoticed: a wrong
+  //  fact nobody asks for never gets to be wrong out loud.
+  //
+  //  Left EMPTY rather than corrected. Family and friends belong to
+  //  useFamilyStore and useRelationshipStore respectively - see the note at
+  //  the top of useFamilyStore.ts - and seeding a third copy here with the
+  //  right names would only make the next person choose between three.
+  // ------------------------------------------------------------------
+  family: [],
+  friends: [],
   exes: [],
   inventory: [],
   subsidiaries: [],
