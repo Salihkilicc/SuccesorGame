@@ -4,16 +4,33 @@
 //  THE WAYS IT CAN STOP
 // ============================================================================
 //
-//  The game already had two endings and neither of them was data: `bankrupt`
-//  and `removed` are strings compared inline in HomeScreen, with their text in
+//  The game already had two endings and neither of them WAS data: `bankrupt`
+//  and `removed` were strings compared inline in HomeScreen, with their text in
 //  the translation file and their trigger buried in the quarterly tick. That
-//  worked while there were two and stops working at three - which is now.
+//  worked while there were two and stopped working at three.
 //
 //  An ending here is a title, a body, and an id a story effect can name. The
 //  audit checks that every `ending` effect points at one of these, the same
 //  way it checks a `schedule` points at a real conversation, because the
 //  failure is identical and worse: a scene offering an ending that does not
 //  exist would take the player's decision and then do nothing with it.
+//
+//  ---------------------------------------------------------------------------
+//  AND NOW ALL OF THEM LIVE HERE, INCLUDING THE OLD TWO
+//  ---------------------------------------------------------------------------
+//  `removedByBoard` was brought over first and `bankrupt` was left behind, so
+//  the game had its endings in two places: prose in this file for one of them,
+//  four translation keys and a nested ternary in HomeScreen for the other.
+//
+//  That ternary is the reason this is worth doing now rather than at the end.
+//  Every new ending had to be threaded through it, and the screen decided both
+//  WHETHER the game was over and WHAT it said about it, in the same
+//  expression. With three endings it is untidy. With the seven this game is
+//  heading for it is where the bugs would come from.
+//
+//  So: this file owns the WORDS. Two things are still allowed to DECIDE - a
+//  story effect, and the quarterly tick - and `ENDING_FOR_STATUS` is how the
+//  tick names one, so that the decision and the prose cannot drift apart.
 // ============================================================================
 
 export interface Ending {
@@ -86,6 +103,56 @@ export const ENDINGS: Record<string, Ending> = {
             + 'thought you knew that. Come for lunch when you have slept. J x"\n\n'
             + 'Nine minutes. You will think about the nine minutes for a long time.',
     },
+
+    // ----------------------------------------------------------------------
+    //  THE MONEY RAN OUT
+    // ----------------------------------------------------------------------
+    //  This was 'gameover.bankruptBody' and it read, in full: "The money ran
+    //  out." Four words for the ending most players will actually reach.
+    //
+    //  It is the hardest of the three to write, because bankruptcy is the one
+    //  the player already knows they earned. Anything with an opinion in it
+    //  reads as the game telling them off, and being told off lets them argue
+    //  with the game instead of sitting in it.
+    //
+    //  So there is no opinion anywhere in it. It is a Friday, some procedure,
+    //  a building. The last line is the only one that judges anything and it
+    //  judges the COMPANY, which the player is at liberty to agree with.
+    // ----------------------------------------------------------------------
+    wentBankrupt: {
+        id: 'wentBankrupt',
+        title: 'THE MONEY RAN OUT',
+        body:
+            'Payroll did not clear. You heard it at 6:40 on a Friday, from the '
+            + 'bank, which means you were not the first person to know.\n\n'
+            + 'Administrators are appointed inside a week. They are polite and '
+            + 'they are fast, and by the second morning somebody you hired is '
+            + 'explaining the filing system to a man with a clipboard.\n\n'
+            + 'The building sells well. It was always the best thing the company '
+            + 'owned, which is a sentence somebody should have said out loud '
+            + 'while there was still time to do anything about it.',
+    },
 };
 
 export const endingById = (id: string): Ending | undefined => ENDINGS[id];
+
+/**
+ * What the quarterly tick's terminal statuses are called here.
+ *
+ * The tick decides these two: capital went negative, or the board voted. It
+ * has always decided them, and it should - they are the outcome of a quarter
+ * of simulation rather than of anything anybody said in a conversation.
+ *
+ * What it must NOT do is carry its own copy of the words, which is what the
+ * ternary in HomeScreen amounted to. This is the join: the tick names an id,
+ * the screen renders whatever is under that id, and there is one place to
+ * change if the writing changes.
+ *
+ * `endings.test.ts` checks both sides resolve. A status pointing at an ending
+ * that does not exist would end the game on a blank screen, and it would do it
+ * only to a player who had just gone bankrupt.
+ */
+export const ENDING_FOR_STATUS: Record<'bankrupt' | 'removed', string> = {
+    bankrupt: 'wentBankrupt',
+    removed: 'removedByBoard',
+};

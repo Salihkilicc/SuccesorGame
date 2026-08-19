@@ -2570,12 +2570,35 @@ export const useGameStore = create<GameStore>()(
                 //  See data/story/endings.ts - and note the timestamps.
                 // ------------------------------------------------------
                 try {
-                  require('./useStoryStore').useStoryStore.getState().endGame('removedByBoard');
+                  const { ENDING_FOR_STATUS } = require('../../data/story/endings');
+                  require('./useStoryStore').useStoryStore.getState()
+                    .endGame(ENDING_FOR_STATUS.removed);
                 } catch { /* story store not ready - the screen still ends it */ }
                 return 'removed' as const;
               }
             } catch { /* kurul durumu okunamadi */ }
-            return newCompanyCapital < 0 ? 'bankrupt' as const : 'active' as const;
+
+            if (newCompanyCapital < 0) {
+              // ------------------------------------------------------
+              //  BANKRUPTCY NAMES AN ENDING TOO, NOW
+              // ------------------------------------------------------
+              //  It used to return the status and nothing else, and
+              //  HomeScreen turned that into four words out of the
+              //  translation file. Routing it the same way as the
+              //  removal above means the two terminal outcomes of a
+              //  quarter behave identically: the tick decides, the
+              //  endings file speaks, and the ending survives a reload
+              //  because it is in the store rather than in a screen's
+              //  local state.
+              // ------------------------------------------------------
+              try {
+                const { ENDING_FOR_STATUS } = require('../../data/story/endings');
+                require('./useStoryStore').useStoryStore.getState()
+                  .endGame(ENDING_FOR_STATUS.bankrupt);
+              } catch { /* story store not ready - the screen still ends it */ }
+              return 'bankrupt' as const;
+            }
+            return 'active' as const;
           })(),
           reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,
           data: {

@@ -166,11 +166,13 @@ export const tr: Record<string, string> = {
         'Ürünün kalite {quality}, bu hat {ceiling} ile sınırlı. Fasona verdiğin her adet müşterinin hissettiği ortalamayı aşağı çeker.',
 
     // ---------------- Oyun sonu ----------------
-    'gameover.bankrupt': 'Oyun bitti',
-    'gameover.bankruptBody': 'Para bitti.',
-    'gameover.removed': 'Görevden alındın',
-    'gameover.removedBody':
-        'Kurul seni görevden aldı. Kurduğun şirket sensiz devam ediyor.',
+    // SHELVED. See the note on the English side: endings live in
+    // data/story/endings.ts now.
+    //   'gameover.bankrupt': 'Oyun bitti',
+    //   'gameover.bankruptBody': 'Para bitti.',
+    //   'gameover.removed': 'Görevden alındın',
+    //   'gameover.removedBody':
+    //       'Kurul seni görevden aldı. Kurduğun şirket sensiz devam ediyor.',
     'gameover.newGame': 'Yeni oyun',
 
 

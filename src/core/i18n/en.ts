@@ -165,11 +165,18 @@ export const en: Record<string, string> = {
         'Your product is quality {quality}, this line caps at {ceiling}. Every outsourced unit drags the average your customers actually feel.',
 
     // ---------------- Oyun sonu ----------------
-    'gameover.bankrupt': 'GAME OVER',
-    'gameover.bankruptBody': 'The money ran out.',
-    'gameover.removed': 'YOU ARE OUT',
-    'gameover.removedBody':
-        'The board voted you out. The company you built goes on without you.',
+    // SHELVED. The words for these two moved into data/story/endings.ts, which
+    // now owns every ending in the game. They were the only four keys in the
+    // file that a screen turned into a nested ternary, and the endings file is
+    // where a new ending has to be written anyway.
+    //
+    // Left here rather than deleted: an ending is player-visible text and
+    // somebody may want the old wording back.
+    //   'gameover.bankrupt': 'GAME OVER',
+    //   'gameover.bankruptBody': 'The money ran out.',
+    //   'gameover.removed': 'YOU ARE OUT',
+    //   'gameover.removedBody':
+    //       'The board voted you out. The company you built goes on without you.',
     'gameover.newGame': 'NEW GAME',
 
 

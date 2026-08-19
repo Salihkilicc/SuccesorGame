@@ -45,7 +45,7 @@ import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 import { useNewsStore } from '../../core/store/useNewsStore';
 import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
-import { endingById } from '../../data/story/endings';
+import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -151,19 +151,34 @@ const HomeScreen = () => {
   //  should not come back to a company they no longer own.
   // ------------------------------------------------------------------
   const storyEnding = useStoryStore(state => state.ending);
-  const ending = storyEnding ? endingById(storyEnding) : undefined;
 
   // --- Quarterly Report State ---
   const [reportVisible, setReportVisible] = useState(false);
   const [lastReportData, setLastReportData] = useState<ReportFinancialData | null>(null);
 
-  // --- Game Over State ---
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [gameOverReason, setGameOverReason] = useState<'bankrupt' | 'removed'>('bankrupt');
+  // ------------------------------------------------------------------
+  //  THE BACKSTOP, AND WHY IT IS AN ID RATHER THAN A SCREEN STATE
+  // ------------------------------------------------------------------
+  //  This was `gameOverReason: 'bankrupt' | 'removed'` plus a boolean, and
+  //  the overlay chose its title and body from them with a nested ternary
+  //  over four translation keys. So the screen held the words for two of
+  //  the endings and the endings file held the words for the third.
+  //
+  //  The tick now names an ending for both of its terminal statuses, so
+  //  `storyEnding` is normally all that is needed. This is kept anyway
+  //  because `endGame` is called inside a try/catch that swallows a store
+  //  that is not ready, and the fallback for "the ending did not get
+  //  written" must not be "the game carries on after bankruptcy".
+  //
+  //  It holds an ID, not prose. Two things may DECIDE the game is over;
+  //  only endings.ts says what that looks like.
+  // ------------------------------------------------------------------
+  const [fallbackEnding, setFallbackEnding] = useState<string | null>(null);
+  const ending = endingById(storyEnding ?? fallbackEnding ?? '');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (isGameOver || !!ending) {
+    if (ending) {
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 2000, // 2 saniye fade-in
@@ -172,7 +187,7 @@ const HomeScreen = () => {
     } else {
       fadeAnim.setValue(0);
     }
-  }, [isGameOver, ending]);
+  }, [ending]);
 
   /**
    * Temiz yeni oyun.
@@ -185,7 +200,9 @@ const HomeScreen = () => {
    * initialStatsState, whose figures are the single source (see START_EMPLOYEES).
    */
   const handleRestart = async () => {
-    setIsGameOver(false);
+    // Both halves of it. `startNewGame` resets the story store, which clears
+    // `ending`; the fallback is this screen's own and nothing else will.
+    setFallbackEnding(null);
     fadeAnim.setValue(0);
 
     try {
@@ -246,9 +263,13 @@ const HomeScreen = () => {
         // IKI FARKLI BITIS. Ikisi de oyunu bitirir ama sebepleri
         // tamamen farkli ve oyuncunun hangisini yasadigini bilmesi
         // gerekir: parasi mi bitti, yoksa sirketi elinden mi alindi.
+        //
+        // The tick has already written the ending to the story store by the
+        // time this runs. This translates the status into the SAME id, so
+        // that if that write was swallowed the overlay still comes up with
+        // the right text on it. See the note by `fallbackEnding`.
         if (result.status === 'bankrupt' || result.status === 'removed') {
-          setGameOverReason(result.status);
-          setIsGameOver(true);
+          setFallbackEnding(ENDING_FOR_STATUS[result.status]);
         }
       }
     } catch (e) {
@@ -607,21 +628,29 @@ const HomeScreen = () => {
         />
 
         {/* --- GAME OVER OVERLAY --- */}
-        {
-          (isGameOver || !!ending) && (
-            <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
+        {/*
+          There is no ternary left in here, which was the point of the
+          exercise. Every ending renders the same way and a new one is a
+          record in data/story/endings.ts and nothing else.
+
+          SHELVED, the version this replaces:
+
+            {(isGameOver || !!ending) && (
               <Text style={styles.gameOverText}>
-                {ending
-                  ? ending.title
+                {ending ? ending.title
                   : gameOverReason === 'removed' ? t('gameover.removed') : t('gameover.bankrupt')}
               </Text>
               <Text style={styles.gameOverSubText}>
-                {ending
-                  ? ending.body
-                  : gameOverReason === 'removed'
-                    ? t('gameover.removedBody')
-                    : t('gameover.bankruptBody')}
+                {ending ? ending.body
+                  : gameOverReason === 'removed' ? t('gameover.removedBody') : t('gameover.bankruptBody')}
               </Text>
+            )}
+        */}
+        {
+          !!ending && (
+            <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
+              <Text style={styles.gameOverText}>{ending.title}</Text>
+              <Text style={styles.gameOverSubText}>{ending.body}</Text>
 
               <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
                 <Text style={styles.restartButtonText}>{t('gameover.newGame')}</Text>
