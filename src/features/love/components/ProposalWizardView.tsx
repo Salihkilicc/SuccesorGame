@@ -1,6 +1,7 @@
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PROPOSAL_LOCATIONS } from '../data/loveConstants';
 
@@ -70,7 +71,11 @@ const ProposalWizardView: React.FC<Props> = ({
                     style={[styles.actionButton, { backgroundColor: theme.colors.accent, marginTop: 12, width: '100%', justifyContent: 'center' }]}
                     onPress={onClose}
                 >
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', textAlign: 'center' }]}>
+                    {/* `onLight`, not white. `accent` is a LIGHT fill and
+                        white on it measures 2.65 - see the note on it in
+                        core/theme.ts: the fill's own colour is unreadable as
+                        text and the text on it has to be black. */}
+                    <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '800', textAlign: 'center' }]}>
                         {isSuccess ? 'Celebrate & Close' : 'Close'}
                     </Text>
                 </Pressable>
@@ -102,7 +107,8 @@ const ProposalWizardView: React.FC<Props> = ({
                 <Pressable
                     style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
                     onPress={() => onDecidePrenup(false)}>
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>❤️ No Prenup (Trust)</Text>
+                    {/* `onLight` again. Same fill, same rule. */}
+                    <Text style={[styles.actionButtonText, { color: theme.colors.onLight }]}>❤️ No Prenup (Trust)</Text>
                 </Pressable>
 
                 <Pressable style={styles.cancelButton} onPress={onClose}>
@@ -161,8 +167,15 @@ const ProposalWizardView: React.FC<Props> = ({
 
             {/* Location Picker */}
             <View style={styles.locationPicker}>
+                {/* An ICON rather than the character. A bare arrow glyph
+                    renders at whatever the system font decides, does not
+                    inherit the app's icon weight, and reads as text to a
+                    screen reader. Every other back control in this app is a
+                    MaterialCommunityIcon. */}
                 <Pressable onPress={() => onCycleLocation('prev')} style={styles.arrowButton}>
-                    <Text style={styles.arrowText}>←</Text>
+                    <MaterialCommunityIcons
+                        name="chevron-left" size={22} color={theme.colors.textPrimary}
+                    />
                 </Pressable>
                 <View style={styles.locationInfo}>
                     <Text style={styles.locationName}>{location.name}</Text>
@@ -215,7 +228,8 @@ const ProposalWizardView: React.FC<Props> = ({
                     { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5, justifyContent: 'center' }
                 ]}
                 onPress={onStartProposal}>
-                <Text style={[styles.actionButtonText, { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1, textAlign: 'center' }]}>{t('love.propose2')}</Text>
+                {/* And the third. `accent` is a light fill; white on it is 2.65. */}
+                <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '800', letterSpacing: 1, textAlign: 'center' }]}>{t('love.propose2')}</Text>
             </Pressable>
 
             {/* Close Button */}

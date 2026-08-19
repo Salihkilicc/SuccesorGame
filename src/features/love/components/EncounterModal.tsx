@@ -42,29 +42,54 @@ interface EncounterModalProps {
     isEmbedded?: boolean;
 }
 
-// Helper functions for Social Class & Tier Badges
+// ============================================================================
+//  THE CLASS BADGE, IN COLOURS THE APP ALREADY OWNS
+// ============================================================================
+//
+//  This carried eight hand-picked hues - a gold, a green, a pink, a red - none
+//  of which were in the palette. Two of them were worse than merely new:
+//  #34D399 sits where the profit green does and #F87171 where the loss red
+//  does, so an OLD MONEY badge read as a gain and an UNDERGROUND badge read as
+//  a cost. A wayfinding colour that looks like a signal is worse than no
+//  colour at all, which is rule 3 in core/theme.ts almost word for word.
+//
+//  `avatarTints` is the set this belongs in. It exists for exactly this: eight
+//  hues with no valence, used to tell people apart, every one of them chosen
+//  to take black text at better than 10:1. Social class is the same kind of
+//  fact - categorical, no good or bad - so it gets the same set rather than a
+//  ninth palette.
+//
+//  The mapping is FIXED rather than hashed. `avatarTintFor` hashes a name
+//  because names are unbounded; there are six classes and they should not
+//  change colour between two players.
+// ============================================================================
+const CLASS_TINT: Record<string, number> = {
+    Royalty: 4,          // wheat
+    HighSociety: 1,      // sand
+    HIGH_SOCIETY: 1,
+    OldMoney: 3,         // teal
+    CorporateElite: 5,   // sky
+    CORPORATE_ELITE: 5,
+    BillionaireHeir: 2,  // rose
+    Artistic: 6,         // lilac
+    Underground: 0,      // coral
+    UNDERGROUND: 0,
+    WorkingClass: 7,     // sage
+    MiddleClass: 7,
+    CriminalElite: 0,
+};
+
 const getSocialClassTheme = (socialClass?: string): { color: string; bg: string; label: string } => {
-    switch (socialClass) {
-        case 'Royalty':
-            return { color: '#FBBF24', bg: 'rgba(251, 191, 36, 0.14)', label: 'ROYALTY' };
-        case 'HighSociety':
-        case 'HIGH_SOCIETY':
-            return { color: '#FFA94D', bg: 'rgba(255, 169, 77, 0.14)', label: 'HIGH SOCIETY' };
-        case 'OldMoney':
-            return { color: '#34D399', bg: 'rgba(52, 211, 153, 0.14)', label: 'OLD MONEY' };
-        case 'CorporateElite':
-        case 'CORPORATE_ELITE':
-            return { color: '#05A8F6', bg: 'rgba(5, 168, 246, 0.14)', label: 'CORPORATE ELITE' };
-        case 'BillionaireHeir':
-            return { color: '#F472B6', bg: 'rgba(244, 114, 182, 0.14)', label: 'BILLIONAIRE HEIR' };
-        case 'Artistic':
-            return { color: '#C084FC', bg: 'rgba(192, 132, 252, 0.14)', label: 'ARTISTIC' };
-        case 'Underground':
-        case 'UNDERGROUND':
-            return { color: '#F87171', bg: 'rgba(248, 113, 113, 0.14)', label: 'UNDERGROUND' };
-        default:
-            return { color: '#7DD3FC', bg: 'rgba(125, 211, 252, 0.14)', label: (socialClass || 'SOCIETY').toUpperCase() };
-    }
+    const tints = theme.colors.avatarTints;
+    const color = tints[CLASS_TINT[socialClass ?? ''] ?? 5];
+    return {
+        color,
+        // The badge fill is a SURFACE, not a wash of the hue. A tinted panel
+        // is the thing that made these read as signals; the word and the
+        // colour of the word are enough.
+        bg: theme.colors.surfaceHigh,
+        label: (socialClass || 'SOCIETY').replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase(),
+    };
 };
 
 export const EncounterModal: React.FC<EncounterModalProps> = ({
@@ -130,7 +155,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                 </Text>
                             </View>
                             <TouchableOpacity style={styles.closeButton} onPress={onIgnore} activeOpacity={0.7}>
-                                <MaterialCommunityIcons name="close" size={18} color="#94A3B8" />
+                                <MaterialCommunityIcons name="close" size={18} color={theme.colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
 
@@ -257,7 +282,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(15, 23, 30, 0.88)',
+        backgroundColor: 'rgba(28, 36, 44, 0.88)',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 16,
@@ -272,7 +297,7 @@ const styles = StyleSheet.create({
 
     // Main Profile Card
     profileCard: {
-        backgroundColor: '#1E2833',
+        backgroundColor: theme.colors.surface,
         borderRadius: 20,
         padding: 20,
         borderWidth: 1,
@@ -323,9 +348,9 @@ const styles = StyleSheet.create({
         width: 76,
         height: 76,
         borderRadius: 38,
-        backgroundColor: '#183D5C',
+        backgroundColor: theme.colors.surfaceHigh,
         borderWidth: 2,
-        borderColor: '#05A8F6',
+        borderColor: theme.colors.accent,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
@@ -347,12 +372,12 @@ const styles = StyleSheet.create({
     ageText: {
         fontSize: 17,
         fontWeight: '500',
-        color: '#94A3B8',
+        color: theme.colors.textSecondary,
     },
     occupationText: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#94A3B8',
+        color: theme.colors.textSecondary,
         marginBottom: 12,
         textAlign: 'center',
     },
@@ -375,21 +400,34 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.4,
     },
+    // ------------------------------------------------------------------
+    //  THE TWO PILLS THAT WERE WEARING SIGNAL COLOURS
+    // ------------------------------------------------------------------
+    //  The trait pill was a violet wash and the buff pill was #34D399, which
+    //  sits where the profit green does. So "gives you a business network"
+    //  read as a gain in the same colour the income statement uses for one,
+    //  on a card about a person.
+    //
+    //  Both are surfaces now, with the research violet on the trait text
+    //  because a personality trait is the nearest thing on this card to a
+    //  fact about capability. The buff keeps `brandMuted`, the section
+    //  heading colour, because that is what it is: a label on a benefit.
+    // ------------------------------------------------------------------
     traitPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(192, 132, 252, 0.14)',
+        backgroundColor: theme.colors.surfaceRaised,
     },
     traitPillText: {
-        color: '#C084FC',
+        color: theme.colors.rp,
         fontSize: 10.5,
         fontWeight: '700',
     },
     buffPill: {
-        backgroundColor: 'rgba(52, 211, 153, 0.14)',
+        backgroundColor: theme.colors.surfaceRaised,
     },
     buffPillText: {
-        color: '#34D399',
+        color: theme.colors.brandMuted,
         fontSize: 10.5,
         fontWeight: '700',
     },
@@ -398,7 +436,7 @@ const styles = StyleSheet.create({
     costBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#151D26',
+        backgroundColor: theme.colors.background,
         borderRadius: 12,
         paddingVertical: 10,
         paddingHorizontal: 12,
@@ -421,7 +459,7 @@ const styles = StyleSheet.create({
     costLabel: {
         fontSize: 9.5,
         fontWeight: '700',
-        color: '#64748B',
+        color: theme.colors.textMuted,
         letterSpacing: 0.5,
         marginBottom: 1,
     },
@@ -439,13 +477,13 @@ const styles = StyleSheet.create({
     lifestyleText: {
         fontSize: 9.5,
         fontWeight: '700',
-        color: '#94A3B8',
+        color: theme.colors.textSecondary,
         letterSpacing: 0.5,
     },
 
     // Scenario Box
     scenarioCard: {
-        backgroundColor: '#151D26',
+        backgroundColor: theme.colors.background,
         borderRadius: 12,
         paddingVertical: 12,
         paddingHorizontal: 14,
@@ -463,7 +501,7 @@ const styles = StyleSheet.create({
     scenarioText: {
         fontSize: 13,
         lineHeight: 19,
-        color: '#CBD5E1',
+        color: theme.colors.textSecondary,
         textAlign: 'center',
         fontStyle: 'italic',
         paddingHorizontal: 8,
@@ -502,9 +540,9 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     hookupButton: {
-        backgroundColor: '#263342',
+        backgroundColor: theme.colors.surfaceRaised,
         borderWidth: 1,
-        borderColor: 'rgba(255, 169, 77, 0.3)',
+        borderColor: theme.colors.border,
     },
     hookupButtonText: {
         fontSize: 14,
@@ -513,7 +551,7 @@ const styles = StyleSheet.create({
     },
     hookupSubtext: {
         fontSize: 10.5,
-        color: '#94A3B8',
+        color: theme.colors.textSecondary,
     },
 });
 

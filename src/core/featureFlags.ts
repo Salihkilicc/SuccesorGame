@@ -53,7 +53,7 @@ export const FEATURES = {
     /** Relationships / partner system (features/love).
      *  NOTE: when it returns it will be reshaped as "stakeholder management"
      *  (board, investor relations, key hires). */
-    love: false,
+    love: true,
     /**
      * Kumarhane: slots, rulet, poker, blackjack.
      *

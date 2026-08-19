@@ -12,6 +12,7 @@ import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { useRelationshipStore } from '../../../core/store/useRelationshipStore';
 import type { LoveStackParamList } from '../../../navigation';
 import { theme } from '../../../core/theme';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import InteractionModal from '../components/InteractionModal';
 import { EncounterModal } from '../components/EncounterModal';
 import BreakupModal from '../components/BreakupModal';
@@ -749,29 +750,27 @@ const LoveScreen = () => {
         style={StyleSheet.absoluteFill}
       />
       <SafeAreaView style={styles.container} edges={['top']}>
-        {/* 1. Ultra-Slim Header */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={handleBack}
-            style={({ pressed }) => [
-              styles.backBtn,
-              pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] },
-            ]}
-          >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8A8A" />
-          </Pressable>
+        {/* ------------------------------------------------------------
+            THE STANDARD HEADER, LIKE EVERY OTHER SCREEN
 
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{t('love.contacts')}</Text>
-            <View style={styles.headerAccent} />
-          </View>
+            This was hand-rolled: its own back button, its own title, its own
+            accent rule. Three consequences, and the audit caught all three.
+            The back arrow was drawn in the LOSS RED - the one control on the
+            screen that costs nothing, in the colour that means "this is
+            costing you". The accent rule was not a category colour, so this
+            screen was the only one in the app that did not tell you where you
+            were. And the title did not scale with the system text size.
 
-          <View style={styles.headerRight}>
-            <Text style={styles.balanceText}>
-              {formatMoney(money)}
-            </Text>
-          </View>
-        </View>
+            `ScreenHeader` does all of it, takes the balance as its `right`
+            slot, and `handleBack` still runs because the header takes it.
+           ------------------------------------------------------------ */}
+        <ScreenHeader
+          title={t('love.contacts')}
+          onBack={handleBack}
+          inset={false}
+          category="brand"
+          right={<Text style={styles.balanceText}>{formatMoney(money)}</Text>}
+        />
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 

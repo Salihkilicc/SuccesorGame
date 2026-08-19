@@ -1,3 +1,20 @@
+// @orphan-ok the actions became submenus and LoveScreen draws its own rows
+//
+// src/features/love/components/LoveActionButton.tsx
+//
+// ============================================================================
+//  SHELVED - nothing renders this
+// ============================================================================
+//
+//  A labelled action row with an emoji, from an earlier shape of LoveScreen
+//  where the actions were a list. They are a submenu now and the screen draws
+//  its own rows inline.
+//
+//  Kept rather than deleted because the shape is still the right one for the
+//  submenus, which each hand-roll the same Pressable with the same three
+//  styles. If those are ever pulled together this is what they become.
+// ============================================================================
+
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import { theme } from '../../../core/theme';
