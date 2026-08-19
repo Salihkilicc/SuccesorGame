@@ -365,6 +365,8 @@ export const en: Record<string, string> = {
     'company.utilization': 'UTILIZATION',
     'company.valuation': 'Valuation',
     'company.wealthManagement': 'Wealth Management',
+    'company.allClear': 'All clear',
+    'company.nToLookAt': '{v1} to look at',
     'company.whatHappened': 'WHAT HAPPENED',
     'company.whatTheMarketWantedVs': 'What the market wanted vs what you could supply',
     'company.whatThisTierGivesYou': 'What this tier gives you, and what it caps',

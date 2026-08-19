@@ -366,6 +366,8 @@ export const tr: Record<string, string> = {
     'company.utilization': 'Kullanım',
     'company.valuation': 'Değerleme',
     'company.wealthManagement': 'Servet Yönetimi',
+    'company.allClear': 'Sorun yok',
+    'company.nToLookAt': '{v1} bakilacak',
     'company.whatHappened': 'Ne oldu',
     'company.whatTheMarketWantedVs': 'Pazarın istediği ile karşılayabildiğin',
     'company.whatThisTierGivesYou': 'Bu kademenin verdiği ve sınırladığı',

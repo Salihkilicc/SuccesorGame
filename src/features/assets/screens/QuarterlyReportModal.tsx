@@ -110,6 +110,19 @@ const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanatio
 //  Tavsiye degil, TESPIT. "Sunu yap" demiyoruz; "su oldu" diyoruz.
 //  Oyuncunun nedensellik kurmasi icin gereken tek sey bu.
 
+/**
+ * A brand figure, as a person would write it.
+ *
+ * `r.brandValue` is a float and three of these notes interpolated it RAW, so
+ * the report said "brand value rose to 11.382938228300001". The engine wants
+ * the precision and the sentence does not; one decimal is what every other
+ * brand figure on this screen already shows.
+ *
+ * A named helper rather than `.toFixed(1)` at three call sites, because the
+ * three of them drifting apart is exactly how one of them ended up raw.
+ */
+const brandFigure = (v: number | undefined): string => (v ?? 0).toFixed(1);
+
 const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; text: string }[] => {
   const notes: { tone: 'bad' | 'warn' | 'good'; text: string }[] = [];
 
@@ -139,19 +152,19 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   if (r.brandChange < -0.5) {
     notes.push({
       tone: 'bad',
-      text: t('obs.brandValueFellV', { v1: Math.abs(r.brandChange).toFixed(1), v2: r.brandValue, v3: formatMoney(r.brandMaintenance ?? 0) }),
+      text: t('obs.brandValueFellV', { v1: brandFigure(Math.abs(r.brandChange)), v2: brandFigure(r.brandValue), v3: formatMoney(r.brandMaintenance ?? 0) }),
     });
   } else if (r.brandChange > 0.5) {
     notes.push({
       tone: 'good',
-      text: t('obs.brandValueRoseV', { v1: r.brandChange.toFixed(1), v2: r.brandValue }),
+      text: t('obs.brandValueRoseV', { v1: brandFigure(r.brandChange), v2: brandFigure(r.brandValue) }),
     });
   }
 
   if (r.isRetooling) {
     notes.push({
       tone: 'warn',
-      text: t('obs.yourFacilityIsBeing', { v1: r.buildQuartersRemaining ?? 0 }),
+      text: t('obs.yourFacilityIsBeing', { v1: Math.round(r.buildQuartersRemaining ?? 0) }),
     });
   }
 
@@ -172,7 +185,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   if (r.brandCeiling && r.brandValue >= r.brandCeiling - 0.5) {
     notes.push({
       tone: 'warn',
-      text: t('obs.brandValueHasHit', { v1: r.facilityName, v2: r.brandCeiling }),
+      text: t('obs.brandValueHasHit', { v1: r.facilityName, v2: brandFigure(r.brandCeiling) }),
     });
   }
 
@@ -186,7 +199,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   if ((r.moraleChange ?? 0) < -2) {
     notes.push({
       tone: 'bad',
-      text: t('obs.moraleFellVPoints', { v1: Math.abs(r.moraleChange ?? 0).toFixed(1), v2: r.employeeMorale.toFixed(0), v3: Math.round((r.salaryRatio ?? 1) * 100), v4: r.moraleWageTarget ?? 70, v5: (r.moraleEfficiency ?? 1).toFixed(2) }),
+      text: t('obs.moraleFellVPoints', { v1: Math.abs(r.moraleChange ?? 0).toFixed(1), v2: r.employeeMorale.toFixed(0), v3: Math.round((r.salaryRatio ?? 1) * 100), v4: Math.round(r.moraleWageTarget ?? 70), v5: (r.moraleEfficiency ?? 1).toFixed(2) }),
     });
   }
 
@@ -491,6 +504,27 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   }
 
   const observations = buildObservations(report);
+
+  // ------------------------------------------------------------------
+  //  WHETHER THIS SECTION IS WORTH OPENING, ON ITS CLOSED HEADER
+  // ------------------------------------------------------------------
+  //  The summary was `observations.length`, which is a number the player
+  //  cannot act on: eleven notes could be eleven congratulations. Counting
+  //  only the ones that are not good, and taking the colour from the worst,
+  //  turns the header into the answer to "do I need to read this".
+  // ------------------------------------------------------------------
+  const observationSummary = React.useMemo(() => {
+    const bad = observations.filter(o => o.tone === 'bad').length;
+    const warn = observations.filter(o => o.tone === 'warn').length;
+    const issues = bad + warn;
+    if (issues === 0) {
+      return { text: t('company.allClear'), color: theme.colors.textMuted };
+    }
+    return {
+      text: t('company.nToLookAt', { v1: issues }),
+      color: bad > 0 ? theme.colors.negative : theme.colors.warning,
+    };
+  }, [observations]);
   const e = report.expenses;
 
   return (
@@ -909,14 +943,26 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               </View>
             </CollapsibleSection>
 
-            {/* ══ NE OLDU — varsayilan olarak ACIK, ozeti bu bolum ══ */}
+            {/* ------------------------------------------------------------
+                NE OLDU — CLOSED, AND THE SUMMARY DECIDES WHETHER TO OPEN IT
+
+                It opened by default and it is the longest thing on the page,
+                so the report arrived as a wall. It is also not compulsory
+                reading: every observation in it is a restatement of a number
+                that is already on this screen, in a sentence.
+
+                Closed, with a summary that earns the tap. The count on its own
+                said nothing - eleven observations could be eleven good ones -
+                so it now says how many are PROBLEMS and takes its colour from
+                the worst of them. A player who sees "2 to look at" in red
+                opens it; one who sees "all clear" does not have to.
+               ------------------------------------------------------------ */}
             <CollapsibleSection
               title={t('company.whatHappened')}
               note={t('company.plainLanguageReadOfThis')}
-              info={t('company.automaticObservationsAboutWhatActually')} 
-              summary={`${observations.length}`}
-              summaryColor="rgba(255,255,255,0.48)"
-              defaultOpen
+              info={t('company.automaticObservationsAboutWhatActually')}
+              summary={observationSummary.text}
+              summaryColor={observationSummary.color}
               hidden={observations.length === 0}
             >
               <View style={styles.notesBox}>

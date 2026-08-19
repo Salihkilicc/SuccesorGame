@@ -91,11 +91,22 @@ export const CollapsibleSection = ({
                 accessibilityRole="button"
                 accessibilityState={{ expanded: open }}
             >
+                {/* ------------------------------------------------------
+                    THE INFO DOT LIVES ON THE RIGHT NOW
+
+                    It used to sit immediately after the title, which put a
+                    small circle in the middle of every section header in the
+                    app - between the two things the header is actually for,
+                    the name of the section and its figure. On a screen with
+                    six sections that is six dots down the centre of the page
+                    and they read as punctuation rather than as controls.
+
+                    Left column is text, right column is controls. The dot
+                    goes with the summary and the chevron, where the eye is
+                    already looking for something to press.
+                   ------------------------------------------------------ */}
                 <View style={styles.headerText}>
-                    <View style={styles.titleRow}>
-                        <Text style={[styles.title, compact && styles.titleCompact]}>{title}</Text>
-                        {info ? <InfoDot title={title} text={info} detail={infoDetail} small /> : null}
-                    </View>
+                    <Text style={[styles.title, compact && styles.titleCompact]}>{title}</Text>
                     {note ? <Text style={[styles.note, compact && styles.noteCompact]}>{note}</Text> : null}
                 </View>
 
@@ -105,6 +116,7 @@ export const CollapsibleSection = ({
                             {summary}
                         </Text>
                     ) : null}
+                    {info ? <InfoDot title={title} text={info} detail={infoDetail} small /> : null}
                     <Text style={[styles.chevron, open && styles.chevronOpen]}>⌄</Text>
                 </View>
             </Pressable>
@@ -141,7 +153,17 @@ const styles = StyleSheet.create({
     },
     headerPressed: { backgroundColor: 'rgba(255,255,255,0.04)' },
     headerText: { flex: 1, paddingRight: 6 },
+    /**
+     * SHELVED with the InfoDot's move to the right of the header.
+     *
+     * @orphan-ok-symbol titleRow
+     *
+     * The title is the only thing on the left now, so it needs no row of its
+     * own. Kept because a second badge on a section title is the obvious next
+     * request and this is where it would go back.
+     *
     titleRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+     */
     title: {
         color: theme.colors.textMuted,
         fontSize: 10.5,
@@ -163,7 +185,8 @@ const styles = StyleSheet.create({
         marginTop: 1,
         lineHeight: 12,
     },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    /** 8 rather than 6: the dot joined this row and three things need air. */
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     summary: { fontSize: 14, fontWeight: '800', maxWidth: 130, textAlign: 'right' },
     summaryCompact: { fontSize: 12, maxWidth: 100 },
     chevron: {
