@@ -27,8 +27,24 @@ import { useStatsStore } from '../store/useStatsStore';
 import { useGameStore } from '../store/useGameStore';
 import { useProductStore } from '../store/useProductStore';
 import { useFamilyStore } from '../store/useFamilyStore';
+import { useStoryStore } from '../store/useStoryStore';
 import { currentQuarter } from './world';
-import { buildRecord, type RecordRow } from './record';
+import { buildRecord, type EstateSummary, type RecordRow } from './record';
+import { divideEstate, familyHolding, type Survivor } from './inheritance';
+import { successorFor } from './mortality';
+
+/**
+ * The endings that leave an estate behind.
+ *
+ * A LIST rather than a flag on the ending record, because it is a fact about
+ * what the closing screen shows rather than about the ending itself, and
+ * putting it on the Ending type would put a rendering concern in a data file
+ * that has stayed clean of them.
+ *
+ * Bankruptcy is deliberately not here. There is nothing to divide and a row
+ * reading "Your successor took nothing" would be the game rubbing it in.
+ */
+const ENDINGS_WITH_AN_ESTATE = ['diedInOffice', 'diedWithoutAnHeir'];
 
 /** Read a number off a store without letting a missing one end the screen. */
 const safe = <T>(read: () => T, fallback: T): T => {
@@ -37,6 +53,58 @@ const safe = <T>(read: () => T, fallback: T): T => {
         return v === undefined || v === null ? fallback : v;
     } catch {
         return fallback;
+    }
+};
+
+/**
+ * What the estate did, or undefined when there was not one.
+ *
+ * The one place the closing screen reads the ending it is showing, and it is
+ * worth being explicit about why: the DIVISION is the same arithmetic whoever
+ * asks, but whether the player wants to see it depends entirely on how the run
+ * finished. See core/story/inheritance.ts for the rule itself.
+ */
+const readEstate = (): EstateSummary | undefined => {
+    try {
+        const ending = useStoryStore.getState().ending;
+        if (!ending || !ENDINGS_WITH_AN_ESTATE.includes(ending)) return undefined;
+
+        const stats = useStatsStore.getState() as any;
+        const family = useFamilyStore.getState() as any;
+        const board = require('../../features/shareholders/stores/useShareholderStore')
+            .useShareholderStore.getState();
+
+        const children = (family.children ?? []);
+        const survivors: Survivor[] = [
+            ...children.map((c: any) => ({ id: c.id, kind: 'child' as const })),
+            ...(family.partner ? [{ id: 'partner', kind: 'spouse' as const }] : []),
+        ];
+
+        const heir = successorFor(
+            children.map((c: any) => ({ id: c.id, age: c.age ?? 0 })),
+            family.designatedSuccessorId ?? null,
+        );
+
+        const bequests = divideEstate(
+            { cash: stats.money ?? 0, shares: board.playerShareCount ?? 0 },
+            survivors,
+            heir?.id ?? null,
+        );
+        if (bequests.length === 0) {
+            return { heirCash: 0, heirStake: 0, familyStake: 0 };
+        }
+
+        const total = board.totalShares || 0;
+        const heirBequest = bequests.find(b => b.kind === 'heir');
+        return {
+            heirCash: heirBequest?.cash ?? 0,
+            heirStake: total > 0 ? (heirBequest?.shares ?? 0) / total : 0,
+            familyStake: familyHolding(bequests, total),
+        };
+    } catch {
+        // The last screen of the game cannot fail. No estate rows is a worse
+        // screen; a thrown error is no screen.
+        return undefined;
     }
 };
 
@@ -77,5 +145,6 @@ export const readRecord = (): RecordRow[] => {
         ),
         children: (family.children ?? []).length,
         heirNamed: !!family.designatedSuccessorId,
+        estate: readEstate(),
     });
 };

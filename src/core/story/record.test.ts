@@ -10,7 +10,9 @@
 //  that it cannot throw on the one screen in the game with nothing after it.
 // ============================================================================
 
-import { asTime, asFamily, buildRecord, endingsProgress, type RecordInput } from './record';
+import {
+    asTime, asFamily, asStake, buildRecord, endingsProgress, type RecordInput,
+} from './record';
 
 const run = (over: Partial<RecordInput> = {}): RecordInput => ({
     quarters: 40, age: 35, companyValue: 1_200_000_000, netWorth: 400_000_000,
@@ -64,6 +66,24 @@ describe('the record itself', () => {
         expect(buildRecord(run())).toHaveLength(8);
     });
 
+    it('and ten when there was an estate to divide', () => {
+        const rows = buildRecord(run({
+            estate: { heirCash: 500_000, heirStake: 0.33, familyStake: 0.55 },
+        }));
+        expect(rows).toHaveLength(10);
+        // Last, because they are the only rows on a page about the player
+        // that are about somebody else.
+        expect(rows[8].label).toBe('Your successor took');
+        expect(rows[9].label).toBe('The family holds');
+    });
+
+    it('while a bankruptcy is not told what its successor took', () => {
+        // Nothing to divide, and a row reading "Nothing" would be the game
+        // rubbing it in.
+        expect(buildRecord(run()).map(r => r.label))
+            .not.toContain('Your successor took');
+    });
+
     it('opens with the time and closes with the family', () => {
         // Deliberate: time lands hardest, and the family is what the player
         // should still be thinking about on the new game screen.
@@ -91,6 +111,26 @@ describe('the record itself', () => {
     it('and has no duplicate labels, since they key the list', () => {
         const labels = buildRecord(run()).map(r => r.label);
         expect(new Set(labels).size).toBe(labels.length);
+    });
+});
+
+describe('a holding, as the player reads it', () => {
+    it('is a whole percentage, because nobody cares about 32.4', () => {
+        expect(asStake(0.324)).toBe('32% of the company');
+        expect(asStake(1)).toBe('100% of the company');
+    });
+
+    it('and zero says what it means', () => {
+        // A real outcome with a meaning: the children were too young and the
+        // company went somewhere else.
+        expect(asStake(0)).toBe('Nothing');
+        expect(asStake(0.001)).toBe('Nothing');
+    });
+
+    it('and nonsense does not reach the last screen of the game', () => {
+        expect(asStake(NaN)).toBe('Nothing');
+        expect(asStake(-2)).toBe('Nothing');
+        expect(asStake(9)).toBe('100% of the company');
     });
 });
 

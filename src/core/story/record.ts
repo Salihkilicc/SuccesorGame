@@ -58,6 +58,31 @@ export type RecordInput = {
     children: number;
     /** Whether a successor was ever named. */
     heirNamed: boolean;
+    /**
+     * What the estate did, on the two endings where there was one.
+     *
+     * Absent on every other ending, and the rows simply do not appear. A
+     * player who went bankrupt has no estate to divide and a row reading
+     * "The heir took $0" would be the game rubbing it in.
+     */
+    estate?: EstateSummary;
+};
+
+/**
+ * The division, as the player needs to see it.
+ *
+ * Two numbers rather than a list of names, because the point of the screen is
+ * not who got what. It is the GAP between what one person now holds and what
+ * the family holds between them, which is the number the next generation of
+ * this game turns on and the one nobody would otherwise notice happening.
+ */
+export type EstateSummary = {
+    /** Cash to the successor. Same as every other child got. */
+    heirCash: number;
+    /** Fraction of the whole company, 0 to 1. */
+    heirStake: number;
+    /** Fraction of the whole company held by all of them together. */
+    familyStake: number;
 };
 
 /**
@@ -107,7 +132,31 @@ export const buildRecord = (input: RecordInput): RecordRow[] => [
     { label: 'Products on sale', value: formatNumber(input.products) },
     { label: 'Companies bought', value: formatNumber(input.subsidiaries) },
     { label: 'Family', value: asFamily(input.children, input.heirNamed) },
+    // ------------------------------------------------------------------
+    //  AND, ON THE TWO ENDINGS WHERE THERE WAS AN ESTATE, WHAT IT DID
+    // ------------------------------------------------------------------
+    //  Last, and only then. These are the only rows on the screen that are
+    //  about somebody other than the player, which is why they belong at
+    //  the bottom of a page they are reading about themselves.
+    //
+    //  The two figures are chosen so that the GAP between them is the
+    //  reading. One person now controls a third of what you controlled;
+    //  the family between them still controls all of it, for one more
+    //  generation, provided they can agree with each other.
+    // ------------------------------------------------------------------
+    ...(input.estate ? [
+        { label: 'Your successor took', value: asStake(input.estate.heirStake) },
+        { label: 'The family holds', value: asStake(input.estate.familyStake) },
+    ] : []),
 ];
+
+/** A holding as the player reads it. Whole per cent: nobody cares about 32.4. */
+export const asStake = (fraction: number): string => {
+    const pct = Math.max(0, Math.min(100, Math.round((fraction || 0) * 100)));
+    // "Nothing" rather than "0%", because a zero here is a real outcome with
+    // a meaning: the children were too young and the company went elsewhere.
+    return pct <= 0 ? 'Nothing' : `${pct}% of the company`;
+};
 
 /**
  * The line under the record: how many of the endings this player has found.
