@@ -1,3 +1,36 @@
+// @orphan-ok the relationship system moved into Profile - see the note below
+//
+// ============================================================================
+//  SHELVED: THE LOVE SCREEN
+// ============================================================================
+//
+//  Nothing routes here any more. The tab is gone, the RootStack entry is gone,
+//  and the Contacts item on the nav bar is gone with them.
+//
+//  Everything this screen did is on PROFILE, and it was already there before
+//  this file was shelved - which is the reason the move cost nothing:
+//
+//    THE PARTNER CARD, with its empty state. Tapping it with nobody opens the
+//    encounter; tapping it with somebody opens their page.
+//    THE ENCOUNTER MODAL, mounted on Profile, same component.
+//    THE PROPOSAL WIZARD, on FamilyMemberScreen, which is where a partner's
+//    page already lives - venue, ring, prenup, result.
+//    THE FAMILY LIST, which was only ever on Profile.
+//
+//  So this screen was a second front door to a house that already had one, and
+//  a tab of its own made it a fifth section of the app for a single card.
+//
+//  These are facts about the PLAYER. Profile is the screen about the player.
+//
+//  ---------------------------------------------------------------------------
+//  KEPT RATHER THAN DELETED
+//  ---------------------------------------------------------------------------
+//  It holds the only laid-out version of the breakup flow and the submenu
+//  pattern, and it is the reference for what a full relationship screen looks
+//  like if one is ever wanted again. Deleting it would mean rebuilding that
+//  from the stores.
+// ============================================================================
+
 import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, Text, Pressable, StyleSheet, Alert, StatusBar } from 'react-native';

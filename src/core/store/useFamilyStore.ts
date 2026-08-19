@@ -117,7 +117,17 @@ export interface FamilyActions {
     updatePartner: (updates: Partial<PartnerProfile>) => void;
     updatePartnerStats: (updates: Partial<PartnerStats>) => void;
     updateLove: (amount: number) => void;
-    updatePartnerLove: (delta: number) => void; // Alias for updateLove
+    /**
+     * Alias for `updateLove`.
+     *
+     * @orphan-ok-symbol updatePartnerLove
+     *
+     * LoveScreen was the only caller and LoveScreen is shelved - the
+     * relationship system lives inside Profile now. Kept because it is one
+     * line and because a store with two names for one action is a smaller
+     * problem than a screen that has to remember which one this store uses.
+     */
+    updatePartnerLove: (delta: number) => void;
     marry: (hasPrenup?: boolean) => boolean;
     /**
      * Ask, and find out. Moved here from useUserStore, which held the only

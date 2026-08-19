@@ -106,7 +106,10 @@ const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
         route === 'Cart'
     )
         return 'Life';
-    if (route === 'Love' || route === 'LoveHome') return 'Love';
+    // 'Love' and 'LoveHome' used to map here. The screen is shelved and the
+    // relationship system lives inside Profile now - see the note on
+    // LoveScreen.tsx - so those routes no longer exist and Profile already
+    // maps to 'Life' above.
     return 'Home';
 };
 
@@ -235,6 +238,11 @@ const LifeStackNavigator = () => (
   </LifeStack.Navigator>
 );
 
+/**
+ * SHELVED with the tab. See the note there.
+ *
+ * @orphan-ok-symbol LoveStackNavigator
+ */
 const LoveStackNavigator = () => (
   <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
@@ -345,6 +353,13 @@ const MainTabs = () => (
         tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🎭</Text>,
       }}
     />
+    {/* SHELVED: the Love tab. The relationship system is inside Profile now
+        - the partner card, the encounter, the proposal wizard and the family
+        list are all on one screen there, which is where they belong: they are
+        facts about the player, and Profile is the screen about the player.
+
+        A tab of its own made it a fifth section of the app for one card.
+
     <Tab.Screen
       name="Love"
       component={LoveStackNavigator}
@@ -352,6 +367,7 @@ const MainTabs = () => (
         tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>❤️</Text>,
       }}
     />
+       */}
     <Tab.Screen
       name="Assets"
       component={AssetsStackNavigator}
@@ -508,7 +524,11 @@ const RootNavigator = () => {
           {FEATURES.casino ? <RootStack.Screen name="Casino" component={CasinoStackNavigator} /> : null}
           <RootStack.Screen name="Assets" component={AssetsStackNavigator} />
           {/* --- RAFA KALDIRILDI: ilişkiler (stakeholder management olarak dönecek) --- */}
+          {/* SHELVED with the tab above. Nothing navigates to 'Love' any
+              more; CrystalNavBar's Contacts item is gone and Profile is the
+              way in.
           {FEATURES.love ? <RootStack.Screen name="Love" component={LoveScreen} /> : null}
+             */}
           {/* --- RAFA KALDIRILDI: karakter statları --- */}
           {FEATURES.dna ? <RootStack.Screen name="DNA" component={DNAScreen} /> : null}
           <RootStack.Screen

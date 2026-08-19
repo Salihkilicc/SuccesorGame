@@ -67,7 +67,9 @@ const UnderworldScreen = () => {
 
     const handleAction = (key: string) => {
         switch (key) {
-            case 'contacts': navigation.navigate('Love'); break;
+            // Was 'Love'. That route no longer exists - the relationship
+            // system is inside Profile. See LoveScreen.tsx.
+            case 'contacts': navigation.navigate('Profile'); break;
             case 'weather': navigation.navigate('Weather'); break;
             case 'settings': navigation.navigate('Settings' as never); break;
             case 'themes': Alert.alert('Themes', 'Coming Soon'); break;

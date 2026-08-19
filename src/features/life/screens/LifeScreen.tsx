@@ -136,7 +136,12 @@ const LifeScreen = () => {
         navigation.navigate('FinancialReport');
         break;
       case 'Contacts':
-        navigation.navigate('Love');
+        // The Love route is gone: the relationship system lives inside
+        // Profile now. This screen is itself behind a shelved flag, so
+        // nothing reaches this branch, but a navigate to a route that does
+        // not exist THROWS - and it would throw the day `life` came back
+        // rather than today.
+        navigation.navigate('Profile');
         break;
       case 'Profile':
         navigation.navigate('DNA');

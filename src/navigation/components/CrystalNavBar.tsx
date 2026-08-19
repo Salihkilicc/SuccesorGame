@@ -74,7 +74,10 @@ const NAV_ITEMS: Array<{
         { key: 'messages', get label() { return t('nav.messages'); }, icon: 'message-text-outline', target: 'Messages', activeFor: 'Messages' },
         // { key: 'stats', get label() { return t('nav.stats'); }, icon: 'chart-bar', target: 'stats', activeFor: '' },
         // Contacts (ilişkiler) rafa kaldırıldı; yerini şirket aldı.
-        { key: 'contacts', get label() { return t('nav.contacts'); }, icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
+        // SHELVED: Contacts. It opened the Love screen, which is shelved -
+        // the relationship system is inside Profile now, and Profile has its
+        // own item two rows down. Two ways into one screen is one too many.
+        // { key: 'contacts', get label() { return t('nav.contacts'); }, icon: 'account-group-outline', target: 'Contacts', activeFor: 'Love', feature: 'love' },
         { key: 'company', get label() { return t('nav.company'); }, icon: 'office-building-outline', target: 'Company', activeFor: 'Company' },
         { key: 'profile', get label() { return t('nav.profile'); }, icon: 'account-outline', target: 'Profile', activeFor: 'Profile' },
     ];
@@ -118,9 +121,11 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
             // ------------------------------------------------------------------
             navigation.navigate('Home', { screen: 'MyCompany' });
         } else if (screen === 'Contacts') {
-            // Güvenlik ağı: modül rafta ise route kayıtlı değil, navigate crash eder.
-            if (!FEATURES.love) return;
-            navigation.navigate('Love');
+            // The item above is shelved so nothing reaches this, and the
+            // route it navigated to no longer exists. Left as a guard rather
+            // than removed: a stale target that silently does nothing is
+            // better than one that throws on the bar visible on every screen.
+            return;
         } else if (screen === 'Profile') {
             navigation.navigate('Profile');
         } else {
