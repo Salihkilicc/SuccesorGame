@@ -1,3 +1,5 @@
+// `useRef` and `Animated` below are referenced only by the shelved game over
+// markup in the render. Both moved into components/story/EndingOverlay.tsx.
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
@@ -46,6 +48,7 @@ import { useNewsStore } from '../../core/store/useNewsStore';
 import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
+import EndingOverlay from '../../components/story/EndingOverlay';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -175,19 +178,11 @@ const HomeScreen = () => {
   // ------------------------------------------------------------------
   const [fallbackEnding, setFallbackEnding] = useState<string | null>(null);
   const ending = endingById(storyEnding ?? fallbackEnding ?? '');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    if (ending) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 2000, // 2 saniye fade-in
-        useNativeDriver: true,
-      }).start();
-    } else {
-      fadeAnim.setValue(0);
-    }
-  }, [ending]);
+  // The fade used to live here as a `fadeAnim` ref plus an effect keyed on
+  // the game over booleans. It went with the markup into EndingOverlay: the
+  // animation is part of how that component arrives, and leaving it behind
+  // meant this screen held a value whose only purpose was to be passed down.
 
   /**
    * Temiz yeni oyun.
@@ -203,7 +198,6 @@ const HomeScreen = () => {
     // Both halves of it. `startNewGame` resets the story store, which clears
     // `ending`; the fallback is this screen's own and nothing else will.
     setFallbackEnding(null);
-    fadeAnim.setValue(0);
 
     try {
       // Asks first, for somebody who has been through the first year - see
@@ -629,11 +623,12 @@ const HomeScreen = () => {
 
         {/* --- GAME OVER OVERLAY --- */}
         {/*
-          There is no ternary left in here, which was the point of the
-          exercise. Every ending renders the same way and a new one is a
-          record in data/story/endings.ts and nothing else.
+          One line, and this screen no longer knows what an ending looks
+          like. It knows only that there is one.
 
-          SHELVED, the version this replaces:
+          SHELVED, the two versions this replaces. The first decided the
+          words with a nested ternary over four translation keys; the second
+          rendered them but still owned the markup and the fade:
 
             {(isGameOver || !!ending) && (
               <Text style={styles.gameOverText}>
@@ -645,19 +640,21 @@ const HomeScreen = () => {
                   : gameOverReason === 'removed' ? t('gameover.removedBody') : t('gameover.bankruptBody')}
               </Text>
             )}
-        */}
-        {
-          !!ending && (
+
             <Animated.View style={[styles.gameOverOverlay, { opacity: fadeAnim }]}>
               <Text style={styles.gameOverText}>{ending.title}</Text>
               <Text style={styles.gameOverSubText}>{ending.body}</Text>
-
               <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
                 <Text style={styles.restartButtonText}>{t('gameover.newGame')}</Text>
               </TouchableOpacity>
             </Animated.View>
-          )
-        }
+
+          The four styles they used - gameOverOverlay, gameOverText,
+          gameOverSubText, restartButton - are shelved in the stylesheet
+          below rather than removed, since the shelved markup above refers
+          to them.
+        */}
+        {!!ending && <EndingOverlay ending={ending} onNewGame={handleRestart} />}
 
         {/* Education Exam Modal - Only show when report is closed */}
         {FEATURES.education && !reportVisible && <EducationExamModal />}
@@ -1238,40 +1235,38 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     lineHeight: 20,
   },
-  gameOverOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(28,36,44,0.85)',
-    zIndex: 999,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  gameOverText: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: theme.colors.danger,
-    textAlign: 'center',
-    letterSpacing: 2,
-    marginBottom: 8,
-  },
-  gameOverSubText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  restartButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    elevation: 5,
-  },
-  restartButtonText: {
-    color: theme.colors.onLight,
-    fontWeight: '800',
-    fontSize: 16,
-  },
+  // ------------------------------------------------------------------
+  //  SHELVED: the game over overlay's styles.
+  // ------------------------------------------------------------------
+  //  The overlay is components/story/EndingOverlay.tsx now. These are kept
+  //  because the shelved markup in the render refers to them by name, and
+  //  a shelved block whose styles no longer exist is unreadable.
+  //
+  //  Note `gameOverText` while it is here: the title was
+  //  `theme.colors.danger`, which the theme file says in as many words is
+  //  now strictly the LOSS half of the profit/loss signal. `soldToPear` is
+  //  the player getting rich, and it was rendering in the colour the game
+  //  uses for a negative number. The replacement is white.
+  //
+  //  gameOverOverlay: {
+  //    ...StyleSheet.absoluteFillObject,
+  //    backgroundColor: 'rgba(28,36,44,0.85)',
+  //    zIndex: 999, justifyContent: 'center', alignItems: 'center', padding: 20,
+  //  },
+  //  gameOverText: {
+  //    fontSize: 48, fontWeight: '900', color: theme.colors.danger,
+  //    textAlign: 'center', letterSpacing: 2, marginBottom: 8,
+  //  },
+  //  gameOverSubText: {
+  //    fontSize: 16, color: '#FFFFFF', textAlign: 'center', marginBottom: 40,
+  //  },
+  //  restartButton: {
+  //    backgroundColor: '#FFFFFF', paddingVertical: 14, paddingHorizontal: 32,
+  //    borderRadius: 8, elevation: 5,
+  //  },
+  //  restartButtonText: {
+  //    color: theme.colors.onLight, fontWeight: '800', fontSize: 16,
+  //  },
   brandContainer: {
     marginTop: 8,
     marginBottom: 4,

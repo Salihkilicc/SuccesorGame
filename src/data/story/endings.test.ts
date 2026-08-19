@@ -39,7 +39,9 @@ import * as path from 'path';
 
 import { ENDINGS, ENDING_FOR_STATUS, endingById } from './endings';
 
-const HOME_SCREEN = path.join(__dirname, '..', '..', 'screens', 'Home', 'HomeScreen.tsx');
+const SRC = path.join(__dirname, '..', '..');
+const HOME_SCREEN = path.join(SRC, 'screens', 'Home', 'HomeScreen.tsx');
+const OVERLAY = path.join(SRC, 'components', 'story', 'EndingOverlay.tsx');
 
 /** Block and line comments removed, so shelved code does not count as code. */
 const codeOf = (file: string): string =>
@@ -117,9 +119,13 @@ describe('HomeScreen', () => {
         expect(code).not.toMatch(/isGameOver/);
     });
 
-    it('while still rendering the title and body it is given', () => {
-        expect(code).toMatch(/ending\.title/);
-        expect(code).toMatch(/ending\.body/);
+    it('and hands the whole thing to one component', () => {
+        // The rendering went to components/story/EndingOverlay.tsx, so this
+        // screen knows only THAT there is an ending. It used to know what one
+        // looks like, which is how the ternary got there in the first place.
+        expect(code).toMatch(/<EndingOverlay/);
+        expect(code).not.toMatch(/ending\.title/);
+        expect(code).not.toMatch(/ending\.body/);
     });
 
     it('and keeps its own way of ending the game if the store write is lost', () => {
@@ -128,5 +134,43 @@ describe('HomeScreen', () => {
         // must not be "the game carries on after bankruptcy" - so the screen
         // still watches the tick's status. It just holds an ID now.
         expect(code).toMatch(/ENDING_FOR_STATUS\[result\.status\]/);
+    });
+});
+
+// ============================================================================
+//  AND THE OVERLAY IS TWO SCREENS, IN THAT ORDER
+// ============================================================================
+//  See the note at the top of core/story/record.ts. The endings file says an
+//  ending is "not an epilogue and not a scorecard", the player wants their
+//  numbers, and both are satisfied by not putting them on the same page.
+// ============================================================================
+describe('EndingOverlay', () => {
+    const code = codeOf(OVERLAY);
+
+    it('renders the ending it is given and nothing of its own', () => {
+        expect(code).toMatch(/ending\.title/);
+        expect(code).toMatch(/ending\.body/);
+        // No title, no body and no fallback prose anywhere in the component.
+        expect(code).not.toMatch(/GAME OVER|YOU ARE OUT/);
+    });
+
+    it('and the record is behind a second tap rather than under the prose', () => {
+        // If these ever end up on one page the writing dies: the eye finds
+        // the figures first, every time.
+        expect(code).toMatch(/showRecord/);
+        expect(code).toMatch(/setShowRecord\(true\)/);
+        expect(code).toMatch(/setShowRecord\(false\)/);
+    });
+
+    it('and the title is not the loss red', () => {
+        // theme.ts: `danger` is now strictly the loss half of the profit/loss
+        // signal. soldToPear is the player getting rich in their first year.
+        expect(code).not.toMatch(/colors\.danger/);
+        expect(code).not.toMatch(/colors\.error/);
+    });
+
+    it('and it counts the endings against what the player has read', () => {
+        expect(code).toMatch(/endingsProgress/);
+        expect(code).toMatch(/markEndingSeen/);
     });
 });

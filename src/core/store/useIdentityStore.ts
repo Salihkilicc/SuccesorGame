@@ -44,6 +44,18 @@ export type IdentityState = {
      * tutorial" offer on the second playthrough and not the first.
      */
     tutorialCompleted: boolean;
+    /**
+     * Which endings this person has reached, across every run.
+     *
+     * Here for the same reason `tutorialCompleted` is: it is a fact about the
+     * PLAYER, not about a company. A run is wiped by a new game and what you
+     * have seen is not, and the closing screen's "2 of 3 endings found" would
+     * mean nothing if it reset every time it was shown.
+     *
+     * Ids from data/story/endings.ts. Stored as an array rather than a Set
+     * because this is persisted as JSON, and de-duplicated on write.
+     */
+    endingsSeen: string[];
     _hasHydrated: boolean;
 };
 
@@ -58,6 +70,16 @@ type IdentityStore = IdentityState & {
         { ok: true } | { ok: false; reason: string };
     /** Called when the last lock clears. Never unset. */
     markTutorialCompleted: () => void;
+    /**
+     * Records that the player reached this ending. Idempotent.
+     *
+     * Called from the closing overlay rather than from `endGame`, so that an
+     * ending which is written but never rendered - the game store's write
+     * happens inside a tick the player may not have finished watching - does
+     * not count as seen. What this collection means is "I have READ this
+     * one", which is why it is safe to show a total next to it.
+     */
+    markEndingSeen: (id: string) => void;
 };
 
 export const initialIdentityState: IdentityState = {
@@ -66,6 +88,7 @@ export const initialIdentityState: IdentityState = {
     gender: 'male',
     created: false,
     tutorialCompleted: false,
+    endingsSeen: [],
     _hasHydrated: false,
 };
 
@@ -89,6 +112,11 @@ export const useIdentityStore = create<IdentityStore>()(
                 return { ok: true };
             },
             markTutorialCompleted: () => set({ tutorialCompleted: true }),
+            markEndingSeen: (id) => set(state => (
+                state.endingsSeen.includes(id)
+                    ? state
+                    : { endingsSeen: [...state.endingsSeen, id] }
+            )),
         }),
         {
             name: 'succesor_identity_v1',
@@ -99,8 +127,14 @@ export const useIdentityStore = create<IdentityStore>()(
                 gender: state.gender,
                 created: state.created,
                 tutorialCompleted: state.tutorialCompleted,
+                endingsSeen: state.endingsSeen,
             }),
             onRehydrateStorage: () => (state) => {
+                // A save written before this field existed rehydrates without
+                // it, and `endingsSeen.includes` on undefined throws on the
+                // last screen of the game. zustand's persist MERGES, so the
+                // initial [] does not survive a partial rehydrate.
+                if (state && !Array.isArray(state.endingsSeen)) state.endingsSeen = [];
                 state?.setHasHydrated(true);
             },
         },
