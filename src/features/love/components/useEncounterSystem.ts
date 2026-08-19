@@ -9,6 +9,7 @@ import {
 } from '../../../data/relationshipTypes';
 import { Partner } from '../types';
 import { generatePartner } from '../logic/partnerGenerator';
+import { runCourtship } from '../logic/runCourtship';
 import { ENCOUNTER_DATA, EncounterScenario } from '../data/encounterData';
 
 // --- Constants ---
@@ -132,6 +133,7 @@ export const useEncounterSystem = () => {
     const generateSmartCandidate = useCallback((context: string, countryId?: string): PartnerProfile => {
         // One call. The generator produces the type that gets stored.
         const candidateProfile = generatePartner();
+        // NOTE: superseded by runCourtship - see triggerEncounter below.
 
         if (__DEV__) {
             console.log('[partner] generated:', {
@@ -196,8 +198,30 @@ export const useEncounterSystem = () => {
         // 2. Pick Random Scenario
         const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
 
-        // 3. Generate Candidate
-        const newCandidate = generateSmartCandidate(context, countryId);
+        // ------------------------------------------------------------------
+        //  3. WHO IS IN THE ROOM, AND WHETHER THEY ARE INTERESTED
+        // ------------------------------------------------------------------
+        //  This called `generatePartner()` with no tier, and the generator
+        //  takes one. So the tier was uniform random: a bankrupt chief
+        //  executive met dynasty heiresses at the same rate as a billionaire,
+        //  and this screen was a slot machine with faces on it.
+        //
+        //  `runCourtship` picks the room from what the COMPANY IS WORTH and
+        //  asks whether they are interested using PUBLIC REPUTATION. A refusal
+        //  arrives as a message from them and shuts that room for a couple of
+        //  quarters, so tapping again is not a re-roll.
+        //
+        //  See logic/courtship.ts for why those are two numbers rather than
+        //  one "prestige".
+        // ------------------------------------------------------------------
+        const result = runCourtship();
+        if (result.kind !== 'candidate') {
+            // Refused, or every room the player can reach is cooling off.
+            // Either way there is no card, and in the refused case they have
+            // already been told by the person who told them.
+            return null;
+        }
+        const newCandidate = result.candidate;
 
         // 4. Update State
         if (autoShow) {

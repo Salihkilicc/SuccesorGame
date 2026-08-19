@@ -90,3 +90,28 @@ export const DEPARTURE_LINES: Record<'quiet' | 'loud', string> = {
     quiet: 'I am going to go.\n\nThere is no scene in this and there is nothing you did in the last week. It has been a year of quarters and I have watched every one of them win.\n\nI hope the company is worth it. I think it might be, for you, and that is most of what I am going on.',
     loud: 'I am done, and I am not going to be quiet about it.\n\nSomebody rang me last month asking what you are like and I said something kind. They are going to ring again and I have decided what I am saying this time.\n\nYou had a year of chances and you spent them all on a factory.',
 };
+
+// ============================================================================
+//  AND WHAT THEY SAY WHEN THEY SAY NO
+// ============================================================================
+//
+//  A refusal ARRIVES AS A MESSAGE rather than as a card that quietly does not
+//  come back, and that was the player's call. It costs a thread on the phone
+//  for somebody they have not met properly, and it buys the thing the silent
+//  version cannot: the player finds out they were turned down, from the person
+//  who turned them down, in the app where everything else in this game
+//  happens.
+//
+//  Same three voices as the strain lines, for the same reason: how somebody
+//  handles an awkward moment is a smaller and more honest axis than
+//  personality, and thirty lines written in one sitting are thirty bad lines.
+//
+//  NONE OF THEM MENTIONS MONEY OR REPUTATION. The player can work out why. A
+//  line that said "your public standing is too low" would put the mechanic
+//  back behind a curtain and undo the whole point of sending a message at all.
+// ============================================================================
+export const REFUSAL_LINES: Record<StrainVoice, string> = {
+    measured: 'It was good to meet you, and I mean that.\n\nI have thought about it and I do not think so. There is nothing you did. I would rather say it now than be vague at you for a month.',
+    counting: 'Thank you for the evening.\n\nI am going to be direct, because I think you would prefer it: no. I hope that is easier to hear once than to work out slowly.',
+    sharp: 'Look, you seem fine.\n\nI asked about you afterwards, which is a thing people do, and I have decided against it. I am not going to explain that and you would not enjoy it if I did.',
+};

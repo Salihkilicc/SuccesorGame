@@ -88,6 +88,20 @@ export interface Child {
 
 export interface FamilyState {
     partner: PartnerProfile | null;
+    /**
+     * WHICH ROOMS ARE COOL ON YOU, AND UNTIL WHEN.
+     *
+     * Keyed by SocialTier, valued with the quarter the door opens again. A
+     * refusal that costs nothing is a re-roll, and a player who can tap again
+     * immediately will tap until it lands.
+     *
+     * On the TIER rather than the person: candidates are generated fresh every
+     * time and their ids mean nothing, so remembering an individual would
+     * remember nobody. Being knocked back at a level and finding that level
+     * cooler for a while is the truer version anyway - word gets around a
+     * small room.
+     */
+    courtshipCooldown: Partial<Record<string, number>>;
     exPartners: ExPartnerProfile[];
     children: Child[];
     designatedSuccessorId: string | null;
@@ -129,6 +143,8 @@ export interface FamilyActions {
     reset: () => void;
     /** Development only. See the note above DEMO_PARTNER. */
     loadDemoFamily: () => void;
+    /** A room has said no. See `courtshipCooldown`. */
+    noteRefusal: (tier: string, untilQuarter: number) => void;
 }
 
 export type FamilyStore = FamilyState & FamilyActions;
@@ -309,6 +325,7 @@ export const DEMO_CHILDREN: Child[] = [
 
 export const initialFamilyState: FamilyState = {
     partner: null,
+    courtshipCooldown: {},
     exPartners: [],
     children: [],
     designatedSuccessorId: null,
@@ -632,6 +649,11 @@ export const useFamilyStore = create<FamilyStore>()(
                     };
                 }),
 
+            noteRefusal: (tier, untilQuarter) =>
+                set(state => ({
+                    courtshipCooldown: { ...state.courtshipCooldown, [tier]: untilQuarter },
+                })),
+
             // --- Utility ---
             reset: () => set({ ...initialFamilyState, _hasHydrated: true }),
 
@@ -666,6 +688,7 @@ export const useFamilyStore = create<FamilyStore>()(
                 children: state.children,
                 designatedSuccessorId: state.designatedSuccessorId,
                 familyReputation: state.familyReputation,
+                courtshipCooldown: state.courtshipCooldown,
             }),
             onRehydrateStorage: () => (state) => {
                 // A save from before the two stores became one may have the
