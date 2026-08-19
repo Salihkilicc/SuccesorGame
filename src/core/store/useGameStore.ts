@@ -2375,6 +2375,28 @@ export const useGameStore = create<GameStore>()(
               console.warn('[partner] quarterly effects could not run', e);
             }
 
+            // ------------------------------------------------------------
+            //  AND WHAT THE PLAYER'S QUARTER DID TO THEM
+            // ------------------------------------------------------------
+            //  Jealousy and crazy, the last two PartnerStats fields that
+            //  decided nothing. NOT on a die: it reads what the player
+            //  actually did - the overtime switch, the casino streak, and
+            //  whether their thread went a quarter unanswered.
+            //
+            //  AFTER runNeglect, which runs earlier in this tick, because it
+            //  reads the same "unanswered for a quarter" fact and reading it
+            //  first would have a partner complaining about a silence that
+            //  was broken in the same tick.
+            // ------------------------------------------------------------
+            try {
+              require('../../features/love/logic/runStrain').runStrain({
+                overtime: overtimeOn,
+                casinoStreak: require('../story/world').readWorld().casinoStreak ?? 0,
+              });
+            } catch (e) {
+              console.warn('[partner] strain could not run', e);
+            }
+
             const { changes, notification } = applyPartnerBuffs(buffPartner);
 
             if (notification) {
