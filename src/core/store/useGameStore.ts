@@ -2294,7 +2294,12 @@ export const useGameStore = create<GameStore>()(
 
           // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
           if (FEATURES.love) {
-            if (isEnabled('love')) useRelationshipStore.getState().advanceQuarterForNPCs();
+            if (isEnabled('love')) {
+              useRelationshipStore.getState().advanceQuarterForNPCs();
+              // The father dies in the script. Without this the family tree
+              // goes on listing him as alive for the rest of the game.
+              useRelationshipStore.getState().syncFromStory();
+            }
           }
 
 
