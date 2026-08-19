@@ -20,8 +20,9 @@
 // ============================================================================
 
 import {
-    tiersOpenTo, reachAbove, courtshipFor, TIER_UNLOCK,
-    REPUTATION_FLOOR, REFUSAL_COOLDOWN_QUARTERS,
+    tiersOpenTo, reachAbove, courtshipFor, TIER_UNLOCK, TIER_STANDING,
+    REPUTATION_FLOOR, REFUSAL_COOLDOWN_QUARTERS, LOOKS_RESISTANCE,
+    REPUTATION_WEIGHT,
 } from './courtship';
 import { generatePartner } from './partnerGenerator';
 import type { PartnerProfile } from '../../../data/relationshipTypes';
@@ -46,6 +47,37 @@ describe('money opens rooms', () => {
         expect(open).toContain('BLUE_COLLAR');
         expect(open).not.toContain('HIGH_SOCIETY');
         expect(open).not.toContain('CORPORATE_ELITE');
+    });
+
+    it('and the list is ordered by STANDING, which is not the same as price', () => {
+        // ------------------------------------------------------------------
+        //  THE BUG THIS ORDER EXISTS TO FIX
+        // ------------------------------------------------------------------
+        //  `runCourtship` takes the best open room with
+        //  `open[open.length - 1]`. That used to be the last key of an object
+        //  literal rather than the most prestigious tier, and the three
+        //  zero-cost tiers happened to be typed STUDENT_LIFE, BLUE_COLLAR,
+        //  UNDERGROUND.
+        //
+        //  So every player under fifty million was introduced to CRIMINALS,
+        //  every single time, because of the order three keys were written in.
+        // ------------------------------------------------------------------
+        const open = tiersOpenTo(4_500_000);
+        expect(open[open.length - 1]).toBe('BLUE_COLLAR');
+        expect(open[open.length - 1]).not.toBe('UNDERGROUND');
+    });
+
+    it('and UNDERGROUND is the fallback rather than the default', () => {
+        // It is the room that is always open, which is exactly why it must
+        // never be the one the player is taken to first: it is the one that
+        // costs reputation to be seen in.
+        expect(TIER_STANDING[0]).toBe('UNDERGROUND');
+    });
+
+    it('while the best room always comes last, at every size', () => {
+        expect(tiersOpenTo(1e8).slice(-1)[0]).toBe('ARTISTIC');
+        expect(tiersOpenTo(1e9).slice(-1)[0]).toBe('CORPORATE_ELITE');
+        expect(tiersOpenTo(1e11).slice(-1)[0]).toBe('HIGH_SOCIETY');
     });
 
     it('while a large one is in all of them', () => {
@@ -111,6 +143,50 @@ describe('reputation decides whether they say yes', () => {
         const plain = courtshipFor(candidate({ looks: 20 }), world(80), 'ARTISTIC', () => 1);
         const striking = courtshipFor(candidate({ looks: 95 }), world(80), 'ARTISTIC', () => 1);
         expect(striking.chance).toBeLessThan(plain.chance);
+    });
+});
+
+describe('how often anybody says yes', () => {
+    // ------------------------------------------------------------------
+    //  MEASURED, AND THE FIRST DRAFT WAS WRONG
+    // ------------------------------------------------------------------
+    //  It ran at 10 to 21 per cent across the whole game, so finding anybody
+    //  took four or five taps. Worse, it got HARDER as the company grew - 13
+    //  per cent at a hundred million, 10 at a billion - because `reachAbove`
+    //  bit the moment a threshold was crossed. Growing the company made
+    //  dating worse, which is backwards from the entire design.
+    //
+    //  The fault was that `looks` was the DOMINANT term: at 0.35 a striking
+    //  candidate took 35 points off a reputation that starts at 50, so the
+    //  number that is supposed to decide this was the second largest thing in
+    //  the sum. It is a trim now.
+    // ------------------------------------------------------------------
+    const rate = (rep: number, value: number, looks = 70, wealth = 30) => {
+        const c = candidate({ looks, familyWealth: wealth });
+        return courtshipFor(c, { publicReputation: rep, companyValue: value },
+            'BLUE_COLLAR', () => 1).chance;
+    };
+
+    it('is better than even for somebody unremarkable', () => {
+        // Nobody in particular, at a starting company. Two taps, not five.
+        expect(rate(50, 4_500_000)).toBeGreaterThan(50);
+    });
+
+    it('and reputation is the biggest term in it', () => {
+        // Which is the whole point of having chosen that number for the job.
+        const swing = rate(90, 4_500_000) - rate(20, 4_500_000);
+        expect(swing).toBeGreaterThan(LOOKS_RESISTANCE * 100);
+        expect(REPUTATION_WEIGHT).toBeGreaterThan(LOOKS_RESISTANCE * 3);
+    });
+
+    it('and growing the company never makes it worse for long', () => {
+        // `reachAbove` still bites on the way through a door, but it is 15
+        // rather than 25 and it clears entirely at three times the bar.
+        expect(reachAbove('HIGH_SOCIETY', TIER_UNLOCK.HIGH_SOCIETY)).toBeLessThan(20);
+    });
+
+    it('while somebody disliked is still refused', () => {
+        expect(rate(REPUTATION_FLOOR - 1, 4_500_000)).toBe(0);
     });
 });
 

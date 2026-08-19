@@ -59,10 +59,34 @@ export const TIER_UNLOCK: Record<SocialTier, number> = {
     HIGH_SOCIETY: 5_000_000_000,
 };
 
-/** Which rooms are open to a company of this size. */
+/**
+ * The rooms in order of standing, worst to best.
+ *
+ * SEPARATE FROM `TIER_UNLOCK`, and it has to be. `runCourtship` picked the
+ * best open room with `open[open.length - 1]`, which is the last key of an
+ * object literal rather than the most prestigious tier - and the three
+ * zero-cost tiers happen to be listed STUDENT_LIFE, BLUE_COLLAR, UNDERGROUND.
+ *
+ * So every player below fifty million was introduced to CRIMINALS, every
+ * single time, because of the order three keys happened to be typed in.
+ *
+ * UNDERGROUND ranks at the bottom on purpose. It is the room that is always
+ * open, which makes it the fallback rather than the default - and being the
+ * default is exactly what it must never be, since it is the one that costs
+ * reputation to be seen in.
+ */
+export const TIER_STANDING: SocialTier[] = [
+    'UNDERGROUND',
+    'STUDENT_LIFE',
+    'BLUE_COLLAR',
+    'ARTISTIC',
+    'CORPORATE_ELITE',
+    'HIGH_SOCIETY',
+];
+
+/** Which rooms are open to a company of this size, worst to best. */
 export const tiersOpenTo = (companyValue: number): SocialTier[] =>
-    (Object.keys(TIER_UNLOCK) as SocialTier[])
-        .filter(tier => (companyValue || 0) >= TIER_UNLOCK[tier]);
+    TIER_STANDING.filter(tier => (companyValue || 0) >= TIER_UNLOCK[tier]);
 
 /**
  * How far above the player's own standing a room is.
@@ -77,15 +101,42 @@ export const reachAbove = (tier: SocialTier, companyValue: number): number => {
     if (bar <= 0) return 0;
     const ratio = (companyValue || 0) / bar;
     if (ratio >= 3) return 0;      // comfortably one of them
-    if (ratio >= 1.5) return 10;   // recently arrived
-    return 25;                     // just through the door
+    if (ratio >= 1.5) return 6;    // recently arrived
+    return 15;                     // just through the door
 };
 
 /** Below this, nobody is interested whatever the room. */
 export const REPUTATION_FLOOR = 15;
 
+// ---------------------------------------------------------------------------
+//  THE NUMBERS, AND WHAT THEY WERE BEFORE
+// ---------------------------------------------------------------------------
+//  The first draft ran at 10 to 21 per cent across the whole game, so finding
+//  anybody took four or five taps. Worse, it got HARDER as the company grew -
+//  13 per cent at a hundred million, 10 at a billion - because `reachAbove`
+//  bit the moment a threshold was crossed. Growing the company made dating
+//  worse, which is backwards from the entire design.
+//
+//  Measured rather than guessed, and the fault was that `looks` was the
+//  DOMINANT term: at 0.35 a striking candidate took 35 points off a
+//  reputation that starts at 50. The number that is supposed to decide this
+//  was the second largest thing in the sum.
+//
+//  Now: reputation is most of it, everything else is a trim, and there is a
+//  base so that being nobody in particular is not the same as being disliked.
+// ---------------------------------------------------------------------------
+
+/** Where everybody starts before their standing is counted. */
+export const COURTSHIP_BASE = 35;
+
+/** How much of `publicReputation` carries into the answer. */
+export const REPUTATION_WEIGHT = 0.7;
+
 /** What a partner's own standards add. Somebody impressive is harder work. */
-export const LOOKS_RESISTANCE = 0.35;
+export const LOOKS_RESISTANCE = 0.15;
+
+/** And somebody who does not need your money is harder to impress with it. */
+export const WEALTH_RESISTANCE = 0.05;
 
 export type Courtship = {
     accepted: boolean;
@@ -109,14 +160,15 @@ export const courtshipFor = (
     const standing = Math.max(0, world.publicReputation ?? 0);
 
     const chance = Math.max(0, Math.min(100,
-        standing
+        COURTSHIP_BASE
+        + standing * REPUTATION_WEIGHT
         - reachAbove(tier, world.companyValue)
         // Their own standards. `looks` is otherwise cosmetic and this is the
         // one place it is allowed to decide anything, because it is the one
-        // thing about them the player can see before asking.
+        // thing about them the player can see before asking. A TRIM, not the
+        // deciding term - see the note above.
         - (candidate.stats?.looks ?? 50) * LOOKS_RESISTANCE
-        // Somebody who does not need your money is harder to impress with it.
-        - (candidate.stats?.familyWealth ?? 0) * 0.1,
+        - (candidate.stats?.familyWealth ?? 0) * WEALTH_RESISTANCE,
     ));
 
     if (standing < REPUTATION_FLOOR) return { accepted: false, chance: 0 };
