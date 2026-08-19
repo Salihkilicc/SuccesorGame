@@ -42,11 +42,54 @@ import { ENDINGS } from '../../data/story/endings';
 import { endingsProgress } from '../../core/story/record';
 import { readRecord } from '../../core/story/readRecord';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
+import { useFamilyStore } from '../../core/store/useFamilyStore';
+import { successorFor } from '../../core/story/mortality';
+import { runSuccession } from '../../core/story/runSuccession';
 
 type Props = {
     ending: Ending;
     /** Wipes the save and sends the player back to a new first quarter. */
     onNewGame: () => void;
+};
+
+/**
+ * The only ending you can walk out of.
+ *
+ * `diedInOffice` and nothing else. Bankruptcy has no company to hand on, the
+ * board removal has taken it from you already, and both Pear endings are the
+ * player choosing to stop.
+ */
+const CONTINUABLE = 'diedInOffice';
+
+/**
+ * Who is standing there, if anybody.
+ *
+ * MODULE LEVEL, not inline in the component, and not only for tidiness: the
+ * reachability audit reads an early `return` inside a callback in a component
+ * body as an early return from the COMPONENT, and then reports every hook
+ * below it as a conditional hook. It is a false positive and it is a fair one
+ * to have to work around, because a reader scanning the file has the same
+ * problem the parser does.
+ *
+ * It asks `successorFor` rather than taking the name from runMortality, so
+ * that "who takes over" has one answer in one file. Guarded, because this is
+ * the last screen of the game and a thrown error here is no screen at all.
+ */
+const heirWaiting = (endingId: string): { id: string; name: string } | null => {
+    if (endingId !== CONTINUABLE) return null;
+    try {
+        const family = useFamilyStore.getState();
+        const found = successorFor(
+            (family.children ?? []).map((c: any) => ({ id: c.id, age: c.age ?? 0 })),
+            family.designatedSuccessorId ?? null,
+        );
+        if (!found) return null;
+        const child = (family.children ?? []).find((c: any) => c.id === found.id);
+        // First name only. "CARRY ON AS ELENA HALE" on a button is a form.
+        return child ? { id: child.id, name: child.name.split(' ')[0] } : null;
+    } catch {
+        return null;
+    }
 };
 
 const EndingOverlay = ({ ending, onNewGame }: Props) => {
@@ -66,6 +109,21 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
     //  under the player mid-read.
     // ------------------------------------------------------------------
     const [rows] = useState(() => readRecord());
+
+    // Read once alongside the record, and for the same reason: both are a
+    // snapshot of the family as it was at the moment the run ended, and
+    // `runSuccession` is about to replace it.
+    const [heir] = useState(() => heirWaiting(ending.id));
+
+    const [handingOver, setHandingOver] = useState(false);
+    const carryOn = () => {
+        // Guarded against a double tap: the second one would divide an
+        // estate that has already been divided, from a family that has
+        // already been replaced.
+        if (handingOver) return;
+        setHandingOver(true);
+        runSuccession();
+    };
 
     useEffect(() => {
         // Recorded here rather than in `endGame`, because what this
@@ -119,13 +177,39 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
                         {endingsProgress(endingsSeen, Object.keys(ENDINGS))}
                     </Text>
 
-                    <TouchableOpacity style={styles.primaryButton} onPress={onNewGame}>
-                        <Text style={styles.primaryButtonText}>{t('gameover.newGame')}</Text>
-                    </TouchableOpacity>
+                    {/* ----------------------------------------------------
+                        THE ONE THING THAT IS NOT A NEW GAME
 
-                    <TouchableOpacity style={styles.backButton} onPress={() => setShowRecord(false)}>
-                        <Text style={styles.backButtonText}>Read it again</Text>
-                    </TouchableOpacity>
+                        Offered rather than automatic. A player who has just
+                        watched a life end may want it to have ended, and
+                        taking that away to keep a dynasty running would
+                        make the death a loading screen.
+
+                        It is the PRIMARY button when it exists, because
+                        somebody who has been naming a successor for twenty
+                        years came here to press it.
+                       ---------------------------------------------------- */}
+                    {heir ? (
+                        <TouchableOpacity style={styles.primaryButton} onPress={carryOn}>
+                            <Text style={styles.primaryButtonText}>
+                                {`CARRY ON AS ${heir.name.toUpperCase()}`}
+                            </Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity style={styles.primaryButton} onPress={onNewGame}>
+                            <Text style={styles.primaryButtonText}>{t('gameover.newGame')}</Text>
+                        </TouchableOpacity>
+                    )}
+
+                    {heir ? (
+                        <TouchableOpacity style={styles.backButton} onPress={onNewGame}>
+                            <Text style={styles.backButtonText}>{t('gameover.newGame')}</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity style={styles.backButton} onPress={() => setShowRecord(false)}>
+                            <Text style={styles.backButtonText}>Read it again</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             )}
         </Animated.View>

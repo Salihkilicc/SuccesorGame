@@ -106,6 +106,23 @@ export interface FamilyState {
     children: Child[];
     designatedSuccessorId: string | null;
     familyReputation: number;       // 0-100 Dynasty prestige
+    /**
+     * Which generation is in the chair. The founder is 1.
+     *
+     * Here rather than in useGameStore because it is a fact about the FAMILY,
+     * and because it must be wiped by a new game and carried by a succession -
+     * which is exactly the line this store already sits on.
+     */
+    generation: number;
+    /**
+     * The parent who outlived the last chief executive.
+     *
+     * Set by a succession and never by anything else. She holds no stock (see
+     * inheritance.ts) so she is not on the register, and without this she would
+     * simply cease to exist at the moment she became the most interesting
+     * person in the family.
+     */
+    survivingParent: { name: string; age: number } | null;
     _hasHydrated: boolean;
 }
 
@@ -339,6 +356,8 @@ export const initialFamilyState: FamilyState = {
     exPartners: [],
     children: [],
     designatedSuccessorId: null,
+    generation: 1,
+    survivingParent: null,
     /**
      * FIFTY, not eighty-two.
      *
@@ -699,8 +718,17 @@ export const useFamilyStore = create<FamilyStore>()(
                 designatedSuccessorId: state.designatedSuccessorId,
                 familyReputation: state.familyReputation,
                 courtshipCooldown: state.courtshipCooldown,
+                generation: state.generation,
+                survivingParent: state.survivingParent,
             }),
             onRehydrateStorage: () => (state) => {
+                // Saves written before a succession existed have neither
+                // field, and zustand persist MERGES - so the initial values
+                // do not survive a partial rehydrate and `generation` would
+                // arrive as undefined into every ordinal on the closing
+                // screen.
+                if (state && typeof state.generation !== 'number') state.generation = 1;
+                if (state && state.survivingParent === undefined) state.survivingParent = null;
                 // A save from before the two stores became one may have the
                 // player's partner in the other key. See `migrateLegacyPartner`.
                 migrateLegacyPartner();
