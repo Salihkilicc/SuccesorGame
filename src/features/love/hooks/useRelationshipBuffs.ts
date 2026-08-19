@@ -1,9 +1,12 @@
 import { useEffect, useMemo } from 'react';
-import { useUserStore } from '../../../core/store/useUserStore';
+import { useFamilyStore } from '../../../core/store/useFamilyStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 
 export const useRelationshipBuffs = () => {
-    const partner = useUserStore(state => state.partner);
+    // useFamilyStore, not useUserStore. There was a partner in each and the
+    // buffs read the one that no encounter ever wrote to - see the note at the
+    // top of useFamilyStore.ts.
+    const partner = useFamilyStore(state => state.partner);
     const setRelationshipBuffs = usePlayerStore(state => state.setRelationshipBuffs);
 
     // Calculate Buffs from Partner Logic

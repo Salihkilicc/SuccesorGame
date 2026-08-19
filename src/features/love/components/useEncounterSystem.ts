@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useUserStore, useStatsStore } from '../../../core/store';
+import { useStatsStore } from '../../../core/store';
+import { useFamilyStore } from '../../../core/store/useFamilyStore';
 import {
     PartnerProfile,
     PartnerStats,
@@ -122,7 +123,10 @@ export const useEncounterSystem = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [cheatingConsequence, setCheatingConsequence] = useState<{ settlement: number; partnerName: string } | null>(null);
 
-    const { partner, setPartner, breakUp } = useUserStore();
+    // Was useUserStore. See the note at the top of useFamilyStore.ts: the
+    // encounters wrote to one store and everything that reads a partner read
+    // the other, so meeting somebody and having somebody were unrelated.
+    const { partner, setPartner, breakup: breakUp } = useFamilyStore();
 
     // --- 1. Smart NPC Generator (Now uses Deep Persona System) ---
     const generateSmartCandidate = useCallback((context: string, countryId?: string): PartnerProfile => {

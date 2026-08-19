@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useUserStore } from '../../core/store';
+import { useFamilyStore } from '../../core/store/useFamilyStore';
 import { PartnerProfile, PartnerStats } from '../../core/types';
 
 export type MatchCandidate = {
@@ -57,7 +57,9 @@ export const useMatchSystem = () => {
   const [visible, setVisible] = useState(false);
   const [matchCandidate, setMatchCandidate] =
     useState<MatchCandidate>(defaultCandidate);
-  const { partner, setPartner } = useUserStore();
+  // One of the three places that used to write a partner, into two different
+  // stores. All three write here now.
+  const { partner, setPartner } = useFamilyStore();
 
   const openMatch = useCallback((candidate?: MatchCandidate) => {
     setMatchCandidate(candidate ?? defaultCandidate);

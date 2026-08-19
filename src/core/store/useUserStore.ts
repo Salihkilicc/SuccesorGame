@@ -77,7 +77,22 @@ export type UserState = {
   profilePhoto?: string | null;
   hasPremium: boolean;
   avatarUrl?: string | null;
-  partner: PartnerProfile | null; // Updated to use comprehensive PartnerProfile
+  /**
+   * SHELVED — there is one partner and it lives in useFamilyStore.
+   *
+   * @orphan-ok-symbol partner
+   *
+   * This store and useFamilyStore each held a `partner`, and the two never
+   * met. Encounters wrote here; the Profile screen, the succession system and
+   * the quarterly buffs read there. So meeting somebody and having somebody
+   * were unrelated events, and which store a player's partner landed in
+   * depended on which screen they were standing on.
+   *
+   * Kept rather than removed because saves written before the migration have a
+   * partner in this key and `migratePartner` reads it exactly once, on
+   * hydration, to move them across.
+   */
+  partner: PartnerProfile | null;
   job: UserJob | null; // NEW: Track player's job
   family: FamilyMember[];
   friends: Friend[];
@@ -119,10 +134,34 @@ type UserStore = UserState & {
   updateJob: (job: UserJob | null) => void; // NEW Action
 
   // === RELATIONSHIP ENGINE ACTIONS ===
+  /**
+   * SHELVED with `partner` above. useFamilyStore.setPartner is the one door.
+   * @orphan-ok-symbol setPartner
+   */
   setPartner: (newPartner: PartnerProfile | null) => void;
+  /**
+   * SHELVED — moved to useFamilyStore, which is where the partner is.
+   *
+   * @orphan-ok-symbol proposeMarriage
+   *
+   * This was the only real version of the question in the game: a clever
+   * partner is harder to talk into a prenup, and Royalty will not marry
+   * without one. It was asking it of a partner nobody ever set.
+   */
   proposeMarriage: (withPrenup: boolean, locationBonus?: number) => MarriageProposalResult;
+  /** SHELVED with the rest. @orphan-ok-symbol marryPartner */
   marryPartner: (hasPrenup: boolean) => void;
   removeItem: (itemId: string) => void;
+  /**
+   * SHELVED — useFamilyStore.breakup is the one that runs.
+   *
+   * @orphan-ok-symbol breakUp
+   *
+   * It held the divorce settlement, which is the best single field in this
+   * system: half of the player's personal wealth if they married without a
+   * prenup. It was taking it from a partner this store never had, so the
+   * prenup protected nobody and leaving the real partner cost nothing.
+   */
   breakUp: (reason: ExPartnerProfile['breakupReason']) => void;
   updateSpecificStat: (statId: string, value: number) => void; // For DNA stats from education
 
@@ -469,6 +508,19 @@ export const useUserStore = create<UserStore>()(
         subsidiaries: state.subsidiaries,
         // Note: DNA stats would be added here when implemented
       }) as any,
+
+      /**
+       * Hand any legacy partner over to the store that owns partners now.
+       *
+       * Both stores call the same idempotent function and whichever hydrates
+       * second does the work - see `migrateLegacyPartner` in useFamilyStore.ts
+       * for why it has to be arranged that way.
+       */
+      onRehydrateStorage: () => () => {
+        try {
+          require('./useFamilyStore').migrateLegacyPartner();
+        } catch { /* the other store is not ready; it will call this itself */ }
+      },
     },
   ),
 );

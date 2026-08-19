@@ -133,3 +133,169 @@ describe('the second seeded family', () => {
         expect(CAST.brother.name).toBe('Julian Hale');
     });
 });
+
+// ============================================================================
+//  STEP 2: ONE STORE
+// ============================================================================
+//  Both this store and useUserStore held a `partner`, and the two never met.
+//  Encounters wrote there; the Profile screen, the succession system and the
+//  quarterly buffs read here. So meeting somebody and having somebody were
+//  unrelated events, and which store a player's partner landed in depended on
+//  which screen they were standing on when they met them.
+//
+//  Two pieces of real machinery were on the wrong side of that line, and both
+//  are the best thing in their area:
+//
+//    THE PROPOSAL, where a clever partner is harder to talk into a prenup and
+//    Royalty will not marry without one. Asked of a partner nobody ever set.
+//
+//    THE DIVORCE SETTLEMENT, half of personal wealth with no prenup. Taken
+//    from a partner this store never had - so the prenup protected nobody and
+//    leaving the real partner cost nothing.
+// ============================================================================
+
+import { useStatsStore } from './useStatsStore';
+import {
+    DIVORCE_SHARE,
+    FORCED_PRENUP_CLASSES,
+    PRENUP_BASE_RESISTANCE,
+    migrateLegacyPartner,
+} from './useFamilyStore';
+
+const married = (over: Partial<typeof DEMO_PARTNER> = {}) => {
+    useFamilyStore.setState({ ...initialFamilyState, _hasHydrated: true });
+    useFamilyStore.getState().setPartner({
+        ...DEMO_PARTNER, isMarried: true, hasPrenup: false, ...over,
+    });
+};
+
+describe('the divorce settlement', () => {
+    it('takes half of what the player owns personally', () => {
+        useStatsStore.setState({ money: 1_000_000 } as never);
+        married();
+        useFamilyStore.getState().breakup('divorce');
+        expect(useStatsStore.getState().money).toBe(1_000_000 * (1 - DIVORCE_SHARE));
+    });
+
+    it('and a prenup is what stops it, which is the whole point of the field', () => {
+        useStatsStore.setState({ money: 1_000_000 } as never);
+        married({ hasPrenup: true });
+        useFamilyStore.getState().breakup('divorce');
+        expect(useStatsStore.getState().money).toBe(1_000_000);
+    });
+
+    it('and leaving somebody you never married costs nothing', () => {
+        useStatsStore.setState({ money: 1_000_000 } as never);
+        married({ isMarried: false });
+        useFamilyStore.getState().breakup('drifted');
+        expect(useStatsStore.getState().money).toBe(1_000_000);
+    });
+
+    it('while the ex is kept either way', () => {
+        married();
+        const ex = useFamilyStore.getState().breakup('divorce');
+        expect(ex?.breakupReason).toBe('divorce');
+        expect(useFamilyStore.getState().exPartners).toHaveLength(1);
+        expect(useFamilyStore.getState().partner).toBeNull();
+    });
+});
+
+describe('the proposal', () => {
+    const propose = (withPrenup: boolean, roll: number) => {
+        const spy = jest.spyOn(Math, 'random').mockReturnValue(roll);
+        const r = useFamilyStore.getState().proposeMarriage(withPrenup);
+        spy.mockRestore();
+        return r;
+    };
+
+    beforeEach(() => married({ isMarried: false, love: 90 }));
+
+    it('lands when they love you and you asked for nothing', () => {
+        // 90 love, no prenup, a roll of 50 out of 100.
+        expect(propose(false, 0.5).success).toBe(true);
+    });
+
+    it('and a prenup is a real question even at ninety', () => {
+        // 90 - (30 + intelligence/5). At 88 intelligence that is about 42, so
+        // a roll of 50 fails where it passed without the paperwork.
+        expect(propose(true, 0.5).success).toBe(false);
+    });
+
+    it('and intelligence is what makes it harder, which was never true before', () => {
+        married({ isMarried: false, love: 90, stats: { ...DEMO_PARTNER.stats, intelligence: 10 } });
+        const clever = propose(true, 0.5);
+        married({ isMarried: false, love: 90, stats: { ...DEMO_PARTNER.stats, intelligence: 100 } });
+        const cleverer = propose(true, 0.5);
+        expect(clever.success).toBe(true);
+        expect(cleverer.success).toBe(false);
+    });
+
+    it('while a refusal costs you, so asking is not free', () => {
+        const before = useFamilyStore.getState().partner!.love;
+        const r = propose(false, 0.99);
+        expect(r.success).toBe(false);
+        expect(useFamilyStore.getState().partner!.love).toBeLessThan(before);
+    });
+
+    it('and some families do not allow one without a prenup', () => {
+        // Their decision, not the player's and not the partner's, which is the
+        // point of having social class as a field at all.
+        expect(FORCED_PRENUP_CLASSES).toContain('Royalty');
+        married({
+            isMarried: false, love: 99,
+            stats: { ...DEMO_PARTNER.stats, socialClass: 'Royalty', intelligence: 50 },
+        });
+        expect(propose(false, 0.1).message).toMatch(/prenup/i);
+    });
+
+    it('and nobody proposes twice', () => {
+        married({ isMarried: true });
+        expect(useFamilyStore.getState().proposeMarriage(false).success).toBe(false);
+    });
+
+    it('and the prenup resistance is a stated number, not a magic one', () => {
+        expect(PRENUP_BASE_RESISTANCE).toBe(30);
+    });
+});
+
+describe('a save from before there was one store', () => {
+    const { useUserStore } = require('./useUserStore');
+
+    beforeEach(() => {
+        useFamilyStore.setState({ ...initialFamilyState, _hasHydrated: true });
+        useUserStore.setState({ partner: null });
+    });
+
+    it('has its partner moved across', () => {
+        useUserStore.setState({ partner: DEMO_PARTNER });
+        expect(migrateLegacyPartner()).toBe(true);
+        expect(useFamilyStore.getState().partner?.name).toBe('Sophia Vance');
+    });
+
+    it('and the old copy is cleared, so nobody has to choose', () => {
+        useUserStore.setState({ partner: DEMO_PARTNER });
+        migrateLegacyPartner();
+        expect(useUserStore.getState().partner).toBeNull();
+    });
+
+    it('and it never overwrites a partner that is already here', () => {
+        // The assertion that makes it safe to call from two hydration hooks:
+        // both stores load asynchronously, neither can wait for the other, so
+        // whichever lands second does the work and the first one's data wins.
+        useFamilyStore.getState().setPartner({ ...DEMO_PARTNER, name: 'Real Partner' });
+        useUserStore.setState({ partner: DEMO_PARTNER });
+        expect(migrateLegacyPartner()).toBe(false);
+        expect(useFamilyStore.getState().partner?.name).toBe('Real Partner');
+    });
+
+    it('and running it twice does nothing the second time', () => {
+        useUserStore.setState({ partner: DEMO_PARTNER });
+        expect(migrateLegacyPartner()).toBe(true);
+        expect(migrateLegacyPartner()).toBe(false);
+    });
+
+    it('and a save with nobody in either store is left alone', () => {
+        expect(migrateLegacyPartner()).toBe(false);
+        expect(useFamilyStore.getState().partner).toBeNull();
+    });
+});

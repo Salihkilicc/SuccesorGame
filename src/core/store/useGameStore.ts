@@ -1069,14 +1069,30 @@ export const useGameStore = create<GameStore>()(
 
         finance.refreshCreditScore();
 
-        // 4b. PARTNER UPKEEP COST (Deep Persona System)
-        const partner = useUserStore.getState().partner;
-        let partnerUpkeepCost = 0;
-
-        // Check if partner has the new Deep Persona structure
-        if (partner && 'finances' in partner && 'monthlyCost' in (partner as any).finances) {
-          partnerUpkeepCost = (partner as any).finances.monthlyCost * months;
-
+        // ==================================================================
+        //  4b. WHAT A PARTNER COSTS, AND WHO PAYS IT
+        // ==================================================================
+        //  This was computed and THROWN AWAY. `partnerUpkeepCost` was
+        //  assigned, never read, and never charged - so a partner at eight and
+        //  a half thousand a month was free for the whole game. It was also
+        //  reading useUserStore, which is the partner store no encounter ever
+        //  wrote to, so most of the time it was computing zero anyway.
+        //
+        //  IT COMES OUT OF PERSONAL CASH, not the company. A chief executive
+        //  whose girlfriend is billed to the shareholders is a story this game
+        //  could tell on purpose, and it is not one it should tell by
+        //  accident. Same pool the divorce settlement takes from.
+        //
+        //  Gated on FEATURES.love with everything else in this system: a
+        //  shelved module must not move money.
+        // ==================================================================
+        const partner = FEATURES.love
+          ? require('./useFamilyStore').useFamilyStore.getState().partner
+          : null;
+        const partnerUpkeepCost = (partner?.finances?.monthlyCost ?? 0) * months;
+        if (partnerUpkeepCost > 0) {
+          const stats = useStatsStore.getState();
+          stats.setField('money', (stats.money || 0) - partnerUpkeepCost);
         }
 
         // ==================================================================
@@ -2312,9 +2328,13 @@ export const useGameStore = create<GameStore>()(
 
           // 7c. PARTNER BUFFS (Gelişmiş Partner Sistemi)
           // RAFA KALDIRILDI: ilişki modülü kapalıyken partner statlara dokunmaz.
-          const partner = FEATURES.love ? useUserStore.getState().partner : null;
-          if (partner) {
-            const { changes, notification } = applyPartnerBuffs(partner);
+          // Same store as the upkeep above and as every screen. There were
+          // two, and this read the empty one.
+          const buffPartner = FEATURES.love
+            ? require('./useFamilyStore').useFamilyStore.getState().partner
+            : null;
+          if (buffPartner) {
+            const { changes, notification } = applyPartnerBuffs(buffPartner);
 
             if (notification) {
 

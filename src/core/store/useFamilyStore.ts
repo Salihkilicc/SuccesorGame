@@ -19,8 +19,10 @@ import {
     PartnerStats,
     SocialClass,
     Ethnicity,
+    MarriageProposalResult,
     BREAKUP_REASONS,
 } from '../../data/relationshipTypes';
+import { useStatsStore } from './useStatsStore';
 
 // Re-export relationship types for ease of import
 export type { PartnerProfile, ExPartnerProfile, PartnerStats, SocialClass, Ethnicity };
@@ -103,6 +105,11 @@ export interface FamilyActions {
     updateLove: (amount: number) => void;
     updatePartnerLove: (delta: number) => void; // Alias for updateLove
     marry: (hasPrenup?: boolean) => boolean;
+    /**
+     * Ask, and find out. Moved here from useUserStore, which held the only
+     * real version of it while this store held the only real partner.
+     */
+    proposeMarriage: (withPrenup: boolean, locationBonus?: number) => MarriageProposalResult;
     breakup: (reason?: string) => ExPartnerProfile | null;
 
     // --- Succession Children Actions ---
@@ -132,6 +139,42 @@ export type FamilyStore = FamilyState & FamilyActions;
 
 const generateId = (prefix: string): string =>
     `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+// ============================================================================
+//  THE FOUR NUMBERS THE PARTNER SYSTEM ACTUALLY TURNS ON
+// ============================================================================
+
+/** Half of what the player owns personally. See `breakup`. */
+export const DIVORCE_SHARE = 0.5;
+
+/**
+ * How much a prenup costs you before intelligence is counted.
+ *
+ * Thirty points off a love score of a hundred. Asking somebody who adores you
+ * to sign is still a real question; asking somebody who does not is a no.
+ */
+export const PRENUP_BASE_RESISTANCE = 30;
+
+/**
+ * And how much their intelligence adds to it.
+ *
+ * Five, so a partner at 100 intelligence adds twenty more points of
+ * resistance. It is the one line in relationshipTypes.ts that describes a
+ * psychometric field doing something, and it was doing it in the store nobody
+ * wrote a partner into.
+ */
+export const PRENUP_INTELLIGENCE_DIVISOR = 5;
+
+/** What a refusal takes off, so asking is not free. Doubled with a prenup. */
+export const PROPOSAL_REFUSAL_COST = 4;
+
+/**
+ * Whose family will not allow a marriage without one.
+ *
+ * Their decision, not the player's and not the partner's, which is the point
+ * of having social class as a field at all.
+ */
+export const FORCED_PRENUP_CLASSES: SocialClass[] = ['Royalty', 'BillionaireHeir'];
 
 // ============================================================================
 //  A NEW GAME HAS NO FAMILY IN IT
@@ -320,6 +363,67 @@ export const useFamilyStore = create<FamilyStore>()(
 
             updatePartnerLove: (delta) => get().updateLove(delta),
 
+            // ------------------------------------------------------------------
+            //  ASKING IS A MECHANIC. MARRYING IS A SETTER.
+            // ------------------------------------------------------------------
+            //  This lived in useUserStore, which is where the second partner
+            //  was - so the store with the real partner had a dumb `marry`
+            //  and the store with no partner had the interesting question.
+            //
+            //  The interesting part is `intelligence`: a clever partner is
+            //  harder to talk into a prenup, which is the one line in
+            //  relationshipTypes.ts that describes a field doing something.
+            //  It was doing it in the store nobody wrote a partner into.
+            //
+            //  It does NOT set state on success. The caller confirms, then
+            //  calls `marry` - so a player can be accepted and still walk out
+            //  of the room.
+            // ------------------------------------------------------------------
+            proposeMarriage: (withPrenup, locationBonus = 0) => {
+                const { partner } = get();
+                if (!partner) {
+                    return { success: false, message: 'You need a partner to propose marriage.' };
+                }
+                if (partner.isMarried) {
+                    return { success: false, message: 'You are already married.' };
+                }
+
+                // Base chance is how much they love you. Everything else is
+                // what you are asking them to sign.
+                const prenupPenalty = withPrenup
+                    ? PRENUP_BASE_RESISTANCE + partner.stats.intelligence / PRENUP_INTELLIGENCE_DIVISOR
+                    : 0;
+                const finalChance = partner.love - prenupPenalty + locationBonus;
+
+                // Some people do not get to marry without one, whatever the
+                // player chooses. Their family decides, not them.
+                const forcedPrenup = FORCED_PRENUP_CLASSES.includes(partner.stats.socialClass);
+                const actualPrenup = withPrenup || forcedPrenup;
+
+                if (Math.random() * 100 <= finalChance) {
+                    return {
+                        success: true,
+                        message: forcedPrenup && !withPrenup
+                            ? `${partner.name} said yes, and their family insisted on a prenup.`
+                            : actualPrenup
+                                ? `${partner.name} said yes, and signed.`
+                                : `${partner.name} said yes.`,
+                    };
+                }
+
+                // A refusal costs something, or asking is free and the player
+                // asks every quarter until it lands.
+                const loveChange = withPrenup ? -PROPOSAL_REFUSAL_COST * 2 : -PROPOSAL_REFUSAL_COST;
+                get().updateLove(loveChange);
+                return {
+                    success: false,
+                    message: withPrenup
+                        ? `${partner.name} said no, and it was the paperwork they said no to.`
+                        : `${partner.name} said no. Not yet, anyway.`,
+                    loveChange,
+                };
+            },
+
             marry: (hasPrenup = true) => {
                 const { partner } = get();
                 if (!partner || partner.isMarried) return false;
@@ -336,6 +440,30 @@ export const useFamilyStore = create<FamilyStore>()(
             breakup: (reason = 'drifted') => {
                 const { partner, exPartners } = get();
                 if (!partner) return null;
+
+                // ------------------------------------------------------
+                //  AND THIS IS WHERE THE MONEY GOES
+                // ------------------------------------------------------
+                //  Half of the player's personal wealth, if they married
+                //  without a prenup. It is the single best field in this
+                //  whole system - a real decision with a real price - and
+                //  it was implemented in useUserStore.breakUp, against the
+                //  partner that store never had.
+                //
+                //  So the prenup protected a partner nobody was seeing,
+                //  and breaking up with the real one cost nothing.
+                //
+                //  PERSONAL cash, not company capital. A divorce takes what
+                //  the player owns, not what the shareholders do.
+                // ------------------------------------------------------
+                if (partner.isMarried && !partner.hasPrenup) {
+                    const stats = useStatsStore.getState();
+                    const settlement = (stats.money || 0) * DIVORCE_SHARE;
+                    stats.setField('money', (stats.money || 0) - settlement);
+                    if (__DEV__) {
+                        console.log(`[family] divorce settlement: ${Math.round(settlement)}`);
+                    }
+                }
 
                 const validReason = (
                     reason in BREAKUP_REASONS
@@ -540,6 +668,10 @@ export const useFamilyStore = create<FamilyStore>()(
                 familyReputation: state.familyReputation,
             }),
             onRehydrateStorage: () => (state) => {
+                // A save from before the two stores became one may have the
+                // player's partner in the other key. See `migrateLegacyPartner`.
+                migrateLegacyPartner();
+
                 if (state && Array.isArray(state.children)) {
                     state.children = state.children.map((c) => {
                         const firstName = c.name.split(' ')[0] || 'Heir';
@@ -551,3 +683,44 @@ export const useFamilyStore = create<FamilyStore>()(
         },
     ),
 );
+
+// ============================================================================
+//  MOVING A PARTNER OUT OF THE STORE THAT NO LONGER HOLDS ONE
+// ============================================================================
+//
+//  Saves written before this migration have the player's partner in
+//  `useUserStore.partner`, because that is where the encounter screens wrote.
+//  Losing them on upgrade would be the migration doing more damage than the
+//  bug it fixes.
+//
+//  IDEMPOTENT AND ORDER-INDEPENDENT, which is the whole design. Both stores
+//  hydrate asynchronously and neither can wait for the other, so this is
+//  called from BOTH `onRehydrateStorage` callbacks and whichever lands second
+//  is the one that does the work. It refuses if this store already has a
+//  partner, so it can never overwrite a real one.
+//
+//  The source is cleared afterwards. A partner in two places is what this
+//  whole step exists to end, and leaving the old copy behind would make the
+//  next reader choose.
+// ============================================================================
+export const migrateLegacyPartner = (): boolean => {
+    try {
+        const family = useFamilyStore.getState();
+        if (family.partner) return false;
+
+        // Required lazily: useUserStore imports from this module's neighbours
+        // and a top-level import here closes the cycle.
+        const { useUserStore } = require('./useUserStore');
+        const legacy = useUserStore.getState().partner;
+        if (!legacy) return false;
+
+        family.setPartner(legacy);
+        useUserStore.setState({ partner: null });
+        if (__DEV__) console.log(`[family] migrated partner "${legacy.name}" from useUserStore.`);
+        return true;
+    } catch {
+        // A migration that throws on launch is worse than one that does not
+        // run: the player would lose the app rather than a partner.
+        return false;
+    }
+};

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserStore, useStatsStore } from '../../../core/store';
+import { useFamilyStore } from '../../../core/store/useFamilyStore';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { useRelationshipStore } from '../../../core/store/useRelationshipStore';
 import type { LoveStackParamList } from '../../../navigation';
@@ -35,11 +36,25 @@ type SubmenuType = 'gift' | 'propose' | 'text' | 'breakup_confirm' | 'breakup_re
 const LoveScreen = () => {
     useLocale();
   const navigation = useNavigation<LoveScreenProp>();
+  // ------------------------------------------------------------------
+  //  ONE STORE
+  // ------------------------------------------------------------------
+  //  The partner, the proposal, the marriage and the breakup all came from
+  //  useUserStore, which is the store no encounter ever wrote a partner into.
+  //  So this screen was showing, proposing to and divorcing a person the rest
+  //  of the game could not see. See the note at the top of useFamilyStore.ts.
+  //
+  //  `family`, `friends` and `exes` still come from useUserStore because that
+  //  is where the legacy lists live and RelationshipList reads them there. They
+  //  are empty now - see initialUserState - and moving them is step 5.
+  // ------------------------------------------------------------------
   const {
-    partner, family, friends, exes,
-    proposeMarriage: proposeMarriageStore, marryPartner, breakUp,
-    setField: setUserField
-  } = useUserStore();
+    partner,
+    proposeMarriage: proposeMarriageStore,
+    marry: marryPartner,
+    breakup: breakUp,
+  } = useFamilyStore();
+  const { family, friends, exes, setField: setUserField } = useUserStore();
   const { money, spendMoney, setField: setStatsField } = useStatsStore();
 
   // Encounter System Hook
