@@ -85,10 +85,15 @@ describe('the two guards', () => {
         expect(thread('a')!.messages).toHaveLength(1);
     });
 
-    it('and nobody writes again for a year', () => {
-        // A family that files a grievance every three months is not a family.
-        // The succession happens over twenty years and should feel like being
-        // reminded rather than being lobbied.
+    it('and NOBODY in the house writes again for a year', () => {
+        // ------------------------------------------------------------------
+        //  FAMILY-WIDE, NOT PER CHILD
+        // ------------------------------------------------------------------
+        //  Per child sounded fairer and was worse: three teenagers on their
+        //  own four-quarter timers is a letter every quarter, from whichever
+        //  one is angriest, for ever. The succession happens over twenty
+        //  years; it should feel like being reminded once a year.
+        // ------------------------------------------------------------------
         family([kid('a')]);
         runHeirs();
         useMessageStore.getState().clearConversation('a');
@@ -100,14 +105,30 @@ describe('the two guards', () => {
         expect(runHeirs().spoke).toBe('a');
     });
 
-    it('while a sibling who has been quiet can still speak', () => {
-        // The cooldown is per child, not per family - otherwise one loud
-        // teenager silences the rest of the house.
-        family([kid('a'), kid('b', { stats: { ...kid('b').stats, ambition: 95 } })], null);
+    it('so a sibling cannot jump in the same quarter either', () => {
+        // The version this replaces let the quiet one speak the moment the
+        // loud one finished, which is the same flood wearing two names.
+        family([kid('a'), kid('b')], null);
         const first = runHeirs();
         expect(first.spoke).not.toBeNull();
         useMessageStore.getState().clearConversation(first.spoke!);
-        const second = runHeirs();
-        expect(second.spoke).not.toBe(first.spoke);
+        expect(runHeirs().spoke).toBeNull();
+    });
+
+    it('while a whole year later somebody does, and it need not be the same one', () => {
+        family([
+            kid('a', { stats: { ...kid('a').stats, ambition: 90 } }),
+            kid('b', { stats: { ...kid('b').stats, ambition: 90 } }),
+        ], null);
+        const heard = new Set<string>();
+        for (let year = 0; year < 40; year++) {
+            useGameStore.setState({ currentMonth: 60 + year * HEIR_COOLDOWN_QUARTERS * 3 } as never);
+            const r = runHeirs();
+            if (r.spoke) {
+                heard.add(r.spoke);
+                useMessageStore.getState().clearConversation(r.spoke);
+            }
+        }
+        expect(heard.size).toBe(2);
     });
 });

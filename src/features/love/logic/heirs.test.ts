@@ -7,9 +7,10 @@
 //  A succession system where the heir is a field on a store is a spreadsheet.
 //  What makes it a story is that the OTHER ONES KNOW.
 //
-//  Nothing here rolls. Which scene fires, and who sends it, comes entirely
-//  from the family: how old they are, whether they are alone, and whether they
-//  were the one chosen.
+//  WHICH SCENE fires comes entirely from the family: how old they are, whether
+//  they are alone, and whether they were the one chosen. WHO sends it is drawn
+//  at random among everybody with something to say - see the note further
+//  down, and the version that did not.
 // ============================================================================
 
 import { heirTurnFor, pressure, HEIR_VOICE_AGE, type Heir } from './heirs';
@@ -25,33 +26,35 @@ describe('who is old enough to have a view', () => {
     it('nobody under sixteen', () => {
         // A nine year old lobbying for the chairmanship is a joke the game
         // would only be able to tell once.
-        expect(heirTurnFor([child({ id: 'a', age: HEIR_VOICE_AGE - 1, ambition: 100 })], null))
+        expect(heirTurnFor([child({ id: 'a', age: HEIR_VOICE_AGE - 1, ambition: 100 })], null, () => 0))
             .toBeUndefined();
     });
 
     it('and at sixteen they do', () => {
-        expect(heirTurnFor([child({ id: 'a', age: HEIR_VOICE_AGE, ambition: 100 })], null))
+        expect(heirTurnFor([child({ id: 'a', age: HEIR_VOICE_AGE, ambition: 100 })], null, () => 0))
             .toBeDefined();
     });
 
     it('while a quiet one says nothing at all', () => {
         // Most quarters are quiet and have to be. A family that files a
         // grievance every three months is not a family.
-        expect(heirTurnFor([child({ id: 'a', ambition: 10 })], null)).toBeUndefined();
+        expect(heirTurnFor([child({ id: 'a', ambition: 10 })], null, () => 0)).toBeUndefined();
     });
 });
 
 describe('which of the three things they say', () => {
     it('an only child sells themselves, because there is nobody to run down', () => {
-        const turn = heirTurnFor([child({ id: 'a', ambition: 90 })], null);
+        const turn = heirTurnFor([child({ id: 'a', ambition: 90 })], null, () => 0);
         expect(turn?.scene).toBe('alone');
     });
 
     it('and somebody passed over takes it out on whoever was not', () => {
+        // b is the heir with loyalty 50, so its pressure falls under the
+        // threshold and only a can speak.
         const turn = heirTurnFor([
             child({ id: 'a', ambition: 60 }),
             child({ id: 'b', ambition: 60 }),
-        ], 'b');
+        ], 'b', () => 0);
         expect(turn?.speaker.id).toBe('a');
         expect(turn?.scene).toBe('passedOver');
     });
@@ -62,7 +65,7 @@ describe('which of the three things they say', () => {
         const turn = heirTurnFor([
             child({ id: 'a', ambition: 5 }),
             child({ id: 'b', ambition: 100, loyalty: 0 }),
-        ], 'b');
+        ], 'b', () => 0);
         expect(turn?.speaker.id).toBe('b');
         expect(turn?.scene).toBe('chosen');
     });
@@ -82,16 +85,67 @@ describe('the loudest person in a succession', () => {
         expect(passedOver).toBeGreaterThan(chosen);
     });
 
-    it('and only one of them writes in a quarter', () => {
+    it('and only one of them writes at a time', () => {
         // Three teenagers arriving in the same tick is a group chat, and a
         // group chat is not a scene.
         const turn = heirTurnFor([
             child({ id: 'a', ambition: 90 }),
             child({ id: 'b', ambition: 95 }),
             child({ id: 'c', ambition: 99 }),
-        ], 'a');
+        ], 'a', () => 0);
         expect(turn).toBeDefined();
-        expect(['b', 'c']).toContain(turn!.speaker.id);
+        expect(['a', 'b', 'c']).toContain(turn!.speaker.id);
+    });
+});
+
+// ============================================================================
+//  AND IT IS NOT ALWAYS THE SAME MOUTH
+// ============================================================================
+//  The first version let the loudest child speak every time, and `pressure` is
+//  stable - so after a year it was the same child every quarter. That is one
+//  person's grievance on a timer rather than a family.
+//
+//  The speaker is drawn at random among everybody with something to say, and
+//  WEIGHTED by how much: uniform would make an ambitious passed-over sibling
+//  exactly as likely as a contented heir, which throws away the only
+//  characterisation `pressure` encodes.
+// ============================================================================
+describe('who actually writes', () => {
+    const house = [
+        child({ id: 'passed', ambition: 70 }),
+        child({ id: 'heir', ambition: 95, loyalty: 10 }),
+    ];
+
+    it('can be the heir OR the one nobody chose', () => {
+        const speakers = new Set<string>();
+        for (let i = 0; i < 200; i++) {
+            const t = heirTurnFor(house, 'heir', () => i / 200);
+            if (t) speakers.add(t.speaker.id);
+        }
+        expect(speakers).toContain('passed');
+        expect(speakers).toContain('heir');
+    });
+
+    it('and the one with more to say is heard from more', () => {
+        // The shape survives the randomness, which is the whole reason it is
+        // weighted rather than a coin.
+        let passed = 0, heir = 0;
+        for (let i = 0; i < 1000; i++) {
+            const t = heirTurnFor(house, 'heir', () => i / 1000);
+            if (t?.speaker.id === 'passed') passed++;
+            if (t?.speaker.id === 'heir') heir++;
+        }
+        // `passed` carries +30 for being passed over; `heir` loses its
+        // loyalty. Both speak, and the angrier one speaks more often.
+        expect(passed).toBeGreaterThan(heir);
+        expect(heir).toBeGreaterThan(0);
+    });
+
+    it('while a house with nothing to say stays silent however the die falls', () => {
+        const quiet = [child({ id: 'a', ambition: 5 }), child({ id: 'b', ambition: 5 })];
+        for (let i = 0; i < 50; i++) {
+            expect(heirTurnFor(quiet, 'a', () => i / 50)).toBeUndefined();
+        }
     });
 });
 

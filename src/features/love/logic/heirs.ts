@@ -26,9 +26,24 @@
 //    WHETHER THEY WERE CHOSEN. Passed over, they take it out on whoever was
 //    not. Chosen, they defend a position nobody has attacked yet.
 //
-//  ONE CHILD SPEAKS PER QUARTER, and it is the one with most to say - see
-//  `pressure`. Three teenagers arriving in the same tick is a group chat, and
-//  a group chat is not a scene.
+//  ---------------------------------------------------------------------------
+//  ONCE A YEAR, AND NOT ALWAYS THE SAME MOUTH
+//  ---------------------------------------------------------------------------
+//  The first version let the loudest child speak every quarter, which with
+//  three teenagers is a letter every three months from whoever is angriest -
+//  and after a year it is the same child every time, because `pressure` is
+//  stable. That drowns the player and it stops being a family: it becomes one
+//  person's grievance on a timer.
+//
+//  So the speaker is drawn at RANDOM among everybody with something to say,
+//  weighted by how much they have to say. The heir can write; so can the one
+//  nobody chose; so can the quiet middle child having a bad year.
+//
+//  WEIGHTED rather than uniform, and that is the one judgement in here. Uniform
+//  would make an ambitious passed-over sibling exactly as likely as a
+//  contented heir, which throws away the only characterisation `pressure`
+//  encodes. Weighted keeps the shape - you hear from the angry one more - while
+//  making sure you do not ONLY hear from them.
 //
 //  PURE. No stores, no clock, no random.
 // ============================================================================
@@ -67,6 +82,27 @@ export type HeirTurn = {
 };
 
 /**
+ * Pick one, weighted by how much each has to say.
+ *
+ * Exported so the test can see the distribution rather than infer it from
+ * outcomes, which is the difference between checking a die and checking a
+ * design.
+ */
+export const weightedPick = <T>(
+    items: { item: T; weight: number }[],
+    roll: () => number,
+): T | undefined => {
+    const total = items.reduce((sum, i) => sum + Math.max(0, i.weight), 0);
+    if (total <= 0) return undefined;
+    let n = roll() * total;
+    for (const i of items) {
+        n -= Math.max(0, i.weight);
+        if (n <= 0) return i.item;
+    }
+    return items[items.length - 1]?.item;
+};
+
+/**
  * How much this child has to say.
  *
  * Ambition is most of it, and being passed over is worth a great deal on top -
@@ -93,7 +129,9 @@ export const pressure = (child: Heir, isHeir: boolean, hasSiblings: boolean): nu
 export const heirTurnFor = (
     children: Heir[],
     designatedSuccessorId: string | null,
-    /** Below this nobody bothers. Keeps the quiet quarters quiet. */
+    /** Injected in tests. The game passes nothing. */
+    roll: () => number = Math.random,
+    /** Below this a child has nothing worth writing about. */
     threshold = 55,
 ): HeirTurn | undefined => {
     const grown = children.filter(c => c.age >= HEIR_VOICE_AGE);
@@ -101,22 +139,24 @@ export const heirTurnFor = (
 
     const hasSiblings = children.length > 1;
 
-    const ranked = grown
-        .map(child => ({
-            child,
-            isHeir: !!designatedSuccessorId && child.id === designatedSuccessorId,
-        }))
-        .map(({ child, isHeir }) => ({
-            child, isHeir, p: pressure(child, isHeir, hasSiblings),
-        }))
-        .sort((a, b) => b.p - a.p);
+    const candidates = grown
+        .map(child => {
+            const isHeir = !!designatedSuccessorId && child.id === designatedSuccessorId;
+            return { child, isHeir, p: pressure(child, isHeir, hasSiblings) };
+        })
+        .filter(c => c.p >= threshold);
 
-    const top = ranked[0];
-    if (!top || top.p < threshold) return undefined;
+    if (candidates.length === 0) return undefined;
+
+    const picked = weightedPick(
+        candidates.map(c => ({ item: c, weight: c.p })),
+        roll,
+    );
+    if (!picked) return undefined;
 
     const scene: HeirScene = !hasSiblings
         ? 'alone'
-        : top.isHeir ? 'chosen' : 'passedOver';
+        : picked.isHeir ? 'chosen' : 'passedOver';
 
-    return { speaker: top.child, scene };
+    return { speaker: picked.child, scene };
 };

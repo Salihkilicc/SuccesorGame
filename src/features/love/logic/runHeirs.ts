@@ -30,11 +30,15 @@ import { HEIR_CONVERSATIONS } from '../../../data/story/heirs';
 import { heirTurnFor, type Heir } from './heirs';
 
 /**
- * How long before the same child may write again.
+ * How long before ANYBODY in the family writes again.
  *
- * Four quarters. A family that files a grievance every three months is not a
- * family, and the succession is a thing that happens over twenty years - it
- * should feel like being reminded rather than being lobbied.
+ * A year, and it is family-wide rather than per child. Per child sounded
+ * fairer and was worse: with three teenagers on their own four-quarter timers
+ * the player gets a letter every quarter, from whichever one is angriest, for
+ * ever.
+ *
+ * The succession happens over twenty years. It should feel like being reminded
+ * once a year, not lobbied.
  */
 export const HEIR_COOLDOWN_QUARTERS = 4;
 
@@ -63,13 +67,25 @@ export const runHeirs = (): { spoke: string | null; scene: string | null } => {
         messages.threads.filter(t => !!t.conversationId).map(t => t.id),
     );
 
+    // ------------------------------------------------------------------
+    //  ONE LETTER A YEAR FROM THE WHOLE HOUSE
+    // ------------------------------------------------------------------
+    //  Measured across every child rather than per child. The newest thing
+    //  any of them said is the clock; if that was inside a year, nobody
+    //  writes.
+    // ------------------------------------------------------------------
+    const childIds = new Set(children.map(c => c.id));
+    const lastSpoke = messages.threads
+        .filter(t => childIds.has(t.id))
+        .flatMap(t => t.messages.map(m => m.atMonth))
+        .reduce((a, b) => Math.max(a, b), -999);
+
+    if (month - lastSpoke < HEIR_COOLDOWN_QUARTERS * 3) {
+        return { spoke: null, scene: null };
+    }
+
     const eligible: Heir[] = children
         .filter(c => !busy.has(c.id))
-        .filter(c => {
-            const last = messages.threads.find(t => t.id === c.id);
-            const lastSaid = last?.messages[last.messages.length - 1]?.atMonth ?? -999;
-            return month - lastSaid >= HEIR_COOLDOWN_QUARTERS * 3;
-        })
         .map(c => ({
             id: c.id,
             name: c.name,
