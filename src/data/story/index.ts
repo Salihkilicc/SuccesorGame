@@ -24,6 +24,7 @@ import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
 import { pearBought } from './pearBought';
+import { successionSibling, successionAlone } from './firstQuarter';
 import { heirAlone, heirPassedOver, heirChosen } from './heirs';
 import {
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
@@ -119,6 +120,13 @@ export const CONVERSATIONS: Conversation[] = [
     heirAlone,
     heirPassedOver,
     heirChosen,
+    // ------------------------------------------------------------------
+    //  AND THE FIRST THING ANYBODY SAYS TO THE NEXT ONE. Same arrangement:
+    //  no `when` and no STORY_BEAT, because runSuccession picks which of
+    //  the two and puts the real name on the thread.
+    // ------------------------------------------------------------------
+    successionSibling,
+    successionAlone,
 
     fatherInheritance,
     fatherQ1,

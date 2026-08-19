@@ -31,7 +31,45 @@ import { useFamilyStore } from '../store/useFamilyStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
+import { useGameStore as gameStore } from '../store/useGameStore';
+import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
+import { CAST } from '../../data/story/cast';
 import { planSuccession, type SuccessionPlan } from './succession';
+
+/**
+ * The first thing anybody says to the new one.
+ *
+ * Posted here rather than queued as a STORY_BEAT for the same reason the
+ * children's messages are: a Conversation is static data and these people are
+ * named by the player, so `deliver` would put a cast id on the thread where a
+ * real name belongs. See features/love/logic/runHeirs.ts, which does the same
+ * two steps for the same reason.
+ *
+ * WHICH ONE depends on whether anybody else inherited stock. With a sibling it
+ * comes from them and it is about the register; alone it comes from the CFO
+ * and it is about an empty floor, which is the harder start rather than the
+ * easier one.
+ */
+const postFirstLetter = (plan: SuccessionPlan) => {
+    const sibling = plan.siblings[0];
+    const conversation = sibling
+        ? SUCCESSION_CONVERSATIONS.sibling
+        : SUCCESSION_CONVERSATIONS.alone;
+
+    const from = sibling
+        ? { id: sibling.id, name: sibling.name, role: 'Your family' }
+        : { id: 'cfo', name: CAST.cfo?.name ?? 'The CFO', role: CAST.cfo?.role ?? 'CFO' };
+
+    const opening = conversation.nodes.find(n => n.id === conversation.start);
+    const month = gameStore.getState().currentMonth;
+
+    const messages = useMessageStore.getState();
+    messages.sendFromCharacter(from, opening?.text ?? '', month);
+    useMessageStore.setState(s => ({
+        threads: s.threads.map(t =>
+            t.id === from.id ? { ...t, conversationId: conversation.id } : t),
+    }));
+};
 
 /**
  * Hand the company to the heir, and become them.
@@ -173,8 +211,33 @@ export const runSuccession = (): SuccessionPlan | null => {
     //  hear again is a separate piece of writing and gets its own list, the
     //  way the opening act did.
     // ------------------------------------------------------------------
-    useMessageStore.getState().reset();
+    // NOT `reset()`, and this is the one thing a test caught rather than a
+    // reading. `useMessageStore.reset()` restores `initialMessageState`,
+    // which SEEDS the head of production congratulating you on the launch.
+    // Correct for a new game and absurd for somebody who has just inherited
+    // a company with fourteen hundred people in it. An empty inbox is the
+    // honest state; the letter below is what goes in it.
+    useMessageStore.setState({ threads: [], _hasHydrated: true } as never);
     useMailStore.getState().reset();
+
+    // ------------------------------------------------------------------
+    //  AND THEN ONE MESSAGE ARRIVES IN IT
+    // ------------------------------------------------------------------
+    //  AFTER the reset, obviously, and the ordering is the only fragile
+    //  thing in this file: posted before it, the letter would be the one
+    //  thing the wipe took.
+    //
+    //  The first generation opened on a letter from a father. The second
+    //  would otherwise open on a quarterly report and silence, which is a
+    //  continuation rather than a beginning.
+    // ------------------------------------------------------------------
+    try {
+        postFirstLetter(plan);
+    } catch (e) {
+        // A missing message store is not a reason to leave the player on
+        // the closing screen with a succession half applied.
+        console.warn('[succession] first letter not delivered', e);
+    }
 
     // ------------------------------------------------------------------
     //  6. AND THE GAME IS NOT OVER

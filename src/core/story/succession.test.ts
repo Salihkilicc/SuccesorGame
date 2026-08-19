@@ -28,6 +28,8 @@ import { useGameStore } from '../store/useGameStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
+import { useMessageStore } from '../store/useMessageStore';
+import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 
 const heir = (id: string, name: string, age: number) => ({
     id, name, age, gender: 'Male' as const,
@@ -128,6 +130,7 @@ describe('handing the company over', () => {
             facilityTier: 4,
         } as never);
         useShareholderStore.setState({ playerShareCount: 6_500_000, members: [] } as never);
+        useMessageStore.getState().reset();
         useIdentityStore.setState({ firstName: 'John', lastName: 'Hale', gender: 'male' } as never);
         useFamilyStore.setState({
             ...initialFamilyState,
@@ -203,6 +206,58 @@ describe('handing the company over', () => {
     it('and the game is no longer over', () => {
         runSuccession();
         expect(useStoryStore.getState().ending).toBeNull();
+    });
+
+    // ------------------------------------------------------------------
+    //  AND THE SECOND GENERATION GETS AN OPENING RATHER THAN A SILENCE
+    // ------------------------------------------------------------------
+    //  The first one opened on a letter from a father. Without this the
+    //  second opens on a quarterly report and nothing, which is a
+    //  continuation rather than a beginning.
+    // ------------------------------------------------------------------
+    it('and somebody writes to you on the first day', () => {
+        runSuccession();
+        const threads = useMessageStore.getState().threads;
+        expect(threads).toHaveLength(1);
+        // A playable scene rather than a notice, so the new chief executive
+        // answers it and the game starts with them saying something.
+        expect(threads[0].conversationId).toBeTruthy();
+    });
+
+    it('and nobody congratulates them on the launch', () => {
+        // What this test caught, which no amount of reading the file would
+        // have. `useMessageStore.reset()` restores the SEED, and the seed is
+        // the head of production saying "congratulations on the launch" -
+        // correct for a new game and absurd for somebody who has just
+        // inherited a company with fourteen hundred people in it.
+        runSuccession();
+        const text = useMessageStore.getState().threads
+            .flatMap(t => t.messages.map(m => m.text)).join(' ');
+        expect(text).not.toContain('Congratulations on the launch');
+    });
+
+    it('and it is your brother, because he owns twelve per cent of you now', () => {
+        runSuccession();
+        const thread = useMessageStore.getState().threads[0];
+        expect(thread.name).toBe('Marcus Hale');
+        expect(thread.conversationId).toBe(SUCCESSION_CONVERSATIONS.sibling.id);
+    });
+
+    it('while an only child hears from the CFO and an empty floor', () => {
+        useFamilyStore.setState({
+            children: [{ id: 'a', name: 'Elena Hale', age: 30, gender: 'Female', stats: {} }],
+            designatedSuccessorId: 'a',
+        } as never);
+        runSuccession();
+        const thread = useMessageStore.getState().threads[0];
+        expect(thread.conversationId).toBe(SUCCESSION_CONVERSATIONS.alone.id);
+    });
+
+    it('and it survives the inbox being cleared, which it is posted after', () => {
+        // The only fragile ordering in the file. Posted before the reset,
+        // this letter is the one thing the wipe takes.
+        runSuccession();
+        expect(useMessageStore.getState().threads.length).toBeGreaterThan(0);
     });
 
     it('and there is nothing to hand over when nobody is of age', () => {
