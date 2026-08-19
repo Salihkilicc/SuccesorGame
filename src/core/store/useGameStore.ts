@@ -2629,7 +2629,35 @@ export const useGameStore = create<GameStore>()(
           }
         };
 
-
+        // ------------------------------------------------------------------
+        //  AND THEN THERE IS THE CLOCK NOBODY WINDS
+        // ------------------------------------------------------------------
+        //  AFTER the status is settled, and only when the company survived
+        //  the quarter. Both orderings matter and neither is obvious:
+        //
+        //  AFTER, because the two statuses above write their ending to the
+        //  story store as they are decided. Running mortality first would let
+        //  a death in the same quarter as a bankruptcy overwrite the
+        //  bankruptcy notice, and the player would read about the wrong event.
+        //
+        //  ONLY WHEN ACTIVE, because a player whose board voted them out this
+        //  quarter is no longer the chief executive of anything, and "you died
+        //  in office" is not true of them. `runMortality` guards this itself
+        //  by checking the store, and it is stated here as well because the
+        //  reason lives at this call site rather than inside that file.
+        //
+        //  See core/story/mortality.ts for the curve and what it measures out
+        //  at, and runMortality.ts for which of the two endings it picks.
+        // ------------------------------------------------------------------
+        if (result.status === 'active') {
+          try {
+            require('../story/runMortality').runMortality();
+          } catch (e) {
+            // A throw here would take the whole quarter down with it, and
+            // the quarter has already been simulated and written.
+            console.warn('[Mortality] check failed', e);
+          }
+        }
 
         return result;
       },

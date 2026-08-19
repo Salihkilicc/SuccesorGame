@@ -67,12 +67,23 @@ describe('every ending is a record in this file', () => {
         }
     });
 
-    it('and the four that exist are the four that can happen', () => {
+    it('and the six that exist are the six that can happen', () => {
         // Reachability checks that every `ending` EFFECT names a real record.
         // Nothing checked the other direction, and an ending nobody can reach
         // is writing that will never be read.
-        expect(Object.keys(ENDINGS).sort())
-            .toEqual(['boughtPear', 'removedByBoard', 'soldToPear', 'wentBankrupt']);
+        //
+        // The two deaths are not named by an effect at all - core/story/
+        // runMortality.ts picks between them - so they would be invisible to
+        // that audit in both directions. This list is the only thing that
+        // sees them.
+        expect(Object.keys(ENDINGS).sort()).toEqual([
+            'boughtPear',
+            'diedInOffice',
+            'diedWithoutAnHeir',
+            'removedByBoard',
+            'soldToPear',
+            'wentBankrupt',
+        ]);
     });
 });
 

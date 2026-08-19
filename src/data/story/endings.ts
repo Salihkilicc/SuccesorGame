@@ -166,6 +166,64 @@ export const ENDINGS: Record<string, Ending> = {
             + 'took the whole of your life, and it turns out to be a smaller '
             + 'thing to hold than it was to want.',
     },
+
+    // ----------------------------------------------------------------------
+    //  YOU DIED, AND SOMEBODY IS READY
+    // ----------------------------------------------------------------------
+    //  The good death, and it is only good by comparison.
+    //
+    //  It is written to be read TWICE, because the closing screen will
+    //  eventually offer to carry on as the heir. A player who takes that
+    //  offer should be able to look back at this page and find that it was
+    //  always about the person picking the phone up, not about the person
+    //  putting it down. So nothing in it is final and nothing in it is a
+    //  summary.
+    //
+    //  THE FUNERAL IS NOT IN IT. Everybody writes the funeral, and a funeral
+    //  is a scene about how people felt about you, which is the one thing
+    //  this game has never once told the player. A Tuesday board meeting
+    //  carrying on without you is the same information and it is true.
+    // ----------------------------------------------------------------------
+    diedInOffice: {
+        id: 'diedInOffice',
+        title: 'YOU DIED',
+        body:
+            'It was not in the building, which everybody agrees is a mercy, and '
+            + 'two of them say so in the same words within an hour.\n\n'
+            + 'The board meets on the Tuesday as scheduled. The chair is left '
+            + 'empty for that one meeting, which is the last piece of theatre '
+            + 'anybody performs on your account, and it is filled at the next.\n\n'
+            + 'Your estate divides. Somebody who is frightened and did not '
+            + 'expect it this soon signs the first thing put in front of them.',
+    },
+
+    // ----------------------------------------------------------------------
+    //  YOU DIED, AND THERE WAS NOBODY
+    // ----------------------------------------------------------------------
+    //  The one that has to exist for naming a successor to mean anything. If
+    //  the game always found somebody, the succession screen would be a
+    //  preference rather than a decision.
+    //
+    //  It is not a scolding and it must not be. Plenty of people do not have
+    //  children and the game has no business having a view about it. What it
+    //  can have a view about is what happens to a company with nobody in it,
+    //  which is nothing dramatic at all: it is absorbed, correctly, by people
+    //  doing their jobs. That is the sting and it costs no cruelty.
+    // ----------------------------------------------------------------------
+    diedWithoutAnHeir: {
+        id: 'diedWithoutAnHeir',
+        title: 'YOU DIED',
+        body:
+            'The board meets on the Tuesday. There is a procedure for this and '
+            + 'it is followed, and it takes eleven minutes.\n\n'
+            + 'An interim is appointed from inside, which is the outcome the '
+            + 'papers call stability. He is competent. He was competent when '
+            + 'you hired him and you never once had a conversation with him '
+            + 'that was not about a number.\n\n'
+            + 'The name stays on the building for four years, because changing '
+            + 'the signage is expensive and nobody wants to be the one who '
+            + 'raised it.',
+    },
 };
 
 export const endingById = (id: string): Ending | undefined => ENDINGS[id];
