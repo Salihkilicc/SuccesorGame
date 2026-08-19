@@ -62,6 +62,8 @@ export interface SendInput {
     quarter: number;
     /** Read from the story flags by the caller. See CONVICTION_RESISTANCE. */
     convicted?: boolean;
+    /** What the player's partner is worth to this board. See partnerEffects. */
+    networkRelief?: number;
 }
 
 type Store = NegotiationState & {
@@ -153,6 +155,7 @@ export const useNegotiationStore = create<Store>()(
                     personalityShift: shiftFor(negotiator, input.subject),
                     priorRefusals: state.refusalsByTarget[input.targetId] ?? 0,
                     convicted: input.convicted,
+                    networkRelief: input.networkRelief,
                 });
 
                 const offer: Offer = {

@@ -36,6 +36,9 @@ import { currentQuarter } from '../../../core/story/world';
 import { SUBJECTS, type Subject } from '../../../core/market/negotiation';
 import { INITIAL_MARKET_ITEMS } from '../../assets/data/marketData';
 import { formatMoney } from '../../../core/utils';
+import { FEATURES } from '../../../core/featureFlags';
+import { useFamilyStore } from '../../../core/store/useFamilyStore';
+import { networkRelief } from '../../love/logic/partnerEffects';
 import { FRIENDLY_LOCK_MARKET_CAP } from '../../../core/market/reach';
 
 const SUBJECT_LABEL: Record<Subject, string> = {
@@ -137,6 +140,21 @@ const ComposeOfferScreen = () => {
             // chief executive who has been found guilty. See
             // CONVICTION_RESISTANCE in core/market/negotiation.ts.
             convicted: !!useStoryStore.getState().flags.fbiGuilty,
+            // ------------------------------------------------------------
+            //  AND WHO YOU ARE MARRIED TO
+            // ------------------------------------------------------------
+            //  `networkPower` was one of eight fields on a partner that
+            //  nothing in the game read. This is the first of them to decide
+            //  anything, and this is the right letter for it: a board is a
+            //  room, and somebody at your table knowing somebody at theirs is
+            //  what a network IS.
+            //
+            //  Gated with the rest of the module. A shelved feature must not
+            //  quietly make acquisitions easier.
+            // ------------------------------------------------------------
+            networkRelief: FEATURES.love
+                ? networkRelief(useFamilyStore.getState().partner)
+                : 0,
         });
         if (!result.ok) {
             Alert.alert('Not sent', result.reason);

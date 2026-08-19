@@ -193,6 +193,19 @@ export interface ResistanceInput {
     priorRefusals: number;
     /** The player has been found guilty. See CONVICTION_RESISTANCE. */
     convicted?: boolean;
+    /**
+     * What the player's partner is worth to this letter, 0 to 0.08.
+     *
+     * PASSED IN, like `convicted`, because core/market must not import
+     * features/love - and because this module has no opinion about WHY a
+     * board is warmer, only that it is. See features/love/logic/
+     * partnerEffects.ts for where the number comes from.
+     *
+     * Subtracted rather than added: everything else in this function makes a
+     * board harder and this is the only term that makes one easier, so the
+     * sign is stated at the call rather than hidden in the value.
+     */
+    networkRelief?: number;
 }
 
 export const resistance = (i: ResistanceInput): number => {
@@ -206,7 +219,9 @@ export const resistance = (i: ResistanceInput): number => {
         + i.personalityShift
         // Negative is a credit, not a no-op. See GOODWILL_FLOOR.
         + Math.max(GOODWILL_FLOOR, i.priorRefusals) * SECOND_APPROACH_PENALTY
-        + (i.convicted ? CONVICTION_RESISTANCE : 0),
+        + (i.convicted ? CONVICTION_RESISTANCE : 0)
+        // Somebody at your table knows somebody at theirs.
+        - Math.max(0, i.networkRelief ?? 0),
     );
 };
 

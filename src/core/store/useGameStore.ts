@@ -2334,6 +2334,42 @@ export const useGameStore = create<GameStore>()(
             ? require('./useFamilyStore').useFamilyStore.getState().partner
             : null;
           if (buffPartner) {
+            // ------------------------------------------------------------
+            //  WHAT BEING SEEN WITH THEM DOES, AND WHAT THEY OFFER
+            // ------------------------------------------------------------
+            //  Two of the eight PartnerStats fields that nothing read. See
+            //  features/love/logic/partnerEffects.ts for the reasoning; the
+            //  short version is that a field which touches no number is not
+            //  a field, it is a label on a card.
+            //
+            //  The AID is an OFFER, posted as a message, not a deposit. Money
+            //  appearing because a hidden percentage came up is the exact
+            //  shape this project has spent weeks removing elsewhere: the
+            //  player cannot connect a number to a cause they never saw.
+            // ------------------------------------------------------------
+            try {
+              const {
+                reputationDrift, aidOffer,
+              } = require('../../features/love/logic/partnerEffects');
+
+              const drift = reputationDrift(buffPartner);
+              if (drift) {
+                require('./useStoryStore').useStoryStore
+                  .getState().nudge('publicReputation', drift);
+              }
+
+              const offer = aidOffer(buffPartner, useStatsStore.getState().money || 0);
+              if (offer) {
+                require('./useMessageStore').useMessageStore.getState().sendFromCharacter(
+                  { id: 'partner', name: offer.from, role: 'Partner' },
+                  `I looked at the account, which I know I am not supposed to do.\n\nI can put in ${Math.round(offer.amount).toLocaleString()} and I would rather do it now than after you have had to ask. Say the word and it is done.`,
+                  get().currentMonth,
+                );
+              }
+            } catch (e) {
+              console.warn('[partner] quarterly effects could not run', e);
+            }
+
             const { changes, notification } = applyPartnerBuffs(buffPartner);
 
             if (notification) {
