@@ -270,6 +270,18 @@ export type StoryFlag =
     // --- Pear.
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'
+    /**
+     * And it closed. You own it.
+     *
+     * SEPARATE FROM `movedOnPear`, which is raised in the same place and one
+     * line apart, because they are different facts: moving on him is a bid he
+     * noticed, and this is the transfer completing. The midnight message reads
+     * the first one and is about a man who has been beaten in a category. The
+     * last letter reads this one and is about a man who no longer owns his
+     * company. Collapsing them into one flag would let the midnight text
+     * arrive from somebody who works for you.
+     */
+    | 'ownsPear'
     /** The night he texted. Once, ever. */
     | 'droveHimToIt'
     // --- Teaching. Raised by the screens the first year points at, so a

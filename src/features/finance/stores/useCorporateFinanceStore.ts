@@ -991,6 +991,22 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                     try {
                         require('../../../core/store/useStoryStore').useStoryStore
                             .getState().raise('movedOnPear');
+                        // ----------------------------------------------
+                        //  AND THE ONE THAT ENDS THE GAME
+                        // ----------------------------------------------
+                        //  Two flags rather than one, a line apart, and
+                        //  the difference matters: `movedOnPear` is a bid
+                        //  he noticed and is what earns the midnight
+                        //  message, while this is the transfer completing.
+                        //  See the note on the flag in core/story/state.ts.
+                        //
+                        //  The letter this queues arrives NEXT QUARTER
+                        //  rather than now, which is the same gap Pear's
+                        //  first letter left after the father's death. He
+                        //  waited a fortnight then too.
+                        // ----------------------------------------------
+                        require('../../../core/store/useStoryStore').useStoryStore
+                            .getState().raise('ownsPear');
                     } catch { /* story store not ready */ }
                 }
 

@@ -132,6 +132,40 @@ export const ENDINGS: Record<string, Ending> = {
             + 'owned, which is a sentence somebody should have said out loud '
             + 'while there was still time to do anything about it.',
     },
+
+    // ----------------------------------------------------------------------
+    //  YOU BOUGHT PEAR
+    // ----------------------------------------------------------------------
+    //  The mirror of `soldToPear`, and it is deliberately built out of the
+    //  same three pieces: a Tuesday, a footnote, and a fact about how long
+    //  the rest of your life is. Somebody who has seen both should recognise
+    //  the shape before they work out why.
+    //
+    //  The inversion is that every one of those pieces now falls the other
+    //  way, and the last line is the point of the whole game. "Nobody ever
+    //  found out whether you would have been any good at it" is what the
+    //  early ending leaves you with. This one is the answer to that question,
+    //  and the answer costs the length of a life to get.
+    //
+    //  It is NOT a victory lap. He does not concede, the letter that precedes
+    //  it concedes nothing (see data/story/pearBought.ts), and the ending
+    //  does not tell the player they won. It tells them what it cost and
+    //  lets them decide, which is the only ending in the file that could
+    //  reasonably be read either way.
+    // ----------------------------------------------------------------------
+    boughtPear: {
+        id: 'boughtPear',
+        title: 'YOU BOUGHT PEAR',
+        body:
+            'The money cleared on a Tuesday. It was not a fair price, and both '
+            + 'of you signed it anyway.\n\n'
+            + 'Vogel is out of the building by Friday. His name appears once in '
+            + 'the integration report, in a footnote, spelled correctly, and '
+            + 'somebody on your staff asks whether that is the right Vogel.\n\n'
+            + 'You have the answer to the only question you ever really had. It '
+            + 'took the whole of your life, and it turns out to be a smaller '
+            + 'thing to hold than it was to want.',
+    },
 };
 
 export const endingById = (id: string): Ending | undefined => ENDINGS[id];

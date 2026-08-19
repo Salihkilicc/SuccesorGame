@@ -23,6 +23,7 @@ import { ctoResearch } from './ctoResearch';
 import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
+import { pearBought } from './pearBought';
 import { heirAlone, heirPassedOver, heirChosen } from './heirs';
 import {
     cfoBoardRoom, cfoBragaName, cfoBragaTruth, cfoResignation,
@@ -131,6 +132,9 @@ export const CONVERSATIONS: Conversation[] = [
     // data/tutorial/sequence.ts.
     ctoResearch,
     pearOffer,
+    // The last letter he ever sends, twenty years the other way up. See the
+    // note at the top of pearBought.ts.
+    pearBought,
     friendCondolence, friendCondolencePublic,
     cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,
     brotherCondolence, brotherCondolencePublic,
@@ -291,6 +295,20 @@ export const STORY_BEATS: StoryBeat[] = [
     // ------------------------------------------------------------------
     { conversation: fatherDeath.id, urgent: true },
     { conversation: pearOffer.id, urgent: true },
+    // ------------------------------------------------------------------
+    //  AND THE END OF IT, WHENEVER THAT IS
+    // ------------------------------------------------------------------
+    //  No quarter on it. Its `when` is a flag raised the moment the
+    //  acquisition closes, which may be quarter forty or may never happen,
+    //  and that is the correct shape for the only beat in the game that is
+    //  gated on the player having done something enormous rather than on
+    //  the calendar.
+    //
+    //  Urgent, because it ends the game. Waiting behind two other letters
+    //  for the allowance would put the last thing Vogel ever writes third
+    //  in a queue.
+    // ------------------------------------------------------------------
+    { conversation: pearBought.id, urgent: true },
 ];
 
 // ============================================================================

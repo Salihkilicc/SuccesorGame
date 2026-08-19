@@ -67,12 +67,12 @@ describe('every ending is a record in this file', () => {
         }
     });
 
-    it('and the three that exist are the three that can happen', () => {
+    it('and the four that exist are the four that can happen', () => {
         // Reachability checks that every `ending` EFFECT names a real record.
         // Nothing checked the other direction, and an ending nobody can reach
         // is writing that will never be read.
         expect(Object.keys(ENDINGS).sort())
-            .toEqual(['removedByBoard', 'soldToPear', 'wentBankrupt']);
+            .toEqual(['boughtPear', 'removedByBoard', 'soldToPear', 'wentBankrupt']);
     });
 });
 
