@@ -34,61 +34,87 @@ const getRandomWeighted = <T>(items: T[], weights: number[]): T => {
     return items[0];
 };
 
-// --- Helper: Convert Deep Persona Partner to PartnerProfile for backward compatibility ---
-const convertToPartnerProfile = (deepPartner: Partner): PartnerProfile => {
-    // Dynamic SocialClass determination based on job & tier
-    let socialClass: SocialClass = 'HighSociety';
-
-    if (deepPartner.job.id === 'dynasty_heiress' || deepPartner.job.id === 'billionaire_heir') {
-        socialClass = 'BillionaireHeir';
-    } else if (deepPartner.job.id === 'royal_envoy') {
-        socialClass = 'Royalty';
-    } else if (deepPartner.job.tier === 'CORPORATE_ELITE') {
-        socialClass = 'OldMoney';
-    } else if (deepPartner.job.tier === 'HIGH_SOCIETY') {
-        socialClass = 'HighSociety';
-    } else if (deepPartner.job.tier === 'UNDERGROUND') {
-        socialClass = 'CriminalElite';
-    } else if (deepPartner.job.tier === 'ARTISTIC') {
-        socialClass = 'HighSociety';
-    } else if (deepPartner.job.tier === 'BLUE_COLLAR') {
-        socialClass = 'WorkingClass';
-    } else if (deepPartner.job.tier === 'STUDENT_LIFE') {
-        socialClass = 'MiddleClass';
-    }
-
-    const isTopTier = ['BillionaireHeir', 'Royalty', 'HighSociety', 'OldMoney'].includes(socialClass);
-
-    const stats: PartnerStats = {
-        ethnicity: 'RoyalEuropean' as Ethnicity,
-        age: deepPartner.age,
-        occupation: deepPartner.job.title,
-        looks: isTopTier ? 75 + Math.floor(Math.random() * 25) : 60 + Math.floor(Math.random() * 35),
-        style: isTopTier ? 'Luxury' : 'Elegant',
-        socialClass,
-        familyWealth: socialClass === 'BillionaireHeir' ? 95 : socialClass === 'Royalty' ? 98 : isTopTier ? 75 + Math.floor(Math.random() * 25) : Math.floor(Math.random() * 60),
-        intelligence: isTopTier ? 82 + Math.floor(Math.random() * 18) : 70 + Math.floor(Math.random() * 30),
-        jealousy: Math.floor(Math.random() * 70),
-        crazy: Math.floor(Math.random() * 60),
-        libido: 60 + Math.floor(Math.random() * 40),
-        reputationBuff: socialClass === 'Royalty' ? 25 : socialClass === 'BillionaireHeir' ? 20 : isTopTier ? 15 : 5,
-        financialAidChance: isTopTier ? 40 + Math.floor(Math.random() * 40) : 15,
-        networkPower: isTopTier ? 80 + Math.floor(Math.random() * 20) : 40 + Math.floor(Math.random() * 40),
-    };
-
-    return {
-        id: deepPartner.id,
-        name: deepPartner.name,
-        photo: deepPartner.avatar || null,
-        stats,
-        love: deepPartner.stats.relationshipLevel,
-        relationYears: 0,
-        isMarried: deepPartner.isMarried,
-        hasPrenup: deepPartner.hasPrenup,
-        // Store Deep Persona data as well for access
-        ...(deepPartner as any), // Include all Deep Persona fields
-    };
-};
+// ============================================================================
+//  SHELVED: THE ADAPTER BETWEEN THE TWO PARTNER TYPES
+// ============================================================================
+//
+//  `convertToPartnerProfile` existed for one reason: `generatePartner` returned
+//  the wrong type. It does not any more, so this translates nothing.
+//
+//  It is worth reading once before it goes quiet, because it is a catalogue of
+//  what happens when a shape has to be guessed at:
+//
+//    - It invented all fifteen psychometrics with `Math.random()`, ignoring the
+//      PERSONALITY entirely. A Loyal Confidante and a High Maintenance came out
+//      of the same distribution, so the label on the card predicted nothing.
+//    - It hardcoded `ethnicity: 'RoyalEuropean'` for every partner in the game,
+//      while the generator had just picked one to build the name from.
+//    - It mapped job tier to social class inline, with a nine-branch if-chain
+//      that disagreed with nothing because nothing else did it.
+//    - And it finished with `...(deepPartner as any)`, spraying `age`, `gender`
+//      and `avatar` onto a profile that has none of those fields - which is why
+//      the resulting object typechecked and was still wrong.
+//
+//  The generator now produces a complete PartnerProfile with the psychometrics
+//  DERIVED from the personality and the tier. See logic/psychometrics.ts.
+//
+//  @orphan-ok-symbol convertToPartnerProfile
+//  // --- Helper: Convert Deep Persona Partner to PartnerProfile for backward compatibility ---
+//  const convertToPartnerProfile = (deepPartner: Partner): PartnerProfile => {
+//      // Dynamic SocialClass determination based on job & tier
+//      let socialClass: SocialClass = 'HighSociety';
+//
+//      if (deepPartner.job.id === 'dynasty_heiress' || deepPartner.job.id === 'billionaire_heir') {
+//          socialClass = 'BillionaireHeir';
+//      } else if (deepPartner.job.id === 'royal_envoy') {
+//          socialClass = 'Royalty';
+//      } else if (deepPartner.job.tier === 'CORPORATE_ELITE') {
+//          socialClass = 'OldMoney';
+//      } else if (deepPartner.job.tier === 'HIGH_SOCIETY') {
+//          socialClass = 'HighSociety';
+//      } else if (deepPartner.job.tier === 'UNDERGROUND') {
+//          socialClass = 'CriminalElite';
+//      } else if (deepPartner.job.tier === 'ARTISTIC') {
+//          socialClass = 'HighSociety';
+//      } else if (deepPartner.job.tier === 'BLUE_COLLAR') {
+//          socialClass = 'WorkingClass';
+//      } else if (deepPartner.job.tier === 'STUDENT_LIFE') {
+//          socialClass = 'MiddleClass';
+//      }
+//
+//      const isTopTier = ['BillionaireHeir', 'Royalty', 'HighSociety', 'OldMoney'].includes(socialClass);
+//
+//      const stats: PartnerStats = {
+//          ethnicity: 'RoyalEuropean' as Ethnicity,
+//          age: deepPartner.age,
+//          occupation: deepPartner.job.title,
+//          looks: isTopTier ? 75 + Math.floor(Math.random() * 25) : 60 + Math.floor(Math.random() * 35),
+//          style: isTopTier ? 'Luxury' : 'Elegant',
+//          socialClass,
+//          familyWealth: socialClass === 'BillionaireHeir' ? 95 : socialClass === 'Royalty' ? 98 : isTopTier ? 75 + Math.floor(Math.random() * 25) : Math.floor(Math.random() * 60),
+//          intelligence: isTopTier ? 82 + Math.floor(Math.random() * 18) : 70 + Math.floor(Math.random() * 30),
+//          jealousy: Math.floor(Math.random() * 70),
+//          crazy: Math.floor(Math.random() * 60),
+//          libido: 60 + Math.floor(Math.random() * 40),
+//          reputationBuff: socialClass === 'Royalty' ? 25 : socialClass === 'BillionaireHeir' ? 20 : isTopTier ? 15 : 5,
+//          financialAidChance: isTopTier ? 40 + Math.floor(Math.random() * 40) : 15,
+//          networkPower: isTopTier ? 80 + Math.floor(Math.random() * 20) : 40 + Math.floor(Math.random() * 40),
+//      };
+//
+//      return {
+//          id: deepPartner.id,
+//          name: deepPartner.name,
+//          photo: deepPartner.avatar || null,
+//          stats,
+//          love: deepPartner.stats.relationshipLevel,
+//          relationYears: 0,
+//          isMarried: deepPartner.isMarried,
+//          hasPrenup: deepPartner.hasPrenup,
+//          // Store Deep Persona data as well for access
+//          ...(deepPartner as any), // Include all Deep Persona fields
+//      };
+//  };
+// ============================================================================
 
 export const useEncounterSystem = () => {
     const [currentScenario, setCurrentScenario] = useState<EncounterScenario | null>(null);
@@ -100,22 +126,20 @@ export const useEncounterSystem = () => {
 
     // --- 1. Smart NPC Generator (Now uses Deep Persona System) ---
     const generateSmartCandidate = useCallback((context: string, countryId?: string): PartnerProfile => {
-        // Generate using Deep Persona System
-        const deepPartner = generatePartner();
+        // One call. The generator produces the type that gets stored.
+        const candidateProfile = generatePartner();
 
-        // Convert to PartnerProfile format for backward compatibility
-        const partnerProfile = convertToPartnerProfile(deepPartner);
+        if (__DEV__) {
+            console.log('[partner] generated:', {
+                name: candidateProfile.name,
+                job: candidateProfile.job?.title,
+                personality: candidateProfile.personality?.label,
+                socialClass: candidateProfile.stats.socialClass,
+                monthlyCost: candidateProfile.finances?.monthlyCost,
+            });
+        }
 
-        console.log('[Deep Persona] Generated partner:', {
-            name: deepPartner.name,
-            job: deepPartner.job.title,
-            tier: deepPartner.job.tier,
-            personality: deepPartner.personality.label,
-            monthlyCost: deepPartner.finances.monthlyCost
-        });
-
-        return partnerProfile;
-
+        return candidateProfile;
     }, []);
 
     // --- 2. Trigger Encounter ---

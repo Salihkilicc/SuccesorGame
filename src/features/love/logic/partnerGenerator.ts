@@ -1,8 +1,47 @@
-import { Partner, SocialTier, JobDefinition, PersonalityTrait } from '../types';
+// ============================================================================
+//  IT PRODUCES THE TYPE THAT CAN BE STORED
+// ============================================================================
+//
+//  This returned `Partner` - the second partner type - and nothing that stores
+//  a partner could read it. `age` and `gender` at the top level rather than in
+//  `stats`, `relationshipLevel` rather than `love`, `avatar` rather than
+//  `photo`, and none of the fifteen psychometric fields at all.
+//
+//  So the player met somebody with no social class, no jealousy and no network:
+//  the whole of what the relationship system does with a person, missing on
+//  arrival, on every partner except the one hand-written demo.
+//
+//  `PartnerProfile` now, complete, with the psychometrics derived from the
+//  personality and the tier that this file was already picking. See
+//  logic/psychometrics.ts for why they are derived rather than rolled.
+// ============================================================================
+
 import { JOBS_DATABASE } from '../data/jobsData';
 import { PERSONALITY_TRAITS } from '../data/personalitiesData';
 import { NAME_DATABASE } from '../data/nameData';
-import { Ethnicity } from '../../../data/relationshipTypes';
+import type {
+    Ethnicity,
+    JobDefinition,
+    PartnerProfile,
+    SocialTier,
+} from '../../../data/relationshipTypes';
+import { fingerprintFor } from './psychometrics';
+
+/**
+ * How somebody dresses, by tier. Cosmetic and stated as such.
+ *
+ * `style`, `looks` and `ethnicity` are the three fields in PartnerStats that
+ * touch no mechanic and are not meant to. Saying so here is what stops the
+ * next person wiring them to something.
+ */
+const STYLE_FOR_TIER: Record<SocialTier, PartnerProfile['stats']['style']> = {
+    HIGH_SOCIETY: 'Luxury',
+    CORPORATE_ELITE: 'Business',
+    ARTISTIC: 'Bohemian',
+    UNDERGROUND: 'Goth',
+    BLUE_COLLAR: 'Casual',
+    STUDENT_LIFE: 'Sporty',
+};
 
 const TIER_BASE_COSTS: Record<SocialTier, number> = {
     'HIGH_SOCIETY': 10000,
@@ -19,7 +58,7 @@ const generateId = (): string => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
-export const generatePartner = (forcedTier?: SocialTier): Partner => {
+export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     // 1. Pick Job (and derive Tier)
     let job: JobDefinition;
 
@@ -53,14 +92,15 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
 
     const age = Math.floor(Math.random() * (maxAge - minAge + 1)) + minAge;
 
-    // 5. Initial Stats
+    // 5. Initial Stats. `intellect` is gone: `intelligence` is derived from
+    //    the personality now and having both would be two numbers for one
+    //    fact, which is how this file came to disagree with the store.
     // Random happiness 50-90
     const happiness = Math.floor(Math.random() * 41) + 50;
     // Relationship level starts at 30-50 range
     const relationshipLevel = Math.floor(Math.random() * 21) + 30;
     // Looks and Intellect ranges
     const looks = Math.floor(Math.random() * 61) + 40; // 40-100
-    const intellect = Math.floor(Math.random() * 61) + 40; // 40-100
 
     // --- SMART BUFF ASSIGNMENT LOGIC ---
     let buffType = job.buffType || 'STRESS_RELIEF';
@@ -114,20 +154,27 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
     return {
         id: generateId(),
         name: `${firstName} ${lastName}`,
-        age,
+        photo: null,
         gender,
-        avatar: '', // Placeholder
-        job: dynamicJob, // ✅ Updated
-        personality,
         stats: {
+            ethnicity,
+            age,
+            occupation: job.title,
             happiness,
-            relationshipLevel,
             looks,
-            intellect,
+            style: STYLE_FOR_TIER[job.tier],
+            // The fifteen fields that used to arrive empty.
+            ...fingerprintFor(job.tier, personality),
         },
+        job: dynamicJob,
+        personality,
         finances: {
             monthlyCost,
         },
+        // `relationshipLevel` was the old name and `love` is the one every
+        // store, screen and buff reads. Same number, one name.
+        love: relationshipLevel,
+        relationYears: 0,
         isMarried: false,
         hasPrenup: false,
     };
@@ -136,6 +183,6 @@ export const generatePartner = (forcedTier?: SocialTier): Partner => {
 /**
  * Generates a list of potential partners (candidates).
  */
-export const generatePartnerCandidates = (count: number = 3): Partner[] => {
+export const generatePartnerCandidates = (count: number = 3): PartnerProfile[] => {
     return Array.from({ length: count }, () => generatePartner());
 };

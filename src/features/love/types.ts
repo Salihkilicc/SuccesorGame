@@ -1,21 +1,37 @@
-export type SocialTier = 'HIGH_SOCIETY' | 'CORPORATE_ELITE' | 'UNDERGROUND' | 'BLUE_COLLAR' | 'STUDENT_LIFE' | 'ARTISTIC';
+// ============================================================================
+//  THESE THREE MOVED, AND THIS FILE NOW POINTS AT THEM
+// ============================================================================
+//  data/relationshipTypes.ts owns the whole shape of a person. It used to own
+//  most of it, and this file owned the rest on a SECOND partner type - which is
+//  how the game came to have two, in two stores, with three ways of setting
+//  one. Re-exported rather than moved-and-fixed-up so that every existing
+//  importer is unchanged.
+// ============================================================================
+export type {
+    SocialTier,
+    JobDefinition,
+    PersonalityTrait,
+} from '../../data/relationshipTypes';
 
-export interface JobDefinition {
-    id: string;
-    title: string;
-    tier: SocialTier;
-    buffType?: string; // e.g. 'MEDICAL_DISCOUNT'
-    buffValue?: number;
-}
+import type { SocialTier, JobDefinition, PersonalityTrait } from '../../data/relationshipTypes';
 
-export interface PersonalityTrait {
-    id: string;
-    label: string; // e.g. 'Gold Digger', 'Humble'
-    costMultiplier: number; // 1.5x, 0.8x
-    description: string;
-}
-
-// Full Partner Interface
+/**
+ * SHELVED — the second partner type.
+ *
+ * @orphan-ok-symbol Partner
+ *
+ * It is the one `generatePartner` used to return, and nothing that stores a
+ * partner could read it: `age` and `gender` at the top level rather than in
+ * `stats`, `relationshipLevel` rather than `love`, `avatar` rather than
+ * `photo`, and none of the fifteen psychometric fields at all. So a partner
+ * the player actually met arrived with no social class, no jealousy, no
+ * network - the whole of what the relationship system is supposed to do with
+ * them, missing on arrival.
+ *
+ * `PartnerProfile` in data/relationshipTypes.ts is the type now, and the
+ * generator produces it directly. Kept because two screens still name it in
+ * their prop types and the mapping is easier to check with both in view.
+ */
 export interface Partner {
     id: string;
     name: string;

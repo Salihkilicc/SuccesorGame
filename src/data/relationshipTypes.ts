@@ -34,6 +34,40 @@ export type SocialClass =
     | 'Royalty'           // Bonus: Max reputation, immunity
     | 'CriminalElite';    // Bonus: Protection. Risk: Prison/Death
 
+// 2b. WHERE SOMEBODY MET YOU, AND WHAT THEY DO
+// ----------------------------------------------------------------------------
+//  These three lived in features/love/types.ts, on a SECOND partner type that
+//  the generator produced and nothing else could read. They move here because
+//  this file is meant to be the whole shape of a person, and a shape split
+//  across two files is how the game ended up with two of them.
+//
+//  features/love/types.ts re-exports them, so every existing importer is
+//  unchanged.
+// ----------------------------------------------------------------------------
+export type SocialTier =
+    | 'HIGH_SOCIETY'
+    | 'CORPORATE_ELITE'
+    | 'UNDERGROUND'
+    | 'BLUE_COLLAR'
+    | 'STUDENT_LIFE'
+    | 'ARTISTIC';
+
+export interface JobDefinition {
+    id: string;
+    title: string;
+    tier: SocialTier;
+    buffType?: string;
+    buffValue?: number;
+}
+
+export interface PersonalityTrait {
+    id: string;
+    label: string;
+    /** What they cost, against the tier's base. 0.6 frugal, 2.5 ruinous. */
+    costMultiplier: number;
+    description: string;
+}
+
 // 3. PARTNER DNA MATRIX (AI Context Data)
 // Comprehensive stats that define partner behavior and gameplay impact
 export type PartnerStats = {
@@ -41,6 +75,18 @@ export type PartnerStats = {
     ethnicity: Ethnicity;
     age: number;
     occupation: string;
+    /**
+     * HOW THEY ARE, as opposed to how they feel about you.
+     *
+     * `love` is the relationship; this is the person. It was on the shelved
+     * `Partner` type and had no home here, which is why a generated partner
+     * lost it the moment anything tried to store them properly.
+     *
+     * OPTIONAL, for the same reason `gender` is: every save and every
+     * hand-written partner predates it and has no happiness to migrate.
+     * Required would mean a migration on read for data that cannot supply it.
+     */
+    happiness?: number;
 
     // === Visuals & Style (UI and AI Image Generation) ===
     looks: number; // 0-100 (affects initial attraction)
@@ -68,7 +114,25 @@ export type PartnerProfile = {
     id: string;
     name: string;
     photo: string | null;
+    /**
+     * OPTIONAL, and that is a migration decision rather than a modelling one.
+     *
+     * The demo partner and every save written before this have no gender
+     * field. Required would mean a migration on read for data that has no
+     * gender to migrate; the screens fall back the way they already did.
+     */
+    gender?: 'male' | 'female';
     stats: PartnerStats;
+
+    /**
+     * What sort of person they are. From PERSONALITY_TRAITS.
+     *
+     * This is where the money comes from - `costMultiplier` against the tier
+     * base is the whole of `finances.monthlyCost` - and under the full life
+     * sim it is also what the psychometrics are derived from. See
+     * features/love/logic/psychometrics.ts.
+     */
+    personality?: PersonalityTrait;
 
     // === Deep Persona Extension ===
     job?: {
