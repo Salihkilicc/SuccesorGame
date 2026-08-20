@@ -47,6 +47,7 @@ import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 import { useNewsStore } from '../../core/store/useNewsStore';
 import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
+import { readTitle } from '../../core/story/world';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
 import EndingOverlay from '../../components/story/EndingOverlay';
 
@@ -111,7 +112,11 @@ const HomeScreen = () => {
   //  distinction that matters: useUserStore is wiped by a new game, and who
   //  you are is not.
   // ------------------------------------------------------------------
-  const { bio, hasPremium, partner } = useUserStore();
+  // `bio` is no longer destructured: the line it fed is the title now, and
+  // an unused binding is a claim that this screen still reads that field.
+  // The store keeps it, with its setter that nothing calls - see the note by
+  // `displayTitle`.
+  const { hasPremium, partner } = useUserStore();
   const firstName = useIdentityStore(s => s.firstName);
   const lastName = useIdentityStore(s => s.lastName);
   const gender = useIdentityStore(s => s.gender);
@@ -276,7 +281,29 @@ const HomeScreen = () => {
   const unreadMail = useMailStore(st => unreadMailCount(st.inbox));
 
   const displayName = fullName(firstName, lastName) || 'New Player';
-  const displayBio = bio || 'New to the rich life.';
+  // ------------------------------------------------------------------
+  //  THE LINE UNDER THE NAME IS WHAT YOU ARE, NOT WHAT THE BUILD IS
+  // ------------------------------------------------------------------
+  //  SHELVED: `const displayBio = bio || 'New to the rich life.';`
+  //
+  //  `useUserStore.bio` defaults to "Beta Tester, CEO Edition" and its
+  //  setter is never called from anywhere, so this was a field the player
+  //  could not change holding a placeholder, in the second most looked at
+  //  piece of text in the app.
+  //
+  //  Derived rather than stored, so there is no `title` field for anybody
+  //  to forget to update and it cannot go stale.
+  //
+  //  THE TWO SUBSCRIPTIONS BELOW ARE FOR THE RE-RENDER, NOT THE VALUE.
+  //  `readTitle` reads with `getState()`, which does not subscribe, and
+  //  the only story slice this screen was watching is `ending`. Without
+  //  them a conviction or the Pear purchase would change the title and
+  //  the line would not repaint until the next quarter moved a stat -
+  //  the sort of bug that looks like a caching problem for a week.
+  // ------------------------------------------------------------------
+  useStoryStore(s => s.flags);
+  useStoryStore(s => s.dials.publicReputation);
+  const displayTitle = readTitle();
   const genderSymbol = useMemo(() => {
     if (gender === 'male') return '♂';
     if (gender === 'female') return '♀';
@@ -419,7 +446,7 @@ const HomeScreen = () => {
                   <Text style={styles.name}>{displayName}</Text>
                   <Text style={styles.gender}>{genderSymbol}</Text>
                 </View>
-                <Text style={styles.bio} numberOfLines={1}>{displayBio}</Text>
+                <Text style={styles.bio} numberOfLines={1}>{displayTitle}</Text>
               </View>
 
               {/* Age / Month chips — right-aligned, same row as name */}

@@ -21,6 +21,7 @@ import { useLaboratoryStore } from '../store/useLaboratoryStore';
 import type { World } from './conditions';
 import { brotherLoyalty } from './brother';
 import { standing } from './standing';
+import { titleFor } from './title';
 
 /**
  * How the world sees the player, right now.
@@ -38,6 +39,24 @@ export const readStanding = (): number => standing(
     useStoryStore.getState().dials.publicReputation ?? 0,
     (useStatsStore.getState() as any).netWorth ?? 0,
 );
+
+/**
+ * What the player is, for the line under their name on the home screen.
+ *
+ * Derived on every render rather than stored, which is the whole design: there
+ * is no `title` field for anybody to forget to update, so it cannot go stale
+ * and it changes on the quarter the thing it describes changes.
+ *
+ * See core/story/title.ts for the ladder and the adjectives.
+ */
+export const readTitle = (): string => titleFor({
+    companyValue: (useStatsStore.getState() as any).companyValue ?? 0,
+    standing: readStanding(),
+    flags: {
+        fbiGuilty: !!useStoryStore.getState().flags.fbiGuilty,
+        ownsPear: !!useStoryStore.getState().flags.ownsPear,
+    },
+});
 
 /**
  * Quarters elapsed since the game began, 1-based.
