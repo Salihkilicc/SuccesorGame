@@ -1,4 +1,33 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
+require 'json'
+
+# ----------------------------------------------------------------------------
+#  THE NEW ARCHITECTURE, AND THE FILE THAT SAID NO AND WAS NEVER READ
+# ----------------------------------------------------------------------------
+#  ios/Podfile.properties.json has said `"newArchEnabled": "false"` all along.
+#  Nothing read it. That key is an Expo convention and this is the plain React
+#  Native Podfile, so the setting was a note to nobody: every `pod install`
+#  printed "Configuring the target with the New Architecture" and the app was
+#  built on Fabric and TurboModules regardless.
+#
+#  React Native 0.81 defaults it ON and turns it off for exactly one reason,
+#  which is this environment variable. See
+#  node_modules/react-native/scripts/cocoapods/new_architecture.rb:
+#
+#      return ENV["RCT_NEW_ARCH_ENABLED"] == '0' ? false : true
+#
+#  WHY IT MATTERS HERE. The device crash report is EXC_CRASH / SIGABRT with an
+#  Objective-C exception rethrown on `com.meta.react.turbomodulemanager.queue`
+#  - the TurboModule queue, which only exists under the new architecture. It
+#  reproduced on an iPhone and not in the simulator, which is the usual shape
+#  of a native module whose new-arch path is not exercised on x86.
+#
+#  So this reads the file rather than replacing it. The intent was already
+#  written down; it just had nowhere to go. Flip the JSON to switch, and
+#  `pod install` again.
+# ----------------------------------------------------------------------------
+podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
+ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
 
 # ----------------------------------------------------------------------------
 #  THE MINIMUM iOS, WHICH IS NOT THE SDK YOU BUILD WITH
