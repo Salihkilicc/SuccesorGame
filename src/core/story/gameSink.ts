@@ -219,14 +219,33 @@ export const gameSink = (): EffectSink => ({
     //  `max(48M, value * 1.25)`. Those agree only while the company is small
     //  enough for the floor to bind, which stopped being true the moment
     //  Pear started writing to successors. Both sides ask pearPrice.ts now.
-    // ------------------------------------------------------------------
+    //
+    //  ------------------------------------------------------------------
+    //  AND IT WRITES `netWorth`, WHICH NOTHING ELSE OUTSIDE THE TICK DOES
+    //  ------------------------------------------------------------------
+    //  `netWorth` is recalculated once a quarter, inside advanceMonth, as
+    //  cash plus your share of the valuation. Every other effect in this
+    //  file can leave it alone because a tick always follows.
+    //
+    //  This one has no tick after it. The ending fires in the same breath,
+    //  so the closing record would have read the figure from BEFORE the
+    //  sale: a player who signed for a billion and a quarter would be told
+    //  on the last screen of the game that they were worth four hundred
+    //  million. See core/story/readRecord.ts, which is the only reader that
+    //  will ever see this state.
+    //
+    //  Set rather than added, because a sale CONVERTS the holding. Adding
+    //  the proceeds on top of a net worth that still counts the company
+    //  would pay the player twice for the thing they just gave away.
+    //  ------------------------------------------------------------------
     sellToPear: () => {
         try {
             const { pearOfferAmount } = require('./pearPrice');
             const stats = require('../store/useStatsStore').useStatsStore;
             const s = stats.getState();
             const amount = pearOfferAmount(s.companyValue || 0);
-            s.update({ money: (s.money || 0) + amount });
+            const cash = (s.money || 0) + amount;
+            s.update({ money: cash, netWorth: cash });
         } catch (e) {
             console.warn('[story] the sale did not pay', e);
         }
