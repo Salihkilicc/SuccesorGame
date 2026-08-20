@@ -21,7 +21,7 @@ import { useLaboratoryStore } from '../store/useLaboratoryStore';
 import type { World } from './conditions';
 import { brotherLoyalty } from './brother';
 import { standing } from './standing';
-import { titleFor } from './title';
+import { titleFor, type TitleWorld } from './title';
 
 /**
  * How the world sees the player, right now.
@@ -49,14 +49,43 @@ export const readStanding = (): number => standing(
  *
  * See core/story/title.ts for the ladder and the adjectives.
  */
-export const readTitle = (): string => titleFor({
-    companyValue: (useStatsStore.getState() as any).companyValue ?? 0,
-    standing: readStanding(),
-    flags: {
-        fbiGuilty: !!useStoryStore.getState().flags.fbiGuilty,
-        ownsPear: !!useStoryStore.getState().flags.ownsPear,
-    },
-});
+export const readTitleWorld = (): TitleWorld => {
+    const stats = useStatsStore.getState() as any;
+    const story = useStoryStore.getState();
+    // Lazily required, like every other cross-feature read in this file: the
+    // family and player stores drag AsyncStorage behind them, and this module
+    // is imported by the audit and by tests.
+    const family = (() => {
+        try { return require('../store/useFamilyStore').useFamilyStore.getState(); }
+        catch { return {}; }
+    })();
+    const casino = (() => {
+        try {
+            return require('../store/usePlayerStore').usePlayerStore
+                .getState().reputation?.casino ?? 0;
+        } catch { return 0; }
+    })();
+    const gender = (() => {
+        try { return require('../store/useIdentityStore').useIdentityStore.getState().gender; }
+        catch { return 'male' as const; }
+    })();
+
+    return {
+        companyValue: stats.companyValue ?? 0,
+        standing: readStanding(),
+        netWorth: stats.netWorth ?? 0,
+        generation: family.generation ?? 1,
+        children: (family.children ?? []).length,
+        casinoReputation: casino,
+        gender,
+        flags: {
+            fbiGuilty: !!story.flags.fbiGuilty,
+            ownsPear: !!story.flags.ownsPear,
+        },
+    };
+};
+
+export const readTitle = (): string => titleFor(readTitleWorld());
 
 /**
  * Quarters elapsed since the game began, 1-based.

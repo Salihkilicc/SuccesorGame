@@ -4,33 +4,52 @@
 //  THE LINE UNDER THE NAME
 // ============================================================================
 //
-//  Three things are checked and only one of them is about the writing.
+//  What is worth testing here is not the arithmetic. It is the three claims
+//  the catalogue makes, each of which is quiet enough to be reversed by
+//  somebody tidying up:
 //
-//  THE LADDER, which is arithmetic and would be dull except that the first
-//  rung is a design decision: a game about earning it must not open by calling
-//  the player a chief executive in its first minute.
+//    THE TWO LADDERS INTERLEAVE. A successor at a billion is not automatically
+//    wearing a better title than his father wore at a billion. He is wearing a
+//    different one at the same altitude.
 //
-//  THE ADJECTIVE, which is the whole point of the file. A conviction beats
-//  every other word because it is the one thing in this game a player cannot
-//  work off.
+//    THE CASINO DOES NOT WAG THE DOG. A Titan of Industry who also gambles is
+//    still a Titan.
 //
-//  THE LENGTH, which is the failure nobody would notice. The card renders this
-//  with `numberOfLines={1}`, so a long title does not wrap, it truncates -
-//  and it truncates only for the players who earned the longest one.
+//    AND IT FITS. `numberOfLines={1}` does not wrap, it truncates, and it
+//    truncates only for the players who earned the longest one.
 // ============================================================================
 
 import {
     titleFor,
+    earnedTitles,
     rungFor,
-    TITLE_RUNGS,
+    TITLES,
+    COMPANY_RUNGS,
+    HOUSE_RUNGS,
     DISGRACE_BELOW,
     CELEBRATED_ABOVE,
+    MACAU_REPUTATION,
+    HIGH_ROLLER_REPUTATION,
+    LARGE_FAMILY,
+    type TitleWorld,
 } from './title';
 
-const at = (companyValue: number, standing = 50, flags = {}) =>
-    titleFor({ companyValue, standing, flags });
+const world = (over: Partial<TitleWorld> = {}): TitleWorld => ({
+    companyValue: 0,
+    standing: 50,
+    netWorth: 0,
+    generation: 1,
+    children: 0,
+    casinoReputation: 0,
+    gender: 'male',
+    flags: {},
+    ...over,
+});
 
-describe('the rung', () => {
+const at = (companyValue: number, over: Partial<TitleWorld> = {}) =>
+    titleFor(world({ companyValue, ...over }));
+
+describe('the company ladder', () => {
     it('starts at what he actually inherited', () => {
         // A player whose first title is "Chief Executive" has been flattered
         // in the opening minute of a game about earning it. He has a factory.
@@ -38,72 +57,173 @@ describe('the rung', () => {
         expect(at(0)).toBe('Factory Owner');
     });
 
-    it('and climbs with the company', () => {
-        expect(at(25_000_000)).toBe('Chief Executive');
-        expect(at(250_000_000)).toBe('Industrialist');
-        expect(at(2_000_000_000)).toBe('Magnate');
-        expect(at(20_000_000_000)).toBe('Tycoon');
-        expect(at(200_000_000_000)).toBe('Titan of Industry');
-        expect(at(3_000_000_000_000)).toBe('Titan of Industry');
+    it('and has eight rungs, so the line moves more than six times in a life', () => {
+        expect(COMPANY_RUNGS).toHaveLength(8);
+        expect(HOUSE_RUNGS).toHaveLength(8);
     });
 
-    it('and never goes backwards on the way up', () => {
+    it('and every one of them is reachable, in order', () => {
+        // A threshold typed one zero out would skip a rung and nothing else
+        // in the game would say so.
+        // Walked off the thresholds themselves rather than off powers of ten:
+        // two of the rungs sit at 50M and 250M, so a powers-of-ten sweep
+        // cannot reach them and would pass while reporting six of eight.
         const seen: string[] = [];
-        for (let e = 5; e <= 13; e++) {
-            const r = rungFor(Math.pow(10, e));
-            if (seen[seen.length - 1] !== r) seen.push(r);
+        for (const rung of COMPANY_RUNGS) {
+            expect(rungFor(rung.at)).toBe(rung.title);
+            // And the quarter before it is still the previous one.
+            if (rung.at > 0) expect(rungFor(rung.at - 1)).not.toBe(rung.title);
+            seen.push(rungFor(rung.at));
         }
-        // Every rung is reachable, and in order. A threshold typed one zero
-        // out would skip one and nothing else would say so.
-        expect(seen).toEqual(TITLE_RUNGS.map(r => r.title));
+        expect(seen).toEqual(COMPANY_RUNGS.map(r => r.title));
+    });
+
+    it('and the top one is a trillion, because a comfortable top rung is not one', () => {
+        expect(at(999_000_000_000)).toBe('Titan of Industry');
+        expect(at(1_000_000_000_000)).toBe('Colossus');
     });
 
     it('and nonsense in does not put a NaN on the home screen', () => {
         expect(at(NaN)).toBe('Factory Owner');
         expect(at(-1)).toBe('Factory Owner');
-        expect(titleFor({ companyValue: 1e9, standing: NaN, flags: {} })).toBe('Industrialist');
+        expect(titleFor(world({ companyValue: 1e9, standing: NaN }))).toBe('Magnate');
     });
 });
 
 describe('the adjective', () => {
     it('is nothing at all, most of the time', () => {
-        // Most players are neither disgraced nor celebrated and the line
-        // should not editorialise about them.
-        expect(at(2_000_000_000, 50)).toBe('Magnate');
-        expect(at(2_000_000_000, DISGRACE_BELOW)).toBe('Magnate');
-        expect(at(2_000_000_000, CELEBRATED_ABOVE - 1)).toBe('Magnate');
+        expect(at(1_000_000_000, { standing: 50 })).toBe('Magnate');
+        expect(at(1_000_000_000, { standing: DISGRACE_BELOW })).toBe('Magnate');
+        expect(at(1_000_000_000, { standing: CELEBRATED_ABOVE - 1 })).toBe('Magnate');
     });
 
     it('and sours when the world has stopped giving you the benefit of the doubt', () => {
-        expect(at(2_000_000_000, DISGRACE_BELOW - 1)).toBe('Disgraced Magnate');
-        expect(at(4_000_000, 5)).toBe('Disgraced Factory Owner');
+        expect(at(1_000_000_000, { standing: DISGRACE_BELOW - 1 })).toBe('Disgraced Magnate');
+        expect(at(4_000_000, { standing: 5 })).toBe('Disgraced Factory Owner');
     });
 
     it('and warms when it has started giving you rather too much', () => {
-        expect(at(2_000_000_000, CELEBRATED_ABOVE)).toBe('Celebrated Magnate');
-        expect(at(300_000_000_000, 100)).toBe('Celebrated Titan of Industry');
+        expect(at(1_000_000_000, { standing: CELEBRATED_ABOVE })).toBe('Celebrated Magnate');
     });
 
     it('while a conviction beats every other word', () => {
-        // The one thing in this game a player cannot work off. It holds even
-        // at a standing that would otherwise read as celebrated, which is the
-        // case that matters: money and a good year do not undo it.
-        expect(at(2_000_000_000, 95, { fbiGuilty: true })).toBe('Convicted Magnate');
-        expect(at(2_000_000_000, 5, { fbiGuilty: true })).toBe('Convicted Magnate');
+        // The one thing in this game a player cannot work off. It holds at a
+        // standing that would otherwise read as celebrated, which is the case
+        // that matters: money and a good year do not undo it.
+        expect(at(1_000_000_000, { standing: 95, flags: { fbiGuilty: true } }))
+            .toBe('Convicted Magnate');
+    });
+
+    it('and it decorates the company rung and nothing else', () => {
+        // "Disgraced The One Who Bought Pear" is not English, and "Celebrated
+        // Founder of a Dynasty" is thirty one characters. Everything outside
+        // the ladder is already a judgement.
+        expect(at(0, { standing: 2, flags: { ownsPear: true } }))
+            .toBe('The One Who Bought Pear');
+        expect(at(1_000_000_000, { standing: 2, generation: 3 }))
+            .toBe('Head of the House');
     });
 });
 
-describe('and one thing that is not a rung at all', () => {
-    it('replaces the whole line', () => {
-        // One player in a thousand ever sees it and they should see nothing
-        // else. Not "Celebrated Titan of Industry" with a footnote.
-        expect(at(3_000_000_000_000, 100, { ownsPear: true }))
-            .toBe('The One Who Bought Pear');
+// ============================================================================
+//  THE HOUSE
+// ============================================================================
+describe('a successor', () => {
+    const heir = (companyValue: number) =>
+        at(companyValue, { generation: 2 });
+
+    it('wears a different set entirely', () => {
+        expect(heir(0)).toBe('The Inheritor');
+        expect(heir(250_000_000)).toBe('The Second Founder');
+        expect(heir(1_000_000_000)).toBe('Head of the House');
+        expect(heir(1_000_000_000_000)).toBe('Founder of a Dynasty');
     });
 
-    it('even over a conviction, because it is the larger fact', () => {
-        expect(at(4_000_000, 2, { ownsPear: true, fbiGuilty: true }))
-            .toBe('The One Who Bought Pear');
+    it('at the same altitude as his father, not above it', () => {
+        // The claim the interleaved ranks exist for. An heir at a billion has
+        // done something DIFFERENT from a founder at a billion, and only one
+        // of the two words is a compliment. Neither is a promotion.
+        for (const rung of COMPANY_RUNGS) {
+            const founder = at(rung.at);
+            const successor = heir(rung.at);
+            expect(successor).not.toBe(founder);
+        }
+    });
+
+    it('while the founder never sees any of them', () => {
+        const founderTitles = earnedTitles(world({
+            companyValue: 3_000_000_000_000, generation: 1,
+        })).map(t => t.id);
+        expect(founderTitles.some(id => id.startsWith('house-'))).toBe(false);
+    });
+});
+
+// ============================================================================
+//  THE TABLES
+// ============================================================================
+describe('the casino', () => {
+    it('is worth a title, twice', () => {
+        expect(at(0, { casinoReputation: HIGH_ROLLER_REPUTATION })).toBe('High Roller');
+        expect(at(0, { casinoReputation: MACAU_REPUTATION })).toBe('Known in Macau');
+    });
+
+    it('and Macau is the seventh room, which is where it stops', () => {
+        expect(at(0, { casinoReputation: MACAU_REPUTATION - 1 })).toBe('High Roller');
+        expect(at(0, { casinoReputation: 1000 })).toBe('Known in Macau');
+    });
+
+    it('but it does not wag the dog', () => {
+        // A Titan of Industry who also gambles is still a Titan. Ranking the
+        // casino titles at the top would demote him, which is the tail wagging
+        // the dog and the reason they sit at the height they feel like.
+        expect(at(100_000_000_000, { casinoReputation: 1000 })).toBe('Titan of Industry');
+        expect(at(1_000_000_000_000, { casinoReputation: 1000 })).toBe('Colossus');
+    });
+
+    it('while a small operator who lives at the tables wears it', () => {
+        // And this is the case they are FOR: somebody whose life the balance
+        // sheet does not record.
+        expect(at(20_000_000, { casinoReputation: MACAU_REPUTATION }))
+            .toBe('Known in Macau');
+    });
+});
+
+// ============================================================================
+//  AND THE FOUR THAT ARE NOT A RUNG
+// ============================================================================
+describe('the ones you cannot climb to', () => {
+    it('a spotless record with money behind it', () => {
+        // Standing is capped at 100 and getting there needs a clean record AND
+        // real money, so this is the one title that wants both halves of the
+        // prestige system at once.
+        expect(at(1_000_000_000, { standing: 100 })).toBe('Beyond Reproach');
+    });
+
+    it('and the wealth half said out loud, which wants the person not the company', () => {
+        expect(at(1_000_000_000, { standing: 100, netWorth: 10_000_000_000 }))
+            .toBe('The Richest Man Alive');
+        expect(at(1_000_000_000, {
+            standing: 100, netWorth: 10_000_000_000, gender: 'female',
+        })).toBe('The Richest Woman Alive');
+    });
+
+    it('and a dynasty measured the blunt way', () => {
+        // The number is in the label because twenty two children is funnier
+        // and sadder than "a large family".
+        expect(at(1_000_000_000, { children: LARGE_FAMILY })).toBe('Patriarch of 20');
+        expect(at(1_000_000_000, { children: 22, gender: 'female' }))
+            .toBe('Matriarch of 22');
+    });
+
+    it('but not for an ordinary number of them', () => {
+        expect(at(1_000_000_000, { children: LARGE_FAMILY - 1 })).toBe('Magnate');
+    });
+
+    it('and one that replaces the whole line', () => {
+        expect(at(3_000_000_000_000, {
+            standing: 100, netWorth: 1e11, children: 30, casinoReputation: 1000,
+            generation: 4, flags: { ownsPear: true },
+        })).toBe('The One Who Bought Pear');
     });
 });
 
@@ -111,47 +231,52 @@ describe('and one thing that is not a rung at all', () => {
 //  AND IT FITS
 // ============================================================================
 describe('every title this can produce', () => {
-    const ADJECTIVES = ['', 'Disgraced', 'Celebrated', 'Convicted'];
+    const ADJECTIVES = ['', 'Disgraced ', 'Celebrated ', 'Convicted '];
 
-    const everyTitle = (): string[] => {
-        const out = ['The One Who Bought Pear'];
-        for (const rung of TITLE_RUNGS) {
-            for (const adj of ADJECTIVES) {
-                out.push(adj ? `${adj} ${rung.title}` : rung.title);
+    const everyString = (): string[] => {
+        const out: string[] = [];
+        const sample = world({ children: 22, gender: 'female' });
+        for (const def of TITLES) {
+            const label = typeof def.label === 'function' ? def.label(sample) : def.label;
+            if (def.decorated) {
+                for (const adj of ADJECTIVES) out.push(`${adj}${label}`);
+            } else {
+                out.push(label);
             }
         }
         return out;
     };
 
     it('fits on one line', () => {
-        // `numberOfLines={1}` does not wrap, it truncates, and it would
-        // truncate only for the players who earned the longest one. Thirty
-        // characters is comfortable on the narrowest phone the card renders
-        // on; the longest this file can produce is 28.
-        for (const title of everyTitle()) {
-            expect(title.length).toBeLessThanOrEqual(30);
-        }
+        // The longest is "Celebrated Titan of Industry" at 28. Thirty is
+        // comfortable on the narrowest phone the card renders on.
+        const tooLong = everyString().filter(s => s.length > 30);
+        expect(tooLong).toEqual([]);
     });
 
     it('and none of them has a dash in it', () => {
         const DASH = /[—–]|(?:^|\s)-(?:\s|$)/;
-        expect(everyTitle().filter(t => DASH.test(t))).toEqual([]);
+        expect(everyString().filter(t => DASH.test(t))).toEqual([]);
     });
 
-    it('and every one of them is reachable', () => {
-        // The guard against a rung or an adjective that exists in the file
-        // and cannot happen in the game.
-        const produced = new Set<string>();
-        for (const rung of TITLE_RUNGS) {
-            for (const s of [0, 50, 100]) {
-                produced.add(titleFor({ companyValue: rung.at, standing: s, flags: {} }));
-                produced.add(titleFor({
-                    companyValue: rung.at, standing: s, flags: { fbiGuilty: true },
-                }));
-            }
-        }
-        produced.add(titleFor({ companyValue: 0, standing: 0, flags: { ownsPear: true } }));
-        expect(produced.size).toBe(everyTitle().length);
+    it('and no two of them are the same words', () => {
+        const labels = TITLES.map(t =>
+            typeof t.label === 'function' ? t.id : t.label);
+        expect(new Set(labels).size).toBe(labels.length);
+    });
+
+    it('and no two of them share a rank', () => {
+        // A tie is resolved by array order, which is nobody's intention and
+        // would silently pick a different winner the first time somebody
+        // reordered the file.
+        const ranks = TITLES.map(t => t.rank);
+        expect(new Set(ranks).size).toBe(ranks.length);
+    });
+
+    it('and there are twenty two of them', () => {
+        // Eight, eight, two and four. If this number moves, something was
+        // added without a line in the header saying what track it is on.
+        expect(TITLES).toHaveLength(22);
     });
 });
 
@@ -159,8 +284,8 @@ describe('every title this can produce', () => {
 //  AND IT IS ON THE SCREEN
 // ============================================================================
 //  The placeholder it replaces was live for months because nothing ever asked
-//  whether that line said anything. A title system nobody renders would be
-//  the same mistake with better writing in it.
+//  whether that line said anything. A title system nobody renders would be the
+//  same mistake with better writing in it.
 // ============================================================================
 /// <reference types="node" />
 import * as fs from 'fs';
