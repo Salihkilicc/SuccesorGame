@@ -20,7 +20,7 @@ import { pearOffer } from './pearOffer';
 import { fatherDeath } from './fatherDeath';
 import { CONVERSATIONS, STORY_BEATS } from './index';
 import { ENDINGS } from './endings';
-import { pearOfferAmount, PEAR_OFFER_FLOOR } from './pearPrice';
+import { pearOfferAmount, PEAR_OFFER_FLOOR } from '../../core/story/pearPrice';
 import { validate } from '../../core/story/graph';
 import { CAST } from './cast';
 import { canUseChannel } from '../../core/story/cast';
@@ -199,7 +199,7 @@ describe('yes is a real ending', () => {
         // The AMOUNT is no longer in the scene. It used to be a literal
         // 48,000,000 which the salutation's `{pearOffer}` token disagreed
         // with the moment the company outgrew the floor, so both sides read
-        // data/story/pearPrice.ts now and the scene names the sale instead.
+        // core/story/pearPrice.ts now and the scene names the sale instead.
         expect(effectsOf(pearOffer.id).filter(e => e.kind === 'sellToPear'))
             .toHaveLength(1);
         expect(pearOfferAmount(0)).toBeGreaterThan(40_000_000);

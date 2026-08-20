@@ -222,7 +222,7 @@ export const gameSink = (): EffectSink => ({
     // ------------------------------------------------------------------
     sellToPear: () => {
         try {
-            const { pearOfferAmount } = require('../../data/story/pearPrice');
+            const { pearOfferAmount } = require('./pearPrice');
             const stats = require('../store/useStatsStore').useStatsStore;
             const s = stats.getState();
             const amount = pearOfferAmount(s.companyValue || 0);

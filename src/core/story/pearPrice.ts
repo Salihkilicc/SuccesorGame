@@ -1,4 +1,4 @@
-// src/data/story/pearPrice.ts
+// src/core/story/pearPrice.ts
 //
 // ============================================================================
 //  ONE NUMBER, AND BOTH HALVES OF THE LETTER READ IT

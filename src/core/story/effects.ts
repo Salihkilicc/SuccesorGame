@@ -101,7 +101,7 @@ export type Effect =
      * It exists because the AMOUNT cannot live in the data. The letter shows
      * `{pearOffer}`, which scales with the company, and a literal in the
      * scene disagreed with it the moment the company grew. Both sides read
-     * data/story/pearPrice.ts now.
+     * core/story/pearPrice.ts now.
      */
     | { kind: 'sellToPear' }
     /**

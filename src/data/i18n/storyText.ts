@@ -38,7 +38,7 @@ import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { useLocaleStore } from '../../core/i18n';
 import { formatMoney } from '../../core/utils';
-import { pearOfferAmount } from '../story/pearPrice';
+import { pearOfferAmount } from '../../core/story/pearPrice';
 
 export type StoryDictionary = Record<string, string>;
 
@@ -151,7 +151,7 @@ const fillTitle = (text: string): string => {
         res = res.replace(/\{title\}/g, honorific(useIdentityStore.getState().gender));
     }
     if (res.includes('{pearOffer}')) {
-        // From data/story/pearPrice.ts, which the `sellToPear` effect also
+        // From core/story/pearPrice.ts, which the `sellToPear` effect also
         // reads. The literal that used to be here disagreed with the money
         // the scene actually paid; see the header of that file.
         const stats = useStatsStore?.getState?.();

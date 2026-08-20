@@ -50,7 +50,7 @@ import type { Condition } from '../../core/story/conditions';
 
 /** Roughly a year of the company's revenue. Fair. That is the trap. */
 // SHELVED with the effect that used it: `const OFFER = 48_000_000;`. The
-// floor lives in data/story/pearPrice.ts now, next to the multiple, where the
+// floor lives in core/story/pearPrice.ts now, next to the multiple, where the
 // salutation and the payment both read it.
 
 // ---------------------------------------------------------------------------
@@ -181,7 +181,7 @@ export const pearOffer: Conversation = {
                         // Was `{ kind: 'cash', amount: OFFER }` with OFFER a
                         // literal 48,000,000, which the salutation's
                         // `{pearOffer}` token disagreed with the moment the
-                        // company outgrew the floor. See data/story/pearPrice.ts.
+                        // company outgrew the floor. See core/story/pearPrice.ts.
                         { kind: 'sellToPear' },
                         {
                             kind: 'news',

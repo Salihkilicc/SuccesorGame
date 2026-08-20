@@ -21,7 +21,7 @@
 
 import { pearOfferHeir } from './pearOfferHeir';
 import { pearOffer } from './pearOffer';
-import { pearOfferAmount, PEAR_OFFER_FLOOR, PEAR_OFFER_MULTIPLE } from './pearPrice';
+import { pearOfferAmount, PEAR_OFFER_FLOOR, PEAR_OFFER_MULTIPLE } from '../../core/story/pearPrice';
 import { CONVERSATIONS, STORY_BEATS } from './index';
 import { ENDINGS } from './endings';
 import { CAST } from './cast';
