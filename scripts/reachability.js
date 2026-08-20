@@ -46,6 +46,10 @@
  * ========================================================================== */
 const fs = require('fs');
 const path = require('path');
+// Used by the conditional-hook rule, which has to know which function a
+// `return` belongs to. Already a dependency of this project: Metro parses
+// every file in the app with it.
+const { parse: babelParse } = require('@babel/parser');
 
 const SRC = path.join(__dirname, '..', 'src');
 const files = [];
@@ -386,24 +390,112 @@ const problems = { components: [], storeActions: [], engineExports: [], statsFie
 //  bottom of a component that already had an early return at the top. It does
 //  not fail tsc and it only crashes on the path the developer does not take
 //  while testing, so it needs a machine to catch it.
-const HOOK = /\b(useState|useEffect|useMemo|useCallback|useRef|useReducer|useContext|use[A-Z]\w*Store)\s*\(/;
+//
+//  ---------------------------------------------------------------------------
+//  AND THEN IT MISSED THE THIRD ONE
+//  ---------------------------------------------------------------------------
+//  QuarterlyReportModal crashed on the device with this exact message and this
+//  rule said nothing about it, twice over.
+//
+//  It only recognised a bail-out that returns NULL, and that modal bails out
+//  by returning a whole `<Modal>` saying no quarter has been completed yet,
+//  which is the better piece of writing and invisible to a rule looking for
+//  the word null. It also only recognised a BARE hook call, and that file
+//  writes `React.useMemo`.
+//
+//  ---------------------------------------------------------------------------
+//  SO IT READS THE SYNTAX TREE NOW, AFTER TWO REGEX VERSIONS DID NOT WORK
+//  ---------------------------------------------------------------------------
+//  Widening the pattern by hand was tried twice and both attempts buried the
+//  one real finding under false ones, because this codebase is full of returns
+//  nested in something that is not the component:
+//
+//      .filter(i => { return 'symbol' in i; })     returns from the callback
+//      useEffect(() => { if (!x) return; })        returns from the effect
+//
+//  Neither can skip a hook. Telling those apart is not a question about
+//  indentation or brace depth, it is a question about WHICH FUNCTION the
+//  return belongs to, and only a parser knows that. Babel is already here.
+//
+//  The test is then exact and one line long: inside one component, a return
+//  that appears before a hook is a return that can skip it.
+const HOOK = /^(useState|useEffect|useMemo|useCallback|useRef|useReducer|useContext|use[A-Z]\w*Store)$/;
+
+/** `useMemo` and `React.useMemo` are the same hook and one of them got past. */
+const calleeName = c => (
+    c?.type === 'Identifier' ? c.name
+        : c?.type === 'MemberExpression' && c.property?.type === 'Identifier' ? c.property.name
+            : null);
+
+/** Everything in one function's OWN body, never its callbacks'. */
+const ownScope = (fn) => {
+    const returns = [];
+    const calls = [];
+    const walk = (node) => {
+        if (!node || typeof node.type !== 'string') return;
+        // A nested function is somebody else's scope. Its returns cannot skip
+        // this function's hooks, and its hooks are not this function's.
+        if (node !== fn && /Function(Declaration|Expression)$/.test(node.type)) return;
+        if (node.type === 'ReturnStatement') returns.push(node);
+        if (node.type === 'CallExpression' && HOOK.test(calleeName(node.callee))) calls.push(node);
+        for (const key of Object.keys(node)) {
+            if (key === 'loc' || key.endsWith('Comments')) continue;
+            const v = node[key];
+            if (Array.isArray(v)) v.forEach(walk);
+            else if (v && typeof v === 'object' && typeof v.type === 'string') walk(v);
+        }
+    };
+    walk(fn.body);
+    return { returns, calls };
+};
+
 // A .tsx TEST is not a component that nothing renders - it is a test, and
 // what renders it is jest. This project's first .tsx test file appeared as a
 // finding the moment it was written, which would have taught whoever wrote
 // the second one that the audit punishes rendering tests.
 for (const f of files.filter(f =>
     f.endsWith('.tsx') && !/\.test\.tsx$/.test(f) && !isDisabled(f))) {
-    const lines = read(f).split('\n');
-    let guard = -1;
-    for (let i = 0; i < lines.length; i++) {
-        // An early return inside a component body (indented, returns nothing useful)
-        if (/^\s{2,8}(if \s*\(.*\)\s*)?return (null|undefined);?\s*$/.test(lines[i])) guard = i;
-        else if (/^\s{0,4}(export )?(const|function) [A-Z]/.test(lines[i])) guard = -1;  // new component
-        else if (guard >= 0 && HOOK.test(lines[i]) && !/^\s*(\/\/|\*)/.test(lines[i])) {
-            problems.hooks.push(`${rel(f)}:${i + 1}  hook after early return on line ${guard + 1}`);
-            guard = -1;
-        }
+    let ast;
+    try {
+        ast = babelParse(read(f), {
+            sourceType: 'module',
+            plugins: ['typescript', 'jsx'],
+            errorRecovery: true,
+        });
+    } catch {
+        continue;  // A file this cannot parse is tsc's problem, not the audit's.
     }
+
+    // Carries the name down from `const Foo =` to the arrow it is assigned.
+    const nameOf = n => (
+        n?.type === 'VariableDeclarator' ? n.id?.name
+            : n?.type === 'FunctionDeclaration' ? n.id?.name
+                : null);
+
+    const visit = (node, name) => {
+        if (!node || typeof node.type !== 'string') return;
+
+        if (/Function(Declaration|Expression)$/.test(node.type) && /^[A-Z]/.test(name || '')) {
+            const { returns, calls } = ownScope(node);
+            for (const call of calls) {
+                const before = returns.find(r => r.end < call.start);
+                if (before) {
+                    problems.hooks.push(`${rel(f)}:${call.loc.start.line}`
+                        + `  hook after early return on line ${before.loc.start.line}`);
+                    break;  // One report per component is enough to fix it.
+                }
+            }
+        }
+
+        for (const key of Object.keys(node)) {
+            if (key === 'loc' || key.endsWith('Comments')) continue;
+            const v = node[key];
+            const down = c => nameOf(c) ?? (/Function/.test(c?.type || '') ? name : null);
+            if (Array.isArray(v)) v.forEach(c => (c && typeof c.type === 'string') && visit(c, down(c)));
+            else if (v && typeof v === 'object' && typeof v.type === 'string') visit(v, down(v));
+        }
+    };
+    visit(ast.program, null);
 }
 
 // --- 0b) Translations frozen at module load ---------------------------------

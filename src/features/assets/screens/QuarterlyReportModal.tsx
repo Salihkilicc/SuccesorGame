@@ -486,24 +486,30 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
   const companyName = useStatsStore(s => s.companyName);
 
-  if (!report) {
-    return (
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-        <View style={styles.overlay}>
-          <View style={styles.card}>
-            <Text style={styles.emptyText}>{t('company.noQuarterHasBeenCompleted')}</Text>
-            <View style={styles.footerActions}>
-              <Pressable style={styles.primaryButton} onPress={onClose}>
-                <Text style={styles.primaryButtonText}>{t('company.close')}</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  const observations = buildObservations(report);
+  // --------------------------------------------------------------------
+  //  EVERY HOOK IN HERE RUNS BEFORE THE BAIL-OUT, AND THAT IS THE POINT
+  // --------------------------------------------------------------------
+  //  THE BUG. `observationSummary` was a useMemo sitting BELOW the
+  //  `if (!report)` return further down. So the first render, with no
+  //  quarter completed, ran one fewer hook than the render after the first
+  //  quarter closed, and React refused it:
+  //
+  //      Rendered more hooks than during the previous render.
+  //
+  //  It only ever fired on the transition, which is to say on pressing Next
+  //  Quarter for the first time in a run - the one path nobody retests once
+  //  they have a save with a report in it.
+  //
+  //  The audit has a rule for exactly this and it did not see this one: it
+  //  looks for an early `return null`, and this component bails out by
+  //  returning a whole Modal. Widened in scripts/reachability.js.
+  //
+  //  `observations` is a plain call rather than a hook, so it is safe above
+  //  the bail-out, and it stays unmemoised deliberately: buildObservations
+  //  reads `boardDemandNotice` off the stats store with getState(), which is
+  //  not reactive, so a memo keyed on the report would hold a stale notice.
+  // --------------------------------------------------------------------
+  const observations = report ? buildObservations(report) : [];
 
   // ------------------------------------------------------------------
   //  WHETHER THIS SECTION IS WORTH OPENING, ON ITS CLOSED HEADER
@@ -525,6 +531,24 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
       color: bad > 0 ? theme.colors.negative : theme.colors.warning,
     };
   }, [observations]);
+
+  if (!report) {
+    return (
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <View style={styles.overlay}>
+          <View style={styles.card}>
+            <Text style={styles.emptyText}>{t('company.noQuarterHasBeenCompleted')}</Text>
+            <View style={styles.footerActions}>
+              <Pressable style={styles.primaryButton} onPress={onClose}>
+                <Text style={styles.primaryButtonText}>{t('company.close')}</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   const e = report.expenses;
 
   return (
