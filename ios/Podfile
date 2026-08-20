@@ -1,6 +1,26 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 
-platform :ios, '26.0'
+# ----------------------------------------------------------------------------
+#  THE MINIMUM iOS, WHICH IS NOT THE SDK YOU BUILD WITH
+# ----------------------------------------------------------------------------
+#  This said 26.0, which is the version of Xcode on this machine rather than a
+#  requirement of anything in the app. The two are independent: you compile
+#  against the newest SDK and you declare the OLDEST OS you support, and
+#  TestFlight offers the build to everybody at or above that line.
+#
+#  At 26.0 the only people who could install it were the ones running the same
+#  beta as the developer.
+#
+#  15.1 is React Native 0.81.5's own floor - see
+#  node_modules/react-native/scripts/cocoapods/helpers.rb,
+#  `min_ios_version_supported` - and the pods already build at 13.0 and 15.1,
+#  so nothing here was ever asking for more. Nothing in ios/Succesor uses an
+#  API newer than that either: there is not a single @available in the folder.
+#
+#  RUN `pod install` AFTER CHANGING THIS. The pods carry their own copy of the
+#  number and CocoaPods only rewrites them when it regenerates the project.
+# ----------------------------------------------------------------------------
+platform :ios, '15.1'
 
 prepare_react_native_project!
 
