@@ -166,6 +166,40 @@ describe('who takes over', () => {
         expect(successorFor([kid('a', 22), kid('b', 40), kid('c', 31)], null)?.id).toBe('b');
     });
 
+    it('but the eldest WITH A LIFE IN FRONT OF THEM', () => {
+        // ------------------------------------------------------------------
+        //  THE ONE REPORTED AS "THE HEIR TAKES OVER AND IS A HUNDRED"
+        // ------------------------------------------------------------------
+        //  The children age alongside the player. A founder who starts at
+        //  twenty, has a child at thirty and dies at ninety leaves an eldest
+        //  of sixty, and plain "eldest" put the player back in the chair at
+        //  an age where the mortality curve is already steep.
+        // ------------------------------------------------------------------
+        const old = kid('a', MORTALITY_START_AGE + 5);
+        const younger = kid('b', 34);
+        expect(successorFor([old, younger], null)?.id).toBe('b');
+    });
+
+    it('and the eldest of those, not the youngest of them', () => {
+        // It is still the traditional answer inside the group that qualifies.
+        expect(successorFor([kid('a', 20), kid('b', 48), kid('c', 70)], null)?.id).toBe('b');
+    });
+
+    it('while a family where everybody is old hands to whoever has most time', () => {
+        // The only sensible thing left. Not null: they still have a company.
+        const heir = successorFor([
+            kid('a', 78), kid('b', 62), kid('c', 71),
+        ], null);
+        expect(heir?.id).toBe('b');
+    });
+
+    it('and the one you NAMED wins even at seventy', () => {
+        // It is their company and they said so. The age rule is a fallback
+        // for people who never opened the screen, not a veto on the ones who
+        // did.
+        expect(successorFor([kid('a', 30), kid('b', 72)], 'b')?.id).toBe('b');
+    });
+
     it('and the eldest when the one you named is a child', () => {
         // A designated successor who is nine does not take the company. The
         // filter runs first, deliberately.

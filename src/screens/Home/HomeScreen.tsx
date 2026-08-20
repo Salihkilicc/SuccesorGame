@@ -324,8 +324,21 @@ const HomeScreen = () => {
   // Status widget satırları: CEO ve Şirket Yönetim Paneli
   const statusRows: { key: string; label: string; value: string; delta?: number }[] = [
     { key: 'team', label: 'Team Morale', value: moraleBrief },
-    { key: 'research', label: t('company.research') || 'R&D Points', value: rpBrief },
-    { key: 'brand', label: t('company.brandValue') || 'Brand Value', value: brandBrief, delta: brandDelta },
+    // ------------------------------------------------------------------
+    //  `|| 'R&D Points'` NEVER RAN, AND COULD NOT
+    // ------------------------------------------------------------------
+    //  `t()` returns THE KEY when a translation is missing, and a key is a
+    //  non-empty string, so the fallback after `||` is unreachable by
+    //  construction. `company.research` does not exist - the catalogue has
+    //  `company.researchDevelopment` and `company.researchPoints` - so this
+    //  row rendered the literal text "company.research" on the home screen.
+    //
+    //  The pattern is the problem rather than the missing key: every
+    //  `t('x') || 'fallback'` in the app is a fallback that can never fire
+    //  and a missing translation that can never be noticed.
+    // ------------------------------------------------------------------
+    { key: 'research', label: t('company.researchPoints'), value: rpBrief },
+    { key: 'brand', label: t('company.brandValue'), value: brandBrief, delta: brandDelta },
   ];
 
   const handleNavigateTabs = (screen: keyof SwipeTabParamList) => {

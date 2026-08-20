@@ -19,7 +19,7 @@
 //  and the plant still being there afterwards.
 // ============================================================================
 
-import { planSuccession, generationName, type SuccessionInput } from './succession';
+import { planSuccession, generationName, firstNameOf, type SuccessionInput } from './succession';
 import { runSuccession } from './runSuccession';
 import { HEIR_STOCK_SHARE } from './inheritance';
 import { useFamilyStore, initialFamilyState } from '../store/useFamilyStore';
@@ -38,6 +38,7 @@ const heir = (id: string, name: string, age: number) => ({
 
 const input = (over: Partial<SuccessionInput> = {}): SuccessionInput => ({
     children: [heir('a', 'Elena Hale', 30), heir('b', 'Marcus Hale', 26)],
+    lastName: 'Hale',
     designatedSuccessorId: 'a',
     survivingParent: { name: 'Claire Hale', age: 68 },
     estate: { cash: 4_000_000, shares: 6_500_000 },
@@ -49,9 +50,10 @@ describe('the plan', () => {
     it('puts the named successor in the chair', () => {
         const plan = planSuccession(input())!;
         expect(plan.ceo.id).toBe('a');
-        // First name only. The surname is the company's and does not change
-        // hands, which useIdentityStore already assumed.
-        expect(plan.ceo.firstName).toBe('Elena Hale');
+        // FIRST NAME ONLY, and it used to say so while handing over the
+        // whole thing - so the identity store got "Elena Hale" as a first
+        // name and the home screen rendered "Elena Hale Hale".
+        expect(plan.ceo.firstName).toBe('Elena');
         expect(plan.ceo.age).toBe(30);
     });
 
@@ -101,6 +103,32 @@ describe('the plan', () => {
         // copy of it appearing in here.
         expect(planSuccession(input({ designatedSuccessorId: null }))!.ceo.id).toBe('a');
         expect(planSuccession(input({ designatedSuccessorId: 'b' }))!.ceo.id).toBe('b');
+    });
+});
+
+describe('taking the family name off', () => {
+    it('leaves the first name', () => {
+        expect(firstNameOf('Elena Hale', 'Hale')).toBe('Elena');
+        expect(firstNameOf('Marcus Hale', 'hale')).toBe('Marcus');
+    });
+
+    it('and keeps a two word given name, which the fallback would cut', () => {
+        // Losing half of "Mary Anne" is worse than leaving a stray surname on
+        // somebody whose name does not end in one, so the strip runs first.
+        expect(firstNameOf('Mary Anne Hale', 'Hale')).toBe('Mary Anne');
+    });
+
+    it('and falls back to the first word when there is no surname on it', () => {
+        expect(firstNameOf('Elena', 'Hale')).toBe('Elena');
+        expect(firstNameOf('Elena Vance', 'Hale')).toBe('Elena');
+        expect(firstNameOf('Elena Hale', '')).toBe('Elena');
+    });
+
+    it('and does not return an empty name', () => {
+        // A child called exactly the family name would otherwise strip to
+        // nothing and the player would be nobody.
+        expect(firstNameOf('Hale', 'Hale')).toBe('Hale');
+        expect(firstNameOf('', 'Hale')).toBe('');
     });
 });
 
@@ -160,7 +188,7 @@ describe('handing the company over', () => {
 
     it('and makes you somebody else', () => {
         runSuccession();
-        expect(useIdentityStore.getState().firstName).toBe('Elena Hale');
+        expect(useIdentityStore.getState().firstName).toBe('Elena');
         expect(useIdentityStore.getState().gender).toBe('female');
         expect(useGameStore.getState().age).toBe(30);
     });

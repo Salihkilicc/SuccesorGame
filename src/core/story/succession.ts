@@ -59,6 +59,8 @@ export type Heir = {
 
 export type SuccessionInput = {
     children: readonly Heir[];
+    /** The family name, so it can be taken off the heir's. */
+    lastName: string;
     designatedSuccessorId: string | null;
     /** The surviving spouse, if there is one. Null when there is not. */
     survivingParent: { name: string; age: number } | null;
@@ -84,6 +86,28 @@ export type SuccessionPlan = {
     /** Kept as a person in the new family. Holds no stock, by design. */
     survivingParent: { name: string; age: number } | null;
     generation: number;
+};
+
+/**
+ * The heir's first name, with the family name taken off.
+ *
+ * Strips the surname when it is there and falls back to the first word when
+ * it is not, which covers a child named before the family name was settled
+ * and a save from an older version. A two word given name survives the first
+ * branch and is only cut by the second, which is the right way round: losing
+ * half of "Mary Anne" is worse than leaving a stray surname on somebody whose
+ * name does not end in it.
+ */
+export const firstNameOf = (fullName: string, lastName: string): string => {
+    const name = (fullName || '').trim();
+    if (lastName) {
+        const stripped = name.replace(new RegExp(`\\s+${lastName}$`, 'i'), '').trim();
+        // Only when it actually took something off. An unchanged string is
+        // truthy, so returning it here skipped the fallback entirely and
+        // "Elena Vance" came back whole under the family name Hale.
+        if (stripped && stripped !== name) return stripped;
+    }
+    return name.split(/\s+/)[0] || name;
 };
 
 /**
@@ -120,10 +144,13 @@ export const planSuccession = (input: SuccessionInput): SuccessionPlan | null =>
     return {
         ceo: {
             id: child.id,
-            // FIRST NAME ONLY. The surname is the company's and it does not
-            // change hands - see useIdentityStore, where the player is asked
-            // for a first name and the family name is fixed.
-            firstName: child.name,
+            // FIRST NAME ONLY, and it said so while passing the whole thing.
+            // Children are stored as "Elena Hale" (useFamilyStore enforces it
+            // on rehydrate) and useIdentityStore holds the first name and the
+            // family name separately, so handing over `child.name` put the
+            // surname in the first name field and the home screen rendered
+            // "Elena Hale Hale".
+            firstName: firstNameOf(child.name, input.lastName),
             age: child.age,
             gender: child.gender === 'Female' ? 'female' : 'male',
         },

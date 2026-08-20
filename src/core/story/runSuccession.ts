@@ -96,6 +96,7 @@ export const runSuccession = (): SuccessionPlan | null => {
             id: c.id, name: c.name, age: c.age, gender: c.gender,
         })),
         designatedSuccessorId: family.designatedSuccessorId ?? null,
+        lastName: useIdentityStore.getState().lastName,
         // The partner becomes the surviving parent. Her `stats.age` is the
         // only age this family stores for her.
         survivingParent: family.partner

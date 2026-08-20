@@ -131,9 +131,27 @@ export const SUCCESSION_AGE = 16;
  * Who takes over, or null.
  *
  * THE NAMED ONE FIRST, and this is the whole reward for having named anybody.
- * A player who never opened the succession screen falls through to the eldest,
- * which is a real outcome rather than a punishment: it is what happens when
- * you leave it to be decided for you, and the siblings will have views.
+ * The player's choice wins even if he is seventy: it is their company and they
+ * said so.
+ *
+ * ---------------------------------------------------------------------------
+ *  AND OTHERWISE THE ELDEST WHO IS NOT ALSO NEARLY DEAD
+ * ---------------------------------------------------------------------------
+ *  Plain "eldest" was the first version and it is wrong in this game
+ *  specifically, because the children age alongside the player. A founder who
+ *  starts at twenty, has a child at thirty and dies at ninety leaves an eldest
+ *  who is SIXTY, and the player who chose to carry on found themselves in the
+ *  chair at an age where the mortality curve is already steep. Reported as
+ *  "the heir takes over and is a hundred".
+ *
+ *  So the fallback is the eldest who is still under `MORTALITY_START_AGE` -
+ *  the eldest of the ones with a life in front of them. It is still the
+ *  traditional answer, it is still not a reward for anything, and the
+ *  siblings will still have views.
+ *
+ *  If every grown child is past it, the YOUNGEST takes over instead. A family
+ *  that left this until everybody was old hands to whoever has the most time,
+ *  which is the only sensible thing left to do.
  *
  * `null` when there is nobody of age, which is its own ending. It has to be
  * possible or naming a successor costs nothing.
@@ -150,8 +168,15 @@ export const successorFor = (
         : undefined;
     if (named) return named;
 
-    // Eldest, and ties broken by order in the family rather than by chance:
-    // an inheritance that comes out differently on a reload is not an
-    // inheritance.
-    return grown.reduce((oldest, c) => (c.age > oldest.age ? c : oldest), grown[0]);
+    // Ties are broken by order in the family rather than by chance: an
+    // inheritance that comes out differently on a reload is not an
+    // inheritance. `>` rather than `>=` keeps the first one written down.
+    const eldestOf = (list: readonly Candidate[]) =>
+        list.reduce((oldest, c) => (c.age > oldest.age ? c : oldest), list[0]);
+
+    const withTimeLeft = grown.filter(c => c.age < MORTALITY_START_AGE);
+    if (withTimeLeft.length > 0) return eldestOf(withTimeLeft);
+
+    // Everybody is old. Whoever has the most time.
+    return grown.reduce((youngest, c) => (c.age < youngest.age ? c : youngest), grown[0]);
 };

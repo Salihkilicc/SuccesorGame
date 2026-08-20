@@ -342,6 +342,24 @@ const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
     const player = useIdentityStore.getState();
 
     // ------------------------------------------------------------------
+    //  YOU ARE YOURSELF AGAIN
+    // ------------------------------------------------------------------
+    //  A succession writes the heir's name into `firstName`, which is right
+    //  for the run it is in: the home screen, the letters and the honorific
+    //  all have to say Elena. But this store is the one thing a new game
+    //  does not wipe, so the next run opened as Elena as well - and the
+    //  player was never asked, because `created` was still true.
+    //
+    //  `ownFirstName` is what they typed on the first screen they ever saw.
+    //  Restoring it here rather than asking again keeps the promise at the
+    //  top of that file: your name outlives a run.
+    // ------------------------------------------------------------------
+    if (player.ownFirstName && player.ownFirstName !== player.firstName) {
+        useIdentityStore.setState({ firstName: player.ownFirstName });
+        console.log('[newGame] Restored the player\'s own name.');
+    }
+
+    // ------------------------------------------------------------------
     //  THE TUTORIAL DOES NOT COME BACK
     // ------------------------------------------------------------------
     //  It used to, with a "Skip the whole tutorial" button on it for anybody

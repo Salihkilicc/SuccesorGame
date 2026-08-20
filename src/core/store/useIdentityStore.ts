@@ -56,6 +56,19 @@ export type IdentityState = {
      * because this is persisted as JSON, and de-duplicated on write.
      */
     endingsSeen: string[];
+    /**
+     * The name the PLAYER chose, as opposed to the one they are wearing.
+     *
+     * A succession overwrites `firstName` with the heir's, which is correct
+     * while that run is going: the home screen, the letters and the honorific
+     * all have to say Elena. But the identity store is the one thing a new
+     * game does not wipe, so without this the next run opens as Elena too, and
+     * the player is never asked, because `created` is still true.
+     *
+     * So `firstName` is who you are PLAYING and this is who you ARE. A new
+     * game puts it back.
+     */
+    ownFirstName: string;
     _hasHydrated: boolean;
 };
 
@@ -89,6 +102,7 @@ export const initialIdentityState: IdentityState = {
     created: false,
     tutorialCompleted: false,
     endingsSeen: [],
+    ownFirstName: '',
     _hasHydrated: false,
 };
 
@@ -105,6 +119,9 @@ export const useIdentityStore = create<IdentityStore>()(
 
                 set({
                     firstName: tidy(firstName),
+                    // Recorded at the same moment and from the same answer, so
+                    // the two cannot be given different values by accident.
+                    ownFirstName: tidy(firstName),
                     lastName: tidy(lastName),
                     gender,
                     created: true,
@@ -128,6 +145,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 created: state.created,
                 tutorialCompleted: state.tutorialCompleted,
                 endingsSeen: state.endingsSeen,
+                ownFirstName: state.ownFirstName,
             }),
             onRehydrateStorage: () => (state) => {
                 // A save written before this field existed rehydrates without
@@ -135,6 +153,10 @@ export const useIdentityStore = create<IdentityStore>()(
                 // last screen of the game. zustand's persist MERGES, so the
                 // initial [] does not survive a partial rehydrate.
                 if (state && !Array.isArray(state.endingsSeen)) state.endingsSeen = [];
+                // Saves written before a succession existed have no record of
+                // the player's own name, and the one they are wearing is the
+                // only one there has ever been.
+                if (state && !state.ownFirstName) state.ownFirstName = state.firstName;
                 state?.setHasHydrated(true);
             },
         },
