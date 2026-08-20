@@ -473,6 +473,30 @@ export const verifyNewGame = (): string[] => {
         check('subsidiary', 'owned', (sub.subsidiaries ?? []).length, 0);
 
         check('news', 'items', useNewsStore.getState().items.length, 0);
+
+        // ------------------------------------------------------------------
+        //  AND EVERYTHING A SUCCESSION LEAVES BEHIND
+        // ------------------------------------------------------------------
+        //  Added because it was asked directly: after carrying on as the heir
+        //  and then dying again, does New Game really start from nothing?
+        //
+        //  It does, and these four are why it is worth checking rather than
+        //  saying so. They are the only fields a succession writes that a new
+        //  game has to unwrite, and all four fail SILENTLY: a run that opens
+        //  as the third generation, with the last family's brothers on the
+        //  board and somebody else's name on the home screen, looks like a
+        //  new game until you read it.
+        // ------------------------------------------------------------------
+        const fam = useFamilyStore.getState() as any;
+        check('family', 'generation', fam.generation, 1);
+        check('family', 'survivingParent', fam.survivingParent ?? null, null);
+        check('family', 'children', (fam.children ?? []).length, 0);
+        check('shareholder', 'inheritedDirectors',
+            sh.members.filter((m: any) => String(m.id).startsWith('DIR_HEIR_')).length, 0);
+
+        // The player is themselves again rather than whoever they last played.
+        const me = useIdentityStore.getState();
+        if (me.ownFirstName) check('identity', 'firstName', me.firstName, me.ownFirstName);
         const mk = useMarketStore.getState() as any;
         check('market', 'valueAnchors', mk.valueAnchors ?? {}, {});
         check('market', 'currentQuarter', mk.currentQuarter ?? 0, 0);

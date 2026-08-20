@@ -255,7 +255,7 @@ const LoveStack = createNativeStackNavigator<LoveStackParamList>();
 const AssetsStack = createNativeStackNavigator<AssetsStackParamList>();
 const CasinoStack = createNativeStackNavigator<CasinoStackParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
+export const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const AssetsStackNavigator = () => (
   <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>

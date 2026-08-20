@@ -6,6 +6,8 @@ import { BlurView } from '@react-native-community/blur';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
+import { jumpToCompany } from '../jumpToCompany';
+import { rootNavigationRef } from '../RootNavigator';
 import { useStatsStore, usePlayerStore } from '../../core/store';
 import { FEATURES } from '../../core/featureFlags';
 import UnreadBadge from '../../components/common/UnreadBadge';
@@ -104,22 +106,23 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         }
         if (screen === 'Company') {
             // ------------------------------------------------------------------
-            //  MyCompany IS NOT A ROOT ROUTE, SO IT HAS TO BE ADDRESSED THROUGH
-            //  THE NAVIGATOR THAT OWNS IT
+            //  MyCompany IS NOT A ROOT ROUTE, SO IT IS ADDRESSED DIRECTLY
             // ------------------------------------------------------------------
-            //  It lives inside the swipe navigator that RootStack registers as
-            //  'Home'; the RootStack entry for it is shelved (see the comment
-            //  in RootNavigator.tsx). navigate() checks the current navigator
-            //  and then walks UP through its parents - it does not descend into
-            //  a sibling's children.
+            //  SHELVED: `navigation.navigate('Home', { screen: 'MyCompany' })`.
             //
-            //  So this worked from Home, where the swipe navigator IS the
-            //  current one, and threw from anywhere in RootStack: Messages, a
-            //  message thread, Mail, a mail detail. Which is to say it worked
-            //  everywhere it was tested and broke on the tab bar that is
-            //  visible on every screen in the app.
+            //  That is the documented form and it does work FROM SOMEWHERE
+            //  ELSE: from Messages it switches the stack to Home and hands
+            //  the nested action down on the way.
+            //
+            //  From HOME it does nothing, because RootStack is already on
+            //  Home and a navigate to the route you are already on never
+            //  reaches the child navigator. Which is the case this bar is in
+            //  most of the time.
+            //
+            //  navigation/jumpToCompany.ts aims the action at the swipe
+            //  navigator by key instead, so RootStack is never asked.
             // ------------------------------------------------------------------
-            navigation.navigate('Home', { screen: 'MyCompany' });
+            jumpToCompany(rootNavigationRef);
         } else if (screen === 'Contacts') {
             // The item above is shelved so nothing reaches this, and the
             // route it navigated to no longer exists. Left as a guard rather
