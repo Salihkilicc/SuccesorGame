@@ -97,4 +97,9 @@ describe('fullName', () => {
         expect(fullName('John', '')).toBe('John');
         expect(fullName('', '')).toBe('');
     });
+
+    it('does not duplicate surname when firstName already contains it', () => {
+        expect(fullName('Elena Hale', 'Hale')).toBe('Elena Hale');
+        expect(fullName('Salih Hale', 'Hale')).toBe('Salih Hale');
+    });
 });

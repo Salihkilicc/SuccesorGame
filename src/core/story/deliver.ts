@@ -61,7 +61,9 @@ export const senderLabel = (from: { name: string; role: string }): string => {
     //  fifteenth field nobody has to fill in is a fifteenth field somebody
     //  will forget.
     // ------------------------------------------------------------------
-    return from.role.includes(',') ? `${from.name} - ${from.role}` : from.name;
+    return (from.role.includes(',') || from.role.startsWith('Head of') || from.role.startsWith('Chair'))
+        ? `${from.name} - ${from.role}`
+        : from.name;
 };
 
 /** Put one conversation in front of the player. */

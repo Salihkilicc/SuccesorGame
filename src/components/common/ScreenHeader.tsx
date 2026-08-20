@@ -120,7 +120,15 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
                     {title}
                 </Text>
                 <View style={[styles.rule, { backgroundColor: rule }]} />
-                {!!subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
+                {!!subtitle && (
+                    <Text
+                        style={styles.subtitle}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.8}>
+                        {subtitle}
+                    </Text>
+                )}
             </View>
 
             {right ? <View style={styles.right}>{right}</View> : null}

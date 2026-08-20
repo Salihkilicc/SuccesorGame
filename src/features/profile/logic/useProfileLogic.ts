@@ -11,6 +11,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { fullName } from '../../../core/identity';
 import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -28,8 +29,12 @@ import { SelectedMember } from '../components/FamilyMemberDetailModal';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 
 export interface FormattedVitals {
+    age: number;
     health: number;
     happiness: number;
+    energy: number;
+    looks: number;
+    smarts: number;
     stress: number;
 }
 
@@ -43,7 +48,7 @@ export const useProfileLogic = () => {
     // --- Navigation ---
     const navigation = useNavigation<any>();
 
-    // --- Store Selectors ---
+    // --- Global Stores ---
     const identity = useIdentityStore();
     const player = usePlayerStore();
     const stats = useStatsStore();
@@ -59,10 +64,10 @@ export const useProfileLogic = () => {
 
     // --- Formatted Strings & Computed Values ---
     const ceoFullName = useMemo(() => {
-        const first = (identity.firstName || 'Salih').trim();
-        // Dynasty surname is strictly Hale
-        return `${first} Hale`;
-    }, [identity.firstName]);
+        const first = identity.firstName || 'Salih';
+        const last = identity.lastName || 'Hale';
+        return fullName(first, last);
+    }, [identity.firstName, identity.lastName]);
 
     const children = useMemo(() => {
         return family.children.map((c) => {

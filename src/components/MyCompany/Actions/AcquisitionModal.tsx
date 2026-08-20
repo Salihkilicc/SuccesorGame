@@ -359,13 +359,13 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
           <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
         </View>
         <View style={styles.itemInfo}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+          <View style={styles.sectorAndTierRow}>
+            <Text style={styles.itemSector}>{item.category || t('common.technology')}</Text>
             <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
               <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
             </View>
           </View>
-          <Text style={styles.itemSector}>{item.category || t('common.technology')}</Text>
         </View>
         <View style={styles.itemValue}>
           <Text style={styles.marketCap}>{formatMoney(valuation)}</Text>
@@ -732,6 +732,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+  sectorAndTierRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
   },
   itemSector: {
     color: theme.colors.textMuted,

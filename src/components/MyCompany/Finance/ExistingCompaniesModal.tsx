@@ -54,13 +54,13 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                                         <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                                            <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                                        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                                            <Text style={styles.sector}>{item.sector}</Text>
                                             <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                                 <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                             </View>
                                         </View>
-                                        <Text style={styles.sector}>{item.sector}</Text>
                                     </View>
                                 </View>
                                 <View style={{ alignItems: 'flex-end', marginLeft: 8 }}>

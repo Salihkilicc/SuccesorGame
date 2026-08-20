@@ -48,9 +48,9 @@ describe('the plan', () => {
     it('puts the named successor in the chair', () => {
         const plan = planSuccession(input())!;
         expect(plan.ceo.id).toBe('a');
-        // First name only. The surname is the company's and does not change
+        // First name only. The surname is the company's and it does not change
         // hands, which useIdentityStore already assumed.
-        expect(plan.ceo.firstName).toBe('Elena Hale');
+        expect(plan.ceo.firstName).toBe('Elena');
         expect(plan.ceo.age).toBe(30);
     });
 
@@ -159,7 +159,7 @@ describe('handing the company over', () => {
 
     it('and makes you somebody else', () => {
         runSuccession();
-        expect(useIdentityStore.getState().firstName).toBe('Elena Hale');
+        expect(useIdentityStore.getState().firstName).toBe('Elena');
         expect(useIdentityStore.getState().gender).toBe('female');
         expect(useGameStore.getState().age).toBe(30);
     });

@@ -64,7 +64,7 @@ export const CAST: Cast = {
     cfo: {
         id: 'cfo',
         name: 'Arthur Vance',
-        role: 'Chief Financial Officer',
+        role: 'CFO',
         channels: 'both',
         email: 'a.vance@hale.co',
         tone: 'Has outlived four CEOs and expects to outlive you. Gives the board position first and his own second, in that order, always. Dry to the point of seeming unbothered; the one time he is not dry, believe him. Knows what your father hid and will tell you when he decides you can hold it.',
@@ -73,7 +73,7 @@ export const CAST: Cast = {
     coo: {
         id: 'coo',
         name: 'Dana Whitfield',
-        role: 'Chief Operating Officer',
+        role: 'COO',
         channels: 'both',
         email: 'd.whitfield@hale.co',
         tone: 'Speaks for the floor and does not soften it. Short sentences, concrete nouns, numbers with units. Angry on behalf of other people rather than herself. Will tell you the line cannot do what you promised before she tells you good morning.',
@@ -82,7 +82,7 @@ export const CAST: Cast = {
     cto: {
         id: 'cto',
         name: 'Priya Raman',
-        role: 'Chief Technology Officer',
+        role: 'CTO',
         channels: 'both',
         email: 'p.raman@hale.co',
         tone: 'Talks in what is possible in eighteen months, which is both her value and her blind spot. Impatient with money questions and slightly embarrassed about that. Excited in a way she tries to keep out of writing and never quite does.',
@@ -136,7 +136,7 @@ export const CAST: Cast = {
     vulture: {
         id: 'vulture',
         name: 'Halberd Partners',
-        role: 'Special Situations Fund',
+        role: 'Special Situations',
         channels: 'mail',
         email: 'origination@halberd.partners',
         tone: 'Cheerful about your disaster. Frames the worst offer you will ever receive as a favour, with genuine warmth, because to them it is simply Tuesday. Never threatens, just describes your position accurately, which is worse.',
@@ -160,7 +160,7 @@ export const CAST: Cast = {
     edison: {
         id: 'edison',
         name: 'Hal Brennerman',
-        role: 'Chief Executive, Edison Motors',
+        role: 'Head of Edison',
         channels: 'mail',
         email: 'h.brennerman@edisonmotors.com',
         tone: 'Thirty-one years in a business of dealers and service bays, and he talks like it: parts, counties, contract terms, people who answer phones at two in the morning. Never threatens, describes an arrangement that already exists and lets you work out that you are outside it. Agrees with your accusations, which is worse than denying them.',
@@ -175,7 +175,7 @@ export const CAST: Cast = {
     openai: {
         id: 'openai',
         name: 'Wen Zhao-Lindqvist',
-        role: 'Head of Research Operations, OpenAI-ish',
+        role: 'Head of OpenAI',
         channels: 'mail',
         email: 'research-ops@openaiish.com',
         tone: 'Writes an HR email about an existential threat and does not appear to notice the difference. Short paragraphs, scheduling language, no adjectives. Sincere congratulations followed immediately by terms. Never says the word "poach" and never needs to.',
@@ -184,7 +184,7 @@ export const CAST: Cast = {
     swanson: {
         id: 'swanson',
         name: 'Dr. Eleanor Ratliff',
-        role: 'Chair, Category Standards Committee',
+        role: 'Chair, Standards',
         channels: 'mail',
         email: 'chair@devicestandards.org',
         tone: 'Never threatens anything, because she does not have to, she describes a process, and every sentence of it is true, procedural and entirely outside your control. Scrupulously fair and aware of how that reads. The only antagonist in the game with nobody in her to argue with.',
@@ -196,7 +196,7 @@ export const CAST: Cast = {
     unknown: {
         id: 'unknown',
         name: 'Unknown Number',
-        role: 'No name attached',
+        role: 'Unknown',
         // Message only. A letter has a return address; that is the point.
         channels: 'message',
         tone: 'Knows more about you than the message admits. No greeting, no sign-off. Short. Every message is a door left slightly open, and never quite a threat you could report.',
@@ -205,7 +205,7 @@ export const CAST: Cast = {
     hacker: {
         id: 'hacker',
         name: 'Cipher',
-        role: 'Encrypted / Anonymous',
+        role: 'Anonymous',
         channels: 'message',
         tone: 'Bored professionalism, like a courier reading out a delivery slot. Deadlines stated as facts. Occasional flashes of something almost friendly, which is the most frightening part.',
     },
@@ -213,7 +213,7 @@ export const CAST: Cast = {
     regulator: {
         id: 'regulator',
         name: 'Consumer Safety Directorate',
-        role: 'Compliance Division',
+        role: 'Compliance',
         // Mail only, and for the same reason as the FBI: everything they send
         // is written to be read aloud somewhere else later.
         channels: 'mail',
@@ -224,7 +224,7 @@ export const CAST: Cast = {
     fbi: {
         id: 'fbi',
         name: 'Field Office',
-        role: 'Federal Bureau of Investigation',
+        role: 'FBI',
         // Mail only. Everything they send is designed to be read aloud in a
         // courtroom later.
         channels: 'mail',

@@ -131,13 +131,13 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                                 <MaterialCommunityIcons name={visual.icon} size={26} color={visual.color} />
                             </View>
                             <View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                                    <Text style={styles.companyName}>{company.name}</Text>
+                                <Text style={styles.companyName}>{company.name}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                                    <Text style={styles.sectorText}>{company.sector} Sector</Text>
                                     <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                         <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                     </View>
                                 </View>
-                                <Text style={styles.sectorText}>{company.sector} Sector</Text>
                             </View>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>

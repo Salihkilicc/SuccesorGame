@@ -107,5 +107,13 @@ export const checkCompany = (raw: string): Check => {
 export const honorific = (gender: Gender): string =>
     gender === 'female' ? 'Ms' : 'Mr';
 
-export const fullName = (firstName: string, lastName: string): string =>
-    tidy(`${firstName} ${lastName}`);
+export const fullName = (firstName: string, lastName: string): string => {
+    const f = tidy(firstName || '');
+    const l = tidy(lastName || '');
+    if (!f) return l;
+    if (!l) return f;
+    if (f.toLowerCase().endsWith(l.toLowerCase())) {
+        return f;
+    }
+    return `${f} ${l}`;
+};

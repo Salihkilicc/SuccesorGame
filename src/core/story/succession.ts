@@ -123,7 +123,7 @@ export const planSuccession = (input: SuccessionInput): SuccessionPlan | null =>
             // FIRST NAME ONLY. The surname is the company's and it does not
             // change hands - see useIdentityStore, where the player is asked
             // for a first name and the family name is fixed.
-            firstName: child.name,
+            firstName: child.name.replace(/\s+Hale$/i, '').trim(),
             age: child.age,
             gender: child.gender === 'Female' ? 'female' : 'male',
         },
