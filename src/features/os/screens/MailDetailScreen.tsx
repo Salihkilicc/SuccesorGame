@@ -20,6 +20,7 @@ import { conversationById } from '../../../data/story';
 import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { readStanding } from '../../../core/story/world';
 import { HOSTILE_MULTIPLE } from '../../../core/market/mergers';
 import { canAccept, priceFor } from '../../../core/market/negotiation';
 import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
@@ -108,7 +109,10 @@ const MailDetailScreen = () => {
     const onMeet = () => {
         if (!negotiation) return;
         const result = answerOffer(negotiation.id, true, {
-            publicReputation: useStoryStore.getState().dials.publicReputation,
+            // The dial plus what the player is worth, capped at 100. A board
+            // asking for a reputable buyer counts the money too, and this is
+            // the same figure the courtship reads - see core/story/standing.ts.
+            publicReputation: readStanding(),
             capital: useStatsStore.getState().companyCapital ?? 0,
             price: 0,
         });
@@ -177,7 +181,7 @@ const MailDetailScreen = () => {
     const onWithdraw = () => {
         if (!negotiation) return;
         answerOffer(negotiation.id, false, {
-            publicReputation: useStoryStore.getState().dials.publicReputation,
+            publicReputation: readStanding(),
             capital: useStatsStore.getState().companyCapital ?? 0,
             price: 0,
         });

@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useGameStore } from '../../../core/store/useGameStore';
 import { useFamilyStore, Child, PartnerProfile } from '../../../core/store/useFamilyStore';
 import { useLuxoNetStore } from '../../../core/store/useLuxoNetStore';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
@@ -102,11 +103,14 @@ export const useProfileLogic = () => {
         };
     }, [player.core.money, player.core.netWorth, stats.companyValue]);
 
+    const playerAge = useGameStore(state => state.age);
     const vitals: FormattedVitals = useMemo(() => ({
+        // The one of the four missing fields there is a real source for.
+        age: playerAge,
         health: Math.max(0, Math.min(100, player.core.health || 100)),
         happiness: Math.max(0, Math.min(100, player.core.happiness || 100)),
         stress: Math.max(0, Math.min(100, player.core.stress || 0)),
-    }), [player.core.health, player.core.happiness, player.core.stress]);
+    }), [playerAge, player.core.health, player.core.happiness, player.core.stress]);
 
     const ownedAssets = useAssetStore((state) => state.ownedItems);
 

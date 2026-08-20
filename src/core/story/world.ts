@@ -20,6 +20,24 @@ import { initialGameState } from '../store/useGameStore';
 import { useLaboratoryStore } from '../store/useLaboratoryStore';
 import type { World } from './conditions';
 import { brotherLoyalty } from './brother';
+import { standing } from './standing';
+
+/**
+ * How the world sees the player, right now.
+ *
+ * The ONE place the wealth bonus is added, so that every room asking the same
+ * question gets the same answer. Three of them do: the courtship, a target's
+ * board demanding a reputable buyer, and the same demand read again when the
+ * player answers the letter.
+ *
+ * Lives next to `readWorld` for the same reason that does - the vocabulary is
+ * pure and importable by the audit, and only a small file knows the app
+ * exists.
+ */
+export const readStanding = (): number => standing(
+    useStoryStore.getState().dials.publicReputation ?? 0,
+    (useStatsStore.getState() as any).netWorth ?? 0,
+);
 
 /**
  * Quarters elapsed since the game began, 1-based.

@@ -16,7 +16,7 @@ import { useMessageStore } from '../../../core/store/useMessageStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useGameStore } from '../../../core/store/useGameStore';
-import { currentQuarter } from '../../../core/story/world';
+import { currentQuarter, readStanding } from '../../../core/story/world';
 import { generatePartner } from './partnerGenerator';
 import { REFUSAL_LINES, VOICE_FOR_PERSONALITY } from '../data/strainLines';
 import {
@@ -62,7 +62,10 @@ export const runCourtship = (roll: () => number = Math.random): CourtshipResult 
     const candidate = generatePartner(tier);
 
     const { accepted } = courtshipFor(candidate, {
-        publicReputation: useStoryStore.getState().dials.publicReputation ?? 0,
+        // What you did PLUS what you are worth. See core/story/standing.ts:
+        // the dial is what the story made it and the money is added on top,
+        // capped at 100.
+        publicReputation: readStanding(),
         companyValue: useStatsStore.getState().companyValue || 0,
     }, tier, roll);
 
