@@ -38,6 +38,7 @@ import ShareControlHub from '../../../components/MyCompany/Shares/ShareControlHu
 import BuybackModal from '../../../components/MyCompany/Shares/BuybackModal';
 import DilutionModal from '../../../components/MyCompany/Shares/DilutionModal';
 import DividendModal from '../../../components/MyCompany/Shares/DividendModal';
+import IpoModal from '../../../components/MyCompany/Shares/IpoModal';
 import { AcquisitionModal } from '../../../components/MyCompany/Actions/AcquisitionModal';
 import ExistingCompaniesModal from '../../../components/MyCompany/Finance/ExistingCompaniesModal';
 import CapitalInjectionModal from '../../../components/MyCompany/Finance/CapitalInjectionModal';
@@ -133,25 +134,43 @@ export const HostileTakeoverScreen = ({ route }: any) => {
     return <AcquisitionModal asScreen visible onClose={close} acquire={route?.params?.acquire} />;
 };
 
-export const StockMarketScreen = ({ route }: any) => {
+export const StockMarketScreen = () => {
     const close = useGoBack();
     const [buyback, setBuyback] = useState(false);
     const [dilution, setDilution] = useState(false);
     const [dividend, setDividend] = useState(false);
-    // The IPO confirmation lives on My Company, which owns the panel that
-    // shows it, so it is handed in as a route param rather than duplicated.
-    const onOpenIPO = route?.params?.onOpenIPO || (() => {});
+    // ------------------------------------------------------------------
+    //  THE FOURTH SIBLING, AND IT USED TO BE THE ODD ONE OUT
+    // ------------------------------------------------------------------
+    //  SHELVED, and it was a bug rather than a style:
+    //
+    //      // The IPO confirmation lives on My Company, which owns the
+    //      // panel that shows it, so it is handed in as a route param
+    //      // rather than duplicated.
+    //      const onOpenIPO = route?.params?.onOpenIPO || (() => {});
+    //
+    //  That comment describes the fault accurately. `handleLaunchIPO` in
+    //  MyCompanyScreen called `setPanel` on MY COMPANY'S state, and My
+    //  Company is not the screen in front of you when you press Launch
+    //  IPO. So the button did nothing, and the confirmation was sitting
+    //  there waiting when the player navigated back.
+    //
+    //  A screen cannot raise a dialog on another screen. So the IPO owns
+    //  its own modal now, like the three below it have always done.
+    // ------------------------------------------------------------------
+    const [ipo, setIpo] = useState(false);
     return (
         <>
             <ShareControlHub
                 asScreen
                 visible
                 onClose={close}
-                onOpenIPO={onOpenIPO}
+                onOpenIPO={() => setIpo(true)}
                 onOpenDilution={() => setDilution(true)}
                 onOpenDividend={() => setDividend(true)}
                 onOpenBuyback={() => setBuyback(true)}
             />
+            <IpoModal visible={ipo} onClose={() => setIpo(false)} />
             <BuybackModal visible={buyback} onClose={() => setBuyback(false)} />
             <DilutionModal visible={dilution} onClose={() => setDilution(false)} />
             <DividendModal visible={dividend} onClose={() => setDividend(false)} />

@@ -14,7 +14,9 @@ import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
-import { IPO_MIN_VALUATION, quoteIpo } from '../../../core/market/equity';
+// SHELVED with the handler below: `import { IPO_MIN_VALUATION, quoteIpo }
+// from '../../../core/market/equity';` - the quote lives in IpoModal now,
+// which is the only place that should be pricing a listing.
 import { CONTROL_THRESHOLD } from '../../../core/market/governance';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
@@ -28,6 +30,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
+import IpoModal from '../../../components/MyCompany/Shares/IpoModal';
 import { formatMoney, formatPrice, formatNumber, formatRP } from '../../../core/utils';
 import TutorialTarget from '../../../components/tutorial/TutorialTarget';
 import InfoDot from '../../../components/common/InfoDot';
@@ -118,92 +121,30 @@ const MyCompanyScreen = () => {
 
   const activeProductsCount = products.filter(p => p.status === 'active').length;
 
-  // IPO Handler
-  const goPublic = useEquityStore((state) => state.goPublic);
-
-  const handleLaunchIPO = () => {
-    // ------------------------------------------------------------------
-    //  HALKA ARZ
-    // ------------------------------------------------------------------
-    //  ESKI EKRAN YANLIS SEY VAAD EDIYORDU: "degerlemenin %20'si kadar
-    //  nakit, sahiplik %80'e duser". Ikisi de yanlisti — oyuncu zaten
-    //  %100'e sahip degildi (%65), ve gercek bir halka arzda paranin
-    //  tamami sirkete girmez.
-    //
-    //  Artik teklif gercek maliyetleriyle gosteriliyor: aracilik
-    //  komisyonu ve halka arz iskontosu dahil.
-    // ------------------------------------------------------------------
-    const cap = useShareholderStore.getState();
-    const quote = quoteIpo(stats.companyValue, cap.totalShares, cap.playerShareCount, 0.20);
-
-    if (stats.companyValue < IPO_MIN_VALUATION) {
-      setPanel({
-        title: t('alert.notReadyToList'),
-        summary: 'Underwriters will not take a company public at this valuation.',
-        lines: [
-          { label: 'Minimum', value: formatMoney(IPO_MIN_VALUATION) },
-          { label: 'You are at', value: formatMoney(stats.companyValue), strong: true },
-        ],
-        note: 'Grow revenue and profit first, the multiple follows.',
-        confirmLabel: 'OK',
-      });
-      return;
-    }
-
-    // The IPO confirmation was nine lines of prose and a table faked with \n
-    // and spaces inside a system dialog. Same figures, rendered as rows.
-    setPanel({
-      title: t('alert.launchIpo'),
-      summary: 'Selling 20% of the company to public investors.',
-      lines: [
-        { label: 'Fair value per share', value: formatPrice(quote.fairPrice) },
-        { label: 'Offer price (−12%)', value: formatPrice(quote.offerPrice) },
-        { label: 'Gross proceeds', value: formatMoney(quote.grossProceeds) },
-        { label: 'Underwriting fee (7%)', value: `−${formatMoney(quote.underwritingFee)}`, tone: 'negative' },
-        { label: 'Net to the company', value: formatMoney(quote.netProceeds), strong: true },
-        { label: 'Your ownership', value: `${stats.companyOwnership.toFixed(1)}% → ${quote.playerOwnershipAfter.toFixed(1)}%` },
-      ],
-      note: `Shares are priced below fair value on purpose so the book fills — that ${formatMoney(quote.moneyLeftOnTable)} is the cost of listing. Once public your multiples rise, but the market reprices you every quarter.`,
-      confirmLabel: t('company.launchIpo'),
-      cancelLabel: t('company.notYet'),
-      onConfirm: () => {
-        const result = goPublic(
-          stats.companyValue,
-          (amount) => {
-            const currentCapital = useStatsStore.getState().companyCapital;
-            stats.update({ companyCapital: currentCapital + amount });
-          },
-          0.20,
-        );
-
-        if (result.error) {
-          setPanel({
-            title: t('alert.cannotLaunchIpo'),
-            summary: result.error,
-            confirmLabel: 'OK',
-            tone: 'danger',
-          });
-          return;
-        }
-
-        stats.update({
-          companyOwnership: result.newOwnershipPercent,
-          isPublic: true,
-        });
-
-        setPanel({
-          title: t('alert.ipoComplete'),
-          summary: 'You are a public company. Every quarter is now a scorecard.',
-          lines: [
-            { label: 'Raised', value: formatMoney(result.cashRaised) },
-            { label: 'Fees', value: `−${formatMoney(result.fee)}`, tone: 'negative' },
-            { label: 'Your ownership', value: `${result.newOwnershipPercent.toFixed(1)}%`, strong: true },
-          ],
-          confirmLabel: 'OK',
-        });
-      },
-    });
-  };
+  // ------------------------------------------------------------------
+  //  THE LISTING MOVED INTO ITS OWN MODAL
+  // ------------------------------------------------------------------
+  //  SHELVED: forty lines that built a ConfirmPanel here - the not-ready
+  //  check, the offer table, the failure branch and the receipt - plus the
+  //  `goPublic` binding they used.
+  //
+  //  It had to move because of WHERE it ran. The Launch IPO button is on
+  //  the Stock Market screen, this handler was handed over as a route
+  //  param, and all it did was `setPanel` on MY COMPANY'S state. My Company
+  //  is not the screen in front of you at that moment, so the button
+  //  appeared to do nothing and the confirmation was found later, on the
+  //  way back.
+  //
+  //  A screen cannot raise a dialog on another screen. Everything the flow
+  //  needs is in components/MyCompany/Shares/IpoModal.tsx now, and both
+  //  entry points open it: this one and the Stock Market screen, each with
+  //  its own visibility flag and neither holding a copy of the quote.
+  //
+  //  The old body is in git. Reproducing it here would be forty lines of
+  //  panel plumbing that must never be called again.
+  // ------------------------------------------------------------------
+  const [ipoOpen, setIpoOpen] = useState(false);
+  const handleLaunchIPO = () => setIpoOpen(true);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -359,7 +300,7 @@ const MyCompanyScreen = () => {
               iconColor="#FBBF24"
               title={t('company.equity')}
               subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
-              onPress={() => navigation.navigate('StockMarket', { onOpenIPO: handleLaunchIPO })}
+              onPress={() => navigation.navigate('StockMarket')}
               info={{
                 title: t('tactic.equityTitle'),
                 text: t('tactic.equityText'),
@@ -432,6 +373,8 @@ const MyCompanyScreen = () => {
           </View>
 
         </ScrollView>
+
+        <IpoModal visible={ipoOpen} onClose={() => setIpoOpen(false)} />
 
         <ConfirmPanel
           visible={!!panel}
