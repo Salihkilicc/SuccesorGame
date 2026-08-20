@@ -67,7 +67,7 @@ describe('every ending is a record in this file', () => {
         }
     });
 
-    it('and the six that exist are the six that can happen', () => {
+    it('and the seven that exist are the seven that can happen', () => {
         // Reachability checks that every `ending` EFFECT names a real record.
         // Nothing checked the other direction, and an ending nobody can reach
         // is writing that will never be read.
@@ -82,6 +82,7 @@ describe('every ending is a record in this file', () => {
             'diedWithoutAnHeir',
             'removedByBoard',
             'soldToPear',
+            'soldWhatYouInherited',
             'wentBankrupt',
         ]);
     });

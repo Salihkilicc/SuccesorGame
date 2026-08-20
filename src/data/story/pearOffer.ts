@@ -49,7 +49,9 @@ import type { Conversation } from '../../core/story/graph';
 import type { Condition } from '../../core/story/conditions';
 
 /** Roughly a year of the company's revenue. Fair. That is the trap. */
-const OFFER = 48_000_000;
+// SHELVED with the effect that used it: `const OFFER = 48_000_000;`. The
+// floor lives in data/story/pearPrice.ts now, next to the multiple, where the
+// salutation and the payment both read it.
 
 // ---------------------------------------------------------------------------
 //  IT ARRIVES IN THE SIXTH QUARTER. THAT IS THE ONLY CONDITION.
@@ -176,7 +178,11 @@ export const pearOffer: Conversation = {
                     text: 'Sign it.',
                     effects: [
                         { kind: 'flag', flag: 'soldToPear' },
-                        { kind: 'cash', amount: OFFER },
+                        // Was `{ kind: 'cash', amount: OFFER }` with OFFER a
+                        // literal 48,000,000, which the salutation's
+                        // `{pearOffer}` token disagreed with the moment the
+                        // company outgrew the floor. See data/story/pearPrice.ts.
+                        { kind: 'sellToPear' },
                         {
                             kind: 'news',
                             headline: 'Pear acquires Hale in an all-cash deal. Terms described as friendly.',

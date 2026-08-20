@@ -271,6 +271,15 @@ export type StoryFlag =
     /** You bid for Pear itself, hostile or otherwise. He noticed. */
     | 'movedOnPear'
     /**
+     * A succession has happened. Somebody is in the chair who did not build it.
+     *
+     * Raised by core/story/runSuccession.ts and never lowered. It is what
+     * brings Pear back: he wrote to a twenty six year old who had just
+     * inherited once already, and a second inheritance is the same opportunity
+     * with a bigger number on it.
+     */
+    | 'succeeded'
+    /**
      * And it closed. You own it.
      *
      * SEPARATE FROM `movedOnPear`, which is raised in the same place and one

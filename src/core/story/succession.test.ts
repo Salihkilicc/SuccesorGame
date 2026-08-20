@@ -199,6 +199,34 @@ describe('handing the company over', () => {
         expect(family.survivingParent?.name).toBe('Claire Hale');
     });
 
+    it('and the mother is not on the register', () => {
+        // Asked for directly, and it holds because two separate decisions
+        // agree: `divideEstate` gives a spouse cash and no stock, and
+        // `runSuccession` seats only `plan.siblings`, which is children.
+        //
+        // Worth asserting rather than reasoning about, because it is exactly
+        // the kind of thing a later "she should get something too" would
+        // break without noticing that a share is a seat on the board that can
+        // remove her own son.
+        runSuccession();
+        const members = useShareholderStore.getState().members;
+        expect(members.some(m => m.name === 'Claire Hale')).toBe(false);
+        expect(members.some(m => m.id.includes('parent'))).toBe(false);
+        // She is still in the family, which is the other half of it.
+        expect(useFamilyStore.getState().survivingParent?.name).toBe('Claire Hale');
+    });
+
+    it('and Pear finds out that the chair has changed hands', () => {
+        // The spine: he wrote to a twenty six year old who had just
+        // inherited, and a second inheritance is the same opportunity with a
+        // bigger number on it. See data/story/pearOfferHeir.ts.
+        useStoryStore.setState({ flags: {}, seenScenes: ['pear-offer-heir'] } as never);
+        runSuccession();
+        expect(useStoryStore.getState().flags.succeeded).toBe(true);
+        // And the letter can arrive again, because it is per generation.
+        expect(useStoryStore.getState().seenScenes).not.toContain('pear-offer-heir');
+    });
+
     it('but a life the heir did not lead does not', () => {
         // `usePlayerStore.reputation` is where the casino, the street and the
         // police remember a PERSON. Left alone, a thirty year old who has

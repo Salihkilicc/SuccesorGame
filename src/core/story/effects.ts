@@ -90,6 +90,21 @@ export type Effect =
      */
     | { kind: 'ending'; ending: string }
     /**
+     * Sign Pear's offer. Pays what the letter quoted, whatever that is.
+     *
+     * NARROW ON PURPOSE. The general version - "sell the company at a
+     * multiple" - would be a mechanic, and nothing else in this game sells
+     * the whole company through a conversation: the acquisition screens do
+     * that, with financing and a board vote. This is one scene, twice, and a
+     * named effect for it is honest where a general one would be an invitation.
+     *
+     * It exists because the AMOUNT cannot live in the data. The letter shows
+     * `{pearOffer}`, which scales with the company, and a literal in the
+     * scene disagreed with it the moment the company grew. Both sides read
+     * data/story/pearPrice.ts now.
+     */
+    | { kind: 'sellToPear' }
+    /**
      * Move what a company is fundamentally worth.
      *
      * `multiplier` against its listed value: 0.45 means somebody is willing to
@@ -268,6 +283,7 @@ export type EffectSink = {
     mail: (m: { from: string; subject: string; body: string }) => void;
     news: (headline: string) => void;
     ending: (id: string) => void;
+    sellToPear: () => void;
     reprice: (company: string, multiplier: number) => void;
     royalty: (category: string, rate: number) => void;
     siege: (category: string, quarters: number, pressure: number) => void;
@@ -306,6 +322,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
         case 'mail': sink.mail(effect); return;
         case 'news': sink.news(effect.headline); return;
         case 'ending': sink.ending(effect.ending); return;
+        case 'sellToPear': sink.sellToPear(); return;
         case 'reprice': sink.reprice(effect.company, effect.multiplier); return;
         case 'royalty': sink.royalty(effect.category, effect.rate); return;
         case 'siege': sink.siege(effect.category, effect.quarters, effect.pressure); return;

@@ -24,6 +24,7 @@ import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
 import { pearBought } from './pearBought';
+import { pearOfferHeir } from './pearOfferHeir';
 import { successionSibling, successionAlone } from './firstQuarter';
 import { heirAlone, heirPassedOver, heirChosen } from './heirs';
 import {
@@ -140,6 +141,8 @@ export const CONVERSATIONS: Conversation[] = [
     // data/tutorial/sequence.ts.
     ctoResearch,
     pearOffer,
+    // The same letter to the next one, whenever the chair changes hands.
+    pearOfferHeir,
     // The last letter he ever sends, twenty years the other way up. See the
     // note at the top of pearBought.ts.
     pearBought,
@@ -317,6 +320,17 @@ export const STORY_BEATS: StoryBeat[] = [
     //  in a queue.
     // ------------------------------------------------------------------
     { conversation: pearBought.id, urgent: true },
+    // ------------------------------------------------------------------
+    //  AND THE SAME QUESTION, ASKED OF WHOEVER IS IN THE CHAIR NOW
+    // ------------------------------------------------------------------
+    //  Gated on `succeeded` and on NOT owning Pear. Urgent, because it is
+    //  the spine: the whole game is one question asked twice, and the
+    //  second asking should not queue behind a sponsorship letter.
+    //
+    //  runSuccession clears this one from `seenScenes`, so it arrives once
+    //  per generation rather than once per save. See the note there.
+    // ------------------------------------------------------------------
+    { conversation: pearOfferHeir.id, urgent: true },
 ];
 
 // ============================================================================

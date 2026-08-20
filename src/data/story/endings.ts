@@ -224,6 +224,37 @@ export const ENDINGS: Record<string, Ending> = {
             + 'the signage is expensive and nobody wants to be the one who '
             + 'raised it.',
     },
+
+    // ----------------------------------------------------------------------
+    //  YOU SOLD WHAT YOU WERE GIVEN
+    // ----------------------------------------------------------------------
+    //  The third face of the same ending, and the cruellest, because it is
+    //  the only one where the player did not build the thing they sold.
+    //
+    //  `soldToPear` is written for somebody who was offered a fortune at
+    //  twenty six for a company he had run for a year, and its sting is that
+    //  nobody ever found out whether he would have been any good at it. This
+    //  one cannot use that line: the answer here is that you did not stay
+    //  long enough to be asked the question.
+    //
+    //  NO SCOLDING, same rule as the other five. It is a defensible decision
+    //  and quite a lot of people would make it. What it costs is stated as
+    //  fact - the name comes off the building, and there is a photograph -
+    //  and the player is left to decide how they feel about that.
+    // ----------------------------------------------------------------------
+    soldWhatYouInherited: {
+        id: 'soldWhatYouInherited',
+        title: 'YOU SOLD IT',
+        body:
+            'The money cleared on a Tuesday, which the lawyers say is usual, '
+            + 'and it is more money than the family has ever had at one time.\n\n'
+            + 'The name comes off the building in the second year. Vogel said it '
+            + 'would and it does, on a Thursday, and it takes four men and most '
+            + 'of a morning.\n\n'
+            + 'There is a photograph in the local paper of the crew on the lift '
+            + 'with the letters in a stack. You will not be in it. You were not '
+            + 'told, and there is no reason anybody would have thought to.',
+    },
 };
 
 export const endingById = (id: string): Ending | undefined => ENDINGS[id];

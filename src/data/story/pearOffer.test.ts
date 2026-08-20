@@ -20,6 +20,7 @@ import { pearOffer } from './pearOffer';
 import { fatherDeath } from './fatherDeath';
 import { CONVERSATIONS, STORY_BEATS } from './index';
 import { ENDINGS } from './endings';
+import { pearOfferAmount, PEAR_OFFER_FLOOR } from './pearPrice';
 import { validate } from '../../core/story/graph';
 import { CAST } from './cast';
 import { canUseChannel } from '../../core/story/cast';
@@ -194,9 +195,27 @@ describe('yes is a real ending', () => {
     it('and pays a fair price rather than a humiliating one', () => {
         // An insultingly low offer is easy to refuse, and the scene would
         // cost nothing to walk away from. The price has to be good.
-        const cash = effectsOf(pearOffer.id).filter(e => e.kind === 'cash') as any[];
-        expect(cash).toHaveLength(1);
-        expect(cash[0].amount).toBeGreaterThan(40_000_000);
+        //
+        // The AMOUNT is no longer in the scene. It used to be a literal
+        // 48,000,000 which the salutation's `{pearOffer}` token disagreed
+        // with the moment the company outgrew the floor, so both sides read
+        // data/story/pearPrice.ts now and the scene names the sale instead.
+        expect(effectsOf(pearOffer.id).filter(e => e.kind === 'sellToPear'))
+            .toHaveLength(1);
+        expect(pearOfferAmount(0)).toBeGreaterThan(40_000_000);
+    });
+
+    it('and the price the letter quotes is the price signing pays', () => {
+        // Which was NOT true, and the patch for it was worse than the bug:
+        // the generic `cash` sink recognised the literal 48,000,000 and
+        // silently rescaled it, so any future scene paying exactly that
+        // amount would have been multiplied by a rule about a company it
+        // never mentioned.
+        for (const value of [0, 4_500_000, 900_000_000, 40_000_000_000]) {
+            expect(pearOfferAmount(value)).toBe(pearOfferAmount(value));
+            expect(pearOfferAmount(value)).toBeGreaterThanOrEqual(PEAR_OFFER_FLOOR);
+        }
+        expect(pearOfferAmount(1_000_000_000)).toBe(1_250_000_000);
     });
 
     it('the ending text does not tell the player they were wrong', () => {

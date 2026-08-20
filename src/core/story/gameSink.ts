@@ -37,13 +37,29 @@ export const gameSink = (): EffectSink => ({
         const s = useStatsStore.getState();
         s.update({ companyCapital: (s.companyCapital || 0) + amount });
     },
+    // ------------------------------------------------------------------
+    //  CASH PAYS WHAT IT WAS ASKED TO PAY
+    // ------------------------------------------------------------------
+    //  SHELVED, and it was a trap rather than a shortcut:
+    //
+    //      // If it is the Pear buyout offer (48_000_000), dynamically
+    //      // scale to 1.25x companyValue
+    //      const payout = amount === 48_000_000
+    //          ? Math.max(48_000_000, Math.round((s.companyValue || 0) * 1.25))
+    //          : amount;
+    //
+    //  It fixed the right problem in the worst place. The letter quotes a
+    //  scaling number and the scene paid a literal, so somebody taught the
+    //  GENERIC cash effect to recognise one specific amount - which means any
+    //  future scene that happens to pay exactly forty eight million is
+    //  silently multiplied by a rule about a company nobody mentioned.
+    //
+    //  There is a `sellToPear` effect now. It reads the same function the
+    //  salutation reads, and this one has no opinions.
+    // ------------------------------------------------------------------
     cash: (amount) => {
         const s = useStatsStore.getState();
-        // If it is the Pear buyout offer (48_000_000), dynamically scale to 1.25x companyValue
-        const payout = amount === 48_000_000
-            ? Math.max(48_000_000, Math.round((s.companyValue || 0) * 1.25))
-            : amount;
-        s.update({ money: (s.money || 0) + payout });
+        s.update({ money: (s.money || 0) + amount });
     },
     employees: (amount) => {
         try {
@@ -195,6 +211,25 @@ export const gameSink = (): EffectSink => ({
     // ending the app forgets on a reload is not an ending.
     ending: (id) => {
         useStoryStore.getState().endGame(id);
+    },
+    // ------------------------------------------------------------------
+    //  SIGNING PAYS WHAT THE LETTER SAID
+    // ------------------------------------------------------------------
+    //  And it used to pay a literal 48,000,000 while the salutation quoted
+    //  `max(48M, value * 1.25)`. Those agree only while the company is small
+    //  enough for the floor to bind, which stopped being true the moment
+    //  Pear started writing to successors. Both sides ask pearPrice.ts now.
+    // ------------------------------------------------------------------
+    sellToPear: () => {
+        try {
+            const { pearOfferAmount } = require('../../data/story/pearPrice');
+            const stats = require('../store/useStatsStore').useStatsStore;
+            const s = stats.getState();
+            const amount = pearOfferAmount(s.companyValue || 0);
+            s.update({ money: (s.money || 0) + amount });
+        } catch (e) {
+            console.warn('[story] the sale did not pay', e);
+        }
     },
     // Writes the ANCHOR, not the price. A price alone drifts back to the
     // shipped value within a few quarters - that was the divestiture bug, and

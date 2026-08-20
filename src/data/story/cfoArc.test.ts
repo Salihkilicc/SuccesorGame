@@ -64,7 +64,7 @@ const playable = () => {
         dial: (d, delta) => { w.dials[d] = clampDial(w.dials[d] + delta); },
         flag: f => { (w.flags as any)[f] = true; },
         message: () => { }, mail: () => { }, news: () => { },
-        ending: () => { }, schedule: () => { }, reprice: () => { },
+        ending: () => { }, sellToPear: () => { }, schedule: () => { }, reprice: () => { },
     royalty: () => { },
     siege: () => { },
     raid: () => { },

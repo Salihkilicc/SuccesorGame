@@ -38,6 +38,7 @@ import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useStatsStore } from '../../core/store/useStatsStore';
 import { useLocaleStore } from '../../core/i18n';
 import { formatMoney } from '../../core/utils';
+import { pearOfferAmount } from '../story/pearPrice';
 
 export type StoryDictionary = Record<string, string>;
 
@@ -150,15 +151,20 @@ const fillTitle = (text: string): string => {
         res = res.replace(/\{title\}/g, honorific(useIdentityStore.getState().gender));
     }
     if (res.includes('{pearOffer}')) {
+        // From data/story/pearPrice.ts, which the `sellToPear` effect also
+        // reads. The literal that used to be here disagreed with the money
+        // the scene actually paid; see the header of that file.
         const stats = useStatsStore?.getState?.();
-        const compVal = stats?.companyValue || 0;
-        const offerAmount = Math.max(48_000_000, Math.round(compVal * 1.25));
-        res = res.replace(/\{pearOffer\}/g, formatMoney(offerAmount));
+        res = res.replace(
+            /\{pearOffer\}/g,
+            formatMoney(pearOfferAmount(stats?.companyValue || 0)),
+        );
     }
     if (res.includes('{brotherShare}')) {
+        // His fifteen per cent, off the SAME number the offer quotes. It used
+        // to recompute the offer from its own copy of the formula.
         const stats = useStatsStore?.getState?.();
-        const compVal = stats?.companyValue || 0;
-        const offerAmount = Math.max(48_000_000, Math.round(compVal * 1.25));
+        const offerAmount = pearOfferAmount(stats?.companyValue || 0);
         const brotherCut = Math.round(offerAmount * 0.15);
         res = res.replace(/\{brotherShare\}/g, formatMoney(brotherCut));
     }

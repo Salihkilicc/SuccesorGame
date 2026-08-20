@@ -271,6 +271,26 @@ export const runSuccession = (): SuccessionPlan | null => {
     //  player is on the closing screen, which is a bad outcome rather than a
     //  broken one.
     // ------------------------------------------------------------------
+    // ------------------------------------------------------------------
+    //  AND PEAR FINDS OUT
+    // ------------------------------------------------------------------
+    //  `succeeded` is what brings him back. He wrote to a twenty six year
+    //  old who had just inherited once already, and a second inheritance is
+    //  the same opportunity with a bigger number on it. The letter itself
+    //  is gated on NOT owning Pear, so a family that bought him gets
+    //  silence, which is the reward.
+    //
+    //  AND THE SEEN MARK COMES OFF. `seenScenes` is deliberately not
+    //  cleared by a succession - nothing about the founder should replay -
+    //  but this one letter is per GENERATION rather than per save. Without
+    //  the removal Pear writes to the second Hale and never to the third,
+    //  which would be the one silence in this game that means nothing.
+    // ------------------------------------------------------------------
+    useStoryStore.getState().raise('succeeded');
+    useStoryStore.setState(st => ({
+        seenScenes: st.seenScenes.filter(id => id !== 'pear-offer-heir'),
+    }));
+
     useStoryStore.setState({ ending: null } as never);
 
     if (__DEV__) {

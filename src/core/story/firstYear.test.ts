@@ -77,9 +77,28 @@ describe('what the Mail app actually holds in the first year', () => {
         const eventScenes = new Set(
             EVENTS.map((e: any) => e.conversation?.id).filter(Boolean),
         );
-        const notRandom = byChannel('mail').filter(c => !eventScenes.has(c.id));
+        // ------------------------------------------------------------------
+        //  AND THE LETTERS THAT NEED A LIFETIME FIRST
+        // ------------------------------------------------------------------
+        //  Written down rather than derived, for the reason data/story/
+        //  openingAct.ts gives for its own list: a rule like "anything gated
+        //  on a flag" would be correct today and would quietly stop being
+        //  correct, and the failure is silent.
+        //
+        //  Both are Pear and neither can reach the first year. One needs a
+        //  succession to have happened and the other needs the player to own
+        //  his company.
+        // ------------------------------------------------------------------
+        const LATER_LIFE = new Set(['pear-offer-heir', 'pear-bought']);
+        const notRandom = byChannel('mail')
+            .filter(c => !eventScenes.has(c.id) && !LATER_LIFE.has(c.id));
         expect(byChannel('mail').length - notRandom.length).toBeGreaterThan(20);
         expect(notRandom.length).toBeLessThan(10);
+
+        // And the guard on the guard: those two exist and are still mail.
+        for (const id of LATER_LIFE) {
+            expect(byChannel('mail').some(c => c.id === id)).toBe(true);
+        }
     });
 
     it('and the first thing that does arrive is on a quarter, not a flag', () => {

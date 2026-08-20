@@ -23,6 +23,7 @@ const recorder = () => {
         mail: m => log.push(`mail:${m.subject}`),
         news: h => log.push(`news:${h}`),
         ending: id => log.push(`ending:${id}`),
+        sellToPear: () => log.push('sellToPear'),
         reprice: (c, m) => log.push(`reprice:${c}:${m}`),
         royalty: (c, r) => log.push(`royalty:${c}:${r}`),
         siege: (c, q, p) => log.push(`siege:${c}:${q}:${p}`),
