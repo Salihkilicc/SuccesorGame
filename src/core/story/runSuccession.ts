@@ -173,6 +173,30 @@ export const runSuccession = (): SuccessionPlan | null => {
     }
 
     // ------------------------------------------------------------------
+    //  3b. AND THE PREVIOUS ONE'S REPUTATION DOES NOT COME WITH THE CHAIR
+    // ------------------------------------------------------------------
+    //  `usePlayerStore.reputation` is where the casino, the street and the
+    //  police remember you, and it is about a PERSON rather than a company.
+    //  Left alone, a thirty year old who has never been anywhere inherits
+    //  six hundred points of Macau and the home screen calls her "Known in
+    //  Macau" on her first morning.
+    //
+    //  Found by the title system rather than by reading this file, which is
+    //  the argument for putting a fact on the screen: nothing had ever
+    //  DISPLAYED that number, so nothing had ever noticed it surviving.
+    //
+    //  Only `reputation` is cleared. The rest of that store is money, which
+    //  useStatsStore owns for this purpose (see step 2), and vitals that
+    //  nothing in the current game moves.
+    // ------------------------------------------------------------------
+    try {
+        const { usePlayerStore } = require('../store/usePlayerStore');
+        usePlayerStore.setState({
+            reputation: { social: 0, street: 0, business: 0, police: 0, casino: 0 },
+        });
+    } catch { /* player store not ready */ }
+
+    // ------------------------------------------------------------------
     //  4. A FAMILY ONE GENERATION ALONG
     // ------------------------------------------------------------------
     //  The heir has no partner and no children, because they are twenty two

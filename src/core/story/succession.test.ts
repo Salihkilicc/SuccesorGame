@@ -29,6 +29,7 @@ import { useStatsStore } from '../store/useStatsStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
 import { useMessageStore } from '../store/useMessageStore';
+import { usePlayerStore } from '../store/usePlayerStore';
 import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 
 const heir = (id: string, name: string, age: number) => ({
@@ -196,6 +197,22 @@ describe('handing the company over', () => {
         // She holds no stock, so without this she would cease to exist at
         // the moment she became the most interesting person in the family.
         expect(family.survivingParent?.name).toBe('Claire Hale');
+    });
+
+    it('but a life the heir did not lead does not', () => {
+        // `usePlayerStore.reputation` is where the casino, the street and the
+        // police remember a PERSON. Left alone, a thirty year old who has
+        // never been anywhere inherits six hundred points of Macau and the
+        // home screen calls her "Known in Macau" on her first morning.
+        //
+        // Found by the title system rather than by reading the file, which is
+        // the whole argument for putting a number on a screen.
+        usePlayerStore.setState({
+            reputation: { social: 40, street: 20, business: 60, police: 10, casino: 900 },
+        } as never);
+        runSuccession();
+        expect(usePlayerStore.getState().reputation.casino).toBe(0);
+        expect(usePlayerStore.getState().reputation.street).toBe(0);
     });
 
     it('while the family standing carries, because it is the family\'s', () => {
