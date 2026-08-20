@@ -31,7 +31,6 @@ import { useFamilyStore } from '../store/useFamilyStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
-import { useGameStore as gameStore } from '../store/useGameStore';
 import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 import { CAST } from '../../data/story/cast';
 import { planSuccession, type SuccessionPlan } from './succession';
@@ -61,7 +60,7 @@ const postFirstLetter = (plan: SuccessionPlan) => {
         : { id: 'cfo', name: CAST.cfo?.name ?? 'The CFO', role: CAST.cfo?.role ?? 'CFO' };
 
     const opening = conversation.nodes.find(n => n.id === conversation.start);
-    const month = gameStore.getState().currentMonth;
+    const month = useGameStore.getState().currentMonth;
 
     const messages = useMessageStore.getState();
     messages.sendFromCharacter(from, opening?.text ?? '', month);

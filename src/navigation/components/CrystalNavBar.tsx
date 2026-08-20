@@ -7,7 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 import { jumpToCompany } from '../jumpToCompany';
-import { rootNavigationRef } from '../RootNavigator';
+import { rootNavigationRef } from '../navigationRef';
 import { useStatsStore, usePlayerStore } from '../../core/store';
 import { FEATURES } from '../../core/featureFlags';
 import UnreadBadge from '../../components/common/UnreadBadge';

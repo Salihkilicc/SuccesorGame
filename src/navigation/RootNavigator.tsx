@@ -6,7 +6,6 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import {
   NavigationContainer,
   NavigatorScreenParams,
-  createNavigationContainerRef,
   DarkTheme,
 } from '@react-navigation/native';
 
@@ -69,6 +68,7 @@ import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import FamilyMemberScreen from '../features/profile/screens/FamilyMemberScreen';
 import CrystalNavBar from './components/CrystalNavBar';
+import { rootNavigationRef } from './navigationRef';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
   MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
@@ -255,7 +255,10 @@ const LoveStack = createNativeStackNavigator<LoveStackParamList>();
 const AssetsStack = createNativeStackNavigator<AssetsStackParamList>();
 const CasinoStack = createNativeStackNavigator<CasinoStackParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-export const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
+// SHELVED: `const rootNavigationRef = createNavigationContainerRef<...>()`.
+// It moved to navigation/navigationRef.ts, because CrystalNavBar needs it and
+// this file imports CrystalNavBar. See the header of that file for what the
+// cycle did.
 
 const AssetsStackNavigator = () => (
   <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>
