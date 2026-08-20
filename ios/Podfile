@@ -22,9 +22,28 @@ require 'json'
 #  reproduced on an iPhone and not in the simulator, which is the usual shape
 #  of a native module whose new-arch path is not exercised on x86.
 #
-#  So this reads the file rather than replacing it. The intent was already
-#  written down; it just had nowhere to go. Flip the JSON to switch, and
-#  `pod install` again.
+#  ---------------------------------------------------------------------------
+#  AND THE ANSWER TURNED OUT TO BE "TRUE"
+#  ---------------------------------------------------------------------------
+#  Turning it off made every screen inside the swipe navigator render blank -
+#  Home and My Company among them - while Messages and Profile, which are
+#  plain stack routes, were fine.
+#
+#  react-native-pager-view 8.0.0 is the reason and it is not ambiguous. Its
+#  ios folder contains RNCPagerViewComponentView and nothing else: no view
+#  manager, no RCT_EXPORT_MODULE, no legacy path at all. Version 8 is Fabric
+#  only. The material top tab navigator is built on it, so without the new
+#  architecture the pager exists and draws nothing.
+#
+#  So `false` in this file was a stale note rather than a description. The
+#  project has been running on the new architecture the whole time and one of
+#  its dependencies requires it. The file says so now.
+#
+#  The device crash is still real and is still a TurboModule throwing. It
+#  needs finding by name rather than by turning the architecture off
+#  underneath it.
+#
+#  Flip the JSON and `pod install` to switch.
 # ----------------------------------------------------------------------------
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
