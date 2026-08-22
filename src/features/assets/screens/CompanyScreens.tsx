@@ -27,13 +27,14 @@
 // ============================================================================
 
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import CorporateFinanceHubModal from '../../../components/MyCompany/Finance/CorporateFinanceHubModal';
 import BorrowModal from '../../../components/MyCompany/Finance/BorrowModal';
 import RepayModal from '../../../components/MyCompany/Finance/RepayModal';
 import EmployeesModule from '../../../components/MyCompany/Management/EmployeesModule';
 import BoardRoomModal from '../../../components/MyCompany/Shares/BoardRoomModal';
+import MemberInteractionModal from '../../../components/MyCompany/Shares/MemberInteractionModal';
 import ShareControlHub from '../../../components/MyCompany/Shares/ShareControlHub';
 import BuybackModal from '../../../components/MyCompany/Shares/BuybackModal';
 import DilutionModal from '../../../components/MyCompany/Shares/DilutionModal';
@@ -54,6 +55,28 @@ const useGoBack = () => {
 export const BoardMembersScreen = () => {
     const close = useGoBack();
     return <BoardRoomModal asScreen visible onClose={close} />;
+};
+
+/**
+ * One director, and everything you can do about them.
+ *
+ * A ROUTE rather than a modal raised from the board room, for the reason at
+ * the top of this file plus one of its own: the board list was carrying the
+ * member's trust bar, their promises and two action buttons INSIDE each row,
+ * so the list of directors read as a stack of dashboards. Everything about a
+ * person belongs on that person's page.
+ */
+export const BoardMemberScreen = () => {
+    const close = useGoBack();
+    const route = useRoute<any>();
+    return (
+        <MemberInteractionModal
+            asScreen
+            visible
+            onClose={close}
+            memberId={route.params?.memberId ?? ''}
+        />
+    );
 };
 
 export const TeamMoraleScreen = () => {

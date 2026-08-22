@@ -71,6 +71,7 @@ import CrystalNavBar from './components/CrystalNavBar';
 import { rootNavigationRef } from './navigationRef';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
+  BoardMemberScreen,
   MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
   BorrowLoanScreen, RepayDebtScreen,
   CapitalInjectionScreen, SharkDealScreen,
@@ -89,7 +90,7 @@ import TutorialOverlay from '../components/tutorial/TutorialOverlay';
  */
 const COMPANY_ROUTES = new Set([
     'MyCompany', 'Products', 'Research', 'TechTree', 'Laboratory', 'Assets', 'FinancialReport',
-    'BoardMembers', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
+    'BoardMembers', 'BoardMember', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
     'BorrowLoan', 'RepayDebt',
 ]);
 
@@ -177,6 +178,16 @@ export type RootStackParamList = {
   Research: undefined;
   // The company sections - routes now, not popups.
   BoardMembers: undefined;
+  /**
+   * One director, and everything you can do about them.
+   *
+   * A ROUTE rather than a modal raised from the board room, and the reason is
+   * the same one that moved the company sections out of modals: an RN Modal
+   * draws above the nav bar. It also means the member arrives with the push
+   * transition every other detail page in the game uses, which is what the
+   * player asked for - "ekran gecisleri tab bar gibi dusun".
+   */
+  BoardMember: { memberId: string };
   TeamMorale: undefined;
   Finance: undefined;
   MyEmpire: undefined;
@@ -499,6 +510,7 @@ const RootNavigator = () => {
           {/* The company sections are routes, not popups - see
               features/assets/screens/CompanyScreens.tsx */}
           <RootStack.Screen name="BoardMembers" component={BoardMembersScreen} />
+          <RootStack.Screen name="BoardMember" component={BoardMemberScreen} />
           <RootStack.Screen name="TeamMorale" component={TeamMoraleScreen} />
           <RootStack.Screen name="Finance" component={FinanceScreen} />
           <RootStack.Screen name="MyEmpire" component={MyEmpireScreen} />

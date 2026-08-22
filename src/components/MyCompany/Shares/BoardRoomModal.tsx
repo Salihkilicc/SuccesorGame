@@ -1,10 +1,11 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
-import MemberInteractionModal from './MemberInteractionModal';
-import { useStatsStore, useGameStore } from '../../../core/store';
+// `useStatsStore` went with the shelved default proposal.
+import { useGameStore } from '../../../core/store';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
@@ -16,7 +17,8 @@ import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
     FOUNDER_GRACE_PERIOD_MONTHS,
-    Proposal,
+    // `Proposal` goes with the shelved `pendingProposal` prop below.
+    // Proposal,
 } from '../../../core/market/governance';
 
 export const TRAIT_VISUALS: Record<string, { icon: string; color: string }> = {
@@ -59,11 +61,19 @@ type Props = {
     asScreen?: boolean;
     visible: boolean;
     onClose: () => void;
-    /** Bekleyen bir teklif varsa lobi ona gore hesaplanir */
-    pendingProposal?: Proposal;
+    /**
+     * SHELVED with the lobbying it fed.
+     *
+     * "Bekleyen bir teklif varsa lobi ona gore hesaplanir" - and nothing in
+     * the app has ever passed it. Kept in the type rather than removed
+     * because the idea is right and will be wanted the day a real proposal
+     * goes to a vote: the member's screen should then ask what is on the
+     * table instead of inventing a generic motion.
+     */
+    // pendingProposal?: Proposal;
 };
 
-const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) => {
+const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
     // Dil degisince yeniden ciz. Bu satir olmadan ekran eski dilde donar.
     useLocale();
     const {
@@ -71,18 +81,15 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
         playerShareCount,
         totalShares,
         boardStance,
-        lobbied,
-        promises,
         lastVote,
         noConfidenceLevel,
         boardLog,
         boardDemands,
-        lobby,
-        makePromise,
         getPlayerOwnershipPercent,
     } = useShareholderStore();
 
-    const companyValue = useStatsStore(s => s.companyValue);
+    // SHELVED with the default proposal below, which was its only reader.
+    // const companyValue = useStatsStore(s => s.companyValue);
     const currentMonth = useGameStore(s => s.currentMonth);
     const inGracePeriod = (currentMonth || 1) <= FOUNDER_GRACE_PERIOD_MONTHS;
 
@@ -99,61 +106,78 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
     }>(null);
 
     // ------------------------------------------------------------------
-    //  THE MEMBER SCREEN WAS UNREACHABLE
+    //  THE MEMBER SCREEN WAS UNREACHABLE, AND THEN IT WAS A MODAL
     // ------------------------------------------------------------------
     //  MemberInteractionModal - gifts, private dinners, buyout offers - was
     //  referenced from NOWHERE in the app. The gesture system behind it was
     //  written and wired to the store, and the player still could not open
     //  it. Same class of bug as per-category brand: built, never surfaced.
     //
-    //  Tapping a director now opens it.
+    //  Tapping a director opened it, as a modal raised from this one. Which
+    //  is why it came up from the bottom while every other detail page in the
+    //  game slides in from the right, and why the nav bar disappeared on it.
+    //
+    //  SHELVED, replaced by a route:
+    //      const [openMemberId, setOpenMemberId] = useState<string | null>(null);
     // ------------------------------------------------------------------
-    const [openMemberId, setOpenMemberId] = useState<string | null>(null);
+    const navigation = useNavigation<any>();
+    const openMember = (memberId: string) =>
+        navigation.navigate('BoardMember', { memberId });
 
     const ownership = getPlayerOwnershipPercent();
     const hasControl = ownership >= CONTROL_THRESHOLD;
     const insiderShares = members.reduce((s, m) => s + m.shareCount, 0);
     const floatShares = Math.max(0, totalShares - playerShareCount - insiderShares);
 
-    // Lobi icin bir teklif gerekiyor; yoksa genel bir "destek" teklifi.
-    const proposal: Proposal = pendingProposal ?? {
-        kind: 'acquisition',
-        amount: companyValue * 0.3,
-        valuation: companyValue,
-        title: t('equity.aMajorMoveNextQuarter'),
-    };
+    // SHELVED with `handleLobby`: the default proposal existed only to feed
+    // it, and the member's screen builds its own from the same valuation.
+    // // Lobi icin bir teklif gerekiyor; yoksa genel bir "destek" teklifi.
+    // const proposal: Proposal = pendingProposal ?? {
+    // kind: 'acquisition',
+    // amount: companyValue * 0.3,
+    // valuation: companyValue,
+    // title: t('equity.aMajorMoveNextQuarter'),
+    // };
 
-    const handleLobby = (memberId: string, name: string) => {
-        const res = lobby(memberId, proposal);
-        if (!res.success) {
-            setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
-            return;
-        }
-        if (!res.demands) {
-            setPanel({ title: t('board.supportSecured'), summary: res.message, confirmLabel: 'OK' });
-            return;
-        }
-
-        const labels: Record<string, string> = {
-            dividend_next: 'pay a dividend next quarter',
-            board_seat: 'give them an extra board seat',
-            no_dilution: 'issue no new shares',
-            share_grant: 'grant them additional shares',
-            reduce_debt: 'bring the debt down',
-        };
-        setPanel({
-            title: `${name} wants something`,
-            summary: res.message,
-            lines: [{ label: 'They want you to', value: labels[res.demands], strong: true }],
-            note: t('board.breakPromise'),
-            cancelLabel: t('board.walkAway'),
-            confirmLabel: t('board.giveMyWord'),
-            onConfirm: () => {
-                makePromise(memberId, res.demands!, 1, 0.8, labels[res.demands!]);
-                setPanel({ title: t('board.committed'), summary: name, confirmLabel: 'OK' });
-            },
-        });
-    };
+    // ------------------------------------------------------------------
+    //  SHELVED: `handleLobby` LIVES ON THE MEMBER'S OWN SCREEN NOW
+    // ------------------------------------------------------------------
+    //  Moved rather than copied, wording and all: what a director asks
+    //  for in return is writing, and two versions of those five
+    //  sentences would have drifted the first time either was edited.
+    //  See MemberInteractionModal, which is where the button is.
+    // ------------------------------------------------------------------
+    // const handleLobby = (memberId: string, name: string) => {
+    //     const res = lobby(memberId, proposal);
+    //     if (!res.success) {
+    //         setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
+    //         return;
+    //     }
+    //     if (!res.demands) {
+    //         setPanel({ title: t('board.supportSecured'), summary: res.message, confirmLabel: 'OK' });
+    //         return;
+    //     }
+    // 
+    //     const labels: Record<string, string> = {
+    //         dividend_next: 'pay a dividend next quarter',
+    //         board_seat: 'give them an extra board seat',
+    //         no_dilution: 'issue no new shares',
+    //         share_grant: 'grant them additional shares',
+    //         reduce_debt: 'bring the debt down',
+    //     };
+    //     setPanel({
+    //         title: `${name} wants something`,
+    //         summary: res.message,
+    //         lines: [{ label: 'They want you to', value: labels[res.demands], strong: true }],
+    //         note: t('board.breakPromise'),
+    //         cancelLabel: t('board.walkAway'),
+    //         confirmLabel: t('board.giveMyWord'),
+    //         onConfirm: () => {
+    //             makePromise(memberId, res.demands!, 1, 0.8, labels[res.demands!]);
+    //             setPanel({ title: t('board.committed'), summary: name, confirmLabel: 'OK' });
+    //         },
+    //     });
+    // };
 
     const moodColor =
         boardStance === 'Supportive' ? theme.colors.textPrimary
@@ -305,91 +329,60 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
 
                         {tab === 'board' ? (
                             <>
+                                {/* ------------------------------------------
+                                    A LIST OF DIRECTORS, NOT SIX DASHBOARDS
+
+                                    Every row used to carry a trust bar, the
+                                    promises you owed that person, a "Speak
+                                    privately" button and a second button whose
+                                    only job was to open their page. With six
+                                    directors that is six stacked control
+                                    panels, and it is what the player meant by
+                                    "cok buyuk duzensiz duruyor".
+
+                                    A row answers the only question a list has
+                                    to answer - who is this, how much do they
+                                    weigh, where do they stand - and everything
+                                    you can DO is one tap away on their own
+                                    screen. See MemberInteractionModal.
+                                   ------------------------------------------ */}
                                 {members.map(m => {
                                     const weight = totalShares > 0 ? (m.shareCount / totalShares) * 100 : 0;
-                                    const promised = promises.filter(p => p.memberId === m.id && !p.resolved);
-                                    const alreadyLobbied = lobbied[m.id] !== undefined;
                                     const traitVisual = getTraitVisual(m.trait);
                                     const trustColor =
                                         m.trust >= 60 ? theme.colors.up
                                             : m.trust >= 35 ? theme.colors.textSecondary
                                                 : theme.colors.down;
-                                    const trustFill =
-                                        m.trust >= 60 ? theme.colors.primary
-                                            : m.trust >= 35 ? theme.colors.borderStrong
-                                                : theme.colors.disabled;
 
                                     return (
-                                        <View key={m.id} style={styles.memberCard}>
-                                            <Pressable onPress={() => setOpenMemberId(m.id)}>
-                                                <View style={styles.memberTop}>
-                                                    <View style={[styles.traitBadge, { backgroundColor: `${traitVisual.color}15`, borderColor: `${traitVisual.color}35` }]}>
-                                                        <MaterialCommunityIcons name={traitVisual.icon} size={20} color={traitVisual.color} />
-                                                    </View>
-                                                    <View style={{ flex: 1, marginLeft: 10 }}>
-                                                        <Text style={styles.memberName}>{m.name} ›</Text>
-                                                        <Text style={styles.memberTrait}>
-                                                            {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
-                                                        </Text>
-                                                    </View>
-                                                    <View style={{ alignItems: 'flex-end' }}>
-                                                        <Text style={[styles.memberTrust, { color: trustColor }]}>
-                                                            {m.trust}
-                                                        </Text>
-                                                        <Text style={styles.memberRel}>
-                                                            {t('board.relShort', { v1: String(Math.round(m.relationship ?? 50)) })}
-                                                        </Text>
-                                                    </View>
+                                        <Pressable
+                                            key={m.id}
+                                            onPress={() => openMember(m.id)}
+                                            style={({ pressed }) => [
+                                                styles.memberCard,
+                                                pressed && { opacity: 0.85 },
+                                            ]}>
+                                            <View style={styles.memberTop}>
+                                                <View style={[styles.traitBadge, { backgroundColor: `${traitVisual.color}15`, borderColor: `${traitVisual.color}35` }]}>
+                                                    <MaterialCommunityIcons name={traitVisual.icon} size={20} color={traitVisual.color} />
                                                 </View>
-                                            </Pressable>
-
-                                            <View style={styles.trustBarBg}>
-                                                <View
-                                                    style={[
-                                                        styles.trustBarFill,
-                                                        { width: `${m.trust}%`, backgroundColor: trustFill },
-                                                    ]}
-                                                />
-                                            </View>
-
-                                            {promised.map(p => (
-                                                <View key={p.id} style={styles.promiseBox}>
-                                                    <MaterialCommunityIcons name="handshake-outline" size={14} color="#FBBF24" style={{ marginRight: 6 }} />
-                                                    <Text style={styles.promiseNote}>
-                                                        You promised to {p.description}
+                                                <View style={{ flex: 1, marginLeft: 10 }}>
+                                                    <Text style={styles.memberName}>{m.name}</Text>
+                                                    <Text style={styles.memberTrait}>
+                                                        {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
                                                     </Text>
                                                 </View>
-                                            ))}
-
-                                            <View style={styles.actionRow}>
-                                                <Pressable
-                                                    style={[styles.lobbyBtn, alreadyLobbied && styles.lobbyBtnDone]}
-                                                    disabled={alreadyLobbied}
-                                                    onPress={() => handleLobby(m.id, m.name)}
-                                                >
-                                                    <MaterialCommunityIcons
-                                                        name={alreadyLobbied ? 'check' : 'message-lock-outline'}
-                                                        size={14}
-                                                        color={alreadyLobbied ? 'rgba(255,255,255,0.48)' : '#FFFFFF'}
-                                                        style={{ marginRight: 4 }}
-                                                    />
-                                                    <Text style={styles.lobbyText}>
-                                                        {alreadyLobbied
-                                                            ? t('board.spokenAlready')
-                                                            : t('board.speakPrivately')}
+                                                <View style={{ alignItems: 'flex-end' }}>
+                                                    <Text style={[styles.memberTrust, { color: trustColor }]}>
+                                                        {m.trust}
                                                     </Text>
-                                                </Pressable>
-                                                <Pressable
-                                                    style={styles.openMemberBtn}
-                                                    onPress={() => setOpenMemberId(m.id)}
-                                                >
-                                                    <MaterialCommunityIcons name="card-account-details-outline" size={14} color={theme.colors.textPrimary} style={{ marginRight: 4 }} />
-                                                    <Text style={styles.openMemberText}>
-                                                        {t('board.openMember')}
+                                                    <Text style={styles.memberRel}>
+                                                        {t('board.relShort', { v1: String(Math.round(m.relationship ?? 50)) })}
                                                     </Text>
-                                                </Pressable>
+                                                </View>
+                                                <Text style={styles.memberChevron}>›</Text>
                                             </View>
-                                        </View>
+                                        </Pressable>
                                     );
                                 })}
 
@@ -443,13 +436,8 @@ const BoardRoomModal = ({ visible, onClose, pendingProposal, asScreen }: Props) 
                 </View>
             </View>
 
-            {/* Director detail — gifts, dinners, buyout */}
-            <MemberInteractionModal
-                visible={!!openMemberId}
-                memberId={openMemberId || ''}
-                onClose={() => setOpenMemberId(null)}
-            />
-        
+            {/* The director's page is a ROUTE now - see `openMember` above. */}
+
             <ConfirmPanel
                 visible={!!panel}
                 title={panel?.title || ''}
@@ -532,6 +520,9 @@ const styles = StyleSheet.create({
     memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#FFFFFF', marginTop: 2 },
+    // The row is a link now, so it says so. The name used to carry a stray
+    // '›' inside its own Text, which wrapped with the name.
+    memberChevron: { color: theme.colors.textMuted, fontSize: 22, marginLeft: 8 },
     memberTrust: { fontSize: 20, fontWeight: '800' },
     trustBarBg: { height: 5, backgroundColor: '#434B50', borderRadius: 3, marginTop: 10, overflow: 'hidden' },
     trustBarFill: { height: '100%', borderRadius: 3 },

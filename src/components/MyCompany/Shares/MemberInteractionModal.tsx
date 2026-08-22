@@ -1,13 +1,43 @@
+// src/components/MyCompany/Shares/MemberInteractionModal.tsx
+//
+// ============================================================================
+//  ONE DIRECTOR, AND EVERYTHING YOU CAN DO ABOUT THEM
+// ============================================================================
+//
+//  WHAT WAS WRONG. This existed and the board room ALSO carried, inside every
+//  row of its list: a trust bar, the promises you had made to that person, a
+//  "Speak privately" button and a button to open this. So a board of six read
+//  as six stacked dashboards, and the things you could do about one person
+//  were split across two places with no rule for which was where.
+//
+//  Reported as "her seyi bu board memberin kendi ekraninda toplayalim, her
+//  seyi oradan yapalim" and "ekrandaki seyler cok buyuk duzensiz duruyor".
+//
+//  So the list is a list now - name, trait, weight, trust, one tap - and this
+//  is the page. Lobbying, gifts, dinner, the buyout, the promises you owe
+//  them: all of it here, none of it there.
+//
+//  ---------------------------------------------------------------------------
+//  AND IT IS A ROUTE
+//  ---------------------------------------------------------------------------
+//  `asScreen` for the same reason the company sections became routes: an RN
+//  Modal draws above the nav bar, and a modal comes up from the bottom while
+//  every other detail page in the game slides in from the right. See
+//  components/common/ScreenHost.tsx.
+// ============================================================================
+
 import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import GameModal from '../../common/GameModal';
+import ScreenHost from '../../common/ScreenHost';
+import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney, formatNumber } from '../../../core/utils';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import { getTraitVisual } from './BoardRoomModal';
 
@@ -15,11 +45,13 @@ interface Props {
     visible: boolean;
     onClose: () => void;
     memberId: string;
+    /** Render as a route rather than a popup - see components/common/ScreenHost. */
+    asScreen?: boolean;
 }
 
 type TabType = 'LOBBYING' | 'BUYOUT';
 
-const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
+const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props) => {
     useLocale();
     const { members, calculateBuyoutPrice, offerGesture, negotiateSharePurchase } = useShareholderStore();
     const { money, companySharePrice, update: updateStats } = useStatsStore();
@@ -50,6 +82,23 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
         tone?: 'default' | 'danger';
     }>(null);
     const [offerPremium, setOfferPremium] = useState(0); // Percentage premium (-20 to +100)
+    // ------------------------------------------------------------------
+    //  SPEAKING TO THEM PRIVATELY IS A THING YOU DO ABOUT A PERSON
+    // ------------------------------------------------------------------
+    //  It lived in the board room list, one button per row, next to a second
+    //  button whose only job was to open this page. Two buttons on every row
+    //  of a list of six is what made the board read as a stack of dashboards.
+    //  See the header.
+    //
+    //  Declared with the other hooks, ABOVE the early return - the rule at
+    //  the top of this component, and the one scripts/reachability.js has a
+    //  check for.
+    // ------------------------------------------------------------------
+    const lobby = useShareholderStore(st => st.lobby);
+    const makePromise = useShareholderStore(st => st.makePromise);
+    const lobbied = useShareholderStore(st => st.lobbied);
+    const promises = useShareholderStore(st => st.promises);
+    const companyValue = useStatsStore(st => st.companyValue);
     const totalShares = useShareholderStore(st => st.totalShares);
     const playerPercent = useShareholderStore(st =>
         st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
@@ -105,6 +154,54 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     };
 
     const trustStatus = getTrustStatus(member.trust);
+
+    const alreadyLobbied = lobbied[member.id] !== undefined;
+    const owed = (promises ?? []).filter(
+        (pr: any) => pr.memberId === member.id && !pr.resolved,
+    );
+
+    /**
+     * Ask them, before the meeting, where they stand.
+     *
+     * Moved from BoardRoomModal unchanged, including the labels: the wording
+     * of what a director asks for is writing, and rewriting it here would
+     * have made two versions of the same five sentences.
+     */
+    const handleLobby = () => {
+        const proposal = {
+            kind: 'acquisition' as const,
+            amount: (companyValue || 0) * 0.3,
+            valuation: companyValue || 0,
+            title: t('equity.aMajorMoveNextQuarter'),
+        };
+        const res = lobby(member.id, proposal);
+        if (!res.success) {
+            setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
+            return;
+        }
+        if (!res.demands) {
+            setPanel({ title: t('board.supportSecured'), summary: res.message, confirmLabel: 'OK' });
+            return;
+        }
+        const labels: Record<string, string> = {
+            dividend_next: 'pay a dividend next quarter',
+            board_seat: 'give them an extra board seat',
+            no_dilution: 'issue no new shares',
+            share_grant: 'grant them additional shares',
+            reduce_debt: 'bring the debt down',
+        };
+        setPanel({
+            title: `${member.name} wants something`,
+            summary: res.message,
+            lines: [{ label: 'They want you to', value: labels[res.demands], strong: true }],
+            note: t('board.breakPromise'),
+            confirmLabel: t('board.giveMyWord'),
+            onConfirm: () => {
+                makePromise(member.id, res.demands!, 1, 0.8, labels[res.demands!]);
+                setPanel({ title: t('board.committed'), summary: member.name, confirmLabel: 'OK' });
+            },
+        });
+    };
 
     // Lobbying Actions
     const handleSendGift = () => {
@@ -314,19 +411,27 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
     };
 
     return (
-        <GameModal visible={visible} onClose={onClose}>
-            {/* Hero Section */}
+        <ScreenHost asScreen={asScreen} visible={visible} animationType="fade" transparent={!asScreen}>
+            {/* ----------------------------------------------------------------
+                THE NAME IS IN THE HEADER, NOT IN THE PAGE
+
+                The hero used to open with a sixty pixel avatar, the name, the
+                trait, a trust pill and a three line character card before a
+                single number appeared - most of a phone screen spent saying
+                who you were looking at, on a page you reached by tapping
+                their name. The header says it once.
+               ---------------------------------------------------------------- */}
+            <ScreenHeader
+                title={member.name}
+                subtitle={`${t('equity.theV1', { v1: member.trait })} · ${trustStatus.label}`}
+                onBack={onClose}
+                inset={!asScreen ? false : undefined}
+                category="finance"
+            />
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.page}>
             <View style={styles.heroSection}>
-                <View style={[styles.heroAvatar, { backgroundColor: `${getTraitVisual(member.trait).color}15`, borderWidth: 1, borderColor: `${getTraitVisual(member.trait).color}35` }]}>
-                    <MaterialCommunityIcons name={getTraitVisual(member.trait).icon} size={30} color={getTraitVisual(member.trait).color} />
-                </View>
-                <Text style={styles.heroName}>{member.name}</Text>
-                <Text style={styles.heroRole}>{t('equity.theV1', { v1: member.trait })}</Text>
-                <View style={[styles.trustBadge, { borderColor: trustStatus.color }]}>
-                    <Text style={[styles.trustBadgeText, { color: trustStatus.color }]}>
-                        {trustStatus.label}
-                    </Text>
-                </View>
 
                 {/* ------------------------------------------------------------
                     WHO THIS PERSON IS
@@ -338,6 +443,18 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                     are now stated plainly.
                    ------------------------------------------------------------ */}
                 <View style={styles.characterCard}>
+                    {/* The trait, once, as a mark rather than a sixty pixel
+                        portrait. The header already says the word. */}
+                    <View style={styles.traitRow}>
+                        <MaterialCommunityIcons
+                            name={getTraitVisual(member.trait).icon}
+                            size={18}
+                            color={getTraitVisual(member.trait).color}
+                        />
+                        <Text style={styles.traitRowText}>
+                            {t('data.trait.' + member.trait)}
+                        </Text>
+                    </View>
                     <Text style={styles.characterLine}>
                         {t('mem.wants')}{'  '}
                         <Text style={styles.characterValue}>
@@ -396,10 +513,52 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 </Pressable>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
-                {/* Lobbying Tab */}
+            {/* Lobbying Tab */}
+            <View style={styles.tabBody}>
                 {activeTab === 'LOBBYING' && (
                     <View style={styles.tabContent}>
+                        {/* ------------------------------------------------
+                            THE ONE THAT DECIDES A VOTE, ABOVE THE ONES THAT
+                            NUDGE A NUMBER
+
+                            A gift is worth a few points of relationship. This
+                            is where you find out whether they will back you,
+                            and what it will cost, so it is not a fourth tile
+                            in a grid of gestures.
+                           ------------------------------------------------ */}
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.lobbyBtn,
+                                alreadyLobbied && styles.lobbyBtnDone,
+                                pressed && !alreadyLobbied && { opacity: 0.85 },
+                            ]}
+                            disabled={alreadyLobbied}
+                            onPress={handleLobby}>
+                            <MaterialCommunityIcons
+                                name={alreadyLobbied ? 'check' : 'message-lock-outline'}
+                                size={16}
+                                color={alreadyLobbied ? theme.colors.textMuted : theme.colors.primaryText}
+                                style={{ marginRight: 6 }}
+                            />
+                            <Text style={[styles.lobbyText, alreadyLobbied && styles.lobbyTextDone]}>
+                                {alreadyLobbied ? t('board.spokenAlready') : t('board.speakPrivately')}
+                            </Text>
+                        </Pressable>
+
+                        {/* What you owe them. It was a box in the board list,
+                            which is the one place it could not be acted on. */}
+                        {owed.map((pr: any) => (
+                            <View key={pr.id} style={styles.promiseBox}>
+                                <MaterialCommunityIcons
+                                    name="handshake-outline" size={14}
+                                    color={theme.colors.warning} style={{ marginRight: 6 }}
+                                />
+                                <Text style={styles.promiseNote}>
+                                    You promised to {pr.description}
+                                </Text>
+                            </View>
+                        ))}
+
                         <Text style={styles.sectionTitle}>{t('equity.influenceActions')}</Text>
                         <View style={styles.actionGrid}>
                             {/* Send Gift */}
@@ -551,6 +710,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                         </View>
                     </View>
                 )}
+            </View>
             </ScrollView>
 
             <ConfirmPanel
@@ -565,21 +725,53 @@ const MemberInteractionModal = ({ visible, onClose, memberId }: Props) => {
                 onConfirm={panel?.onConfirm}
                 onCancel={() => setPanel(null)}
             />
-        </GameModal>
+        </ScreenHost>
     );
 };
 
 export default MemberInteractionModal;
 
 const styles = StyleSheet.create({
-    heroSection: {
+    // ----------------------------------------------------------------------
+    //  THE PAGE, AND WHY THE HERO SHRANK
+    // ----------------------------------------------------------------------
+    //  24pt of padding, a centred column, and a card that carried the avatar,
+    //  the name, the trait, a trust pill, three lines of character and four
+    //  stats. On a phone that is the whole screen before the first thing you
+    //  can DO. The name and the trait moved to the header, the avatar went
+    //  with them, and what is left is the four numbers and the two sentences
+    //  that actually change how you play this person.
+    // ----------------------------------------------------------------------
+    page: { padding: 16, paddingBottom: NAV_BAR_CLEARANCE + 16, gap: 14 },
+    lobbyBtn: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.radius.md,
+        paddingVertical: 13,
+    },
+    // Done is a SURFACE, not a colour: nothing here is a profit or a loss.
+    lobbyBtnDone: { backgroundColor: theme.colors.surfaceHigh },
+    lobbyText: { color: theme.colors.primaryText, fontWeight: '800', fontSize: 14, letterSpacing: 0.5 },
+    lobbyTextDone: { color: theme.colors.textMuted },
+    promiseBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: theme.colors.surfaceHigh,
+        borderRadius: theme.radius.sm,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+    },
+    promiseNote: { color: theme.colors.textSecondary, fontSize: 11.5, flex: 1, lineHeight: 16 },
+    tabBody: { gap: 16 },
+    heroSection: {
         backgroundColor: '#434B50',
         borderRadius: 16,
-        padding: 24,
-        marginBottom: 20,
+        padding: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.06)',
+        gap: 12,
     },
     heroAvatar: {
         width: 80,
@@ -618,16 +810,21 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         letterSpacing: 1,
     },
-    characterCard: { backgroundColor: '#434B50', borderRadius: 10, padding: 10, marginTop: 10, alignSelf: 'stretch' },
+    // Inside the hero rather than a card within a card - two nested surfaces
+    // of the same colour is a border doing nothing.
+    characterCard: { alignSelf: 'stretch', gap: 3 },
+    traitRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 3 },
+    traitRowText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
     characterLine: { color: 'rgba(255,255,255,0.48)', fontSize: 11, marginBottom: 3 },
     characterValue: { color: '#FFFFFF', fontWeight: '700' },
     characterHint: { color: '#FFFFFF', fontSize: 10, marginTop: 4, lineHeight: 14, fontStyle: 'italic' },
     statsRow: {
         flexDirection: 'row',
-        gap: 24,
+        justifyContent: 'space-between',
     },
     statItem: {
         alignItems: 'center',
+        flex: 1,
     },
     statLabel: {
         fontSize: 10,
