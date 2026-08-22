@@ -82,12 +82,18 @@
 	<false/>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleDefault</string>
+	<!-- PORTRAIT ONLY. Every screen in this game is a single column with a
+	     tab bar pinned to the bottom, and nothing in it was ever laid out
+	     for a landscape width: the report cards cap at 480pt and centre,
+	     leaving two empty gutters, and the swipe navigator's page width is
+	     read from the window.
+
+	     Upside down is gone with them. It is ignored on a notched iPhone
+	     anyway, and on the ones that honour it the bottom tab bar ends up
+	     at the top. -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
