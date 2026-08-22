@@ -110,8 +110,49 @@ export const DEPARTURE_LINES: Record<'quiet' | 'loud', string> = {
 //  line that said "your public standing is too low" would put the mechanic
 //  back behind a curtain and undo the whole point of sending a message at all.
 // ============================================================================
-export const REFUSAL_LINES: Record<StrainVoice, string> = {
-    measured: 'It was good to meet you, and I mean that.\n\nI have thought about it and I do not think so. There is nothing you did. I would rather say it now than be vague at you for a month.',
-    counting: 'Thank you for the evening.\n\nI am going to be direct, because I think you would prefer it: no. I hope that is easier to hear once than to work out slowly.',
-    sharp: 'Look, you seem fine.\n\nI asked about you afterwards, which is a thing people do, and I have decided against it. I am not going to explain that and you would not enjoy it if I did.',
+//  ---------------------------------------------------------------------------
+//  AND THERE ARE FOUR OF EACH, NOT ONE
+//  ---------------------------------------------------------------------------
+//  There was one line per voice, so a player who was turned down twice read
+//  the same paragraph twice, word for word, from two different people. Which
+//  is worse than a generic line: a generic line is a system speaking, and a
+//  repeated specific one is a person who turns out to be a system.
+//
+//  Four is enough that a run does not repeat and few enough that all twelve
+//  can be written properly. See `refusalLine` for the picking.
+// ============================================================================
+export const REFUSAL_LINES: Record<StrainVoice, string[]> = {
+    measured: [
+        'It was good to meet you, and I mean that.\n\nI have thought about it and I do not think so. There is nothing you did. I would rather say it now than be vague at you for a month.',
+        'I have been trying to word this since Tuesday and there is no good version, so: no.\n\nYou were easy to talk to and I am not going to pretend that settles it. I hope the rest of your week is better than this message.',
+        'Thank you for asking. It is not nothing, being asked.\n\nI am going to say no, and I want to be clear that it is about my life rather than about you. That is true even though it is also what people say when it is not.',
+        'No, and I am sorry to put it that plainly.\n\nI thought about softening it and decided you would rather have the sentence than the paragraph around it.',
+    ],
+    counting: [
+        'Thank you for the evening.\n\nI am going to be direct, because I think you would prefer it: no. I hope that is easier to hear once than to work out slowly.',
+        'Answering properly rather than leaving it.\n\nIt is a no. I have thought about what the next six months would look like and I did not like my own answer.',
+        'You will want this quickly so here it is: no.\n\nI have made a habit of saying so on the day I decide. It costs me the awkward message and it saves us both a fortnight.',
+        'I have given this the time it deserved and the answer is still no.\n\nThere is nothing to argue with and I would rather you did not try, because you would be good at it and I would still be right.',
+    ],
+    sharp: [
+        'Look, you seem fine.\n\nI asked about you afterwards, which is a thing people do, and I have decided against it. I am not going to explain that and you would not enjoy it if I did.',
+        'No.\n\nI could dress that up. You are a grown man and I have watched you take worse news than this before lunch.',
+        'I thought about it for slightly less time than you are going to spend reading this. No.\n\nDo not send flowers. I mean that as advice rather than as a rule.',
+        'Somebody at that table told me something about you afterwards and I have not stopped thinking about it, which is not the compliment it sounds like.\n\nSo, no.',
+    ],
+};
+
+/**
+ * One of them, at random.
+ *
+ * The index rather than the array is exported to the caller so the picking
+ * lives here with the writing. A caller choosing its own index would end up
+ * with two places that both know how many lines there are.
+ */
+export const refusalLine = (
+    voice: StrainVoice,
+    roll: () => number = Math.random,
+): string => {
+    const lines = REFUSAL_LINES[voice] ?? REFUSAL_LINES.measured;
+    return lines[Math.min(lines.length - 1, Math.floor(roll() * lines.length))];
 };

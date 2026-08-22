@@ -118,6 +118,20 @@ const getRandomWeighted = <T>(items: T[], weights: number[]): T => {
 //  };
 // ============================================================================
 
+/**
+ * What came of asking.
+ *
+ * A shape rather than `X | null`, because null was being read as "nothing
+ * happened" by every caller and a refusal is not nothing - see the note in
+ * `triggerEncounter`.
+ */
+export type EncounterOutcome =
+    | { kind: 'candidate'; candidate: PartnerProfile; scenario: EncounterScenario }
+    /** They were not interested. The message from them is already sent. */
+    | { kind: 'refused'; name: string }
+    /** Every room open to this player is cooling off from an earlier no. */
+    | { kind: 'nobody' };
+
 export const useEncounterSystem = () => {
     const [currentScenario, setCurrentScenario] = useState<EncounterScenario | null>(null);
     const [candidate, setCandidate] = useState<PartnerProfile | null>(null);
@@ -149,7 +163,11 @@ export const useEncounterSystem = () => {
     }, []);
 
     // --- 2. Trigger Encounter ---
-    const triggerEncounter = useCallback((context: string, countryId?: string, autoShow: boolean = true): { candidate: PartnerProfile, scenario: EncounterScenario } | null => {
+    const triggerEncounter = useCallback((
+        context: string,
+        countryId?: string,
+        autoShow: boolean = true,
+    ): EncounterOutcome => {
         // 0. Probability Check (Internal)
         let chance = 10; // Default 10% (Generic passive background)
 
@@ -180,7 +198,9 @@ export const useEncounterSystem = () => {
         console.log(`[Encounter] Context: ${context}, Chance: ${chance}%, Roll: ${roll.toFixed(1)}`);
 
         if (roll > chance) {
-            return null;
+            // Nobody was in the room. Distinct from a refusal, and the caller
+            // should be able to tell them apart.
+            return { kind: 'nobody' };
         }
 
         // 1. Select Scenario List
@@ -214,12 +234,30 @@ export const useEncounterSystem = () => {
         //  See logic/courtship.ts for why those are two numbers rather than
         //  one "prestige".
         // ------------------------------------------------------------------
+        // ------------------------------------------------------------------
+        //  A TAP THAT DOES NOTHING IS NOT A REFUSAL, IT IS A BROKEN BUTTON
+        // ------------------------------------------------------------------
+        //  This returned `null` on a refusal and every caller treated null as
+        //  "no encounter this time". So the player pressed the button to go
+        //  and meet somebody, watched nothing happen, and a message arrived
+        //  some seconds later from a person they had never seen a card for.
+        //
+        //  Nothing connected the two. Reported as the refusal not appearing
+        //  to do anything, which is exactly what it looked like.
+        //
+        //  The outcome is named now and handed back, so the screen can say
+        //  what happened at the moment the player asked. The message still
+        //  goes - being told twice is not the problem, being told by neither
+        //  is.
+        // ------------------------------------------------------------------
         const result = runCourtship();
+        if (result.kind === 'refused') {
+            return { kind: 'refused', name: result.candidate.name };
+        }
         if (result.kind !== 'candidate') {
-            // Refused, or every room the player can reach is cooling off.
-            // Either way there is no card, and in the refused case they have
-            // already been told by the person who told them.
-            return null;
+            // Every room the player can reach is still cooling off from an
+            // earlier no. Also worth saying out loud rather than swallowing.
+            return { kind: 'nobody' };
         }
         const newCandidate = result.candidate;
 
@@ -230,7 +268,7 @@ export const useEncounterSystem = () => {
             setIsVisible(true);
         }
 
-        return { candidate: newCandidate, scenario }; // Interaction Started!
+        return { kind: 'candidate', candidate: newCandidate, scenario };
     }, [generateSmartCandidate]);
 
     // --- 3. Handle Date Action ---

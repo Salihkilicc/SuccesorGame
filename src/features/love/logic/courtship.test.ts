@@ -23,6 +23,9 @@ import {
     tiersOpenTo, reachAbove, courtshipFor, TIER_UNLOCK, TIER_STANDING,
     REPUTATION_FLOOR, REFUSAL_COOLDOWN_QUARTERS, LOOKS_RESISTANCE,
     REPUTATION_WEIGHT,
+    reachBelow,
+    REACH_BELOW_MAX,
+    COURTSHIP_CEILING,
 } from './courtship';
 import { generatePartner } from './partnerGenerator';
 import type { PartnerProfile } from '../../../data/relationshipTypes';
@@ -212,5 +215,62 @@ describe('and the room decides who is generated', () => {
             expect(generatePartner('STUDENT_LIFE').stats.socialClass).toBe('WorkingClass');
             expect(generatePartner('HIGH_SOCIETY').stats.socialClass).toBe('OldMoney');
         }
+    });
+});
+
+// ============================================================================
+//  AND THE ROOM YOU COULD BE IN IS WHAT MAKES THIS ONE EASY
+// ============================================================================
+//
+//  "Reddetmeleri neye gore, fakir biri ise reddedemesin."
+//
+//  `reachAbove` punished reaching UP and there was nothing for reaching down,
+//  so a student and a dynasty daughter applied identical standards to a man
+//  worth two billion. The formula treated every room as equally hard.
+// ============================================================================
+describe('reaching below', () => {
+    const world = (rep: number, value: number) =>
+        ({ publicReputation: rep, companyValue: value });
+
+    it('is nothing when you belong where you are', () => {
+        // A player who has just cleared the artistic bar is not above it.
+        expect(reachBelow('STUDENT_LIFE', 10_000_000)).toBe(0);
+        expect(reachBelow('BLUE_COLLAR', 0)).toBe(0);
+    });
+
+    it('and grows with how far past the next room you are', () => {
+        const near = reachBelow('STUDENT_LIFE', 60_000_000);
+        const far = reachBelow('STUDENT_LIFE', 2_000_000_000);
+        expect(far).toBeGreaterThan(near);
+        expect(near).toBeGreaterThan(0);
+    });
+
+    it('and stops, because a person is still a person', () => {
+        expect(reachBelow('STUDENT_LIFE', 1e15)).toBe(REACH_BELOW_MAX);
+    });
+
+    it('while the best room in the game has nothing above it to outgrow', () => {
+        expect(reachBelow('HIGH_SOCIETY', 1e15)).toBe(0);
+    });
+
+    it('so a billionaire is much harder to turn down in a student bar', () => {
+        const rich = courtshipFor(candidate({ looks: 50 }), world(50, 5_000_000_000), 'STUDENT_LIFE', () => 1);
+        const modest = courtshipFor(candidate({ looks: 50 }), world(50, 3_000_000), 'STUDENT_LIFE', () => 1);
+        expect(rich.chance).toBeGreaterThan(modest.chance + 15);
+    });
+
+    it('and still not a certainty, whatever he is worth', () => {
+        // The line the whole file is drawn along: money buys a much better
+        // hearing and it does not buy an answer.
+        const r = courtshipFor(candidate({ looks: 90 }), world(100, 1e15), 'STUDENT_LIFE', () => 1);
+        expect(r.chance).toBeLessThan(100);
+        expect(r.accepted).toBe(false);
+    });
+
+    it('and being disgraced still ends it wherever you stand', () => {
+        // The floor is checked before anything else, so no amount of money
+        // buys past it.
+        const r = courtshipFor(candidate(), world(REPUTATION_FLOOR - 1, 1e15), 'STUDENT_LIFE', () => 0);
+        expect(r.accepted).toBe(false);
     });
 });

@@ -60,7 +60,10 @@ describe('being turned down', () => {
         const r = runCourtship(() => 1);
         expect(r.kind).toBe('refused');
         expect(threads()).toHaveLength(1);
-        expect(Object.values(REFUSAL_LINES)).toContain(threads()[0].messages[0].text);
+        // Four per voice now rather than one, so a player turned down twice
+        // does not read the same paragraph from two different people.
+        expect(Object.values(REFUSAL_LINES).flat())
+            .toContain(threads()[0].messages[0].text);
     });
 
     it('and the message never says why in mechanical terms', () => {
@@ -100,5 +103,48 @@ describe('a disgraced player with all the money in the game', () => {
         // The assertion the two-number split exists for.
         world(50_000_000_000, 5);
         expect(runCourtship(() => 0).kind).toBe('refused');
+    });
+});
+
+// ============================================================================
+//  AND THE TAP SAYS SOMETHING
+// ============================================================================
+//
+//  `triggerEncounter` returned null on a refusal and every caller read null as
+//  "no encounter this time". So the player pressed the button to go and meet
+//  somebody, watched nothing happen, and a message arrived some seconds later
+//  from a person they had never seen a card for. Nothing connected the two.
+// ============================================================================
+describe('the refusal is answerable in the moment', () => {
+    it('so the runner names the person who said no', () => {
+        world(10_000_000_000, 20);
+        const r = runCourtship(() => 1);
+        expect(r.kind).toBe('refused');
+        if (r.kind === 'refused') {
+            expect(r.candidate.name.length).toBeGreaterThan(0);
+        }
+    });
+
+    it('and the screen is given an outcome rather than a null', () => {
+        // Read off the source: the hook is a React file and this is the shape
+        // that was wrong, not the rendering.
+        const fs = require('fs');
+        const path = require('path');
+        const hook = fs.readFileSync(
+            path.join(__dirname, '..', 'components', 'useEncounterSystem.ts'), 'utf8',
+        );
+        expect(hook).toContain('export type EncounterOutcome');
+        expect(hook).toMatch(/kind: 'refused'; name: string/);
+        expect(hook).toMatch(/return \{ kind: 'refused', name: result\.candidate\.name \}/);
+    });
+
+    it('and the one screen that asks for a partner reports it', () => {
+        const fs = require('fs');
+        const path = require('path');
+        const profile = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'profile', 'logic', 'useProfileLogic.ts'), 'utf8',
+        );
+        expect(profile).toMatch(/outcome\.kind === 'refused'/);
+        expect(profile).not.toMatch(/^\s*encounter\.triggerEncounter\('VIP_LOUNGE'\);\s*$/m);
     });
 });

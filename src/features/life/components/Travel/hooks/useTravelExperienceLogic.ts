@@ -87,7 +87,7 @@ export const useTravelExperienceLogic = ({
         // Try to trigger an encounter
         const encounter = triggerEncounter('travel', spot.id, true);
 
-        if (encounter) {
+        if (encounter.kind === 'candidate') {
             console.log('[Travel] Encounter triggered:', encounter.candidate.name);
             // Encounter modal will show automatically due to isEncounterVisible from hook
         } else {

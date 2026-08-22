@@ -105,6 +105,46 @@ export const reachAbove = (tier: SocialTier, companyValue: number): number => {
     return 15;                     // just through the door
 };
 
+/**
+ * And the other direction, which did not exist.
+ *
+ * ---------------------------------------------------------------------------
+ *  A BARISTA COULD TURN DOWN A BILLIONAIRE AT THE SAME RATE AS AN HEIRESS
+ * ---------------------------------------------------------------------------
+ *  `reachAbove` punishes reaching UP and there was nothing for reaching down,
+ *  so the formula treated every room as equally hard to impress. The three
+ *  zero-cost tiers return 0 from it, which means a student and a dynasty
+ *  daughter applied identical standards to a man worth two billion.
+ *
+ *  Reported as "reddetmeleri neye gore, fakir biri ise reddedemesin".
+ *
+ *  So: how far the player is ABOVE the room's own bar, as a bonus. It is
+ *  measured against the NEXT tier up rather than against this one, because
+ *  every open tier's own bar is already cleared by definition - what makes a
+ *  student bar easy for you is that you could be somewhere else entirely.
+ *
+ *  CAPPED, and the cap is the point. A person is still a person: money buys
+ *  you a much better hearing and it does not buy an answer, which is the
+ *  distinction the whole file is built on.
+ */
+export const REACH_BELOW_MAX = 30;
+
+export const reachBelow = (tier: SocialTier, companyValue: number): number => {
+    const rank = TIER_STANDING.indexOf(tier);
+    if (rank < 0) return 0;
+    // The bar of the cheapest room this player has OUTGROWN.
+    const above = TIER_STANDING.slice(rank + 1)
+        .map(t => TIER_UNLOCK[t])
+        .filter(bar => bar > 0);
+    if (above.length === 0) return 0;   // already the best room there is
+
+    const nextBar = Math.min(...above);
+    const ratio = (companyValue || 0) / nextBar;
+    if (ratio < 1) return 0;            // you belong here, more or less
+    // Doubling your way past the room you could be in, up to the cap.
+    return Math.min(REACH_BELOW_MAX, Math.round(Math.log2(ratio) * 12));
+};
+
 /** Below this, nobody is interested whatever the room. */
 export const REPUTATION_FLOOR = 15;
 
@@ -138,6 +178,21 @@ export const LOOKS_RESISTANCE = 0.15;
 /** And somebody who does not need your money is harder to impress with it. */
 export const WEALTH_RESISTANCE = 0.05;
 
+/**
+ * NOBODY IS A CERTAINTY.
+ *
+ * The player's side of this - reputation, and the room they could be in
+ * instead - is capped BEFORE the candidate's own standards are taken off, so
+ * those standards always bite. Without the cap, adding `reachBelow` pushed a
+ * respected billionaire to a hundred in every room he had outgrown, and a
+ * hundred minus a trim is still a hundred: the person in front of him stopped
+ * being a person and became a formality.
+ *
+ * Which is the line the whole file is drawn along. Money buys a much better
+ * hearing. It does not buy an answer.
+ */
+export const COURTSHIP_CEILING = 92;
+
 export type Courtship = {
     accepted: boolean;
     /** 0-100, for the log and for the test. */
@@ -159,14 +214,23 @@ export const courtshipFor = (
 ): Courtship => {
     const standing = Math.max(0, world.publicReputation ?? 0);
 
-    const chance = Math.max(0, Math.min(100,
+    // The player's side of it, capped short of certain - see COURTSHIP_CEILING.
+    const openness = Math.min(
+        COURTSHIP_CEILING,
         COURTSHIP_BASE
         + standing * REPUTATION_WEIGHT
         - reachAbove(tier, world.companyValue)
-        // Their own standards. `looks` is otherwise cosmetic and this is the
-        // one place it is allowed to decide anything, because it is the one
-        // thing about them the player can see before asking. A TRIM, not the
-        // deciding term - see the note above.
+        // And the other way. See `reachBelow`: the room you could be in and
+        // are not is what makes this one easy.
+        + reachBelow(tier, world.companyValue),
+    );
+
+    const chance = Math.max(0, Math.min(100,
+        openness
+        // Their own standards, taken off AFTER the cap so they always count.
+        // `looks` is otherwise cosmetic and this is the one place it is
+        // allowed to decide anything, because it is the one thing about them
+        // the player can see before asking. A TRIM, not the deciding term.
         - (candidate.stats?.looks ?? 50) * LOOKS_RESISTANCE
         - (candidate.stats?.familyWealth ?? 0) * WEALTH_RESISTANCE,
     ));

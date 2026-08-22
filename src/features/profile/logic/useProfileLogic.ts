@@ -155,8 +155,22 @@ export const useProfileLogic = () => {
                 memberName: family.partner.name,
             });
         } else {
-            // Find a partner in VIP Lounge / Gala
-            encounter.triggerEncounter('VIP_LOUNGE');
+            // ----------------------------------------------------------
+            //  AND SAY WHAT HAPPENED
+            // ----------------------------------------------------------
+            //  This called it and threw the answer away, so on a refusal
+            //  the button did nothing at all and a message turned up some
+            //  seconds later from somebody the player had never seen. The
+            //  two never connected.
+            // ----------------------------------------------------------
+            const outcome = encounter.triggerEncounter('VIP_LOUNGE');
+            if (outcome.kind === 'refused') {
+                setActionFeedback(`${outcome.name} was not interested. She has written to you.`);
+                setTimeout(() => setActionFeedback(null), 3500);
+            } else if (outcome.kind === 'nobody') {
+                setActionFeedback('Nobody worth the evening tonight.');
+                setTimeout(() => setActionFeedback(null), 3000);
+            }
         }
     }, [family.partner, navigation, encounter]);
 

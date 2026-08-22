@@ -18,7 +18,7 @@ import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { currentQuarter, readStanding } from '../../../core/story/world';
 import { generatePartner } from './partnerGenerator';
-import { REFUSAL_LINES, VOICE_FOR_PERSONALITY } from '../data/strainLines';
+import { refusalLine, VOICE_FOR_PERSONALITY } from '../data/strainLines';
 import {
     tiersOpenTo, courtshipFor, REFUSAL_COOLDOWN_QUARTERS,
 } from './courtship';
@@ -83,7 +83,7 @@ export const runCourtship = (roll: () => number = Math.random): CourtshipResult 
     const voice = VOICE_FOR_PERSONALITY[candidate.personality?.id ?? ''] ?? 'measured';
     useMessageStore.getState().sendFromCharacter(
         { id: `courtship-${candidate.id}`, name: candidate.name, role: candidate.stats.occupation },
-        REFUSAL_LINES[voice],
+        refusalLine(voice, roll),
         useGameStore.getState().currentMonth,
     );
 
