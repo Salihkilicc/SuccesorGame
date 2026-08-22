@@ -41,7 +41,7 @@ export const opsPlantEfficiency: Conversation = {
                 {
                     text: 'Invest in robotic line automation ({opsAutomationCost}).',
                     effects: [
-                        { kind: 'capital', amount: -1_500_000 },
+                        { kind: 'quoted', item: 'opsAutomation' },
                         { kind: 'brand', amount: 13 },
                         { kind: 'morale', amount: 4 },
                         {
@@ -53,7 +53,7 @@ export const opsPlantEfficiency: Conversation = {
                 {
                     text: 'Distribute {opsBonusCost} in worker performance bonuses.',
                     effects: [
-                        { kind: 'capital', amount: -600_000 },
+                        { kind: 'quoted', item: 'opsBonus' },
                         { kind: 'morale', amount: 8 },
                         {
                             kind: 'news',
@@ -95,7 +95,7 @@ export const opsSupplyChain: Conversation = {
                 {
                     text: 'Lock in 2-year carrier rate ({opsLogisticsCost} commitment).',
                     effects: [
-                        { kind: 'capital', amount: -1_200_000 },
+                        { kind: 'quoted', item: 'opsLogistics' },
                         { kind: 'brand', amount: 9 },
                         {
                             kind: 'news',
@@ -148,7 +148,7 @@ export const techLabBreakthrough: Conversation = {
                 {
                     text: 'Expedite global patent filing ({techPatentCost}).',
                     effects: [
-                        { kind: 'capital', amount: -800_000 },
+                        { kind: 'quoted', item: 'techPatent' },
                         { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',
@@ -201,7 +201,7 @@ export const techCloudScaling: Conversation = {
                 {
                     text: 'Deploy high-availability server clusters ({techCloudCost}).',
                     effects: [
-                        { kind: 'capital', amount: -900_000 },
+                        { kind: 'quoted', item: 'techCloud' },
                         { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
@@ -250,7 +250,7 @@ export const cfoTreasuryYield: Conversation = {
                 {
                     text: 'Reinvest yields into corporate working capital buffer.',
                     effects: [
-                        { kind: 'capital', amount: 500_000 },
+                        { kind: 'quoted', item: 'cfoTreasuryGain' },
                         {
                             kind: 'news',
                             headline: 'Hale treasury management maintains disciplined balance sheet liquidity.',
@@ -302,7 +302,7 @@ export const cfoInstitutionalInvestor: Conversation = {
                 {
                     text: 'Host private investor symposium & dinner ({cfoInvestorCost}).',
                     effects: [
-                        { kind: 'capital', amount: -300_000 },
+                        { kind: 'quoted', item: 'cfoInvestor' },
                         { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',

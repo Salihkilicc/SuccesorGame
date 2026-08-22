@@ -38,6 +38,7 @@
 
 import type { Dial, StoryFlag } from './state';
 import type { FineSeverity } from './fines';
+import type { Quoted } from './prices';
 
 export type Effect =
     /**
@@ -60,6 +61,19 @@ export type Effect =
      * the balance sheet looks like when the letter lands.
      */
     | { kind: 'fine'; severity: FineSeverity }
+    /**
+     * A price the scene also QUOTES, taken from the one book that computes it.
+     *
+     * `{ kind: 'quoted', item: 'opsAutomation' }` next to a sentence reading
+     * "({opsAutomationCost})" is the whole design: the button and the ledger
+     * name the same entry, so they cannot disagree. They did, in seven places
+     * at once - see core/story/prices.ts.
+     *
+     * The direction lives in the book rather than on the effect, because
+     * whether the treasury pays you or you pay the underwriters is a fact
+     * about the item and not a decision the scene gets to make twice.
+     */
+    | { kind: 'quoted'; item: Quoted }
     /** The player's personal cash. Separate pool, separate effect. */
     | { kind: 'cash'; amount: number }
     /** Company workforce headcount delta. Negative takes. */
@@ -315,6 +329,7 @@ export type Effect =
 export type EffectSink = {
     capital: (amount: number) => void;
     fine: (severity: FineSeverity) => void;
+    quoted: (item: Quoted) => void;
     cash: (amount: number) => void;
     employees: (amount: number) => void;
     researchers: (amount: number) => void;
@@ -355,6 +370,7 @@ export const applyEffect = (effect: Effect, sink: EffectSink): void => {
     switch (effect.kind) {
         case 'capital': sink.capital(effect.amount); return;
         case 'fine': sink.fine(effect.severity); return;
+        case 'quoted': sink.quoted(effect.item); return;
         case 'cash': sink.cash(effect.amount); return;
         case 'employees': sink.employees(effect.amount); return;
         case 'researchers': sink.researchers(effect.amount); return;

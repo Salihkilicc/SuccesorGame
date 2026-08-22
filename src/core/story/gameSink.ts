@@ -19,6 +19,7 @@ import { useGameStore } from '../store/useGameStore';
 import { useNewsStore } from '../store/useNewsStore';
 import { applyCorporateShock, corporateBrandFrom } from '../market/brand';
 import { fineAmount } from './fines';
+import { quotedDelta } from './prices';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
 import { CONVERSATIONS } from '../../data/story';
@@ -37,6 +38,18 @@ export const gameSink = (): EffectSink => ({
     capital: (amount) => {
         const s = useStatsStore.getState();
         s.update({ companyCapital: (s.companyCapital || 0) + amount });
+    },
+    // ------------------------------------------------------------------
+    //  THE BUTTON AND THE LEDGER READ THE SAME FUNCTION
+    // ------------------------------------------------------------------
+    //  Which they did not, in seven places, for as long as those scenes have
+    //  existed: the sentence computed a share of capital and the effect
+    //  charged a literal. See prices.ts.
+    // ------------------------------------------------------------------
+    quoted: (item) => {
+        const s = useStatsStore.getState();
+        const capital = s.companyCapital || 0;
+        s.update({ companyCapital: capital + quotedDelta(capital, item) });
     },
     // ------------------------------------------------------------------
     //  A PENALTY IS PRICED WHEN IT IS PAID, NOT WHEN IT IS WRITTEN

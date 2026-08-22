@@ -1,6 +1,7 @@
 // src/components/story/effectBadges.ts
 import type { Effect } from '../../core/story/effects';
 import { fineAmount, FINE_LABEL } from '../../core/story/fines';
+import { quotedDelta, PRICE_BOOK } from '../../core/story/prices';
 import { formatMoney } from '../../core/utils';
 
 /**
@@ -55,6 +56,27 @@ export const formatEffectBadge = (
                 label,
                 tone: 'negative',
                 icon: '⚖️',
+            };
+        }
+        // The figure the sentence above it is quoting, from the same book.
+        case 'quoted': {
+            const capital = context.companyCapital;
+            const entry = PRICE_BOOK[effect.item];
+            const isIn = entry?.direction === 'in';
+            if (typeof capital !== 'number') {
+                return {
+                    id: `quoted_${effect.item}`,
+                    label: isIn ? 'Capital in' : 'Capital out',
+                    tone: isIn ? 'positive' : 'negative',
+                    icon: isIn ? '💰' : '💸',
+                };
+            }
+            const delta = quotedDelta(capital, effect.item);
+            return {
+                id: `quoted_${effect.item}`,
+                label: `${isIn ? '+' : '-'}${formatMoney(Math.abs(delta))} Capital`,
+                tone: isIn ? 'positive' : 'negative',
+                icon: isIn ? '💰' : '💸',
             };
         }
         case 'capital': {

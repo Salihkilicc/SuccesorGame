@@ -39,6 +39,7 @@ import { useStatsStore } from '../../core/store/useStatsStore';
 import { useLocaleStore } from '../../core/i18n';
 import { formatMoney } from '../../core/utils';
 import { pearOfferAmount } from '../../core/story/pearPrice';
+import { PRICE_BOOK, QUOTED, quotedAmount } from '../../core/story/prices';
 
 export type StoryDictionary = Record<string, string>;
 
@@ -181,40 +182,30 @@ const fillTitle = (text: string): string => {
         const divBrother = Math.round(divTotal * 0.15);
         res = res.replace(/\{brotherDividendCut\}/g, formatMoney(divBrother));
     }
-    if (res.includes('{opsAutomationCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(1_000_000, Math.min(Math.round(cap * 0.03), 15_000_000));
-        res = res.replace(/\{opsAutomationCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{opsBonusCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(300_000, Math.min(Math.round(cap * 0.01), 5_000_000));
-        res = res.replace(/\{opsBonusCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{opsLogisticsCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(800_000, Math.min(Math.round(cap * 0.02), 10_000_000));
-        res = res.replace(/\{opsLogisticsCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{techPatentCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(500_000, Math.min(Math.round(cap * 0.015), 8_000_000));
-        res = res.replace(/\{techPatentCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{techCloudCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(600_000, Math.min(Math.round(cap * 0.02), 10_000_000));
-        res = res.replace(/\{techCloudCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{cfoInvestorCost}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const cost = Math.max(200_000, Math.min(Math.round(cap * 0.005), 3_000_000));
-        res = res.replace(/\{cfoInvestorCost\}/g, formatMoney(cost));
-    }
-    if (res.includes('{cfoTreasuryGain}')) {
-        const cap = useStatsStore?.getState?.()?.companyCapital || 0;
-        const gain = Math.max(500_000, Math.min(Math.round(cap * 0.01), 10_000_000));
-        res = res.replace(/\{cfoTreasuryGain\}/g, formatMoney(gain));
+    // ------------------------------------------------------------------
+    //  THE SEVEN FIGURES THE SCENES QUOTE
+    // ------------------------------------------------------------------
+    //  SHELVED, and it was seven copies of one idea that the effects behind
+    //  them did not share:
+    //
+    //      if (res.includes('{opsAutomationCost}')) {
+    //          const cap = useStatsStore?.getState?.()?.companyCapital || 0;
+    //          const cost = Math.max(1_000_000, Math.min(Math.round(cap * 0.03), 15_000_000));
+    //          res = res.replace(/\{opsAutomationCost\}/g, formatMoney(cost));
+    //      }
+    //      ... six more, same shape, different constants
+    //
+    //  The arithmetic here was RIGHT. What was wrong is that it lived only
+    //  here: the choice underneath charged a flat 1,500,000, so the sentence
+    //  and the ledger agreed at exactly one company size. Same failure as the
+    //  Pear salutation, and the same fix - see core/story/prices.ts, which now
+    //  holds the formulas and which the effect reads too.
+    // ------------------------------------------------------------------
+    const capital = useStatsStore?.getState?.()?.companyCapital || 0;
+    for (const item of QUOTED) {
+        const { token } = PRICE_BOOK[item];
+        if (!res.includes(token)) continue;
+        res = res.split(token).join(formatMoney(quotedAmount(capital, item)));
     }
     return res;
 };
