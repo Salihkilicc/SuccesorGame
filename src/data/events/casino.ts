@@ -87,7 +87,7 @@ export const casinoScandalScene: Conversation = {
                     text: 'Write it. I will sign it.',
                     effects: [
                         { kind: 'flag', flag: 'casinoScandal' },
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'dial', dial: 'publicReputation', delta: -8 },
                         { kind: 'dial', dial: 'cfoTrust', delta: 3 },
                         {
@@ -110,7 +110,7 @@ export const casinoScandalScene: Conversation = {
                     text: '(let it run)',
                     effects: [
                         { kind: 'flag', flag: 'casinoScandal' },
-                        { kind: 'brand', amount: -12 },
+                        { kind: 'brand', amount: -26 },
                         { kind: 'dial', dial: 'publicReputation', delta: -15 },
                         { kind: 'morale', amount: -6 },
                         {

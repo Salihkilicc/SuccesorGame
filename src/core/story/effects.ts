@@ -47,7 +47,29 @@ export type Effect =
     | { kind: 'employees'; amount: number }
     /** Laboratory researcher headcount delta. Negative takes. */
     | { kind: 'researchers'; amount: number }
-    /** Brand value, in points. */
+    /**
+     * Brand value, IN POINTS, and the unit is the whole story.
+     *
+     * A point is not a percent. `brandEquilibrium` is share x 43.3, so an
+     * ordinary mid-game company sits somewhere near 170 and an early one near
+     * 40. The 0-100 figure a person pictures when they read "brand" is the
+     * INDEX, which is points / 4.33.
+     *
+     * Every scene in the game was written against that index. Fifty six
+     * effects said things like `amount: 3` meaning three points out of a
+     * hundred, and landed as three points out of a hundred and seventy: a
+     * choice that cost nine hundred thousand and moved the number by one and a
+     * half per cent. Reported as "the choices take money and do not raise
+     * brand", which was very nearly right - it raised it invisibly.
+     *
+     * Nothing failed. The effect ran, the sink spread it across the
+     * categories, the store changed and the screen updated. The number was
+     * simply too small to see, which is the same failure ProductModals.tsx
+     * already carries a note about from the same scale change.
+     *
+     * So: WRITE POINTS HERE. If a scene wants a hit worth ten per cent of a
+     * mid-sized reputation, that is about 17, not 10.
+     */
     | { kind: 'brand'; amount: number }
     /** Move a relationship. Deltas compound; see useStoryStore.nudge. */
     | { kind: 'dial'; dial: Dial; delta: number }

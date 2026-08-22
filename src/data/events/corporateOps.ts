@@ -42,7 +42,7 @@ export const opsPlantEfficiency: Conversation = {
                     text: 'Invest in robotic line automation ({opsAutomationCost}).',
                     effects: [
                         { kind: 'capital', amount: -1_500_000 },
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         { kind: 'morale', amount: 4 },
                         {
                             kind: 'news',
@@ -96,7 +96,7 @@ export const opsSupplyChain: Conversation = {
                     text: 'Lock in 2-year carrier rate ({opsLogisticsCost} commitment).',
                     effects: [
                         { kind: 'capital', amount: -1_200_000 },
-                        { kind: 'brand', amount: 2 },
+                        { kind: 'brand', amount: 9 },
                         {
                             kind: 'news',
                             headline: 'Hale secures multi-year logistics agreement to insulate global shipping costs.',
@@ -149,7 +149,7 @@ export const techLabBreakthrough: Conversation = {
                     text: 'Expedite global patent filing ({techPatentCost}).',
                     effects: [
                         { kind: 'capital', amount: -800_000 },
-                        { kind: 'brand', amount: 4 },
+                        { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',
                             headline: 'Hale files key patents covering next-generation low-thermal architecture.',
@@ -159,7 +159,7 @@ export const techLabBreakthrough: Conversation = {
                 {
                     text: 'Publish technical paper and open benchmark.',
                     effects: [
-                        { kind: 'brand', amount: 5 },
+                        { kind: 'brand', amount: 22 },
                         { kind: 'morale', amount: 4 },
                         {
                             kind: 'news',
@@ -202,7 +202,7 @@ export const techCloudScaling: Conversation = {
                     text: 'Deploy high-availability server clusters ({techCloudCost}).',
                     effects: [
                         { kind: 'capital', amount: -900_000 },
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
                             headline: 'Hale completes multi-region infrastructure expansion to support device ecosystem.',
@@ -260,7 +260,7 @@ export const cfoTreasuryYield: Conversation = {
                 {
                     text: 'Direct surplus into ESG & corporate social initiatives.',
                     effects: [
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         { kind: 'morale', amount: 3 },
                         {
                             kind: 'news',
@@ -303,7 +303,7 @@ export const cfoInstitutionalInvestor: Conversation = {
                     text: 'Host private investor symposium & dinner ({cfoInvestorCost}).',
                     effects: [
                         { kind: 'capital', amount: -300_000 },
-                        { kind: 'brand', amount: 4 },
+                        { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',
                             headline: 'Institutional investors express confidence following Hale strategic briefing.',
@@ -348,7 +348,7 @@ export const boardEsgMilestone: Conversation = {
                 {
                     text: 'Publish governance milestone in annual stakeholder review.',
                     effects: [
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
                             headline: 'Hale receives top governance recognition from corporate rating agencies.',

@@ -131,7 +131,7 @@ export const friendGossipReal: Conversation = {
                     text: 'Thank you. Genuinely.',
                     effects: [
                         { kind: 'dial', dial: 'friendLoyalty', delta: 6 },
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
                             headline: 'FaceSpace is preparing a push into consumer hardware, according to people familiar.',
@@ -153,7 +153,7 @@ export const friendGossipReal: Conversation = {
                     text: 'Thank you.',
                     effects: [
                         { kind: 'dial', dial: 'friendLoyalty', delta: 8 },
-                        { kind: 'brand', amount: 3 },
+                        { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
                             headline: 'FaceSpace is preparing a push into consumer hardware, according to people familiar.',
@@ -257,7 +257,7 @@ export const friendPearWeakness: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'knowsPearWeakness' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 5 },
-                        { kind: 'brand', amount: 8 },
+                        { kind: 'brand', amount: 35 },
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
                         {
                             kind: 'news',
@@ -282,7 +282,7 @@ export const friendPearWeakness: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'knowsPearWeakness' },
                         { kind: 'dial', dial: 'friendLoyalty', delta: 9 },
-                        { kind: 'brand', amount: 8 },
+                        { kind: 'brand', amount: 35 },
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
                         {
                             kind: 'news',

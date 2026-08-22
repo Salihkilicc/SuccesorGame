@@ -97,7 +97,7 @@ export const crisisRansomware: Conversation = {
                         { kind: 'flag', flag: 'paidTheRansom' },
                         // Smaller than refusing, because nobody hears about it
                         // - which is exactly why it is the tempting one.
-                        { kind: 'brand', amount: -2 },
+                        { kind: 'brand', amount: -4 },
                     ],
                 },
                 { text: 'We are not paying you.', next: 'refuse' },
@@ -112,7 +112,7 @@ export const crisisRansomware: Conversation = {
                     text: 'Rebuild from whatever we have.',
                     effects: [
                         { kind: 'capital', amount: -1_100_000 },
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'morale', amount: -5 },
                         {
                             kind: 'news',
@@ -159,7 +159,7 @@ export const crisisLeak: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'concealedTheLeak' },
                         // Cheap now. The regulator's letter is what it costs.
-                        { kind: 'brand', amount: -1 },
+                        { kind: 'brand', amount: -4 },
                     ],
                 },
                 { text: 'Write to all four hundred thousand.', next: 'notify' },
@@ -174,7 +174,7 @@ export const crisisLeak: Conversation = {
                     text: 'Send it.',
                     effects: [
                         { kind: 'capital', amount: -800_000 },
-                        { kind: 'brand', amount: -5 },
+                        { kind: 'brand', amount: -11 },
                         { kind: 'dial', dial: 'publicReputation', delta: 5 },
                         {
                             kind: 'news',
@@ -221,7 +221,7 @@ export const crisisForcedRecall: Conversation = {
                     text: '(comply)',
                     effects: [
                         { kind: 'capital', amount: -4_500_000 },
-                        { kind: 'brand', amount: -12 },
+                        { kind: 'brand', amount: -26 },
                         { kind: 'dial', dial: 'publicReputation', delta: -10 },
                         {
                             kind: 'news',
@@ -242,7 +242,7 @@ export const crisisForcedRecall: Conversation = {
                     text: '(comply)',
                     effects: [
                         { kind: 'capital', amount: -4_500_000 },
-                        { kind: 'brand', amount: -12 },
+                        { kind: 'brand', amount: -26 },
                         { kind: 'dial', dial: 'publicReputation', delta: -10 },
                         {
                             kind: 'news',
@@ -291,7 +291,7 @@ export const crisisSupplier: Conversation = {
                     text: 'Build fewer things.',
                     effects: [
                         { kind: 'siege', category: 'Consumer', quarters: 4, pressure: 1.3 },
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                     ],
                 },
             ],
@@ -372,7 +372,7 @@ export const crisisUnion: Conversation = {
                     text: 'Sit it out.',
                     effects: [
                         { kind: 'morale', amount: -14 },
-                        { kind: 'brand', amount: -5 },
+                        { kind: 'brand', amount: -11 },
                         { kind: 'dial', dial: 'publicReputation', delta: -6 },
                         {
                             kind: 'news',
@@ -419,7 +419,7 @@ export const crisisExecutive: Conversation = {
                     text: 'We keep him and we ride it out.',
                     effects: [
                         { kind: 'flag', flag: 'keptTheScandal' },
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'morale', amount: -9 },
                         { kind: 'dial', dial: 'publicReputation', delta: -7 },
                     ],
@@ -435,7 +435,7 @@ export const crisisExecutive: Conversation = {
                     text: 'Pay him off. Today.',
                     effects: [
                         { kind: 'capital', amount: -2_800_000 },
-                        { kind: 'brand', amount: -3 },
+                        { kind: 'brand', amount: -6 },
                         { kind: 'dial', dial: 'cfoTrust', delta: 4 },
                     ],
                 },
@@ -537,7 +537,7 @@ export const crisisAccident: Conversation = {
                     text: 'Keep it internal until we know more.',
                     effects: [
                         { kind: 'flag', flag: 'plantAccident' },
-                        { kind: 'brand', amount: -8 },
+                        { kind: 'brand', amount: -17 },
                         { kind: 'morale', amount: -16 },
                         { kind: 'dial', dial: 'publicReputation', delta: -9 },
                     ],
@@ -554,7 +554,7 @@ export const crisisAccident: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'plantAccident' },
                         { kind: 'capital', amount: -4_200_000 },
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         // The only place in the pack where morale goes UP on
                         // the expensive door. They were watching.
                         { kind: 'morale', amount: 4 },
@@ -565,7 +565,7 @@ export const crisisAccident: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'plantAccident' },
                         { kind: 'capital', amount: -900_000 },
-                        { kind: 'brand', amount: -7 },
+                        { kind: 'brand', amount: -15 },
                         { kind: 'morale', amount: -12 },
                     ],
                 },
@@ -601,7 +601,7 @@ export const crisisCounterfeit: Conversation = {
                 {
                     text: 'Stop it anyway.',
                     effects: [
-                        { kind: 'brand', amount: -7 },
+                        { kind: 'brand', amount: -15 },
                         { kind: 'dial', dial: 'publicReputation', delta: -4 },
                     ],
                 },
@@ -617,14 +617,14 @@ export const crisisCounterfeit: Conversation = {
                     text: 'Buy them off the shelves.',
                     effects: [
                         { kind: 'capital', amount: -3_100_000 },
-                        { kind: 'brand', amount: -2 },
+                        { kind: 'brand', amount: -4 },
                         { kind: 'dial', dial: 'publicReputation', delta: 4 },
                     ],
                 },
                 {
                     text: 'No. Stop the warranty.',
                     effects: [
-                        { kind: 'brand', amount: -7 },
+                        { kind: 'brand', amount: -15 },
                         { kind: 'dial', dial: 'publicReputation', delta: -4 },
                     ],
                 },
@@ -665,7 +665,7 @@ export const crisisInquiry: Conversation = {
                     text: 'Narrow. Nothing they did not ask for.',
                     effects: [
                         { kind: 'capital', amount: -600_000 },
-                        { kind: 'brand', amount: -3 },
+                        { kind: 'brand', amount: -6 },
                         { kind: 'dial', dial: 'cfoTrust', delta: -5 },
                     ],
                 },
@@ -681,7 +681,7 @@ export const crisisInquiry: Conversation = {
                     text: 'Everything. Write the letter.',
                     effects: [
                         { kind: 'capital', amount: -2_200_000 },
-                        { kind: 'brand', amount: -1 },
+                        { kind: 'brand', amount: -4 },
                         { kind: 'dial', dial: 'cfoTrust', delta: 8 },
                     ],
                 },
@@ -718,7 +718,7 @@ export const crisisOutage: Conversation = {
                 {
                     text: 'Ship it quietly. No announcement.',
                     effects: [
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'dial', dial: 'publicReputation', delta: -3 },
                     ],
                 },
@@ -732,7 +732,7 @@ export const crisisOutage: Conversation = {
                 {
                     text: 'Say what happened, in plain words.',
                     effects: [
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         { kind: 'capital', amount: -300_000 },
                         { kind: 'dial', dial: 'publicReputation', delta: 3 },
                         {
@@ -744,7 +744,7 @@ export const crisisOutage: Conversation = {
                 {
                     text: 'Ship it quietly.',
                     effects: [
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'dial', dial: 'publicReputation', delta: -3 },
                     ],
                 },

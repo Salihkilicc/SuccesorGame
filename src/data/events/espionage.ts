@@ -120,7 +120,7 @@ export const espionageKestrel: Conversation = {
                     text: 'Initiate platform overhaul.',
                     effects: [
                         { kind: 'capital', amount: -2_600_000 },
-                        { kind: 'brand', amount: -3 },
+                        { kind: 'brand', amount: -6 },
                         { kind: 'siege', category: 'Consumer', quarters: 3, pressure: 1.25 },
                     ],
                 },
@@ -144,7 +144,7 @@ export const espionageKestrelBetrayal: Conversation = {
                     text: 'Understood.',
                     effects: [
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
-                        { kind: 'brand', amount: -7 },
+                        { kind: 'brand', amount: -15 },
                         { kind: 'dial', dial: 'publicReputation', delta: -5 },
                         { kind: 'siege', category: 'Consumer', quarters: 4, pressure: 1.3 },
                         {
@@ -219,7 +219,7 @@ export const espionageBroker: Conversation = {
                 {
                     text: 'Brief the team today.',
                     effects: [
-                        { kind: 'brand', amount: -5 },
+                        { kind: 'brand', amount: -11 },
                         { kind: 'morale', amount: -8 },
                         { kind: 'raid', company: 'tech_skynet' },
                         {
@@ -248,7 +248,7 @@ export const espionageBrokerBetrayal: Conversation = {
                     text: 'We were double-crossed.',
                     effects: [
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
-                        { kind: 'brand', amount: -6 },
+                        { kind: 'brand', amount: -13 },
                         { kind: 'morale', amount: -6 },
                         { kind: 'raid', company: 'tech_skynet' },
                         { kind: 'dial', dial: 'publicReputation', delta: -4 },
@@ -318,7 +318,7 @@ export const espionageOracle: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'paidTheRansom' },
                         { kind: 'siege', category: 'Deep Tech', quarters: 6, pressure: 1.5 },
-                        { kind: 'brand', amount: -2 },
+                        { kind: 'brand', amount: -4 },
                         {
                             kind: 'risk',
                             chance: KEPT_PROMISE,
@@ -339,7 +339,7 @@ export const espionageOracle: Conversation = {
                     text: 'Commission forensics.',
                     effects: [
                         { kind: 'capital', amount: -3_800_000 },
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         {
                             kind: 'schedule',
                             conversation: 'event-espionage-oracle-betrayal',
@@ -386,7 +386,7 @@ export const espionageOracleBetrayal: Conversation = {
                     effects: [
                         { kind: 'flag', flag: 'pearHiredThem' },
                         { kind: 'dial', dial: 'pearHostility', delta: 10 },
-                        { kind: 'brand', amount: -3 },
+                        { kind: 'brand', amount: -6 },
                     ],
                 },
             ],
@@ -402,7 +402,7 @@ export const espionageOracleBetrayal: Conversation = {
                         { kind: 'flag', flag: 'pearHiredThem' },
                         { kind: 'flag', flag: 'betrayedAfterPaying' },
                         { kind: 'dial', dial: 'pearHostility', delta: 18 },
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         {
                             kind: 'news',
                             headline: 'Two industry rivals are said to be investigating parallel intrusions.',

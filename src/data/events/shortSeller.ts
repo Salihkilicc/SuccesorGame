@@ -51,7 +51,7 @@ export const shortSellerConversation: Conversation = {
                     effects: [
                         { kind: 'dial', dial: 'cfoTrust', delta: 5 },
                         { kind: 'dial', dial: 'publicReputation', delta: 3 },
-                        { kind: 'brand', amount: -3 },
+                        { kind: 'brand', amount: -6 },
                         {
                             kind: 'news',
                             headline: 'Short thesis published, and rebutted the same morning. The stock ends the day roughly flat.',
@@ -74,7 +74,7 @@ export const shortSellerConversation: Conversation = {
                         // Roughly three times the rebutted branch. The gap is
                         // the whole lesson and it should be legible from the
                         // brand number alone.
-                        { kind: 'brand', amount: -9 },
+                        { kind: 'brand', amount: -19 },
                         {
                             kind: 'news',
                             headline: 'Short thesis published. The company declined to comment.',

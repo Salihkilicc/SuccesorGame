@@ -183,7 +183,7 @@ export const moleFirstContact: Conversation = {
                     effects: [
                         { kind: 'capital', amount: -80_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
-                        { kind: 'brand', amount: 2 },
+                        { kind: 'brand', amount: 9 },
                     ],
                 },
                 {
@@ -298,7 +298,7 @@ export const moleOffer: Conversation = {
                     effects: [
                         { kind: 'capital', amount: -300_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
-                        { kind: 'brand', amount: 6 },
+                        { kind: 'brand', amount: 26 },
                         { kind: 'dial', dial: 'pearHostility', delta: 5 },
                         {
                             kind: 'news',
@@ -312,7 +312,7 @@ export const moleOffer: Conversation = {
                         { kind: 'capital', amount: -300_000 },
                         { kind: 'flag', flag: 'moleEngaged' },
                         { kind: 'flag', flag: 'moleRepeated' },
-                        { kind: 'brand', amount: 9 },
+                        { kind: 'brand', amount: 39 },
                         { kind: 'dial', dial: 'pearHostility', delta: 8 },
                         {
                             kind: 'news',

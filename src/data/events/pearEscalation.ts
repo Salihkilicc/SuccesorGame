@@ -91,7 +91,7 @@ export const pearPatent: Conversation = {
                     text: '(file it)',
                     effects: [
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
-                        { kind: 'brand', amount: -2 },
+                        { kind: 'brand', amount: -4 },
                     ],
                 },
             ],
@@ -143,7 +143,7 @@ export const pearSuppliers: Conversation = {
                     effects: [
                         { kind: 'capital', amount: -1_800_000 },
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
-                        { kind: 'brand', amount: 2 },
+                        { kind: 'brand', amount: 9 },
                         {
                             kind: 'news',
                             headline: 'A contract assembler stays with its existing customer after a competing offer.',
@@ -162,7 +162,7 @@ export const pearSuppliers: Conversation = {
                     text: '(close)',
                     effects: [
                         { kind: 'dial', dial: 'pearHostility', delta: 8 },
-                        { kind: 'brand', amount: -5 },
+                        { kind: 'brand', amount: -11 },
                         {
                             kind: 'news',
                             headline: 'Pear signs an exclusive capacity commitment with a major contract assembler.',
@@ -213,7 +213,7 @@ export const pearPriceWar: Conversation = {
                     text: '(close)',
                     effects: [
                         { kind: 'dial', dial: 'pearHostility', delta: 5 },
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         {
                             kind: 'news',
                             headline: 'Pear cuts consumer prices across the board. Analysts expect margin pressure on smaller rivals.',

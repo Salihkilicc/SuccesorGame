@@ -79,7 +79,7 @@ export const recallConversation: Conversation = {
                         { kind: 'capital', amount: -RECALL_COST },
                         // Smaller than the buried branch, and it is the
                         // difference that is the lesson rather than the sign.
-                        { kind: 'brand', amount: -4 },
+                        { kind: 'brand', amount: -9 },
                         { kind: 'dial', dial: 'publicReputation', delta: 4 },
                         {
                             kind: 'news',

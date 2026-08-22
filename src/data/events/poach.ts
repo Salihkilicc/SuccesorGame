@@ -93,7 +93,7 @@ export const poachConversation: Conversation = {
                         { kind: 'dial', dial: 'pearHostility', delta: 8 },
                         // He got four engineers for nothing and learned you
                         // will not fight for them.
-                        { kind: 'brand', amount: -2 },
+                        { kind: 'brand', amount: -4 },
                         { kind: 'researchers', amount: -2 },
                         {
                             kind: 'news',
