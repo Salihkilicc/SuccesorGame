@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+// DEV only, compiles to nothing in release. See core/perf.ts.
+import { beginTiming, mark, endTiming } from '../perf';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { simulateNewMonth } from '../../event/eventEngine';
@@ -299,6 +301,7 @@ export const useGameStore = create<GameStore>()(
 
       },
       advanceMonth: async (monthsInput?: number) => {
+        beginTiming('quarter');
         // Input güvenliği (Varsayılan 3 ay)
         const months = typeof monthsInput === 'number' ? monthsInput : 3;
 
@@ -357,6 +360,7 @@ export const useGameStore = create<GameStore>()(
           setbackMessage = LOW_MORALE_REASONS[Math.floor(Math.random() * LOW_MORALE_REASONS.length)];
         }
 
+        mark('setup');
         // ==================================================================
         //  PAZAR PAYI ON HESABI
         // ==================================================================
@@ -589,6 +593,7 @@ export const useGameStore = create<GameStore>()(
             require('./useTerritoryStore').useTerritoryStore.getState().pressureIn(category),
           );
 
+          mark('market share');
           // ==============================================================
           //  RAKIPLERI BIR CEYREK ILERLET
           // ==============================================================
@@ -633,6 +638,7 @@ export const useGameStore = create<GameStore>()(
           });
         });
 
+        mark('competitors');
         // ==================================================================
         //  KAPASITE PAYLASTIRMA
         // ==================================================================
@@ -1095,6 +1101,7 @@ export const useGameStore = create<GameStore>()(
           stats.setField('money', (stats.money || 0) - partnerUpkeepCost);
         }
 
+        mark('capacity');
         // ==================================================================
         //  WHAT YOU AGREED TO PAY SOMEBODY ELSE'S SHAREHOLDERS
         // ==================================================================
@@ -1224,6 +1231,7 @@ export const useGameStore = create<GameStore>()(
         // to `money` in the same tick is how the last one silently wins.
         const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow + bonus.paid;
 
+        mark('acquisitions');
         // ------------------------------------------------------------------
         //  6b. CEYREK RAPORUNU KUR
         // ------------------------------------------------------------------
@@ -1425,6 +1433,7 @@ export const useGameStore = create<GameStore>()(
         // Everything written before brand points existed reads a 0-100 index.
         const brandIdx = brandIndex(corporateQ);
 
+        mark('brand');
         // ------------------------------------------------------------------
         //  KADRO VE INSAAT DURUMUNU YAZ
         // ------------------------------------------------------------------
@@ -1701,6 +1710,7 @@ export const useGameStore = create<GameStore>()(
         // 4. Aylık Flagleri Sıfırla
         get().resetMonthlyState();
 
+        mark('crew and plant');
         // ------------------------------------------------------------------
         //  THE INBOX QUEUE
         // ------------------------------------------------------------------
@@ -1726,6 +1736,7 @@ export const useGameStore = create<GameStore>()(
         // The story block used to sit here. It has moved to the END of the
         // tick - see "THE STORY READS A FINISHED QUARTER" below for why.
 
+        mark('inbox');
         // 5. Store'ları Güncelle (Yeni verileri kaydet)
         // CRITICAL FIX: Use update() instead of setState() to preserve other fields
         // ==================================================================
@@ -1967,6 +1978,7 @@ export const useGameStore = create<GameStore>()(
             });
           }
 
+          mark('valuation');
           // ------------------------------------------------------------------
           //  SHARK LOANS COME DUE
           // ------------------------------------------------------------------
@@ -2110,6 +2122,7 @@ export const useGameStore = create<GameStore>()(
             bonusDistributedThisQuarter: false,
           }));
 
+          mark('loans and board');
           // ==============================================================
           //  THE STORY READS A FINISHED QUARTER
           // ==============================================================
@@ -2243,6 +2256,7 @@ export const useGameStore = create<GameStore>()(
             console.warn('[tutorial] scene could not be queued', e);
           }
 
+          mark('story');
           // ==============================================================
           //  THE POST ARRIVES
           // ==============================================================
@@ -2659,6 +2673,10 @@ export const useGameStore = create<GameStore>()(
           }
         }
 
+        // Everything after the story phase, in one bucket. Worth splitting
+        // only if it turns out to be the expensive one.
+        mark('close');
+        endTiming();
         return result;
       },
       distributeBonus: () => {
