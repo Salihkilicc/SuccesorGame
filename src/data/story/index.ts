@@ -110,6 +110,10 @@ import {
     cfoInstitutionalInvestor,
     boardEsgMilestone,
 } from '../events/corporateOps';
+// Scheduled by the choices above rather than by a chance roll, so they have no
+// GameEvent and no STORY_BEAT - but the inbox delivers by id and looks it up
+// here, so they must be in this list or the letter never arrives.
+import { PAYOFF_CONVERSATIONS } from '../events/payoffs';
 
 export const CONVERSATIONS: Conversation[] = [
     // ------------------------------------------------------------------
@@ -216,6 +220,7 @@ export const CONVERSATIONS: Conversation[] = [
     cfoTreasuryYield,
     cfoInstitutionalInvestor,
     boardEsgMilestone,
+    ...PAYOFF_CONVERSATIONS,
 ];
 
 export const conversationById = (id: string): Conversation | undefined =>

@@ -42,6 +42,8 @@ export const opsPlantEfficiency: Conversation = {
                     text: 'Invest in robotic line automation ({opsAutomationCost}).',
                     effects: [
                         { kind: 'quoted', item: 'opsAutomation' },
+                        // What it was for, a year later. See data/events/payoffs.ts.
+                        { kind: 'schedule', conversation: 'event-payoff-automation', afterQuarters: 4 },
                         { kind: 'brand', amount: 13 },
                         { kind: 'morale', amount: 4 },
                         {
@@ -96,6 +98,8 @@ export const opsSupplyChain: Conversation = {
                     text: 'Lock in 2-year carrier rate ({opsLogisticsCost} commitment).',
                     effects: [
                         { kind: 'quoted', item: 'opsLogistics' },
+                        // What it was for, a year later. See data/events/payoffs.ts.
+                        { kind: 'schedule', conversation: 'event-payoff-logistics', afterQuarters: 4 },
                         { kind: 'brand', amount: 9 },
                         {
                             kind: 'news',
@@ -149,6 +153,8 @@ export const techLabBreakthrough: Conversation = {
                     text: 'Expedite global patent filing ({techPatentCost}).',
                     effects: [
                         { kind: 'quoted', item: 'techPatent' },
+                        // What it was for, a year later. See data/events/payoffs.ts.
+                        { kind: 'schedule', conversation: 'event-payoff-patent', afterQuarters: 4 },
                         { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',
@@ -303,6 +309,8 @@ export const cfoInstitutionalInvestor: Conversation = {
                     text: 'Host private investor symposium & dinner ({cfoInvestorCost}).',
                     effects: [
                         { kind: 'quoted', item: 'cfoInvestor' },
+                        // What it was for, a year later. See data/events/payoffs.ts.
+                        { kind: 'schedule', conversation: 'event-payoff-investor', afterQuarters: 4 },
                         { kind: 'brand', amount: 17 },
                         {
                             kind: 'news',

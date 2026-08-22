@@ -88,8 +88,19 @@ describe('what the Mail app actually holds in the first year', () => {
         //  Both are Pear and neither can reach the first year. One needs a
         //  succession to have happened and the other needs the player to own
         //  his company.
+        //
+        //  AND THE FOUR PAYOFFS. Same category and a different reason: they
+        //  have no `when` of their own because nothing rolls for them. Each is
+        //  scheduled by a corporateOps choice four quarters after the player
+        //  pays for it, and every one of those is gated on a dead father and
+        //  the twelfth quarter - so the earliest any of these can land is the
+        //  fifth year. See data/events/payoffs.ts.
         // ------------------------------------------------------------------
-        const LATER_LIFE = new Set(['pear-offer-heir', 'pear-bought']);
+        const LATER_LIFE = new Set([
+            'pear-offer-heir', 'pear-bought',
+            'event-payoff-automation', 'event-payoff-logistics',
+            'event-payoff-patent', 'event-payoff-investor',
+        ]);
         const notRandom = byChannel('mail')
             .filter(c => !eventScenes.has(c.id) && !LATER_LIFE.has(c.id));
         expect(byChannel('mail').length - notRandom.length).toBeGreaterThan(20);

@@ -51,7 +51,12 @@ export type Quoted =
     | 'techPatent'
     | 'techCloud'
     | 'cfoInvestor'
-    | 'cfoTreasuryGain';
+    | 'cfoTreasuryGain'
+    // --- and what four of them are worth a year later ---
+    | 'opsAutomationReturn'
+    | 'opsLogisticsReturn'
+    | 'techPatentReturn'
+    | 'cfoInvestorReturn';
 
 export type PriceEntry = {
     /** Of company capital. */
@@ -88,6 +93,41 @@ export const PRICE_BOOK: Record<Quoted, PriceEntry> = {
     techCloud: { share: 0.02, min: 600_000, max: 10_000_000, direction: 'out', token: '{techCloudCost}' },
     cfoInvestor: { share: 0.005, min: 200_000, max: 3_000_000, direction: 'out', token: '{cfoInvestorCost}' },
     cfoTreasuryGain: { share: 0.01, min: 500_000, max: 10_000_000, direction: 'in', token: '{cfoTreasuryGain}' },
+
+    // ------------------------------------------------------------------
+    //  THE RETURNS, WHICH DID NOT EXIST
+    // ------------------------------------------------------------------
+    //  Every opportunity in the game was a purchase. You paid three per cent
+    //  of the company for an automation line and got reputation, and the
+    //  money never came back - so across forty one money effects in the whole
+    //  conversation system, exactly one went the player's way.
+    //
+    //  Reported as "kazanc da lazim, hep ceza".
+    //
+    //  Set at roughly 1.7x the cost, and arriving a year later, which is what
+    //  makes it a decision rather than a button. Early on, three per cent of a
+    //  small company is money you may need in the quarter it is gone; late on
+    //  it is obviously worth taking, and by then you have other problems.
+    //  That is how capital expenditure actually feels and it is the tension
+    //  the pack was missing.
+    // ------------------------------------------------------------------
+    opsAutomationReturn: { share: 0.05, min: 1_700_000, max: 25_000_000, direction: 'in', token: '{opsAutomationReturn}' },
+    opsLogisticsReturn: { share: 0.034, min: 1_350_000, max: 17_000_000, direction: 'in', token: '{opsLogisticsReturn}' },
+    techPatentReturn: { share: 0.026, min: 850_000, max: 13_500_000, direction: 'in', token: '{techPatentReturn}' },
+    cfoInvestorReturn: { share: 0.009, min: 340_000, max: 5_000_000, direction: 'in', token: '{cfoInvestorReturn}' },
+};
+
+/**
+ * What an investment pays back, for the test that keeps the pair honest.
+ *
+ * A return that quietly fell below its cost would turn the opportunity pack
+ * back into the pure drain it was, and nothing on screen would say so.
+ */
+export const RETURN_ON: Partial<Record<Quoted, Quoted>> = {
+    opsAutomation: 'opsAutomationReturn',
+    opsLogistics: 'opsLogisticsReturn',
+    techPatent: 'techPatentReturn',
+    cfoInvestor: 'cfoInvestorReturn',
 };
 
 /** What this costs, or pays, at this size of company. Always positive. */
