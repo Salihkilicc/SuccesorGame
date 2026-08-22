@@ -74,6 +74,25 @@ export const deliver = (conversationId: string): boolean => {
     const atMonth = useGameStore.getState().currentMonth;
     const opening = c.nodes.find(n => n.id === c.start);
 
+    // ------------------------------------------------------------------
+    //  A FRESH COPY IS A FRESH SCENE
+    // ------------------------------------------------------------------
+    //  Events with a `cooldown` fire again, so the same conversation can be
+    //  delivered twice with eight quarters between - and `sceneProgress` is
+    //  keyed by conversation id, so the second copy read the first copy's
+    //  saved position. Answered, that position is a null node, and the runner
+    //  renders a null node as the last exchange and a Close button.
+    //
+    //  So a letter arriving new opened on its own ending, which is half of
+    //  "bitmis mailler tekrar geliyor ve sadece son kismi kaliyor". The other
+    //  half was the mail screen never clearing it - see
+    //  useMailStore.closeConversation.
+    //
+    //  Cleared here rather than only there, because a save made before that
+    //  fix still has the stale record and would otherwise carry it forever.
+    // ------------------------------------------------------------------
+    useStoryStore.getState().clearScene(c.id);
+
     if (c.channel === 'mail') {
         useMailStore.getState().receiveMail({
             // ------------------------------------------------------------------

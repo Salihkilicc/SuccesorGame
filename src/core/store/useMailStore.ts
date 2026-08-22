@@ -49,6 +49,35 @@ type MailStore = MailState & {
     markAllRead: () => void;
     receiveMail: (mail: Omit<Mail, 'id' | 'isRead'>) => void;
     deleteMail: (mailId: string) => void;
+    /**
+     * The letter has been answered. Turn it into a record of the exchange.
+     *
+     * ---------------------------------------------------------------------
+     *  THE BUG THIS EXISTS FOR
+     * ---------------------------------------------------------------------
+     *  The messages screen has done this since it was written: on finishing,
+     *  it appends the transcript to the thread and detaches the conversation,
+     *  so the thread reads afterwards as the conversation you had. The mail
+     *  screen did neither. It called `navigation.goBack()` and left the row
+     *  carrying the same `conversationId` with `sceneProgress` still holding
+     *  a finished scene.
+     *
+     *  Two consequences, and the player reported both as one sentence -
+     *  "bitmis mailler tekrar geliyor ve sadece son kismi kaliyor":
+     *
+     *    RE-OPENING AN ANSWERED LETTER showed the runner resuming at a null
+     *    node, which renders the last exchange and a Close button. The letter
+     *    you answered turns into a stub of itself.
+     *
+     *    AND SO DID THE NEXT COPY. Events with a `cooldown` fire again, and a
+     *    second delivery of the same scene reads the same saved progress - so
+     *    a letter that arrives fresh eight quarters later opens on its own
+     *    ending.
+     */
+    closeConversation: (
+        mailId: string,
+        lines: { from: 'them' | 'player'; text: string }[],
+    ) => void;
     reset: () => void;
 };
 
@@ -140,6 +169,36 @@ export const useMailStore = create<MailStore>()(
                     };
                 }),
                 
+            // ------------------------------------------------------------------
+            //  WHAT AN ANSWERED LETTER LOOKS LIKE AFTERWARDS
+            // ------------------------------------------------------------------
+            //  The exchange is written into the BODY, which is the only field
+            //  the plain letter view renders, so an answered letter reads as
+            //  the correspondence it became. The opening is already the body,
+            //  so it is skipped rather than printed twice - the same reasoning
+            //  useMessageStore.appendTranscript gives for skipping the first
+            //  card.
+            //
+            //  And `conversationId` goes. It is what makes the row playable,
+            //  and a letter that has been answered is not.
+            // ------------------------------------------------------------------
+            closeConversation: (mailId, lines) =>
+                set(state => ({
+                    inbox: state.inbox.map(m => {
+                        if (m.id !== mailId) return m;
+                        const said = lines
+                            .slice(1)
+                            .map(l => (l.from === 'player' ? `> ${l.text}` : l.text))
+                            .join('\n\n');
+                        return {
+                            ...m,
+                            conversationId: undefined,
+                            isRead: true,
+                            body: said ? `${m.body}\n\n---\n\n${said}` : m.body,
+                        };
+                    }),
+                })),
+
             deleteMail: (mailId) => 
                 set(state => ({
                     inbox: state.inbox.filter(m => m.id !== mailId)

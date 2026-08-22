@@ -236,7 +236,24 @@ const MailDetailScreen = () => {
                 <ConversationRunner
                     conversation={conversation}
                     variant="mail"
-                    onFinished={() => navigation.goBack()}
+                    // ------------------------------------------------------
+                    //  CLOSE IT PROPERLY, THE WAY A THREAD IS CLOSED
+                    // ------------------------------------------------------
+                    //  This was `() => navigation.goBack()`, which left the
+                    //  row playable and the scene's progress saved at its own
+                    //  ending. Re-opening the letter then showed the last
+                    //  exchange and a Close button, and so did the next copy
+                    //  when a repeatable event delivered the scene again.
+                    //  See useMailStore.closeConversation.
+                    // ------------------------------------------------------
+                    onFinished={(history) => {
+                        useMailStore.getState().closeConversation(
+                            mail.id,
+                            history.map(h => ({ from: h.from, text: h.text })),
+                        );
+                        useStoryStore.getState().clearScene(conversation.id);
+                        navigation.goBack();
+                    }}
                 />
             </View>
         );
