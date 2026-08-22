@@ -58,6 +58,51 @@ type HomeNavProp = CompositeNavigationProp<
 
 
 
+// ============================================================================
+//  THE WALLPAPER, AND WHY IT HAS A CONSTANT
+// ============================================================================
+//
+//  From the device log, on every launch and again after every quarter:
+//
+//      [PERF ASSETS] Loading image at size {2874, 2156},
+//                    which is larger than the screen size {1179, 2556}
+//
+//  Two faults in one line. The width was asked for in the URL - `w=2874` -
+//  which is six million pixels to fill a screen that has three, so the phone
+//  downloads and decodes twice what it can show.
+//
+//  And the source was an OBJECT LITERAL inside the render. A new object every
+//  time this screen re-renders, which the quarter tick forces, so nothing
+//  downstream can tell it is the same picture. Hoisted, so it is.
+//
+//  IT IS STILL REMOTE, which is its own decision and not one to make quietly:
+//  the home screen of an offline game currently needs the internet to draw its
+//  own background. Bundling it is the right answer and it needs the file.
+// ============================================================================
+const WALLPAPER = {
+  uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1200&auto=format&fit=crop',
+} as const;
+
+// ============================================================================
+//  AND THESE ARE NOT GRADIENTS
+// ============================================================================
+//
+//  Five of the eight are the same colour twice - `['#05A8F6', '#05A8F6']` - so
+//  they are a solid fill being painted by the most expensive component in the
+//  tree. The three that do change still have no transparent stop.
+//
+//  That matters because of what the log says about them, eight times per
+//  render:
+//
+//      (ADVICE) View #414 of type BVLinearGradient has a shadow set but
+//               cannot calculate shadow efficiently.
+//
+//  iOS can cache a shadow when it knows the layer is opaque; a gradient view
+//  has no background colour, so it has to rasterise the whole thing every
+//  frame to find its own silhouette. Giving each tile the solid colour that
+//  is already underneath the gradient is invisible on screen and hands iOS
+//  the bounds it was looking for.
+// ============================================================================
 const GRADIENTS = {
   purplePink: ['#05A8F6', '#05A8F6'],
   pinkRed: ['#FF8A8A', '#FF8A8A'],
@@ -376,7 +421,9 @@ const HomeScreen = () => {
       <View>
         <LinearGradient
           colors={item.gradient}
-          style={styles.appCardInner}
+          // The solid colour the gradient starts from, so the shadow on this
+          // style is one iOS can cache. See the note above GRADIENTS.
+          style={[styles.appCardInner, { backgroundColor: item.gradient[0] }]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
@@ -391,7 +438,7 @@ const HomeScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: '#1C242C' }}>
       <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2874&auto=format&fit=crop' }}
+        source={WALLPAPER}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
       />
@@ -781,6 +828,10 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+    // The colour the gradient over it starts from, so the shadow below is one
+    // iOS can cache rather than rasterising a circle every frame. See the note
+    // above GRADIENTS.
+    backgroundColor: theme.colors.primary,
     shadowColor: '#1C242C', // Dark gold shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
@@ -790,7 +841,17 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#FFFFFF',
+    // ------------------------------------------------------------------
+    //  BLACK, BECAUSE THE CIRCLE IS A LIGHT FILL
+    // ------------------------------------------------------------------
+    //  White on #05A8F6 measures 2.65 and the theme has a rule about it -
+    //  see rule 1 in core/theme.ts, which lists this exact colour taking
+    //  BLACK. The initial was white the whole time and the palette audit
+    //  could not see it, because the fill was a gradient prop rather than
+    //  a resolvable token. Giving the circle its backing colour above is
+    //  what made it visible.
+    // ------------------------------------------------------------------
+    color: theme.colors.onLight,
   },
   headerNameBlock: {
     flex: 1,
