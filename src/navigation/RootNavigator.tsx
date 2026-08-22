@@ -33,6 +33,7 @@ import {
   ShoppingScreen,
   ShopDetailScreen,
   ProductsScreen,
+  ProductDetailScreen,
   TechTreeScreen,
   DNAScreen,
   ResearchScreen,
@@ -72,6 +73,7 @@ import { rootNavigationRef } from './navigationRef';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
   BoardMemberScreen,
+  SubsidiaryScreen,
   MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
   BorrowLoanScreen, RepayDebtScreen,
   CapitalInjectionScreen, SharkDealScreen,
@@ -90,7 +92,7 @@ import TutorialOverlay from '../components/tutorial/TutorialOverlay';
  */
 const COMPANY_ROUTES = new Set([
     'MyCompany', 'Products', 'Research', 'TechTree', 'Laboratory', 'Assets', 'FinancialReport',
-    'BoardMembers', 'BoardMember', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
+    'BoardMembers', 'BoardMember', 'ProductDetail', 'Subsidiary', 'TeamMorale', 'Finance', 'MyEmpire', 'HostileTakeover', 'StockMarket',
     'BorrowLoan', 'RepayDebt',
 ]);
 
@@ -188,6 +190,16 @@ export type RootStackParamList = {
    * player asked for - "ekran gecisleri tab bar gibi dusun".
    */
   BoardMember: { memberId: string };
+  /**
+   * One product, and everything you set about it.
+   *
+   * The ID rather than the product, and no callbacks. Route params must be
+   * serialisable, and a function travelling between screens has cost this
+   * codebase once already - see ProductDetailScreen for the story.
+   */
+  ProductDetail: { productId: string };
+  /** One company you own. Same argument as ProductDetail. */
+  Subsidiary: { companyId: string };
   TeamMorale: undefined;
   Finance: undefined;
   MyEmpire: undefined;
@@ -511,6 +523,8 @@ const RootNavigator = () => {
               features/assets/screens/CompanyScreens.tsx */}
           <RootStack.Screen name="BoardMembers" component={BoardMembersScreen} />
           <RootStack.Screen name="BoardMember" component={BoardMemberScreen} />
+          <RootStack.Screen name="ProductDetail" component={ProductDetailScreen} />
+          <RootStack.Screen name="Subsidiary" component={SubsidiaryScreen} />
           <RootStack.Screen name="TeamMorale" component={TeamMoraleScreen} />
           <RootStack.Screen name="Finance" component={FinanceScreen} />
           <RootStack.Screen name="MyEmpire" component={MyEmpireScreen} />

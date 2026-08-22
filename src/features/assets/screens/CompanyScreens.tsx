@@ -46,6 +46,10 @@ import CapitalInjectionModal from '../../../components/MyCompany/Finance/Capital
 import SharkDealModal from '../../../components/MyCompany/Finance/SharkDealModal';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 
+// A route of its own file because it is long enough to deserve one. Named
+// here so the navigator still has a single import for every company route.
+export { default as SubsidiaryScreen } from './SubsidiaryScreen';
+
 /** Going back is what "close" means once these are screens. */
 const useGoBack = () => {
     const navigation = useNavigation<any>();

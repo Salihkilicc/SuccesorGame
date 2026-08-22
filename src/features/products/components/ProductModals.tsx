@@ -7,6 +7,7 @@ import TutorialOverlay from '../../../components/tutorial/TutorialOverlay';
 import { theme } from '../../../core/theme';
 import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { StatRow } from '../../../components/common/Disclosure';
+import ScreenHost from '../../../components/common/ScreenHost';
 import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
@@ -143,7 +144,23 @@ const EMPTY_PRODUCT: any = Object.freeze({
  */
 const SHOW_EARNINGS_EXPLAINER: boolean = false;
 
-export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity }: any) => {
+/**
+ * A product, and everything you set about it.
+ *
+ * ---------------------------------------------------------------------------
+ *  `asScreen`, FOR THE REASON EVERY OTHER DETAIL PAGE IS A ROUTE
+ * ---------------------------------------------------------------------------
+ *  It was already full screen with its own ScreenHeader; the only thing the
+ *  Modal was still doing was making it arrive differently. Products slid in
+ *  from the right and the product itself faded in on top, so opening one and
+ *  closing it were two unrelated gestures on the same screen.
+ *
+ *  Reported as "urunlere girip cikinca ekran saga gitmeli, girerken sola
+ *  gelmeli, ekran kayarak".
+ *
+ *  A Modal also draws above the nav bar. See components/common/ScreenHost.
+ */
+export const ProductDetailModal = ({ visible, product: initialProduct, onClose, onUpdate, onRetire, getTip, totalCapacity, asScreen }: any) => {
     // Dil degisince yeniden ciz.
     useLocale();
     // 1. Get live product from store to ensure reactivity
@@ -541,7 +558,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     if (productMissing) return null;
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <ScreenHost asScreen={asScreen} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
                     <ScreenHeader
@@ -1356,7 +1373,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                 its own window holds the measured control.
                ------------------------------------------------------------ */}
             <TutorialOverlay />
-        </Modal>
+        </ScreenHost>
     );
 };
 

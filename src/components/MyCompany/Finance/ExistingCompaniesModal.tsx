@@ -11,7 +11,6 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
-import SubsidiaryDetailModal from './SubsidiaryDetailModal';
 import { formatMoney } from '../../../core/utils';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
@@ -29,7 +28,8 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
     useLocale();
     const navigation = useNavigation<any>();
     const { subsidiaries } = useCorporateFinanceStore();
-    const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
+    // SHELVED with the modal it opened: the company is a route now.
+    // const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
     const handleHomePress = () => {
         onClose();
@@ -48,7 +48,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                     renderItem={({ item }) => {
                         const visual = getCompanyVisual(item, item.valuation);
                         return (
-                            <TouchableOpacity style={styles.row} onPress={() => setSelectedCompanyId(item.id)}>
+                            <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('Subsidiary', { companyId: item.id })}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
                                     <View style={[styles.sectorIconBadge, { backgroundColor: visual.badgeBg, borderColor: visual.badgeBorder }]}>
                                         <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
@@ -83,14 +83,18 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                         subsidiaries.length === 0 && styles.emptyList
                     ]}
                 />
-                {/* Detail Modal Integration */}
-                {selectedCompanyId && (
-                    <SubsidiaryDetailModal
-                        visible={!!selectedCompanyId}
-                        subsidiaryId={selectedCompanyId}
-                        onClose={() => setSelectedCompanyId(null)}
-                    />
-                )}
+                {/* ----------------------------------------------------
+                    THE COMPANY IS A ROUTE NOW
+
+                    SHELVED, and see screens/SubsidiaryScreen.tsx for why:
+                      {selectedCompanyId && (
+                        <SubsidiaryDetailModal
+                            visible={!!selectedCompanyId}
+                            subsidiaryId={selectedCompanyId}
+                            onClose={() => setSelectedCompanyId(null)}
+                        />
+                      )}
+                   ---------------------------------------------------- */}
             </View>
         </ScreenHost>
     );

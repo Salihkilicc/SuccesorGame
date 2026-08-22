@@ -5,7 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useProductsLogic } from '../logic/useProductsLogic';
-import { ProductLaunchModal, ProductDetailModal } from '../components/ProductModals';
+// `ProductDetailModal` is mounted by its own route now - see
+// screens/ProductDetailScreen.tsx.
+import { ProductLaunchModal } from '../components/ProductModals';
 import { ProductIconBadge } from '../components/ProductIcon';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import { formatMoney, formatNumber } from '../../../core/utils';
@@ -29,6 +31,18 @@ const Wrap = ({ target, style, children }: {
 const ProductsScreen = () => {
     useLocale();
   const navigation = useNavigation<any>();
+
+  /**
+   * Open a product.
+   *
+   * `openDetailModal` still runs: it is what clears the first tutorial step,
+   * and that reason is written down where it lives. What it no longer does is
+   * decide where the sheet appears.
+   */
+  const openProduct = (prod: any) => {
+    actions.openDetailModal(prod);
+    navigation.navigate('ProductDetail', { productId: prod.id });
+  };
   const {
     activeProducts,
     lockedProducts,
@@ -62,7 +76,7 @@ const ProductsScreen = () => {
         <View style={styles.activeList}>
           {activeProducts.map((prod, i) => (
             <Wrap key={prod.id} target={i === 0} style={styles.activeCardWrap}>
-            <Pressable style={styles.activeCardFill} onPress={() => actions.openDetailModal(prod)}>
+            <Pressable style={styles.activeCardFill} onPress={() => openProduct(prod)}>
               <View style={styles.activeHeader}>
                 <ProductIconBadge productId={prod.id} category={prod.category} size={40} iconSize={22} />
                 <View style={styles.statusBadge}><Text style={styles.statusText}>{t('product.active')}</Text></View>
@@ -109,17 +123,27 @@ const ProductsScreen = () => {
         />
       )}
 
-      {selectedProduct?.status === 'active' && (
-        <ProductDetailModal
-          visible={!!selectedProduct}
-          product={selectedProduct}
-          totalCapacity={maxCapacityUnits} // Passed dynamically
-          onClose={actions.closeModal}
-          onUpdate={actions.updateProductSettings}
-          onRetire={actions.retireProduct}
-          getTip={actions.getInsightTip}
-        />
-      )}
+      {/* ------------------------------------------------------------------
+          THE PRODUCT IS A ROUTE NOW
+
+          It was a Modal raised from here, so it faded in on top of a screen
+          that had itself slid in from the right - two different gestures one
+          after the other on the way to the same place. See
+          screens/ProductDetailScreen.tsx.
+
+          SHELVED:
+            {selectedProduct?.status === 'active' && (
+              <ProductDetailModal
+                visible={!!selectedProduct}
+                product={selectedProduct}
+                totalCapacity={maxCapacityUnits}
+                onClose={actions.closeModal}
+                onUpdate={actions.updateProductSettings}
+                onRetire={actions.retireProduct}
+                getTip={actions.getInsightTip}
+              />
+            )}
+         ------------------------------------------------------------------ */}
 
     </View>
   );

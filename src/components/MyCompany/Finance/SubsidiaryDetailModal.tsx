@@ -9,15 +9,24 @@ import { theme } from '../../../core/theme';
 import SellCompanyModal from '../Actions/SellCompanyModal';
 import { formatMoney } from '../../../core/utils';
 import { getCompanyVisual } from '../../../core/market/companyVisuals';
+import ScreenHost from '../../common/ScreenHost';
 
 type Props = {
+    /**
+     * Render as a route rather than a popup - see components/common/ScreenHost.
+     *
+     * "Sirketlere girerken ekrandan sagdan gelmeli, cikarken saga gitmeli,
+     * oyunda her yerdeki gibi." As a Modal it faded in on top of a list that
+     * had itself slid in from the right, and it drew above the nav bar.
+     */
+    asScreen?: boolean;
     visible: boolean;
     subsidiaryId?: string | null;  // Changed to match ExistingCompaniesModal usage (subsidiaryId)
     companyId?: string | null;     // Kept for backward compatibility if any
     onClose: () => void;
 };
 
-export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId, onClose }: Props) {
+export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId, onClose, asScreen }: Props) {
     useLocale();
     const navigation = useNavigation<any>();
     const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
@@ -113,17 +122,27 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
     );
 
     return (
-        <Modal
+        <ScreenHost
+            asScreen={asScreen}
             visible={visible}
             transparent={true}
             animationType="fade"
             onRequestClose={onClose}
         >
-            <View style={styles.overlay}>
-                {/* Darkened Background instead of Blur for safety */}
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(28,36,44,0.85)' }]} />
+            <View style={[styles.overlay, asScreen && styles.overlayScreen]}>
+                {/* As a SCREEN there is no backdrop to dim and nothing to tap
+                    outside of, and the card must stop being a card: a 420pt
+                    box at 92% height, centred and rounded, inside a screen
+                    that is already exactly that shape. */}
+                {!asScreen && (
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(28,36,44,0.85)' }]} />
+                )}
 
-                <View style={[styles.container, { marginTop: 60 }]}>
+                <View style={[
+                    styles.container,
+                    !asScreen && { marginTop: 60 },
+                    asScreen && styles.containerScreen,
+                ]}>
                     {/* Header */}
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -213,7 +232,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     onClose={() => setSellModalVisible(false)}
                 />}
             </View>
-        </Modal>
+        </ScreenHost>
     );
 };
 
@@ -223,6 +242,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(28,36,44,0.5)',
+    },
+    overlayScreen: { backgroundColor: theme.colors.background, justifyContent: 'flex-start' },
+    containerScreen: {
+        width: '100%',
+        maxWidth: undefined,
+        height: '100%',
+        borderRadius: 0,
+        borderWidth: 0,
     },
     container: {
         width: '90%',
@@ -456,14 +483,24 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     saveBtn: {
-        backgroundColor: '#FFFFFF',
+        // ------------------------------------------------------------------
+        //  THE PRIMARY ACTION IS THE PRIMARY COLOUR
+        // ------------------------------------------------------------------
+        //  It was a raw '#FFFFFF', which the palette audit cannot resolve, so
+        //  the button was invisible to the contrast pass and its label was
+        //  being measured against whatever painted ancestor the script COULD
+        //  read. Every other primary action in the game is `colors.primary`
+        //  with `colors.primaryText` - see the note on IpoModal's own confirm
+        //  button, which made this same change for the same reason.
+        // ------------------------------------------------------------------
+        backgroundColor: theme.colors.primary,
         height: 50,
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
     },
     saveBtnText: {
-        color: theme.colors.onLight,
+        color: theme.colors.primaryText,
         fontSize: 16,
         fontWeight: '800',
         letterSpacing: 0.5,
