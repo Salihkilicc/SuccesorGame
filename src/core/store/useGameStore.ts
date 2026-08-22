@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 // DEV only, compiles to nothing in release. See core/perf.ts.
 import { beginTiming, mark, endTiming } from '../perf';
+import { whenSettled } from '../../storage/persist';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { simulateNewMonth } from '../../event/eventEngine';
@@ -301,6 +302,22 @@ export const useGameStore = create<GameStore>()(
 
       },
       advanceMonth: async (monthsInput?: number) => {
+        // ------------------------------------------------------------------
+        //  NOT UNTIL EVERY SAVE HAS BEEN READ
+        // ------------------------------------------------------------------
+        //  A write made before its store has hydrated is dropped by
+        //  storage/persist.ts - correctly, because it is derived from the
+        //  empty initial state and would land on top of the real save. But
+        //  the quarter's work goes with it, twice: the write is dropped and
+        //  then hydration overwrites the memory that held it.
+        //
+        //  App.tsx holds the UI until `warmUpStorage` resolves, so in practice
+        //  this is a microtask. It is here as well because the gate up there
+        //  can only wait for stores that exist, and the failure mode of a new
+        //  lazily required store is silent.
+        // ------------------------------------------------------------------
+        await whenSettled();
+
         beginTiming('quarter');
         // Input güvenliği (Varsayılan 3 ay)
         const months = typeof monthsInput === 'number' ? monthsInput : 3;

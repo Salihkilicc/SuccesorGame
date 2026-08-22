@@ -3,15 +3,39 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BootSplash from 'react-native-bootsplash';
 import RootNavigator from './src/navigation/RootNavigator';
-import { useStatsStore } from './src/core/store/useStatsStore';
-import { useGameStore } from './src/core/store/useGameStore';
+import { warmUpStorage } from './src/storage/warmUp';
 
 const App = () => {
-  // Sadece kritik store'ların yüklenmesi yeterli (diğerleri de onlarla aynı anda store'dan çıkacak)
-  const statsHydrated = useStatsStore(state => state._hasHydrated);
-  const gameHydrated = useGameStore(state => state._hasHydrated);
+  // ==========================================================================
+  //  EVERY SAVE, NOT TWO OF THEM
+  // ==========================================================================
+  //  SHELVED, and the comment on it was the bug:
+  //
+  //    // Sadece kritik store'larin yuklenmesi yeterli
+  //    // (digerleri de onlarla ayni anda store'dan cikacak)
+  //    const statsHydrated = useStatsStore(state => state._hasHydrated);
+  //    const gameHydrated = useGameStore(state => state._hasHydrated);
+  //    const isFullyHydrated = statsHydrated && gameHydrated;
+  //
+  //  They do not come out at the same time. A store starts reading when it is
+  //  CREATED, and half of them are created by a lazy `require` inside the
+  //  quarter tick - so their first read began in the same pass as their first
+  //  write, and the write was dropped.
+  //
+  //  Measured on a device: launch, press Next Quarter within about a second,
+  //  and that quarter's territory, sponsorship, casino risk, achievements and
+  //  subsidiaries are all discarded. Thirty dropped writes in one tick.
+  //
+  //  `warmUpStorage` imports every persisted store, which is what starts the
+  //  reads, and resolves when all of them have landed. See storage/warmUp.ts.
+  // ==========================================================================
+  const [isFullyHydrated, setFullyHydrated] = React.useState(false);
 
-  const isFullyHydrated = statsHydrated && gameHydrated;
+  useEffect(() => {
+    let alive = true;
+    warmUpStorage().then(() => { if (alive) setFullyHydrated(true); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     // Sadece HER ŞEY yüklendiğinde splash screen'i gizle

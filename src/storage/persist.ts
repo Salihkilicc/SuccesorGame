@@ -27,6 +27,64 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /** Keys whose disk copy has been read at least once this session. */
 const hydrated = new Set<string>();
 
+// ============================================================================
+//  AND WHO IS STILL WAITING
+// ============================================================================
+//
+//  Dropping the write is the right answer and it is not the whole answer. The
+//  drop protects what is on DISK; it does nothing for what the game just
+//  computed, which is thrown away twice over - the write is dropped, and then
+//  hydration lands and overwrites the memory that held it.
+//
+//  Measured on a device: launch the app and press Next Quarter within about a
+//  second, and that quarter's changes to territory, sponsorship, the casino
+//  risk record, the achievements and the subsidiaries are all silently lost.
+//  Thirty dropped writes in one tick, in the log, at quarter 193.
+//
+//  The reason the window is that wide is that App.tsx gated on TWO stores,
+//  `useStatsStore` and `useGameStore`, with a comment saying the rest come out
+//  at the same time. They do not. A store begins reading when it is CREATED,
+//  and half of these are created by a lazy `require` inside the quarter tick
+//  itself - so their first read starts in the same pass as their first write.
+//
+//  So the storage layer keeps a second set: every key anybody has ASKED for.
+//  `whenSettled` is then answerable - everything asked for has been read - and
+//  the app can wait for it rather than guessing which two stores stand for all
+//  of them. See storage/warmUp.ts, which is what does the asking.
+// ============================================================================
+
+/** Keys some store has begun reading, whether or not it has landed. */
+const asked = new Set<string>();
+
+/** Resolved the moment `asked` and `hydrated` agree. */
+let waiters: (() => void)[] = [];
+
+const settleIfDone = (): void => {
+    if (waiters.length === 0) return;
+    for (const key of asked) if (!hydrated.has(key)) return;
+    const done = waiters;
+    waiters = [];
+    for (const w of done) w();
+};
+
+/**
+ * Every read that has been started has landed.
+ *
+ * Resolves immediately when nothing is outstanding, which is the ordinary
+ * case: after launch this costs one microtask. It deliberately does NOT wait
+ * for keys nobody has asked for - a store that is never created has no state
+ * to lose, and PERSIST_KEYS carries legacy keys no live store reads.
+ */
+export const whenSettled = (): Promise<void> =>
+    new Promise<void>(resolve => {
+        waiters.push(resolve);
+        settleIfDone();
+    });
+
+/** What is still outstanding, for the log and for the test. */
+export const outstandingReads = (): string[] =>
+    Array.from(asked).filter(k => !hydrated.has(k));
+
 /** Pending writes queued for debounce to avoid freezing the JS thread with dozens of JSON serializations per quarter tick. */
 const pendingWrites = new Map<string, string>();
 const writeTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -57,14 +115,25 @@ export const flushPendingStorageWrites = async (): Promise<void> => {
 
 export const zustandStorage = {
     getItem: async (name: string): Promise<string | null> => {
+        // Recorded BEFORE the await, so `whenSettled` can see the read is
+        // outstanding rather than resolving in the gap before it lands.
+        asked.add(name);
+
         // If there is a pending write in memory, return it directly
         if (pendingWrites.has(name)) {
             hydrated.add(name);
+            settleIfDone();
             return pendingWrites.get(name)!;
         }
-        const value = await AsyncStorage.getItem(name);
-        hydrated.add(name);
-        return value;
+        try {
+            return await AsyncStorage.getItem(name);
+        } finally {
+            // In a `finally`, because a read that FAILED is still a read that
+            // is no longer outstanding. Leaving it in `asked` alone would hang
+            // every later `whenSettled` for the rest of the session.
+            hydrated.add(name);
+            settleIfDone();
+        }
     },
 
     setItem: async (name: string, value: string): Promise<void> => {
