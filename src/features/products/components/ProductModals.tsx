@@ -52,7 +52,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
-                    <ScreenHeader inset title="🚀 New Product Opportunity" onBack={onClose} />
+                    <ScreenHeader inset title="New Product Opportunity" onBack={onClose} />
 
                     <View style={styles.contentPad}>
                     <View style={styles.header}>
@@ -70,7 +70,14 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 
                     {isAnalyzed ? (
                         <View style={styles.analysisBox}>
-                            <Text style={styles.sectionHeader}>📊 Market Analysis</Text>
+                            <View style={styles.sectionHeaderRow}>
+                                <MaterialCommunityIcons
+                                    name="chart-box-outline"
+                                    size={15}
+                                    color={theme.colors.textMuted}
+                                />
+                                <Text style={styles.sectionHeader}>Market Analysis</Text>
+                            </View>
                             <View style={styles.statRow}>
                                 <Text style={styles.label}>{t('product.marketDemand')}</Text>
                                 <Text style={styles.value}>{product.marketDemand}%</Text>
@@ -584,7 +591,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text style={styles.heroValue}>${currentUnitCost}</Text>
                                         <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(-2%)</Text>
                                     </View>
-                                    <Text style={styles.hint}>Lvl {processLevel} ➜ {processLevel + 1}</Text>
+                                    <Text style={styles.hint}>Lvl {processLevel} → {processLevel + 1}</Text>
                                 </View>
                                 <Pressable
                                     style={[
@@ -610,7 +617,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text style={styles.heroValue}>${product.sellingPrice || product.suggestedPrice}</Text>
                                         <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(+3%)</Text>
                                     </View>
-                                    <Text style={styles.hint}>Lvl {qualityLevel} ➜ {qualityLevel + 1}</Text>
+                                    <Text style={styles.hint}>Lvl {qualityLevel} → {qualityLevel + 1}</Text>
                                     {/* Owned but not yet buildable — queued, not lost. */}
                                     {queuedQuality > 0 && (
                                         <Text style={styles.queuedLine}>
@@ -907,116 +914,113 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             </View>
 
                             {CONTRACT_PARTNERS.filter(pt => brandValue < pt.minBrand).map(pt => (
-                                <Text key={pt.id} style={styles.partnerLocked}>
-                                    🔒 {pt.name} — needs brand {Math.round(pt.minBrand * BRAND_INDEX_SCALE)} (you have {Math.round(brandPoints)})
-                                </Text>
+                                <View key={pt.id} style={styles.partnerLockedRow}>
+                                    <MaterialCommunityIcons
+                                        name="lock-outline"
+                                        size={12}
+                                        color={theme.colors.textMuted}
+                                    />
+                                    <Text style={styles.partnerLocked}>
+                                        {pt.name} — needs brand {Math.round(pt.minBrand * BRAND_INDEX_SCALE)} (you have {Math.round(brandPoints)})
+                                    </Text>
+                                </View>
                             ))}
 
                             {!!chosenPartner && (
                                 <>
                                     <Text style={styles.contractDesc}>{chosenPartner.description}</Text>
-                                    <Text style={styles.partnerLimitHint}>
-                                        📦 Min: {formatNumber(partnerMinUnits)} · Max: {formatNumber(partnerMaxUnits)} units
-                                    </Text>
+                                    <View style={styles.partnerLimitRow}>
+                                        <MaterialCommunityIcons
+                                            name="package-variant-closed"
+                                            size={13}
+                                            color={theme.colors.textMuted}
+                                        />
+                                        <Text style={styles.partnerLimitHint}>
+                                            {formatNumber(partnerMinUnits)} to {formatNumber(partnerMaxUnits)} units
+                                        </Text>
+                                    </View>
 
-                                    {/* Quick Presets Bar */}
+                                    {/* ------------------------------------------------------------
+                                        THREE PRESETS, NOT FIVE, AND NO EMOJI
+
+                                        There were five: Off, two fixed percentages of what the plant
+                                        was already building, Match Gap and
+                                        Max. Three of them answered a question nobody asks - "what
+                                        is a quarter of what I was already going to build" is not a
+                                        production decision, it is arithmetic the stepper below can
+                                        do - and they wrapped onto a second row on a phone, which is
+                                        what made the block look like a control panel.
+
+                                        The three that are left are the three real answers: none of
+                                        it, exactly the shortfall, or everything they will sell you.
+
+                                        MATCH GAP STAYS WHEN THERE IS NO GAP. It used to vanish,
+                                        which moved the other two buttons under the player's thumb
+                                        between one render and the next. Disabled, with the reason
+                                        in the label, teaches what it is for.
+
+                                        The emoji went with them: a picture glyph is a different
+                                        typeface at a different weight from everything around them
+                                        - see the icon set this file already imports.
+                                       ------------------------------------------------------------ */}
                                     <View style={styles.contractPresetsRow}>
-                                        <Pressable
-                                            style={[styles.presetBtn, contractUnits === 0 && styles.presetBtnActive]}
-                                            onPress={() => setContractUnits(0)}
-                                        >
-                                            <Text style={[styles.presetBtnText, contractUnits === 0 && styles.presetBtnTextActive]}>
-                                                0 (Off)
-                                            </Text>
-                                        </Pressable>
-
-                                        <Pressable
-                                            style={[
-                                                styles.presetBtn,
-                                                contractUnits === Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.25))) &&
-                                                    contractUnits > 0 &&
-                                                    styles.presetBtnActive,
-                                            ]}
-                                            onPress={() =>
-                                                setContractUnits(
-                                                    Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.25))),
-                                                )
-                                            }
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.presetBtnText,
-                                                    contractUnits ===
-                                                        Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.25))) &&
-                                                        contractUnits > 0 &&
-                                                        styles.presetBtnTextActive,
-                                                ]}
-                                            >
-                                                +25% Extra
-                                            </Text>
-                                        </Pressable>
-
-                                        <Pressable
-                                            style={[
-                                                styles.presetBtn,
-                                                contractUnits === Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.5))) &&
-                                                    contractUnits > 0 &&
-                                                    styles.presetBtnActive,
-                                            ]}
-                                            onPress={() =>
-                                                setContractUnits(
-                                                    Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.5))),
-                                                )
-                                            }
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.presetBtnText,
-                                                    contractUnits ===
-                                                        Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.round(willBuild * 0.5))) &&
-                                                        contractUnits > 0 &&
-                                                        styles.presetBtnTextActive,
-                                                ]}
-                                            >
-                                                +50% Extra
-                                            </Text>
-                                        </Pressable>
-
-                                        {supplyGap < 0 && (
-                                            <Pressable
-                                                style={[
-                                                    styles.presetBtn,
-                                                    contractUnits ===
-                                                        Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.abs(supplyGap))) &&
-                                                        styles.presetBtnActive,
-                                                ]}
-                                                onPress={() =>
-                                                    setContractUnits(
-                                                        Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.abs(supplyGap))),
-                                                    )
-                                                }
-                                            >
-                                                <Text
-                                                    style={[
-                                                        styles.presetBtnText,
-                                                        contractUnits ===
-                                                            Math.min(partnerMaxUnits, Math.max(partnerMinUnits, Math.abs(supplyGap))) &&
-                                                            styles.presetBtnTextActive,
-                                                    ]}
-                                                >
-                                                    🎯 Match Gap ({formatNumber(Math.abs(supplyGap))})
-                                                </Text>
-                                            </Pressable>
-                                        )}
-
-                                        <Pressable
-                                            style={[styles.presetBtn, contractUnits === partnerMaxUnits && styles.presetBtnActive]}
-                                            onPress={() => setContractUnits(partnerMaxUnits)}
-                                        >
-                                            <Text style={[styles.presetBtnText, contractUnits === partnerMaxUnits && styles.presetBtnTextActive]}>
-                                                Max ({formatNumber(partnerMaxUnits)})
-                                            </Text>
-                                        </Pressable>
+                                        {(() => {
+                                            const gapUnits = Math.min(
+                                                partnerMaxUnits,
+                                                Math.max(partnerMinUnits, Math.abs(supplyGap)),
+                                            );
+                                            const presets: {
+                                                key: string; icon: string; label: string;
+                                                units: number; off?: boolean;
+                                            }[] = [
+                                                { key: 'off', icon: 'close', label: 'Off', units: 0 },
+                                                {
+                                                    key: 'gap',
+                                                    icon: 'target',
+                                                    label: supplyGap < 0
+                                                        ? `Match gap  ${formatNumber(Math.abs(supplyGap))}`
+                                                        : 'No gap',
+                                                    units: gapUnits,
+                                                    off: supplyGap >= 0,
+                                                },
+                                                {
+                                                    key: 'max',
+                                                    icon: 'arrow-collapse-up',
+                                                    label: `Max  ${formatNumber(partnerMaxUnits)}`,
+                                                    units: partnerMaxUnits,
+                                                },
+                                            ];
+                                            return presets.map(pr => {
+                                                const active = !pr.off && contractUnits === pr.units;
+                                                return (
+                                                    <Pressable
+                                                        key={pr.key}
+                                                        disabled={pr.off}
+                                                        style={[
+                                                            styles.presetBtn,
+                                                            active && styles.presetBtnActive,
+                                                            pr.off && styles.presetBtnOff,
+                                                        ]}
+                                                        onPress={() => setContractUnits(pr.units)}>
+                                                        <MaterialCommunityIcons
+                                                            name={pr.icon}
+                                                            size={13}
+                                                            color={active
+                                                                ? theme.colors.primary
+                                                                : theme.colors.textMuted}
+                                                        />
+                                                        <Text
+                                                            numberOfLines={1}
+                                                            style={[
+                                                                styles.presetBtnText,
+                                                                active && styles.presetBtnTextActive,
+                                                            ]}>
+                                                            {pr.label}
+                                                        </Text>
+                                                    </Pressable>
+                                                );
+                                            });
+                                        })()}
                                     </View>
 
                                     <View style={styles.contractStepper}>
@@ -1052,7 +1056,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     </View>
 
                                     {!!contractQuote?.note && (
-                                        <Text style={styles.contractWarn}>⚠️ {contractQuote.note}</Text>
+                                        <View style={styles.contractWarnRow}>
+                                            <MaterialCommunityIcons
+                                                name="alert-outline" size={13}
+                                                color={theme.colors.warning}
+                                            />
+                                            <Text style={styles.contractWarn}>{contractQuote.note}</Text>
+                                        </View>
                                     )}
 
                                     {!!margins && (
@@ -1088,7 +1098,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                                     {qualityLevel > chosenPartner.qualityCeiling && (
                                         <Text style={styles.contractWarn}>
-                                            ⚠️ {t('product.qualityCapWarn', {
+                                            {t('product.qualityCapWarn', {
                                                 quality: qualityLevel,
                                                 ceiling: chosenPartner.qualityCeiling,
                                             })}
@@ -1266,7 +1276,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             player glances at - it dominated the bottom of the
                             screen. Same information, one row. */}
                         <StatRow
-                            label="📦 Inventory"
+                            icon="package-variant-closed"
+                            label="Inventory"
                             value={`${formatNumber(product.inventory || 0)} units`}
                             why={t('product.estStorageCostV1Quarter', { v1: formatNumber((product.inventory || 0) * 5) })}
                         />
@@ -1600,15 +1611,43 @@ const styles = StyleSheet.create({
     contractHint: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginBottom: 10 },
     contractDesc: { fontSize: 11, color: 'rgba(255,255,255,0.48)', fontStyle: 'italic', marginTop: 10, marginBottom: 4 },
     partnerLimitHint: { fontSize: 11, color: theme.colors.brandMuted, fontWeight: '600', marginBottom: 6 },
-    contractPresetsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8, marginBottom: 8 },
+    // Three across, one row, no wrapping. `flexWrap` was carrying five
+    // buttons onto a second line on a phone - see the note at the call site.
+    // ----------------------------------------------------------------------
+    //  SHELVED: THE TWO PERCENTAGE PRESETS
+    // ----------------------------------------------------------------------
+    //  "+25% Extra" and "+50% Extra" set the contract order to a quarter or a
+    //  half of what the plant was already going to build:
+    //
+    //      onPress={() => setContractUnits(
+    //          Math.min(partnerMaxUnits,
+    //              Math.max(partnerMinUnits, Math.round(willBuild * 0.25))))}
+    //
+    //  Kept here rather than deleted because the arithmetic is right. What is
+    //  wrong is that it is not a decision anybody makes - you outsource to
+    //  cover a shortfall, not to add a fixed fraction of your own output - and
+    //  the stepper underneath already reaches any number they answer.
+    // ----------------------------------------------------------------------
+    contractPresetsRow: { flexDirection: 'row', gap: 6, marginTop: 8, marginBottom: 8 },
+    partnerLimitRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+    contractWarnRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 5 },
+    sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    partnerLockedRow: { flexDirection: 'row', alignItems: 'center', gap: 5, flexShrink: 1 },
     presetBtn: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
+        paddingHorizontal: 8,
+        paddingVertical: 7,
         borderRadius: 8,
         backgroundColor: '#323A40',
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.08)',
     },
+    // Dimmed by the surface. Nothing here is a profit or a loss.
+    presetBtnOff: { opacity: 0.45 },
     presetBtnActive: {
         backgroundColor: '#434B50',
         borderColor: theme.colors.primary,

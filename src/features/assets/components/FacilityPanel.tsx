@@ -22,8 +22,10 @@
 // ============================================================================
 
 import React, { useState, useEffect, useCallback } from 'react';
+import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, Pressable, Alert, LayoutAnimation } from 'react-native';
+// `Alert` went with the two dialogs that became ConfirmPanels.
+import { View, Text, StyleSheet, Pressable, LayoutAnimation } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -88,6 +90,30 @@ const FacilityPanel: React.FC = () => {
 
     /** The stripe IS the facility header now - tapping it opens the details. */
     const [facilityOpen, setFacilityOpen] = useState(false);
+    // ------------------------------------------------------------------
+    //  THE BIGGEST DECISION ON THIS SCREEN WAS A SYSTEM ALERT
+    // ------------------------------------------------------------------
+    //  `Alert.alert` with eight figures interpolated into three paragraphs:
+    //  the price, the RP, the build time, the retooling ratio, the new
+    //  capacity, the crew, the unit cost multiplier and two ceilings. All
+    //  prose, none of it aligned, in an OS dialog that looks nothing like the
+    //  rest of the game and cannot be read at a glance.
+    //
+    //  Rebuilding the plant is the largest single thing that happens to a
+    //  company short of listing it, and the IPO already got this treatment -
+    //  components/MyCompany/Shares/IpoModal.tsx makes the same argument about
+    //  the same shape of decision.
+    // ------------------------------------------------------------------
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        lines?: ConfirmLine[];
+        note?: string;
+        confirmLabel: string;
+        cancelLabel?: string;
+        onConfirm?: () => void;
+        tone?: 'default' | 'danger';
+    }>(null);
     const toggleFacility = useCallback(() => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setFacilityOpen(o => !o);
@@ -108,40 +134,53 @@ const FacilityPanel: React.FC = () => {
 
     const handleUpgrade = () => {
         if (!next) return;
-        Alert.alert(
-            t('fac.upgradeTo', { v1: next.name }),
-            t('fac.upgradeBody', {
-                v1: formatMoney(next.upgradeCost) + (next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''),
-                v2: next.buildQuarters,
-                v3: Math.round(tier.retoolingRatio * 100),
-                v4: formatNumber(next.capacity),
-                v5: formatNumber(next.crew),
-                v6: next.unitCostMultiplier.toFixed(2),
-                v7: next.brandCeiling,
-                v8: next.qualityCeiling,
-            }),
-            [
-                { text: t('company.cancel'), style: 'cancel' },
+        setPanel({
+            title: t('fac.upgradeTo', { v1: next.name }),
+            // The eight figures were a paragraph. They are rows the eye can
+            // run down now, in the order the questions get asked: what does
+            // it cost, how long am I weakened, what do I get.
+            lines: [
                 {
-                    text: t('company.confirm'),
-                    onPress: () => {
-                        const result = startFacilityUpgrade();
-                        if (!result.success) Alert.alert(t('alert.cannotStart'), result.message);
-                    },
+                    label: 'Cost',
+                    value: formatMoney(next.upgradeCost)
+                        + (next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''),
+                    strong: true,
                 },
+                { label: 'Build time', value: `${next.buildQuarters} quarter(s)` },
+                {
+                    label: 'Capacity while building',
+                    value: `${Math.round(tier.retoolingRatio * 100)}%`,
+                },
+                { label: 'Capacity when it lands', value: formatNumber(next.capacity), strong: true },
+                { label: 'Crew it needs', value: formatNumber(next.crew) },
+                { label: 'Unit cost', value: `x${next.unitCostMultiplier.toFixed(2)}` },
+                { label: 'Brand ceiling', value: String(next.brandCeiling) },
+                { label: 'Quality ceiling', value: String(next.qualityCeiling) },
             ],
-        );
+            note: 'You will produce less while it is being built, and you may lose share.',
+            cancelLabel: t('company.cancel'),
+            confirmLabel: t('company.confirm'),
+            onConfirm: () => {
+                const result = startFacilityUpgrade();
+                setPanel(result.success ? null : {
+                    title: t('alert.cannotStart'),
+                    summary: result.message,
+                    confirmLabel: 'OK',
+                    tone: 'danger',
+                });
+            },
+        });
     };
 
     const handleCancel = () => {
-        Alert.alert(
-            t('alert.cancelUpgrade'),
-            t('alert.theConstructionWillBeStopped'),
-            [
-                { text: t('company.keepBuilding'), style: 'cancel' },
-                { text: t('company.cancelUpgrade'), style: 'destructive', onPress: cancelFacilityUpgrade },
-            ],
-        );
+        setPanel({
+            title: t('alert.cancelUpgrade'),
+            summary: t('alert.theConstructionWillBeStopped'),
+            cancelLabel: t('company.keepBuilding'),
+            confirmLabel: t('company.cancelUpgrade'),
+            tone: 'danger',
+            onConfirm: () => { cancelFacilityUpgrade(); setPanel(null); },
+        });
     };
 
     const applyTarget = () => {
@@ -513,6 +552,19 @@ const FacilityPanel: React.FC = () => {
                     button. FACILITY_TIERS still holds the data if it comes
                     back as something you can actually do. */}
             </CollapsibleSection>
+
+            <ConfirmPanel
+                visible={!!panel}
+                title={panel?.title || ''}
+                summary={panel?.summary}
+                lines={panel?.lines}
+                note={panel?.note}
+                tone={panel?.tone}
+                confirmLabel={panel?.confirmLabel || 'OK'}
+                cancelLabel={panel?.cancelLabel}
+                onConfirm={panel?.onConfirm}
+                onCancel={() => setPanel(null)}
+            />
 
         </View>
     );

@@ -37,7 +37,7 @@
 //  the middle of a place name is worse than a slightly smaller place name.
 // ============================================================================
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,6 +93,25 @@ type Props = {
 };
 
 const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }: Props) => {
+    // ------------------------------------------------------------------
+    //  THE TITLE HAS TO CLEAR WHATEVER IS ACTUALLY ON THE RIGHT
+    // ------------------------------------------------------------------
+    //  THE BUG. Both accessories are absolutely positioned and the centre
+    //  reserved a FIXED gutter - the back button's width - on each side. The
+    //  back button is that width, so the left was always right. The right is
+    //  whatever the screen puts there, and on the tech tree that is an info
+    //  dot plus a two line balance carrying the research points and the cash.
+    //  Far wider than a button, so the centred title ran underneath it.
+    //
+    //  Reported as "innovation centerda RP points cakisiyor diger yerlerle".
+    //
+    //  Measured rather than guessed at, because the next screen to put
+    //  something there will have a different width and a second magic number
+    //  would be the same bug again. The title keeps its optical centre: the
+    //  same gutter goes on BOTH sides, so it shrinks symmetrically rather
+    //  than sliding left.
+    // ------------------------------------------------------------------
+    const [rightWidth, setRightWidth] = useState(0);
     const navigation = useNavigation<any>();
     const route = useRoute();
     const insets = useSafeAreaInsets();
@@ -111,7 +130,12 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
                 <MaterialCommunityIcons name="arrow-left" size={22} color={theme.colors.textPrimary} />
             </Pressable>
 
-            <View style={[styles.center, !right && { transform: [{ translateX: TITLE_NUDGE }] }]}>
+            <View
+                style={[
+                    styles.center,
+                    { paddingHorizontal: Math.max(HEADER_BACK_SIZE, rightWidth) + theme.spacing.sm },
+                    !right && { transform: [{ translateX: TITLE_NUDGE }] },
+                ]}>
                 <Text
                     style={styles.title}
                     numberOfLines={1}
@@ -123,7 +147,13 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
                 {!!subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
             </View>
 
-            {right ? <View style={styles.right}>{right}</View> : null}
+            {right ? (
+                <View
+                    style={styles.right}
+                    onLayout={e => setRightWidth(e.nativeEvent.layout.width)}>
+                    {right}
+                </View>
+            ) : null}
         </View>
     );
 };
@@ -163,8 +193,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        // Clear of the back button on both sides, so a long title shrinks
-        // instead of sliding under it.
+        // The gutter is applied at the call site from the MEASURED width of
+        // whatever is on the right - see the note in the component. This is
+        // the floor, for the case where there is nothing there at all.
         paddingHorizontal: HEADER_BACK_SIZE + theme.spacing.sm,
     },
     title: {

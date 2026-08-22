@@ -22,11 +22,22 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 
 type StatRowProps = {
     /** What the number is. */
     label: string;
+    /**
+     * A glyph from the icon set the rest of the app uses.
+     *
+     * Exists because rows were being labelled with emoji - "📦 Inventory",
+     * "📊 Market Analysis" - and an emoji is a different typeface at a
+     * different weight and a colour nothing in the theme chose. It sits
+     * beside its own text at a size that follows the label rather than
+     * shouting over it.
+     */
+    icon?: string;
     /** The number itself - this is the thing the player came for. */
     value: string;
     /** ONE line explaining where the number came from. Keep it short. */
@@ -55,7 +66,7 @@ type StatRowProps = {
     onPress?: () => void;
 };
 
-export const StatRow = ({ label, value, why, valueColor, detail, startOpen, onPress }: StatRowProps) => {
+export const StatRow = ({ label, icon, value, why, valueColor, detail, startOpen, onPress }: StatRowProps) => {
     const [open, setOpen] = useState(!!startOpen);
     const expandable = !!detail && !onPress;
 
@@ -87,7 +98,16 @@ export const StatRow = ({ label, value, why, valueColor, detail, startOpen, onPr
     const body = (
         <>
             <View style={styles.rowTop}>
-                <Text style={styles.label}>{label}</Text>
+                <View style={styles.labelRow}>
+                    {!!icon && (
+                        <MaterialCommunityIcons
+                            name={icon}
+                            size={14}
+                            color={theme.colors.textMuted}
+                        />
+                    )}
+                    <Text style={styles.label}>{label}</Text>
+                </View>
                 <View style={styles.rowRight}>
                     <Text style={[styles.value, !!valueColor && { color: valueColor }]}>{value}</Text>
                     {expandable && (
@@ -229,6 +249,7 @@ const styles = StyleSheet.create({
         borderBottomColor: theme.colors.border,
     },
     rowPressed: { backgroundColor: theme.colors.surfaceRaised },
+    labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 },
     rowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     rowRight: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
     label: { color: theme.colors.textSecondary, fontSize: theme.typography.body, flexShrink: 1 },
