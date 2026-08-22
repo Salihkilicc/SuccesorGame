@@ -42,6 +42,27 @@ export type Neglectable = {
     messages: { from: 'player' | 'them'; atMonth: number }[];
     /** The month they were last chased, so nobody is chased twice for one silence. */
     chasedAtMonth?: number;
+    /**
+     * They asked you something and you never picked an answer.
+     *
+     * ---------------------------------------------------------------------
+     *  THE HOLE THIS CLOSES
+     * ---------------------------------------------------------------------
+     *  `unread` alone was the whole test, and opening a thread marks it read.
+     *  So the cheapest way to play the entire conversation system was:
+     *
+     *      open the crisis, read both costs, press back      free
+     *
+     *  Every branch inside a crisis takes something and the exit took
+     *  nothing, which made ignoring the part of the game with the writing in
+     *  it the optimal strategy. Reported as "secim yapmadan ciksam para
+     *  cezasi yemiyorum".
+     *
+     *  Reading is not answering. A letter that is open on your desk with the
+     *  question still in it has been ignored in exactly the way this file
+     *  exists to notice, so it counts the same.
+     */
+    unanswered?: boolean;
 };
 
 /**
@@ -76,7 +97,9 @@ export const whoWasIgnored = (
 ): string[] =>
     threads
         .filter(t => {
-            if (t.unread <= 0) return false;
+            // Unread OR unanswered. See the note on `unanswered` for the
+            // exploit the first half alone left open.
+            if (t.unread <= 0 && !t.unanswered) return false;
 
             // Already chased for this silence. The chase itself lands in the
             // thread as a new message, so the clock below restarts from it and
