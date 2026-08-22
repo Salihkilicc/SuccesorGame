@@ -168,8 +168,11 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             <Text style={styles.sectionTitle}>{t('finance.corporateStrategy')}</Text>
                             {remainingPoints > 0 && (
                                 <View style={styles.pointsBadge}>
-                                    <Text style={styles.pointsText}>
-                                        {remainingPoints} Points Available
+                                    {/* "1 Points Available" was both too wide
+                                        for the row and wrong about the one.
+                                        Shorter, and it agrees with itself. */}
+                                    <Text style={styles.pointsText} numberOfLines={1}>
+                                        {remainingPoints} {remainingPoints === 1 ? 'point' : 'points'} left
                                     </Text>
                                 </View>
                             )}
@@ -224,7 +227,15 @@ const styles = StyleSheet.create({
     container: {
         width: '90%',
         maxWidth: 420,
-        height: '80%',
+        // ------------------------------------------------------------------
+        //  DOWN TO 92%, WHICH IS WHAT EVERY OTHER SHEET IN THE GAME USES
+        // ------------------------------------------------------------------
+        //  At 80% this sheet has four strategy rows, a KPI block, an info
+        //  note and a two button footer inside it, and the list was scrolling
+        //  under the footer with a fifth of the screen left empty below the
+        //  card. The report modal settled on 92% for the same reason.
+        // ------------------------------------------------------------------
+        height: '92%',
         backgroundColor: '#1C242C',
         borderRadius: 24,
         overflow: 'hidden',
@@ -318,22 +329,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 16,
+        gap: 8,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
         color: '#FFFFFF',
+        // The heading gives way, not the badge. A truncated "Corporate
+        // Strateg..." is readable; a truncated count is not a count.
+        flexShrink: 1,
     },
     pointsBadge: {
         backgroundColor: '#434B50',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
+        paddingHorizontal: 9,
+        paddingVertical: 4,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
+        flexShrink: 0,
     },
     pointsText: {
-        fontSize: 12,
+        fontSize: 10.5,
         fontWeight: '700',
         color: '#FFFFFF',
     },

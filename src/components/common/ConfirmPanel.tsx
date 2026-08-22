@@ -83,8 +83,26 @@ type Props = {
      * message body above the buttons.
      *
      * When present, `confirmLabel` is not shown - the choices ARE the answer.
+     *
+     * ---------------------------------------------------------------------
+     *  A CHOICE THAT CANNOT BE TAKEN IS STILL WORTH SHOWING
+     * ---------------------------------------------------------------------
+     *  The acquisition panel filtered the impossible routes out of this list,
+     *  so a player who could not pay cash saw two buttons and no explanation.
+     *  Reported as "param var ama olmuyor, issue shares cikiyor sadece" - and
+     *  the money was there, it was in the wrong pocket: a deal is paid from
+     *  company capital and the player was looking at their own.
+     *
+     *  A missing button teaches nothing. A greyed one with the reason under
+     *  it teaches the whole rule in one line.
      */
-    choices?: { label: string; description?: string; onPress: () => void }[];
+    choices?: {
+        label: string;
+        description?: string;
+        onPress: () => void;
+        /** Shown, greyed, and not pressable. `description` carries the why. */
+        disabled?: boolean;
+    }[];
 };
 
 const ConfirmPanel = ({
@@ -149,10 +167,19 @@ const ConfirmPanel = ({
                         {choices.map((c, i) => (
                             <Pressable
                                 key={i}
-                                onPress={c.onPress}
-                                style={({ pressed }) => [styles.choice, pressed && styles.btnPressed]}>
-                                <Text style={styles.choiceLabel}>{c.label}</Text>
-                                {!!c.description && <Text style={styles.choiceDesc}>{c.description}</Text>}
+                                onPress={c.disabled ? undefined : c.onPress}
+                                disabled={c.disabled}
+                                style={({ pressed }) => [
+                                    styles.choice,
+                                    c.disabled && styles.choiceOff,
+                                    pressed && !c.disabled && styles.btnPressed,
+                                ]}>
+                                <Text style={[styles.choiceLabel, c.disabled && styles.choiceLabelOff]}>
+                                    {c.label}
+                                </Text>
+                                {!!c.description && (
+                                    <Text style={styles.choiceDesc}>{c.description}</Text>
+                                )}
                             </Pressable>
                         ))}
                     </View>
@@ -243,7 +270,13 @@ const styles = StyleSheet.create({
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.border,
     },
+    // Dimmed by the SURFACE rather than by the text, so the reason underneath
+    // stays as readable as it is on a live row. A greyed explanation is an
+    // explanation nobody reads. See rule 3 in core/theme.ts: no signal colour
+    // for a state that is not a profit or a loss.
+    choiceOff: { opacity: 0.55 },
     choiceLabel: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    choiceLabelOff: { color: theme.colors.textMuted },
     choiceDesc: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, marginTop: 3, lineHeight: 16 },
     actions: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.xs },
     btn: { flex: 1, paddingVertical: theme.spacing.md, borderRadius: theme.radius.md, alignItems: 'center' },

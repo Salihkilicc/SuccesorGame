@@ -31,6 +31,7 @@ import {
   quoteFinancing,
   HOSTILE_MULTIPLE,
 } from '../../../core/market/mergers';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
@@ -105,7 +106,7 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
     cancelLabel?: string;
     onConfirm?: () => void;
     tone?: 'default' | 'danger';
-    choices?: { label: string; description?: string; onPress: () => void }[];
+    choices?: { label: string; description?: string; onPress: () => void; disabled?: boolean }[];
   }>(null);
 
   // 1. Prepare Data
@@ -226,16 +227,37 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
     // Each financing route needs a sentence of its own, which a system Alert
     // could not give it - the terms had to be packed into the message body
     // above three unlabelled buttons. They are rows now.
+    // ------------------------------------------------------------------
+    //  ALL THREE ROUTES, INCLUDING THE ONES YOU CANNOT TAKE
+    // ------------------------------------------------------------------
+    //  THE BUG. This mapped over `feasible`, so a route that did not qualify
+    //  simply was not there. A player with a full personal account who could
+    //  not cover the price out of COMPANY CAPITAL saw two buttons, one of
+    //  them "Issue shares", and no reason for the missing third.
+    //
+    //  Reported as "param var ama olmuyor, issue shares cikiyor sadece", and
+    //  they were right about the money - it was in the wrong pocket. A deal
+    //  is paid from the treasury; the figure on the profile is not it.
+    //
+    //  `quoteFinancing` has always returned the reason. It was being thrown
+    //  away one line before it reached the screen, which is the exact shape
+    //  this codebase keeps finding: correct code that nothing reads.
+    //
+    //  Kept in a fixed order - cash, debt, stock - so the rows do not move
+    //  around between deals depending on what happens to be affordable.
+    // ------------------------------------------------------------------
     setPanel({
       title: t('acq.howDoYouPay', { v1: selectedTarget.name }),
       lines: [
         { label: 'Price', value: formatMoney(q.price) },
+        { label: 'Company capital', value: formatMoney(companyCapital) },
         { label: 'Your valuation', value: formatMoney(acquirerValuation) },
         { label: 'Relative size', value: `${(q.relativeSize * 100).toFixed(1)}%`, strong: true },
       ],
-      choices: feasible.map(o => ({
+      choices: options.map(o => ({
         label: o.method === 'cash' ? t('acq.payCash') : o.method === 'debt' ? t('acq.borrow') : t('acq.issueShares'),
-        description: describe(o),
+        description: o.feasible ? describe(o) : (o.reason || ''),
+        disabled: !o.feasible,
         onPress: () => { setPanel(null); confirmDeal(q, o, hostile, acquirerValuation); },
       })),
       cancelLabel: t('action.cancel'),
@@ -690,7 +712,18 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 12,
-    paddingBottom: 80, // Space for Bottom Bar
+    // ------------------------------------------------------------------
+    //  THE BAR IS 122 TALL AND THIS SAID 80
+    // ------------------------------------------------------------------
+    //  So the last two companies in the list sat underneath the nav bar and
+    //  could not be scrolled clear of it. The number was written down rather
+    //  than asked for, and the bar has changed height since.
+    //
+    //  `NAV_BAR_CLEARANCE` is the bar's own answer to how much room it needs
+    //  - see navigation/components/CrystalNavBar.tsx, where it is derived
+    //  from the height and the inset rather than guessed at.
+    // ------------------------------------------------------------------
+    paddingBottom: NAV_BAR_CLEARANCE + 16,
   },
   itemRow: {
     flexDirection: 'row',
