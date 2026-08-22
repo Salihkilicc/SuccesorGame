@@ -10,6 +10,7 @@ import { CAST } from '../../data/story/cast';
 import type { Said } from '../../core/store/useStoryStore';
 import { useConversationRunnerLogic } from './logic/useConversationRunnerLogic';
 import { getChoiceBadges } from './effectBadges';
+import { useStatsStore } from '../../core/store/useStatsStore';
 import AnimatedBubble from './AnimatedBubble';
 import TypingIndicator from './TypingIndicator';
 
@@ -24,6 +25,10 @@ type Props = {
 };
 
 const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
+    // A penalty is a share of capital, so its badge has no figure until the
+    // company is known. Read here rather than inside the badge so that file
+    // stays pure and testable - see effectBadges.BadgeContext.
+    const companyCapital = useStatsStore(s => s.companyCapital);
     const { state, actions } = useConversationRunnerLogic({ conversation, variant, onFinished });
     const { history, isTyping, available, node, done, scroller, subject } = state;
     const { pick, finish, answer } = actions;
@@ -45,7 +50,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
             : isTyping
                 ? null
                 : available.map(({ choice, index }) => {
-                    const badges = getChoiceBadges(choice.effects);
+                    const badges = getChoiceBadges(choice.effects, { companyCapital });
                     return (
                         <Pressable
                             key={index}
@@ -106,7 +111,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                             </Text>
                             {said.from === 'player' && !!said.effects && said.effects.length > 0 && (
                                 <View style={styles.historyBadgeRow}>
-                                    {getChoiceBadges(said.effects).map(b => (
+                                    {getChoiceBadges(said.effects, { companyCapital }).map(b => (
                                         <View key={b.id} style={[styles.badge, (styles as any)[`badge_${b.tone}`]]}>
                                             {b.icon ? <Text style={styles.badgeIcon}>{b.icon}</Text> : null}
                                             <Text style={[styles.badgeText, (styles as any)[`badgeText_${b.tone}`]]}>

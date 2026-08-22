@@ -225,7 +225,10 @@ describe('being found guilty', () => {
 
     it('costs money, the name and the public, all at once', () => {
         const kinds = guiltyEffects.map(e => e.kind);
-        expect(kinds).toContain('capital');
+        // `fine` rather than `capital`: a conviction used to cost a flat
+        // eighteen million, which against a starting capital of three was not
+        // a penalty, it was the ending. See core/story/fines.ts.
+        expect(kinds).toContain('fine');
         expect(kinds).toContain('brand');
         expect(kinds).toContain('dial');
         expect(kinds).toContain('morale');
@@ -257,7 +260,7 @@ describe('being found guilty', () => {
 
     it('and being cleared is not free either', () => {
         const cleared = endsIn(fbiFinancial, 'fbiCleared')[0].effects!;
-        expect(cleared.some(e => e.kind === 'capital' && e.amount < 0)).toBe(true);
+        expect(cleared.some(e => e.kind === 'fine')).toBe(true);
         expect(cleared.some(e => e.kind === 'brand' && e.amount < 0)).toBe(true);
     });
 });

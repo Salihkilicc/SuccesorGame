@@ -37,10 +37,29 @@
 // ============================================================================
 
 import type { Dial, StoryFlag } from './state';
+import type { FineSeverity } from './fines';
 
 export type Effect =
-    /** Company capital in or out. Negative takes. */
+    /**
+     * Company capital in or out. Negative takes.
+     *
+     * FOR A PRICE, NOT FOR A PENALTY. Use this when the player is buying
+     * something at a figure the scene states out loud - the automation line,
+     * the patent filing, the two year carrier rate. Those cost what they cost.
+     *
+     * A penalty is `fine`. See the header of fines.ts for what a literal one
+     * did to a company holding three million.
+     */
     | { kind: 'capital'; amount: number }
+    /**
+     * The world takes money off you, and how much depends on what you have.
+     *
+     * A scene says how bad it is; core/story/fines.ts says what that costs
+     * this company on this quarter. Same division as `retention`, and for the
+     * same reason: a scene knows a regulator is furious and cannot know what
+     * the balance sheet looks like when the letter lands.
+     */
+    | { kind: 'fine'; severity: FineSeverity }
     /** The player's personal cash. Separate pool, separate effect. */
     | { kind: 'cash'; amount: number }
     /** Company workforce headcount delta. Negative takes. */
@@ -295,6 +314,7 @@ export type Effect =
  */
 export type EffectSink = {
     capital: (amount: number) => void;
+    fine: (severity: FineSeverity) => void;
     cash: (amount: number) => void;
     employees: (amount: number) => void;
     researchers: (amount: number) => void;
@@ -334,6 +354,7 @@ export type EffectSink = {
 export const applyEffect = (effect: Effect, sink: EffectSink): void => {
     switch (effect.kind) {
         case 'capital': sink.capital(effect.amount); return;
+        case 'fine': sink.fine(effect.severity); return;
         case 'cash': sink.cash(effect.amount); return;
         case 'employees': sink.employees(effect.amount); return;
         case 'researchers': sink.researchers(effect.amount); return;

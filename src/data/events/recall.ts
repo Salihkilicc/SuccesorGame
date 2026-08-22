@@ -24,7 +24,10 @@
 import type { Conversation } from '../../core/story/graph';
 import type { GameEvent } from '../../core/events/types';
 
-const RECALL_COST = 900_000;
+// SHELVED, and the header of core/story/fines.ts says why a literal was
+// wrong here: a recall is imposed on you, and nine hundred thousand is a
+// third of the company in the first year and invisible in the tenth.
+// const RECALL_COST = 900_000;
 
 export const recallConversation: Conversation = {
     id: 'event-recall',
@@ -76,7 +79,7 @@ export const recallConversation: Conversation = {
                 {
                     text: 'Do it.',
                     effects: [
-                        { kind: 'capital', amount: -RECALL_COST },
+                        { kind: 'fine', severity: 'minor' },
                         // Smaller than the buried branch, and it is the
                         // difference that is the lesson rather than the sign.
                         { kind: 'brand', amount: -9 },

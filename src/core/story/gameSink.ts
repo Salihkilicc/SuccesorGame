@@ -18,6 +18,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useNewsStore } from '../store/useNewsStore';
 import { applyCorporateShock, corporateBrandFrom } from '../market/brand';
+import { fineAmount } from './fines';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
 import { CONVERSATIONS } from '../../data/story';
@@ -36,6 +37,19 @@ export const gameSink = (): EffectSink => ({
     capital: (amount) => {
         const s = useStatsStore.getState();
         s.update({ companyCapital: (s.companyCapital || 0) + amount });
+    },
+    // ------------------------------------------------------------------
+    //  A PENALTY IS PRICED WHEN IT IS PAID, NOT WHEN IT IS WRITTEN
+    // ------------------------------------------------------------------
+    //  Read at CALL time, like everything else in this file, and that is the
+    //  whole point of the effect: the same scene costs a first year company
+    //  and a fifteenth year one the same FRACTION rather than the same
+    //  number. See fines.ts for what the literals were doing.
+    // ------------------------------------------------------------------
+    fine: (severity) => {
+        const s = useStatsStore.getState();
+        const capital = s.companyCapital || 0;
+        s.update({ companyCapital: capital - fineAmount(capital, severity) });
     },
     // ------------------------------------------------------------------
     //  CASH PAYS WHAT IT WAS ASKED TO PAY

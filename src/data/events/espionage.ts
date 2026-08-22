@@ -119,7 +119,7 @@ export const espionageKestrel: Conversation = {
                 {
                     text: 'Initiate platform overhaul.',
                     effects: [
-                        { kind: 'capital', amount: -2_600_000 },
+                        { kind: 'fine', severity: 'severe' },
                         { kind: 'brand', amount: -6 },
                         { kind: 'siege', category: 'Consumer', quarters: 3, pressure: 1.25 },
                     ],
@@ -338,7 +338,7 @@ export const espionageOracle: Conversation = {
                 {
                     text: 'Commission forensics.',
                     effects: [
-                        { kind: 'capital', amount: -3_800_000 },
+                        { kind: 'fine', severity: 'severe' },
                         { kind: 'brand', amount: -9 },
                         {
                             kind: 'schedule',

@@ -74,7 +74,7 @@ export const pearPatent: Conversation = {
                 {
                     text: 'Noted.',
                     effects: [
-                        { kind: 'capital', amount: -450_000 },
+                        { kind: 'fine', severity: 'minor' },
                         { kind: 'dial', dial: 'pearHostility', delta: 4 },
                         { kind: 'dial', dial: 'cfoTrust', delta: 3 },
                     ],
@@ -141,7 +141,7 @@ export const pearSuppliers: Conversation = {
                 {
                     text: 'Noted.',
                     effects: [
-                        { kind: 'capital', amount: -1_800_000 },
+                        { kind: 'fine', severity: 'serious' },
                         { kind: 'dial', dial: 'pearHostility', delta: 6 },
                         { kind: 'brand', amount: 9 },
                         {

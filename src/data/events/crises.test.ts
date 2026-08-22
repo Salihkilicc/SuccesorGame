@@ -59,7 +59,11 @@ const terminals = (c: typeof crisisLeak): Choice[] =>
 /** What an answer actually takes from the player. */
 const costsOf = (ch: Choice): string[] => (ch.effects ?? [])
     .filter(e => (
-        (e.kind === 'capital' && e.amount < 0)
+        // A penalty is `fine` now rather than a literal `capital`, and it is
+        // still money leaving. See core/story/fines.ts for why the figure
+        // moved out of the scene.
+        e.kind === 'fine'
+        || (e.kind === 'capital' && e.amount < 0)
         || (e.kind === 'cash' && e.amount < 0)
         || (e.kind === 'brand' && e.amount < 0)
         || (e.kind === 'morale' && e.amount < 0)
@@ -184,7 +188,9 @@ describe('and most of the damage is to the name on the box', () => {
         );
         // Money, name, people, standing, position, and a fact about you.
         expect(kinds.size).toBeGreaterThanOrEqual(5);
-        expect(kinds).toContain('capital');
+        // Money, by whichever door. Every crisis in this pack now takes it
+        // as a share of capital rather than a literal.
+        expect([...kinds].some(k => k === 'fine' || k === 'capital')).toBe(true);
         expect(kinds).toContain('brand');
         expect(kinds).toContain('morale');
         expect(kinds).toContain('siege');
@@ -320,8 +326,18 @@ describe('and they are not one crisis twelve times', () => {
         const all = crisisInquiry.nodes.flatMap(n => n.choices ?? []);
         const narrow = all.find(ch => ch.text.startsWith('Narrow'))!;
         const everything = all.find(ch => ch.text.startsWith('Everything'))!;
-        const money = (ch: Choice) =>
-            Math.abs(((ch.effects ?? []).find(e => e.kind === 'capital') as any)?.amount ?? 0);
+        // Compared by SEVERITY rather than by figure, because the figure is
+        // no longer in the scene - it is a share of whatever the company is
+        // worth on the quarter the inquiry lands.
+        const RANK: Record<string, number> = {
+            minor: 1, serious: 2, severe: 3, ruinous: 4,
+        };
+        const money = (ch: Choice) => {
+            const fine = (ch.effects ?? []).find(e => e.kind === 'fine') as any;
+            if (fine) return RANK[fine.severity] ?? 0;
+            const cap = (ch.effects ?? []).find(e => e.kind === 'capital') as any;
+            return cap ? Math.abs(cap.amount) : 0;
+        };
         expect(money(everything)).toBeGreaterThan(money(narrow));
         // And it is the CFO who notices, in both directions.
         const trust = (ch: Choice) =>

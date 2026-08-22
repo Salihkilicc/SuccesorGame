@@ -13,6 +13,7 @@ const recorder = () => {
     const log: string[] = [];
     const sink: EffectSink = {
         capital: a => log.push(`capital:${a}`),
+        fine: s => log.push(`fine:${s}`),
         cash: a => log.push(`cash:${a}`),
         employees: a => log.push(`employees:${a}`),
         researchers: a => log.push(`researchers:${a}`),

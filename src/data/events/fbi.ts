@@ -63,7 +63,7 @@ import type { GameEvent } from '../../core/events/types';
 
 const GUILTY: Effect[] = [
     { kind: 'flag', flag: 'fbiGuilty' },
-    { kind: 'capital', amount: -18_000_000 },
+    { kind: 'fine', severity: 'ruinous' },
     // The share collapse. Not a direct write - see the note above.
     { kind: 'brand', amount: -54 },
     { kind: 'dial', dial: 'publicReputation', delta: -35 },
@@ -78,7 +78,7 @@ const CLEARED: Effect[] = [
     { kind: 'flag', flag: 'fbiCleared' },
     // Being cleared is not free either. Three quarters of lawyers and a year
     // of the phrase "under investigation" attached to your name.
-    { kind: 'capital', amount: -2_400_000 },
+    { kind: 'fine', severity: 'serious' },
     { kind: 'brand', amount: -9 },
     { kind: 'dial', dial: 'publicReputation', delta: 4 },
     {

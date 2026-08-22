@@ -152,7 +152,9 @@ describe('three doors, and only the third is the crime', () => {
         const legal = moleFirstContact.nodes.find(n => n.id === 'firstTierOnly')!;
         const buy = legal.choices!.find(c => c.text === 'Send an invoice.')!;
         const effects = buy.effects!;
-        expect(effects.some(e => e.kind === 'capital')).toBe(true);
+        // Priced as a share of capital now rather than a flat eighty
+        // thousand - see core/story/fines.ts.
+        expect(effects.some(e => e.kind === 'fine')).toBe(true);
         expect(effects.some(e => e.kind === 'brand' && (e as any).amount > 0)).toBe(true);
         // And it is not a crime: nothing here can lead to the letter.
         expect(effects.some(e => e.kind === 'flag' && (e as any).flag === 'moleRepeated')).toBe(false);

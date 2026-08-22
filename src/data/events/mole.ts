@@ -181,7 +181,7 @@ export const moleFirstContact: Conversation = {
                 {
                     text: 'Send an invoice.',
                     effects: [
-                        { kind: 'capital', amount: -80_000 },
+                        { kind: 'fine', severity: 'minor' },
                         { kind: 'flag', flag: 'moleEngaged' },
                         { kind: 'brand', amount: 9 },
                     ],
@@ -309,7 +309,7 @@ export const moleOffer: Conversation = {
                 {
                     text: 'Pay it, and there will be more.',
                     effects: [
-                        { kind: 'capital', amount: -300_000 },
+                        { kind: 'fine', severity: 'minor' },
                         { kind: 'flag', flag: 'moleEngaged' },
                         { kind: 'flag', flag: 'moleRepeated' },
                         { kind: 'brand', amount: 39 },
