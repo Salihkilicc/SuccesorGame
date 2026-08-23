@@ -111,3 +111,71 @@ describe('and each sheet can be a screen', () => {
         expect(src).toMatch(/asScreen/);
     });
 });
+
+// ============================================================================
+//  AND NO TWO ROUTES SHARE A NAME
+// ============================================================================
+//
+//  React Navigation said this on every launch:
+//
+//      Found screens with the same name nested inside one another.
+//      Check: Home, Home > Home
+//
+//  RootStack's `Home` owns the swipe navigator, and the swipe navigator had a
+//  `Home` inside it, so every `navigate('Home')` in the app resolved to
+//  whichever the caller happened to be nearest.
+//
+//  It had already cost one bug and was quietly costing a second.
+//  jumpToCompany.ts exists because a navigate to the route you are already on
+//  never reaches the child navigator; the bar's HOME button had the same fault
+//  the other way round and nobody noticed, because Home is where people start.
+// ============================================================================
+describe('the route names', () => {
+    const routeNames = (text: string): string[] =>
+        [...text.matchAll(/<\w+\.Screen\s+name="(\w+)"/g)].map(m => m[1]);
+
+    it('never put a route inside a route of the same name', () => {
+        // The rule React Navigation actually enforces, and the only kind of
+        // duplicate that breaks a `navigate`: a name resolving to two places,
+        // one nested in the other, so the answer depends on where the caller
+        // happens to be sitting.
+        //
+        // Duplicates across SIBLING branches are a different thing and this
+        // file does not claim to police them - `DNA` exists in RootStack and
+        // in the shelved LifeStack, which is untidy and is not this bug.
+        const hosts = [...nav().matchAll(
+            /<RootStack\.Screen\s+name="(\w+)"\s+component=\{(\w+)\}/g,
+        )].map(m => ({ route: m[1], component: m[2] }));
+
+        const swipeHost = hosts.find(h => h.component === 'SwipeNavigator');
+        expect(swipeHost).toBeDefined();
+
+        const inside = [...nav().matchAll(/<SwipeTab\.Screen\s+name="(\w+)"/g)]
+            .map(m => m[1]);
+        expect(inside).not.toContain(swipeHost!.route);
+    });
+
+    it('so the swipe tab is not called Home', () => {
+        // The container route keeps the name, because a dozen callers say
+        // `navigate('Home')` meaning "go back to the home area" and that is
+        // what they get. The inner one is what moved.
+        expect(nav()).toContain('name="Dashboard"');
+        expect(nav()).toMatch(/SwipeTabParamList[\s\S]{0,300}Dashboard: undefined/);
+        expect(nav()).not.toMatch(/SwipeTab\.Screen\s+name="Home"/);
+    });
+
+    it('and the bar addresses the tab rather than the stack', () => {
+        const bar = code('navigation', 'components', 'CrystalNavBar.tsx');
+        expect(bar).toMatch(/jumpToTab\(rootNavigationRef, 'Dashboard'\)/);
+        // The generic fall-through was what did nothing from another tab.
+        expect(bar).not.toMatch(/screen === 'Home'[\s\S]{0,80}navigation\.navigate\('Home'\)/);
+    });
+
+    it('while the helper is about tabs rather than about one tab', () => {
+        // The bug it documents is a fact about every tab in the swipe
+        // navigator, not about My Company.
+        const helper = code('navigation', 'jumpToCompany.ts');
+        expect(helper).toContain('export const jumpToTab');
+        expect(helper).toMatch(/jumpToCompany[\s\S]{0,200}jumpToTab\(ref, 'MyCompany'\)/);
+    });
+});

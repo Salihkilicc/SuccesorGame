@@ -113,6 +113,11 @@ const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
     // relationship system lives inside Profile now - see the note on
     // LoveScreen.tsx - so those routes no longer exist and Profile already
     // maps to 'Life' above.
+    //
+    // `Dashboard` reaches this line and that is deliberate rather than an
+    // omission: the swipe tab was renamed to end the `Home > Home` collision
+    // (see the note above SwipeTabParamList) and the BAR still calls its
+    // highlight 'Home', because that is the word on the button.
     return 'Home';
 };
 
@@ -406,16 +411,42 @@ const MainTabs = () => (
 
 const SwipeTab = createMaterialTopTabNavigator();
 
+// ============================================================================
+//  THE TAB IS `Dashboard`, NOT `Home`, AND THE RENAME IS THE FIX
+// ============================================================================
+//
+//  React Navigation said this on every launch:
+//
+//      Found screens with the same name nested inside one another.
+//      Check: Home, Home > Home
+//
+//  RootStack's `Home` owns this navigator, and this navigator had a `Home`
+//  inside it. So every `navigate('Home')` in the app - and there are a dozen -
+//  resolved to whichever of the two the caller happened to be nearest, which
+//  is not a thing anybody wrote down or could reason about.
+//
+//  It had already cost one bug. navigation/jumpToCompany.ts exists because
+//  `navigate('Home', { screen: 'MyCompany' })` does nothing when RootStack is
+//  already on Home, and the bar's HOME button had the same fault the other way
+//  round: pressing it from the Company tab called `navigate('Home')`, RootStack
+//  was already there, and the swipe navigator never heard about it. Unreported
+//  because Home is where people start, so the button is usually pressed when
+//  it is already correct.
+//
+//  Renaming the INNER one leaves every `navigate('Home')` meaning what its
+//  author meant - go back to the home area - and unambiguously so. The bar
+//  addresses the tab directly, through the same helper My Company uses.
+// ============================================================================
 export type SwipeTabParamList = {
   Life: undefined;
-  Home: undefined;
+  Dashboard: undefined;
   Underworld: undefined;
   MyCompany: undefined;
 };
 
 const SwipeNavigator = () => (
   <SwipeTab.Navigator
-    initialRouteName="Home"
+    initialRouteName="Dashboard"
     tabBarPosition="top"
     screenOptions={{
       tabBarStyle: { display: 'none' },
@@ -426,7 +457,7 @@ const SwipeNavigator = () => (
   >
     {/* --- RAFA KALDIRILDI: lifestyle hub'ı --- */}
     {FEATURES.life ? <SwipeTab.Screen name="Life" component={LifeScreen} /> : null}
-    <SwipeTab.Screen name="Home" component={HomeScreen} />
+    <SwipeTab.Screen name="Dashboard" component={HomeScreen} />
     {/* --- RAFA KALDIRILDI: underworld hub'ı --- */}
     {FEATURES.underworld ? <SwipeTab.Screen name="Underworld" component={UnderworldScreen} /> : null}
     <SwipeTab.Screen name="MyCompany" component={MyCompanyScreen} />

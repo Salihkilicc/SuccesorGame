@@ -46,18 +46,35 @@ import { CommonActions, type NavigationContainerRef } from '@react-navigation/na
 /** The RootStack route that owns the swipe navigator. */
 const HOST = 'Home';
 
-/** The screen inside it. */
-const TARGET = 'MyCompany';
-
 /**
- * Put My Company on screen, from anywhere.
+ * Put one of the swipe tabs on screen, from anywhere.
+ *
+ * ---------------------------------------------------------------------------
+ *  THIS WAS ONLY EVER ABOUT MY COMPANY, AND IT SHOULD NOT HAVE BEEN
+ * ---------------------------------------------------------------------------
+ *  The bug this file documents - a navigate to the route you are already on
+ *  never reaches the child navigator - is not a fact about My Company. It is a
+ *  fact about every tab in the swipe navigator, and the bar's Home button had
+ *  it too: pressing Home while on the Company tab called `navigate('Home')`,
+ *  RootStack was already there, and nothing happened.
+ *
+ *  It went unreported because Home is where people start, so the button is
+ *  usually pressed when it is already correct. React Navigation was saying it
+ *  out loud the whole time:
+ *
+ *      Found screens with the same name nested inside one another.
+ *      Check: Home, Home > Home
+ *
+ *  Two routes named Home, one inside the other, and every `navigate('Home')`
+ *  in the app resolving to whichever the caller happened to be nearest.
  *
  * Takes the container ref rather than a screen's `navigation`, because the bar
  * is rendered outside every screen - once, at the root - and the whole point
  * is not to care which navigator the caller happens to be sitting in.
  */
-export const jumpToCompany = (
+export const jumpToTab = (
     ref: Pick<NavigationContainerRef<any>, 'isReady' | 'getRootState' | 'dispatch'>,
+    tab: string,
 ): boolean => {
     if (!ref.isReady?.()) return false;
 
@@ -68,17 +85,22 @@ export const jumpToCompany = (
 
         if (key) {
             // Aimed at the swipe navigator itself. RootStack is not consulted,
-            // so being already on Home cannot swallow it.
-            ref.dispatch({ ...CommonActions.navigate(TARGET), target: key });
+            // so being already on its Home route cannot swallow it.
+            ref.dispatch({ ...CommonActions.navigate(tab), target: key });
             return true;
         }
 
         // Not mounted yet, so there is nothing to aim at. Send the stack, and
         // the nested action rides along.
-        ref.dispatch(CommonActions.navigate(HOST, { screen: TARGET }));
+        ref.dispatch(CommonActions.navigate(HOST, { screen: tab }));
         return true;
     } catch {
         // The bar is on every screen in the game. It does not get to throw.
         return false;
     }
 };
+
+/** The original caller, kept so the bar reads as what it does. */
+export const jumpToCompany = (
+    ref: Pick<NavigationContainerRef<any>, 'isReady' | 'getRootState' | 'dispatch'>,
+): boolean => jumpToTab(ref, 'MyCompany');

@@ -6,7 +6,7 @@ import { BlurView } from '@react-native-community/blur';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
-import { jumpToCompany } from '../jumpToCompany';
+import { jumpToCompany, jumpToTab } from '../jumpToCompany';
 import { rootNavigationRef } from '../navigationRef';
 import { useStatsStore, usePlayerStore } from '../../core/store';
 import { FEATURES } from '../../core/featureFlags';
@@ -123,6 +123,24 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
             //  navigator by key instead, so RootStack is never asked.
             // ------------------------------------------------------------------
             jumpToCompany(rootNavigationRef);
+        } else if (screen === 'Home') {
+            // ------------------------------------------------------------------
+            //  AND HOME HAS THE SAME FAULT, IN THE OTHER DIRECTION
+            // ------------------------------------------------------------------
+            //  SHELVED: it fell through to `navigation.navigate('Home')`.
+            //
+            //  Which did nothing when the player was on another swipe tab,
+            //  for exactly the reason above: RootStack is already on its Home
+            //  route, and a navigate to the route you are already on never
+            //  reaches the child navigator. Pressing HOME from My Company
+            //  left you on My Company.
+            //
+            //  It went unreported because Home is where people start, so the
+            //  button is usually pressed when it is already correct. The tab
+            //  is `Dashboard` now - see the note in RootNavigator - and it is
+            //  addressed the same way My Company is.
+            // ------------------------------------------------------------------
+            jumpToTab(rootNavigationRef, 'Dashboard');
         } else if (screen === 'Contacts') {
             // The item above is shelved so nothing reaches this, and the
             // route it navigated to no longer exists. Left as a guard rather
