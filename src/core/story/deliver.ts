@@ -319,13 +319,33 @@ export const runInbox = (
     // ------------------------------------------------------------------
     const quiet = forceQuiet ?? (Math.random() < QUIET_QUARTER_CHANCE);
 
+    // ------------------------------------------------------------------
+    //  TWO REASONS A SCENE DOES NOT ARRIVE, AND THEY ARE NOT THE SAME
+    // ------------------------------------------------------------------
+    //  ITS OWN GATE is shut: a condolence before anybody has died. That is
+    //  what `expiresAfter` was written for - wait a while, then accept that
+    //  it has stopped making sense.
+    //
+    //  THE QUARTER IS QUIET: the pacing system asking for silence, which it
+    //  does three times in four. Nothing about the scene is wrong.
+    //
+    //  Both used to come back as one `false`, so the second was counted as
+    //  the first and every queued message aged on quarters it was never
+    //  offered on. See the note on `isHushed` in inbox.ts for what that did.
+    // ------------------------------------------------------------------
+    const hushed = (p: Pending): boolean => {
+        const c = conversationById(p.conversationId);
+        if (!c) return false;
+        const isOpeningOrUrgent = p.urgent || OPENING_ACT.includes(p.conversationId as any);
+        return quiet && !isOpeningOrUrgent && c.channel === 'message';
+    };
+
     const canDeliver = (p: Pending): boolean => {
         const c = conversationById(p.conversationId);
         // A queued conversation that no longer exists - a scene renamed or
         // removed between versions - is dropped rather than retried forever.
         if (!c) return false;
-        const isOpeningOrUrgent = p.urgent || OPENING_ACT.includes(p.conversationId as any);
-        if (quiet && !isOpeningOrUrgent && c.channel === 'message') return false;
+        if (hushed(p)) return false;
         return testAll(c.when, world);
     };
 
@@ -365,7 +385,7 @@ export const runInbox = (
     };
 
     const { deliver: due, keep, expired } =
-        drain(story.pending, quarter, canDeliver, undefined, senderOf);
+        drain(story.pending, quarter, canDeliver, undefined, senderOf, hushed);
 
     // ------------------------------------------------------------------
     //  ONE COPY PER DRAIN

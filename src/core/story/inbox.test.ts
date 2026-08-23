@@ -152,3 +152,78 @@ describe('nextPriority', () => {
         expect(nextPriority(existing, 5)).toBe(0);
     });
 });
+
+// ============================================================================
+//  AND A QUIET QUARTER IS NOT A CLOSED GATE
+// ============================================================================
+//
+//  Found in a device log:
+//
+//      [story] expired without ever being deliverable:
+//              event-tech-lab-breakthrough
+//
+//  Its gate is a dead father and the twelfth quarter, both true since the
+//  twelfth quarter. Nothing was wrong with the scene.
+//
+//  What expired it was `QUIET_QUARTER_CHANCE`, which silences non-urgent
+//  MESSAGES three times in four. That came back from `canDeliver` as the same
+//  `false` a shut gate does, so the expiry clock ran on quarters the scene was
+//  never offered on - and a scene with four quarters of patience got about one
+//  real chance at being sent.
+//
+//  `expiresAfter` means what its own note says: give up after this many
+//  quarters of being undeliverable, where undeliverable is about the SCENE.
+// ============================================================================
+describe('a quiet quarter', () => {
+    const hushed = () => true;
+
+    it('does not spend the scene\'s patience', () => {
+        const r = drain(
+            [item({ conversationId: 'lab', queuedAtQuarter: 1, expiresAfter: 2 })],
+            9, never, undefined, undefined, hushed);
+        expect(r.expired).toEqual([]);
+        expect(ids(r.keep)).toEqual(['lab']);
+    });
+
+    it('and moves the wait on, so it is silence rather than a pause', () => {
+        // Eight quarters past its expiry and it is still here, because none
+        // of those quarters counted.
+        const r = drain(
+            [item({ conversationId: 'lab', queuedAtQuarter: 1, expiresAfter: 2 })],
+            9, never, undefined, undefined, hushed);
+        expect(r.keep[0].queuedAtQuarter).toBe(2);
+    });
+
+    it('while a shut gate still spends it', () => {
+        // The case the expiry was written for is untouched: a condolence
+        // eleven quarters after the funeral should not appear.
+        const r = drain(
+            [item({ conversationId: 'condolence', queuedAtQuarter: 1, expiresAfter: 2 })],
+            5, never, undefined, undefined, () => false);
+        expect(ids(r.expired)).toEqual(['condolence']);
+    });
+
+    it('and nothing changes when the caller does not say', () => {
+        // The parameter is optional, so every existing caller behaves as it
+        // did - which is what the four tests above this block assert.
+        const r = drain(
+            [item({ conversationId: 'condolence', queuedAtQuarter: 1, expiresAfter: 2 })],
+            5, never);
+        expect(ids(r.expired)).toEqual(['condolence']);
+    });
+});
+
+// ============================================================================
+//  AND THE DELIVERER TELLS IT WHICH IS WHICH
+// ============================================================================
+describe('the caller', () => {
+    it('separates the quarter being quiet from the gate being shut', () => {
+        const fs = require('fs');
+        const path = require('path');
+        const src = fs.readFileSync(path.join(__dirname, 'deliver.ts'), 'utf8');
+        // The quiet rule moved out of canDeliver into its own predicate...
+        expect(src).toMatch(/const hushed = \(p: Pending\): boolean =>/);
+        // ...and both are handed to the queue.
+        expect(src).toMatch(/drain\(story\.pending, quarter, canDeliver, undefined, senderOf, hushed\)/);
+    });
+});

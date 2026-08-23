@@ -132,6 +132,30 @@ export const drain = (
      * below; omitted, the rule simply does not apply.
      */
     senderOf: (p: Pending) => string | undefined = () => undefined,
+    /**
+     * Was it the QUARTER that silenced it, rather than its own gate?
+     *
+     * ---------------------------------------------------------------------
+     *  THE QUIET QUARTER WAS BEING COUNTED AS A CLOSED GATE
+     * ---------------------------------------------------------------------
+     *  `expiresAfter` means what its own note says: give up after this many
+     *  quarters of being UNDELIVERABLE, where undeliverable means the scene's
+     *  own conditions are not met. A condolence nobody can be sent stops
+     *  making sense; that is the case it was written for.
+     *
+     *  But a quiet quarter is not that. It is the pacing system asking for
+     *  silence, and it fires three times in four - QUIET_QUARTER_CHANCE is
+     *  0.75. Every queued message aged during all of them, so a scene with
+     *  four quarters of patience got about one real chance at being sent.
+     *
+     *  Found in a device log: "expired without ever being deliverable:
+     *  event-tech-lab-breakthrough". Its gate is a dead father and the
+     *  twelfth quarter, both true since quarter twelve. Nothing was wrong
+     *  with the scene at all.
+     *
+     *  A hushed quarter keeps the entry and does not count against it.
+     */
+    isHushed: (p: Pending) => boolean = () => false,
 ): DrainResult => {
     const deliver: Pending[] = [];
     const keep: Pending[] = [];
@@ -171,6 +195,13 @@ export const drain = (
         if (p.dueQuarter > quarter) { keep.push(p); continue; }
 
         if (!canDeliver(p)) {
+            // Silenced by the quarter rather than by its own gate. Kept with
+            // its wait moved on, which is the whole of "this one did not
+            // count" - `queuedAtQuarter` is read nowhere else.
+            if (isHushed(p)) {
+                keep.push({ ...p, queuedAtQuarter: p.queuedAtQuarter + 1 });
+                continue;
+            }
             const waited = quarter - p.queuedAtQuarter;
             if (p.expiresAfter !== undefined && waited > p.expiresAfter) expired.push(p);
             else keep.push(p);
